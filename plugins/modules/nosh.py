@@ -403,7 +403,7 @@ def handle_enabled(module, result, service_path):
             if not module.check_mode:
                 (rc, out, err) = run_sys_ctl(module, [action, service_path])
                 if rc != 0:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service_path, out + err))
+                    module.fail_json(msg=f"Unable to {action} service {service_path}: {out + err}")
             result['preset'] = not preset
             result['enabled'] = not enabled
 
@@ -420,7 +420,7 @@ def handle_enabled(module, result, service_path):
             if not module.check_mode:
                 (rc, out, err) = run_sys_ctl(module, [action, service_path])
                 if rc != 0:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service_path, out + err))
+                    module.fail_json(msg=f"Unable to {action} service {service_path}: {out + err}")
             result['enabled'] = not enabled
             result['preset'] = not preset
 
@@ -496,7 +496,7 @@ def handle_state(module, result, service_path):
         if not module.check_mode:
             (rc, out, err) = run_sys_ctl(module, [action, service_path])
             if rc != 0:
-                module.fail_json(msg="Unable to %s service %s: %s" % (action, service_path, err))
+                module.fail_json(msg=f"Unable to {action} service {service_path}: {err}")
 
 # ===========================================
 # Main control flow

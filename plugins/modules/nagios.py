@@ -455,7 +455,7 @@ class Nagios(object):
         if start is None:
             start = entry_time
 
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
+        hdr = f"[{entry_time}] {cmd};{host};"
         duration_s = (duration * 60)
         end = start + duration_s
 
@@ -474,7 +474,7 @@ class Nagios(object):
                        str(duration_s), author, comment]
 
         dt_arg_str = ";".join(dt_args)
-        dt_str = hdr + dt_arg_str + "\n"
+        dt_str = f"{hdr}{dt_arg_str}\n"
 
         return dt_str
 
@@ -497,7 +497,7 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
+        hdr = f"[{entry_time}] {cmd};{host};"
 
         if not author:
             author = self.author
@@ -512,7 +512,7 @@ class Nagios(object):
             ack_args = [str(sticky), str(notify), str(persistent), author, comment]
 
         ack_arg_str = ";".join(ack_args)
-        ack_str = hdr + ack_arg_str + "\n"
+        ack_str = f"{hdr}{ack_arg_str}\n"
 
         return ack_str
 
@@ -531,7 +531,7 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
+        hdr = f"[{entry_time}] {cmd};{host};"
 
         if comment is None:
             comment = self.comment
@@ -553,7 +553,7 @@ class Nagios(object):
             dt_del_args.append('')
 
         dt_del_arg_str = ";".join(dt_del_args)
-        dt_del_str = hdr + dt_del_arg_str + "\n"
+        dt_del_str = f"{hdr}{dt_del_arg_str}\n"
 
         return dt_del_str
 
@@ -570,7 +570,7 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
+        hdr = f"[{entry_time}] {cmd};{host};"
 
         if start is None:
             start = entry_time + 3
@@ -581,7 +581,7 @@ class Nagios(object):
             chk_args = [svc, str(start)]
 
         chk_arg_str = ";".join(chk_args)
-        chk_str = hdr + chk_arg_str + "\n"
+        chk_str = f"{hdr}{chk_arg_str}\n"
 
         return chk_str
 
@@ -599,12 +599,12 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        notif_str = "[%s] %s" % (entry_time, cmd)
+        notif_str = f"[{entry_time}] {cmd}"
         if host is not None:
-            notif_str += ";%s" % host
+            notif_str += f";{host}"
 
             if svc is not None:
-                notif_str += ";%s" % svc
+                notif_str += f";{svc}"
 
         notif_str += "\n"
 
@@ -1170,10 +1170,10 @@ class Nagios(object):
         You just have to provide the properly formatted command
         """
 
-        pre = '[%s]' % int(time.time())
+        pre = f'[{int(time.time())}]'
 
         post = '\n'
-        cmdstr = '%s %s%s' % (pre, cmd, post)
+        cmdstr = f'{pre} {cmd}{post}'
         self._write_command(cmdstr)
 
     def act(self):

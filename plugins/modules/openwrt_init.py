@@ -106,14 +106,14 @@ def main():
 
     # initialize
     service = module.params['name']
-    init_script = '/etc/init.d/' + service
+    init_script = f"/etc/init.d/{service}"
     result = {
         'name': service,
         'changed': False,
     }
     # check if service exists
     if not os.path.exists(init_script):
-        module.fail_json(msg='service %s does not exist' % service)
+        module.fail_json(msg=f'service {service} does not exist')
 
     # Enable/disable service startup at boot if requested
     if module.params['enabled'] is not None:
@@ -134,7 +134,7 @@ def main():
                 # command if the init script doesn't contain a STOP value, so we ignore the exit
                 # code and explicitly check if the service is now in the desired state
                 if is_enabled() != module.params['enabled']:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service, err))
+                    module.fail_json(msg=f"Unable to {action} service {service}: {err}")
 
             result['enabled'] = not enabled
 
@@ -179,7 +179,7 @@ def main():
             if not module.check_mode:
                 rc, dummy, err = module.run_command([init_script, action])
                 if rc != 0:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service, err))
+                    module.fail_json(msg=f"Unable to {action} service {service}: {err}")
 
     module.exit_json(**result)
 

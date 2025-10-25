@@ -160,7 +160,7 @@ class HostModule(OpenNebulaModule):
                                    self.get_parameter('cluster_id'))
             self.result['changed'] = True
         except Exception as e:
-            self.fail(msg="Could not allocate host, ERROR: " + str(e))
+            self.fail(msg=f"Could not allocate host, ERROR: {e}")
 
         return True
 
@@ -199,7 +199,7 @@ class HostModule(OpenNebulaModule):
                 host = self.get_host_by_name(host_name)
                 self.wait_for_host_state(host, [HOST_STATES.MONITORED])
             elif current_state in [HOST_STATES.ERROR, HOST_STATES.MONITORING_ERROR]:
-                self.fail(msg="invalid host state %s" % current_state_name)
+                self.fail(msg=f"invalid host state {current_state_name}")
 
         elif desired_state == 'enabled':
             if current_state == HOST_ABSENT:
@@ -215,7 +215,7 @@ class HostModule(OpenNebulaModule):
             elif current_state in [HOST_STATES.MONITORED]:
                 pass
             else:
-                self.fail(msg="unknown host state %s, cowardly refusing to change state to enable" % current_state_name)
+                self.fail(msg=f"unknown host state {current_state_name}, cowardly refusing to change state to enable")
 
         elif desired_state == 'disabled':
             if current_state == HOST_ABSENT:
@@ -226,12 +226,12 @@ class HostModule(OpenNebulaModule):
                     one.host.status(host.ID, HOST_STATUS.DISABLED)
                     result['changed'] = True
                 except Exception as e:
-                    self.fail(msg="Could not disable host, ERROR: " + str(e))
+                    self.fail(msg=f"Could not disable host, ERROR: {e}")
                 self.wait_for_host_state(host, [HOST_STATES.DISABLED])
             elif current_state in [HOST_STATES.DISABLED]:
                 pass
             else:
-                self.fail(msg="unknown host state %s, cowardly refusing to change state to disable" % current_state_name)
+                self.fail(msg=f"unknown host state {current_state_name}, cowardly refusing to change state to disable")
 
         elif desired_state == 'offline':
             if current_state == HOST_ABSENT:
@@ -242,12 +242,12 @@ class HostModule(OpenNebulaModule):
                     one.host.status(host.ID, HOST_STATUS.OFFLINE)
                     result['changed'] = True
                 except Exception as e:
-                    self.fail(msg="Could not set host offline, ERROR: " + str(e))
+                    self.fail(msg=f"Could not set host offline, ERROR: {e}")
                 self.wait_for_host_state(host, [HOST_STATES.OFFLINE])
             elif current_state in [HOST_STATES.OFFLINE]:
                 pass
             else:
-                self.fail(msg="unknown host state %s, cowardly refusing to change state to offline" % current_state_name)
+                self.fail(msg=f"unknown host state {current_state_name}, cowardly refusing to change state to offline")
 
         elif desired_state == 'absent':
             if current_state != HOST_ABSENT:
@@ -256,7 +256,7 @@ class HostModule(OpenNebulaModule):
                     one.host.delete(host.ID)
                     result['changed'] = True
                 except Exception as e:
-                    self.fail(msg="Could not delete host from cluster, ERROR: " + str(e))
+                    self.fail(msg=f"Could not delete host from cluster, ERROR: {e}")
 
         # if we reach this point we can assume that the host was taken to the desired state
 
@@ -279,7 +279,7 @@ class HostModule(OpenNebulaModule):
                     one.host.update(host.ID, desired_template_changes, 1)
                     result['changed'] = True
                 except Exception as e:
-                    self.fail(msg="Failed to update the host template, ERROR: " + str(e))
+                    self.fail(msg=f"Failed to update the host template, ERROR: {e}")
 
             # the cluster
             if host.CLUSTER_ID != self.get_parameter('cluster_id'):
@@ -288,7 +288,7 @@ class HostModule(OpenNebulaModule):
                     one.cluster.addhost(self.get_parameter('cluster_id'), host.ID)
                     result['changed'] = True
                 except Exception as e:
-                    self.fail(msg="Failed to update the host cluster, ERROR: " + str(e))
+                    self.fail(msg=f"Failed to update the host cluster, ERROR: {e}")
 
         # return
         self.exit()

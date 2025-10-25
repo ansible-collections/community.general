@@ -205,30 +205,30 @@ class OSXDefaults(object):
                 return True
             elif value in [False, 0, "false", "0", "no"]:
                 return False
-            raise OSXDefaultsException("Invalid boolean value: {0}".format(repr(value)))
+            raise OSXDefaultsException(f"Invalid boolean value: {value!r}")
         elif data_type == "date":
             try:
                 return datetime.strptime(value.split("+")[0].strip(), "%Y-%m-%d %H:%M:%S")
             except ValueError:
                 raise OSXDefaultsException(
-                    "Invalid date value: {0}. Required format yyy-mm-dd hh:mm:ss.".format(repr(value))
+                    f"Invalid date value: {value!r}. Required format yyy-mm-dd hh:mm:ss."
                 )
         elif data_type in ["int", "integer"]:
             if not OSXDefaults.is_int(value):
-                raise OSXDefaultsException("Invalid integer value: {0}".format(repr(value)))
+                raise OSXDefaultsException(f"Invalid integer value: {value!r}")
             return int(value)
         elif data_type == "float":
             try:
                 value = float(value)
             except ValueError:
-                raise OSXDefaultsException("Invalid float value: {0}".format(repr(value)))
+                raise OSXDefaultsException(f"Invalid float value: {value!r}")
             return value
         elif data_type == "array":
             if not isinstance(value, list):
                 raise OSXDefaultsException("Invalid value. Expected value to be an array")
             return value
 
-        raise OSXDefaultsException('Type is not supported: {0}'.format(data_type))
+        raise OSXDefaultsException(f'Type is not supported: {data_type}')
 
     def _host_args(self):
         """ Returns a normalized list of commandline arguments based on the "host" attribute """
@@ -272,7 +272,7 @@ class OSXDefaults(object):
 
         # If the RC is not 0, then terrible happened! Ooooh nooo!
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while reading key type from defaults: %s" % err)
+            raise OSXDefaultsException(f"An error occurred while reading key type from defaults: {err}")
 
         # Ok, lets parse the type from output
         data_type = out.strip().replace('Type is ', '')
@@ -285,7 +285,7 @@ class OSXDefaults(object):
 
         # A non zero RC at this point is kinda strange...
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while reading key value from defaults: %s" % err)
+            raise OSXDefaultsException(f"An error occurred while reading key value from defaults: {err}")
 
         # Convert string to list when type is array
         if data_type == "array":
@@ -319,17 +319,17 @@ class OSXDefaults(object):
         if not isinstance(value, list):
             value = [value]
 
-        rc, out, err = self.module.run_command(self._base_command() + ['write', self.domain, self.key, '-' + self.type] + value,
+        rc, out, err = self.module.run_command(self._base_command() + ['write', self.domain, self.key, f"-{self.type}"] + value,
                                                expand_user_and_vars=False)
 
         if rc != 0:
-            raise OSXDefaultsException('An error occurred while writing value to defaults: %s' % err)
+            raise OSXDefaultsException(f'An error occurred while writing value to defaults: {err}')
 
     def delete(self):
         """ Deletes defaults key from domain """
         rc, out, err = self.module.run_command(self._base_command() + ['delete', self.domain, self.key])
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while deleting key from defaults: %s" % err)
+            raise OSXDefaultsException(f"An error occurred while deleting key from defaults: {err}")
 
     # /commands ----------------------------------------------------------- }}}
 
@@ -357,7 +357,7 @@ class OSXDefaults(object):
         if self.check_type:
             value_type = type(self.value)
             if self.current_value is not None and not isinstance(self.current_value, value_type):
-                raise OSXDefaultsException("Type mismatch. Type in defaults: %s" % type(self.current_value).__name__)
+                raise OSXDefaultsException(f"Type mismatch. Type in defaults: {type(self.current_value).__name__}")
 
         # Current value matches the given value. Nothing need to be done. Arrays need extra care
         if self.type == "array" and self.current_value is not None and not self.array_add and \

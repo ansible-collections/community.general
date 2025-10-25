@@ -157,7 +157,6 @@ import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
@@ -183,7 +182,7 @@ class Npm(object):
             self.executable = [module.get_bin_path('npm', True)]
 
         if kwargs['version'] and kwargs['state'] != 'absent':
-            self.name_version = self.name + '@' + str(kwargs['version'])
+            self.name_version = f"{self.name}@{kwargs['version']}"
         else:
             self.name_version = self.name
 
@@ -212,7 +211,7 @@ class Npm(object):
                 if not os.path.exists(self.path):
                     os.makedirs(self.path)
                 if not os.path.isdir(self.path):
-                    self.module.fail_json(msg="path %s is not a directory" % self.path)
+                    self.module.fail_json(msg=f"path {self.path} is not a directory")
                 cwd = self.path
 
             params = dict(self.module.params)
@@ -239,7 +238,7 @@ class Npm(object):
         try:
             data = json.loads(self._exec(cmd, True, False, False) or '{}')
         except (getattr(json, 'JSONDecodeError', ValueError)) as e:
-            self.module.fail_json(msg="Failed to parse NPM output with error %s" % to_native(e))
+            self.module.fail_json(msg=f"Failed to parse NPM output with error {e}")
         if 'dependencies' in data:
             for dep, props in data['dependencies'].items():
 
@@ -250,7 +249,7 @@ class Npm(object):
                 else:
                     installed.append(dep)
                     if 'version' in props and props['version']:
-                        dep_version = dep + '@' + str(props['version'])
+                        dep_version = f"{dep}@{props['version']}"
                         installed.append(dep_version)
             if self.name_version and self.name_version not in installed:
                 missing.append(self.name)

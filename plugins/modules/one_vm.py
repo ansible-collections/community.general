@@ -708,12 +708,12 @@ def check_updateconf(module, to_check):
     '''Checks if attributes are compatible with one.vm.updateconf API call.'''
     for attr, subattributes in to_check.items():
         if attr not in UPDATECONF_ATTRIBUTES:
-            module.fail_json(msg="'{0:}' is not a valid VM attribute.".format(attr))
+            module.fail_json(msg=f"'{attr}' is not a valid VM attribute.")
         if not UPDATECONF_ATTRIBUTES[attr]:
             continue
         for subattr in subattributes:
             if subattr not in UPDATECONF_ATTRIBUTES[attr]:
-                module.fail_json(msg="'{0:}' is not a valid VM subattribute of '{1:}'".format(subattr, attr))
+                module.fail_json(msg=f"'{subattr}' is not a valid VM subattribute of '{attr}'")
 
 
 def parse_updateconf(vm_template):
@@ -749,7 +749,7 @@ def get_template(module, client, predicate):
     if found == 0:
         return None
     elif found > 1:
-        module.fail_json(msg='There are more templates with name: ' + template_name)
+        module.fail_json(msg=f"There are more templates with name: {template_name}")
     return found_template
 
 
@@ -784,7 +784,7 @@ def get_datastore(module, client, predicate):
     if found == 0:
         return None
     elif found > 1:
-        module.fail_json(msg='There are more datastores with name: ' + datastore_name)
+        module.fail_json(msg=f"There are more datastores with name: {datastore_name}")
     return found_datastore
 
 
@@ -818,7 +818,7 @@ def get_vms_by_ids(module, client, state, ids):
     for vm_id in ids:
         vm = get_vm_by_id(client, vm_id)
         if vm is None and state != 'absent':
-            module.fail_json(msg='There is no VM with id=' + str(vm_id))
+            module.fail_json(msg=f"There is no VM with id={vm_id}")
         vms.append(vm)
 
     return vms
@@ -834,9 +834,9 @@ def get_vm_info(client, vm):
     if 'DISK' in vm.TEMPLATE:
         if isinstance(vm.TEMPLATE['DISK'], list):
             for disk in vm.TEMPLATE['DISK']:
-                disk_size.append(disk['SIZE'] + ' MB')
+                disk_size.append(f"{disk['SIZE']} MB")
         else:
-            disk_size.append(vm.TEMPLATE['DISK']['SIZE'] + ' MB')
+            disk_size.append(f"{vm.TEMPLATE['DISK']['SIZE']} MB")
 
     if 'NIC' in vm.TEMPLATE:
         if isinstance(vm.TEMPLATE['NIC'], list):
@@ -884,7 +884,7 @@ def get_vm_info(client, vm):
         'owner_id': vm.UID,
         'networks': networks_info,
         'disk_size': disk_size,
-        'memory': vm.TEMPLATE['MEMORY'] + ' MB',
+        'memory': f"{vm.TEMPLATE['MEMORY']} MB",
         'vcpu': vm.TEMPLATE['VCPU'],
         'cpu': vm.TEMPLATE['CPU'],
         'group_name': vm.GNAME,
@@ -988,7 +988,7 @@ def get_size_in_MB(module, size_str):
     symbol = s.strip()
 
     if symbol not in SYMBOLS:
-        module.fail_json(msg="Cannot interpret %r %r %d" % (init, symbol, num))
+        module.fail_json(msg=f"Cannot interpret {init!r} {symbol!r} {num}")
 
     prefix = {'B': 1}
 
@@ -1012,7 +1012,7 @@ def create_vm(module, client, template_id, attributes_dict, labels_list, disk_si
         size_count = len(flatten(disk_size))
         # check if the number of disks is correct
         if disk_count != size_count:
-            module.fail_json(msg='This template has ' + str(disk_count) + ' disks but you defined ' + str(size_count))
+            module.fail_json(msg=f"This template has {disk_count} disks but you defined {size_count}")
 
     vm_extra_template = dict_merge(template or {}, attributes_dict or {})
     vm_extra_template = dict_merge(vm_extra_template, {
@@ -1241,7 +1241,7 @@ def wait_for_state(module, client, vm, wait_timeout, state_predicate):
             return vm
         elif state not in [VM_STATES.index('INIT'), VM_STATES.index('PENDING'), VM_STATES.index('HOLD'),
                            VM_STATES.index('ACTIVE'), VM_STATES.index('CLONING'), VM_STATES.index('POWEROFF')]:
-            module.fail_json(msg='Action is unsuccessful. VM state: ' + VM_STATES[state])
+            module.fail_json(msg=f"Action is unsuccessful. VM state: {VM_STATES[state]}")
 
         time.sleep(1)
 
@@ -1351,8 +1351,8 @@ def resume_vm(module, client, vm):
 
     lcm_state = vm.LCM_STATE
     if lcm_state == LCM_STATES.index('SHUTDOWN_POWEROFF'):
-        module.fail_json(msg="Cannot perform action 'resume' because this action is not available " +
-                         "for LCM_STATE: 'SHUTDOWN_POWEROFF'. Wait for the VM to shutdown properly")
+        module.fail_json(msg="Cannot perform action 'resume' because this action is not available "
+                             "for LCM_STATE: 'SHUTDOWN_POWEROFF'. Wait for the VM to shutdown properly")
     if lcm_state not in [LCM_STATES.index('RUNNING')]:
         changed = True
 
@@ -1377,8 +1377,8 @@ def release_vm(module, client, vm):
 
     state = vm.STATE
     if state != VM_STATES.index('HOLD'):
-        module.fail_json(msg="Cannot perform action 'release' because this action is not available " +
-                         "because VM is not in state 'HOLD'.")
+        module.fail_json(msg="Cannot perform action 'release' because this action is not available "
+                             "because VM is not in state 'HOLD'.")
     else:
         changed = True
 
@@ -1392,8 +1392,8 @@ def check_name_attribute(module, attributes):
     if attributes.get("NAME"):
         import re
         if re.match(r'^[^#]+#*$', attributes.get("NAME")) is None:
-            module.fail_json(msg="Illegal 'NAME' attribute: '" + attributes.get("NAME") +
-                             "' .Signs '#' are allowed only at the end of the name and the name cannot contain only '#'.")
+            module.fail_json(msg=f"Illegal 'NAME' attribute: '{attributes.get('NAME')}"
+                                 "' .Signs '#' are allowed only at the end of the name and the name cannot contain only '#'.")
 
 
 TEMPLATE_RESTRICTED_ATTRIBUTES = ["CPU", "VCPU", "OS", "FEATURES", "MEMORY", "DISK", "NIC", "INPUT", "GRAPHICS",
@@ -1404,7 +1404,7 @@ TEMPLATE_RESTRICTED_ATTRIBUTES = ["CPU", "VCPU", "OS", "FEATURES", "MEMORY", "DI
 def check_attributes(module, attributes):
     for key in attributes.keys():
         if key in TEMPLATE_RESTRICTED_ATTRIBUTES:
-            module.fail_json(msg='Restricted attribute `' + key + '` cannot be used when filtering VMs.')
+            module.fail_json(msg=f"Restricted attribute `{key}` cannot be used when filtering VMs.")
     # Check the format of the name attribute
     check_name_attribute(module, attributes)
 
@@ -1452,9 +1452,9 @@ def get_connection_info(module):
                 username = authstring.split(":")[0]
                 password = authstring.split(":")[1]
             except (OSError, IOError):
-                module.fail_json(msg=("Could not find or read ONE_AUTH file at '%s'" % authfile))
+                module.fail_json(msg=f"Could not find or read ONE_AUTH file at '{authfile}'")
             except Exception:
-                module.fail_json(msg=("Error occurs when read ONE_AUTH file at '%s'" % authfile))
+                module.fail_json(msg=f"Error occurs when read ONE_AUTH file at '{authfile}'")
     if not url:
         module.fail_json(msg="Opennebula API url (api_url) is not specified")
     from collections import namedtuple
@@ -1558,7 +1558,7 @@ def main():
     if not (auth.username and auth.password):
         module.warn("Credentials missing")
     else:
-        one_client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
+        one_client = pyone.OneServer(auth.url, session=f"{auth.username}:{auth.password}")
 
     if attributes:
         attributes = {key.upper(): value for key, value in attributes.items()}
@@ -1585,9 +1585,9 @@ def main():
         template_id = get_template_id(module, one_client, requested_template_id, requested_template_name)
         if template_id is None:
             if requested_template_id is not None:
-                module.fail_json(msg='There is no template with template_id: ' + str(requested_template_id))
+                module.fail_json(msg=f"There is no template with template_id: {requested_template_id}")
             elif requested_template_name:
-                module.fail_json(msg="There is no template with name: " + requested_template_name)
+                module.fail_json(msg=f"There is no template with name: {requested_template_name}")
 
     # Fetch datastore
     datastore_id = None
@@ -1595,11 +1595,11 @@ def main():
         datastore_id = get_datastore_id(module, one_client, requested_datastore_id, requested_datastore_name)
         if datastore_id is None:
             if requested_datastore_id:
-                module.fail_json(msg='There is no datastore with datastore_id: ' + str(requested_datastore_id))
+                module.fail_json(msg=f"There is no datastore with datastore_id: {requested_datastore_id}")
             elif requested_datastore_name:
-                module.fail_json(msg="There is no datastore with name: " + requested_datastore_name)
+                module.fail_json(msg=f"There is no datastore with name: {requested_datastore_name}")
         else:
-            attributes['SCHED_DS_REQUIREMENTS'] = 'ID=' + str(datastore_id)
+            attributes['SCHED_DS_REQUIREMENTS'] = f"ID={datastore_id}"
 
     if exact_count and template_id is None:
         module.fail_json(msg='Option `exact_count` needs template_id or template_name')

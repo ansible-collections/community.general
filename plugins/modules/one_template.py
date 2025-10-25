@@ -199,7 +199,7 @@ class TemplateModule(OpenNebulaModule):
         needs_creation = False
         if not template and desired_state != 'absent':
             if id:
-                module.fail_json(msg="There is no template with id=" + str(id))
+                module.fail_json(msg=f"There is no template with id={id}")
             else:
                 needs_creation = True
 
@@ -254,7 +254,7 @@ class TemplateModule(OpenNebulaModule):
 
     def create_template(self, name, template_data, filter):
         if not self.module.check_mode:
-            self.one.template.allocate("NAME = \"" + name + "\"\n" + template_data)
+            self.one.template.allocate(f'NAME = "{name}"\n{template_data}')
 
         result = self.get_template_info(self.get_template_by_name(name, filter))
         result['changed'] = True

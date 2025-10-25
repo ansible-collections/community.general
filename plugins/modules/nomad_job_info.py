@@ -323,7 +323,7 @@ def run():
                     filter.append(job)
                     result = filter
             if not filter:
-                module.fail_json(msg="Couldn't find Job with id " + str(module.params.get('name')))
+                module.fail_json(msg=f"Couldn't find Job with id {module.params['name']}")
         except Exception as e:
             module.fail_json(msg=to_native(e))
 

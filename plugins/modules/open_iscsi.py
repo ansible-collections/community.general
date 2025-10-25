@@ -190,7 +190,7 @@ def iscsi_get_cached_nodes(module, portal=None):
 
 
 def iscsi_discover(module, portal, port):
-    cmd = [iscsiadm_cmd, '--mode', 'discovery', '--type', 'sendtargets', '--portal', '%s:%s' % (portal, port)]
+    cmd = [iscsiadm_cmd, '--mode', 'discovery', '--type', 'sendtargets', '--portal', f'{portal}:{port}']
     module.run_command(cmd, check_rc=True)
 
 
@@ -213,7 +213,7 @@ def target_loggedon(module, target, portal=None, port=None):
         port = ""
 
     if rc == 0:
-        search_re = "%s:%s.*%s" % (re.escape(portal), port, re.escape(target))
+        search_re = f"{re.escape(portal)}:{port}.*{re.escape(target)}"
         return re.search(search_re, out) is not None
     elif rc == 21:
         return False
@@ -246,7 +246,7 @@ def target_login(module, target, check_rc, portal=None, port=None):
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
     if portal is not None and port is not None:
         cmd.append('--portal')
-        cmd.append('%s:%s' % (portal, port))
+        cmd.append(f'{portal}:{port}')
 
     rc, out, err = module.run_command(cmd, check_rc=check_rc)
     return rc
@@ -261,7 +261,7 @@ def target_device_node(target):
     # if anyone know a better way to find out which devicenodes get created for
     # a given target...
 
-    devices = glob.glob('/dev/disk/by-path/*%s*' % target)
+    devices = glob.glob(f'/dev/disk/by-path/*{target}*')
     devdisks = []
     for dev in devices:
         # exclude partitions
@@ -278,7 +278,7 @@ def target_isauto(module, target, portal=None, port=None):
 
     if portal is not None and port is not None:
         cmd.append('--portal')
-        cmd.append('%s:%s' % (portal, port))
+        cmd.append(f'{portal}:{port}')
 
     dummy, out, dummy = module.run_command(cmd, check_rc=True)
 
@@ -294,7 +294,7 @@ def target_setauto(module, target, portal=None, port=None):
 
     if portal is not None and port is not None:
         cmd.append('--portal')
-        cmd.append('%s:%s' % (portal, port))
+        cmd.append(f'{portal}:{port}')
 
     module.run_command(cmd, check_rc=True)
 
@@ -304,7 +304,7 @@ def target_setmanual(module, target, portal=None, port=None):
 
     if portal is not None and port is not None:
         cmd.append('--portal')
-        cmd.append('%s:%s' % (portal, port))
+        cmd.append(f'{portal}:{port}')
 
     module.run_command(cmd, check_rc=True)
 

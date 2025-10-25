@@ -128,15 +128,15 @@ def main():
 
     # Check that the instance exists
     try:
-        project = client.get('/cloud/project/{0}'.format(project_id))
+        project = client.get(f'/cloud/project/{project_id}')
     except ovh.exceptions.ResourceNotFoundError:
-        module.fail_json(msg='project {0} does not exist'.format(project_id))
+        module.fail_json(msg=f'project {project_id} does not exist')
 
     # Check that the instance exists
     try:
-        instance = client.get('/cloud/project/{0}/instance/{1}'.format(project_id, instance_id))
+        instance = client.get(f'/cloud/project/{project_id}/instance/{instance_id}')
     except ovh.exceptions.ResourceNotFoundError:
-        module.fail_json(msg='instance {0} does not exist in project {1}'.format(instance_id, project_id))
+        module.fail_json(msg=f'instance {instance_id} does not exist in project {project_id}')
 
     # Is monthlyBilling already enabled or pending ?
     if instance['monthlyBilling'] is not None:
@@ -147,10 +147,10 @@ def main():
         module.exit_json(changed=True, msg="Dry Run!")
 
     try:
-        ovh_billing_status = client.post('/cloud/project/{0}/instance/{1}/activeMonthlyBilling'.format(project_id, instance_id))
+        ovh_billing_status = client.post(f'/cloud/project/{project_id}/instance/{instance_id}/activeMonthlyBilling')
         module.exit_json(changed=True, ovh_billing_status=ovh_billing_status['monthlyBilling'])
     except APIError as apiError:
-        module.fail_json(changed=False, msg="Failed to call OVH API: {0}".format(apiError))
+        module.fail_json(changed=False, msg=f"Failed to call OVH API: {apiError}")
 
     # We should never reach here
     module.fail_json(msg='Internal ovh_monthly_billing module error')

@@ -178,7 +178,7 @@ class Opkg(StateModuleHelper):
     def _package_in_desired_state(self, name, want_installed, version=None):
         dummy, out, dummy = self.runner("state package").run(state="query", package=name)
 
-        has_package = out.startswith(name + " - %s" % ("" if not version else (version + " ")))
+        has_package = out.startswith(f"{name} - {'' if not version else f'{version} '}")
         return want_installed == has_package
 
     def state_present(self):
@@ -189,10 +189,10 @@ class Opkg(StateModuleHelper):
                     ctx.run(package=package)
                     self.vars.set("run_info", ctx.run_info, verbosity=4)
                     if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version):
-                        self.do_raise("failed to install %s" % package)
+                        self.do_raise(f"failed to install {package}")
                     self.vars.install_c += 1
         if self.vars.install_c > 0:
-            self.vars.msg = "installed %s package(s)" % self.vars.install_c
+            self.vars.msg = f"installed {self.vars.install_c} package(s)"
         else:
             self.vars.msg = "package(s) already present"
 
@@ -204,10 +204,10 @@ class Opkg(StateModuleHelper):
                     ctx.run(package=package)
                     self.vars.set("run_info", ctx.run_info, verbosity=4)
                     if not self._package_in_desired_state(package, want_installed=False):
-                        self.do_raise("failed to remove %s" % package)
+                        self.do_raise(f"failed to remove {package}")
                     self.vars.remove_c += 1
         if self.vars.remove_c > 0:
-            self.vars.msg = "removed %s package(s)" % self.vars.remove_c
+            self.vars.msg = f"removed {self.vars.remove_c} package(s)"
         else:
             self.vars.msg = "package(s) already absent"
 

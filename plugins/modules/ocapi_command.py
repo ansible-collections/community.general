@@ -208,17 +208,17 @@ def main():
     # timeout
     timeout = module.params['timeout']
 
-    base_uri = "https://" + module.params["baseuri"]
+    base_uri = f"https://{module.params['baseuri']}"
     proxy_slot_number = module.params.get("proxy_slot_number")
     ocapi_utils = OcapiUtils(creds, base_uri, proxy_slot_number, timeout, module)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}"))
 
     # Check that the command is valid
     if command not in CATEGORY_COMMANDS_ALL[category]:
-        module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (command, CATEGORY_COMMANDS_ALL[category])))
+        module.fail_json(msg=to_native(f"Invalid Command '{command}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}"))
 
     # Organize by Categories / Commands
     if category == "Chassis":
@@ -244,7 +244,7 @@ def main():
             job_name = module.params.get("job_name")
             if job_name is None:
                 module.fail_json("Missing job_name")
-            job_uri = urljoin(base_uri, "Jobs/" + job_name)
+            job_uri = urljoin(base_uri, f"Jobs/{job_name}")
             result = ocapi_utils.delete_job(job_uri)
 
     if result['ret'] is False:

@@ -423,9 +423,9 @@ class ImageModule(OpenNebulaModule):
                 self.result = self.create_image(name, template, datastore_id, wait_timeout)
             # Using 'if id:' doesn't work properly when id=0
             elif id is not None:
-                module.fail_json(msg="There is no image with id=" + str(id))
+                module.fail_json(msg=f"There is no image with id={id}")
             elif name is not None:
-                module.fail_json(msg="There is no image with name=" + name)
+                module.fail_json(msg=f"There is no image with name={name}")
 
         if desired_state == 'absent':
             self.result = self.delete_image(image, wait_timeout)
@@ -466,7 +466,7 @@ class ImageModule(OpenNebulaModule):
 
     def create_image(self, image_name, template, datastore_id, wait_timeout):
         if not self.module.check_mode:
-            image_id = self.one.image.allocate("NAME = \"" + image_name + "\"\n" + template, datastore_id)
+            image_id = self.one.image.allocate(f'NAME = "{image_name}"\n{template}', datastore_id)
             self.wait_for_ready(image_id, wait_timeout)
             image = self.get_image_by_id(image_id)
             result = self.get_image_info(image)
@@ -483,7 +483,7 @@ class ImageModule(OpenNebulaModule):
             state = image.STATE
 
             if state in [IMAGE_STATES.index('ERROR')]:
-                self.module.fail_json(msg="Got an ERROR state: " + image.TEMPLATE['ERROR'])
+                self.module.fail_json(msg=f"Got an ERROR state: {image.TEMPLATE['ERROR']}")
 
             if state in [IMAGE_STATES.index('READY')]:
                 return True
@@ -521,9 +521,9 @@ class ImageModule(OpenNebulaModule):
 
         if state not in [IMAGE_STATES.index('READY'), IMAGE_STATES.index('DISABLED'), IMAGE_STATES.index('ERROR')]:
             if enable:
-                self.module.fail_json(msg="Cannot enable " + IMAGE_STATES[state] + " image!")
+                self.module.fail_json(msg=f"Cannot enable {IMAGE_STATES[state]} image!")
             else:
-                self.module.fail_json(msg="Cannot disable " + IMAGE_STATES[state] + " image!")
+                self.module.fail_json(msg=f"Cannot disable {IMAGE_STATES[state]} image!")
 
         if ((enable and state != IMAGE_STATES.index('READY')) or
                 (not enable and state != IMAGE_STATES.index('DISABLED'))):
@@ -545,9 +545,9 @@ class ImageModule(OpenNebulaModule):
 
         if state not in [IMAGE_STATES.index('READY'), IMAGE_STATES.index('DISABLED'), IMAGE_STATES.index('ERROR')]:
             if enable:
-                self.module.fail_json(msg="Cannot enable persistence for " + IMAGE_STATES[state] + " image!")
+                self.module.fail_json(msg=f"Cannot enable persistence for {IMAGE_STATES[state]} image!")
             else:
-                self.module.fail_json(msg="Cannot disable persistence for " + IMAGE_STATES[state] + " image!")
+                self.module.fail_json(msg=f"Cannot disable persistence for {IMAGE_STATES[state]} image!")
 
         if ((enable and state != IMAGE_STATES.index('READY')) or
                 (not enable and state != IMAGE_STATES.index('DISABLED'))):
@@ -563,7 +563,7 @@ class ImageModule(OpenNebulaModule):
 
     def clone_image(self, image, new_name, wait_timeout):
         if new_name is None:
-            new_name = "Copy of " + image.NAME
+            new_name = f"Copy of {image.NAME}"
 
         tmp_image = self.get_image_by_name(new_name)
         if tmp_image:
@@ -595,7 +595,7 @@ class ImageModule(OpenNebulaModule):
 
         tmp_image = self.get_image_by_name(new_name)
         if tmp_image:
-            self.module.fail_json(msg="Name '" + new_name + "' is already taken by IMAGE with id=" + str(tmp_image.ID))
+            self.module.fail_json(msg=f"Name '{new_name}' is already taken by IMAGE with id={tmp_image.ID!s}")
 
         if not self.module.check_mode:
             self.one.image.rename(image.ID, new_name)
@@ -609,7 +609,7 @@ class ImageModule(OpenNebulaModule):
             return {'changed': False}
 
         if image.RUNNING_VMS > 0:
-            self.module.fail_json(msg="Cannot delete image. There are " + str(image.RUNNING_VMS) + " VMs using it.")
+            self.module.fail_json(msg=f"Cannot delete image. There are {image.RUNNING_VMS!s} VMs using it.")
 
         if not self.module.check_mode:
             self.one.image.delete(image.ID)

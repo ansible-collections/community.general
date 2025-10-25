@@ -327,7 +327,7 @@ class ImageInfoModule(OpenNebulaModule):
                     break
 
         if len(ids) > 0:
-            self.module.fail_json(msg='There is no IMAGE(s) with id(s)=' + ', '.join('{id}'.format(id=str(image_id)) for image_id in ids))
+            self.module.fail_json(msg=f"There is no IMAGE(s) with id(s)={', '.join(str(image_id) for image_id in ids)}")
 
         return images
 
@@ -354,7 +354,7 @@ class ImageInfoModule(OpenNebulaModule):
 
         # if the specific name is indicated
         if pattern is None and len(images) == 0:
-            self.module.fail_json(msg="There is no IMAGE with name=" + name_pattern)
+            self.module.fail_json(msg=f"There is no IMAGE with name={name_pattern}")
 
         return images
 

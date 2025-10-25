@@ -162,7 +162,7 @@ def create_public_ip(module, oneandone_conn):
         if datacenter_id is None:
             _check_mode(module, False)
             module.fail_json(
-                msg='datacenter %s not found.' % datacenter)
+                msg=f'datacenter {datacenter} not found.')
 
     try:
         _check_mode(module, True)
@@ -206,7 +206,7 @@ def update_public_ip(module, oneandone_conn):
     if public_ip is None:
         _check_mode(module, False)
         module.fail_json(
-            msg='public IP %s not found.' % public_ip_id)
+            msg=f'public IP {public_ip_id} not found.')
 
     try:
         _check_mode(module, True)
@@ -245,7 +245,7 @@ def delete_public_ip(module, oneandone_conn):
     if public_ip is None:
         _check_mode(module, False)
         module.fail_json(
-            msg='public IP %s not found.' % public_ip_id)
+            msg=f'public IP {public_ip_id} not found.')
 
     try:
         _check_mode(module, True)

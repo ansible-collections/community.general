@@ -205,9 +205,9 @@ class EthernetNetworkModule(OneViewModuleBase):
                 result['changed'] = False
             else:
                 if len(vlan_ids) == 1:
-                    self.data['vlanIdRange'] = '{0}-{1}'.format(vlan_ids[0], vlan_ids[0])
+                    self.data['vlanIdRange'] = f'{vlan_ids[0]}-{vlan_ids[0]}'
                 else:
-                    self.data['vlanIdRange'] = ','.join(map(str, vlan_ids))
+                    self.data['vlanIdRange'] = ','.join(str(s) for s in vlan_ids)
 
                 self.resource_client.create_bulk(self.data)
                 result['changed'] = True

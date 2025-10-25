@@ -235,9 +235,7 @@ ONEANDONE_SERVER_STATES = (
 
 def _check_mode(module, result):
     if module.check_mode:
-        module.exit_json(
-            changed=result
-        )
+        module.exit_json(changed=result)
 
 
 def _create_server(module, oneandone_conn, hostname, description,
@@ -334,7 +332,7 @@ def create_server(module, oneandone_conn):
     if datacenter_id is None:
         _check_mode(module, False)
         module.fail_json(
-            msg='datacenter %s not found.' % datacenter)
+            msg=f'datacenter {datacenter} not found.')
 
     fixed_instance_size_id = None
     if fixed_instance_size:
@@ -344,13 +342,13 @@ def create_server(module, oneandone_conn):
         if fixed_instance_size_id is None:
             _check_mode(module, False)
             module.fail_json(
-                msg='fixed_instance_size %s not found.' % fixed_instance_size)
+                msg=f'fixed_instance_size {fixed_instance_size} not found.')
 
     appliance_id = get_appliance(oneandone_conn, appliance)
     if appliance_id is None:
         _check_mode(module, False)
         module.fail_json(
-            msg='appliance %s not found.' % appliance)
+            msg=f'appliance {appliance} not found.')
 
     private_network_id = None
     if private_network:
@@ -360,7 +358,7 @@ def create_server(module, oneandone_conn):
         if private_network_id is None:
             _check_mode(module, False)
             module.fail_json(
-                msg='private network %s not found.' % private_network)
+                msg=f'private network {private_network} not found.')
 
     monitoring_policy_id = None
     if monitoring_policy:
@@ -370,7 +368,7 @@ def create_server(module, oneandone_conn):
         if monitoring_policy_id is None:
             _check_mode(module, False)
             module.fail_json(
-                msg='monitoring policy %s not found.' % monitoring_policy)
+                msg=f'monitoring policy {monitoring_policy} not found.')
 
     firewall_policy_id = None
     if firewall_policy:
@@ -380,7 +378,7 @@ def create_server(module, oneandone_conn):
         if firewall_policy_id is None:
             _check_mode(module, False)
             module.fail_json(
-                msg='firewall policy %s not found.' % firewall_policy)
+                msg=f'firewall policy {firewall_policy} not found.')
 
     load_balancer_id = None
     if load_balancer:
@@ -390,7 +388,7 @@ def create_server(module, oneandone_conn):
         if load_balancer_id is None:
             _check_mode(module, False)
             module.fail_json(
-                msg='load balancer %s not found.' % load_balancer)
+                msg=f'load balancer {load_balancer} not found.')
 
     if auto_increment:
         hostnames = _auto_increment_hostname(count, hostname)
@@ -481,7 +479,7 @@ def remove_server(module, oneandone_conn):
             changed = True
         except Exception as ex:
             module.fail_json(
-                msg="failed to terminate the server: %s" % str(ex))
+                msg=f"failed to terminate the server: {ex}")
 
         removed_server = {
             'id': server['id'],
@@ -532,8 +530,7 @@ def startstop_server(module, oneandone_conn):
                     method='SOFTWARE')
         except Exception as ex:
             module.fail_json(
-                msg="failed to set server %s to state %s: %s" % (
-                    server_id, state, str(ex)))
+                msg=f"failed to set server {server_id} to state {state}: {ex}")
 
         _check_mode(module, False)
 
@@ -553,8 +550,7 @@ def startstop_server(module, oneandone_conn):
                     break
             if not operation_completed:
                 module.fail_json(
-                    msg="Timeout waiting for server %s to get to state %s" % (
-                        server_id, state))
+                    msg=f"Timeout waiting for server {server_id} to get to state {state}")
 
         changed = True
         server = _insert_network_data(server)
@@ -639,8 +635,7 @@ def main():
 
     if not module.params.get('auth_token'):
         module.fail_json(
-            msg='The "auth_token" parameter or ' +
-            'ONEANDONE_AUTH_TOKEN environment variable is required.')
+            msg='The "auth_token" parameter or ONEANDONE_AUTH_TOKEN environment variable is required.')
 
     if not module.params.get('api_url'):
         oneandone_conn = oneandone.client.OneAndOneService(
@@ -675,7 +670,7 @@ def main():
                       'datacenter'):
             if not module.params.get(param):
                 module.fail_json(
-                    msg="%s parameter is required for new server." % param)
+                    msg=f"{param} parameter is required for new server.")
         try:
             (changed, servers) = create_server(module, oneandone_conn)
         except Exception as ex:

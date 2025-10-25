@@ -198,7 +198,6 @@ except ImportError:
     HAVE_DNSPYTHON = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 class RecordManager(object):
@@ -213,7 +212,7 @@ class RecordManager(object):
             except TypeError:
                 module.fail_json(msg='Missing key_secret')
             except binascii_error as e:
-                module.fail_json(msg='TSIG key error: %s' % to_native(e))
+                module.fail_json(msg=f'TSIG key error: {e}')
         else:
             self.keyring = None
 
@@ -233,7 +232,7 @@ class RecordManager(object):
                 self.zone += '.'
 
         if module.params['record'][-1] != '.':
-            self.fqdn = module.params['record'] + '.' + self.zone
+            self.fqdn = f"{module.params['record']}.{self.zone}"
         else:
             self.fqdn = module.params['record']
 
@@ -247,7 +246,7 @@ class RecordManager(object):
     def txt_helper(self, entry):
         if entry[0] == '"' and entry[-1] == '"':
             return entry
-        return '"{text}"'.format(text=entry)
+        return f'"{entry}"'
 
     def lookup_zone(self):
         name = dns.name.from_text(self.module.params['record'])
@@ -261,12 +260,12 @@ class RecordManager(object):
                 else:
                     lookup = dns.query.udp(query, self.module.params['server'], timeout=10, port=self.module.params['port'])
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
-                self.module.fail_json(msg='TSIG update error (%s): %s' % (e.__class__.__name__, to_native(e)))
+                self.module.fail_json(msg=f'TSIG update error ({e.__class__.__name__}): {e}')
             except (socket_error, dns.exception.Timeout) as e:
-                self.module.fail_json(msg='DNS server error: (%s): %s' % (e.__class__.__name__, to_native(e)))
+                self.module.fail_json(msg=f'DNS server error: ({e.__class__.__name__}): {e}')
             if lookup.rcode() in [dns.rcode.SERVFAIL, dns.rcode.REFUSED]:
-                self.module.fail_json(msg='Zone lookup failure: \'%s\' will not respond to queries regarding \'%s\'.' % (
-                    self.module.params['server'], self.module.params['record']))
+                self.module.fail_json(msg=f"Zone lookup failure: '{self.module.params['server']}' will not "
+                                          f"respond to queries regarding '{self.module.params['record']}'.")
             # If the response contains an Answer SOA RR whose name matches the queried name,
             # this is the name of the zone in which the record needs to be inserted.
             for rr in lookup.answer:
@@ -280,7 +279,7 @@ class RecordManager(object):
             try:
                 name = name.parent()
             except dns.name.NoParent:
-                self.module.fail_json(msg='Zone lookup of \'%s\' failed for unknown reason.' % (self.module.params['record']))
+                self.module.fail_json(msg=f"Zone lookup of '{self.module.params['record']}' failed for unknown reason.")
 
     def __do_update(self, update):
         response = None
@@ -290,9 +289,9 @@ class RecordManager(object):
             else:
                 response = dns.query.udp(update, self.module.params['server'], timeout=10, port=self.module.params['port'])
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
-            self.module.fail_json(msg='TSIG update error (%s): %s' % (e.__class__.__name__, to_native(e)))
+            self.module.fail_json(msg=f'TSIG update error ({e.__class__.__name__}): {e}')
         except (socket_error, dns.exception.Timeout) as e:
-            self.module.fail_json(msg='DNS server error: (%s): %s' % (e.__class__.__name__, to_native(e)))
+            self.module.fail_json(msg=f'DNS server error: ({e.__class__.__name__}): {e}')
         return response
 
     def create_or_update_record(self):
@@ -306,12 +305,12 @@ class RecordManager(object):
             if exists == 0:
                 self.dns_rc = self.create_record()
                 if self.dns_rc != 0:
-                    result['msg'] = "Failed to create DNS record (rc: %d)" % self.dns_rc
+                    result['msg'] = f"Failed to create DNS record (rc: {int(self.dns_rc)})"
 
             elif exists == 2:
                 self.dns_rc = self.modify_record()
                 if self.dns_rc != 0:
-                    result['msg'] = "Failed to update DNS record (rc: %d)" % self.dns_rc
+                    result['msg'] = f"Failed to update DNS record (rc: {int(self.dns_rc)})"
 
             if self.dns_rc != 0:
                 result['failed'] = True
@@ -358,9 +357,9 @@ class RecordManager(object):
                 else:
                     lookup = dns.query.udp(query, self.module.params['server'], timeout=10, port=self.module.params['port'])
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
-                self.module.fail_json(msg='TSIG update error (%s): %s' % (e.__class__.__name__, to_native(e)))
+                self.module.fail_json(msg=f'TSIG update error ({e.__class__.__name__}): {e}')
             except (socket_error, dns.exception.Timeout) as e:
-                self.module.fail_json(msg='DNS server error: (%s): %s' % (e.__class__.__name__, to_native(e)))
+                self.module.fail_json(msg=f'DNS server error: ({e.__class__.__name__}): {e}')
 
             lookup_result = lookup.answer[0] if lookup.answer else lookup.authority[0]
             entries_to_remove = [n.to_text() for n in lookup_result.items if n.to_text() not in self.value]
@@ -404,7 +403,7 @@ class RecordManager(object):
 
         if self.dns_rc != 0:
             result['failed'] = True
-            result['msg'] = "Failed to delete record (rc: %d)" % self.dns_rc
+            result['msg'] = f"Failed to delete record (rc: {int(self.dns_rc)})"
         else:
             result['changed'] = True
 
@@ -415,7 +414,7 @@ class RecordManager(object):
         try:
             update.present(self.module.params['record'], self.module.params['type'])
         except dns.rdatatype.UnknownRdatatype as e:
-            self.module.fail_json(msg='Record error: {0}'.format(to_native(e)))
+            self.module.fail_json(msg=f'Record error: {e}')
 
         response = self.__do_update(update)
         self.dns_rc = dns.message.Message.rcode(response)
@@ -452,9 +451,9 @@ class RecordManager(object):
             else:
                 lookup = dns.query.udp(query, self.module.params['server'], timeout=10, port=self.module.params['port'])
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
-            self.module.fail_json(msg='TSIG update error (%s): %s' % (e.__class__.__name__, to_native(e)))
+            self.module.fail_json(msg=f'TSIG update error ({e.__class__.__name__}): {e}')
         except (socket_error, dns.exception.Timeout) as e:
-            self.module.fail_json(msg='DNS server error: (%s): %s' % (e.__class__.__name__, to_native(e)))
+            self.module.fail_json(msg=f'DNS server error: ({e.__class__.__name__}): {e}')
 
         if lookup.rcode() != dns.rcode.NOERROR:
             self.module.fail_json(msg='Failed to lookup TTL of existing matching record.')

@@ -160,10 +160,9 @@ class OmapiHostManager:
         except binascii.Error:
             self.module.fail_json(msg="Unable to open OMAPI connection. 'key' is not a valid base64 key.")
         except OmapiError as e:
-            self.module.fail_json(msg="Unable to open OMAPI connection. Ensure 'host', 'port', 'key' and 'key_name' "
-                                      "are valid. Exception was: %s" % to_native(e))
+            self.module.fail_json(msg=f"Unable to open OMAPI connection. Ensure 'host', 'port', 'key' and 'key_name' are valid. Exception was: {e}")
         except socket.error as e:
-            self.module.fail_json(msg="Unable to connect to OMAPI server: %s" % to_native(e))
+            self.module.fail_json(msg=f"Unable to connect to OMAPI server: {e}")
 
     def get_host(self, macaddr):
         msg = OmapiMessage.open(to_bytes("host", errors='surrogate_or_strict'))
@@ -207,14 +206,14 @@ class OmapiHostManager:
 
             stmt_join = ""
             if self.module.params['ddns']:
-                stmt_join += 'ddns-hostname "{0}"; '.format(self.module.params['hostname'])
+                stmt_join += f"ddns-hostname \"{self.module.params['hostname']}\"; "
 
             try:
                 if len(self.module.params['statements']) > 0:
                     stmt_join += "; ".join(self.module.params['statements'])
                     stmt_join += "; "
             except TypeError as e:
-                self.module.fail_json(msg="Invalid statements found: %s" % to_native(e))
+                self.module.fail_json(msg=f"Invalid statements found: {e}")
 
             if len(stmt_join) > 0:
                 msg.obj.append((to_bytes('statements'), to_bytes(stmt_join)))
@@ -226,7 +225,7 @@ class OmapiHostManager:
                                               "are valid.")
                 self.module.exit_json(changed=True, lease=self.unpack_facts(response.obj))
             except OmapiError as e:
-                self.module.fail_json(msg="OMAPI error: %s" % to_native(e))
+                self.module.fail_json(msg=f"OMAPI error: {e}")
         # Forge update message
         else:
             response_obj = self.unpack_facts(host_response.obj)
@@ -238,9 +237,8 @@ class OmapiHostManager:
 
             # Name cannot be changed
             if 'name' not in response_obj or response_obj['name'] != self.module.params['hostname']:
-                self.module.fail_json(msg="Changing hostname is not supported. Old was %s, new is %s. "
-                                          "Please delete host and add new." %
-                                          (response_obj['name'], self.module.params['hostname']))
+                self.module.fail_json(msg=(f"Changing hostname is not supported. Old was {response_obj['name']}, "
+                                           f"new is {self.module.params['hostname']}. Please delete host and add new."))
 
             """
             # It seems statements are not returned by OMAPI, then we cannot modify them at this moment.
@@ -263,7 +261,7 @@ class OmapiHostManager:
                                               "are valid.")
                 self.module.exit_json(changed=True)
             except OmapiError as e:
-                self.module.fail_json(msg="OMAPI error: %s" % to_native(e))
+                self.module.fail_json(msg=f"OMAPI error: {e}")
 
     def remove_host(self):
         try:
@@ -272,7 +270,7 @@ class OmapiHostManager:
         except OmapiErrorNotFound:
             self.module.exit_json()
         except OmapiError as e:
-            self.module.fail_json(msg="OMAPI error: %s" % to_native(e))
+            self.module.fail_json(msg=f"OMAPI error: {e}")
 
 
 def main():
@@ -308,7 +306,7 @@ def main():
         elif module.params['state'] == 'absent':
             host_manager.remove_host()
     except ValueError as e:
-        module.fail_json(msg="OMAPI input value error: %s" % to_native(e))
+        module.fail_json(msg=f"OMAPI input value error: {e}")
 
 
 if __name__ == '__main__':

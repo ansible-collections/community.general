@@ -237,8 +237,8 @@ class OnePasswordInfo(object):
                             return {field_name: field_data.get('v', '')}
 
         # We will get here if the field could not be found in any section and the item wasn't a document to be downloaded.
-        optional_section_title = '' if section_title is None else " in the section '%s'" % section_title
-        module.fail_json(msg="Unable to find an item in 1Password named '%s' with the field '%s'%s." % (item_id, field_name, optional_section_title))
+        optional_section_title = '' if section_title is None else f" in the section '{section_title}'"
+        module.fail_json(msg=f"Unable to find an item in 1Password named '{item_id}' with the field '{field_name}'{optional_section_title}.")
 
     def parse_search_terms(self, terms):
         processed_terms = []
@@ -248,7 +248,7 @@ class OnePasswordInfo(object):
                 term = {'name': term}
 
             if 'name' not in term:
-                module.fail_json(msg="Missing required 'name' field from search term, got: '%s'" % to_native(term))
+                module.fail_json(msg=f"Missing required 'name' field from search term, got: '{term}'")
 
             term['field'] = term.get('field', 'password')
             term['section'] = term.get('section', None)
@@ -262,15 +262,15 @@ class OnePasswordInfo(object):
         try:
             args = ["get", "item", item_id]
             if vault is not None:
-                args += ['--vault={0}'.format(vault)]
+                args += [f'--vault={vault}']
             rc, output, dummy = self._run(args)
             return output
 
         except Exception as e:
             if re.search(".*not found.*", to_native(e)):
-                module.fail_json(msg="Unable to find an item in 1Password named '%s'." % item_id)
+                module.fail_json(msg=f"Unable to find an item in 1Password named '{item_id}'.")
             else:
-                module.fail_json(msg="Unexpected error attempting to find an item in 1Password named '%s': %s" % (item_id, to_native(e)))
+                module.fail_json(msg=f"Unexpected error attempting to find an item in 1Password named '{item_id}': {e}")
 
     def get_field(self, item_id, field, section=None, vault=None):
         output = self.get_raw(item_id, vault)
@@ -285,7 +285,7 @@ class OnePasswordInfo(object):
 
             args = [
                 'signin',
-                '{0}.1password.com'.format(self.auto_login['subdomain']),
+                f"{self.auto_login['subdomain']}.1password.com",
                 to_bytes(self.auto_login['username']),
                 to_bytes(self.auto_login['secret_key']),
                 '--output=raw',
@@ -295,10 +295,10 @@ class OnePasswordInfo(object):
                 rc, out, err = self._run(args, command_input=to_bytes(self.auto_login['master_password']))
                 self.token = out.strip()
             except AnsibleModuleError as e:
-                module.fail_json(msg="Failed to perform initial sign in to 1Password: %s" % to_native(e))
+                module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {to_native(e)}")
         else:
-            module.fail_json(msg="Unable to perform an initial sign in to 1Password. Please run '%s signin' "
-                                 "or define credentials in 'auto_login'. See the module documentation for details." % self.cli_path)
+            module.fail_json(msg=f"Unable to perform an initial sign in to 1Password. Please run '{self.cli_path} signin' "
+                                 "or define credentials in 'auto_login'. See the module documentation for details.")
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
@@ -339,7 +339,7 @@ class OnePasswordInfo(object):
                 self.get_token()
         except OSError as e:
             if e.errno == errno.ENOENT:
-                module.fail_json(msg="1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
+                module.fail_json(msg=f"1Password CLI tool '{self.cli_path}' not installed in path on control machine")
             raise e
 
     def run(self):

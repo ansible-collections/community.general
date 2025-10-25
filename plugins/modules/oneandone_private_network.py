@@ -236,7 +236,7 @@ def create_network(module, oneandone_conn):
         datacenter_id = get_datacenter(oneandone_conn, datacenter)
         if datacenter_id is None:
             module.fail_json(
-                msg='datacenter %s not found.' % datacenter)
+                msg=f'datacenter {datacenter} not found.')
 
     try:
         _check_mode(module, True)

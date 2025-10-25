@@ -1922,10 +1922,8 @@ class Nmcli(object):
             })
         elif self.type == 'bond-slave':
             if self.slave_type and self.slave_type != 'bond':
-                self.module.fail_json(msg="Connection type '%s' cannot be combined with '%s' slave-type. "
-                                          "Allowed slave-type for '%s' is 'bond'."
-                                          % (self.type, self.slave_type, self.type)
-                                      )
+                self.module.fail_json(msg=(f"Connection type '{self.type}' cannot be combined with '{self.slave_type}' slave-type. "
+                                           f"Allowed slave-type for '{self.type}' is 'bond'."))
             if not self.slave_type:
                 self.module.warn("Connection 'slave-type' property automatically set to 'bond' "
                                  "because of using 'bond-slave' connection type.")
@@ -1956,10 +1954,8 @@ class Nmcli(object):
                 })
         elif self.type == 'bridge-slave':
             if self.slave_type and self.slave_type != 'bridge':
-                self.module.fail_json(msg="Connection type '%s' cannot be combined with '%s' slave-type. "
-                                          "Allowed slave-type for '%s' is 'bridge'."
-                                          % (self.type, self.slave_type, self.type)
-                                      )
+                self.module.fail_json(msg=(f"Connection type '{self.type}' cannot be combined with '{self.slave_type}' slave-type. "
+                                           f"Allowed slave-type for '{self.type}' is 'bridge'."))
             if not self.slave_type:
                 self.module.warn("Connection 'slave-type' property automatically set to 'bridge' "
                                  "because of using 'bridge-slave' connection type.")
@@ -1975,10 +1971,8 @@ class Nmcli(object):
             })
         elif self.type == 'team-slave':
             if self.slave_type and self.slave_type != 'team':
-                self.module.fail_json(msg="Connection type '%s' cannot be combined with '%s' slave-type. "
-                                          "Allowed slave-type for '%s' is 'team'."
-                                          % (self.type, self.slave_type, self.type)
-                                      )
+                self.module.fail_json(msg=(f"Connection type '{self.type}' cannot be combined with '{self.slave_type}' slave-type. "
+                                           f"Allowed slave-type for '{self.type}' is 'team'."))
             if not self.slave_type:
                 self.module.warn("Connection 'slave-type' property automatically set to 'team' "
                                  "because of using 'team-slave' connection type.")
@@ -2019,24 +2013,24 @@ class Nmcli(object):
             if self.wifi:
                 for name, value in self.wifi.items():
                     options.update({
-                        '802-11-wireless.%s' % name: value
+                        f'802-11-wireless.{name}': value
                     })
             if self.wifi_sec:
                 for name, value in self.wifi_sec.items():
                     options.update({
-                        '802-11-wireless-security.%s' % name: value
+                        f'802-11-wireless-security.{name}': value
                     })
         elif self.type == 'gsm':
             if self.gsm:
                 for name, value in self.gsm.items():
                     options.update({
-                        'gsm.%s' % name: value,
+                        f'gsm.{name}': value,
                     })
         elif self.type == 'macvlan':
             if self.macvlan:
                 for name, value in self.macvlan.items():
                     options.update({
-                        'macvlan.%s' % name: value,
+                        f'macvlan.{name}': value,
                     })
             elif self.state == 'present':
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
@@ -2044,7 +2038,7 @@ class Nmcli(object):
             if self.wireguard:
                 for name, value in self.wireguard.items():
                     options.update({
-                        'wireguard.%s' % name: value,
+                        f'wireguard.{name}': value,
                     })
         elif self.type == 'vpn':
             if self.vpn:
@@ -2065,7 +2059,7 @@ class Nmcli(object):
                         if isinstance(value, bool):
                             value = self.bool_to_string(value)
 
-                        vpn_data_values += '%s=%s' % (name, value)
+                        vpn_data_values += f'{name}={value}'
                     options.update({
                         'vpn.data': vpn_data_values,
                     })
@@ -2084,7 +2078,7 @@ class Nmcli(object):
             if self.sriov:
                 for name, value in self.sriov.items():
                     options.update({
-                        'sriov.%s' % name: value,
+                        f'sriov.{name}': value,
                     })
 
         # Convert settings values based on the situation.
@@ -2184,7 +2178,7 @@ class Nmcli(object):
             return None
 
         if privacy not in ip6_privacy_values:
-            raise AssertionError('{privacy} is invalid ip_privacy6 option'.format(privacy=privacy))
+            raise AssertionError(f'{privacy} is invalid ip_privacy6 option')
 
         return ip6_privacy_values[privacy]
 
@@ -2218,13 +2212,13 @@ class Nmcli(object):
     def enforce_ipv4_cidr_notation(ip4_addresses):
         if ip4_addresses is None:
             return None
-        return [address if '/' in address else address + '/32' for address in ip4_addresses]
+        return [address if '/' in address else f"{address}/32" for address in ip4_addresses]
 
     @staticmethod
     def enforce_ipv6_cidr_notation(ip6_addresses):
         if ip6_addresses is None:
             return None
-        return [address if '/' in address else address + '/128' for address in ip6_addresses]
+        return [address if '/' in address else f"{address}/128" for address in ip6_addresses]
 
     def enforce_routes_format(self, routes, routes_extended):
         if routes is not None:
@@ -2239,13 +2233,13 @@ class Nmcli(object):
         result_str = ''
         result_str += route['ip']
         if route.get('next_hop') is not None:
-            result_str += ' ' + route['next_hop']
+            result_str += f" {route['next_hop']}"
         if route.get('metric') is not None:
-            result_str += ' ' + str(route['metric'])
+            result_str += f" {route['metric']!s}"
 
         for attribute, value in sorted(route.items()):
             if attribute not in ('ip', 'next_hop', 'metric') and value is not None:
-                result_str += ' {0}={1}'.format(attribute, str(value).lower())
+                result_str += f' {attribute}={str(value).lower()}'
 
         return result_str
 
@@ -2371,13 +2365,13 @@ class Nmcli(object):
         for key, value in options.items():
             if value is not None:
                 if key in self.SECRET_OPTIONS:
-                    self.edit_commands += ['set %s %s' % (key, value)]
+                    self.edit_commands += [f'set {key} {value}']
                     continue
                 if key == 'xmit_hash_policy':
-                    cmd.extend(['+bond.options', 'xmit_hash_policy=%s' % value])
+                    cmd.extend(['+bond.options', f'xmit_hash_policy={value}'])
                     continue
                 if key == 'fail_over_mac':
-                    cmd.extend(['+bond.options', 'fail_over_mac=%s' % value])
+                    cmd.extend(['+bond.options', f'fail_over_mac={value}'])
                     continue
                 cmd.extend([key, value])
 
@@ -2467,11 +2461,11 @@ class Nmcli(object):
         if setting == '802-11-wireless-security':
             set_property = 'psk'
             set_value = 'FAKEVALUE'
-            commands = ['set %s.%s %s' % (setting, set_property, set_value)]
+            commands = [f'set {setting}.{set_property} {set_value}']
         else:
             commands = []
 
-        commands += ['print %s' % setting, 'quit', 'yes']
+        commands += [f'print {setting}', 'quit', 'yes']
 
         (rc, out, err) = self.execute_edit_commands(commands, arguments=['type', self.type])
 
@@ -2479,7 +2473,7 @@ class Nmcli(object):
             raise NmcliModuleError(err)
 
         for line in out.splitlines():
-            prefix = '%s.' % setting
+            prefix = f'{setting}.'
             if line.startswith(prefix):
                 pair = line.split(':', 1)
                 property = pair[0].strip().replace(prefix, '')
@@ -2505,7 +2499,7 @@ class Nmcli(object):
         if unsupported_properties:
             msg_options = []
             for property in unsupported_properties:
-                msg_options.append('%s.%s' % (setting_key, property))
+                msg_options.append(f'{setting_key}.{property}')
 
             msg = 'Invalid or unsupported option(s): "%s"' % '", "'.join(msg_options)
             if self.ignore_unsupported_suboptions:
@@ -2806,7 +2800,7 @@ def main():
                 (rc, out, err) = nmcli.down_connection()
                 (rc, out, err) = nmcli.remove_connection()
                 if rc != 0:
-                    module.fail_json(name=('Error removing connection named %s' % nmcli.conn_name), msg=err, rc=rc)
+                    module.fail_json(name=f'Error removing connection named {nmcli.conn_name}', msg=err, rc=rc)
 
         elif nmcli.state == 'present':
             if nmcli.connection_exists():
@@ -2828,7 +2822,7 @@ def main():
                     if module.check_mode:
                         module.exit_json(changed=False, **result)
             if not nmcli.connection_exists():
-                result['Connection'] = ('Connection %s of Type %s is being added' % (nmcli.conn_name, nmcli.type))
+                result['Connection'] = f'Connection {nmcli.conn_name} of Type {nmcli.type} is being added'
                 if module.check_mode:
                     module.exit_json(changed=True, **result)
                 (rc, out, err) = nmcli.create_connection()
@@ -2843,7 +2837,7 @@ def main():
                     (rc, out, err) = nmcli.reload_connection()
                 (rc, out, err) = nmcli.up_connection()
                 if rc != 0:
-                    module.fail_json(name=('Error bringing up connection named %s' % nmcli.conn_name), msg=err, rc=rc)
+                    module.fail_json(name=f'Error bringing up connection named {nmcli.conn_name}', msg=err, rc=rc)
 
         elif nmcli.state == 'down':
             if nmcli.connection_exists():
@@ -2853,7 +2847,7 @@ def main():
                     (rc, out, err) = nmcli.reload_connection()
                 (rc, out, err) = nmcli.down_connection()
                 if rc != 0:
-                    module.fail_json(name=('Error bringing down connection named %s' % nmcli.conn_name), msg=err, rc=rc)
+                    module.fail_json(name=f'Error bringing down connection named {nmcli.conn_name}', msg=err, rc=rc)
 
     except NmcliModuleError as e:
         module.fail_json(name=nmcli.conn_name, msg=str(e))

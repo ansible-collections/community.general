@@ -127,7 +127,7 @@ def main():
         module.fail_json(msg="you must set one of 'app_name' or 'application_id'")
 
     if app_id is None:
-        module.fail_json(msg="No application with name %s is found in NewRelic" % module.params["app_name"])
+        module.fail_json(msg=f"No application with name {module.params['app_name']} is found in NewRelic")
 
     for item in ["changelog", "description", "revision", "user"]:
         if module.params[item]:
@@ -138,7 +138,7 @@ def main():
         module.exit_json(changed=True)
 
     # Send the data to New Relic
-    url = "https://api.newrelic.com/v2/applications/%s/deployments.json" % quote(str(app_id), safe='')
+    url = f"https://api.newrelic.com/v2/applications/{quote(str(app_id), safe='')}/deployments.json"
     data = {
         'deployment': params
     }
@@ -150,23 +150,23 @@ def main():
     if info['status'] in (200, 201):
         module.exit_json(changed=True)
     else:
-        module.fail_json(msg="Unable to insert deployment marker: %s" % info['msg'])
+        module.fail_json(msg=f"Unable to insert deployment marker: {info['msg']}")
 
 
 def get_application_id(module):
     url = "https://api.newrelic.com/v2/applications.json"
-    data = "filter[name]=%s" % module.params["app_name"]
+    data = f"filter[name]={module.params['app_name']}"
     application_id = None
     headers = {
         'Api-Key': module.params["token"],
     }
     response, info = fetch_url(module, url, data=data, headers=headers)
     if info['status'] not in (200, 201):
-        module.fail_json(msg="Unable to get application: %s" % info['msg'])
+        module.fail_json(msg=f"Unable to get application: {info['msg']}")
 
     result = json.loads(response.read())
     if result is None or len(result.get("applications", "")) == 0:
-        module.fail_json(msg='No application found with name "%s"' % module.params["app_name"])
+        module.fail_json(msg=f"No application found with name \"{module.params['app_name']}\"")
 
     if module.params["app_name_exact_match"]:
         for item in result["applications"]:
@@ -174,7 +174,7 @@ def get_application_id(module):
                 application_id = item["id"]
                 break
         if application_id is None:
-            module.fail_json(msg='No application found with exact name "%s"' % module.params["app_name"])
+            module.fail_json(msg=f"No application found with exact name \"{module.params['app_name']}\"")
     else:
         application_id = result["applications"][0]["id"]
 

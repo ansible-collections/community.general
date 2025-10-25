@@ -257,8 +257,7 @@ def do_notify_connector_card_webhook(module, webhook, payload):
             module.fail_json(msg=OFFICE_365_INVALID_WEBHOOK_MSG)
     else:
         module.fail_json(
-            msg="failed to send %s as a connector card to Incoming Webhook: %s"
-                % (payload, info['msg'])
+            msg=f"failed to send {payload} as a connector card to Incoming Webhook: {info['msg']}"
         )
 
 

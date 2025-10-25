@@ -108,8 +108,6 @@ EXAMPLES = r"""
     consumer_key: yourconsumerkey
 """
 
-RETURN = r"""
-"""
 
 import time
 from urllib.parse import quote_plus
@@ -141,7 +139,7 @@ def getOvhClient(ansibleModule):
 
 def waitForNoTask(client, name, timeout):
     currentTimeout = timeout
-    while client.get('/ip/{0}/task'.format(quote_plus(name)),
+    while client.get(f'/ip/{quote_plus(name)}/task',
                      function='genericMoveFloatingIp',
                      status='todo'):
         time.sleep(1)  # Delay for 1 sec
@@ -154,7 +152,7 @@ def waitForNoTask(client, name, timeout):
 def waitForTaskDone(client, name, taskId, timeout):
     currentTimeout = timeout
     while True:
-        task = client.get('/ip/{0}/task/{1}'.format(quote_plus(name), taskId))
+        task = client.get(f'/ip/{quote_plus(name)}/task/{taskId}')
         if task['status'] == 'done':
             return True
         time.sleep(5)  # Delay for 5 sec to not harass the API
@@ -201,40 +199,34 @@ def main():
         ips = client.get('/ip', ip=name, type='failover')
     except APIError as apiError:
         module.fail_json(
-            msg='Unable to call OVH api for getting the list of ips, '
-                'check application key, secret, consumerkey and parameters. '
-                'Error returned by OVH api was : {0}'.format(apiError))
+            msg=f'Unable to call OVH API for getting the list of ips, check application key, secret, consumerkey and parameters. '
+                f'Error returned by OVH API was : {apiError}')
 
-    if name not in ips and '{0}/32'.format(name) not in ips:
-        module.fail_json(msg='IP {0} does not exist'.format(name))
+    if name not in ips and f'{name}/32' not in ips:
+        module.fail_json(msg=f'IP {name} does not exist')
 
     # Check that no task is pending before going on
     try:
         if not waitForNoTask(client, name, timeout):
             module.fail_json(
-                msg='Timeout of {0} seconds while waiting for no pending '
-                    'tasks before executing the module '.format(timeout))
+                msg=f'Timeout of {timeout} seconds while waiting for no pending tasks before executing the module ')
     except APIError as apiError:
         module.fail_json(
-            msg='Unable to call OVH api for getting the list of pending tasks '
-                'of the ip, check application key, secret, consumerkey '
-                'and parameters. Error returned by OVH api was : {0}'
-                .format(apiError))
+            msg=f'Unable to call OVH API for getting the list of pending tasks of the ip, check application key, secret, consumerkey and parameters. '
+                f'Error returned by OVH API was : {apiError}')
 
     try:
-        ipproperties = client.get('/ip/{0}'.format(quote_plus(name)))
+        ipproperties = client.get(f'/ip/{quote_plus(name)}')
     except APIError as apiError:
         module.fail_json(
-            msg='Unable to call OVH api for getting the properties '
-                'of the ip, check application key, secret, consumerkey '
-                'and parameters. Error returned by OVH api was : {0}'
-            .format(apiError))
+            msg=f'Unable to call OVH API for getting the properties of the ip, check application key, secret, consumerkey and parameters. '
+                f'Error returned by OVH API was : {apiError}')
 
     if ipproperties['routedTo']['serviceName'] != service:
         if not module.check_mode:
             if wait_task_completion == 0:
                 # Move the IP and get the created taskId
-                task = client.post('/ip/{0}/move'.format(quote_plus(name)), to=service)
+                task = client.post(f'/ip/{quote_plus(name)}/move', to=service)
                 taskId = task['taskId']
                 result['moved'] = True
             else:
@@ -245,8 +237,7 @@ def main():
             if wait_completion or wait_task_completion != 0:
                 if not waitForTaskDone(client, name, taskId, timeout):
                     module.fail_json(
-                        msg='Timeout of {0} seconds while waiting for completion '
-                            'of move ip to service'.format(timeout))
+                        msg=f'Timeout of {timeout} seconds while waiting for completion of move ip to service')
                 result['waited'] = True
             else:
                 result['waited'] = False

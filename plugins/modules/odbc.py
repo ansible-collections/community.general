@@ -83,7 +83,6 @@ row_count:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 HAS_PYODBC = None
 try:
@@ -116,7 +115,7 @@ def main():
     try:
         connection = pyodbc.connect(dsn)
     except Exception as e:
-        module.fail_json(msg='Failed to connect to DSN: {0}'.format(to_native(e)))
+        module.fail_json(msg=f'Failed to connect to DSN: {e}')
 
     result = dict(
         changed=True,
@@ -137,9 +136,7 @@ def main():
         try:
             # Get the rows out into an 2d array
             for row in cursor.fetchall():
-                new_row = []
-                for column in row:
-                    new_row.append("{0}".format(column))
+                new_row = [f"{column}" for column in row]
                 result['results'].append(new_row)
 
             # Return additional information from the cursor
@@ -158,11 +155,11 @@ def main():
         except pyodbc.ProgrammingError as pe:
             pass
         except Exception as e:
-            module.fail_json(msg="Exception while reading rows: {0}".format(to_native(e)))
+            module.fail_json(msg=f"Exception while reading rows: {e}")
 
         cursor.close()
     except Exception as e:
-        module.fail_json(msg="Failed to execute query: {0}".format(to_native(e)))
+        module.fail_json(msg=f"Failed to execute query: {e}")
     finally:
         connection.close()
 
