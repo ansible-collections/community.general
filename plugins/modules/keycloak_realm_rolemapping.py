@@ -293,7 +293,7 @@ def main():
         if group_rep is not None:
             gid = group_rep['id']
         else:
-            module.fail_json(msg='Could not fetch group %s:' % group_name)
+            module.fail_json(msg=f'Could not fetch group {group_name}:')
     else:
         group_rep = kc.get_group_by_groupid(gid, realm=realm)
 
@@ -309,7 +309,7 @@ def main():
                 if role_rep is not None:
                     role['id'] = role_rep['id']
                 else:
-                    module.fail_json(msg='Could not fetch realm role %s by name:' % (role['name']))
+                    module.fail_json(msg=f"Could not fetch realm role {role['name']} by name:")
             # Fetch missing role_name
             else:
                 for realm_role in kc.get_realm_roles(realm=realm):
@@ -318,7 +318,7 @@ def main():
                         break
 
                 if role['name'] is None:
-                    module.fail_json(msg='Could not fetch realm role %s by ID' % (role['id']))
+                    module.fail_json(msg=f"Could not fetch realm role {role['id']} by ID")
 
     assigned_roles_before = group_rep.get('realmRoles', [])
 
@@ -357,11 +357,11 @@ def main():
         if state == 'present':
             # Assign roles
             kc.add_group_realm_rolemapping(gid=gid, role_rep=update_roles, realm=realm)
-            result['msg'] = 'Realm roles %s assigned to groupId %s.' % (update_roles, gid)
+            result['msg'] = f'Realm roles {update_roles} assigned to groupId {gid}.'
         else:
             # Remove mapping of role
             kc.delete_group_realm_rolemapping(gid=gid, role_rep=update_roles, realm=realm)
-            result['msg'] = 'Realm roles %s removed from groupId %s.' % (update_roles, gid)
+            result['msg'] = f'Realm roles {update_roles} removed from groupId {gid}.'
 
         if gid is None:
             assigned_roles_after = kc.get_group_by_name(group_name, realm=realm, parents=parents).get('realmRoles', [])
@@ -372,7 +372,7 @@ def main():
     # Do nothing
     else:
         result['changed'] = False
-        result['msg'] = 'Nothing to do, roles %s are %s with group %s.' % (roles, 'mapped' if state == 'present' else 'not mapped', group_name)
+        result['msg'] = f"Nothing to do, roles {roles} are {'mapped' if state == 'present' else 'not mapped'} with group {group_name}."
         module.exit_json(**result)
 
 

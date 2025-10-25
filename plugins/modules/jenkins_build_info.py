@@ -111,7 +111,6 @@ except ImportError:
     python_jenkins_installed = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 class JenkinsBuildInfo:
@@ -145,7 +144,7 @@ class JenkinsBuildInfo:
             else:
                 return jenkins.Jenkins(self.jenkins_url)
         except Exception as e:
-            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
+            self.module.fail_json(msg=f'Unable to connect to Jenkins server, {e}')
 
     def get_build_status(self):
         try:
@@ -159,7 +158,7 @@ class JenkinsBuildInfo:
             response["result"] = "ABSENT"
             return response
         except Exception as e:
-            self.module.fail_json(msg='Unable to fetch build information, %s' % to_native(e),
+            self.module.fail_json(msg=f'Unable to fetch build information, {e}',
                                   exception=traceback.format_exc())
 
     def get_result(self):

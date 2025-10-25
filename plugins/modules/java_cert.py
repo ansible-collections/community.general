@@ -264,7 +264,7 @@ def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_cert
 
         if extract_rc != 0:
             # this time it is a real failure
-            module.fail_json(msg="Internal module failure, cannot extract certificate, error: %s" % extract_stderr,
+            module.fail_json(msg=f"Internal module failure, cannot extract certificate, error: {extract_stderr}",
                              rc=extract_rc, cmd=extract_cmd)
 
     return extract_rc
@@ -286,7 +286,7 @@ def _get_digest_from_x509_file(module, pem_certificate_file, openssl_bin):
     (dgst_rc, dgst_stdout, dgst_stderr) = module.run_command(dgst_cmd, check_rc=False)
 
     if dgst_rc != 0:
-        module.fail_json(msg="Internal module failure, cannot compute digest for certificate, error: %s" % dgst_stderr,
+        module.fail_json(msg=f"Internal module failure, cannot compute digest for certificate, error: {dgst_stderr}",
                          rc=dgst_rc, cmd=dgst_cmd)
 
     return dgst_stdout.split(' ')[0]
@@ -310,7 +310,7 @@ def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, passwo
     (export_rc, export_stdout, export_err) = module.run_command(export_cmd, data=password, check_rc=False)
 
     if export_rc != 0:
-        module.fail_json(msg="Internal module failure, cannot extract public certificate from PKCS12, message: %s" % export_stdout,
+        module.fail_json(msg=f"Internal module failure, cannot extract public certificate from PKCS12, message: {export_stdout}",
                          stderr=export_err,
                          rc=export_rc)
 
@@ -339,7 +339,7 @@ def build_proxy_options():
 
     proxy_opts = []
     if proxy_host:
-        proxy_opts.extend(["-J-Dhttps.proxyHost=%s" % proxy_host, "-J-Dhttps.proxyPort=%s" % proxy_port])
+        proxy_opts.extend([f"-J-Dhttps.proxyHost={proxy_host}", f"-J-Dhttps.proxyPort={proxy_port}"])
 
         if no_proxy is not None:
             # For Java's nonProxyHosts property, items are separated by '|',
@@ -349,7 +349,7 @@ def build_proxy_options():
 
             # The property name is http.nonProxyHosts, there is no
             # separate setting for HTTPS.
-            proxy_opts.extend(["-J-Dhttp.nonProxyHosts=%s" % non_proxy_hosts])
+            proxy_opts.extend([f"-J-Dhttp.nonProxyHosts={non_proxy_hosts}"])
     return proxy_opts
 
 
@@ -363,13 +363,13 @@ def _download_cert_url(module, executable, url, port):
     """ Fetches the certificate from the remote URL using `keytool -printcert...`
           The PEM formatted string is returned """
     proxy_opts = build_proxy_options()
-    fetch_cmd = [executable, "-printcert", "-rfc", "-sslserver"] + proxy_opts + ["%s:%d" % (url, port)]
+    fetch_cmd = [executable, "-printcert", "-rfc", "-sslserver"] + proxy_opts + [f"{url}:{int(port)}"]
 
     # Fetch SSL certificate from remote host.
     (fetch_rc, fetch_out, fetch_err) = module.run_command(fetch_cmd, check_rc=False)
 
     if fetch_rc != 0:
-        module.fail_json(msg="Internal module failure, cannot download certificate, error: %s" % fetch_err,
+        module.fail_json(msg=f"Internal module failure, cannot download certificate, error: {fetch_err}",
                          rc=fetch_rc, cmd=fetch_cmd)
 
     return fetch_out
@@ -401,14 +401,14 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
 
     import_cmd += _get_keystore_type_keytool_parameters(keystore_type)
 
-    secret_data = "%s\n%s" % (keystore_pass, pkcs12_pass)
+    secret_data = f"{keystore_pass}\n{pkcs12_pass}"
     # Password of a new keystore must be entered twice, for confirmation
     if not os.path.exists(keystore_path):
-        secret_data = "%s\n%s" % (keystore_pass, secret_data)
+        secret_data = f"{keystore_pass}\n{secret_data}"
 
     # Use local certificate from local path and import it to a java keystore
     (import_rc, import_out, import_err) = module.run_command(import_cmd, data=secret_data, check_rc=False)
-    diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
+    diff = {'before': '\n', 'after': f'{keystore_alias}\n'}
 
     if import_rc != 0 or not os.path.exists(keystore_path):
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
@@ -439,9 +439,9 @@ def import_cert_path(module, executable, path, keystore_path, keystore_pass, ali
 
     # Use local certificate from local path and import it to a java keystore
     (import_rc, import_out, import_err) = module.run_command(import_cmd,
-                                                             data="%s\n%s" % (keystore_pass, keystore_pass),
+                                                             data=f"{keystore_pass}\n{keystore_pass}",
                                                              check_rc=False)
-    diff = {'before': '\n', 'after': '%s\n' % alias}
+    diff = {'before': '\n', 'after': f'{alias}\n'}
 
     if import_rc != 0:
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
@@ -467,7 +467,7 @@ def delete_cert(module, executable, keystore_path, keystore_pass, alias, keystor
 
     # Delete SSL certificate from keystore
     (del_rc, del_out, del_err) = module.run_command(del_cmd, data=keystore_pass, check_rc=True)
-    diff = {'before': '%s\n' % alias, 'after': None}
+    diff = {'before': f'{alias}\n', 'after': None}
 
     if del_rc != 0:
         module.fail_json(msg=del_out, rc=del_rc, cmd=del_cmd, error=del_err)
@@ -488,7 +488,7 @@ def test_keystore(module, keystore_path):
 
     if not os.path.exists(keystore_path) and not os.path.isfile(keystore_path):
         # Keystore doesn't exist we want to create it
-        module.fail_json(changed=False, msg="Module require existing keystore at keystore_path '%s'" % keystore_path)
+        module.fail_json(changed=False, msg=f"Module require existing keystore at keystore_path '{keystore_path}'")
 
 
 def main():
@@ -546,8 +546,7 @@ def main():
 
     if path and not cert_alias:
         module.fail_json(changed=False,
-                         msg="Using local path import from %s requires alias argument."
-                             % keystore_path)
+                         msg=f"Using local path import from {keystore_path} requires alias argument.")
 
     test_keytool(module, executable)
 

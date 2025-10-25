@@ -191,18 +191,18 @@ def main():
 
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
-        module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
+        module.fail_json(msg=f"Failed to retrive realm '{realm}'")
 
     objClient = kc.get_client_by_clientid(clientid, realm)
     if not objClient:
-        module.fail_json(msg="Failed to retrive client '{realm}.{clientid}'".format(realm=realm, clientid=clientid))
+        module.fail_json(msg=f"Failed to retrive client '{realm}.{clientid}'")
     if objClient["fullScopeAllowed"] and state == "present":
-        module.fail_json(msg="FullScopeAllowed is active for Client '{realm}.{clientid}'".format(realm=realm, clientid=clientid))
+        module.fail_json(msg=f"FullScopeAllowed is active for Client '{realm}.{clientid}'")
 
     if client_scope_id:
         objClientScope = kc.get_client_by_clientid(client_scope_id, realm)
         if not objClientScope:
-            module.fail_json(msg="Failed to retrive client '{realm}.{client_scope_id}'".format(realm=realm, client_scope_id=client_scope_id))
+            module.fail_json(msg=f"Failed to retrive client '{realm}.{client_scope_id}'")
         before_role_mapping = kc.get_client_role_scope_from_client(objClient["id"], objClientScope["id"], realm)
     else:
         before_role_mapping = kc.get_client_role_scope_from_realm(objClient["id"], realm)
@@ -224,10 +224,9 @@ def main():
         for role_name in role_names:
             if role_name not in client_scope_roles_by_name:
                 if client_scope_id:
-                    module.fail_json(msg="Failed to retrive role '{realm}.{client_scope_id}.{role_name}'"
-                                     .format(realm=realm, client_scope_id=client_scope_id, role_name=role_name))
+                    module.fail_json(msg=f"Failed to retrive role '{realm}.{client_scope_id}.{role_name}'")
                 else:
-                    module.fail_json(msg="Failed to retrive role '{realm}.{role_name}'".format(realm=realm, role_name=role_name))
+                    module.fail_json(msg=f"Failed to retrive role '{realm}.{role_name}'")
             if role_name not in role_mapping_by_name:
                 role_mapping_to_manipulate.append(client_scope_roles_by_name[role_name])
                 role_mapping_by_name[role_name] = client_scope_roles_by_name[role_name]
@@ -249,7 +248,7 @@ def main():
     if not result['changed']:
         # no changes
         result['end_state'] = before_role_mapping
-        result['msg'] = "No changes required for client role scope {name}.".format(name=clientid)
+        result['msg'] = f"No changes required for client role scope {clientid}."
     elif state == "present":
         # doing update
         if module.check_mode:
@@ -258,7 +257,7 @@ def main():
             result['end_state'] = kc.update_client_role_scope_from_client(role_mapping_to_manipulate, objClient["id"], objClientScope["id"], realm)
         else:
             result['end_state'] = kc.update_client_role_scope_from_realm(role_mapping_to_manipulate, objClient["id"], realm)
-        result['msg'] = "Client role scope for {name} has been updated".format(name=clientid)
+        result['msg'] = f"Client role scope for {clientid} has been updated"
     else:
         # doing delete
         if module.check_mode:
@@ -267,7 +266,7 @@ def main():
             result['end_state'] = kc.delete_client_role_scope_from_client(role_mapping_to_manipulate, objClient["id"], objClientScope["id"], realm)
         else:
             result['end_state'] = kc.delete_client_role_scope_from_realm(role_mapping_to_manipulate, objClient["id"], realm)
-        result['msg'] = "Client role scope for {name} has been deleted".format(name=clientid)
+        result['msg'] = f"Client role scope for {clientid} has been deleted"
     module.exit_json(**result)
 
 

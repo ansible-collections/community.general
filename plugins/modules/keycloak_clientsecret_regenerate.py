@@ -166,7 +166,7 @@ def main():
     clientsecret = kc.create_clientsecret(id=id, realm=realm)
 
     result = {
-        "msg": 'New client secret has been generated for ID {id}'.format(id=id),
+        "msg": f'New client secret has been generated for ID {id}',
         "end_state": clientsecret
     }
     module.exit_json(**result)

@@ -654,7 +654,7 @@ def main():
 
         result['end_state'] = sanitize(after_idp)
 
-        result['msg'] = 'Identity provider {alias} has been created'.format(alias=alias)
+        result['msg'] = f'Identity provider {alias} has been created'
         module.exit_json(**result)
 
     else:
@@ -665,7 +665,7 @@ def main():
             if desired_idp == before_idp:
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_idp)
-                result['msg'] = "No changes required to identity provider {alias}.".format(alias=alias)
+                result['msg'] = f"No changes required to identity provider {alias}."
                 module.exit_json(**result)
 
             # doing an update
@@ -703,7 +703,7 @@ def main():
 
             result['end_state'] = sanitize(after_idp)
 
-            result['msg'] = "Identity provider {alias} has been updated".format(alias=alias)
+            result['msg'] = f"Identity provider {alias} has been updated"
             module.exit_json(**result)
 
         elif state == 'absent':
@@ -721,7 +721,7 @@ def main():
 
             result['end_state'] = {}
 
-            result['msg'] = "Identity provider {alias} has been deleted".format(alias=alias)
+            result['msg'] = f"Identity provider {alias} has been deleted"
 
     module.exit_json(**result)
 

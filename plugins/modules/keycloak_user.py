@@ -473,7 +473,7 @@ def main():
         else:
             # Delete user
             kc.delete_user(user_id=before_user['id'], realm=realm)
-            result["msg"] = 'User %s deleted' % (before_user['username'])
+            result["msg"] = f"User {before_user['username']} deleted"
             changed = True
 
     else:
@@ -496,7 +496,7 @@ def main():
                 module.exit_json(**result)
             # Create the user
             after_user = kc.create_user(userrep=desired_user, realm=realm)
-            result["msg"] = 'User %s created' % (desired_user['username'])
+            result["msg"] = f"User {desired_user['username']} created"
             # Add user ID to new representation
             desired_user['id'] = after_user["id"]
         else:
@@ -527,9 +527,9 @@ def main():
         after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
         result["end_state"] = after_user
         if changed:
-            result["msg"] = 'User %s updated' % (desired_user['username'])
+            result["msg"] = f"User {desired_user['username']} updated"
         else:
-            result["msg"] = 'No changes made for user %s' % (desired_user['username'])
+            result["msg"] = f"No changes made for user {desired_user['username']}"
 
     result['changed'] = changed
     module.exit_json(**result)

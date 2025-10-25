@@ -161,8 +161,7 @@ def main():
 
     cid = kc.get_client_id(client_id, realm=realm)
     if not cid:
-        module.fail_json(msg='Invalid client %s for realm %s' %
-                         (client_id, realm))
+        module.fail_json(msg=f'Invalid client {client_id} for realm {realm}')
 
     before_authz_custom_policy = kc.get_authz_policy_by_name(
         name=name, client_id=cid, realm=realm)
@@ -173,31 +172,31 @@ def main():
 
     # Modifying existing custom policies is not possible
     if before_authz_custom_policy and state == 'present':
-        result['msg'] = "Custom policy %s already exists" % (name)
+        result['msg'] = f"Custom policy {name} already exists"
         result['changed'] = False
         result['end_state'] = desired_authz_custom_policy
     elif not before_authz_custom_policy and state == 'present':
         if module.check_mode:
-            result['msg'] = "Would create custom policy %s" % (name)
+            result['msg'] = f"Would create custom policy {name}"
         else:
             kc.create_authz_custom_policy(
                 payload=desired_authz_custom_policy, policy_type=policy_type, client_id=cid, realm=realm)
-            result['msg'] = "Custom policy %s created" % (name)
+            result['msg'] = f"Custom policy {name} created"
 
         result['changed'] = True
         result['end_state'] = desired_authz_custom_policy
     elif before_authz_custom_policy and state == 'absent':
         if module.check_mode:
-            result['msg'] = "Would remove custom policy %s" % (name)
+            result['msg'] = f"Would remove custom policy {name}"
         else:
             kc.remove_authz_custom_policy(
                 policy_id=before_authz_custom_policy['id'], client_id=cid, realm=realm)
-            result['msg'] = "Custom policy %s removed" % (name)
+            result['msg'] = f"Custom policy {name} removed"
 
         result['changed'] = True
         result['end_state'] = {}
     elif not before_authz_custom_policy and state == 'absent':
-        result['msg'] = "Custom policy %s does not exist" % (name)
+        result['msg'] = f"Custom policy {name} does not exist"
         result['changed'] = False
         result['end_state'] = {}
 

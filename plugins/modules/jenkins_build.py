@@ -156,7 +156,6 @@ except ImportError:
     python_jenkins_installed = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 class JenkinsBuild:
@@ -197,13 +196,13 @@ class JenkinsBuild:
             else:
                 return jenkins.Jenkins(self.jenkins_url)
         except Exception as e:
-            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
+            self.module.fail_json(msg=f'Unable to connect to Jenkins server, {e}')
 
     def get_next_build(self):
         try:
             build_number = self.server.get_job_info(self.name)['nextBuildNumber']
         except Exception as e:
-            self.module.fail_json(msg='Unable to get job info from Jenkins server, %s' % to_native(e),
+            self.module.fail_json(msg=f'Unable to get job info from Jenkins server, {e}',
                                   exception=traceback.format_exc())
 
         return build_number
@@ -217,7 +216,7 @@ class JenkinsBuild:
             response["result"] = "ABSENT"
             return response
         except Exception as e:
-            self.module.fail_json(msg='Unable to fetch build information, %s' % to_native(e),
+            self.module.fail_json(msg=f'Unable to fetch build information, {e}',
                                   exception=traceback.format_exc())
 
     def present_build(self):
@@ -229,7 +228,7 @@ class JenkinsBuild:
             else:
                 self.server.build_job(self.name, self.args)
         except Exception as e:
-            self.module.fail_json(msg='Unable to create build for %s: %s' % (self.jenkins_url, to_native(e)),
+            self.module.fail_json(msg=f'Unable to create build for {self.jenkins_url}: {e}',
                                   exception=traceback.format_exc())
 
     def stopped_build(self):
@@ -239,7 +238,7 @@ class JenkinsBuild:
             if build_info['building'] is True:
                 self.server.stop_build(self.name, self.build_number)
         except Exception as e:
-            self.module.fail_json(msg='Unable to stop build for %s: %s' % (self.jenkins_url, to_native(e)),
+            self.module.fail_json(msg=f'Unable to stop build for {self.jenkins_url}: {e}',
                                   exception=traceback.format_exc())
         else:
             if build_info['building'] is False:
@@ -249,7 +248,7 @@ class JenkinsBuild:
         try:
             self.server.delete_build(self.name, self.build_number)
         except Exception as e:
-            self.module.fail_json(msg='Unable to delete build for %s: %s' % (self.jenkins_url, to_native(e)),
+            self.module.fail_json(msg=f'Unable to delete build for {self.jenkins_url}: {e}',
                                   exception=traceback.format_exc())
 
     def get_result(self):

@@ -305,15 +305,13 @@ def main():
                 # Check if name is provided
                 if 'name' not in desired_required_action or desired_required_action['name'] is None:
                     module.fail_json(
-                        msg='Unable to register required action %s in realm %s: name not included'
-                        % (desired_required_action['alias'], realm)
+                        msg=f"Unable to register required action {desired_required_action['alias']} in realm {realm}: name not included"
                     )
 
                 # Check if provider ID is provided
                 if 'providerId' not in desired_required_action or desired_required_action['providerId'] is None:
                     module.fail_json(
-                        msg='Unable to register required action %s in realm %s: providerId not included'
-                        % (desired_required_action['alias'], realm)
+                        msg=f"Unable to register required action {desired_required_action['alias']} in realm {realm}: providerId not included"
                     )
 
                 register_required_actions.append(desired_required_action)
