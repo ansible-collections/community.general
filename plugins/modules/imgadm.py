@@ -163,7 +163,7 @@ class Imgadm(object):
         (rc, stdout, stderr) = self.module.run_command(cmd)
 
         if rc != 0:
-            self.module.fail_json(msg='Failed to update images: {0}'.format(self.errmsg(stderr)))
+            self.module.fail_json(msg=f'Failed to update images: {self.errmsg(stderr)}')
 
         # There is no feedback from imgadm(1M) to determine if anything
         # was actually changed. So treat this as an 'always-changes' operation.
@@ -185,32 +185,32 @@ class Imgadm(object):
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
-                self.module.fail_json(msg='Failed to add source: {0}'.format(self.errmsg(stderr)))
+                self.module.fail_json(msg=f'Failed to add source: {self.errmsg(stderr)}')
 
             # Check the various responses.
             # Note that trying to add a source with the wrong type is handled
             # above as it results in a non-zero status.
 
-            regex = 'Already have "{0}" image source "{1}", no change'.format(imgtype, source)
+            regex = f'Already have "{imgtype}" image source "{source}", no change'
             if re.match(regex, stdout):
                 self.changed = False
 
-            regex = 'Added "%s" image source "%s"' % (imgtype, source)
+            regex = f'Added "{imgtype}" image source "{source}"'
             if re.match(regex, stdout):
                 self.changed = True
         else:
             # Type is ignored by imgadm(1M) here
-            cmd += ' -d %s' % source
+            cmd += f' -d {source}'
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
-                self.module.fail_json(msg='Failed to remove source: {0}'.format(self.errmsg(stderr)))
+                self.module.fail_json(msg=f'Failed to remove source: {self.errmsg(stderr)}')
 
-            regex = 'Do not have image source "%s", no change' % source
+            regex = f'Do not have image source "{source}", no change'
             if re.match(regex, stdout):
                 self.changed = False
 
-            regex = 'Deleted ".*" image source "%s"' % source
+            regex = f'Deleted ".*" image source "{source}"'
             if re.match(regex, stdout):
                 self.changed = True
 
@@ -225,7 +225,7 @@ class Imgadm(object):
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
-                self.module.fail_json(msg='Failed to vacuum images: {0}'.format(self.errmsg(stderr)))
+                self.module.fail_json(msg=f'Failed to vacuum images: {self.errmsg(stderr)}')
             else:
                 if stdout == '':
                     self.changed = False
@@ -236,9 +236,9 @@ class Imgadm(object):
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
-                self.module.fail_json(msg='Failed to import image: {0}'.format(self.errmsg(stderr)))
+                self.module.fail_json(msg=f'Failed to import image: {self.errmsg(stderr)}')
 
-            regex = r'Image {0} \(.*\) is already installed, skipping'.format(self.uuid)
+            regex = rf'Image {self.uuid} \(.*\) is already installed, skipping'
             if re.match(regex, stdout):
                 self.changed = False
 
@@ -246,7 +246,7 @@ class Imgadm(object):
             if re.match(regex, stderr):
                 self.changed = False
 
-            regex = 'Imported image {0}.*'.format(self.uuid)
+            regex = f'Imported image {self.uuid}.*'
             if re.match(regex, stdout.splitlines()[-1]):
                 self.changed = True
         else:
@@ -259,7 +259,7 @@ class Imgadm(object):
                 # in order to determine if there was a change.
                 self.changed = False
 
-            regex = 'Deleted image {0}'.format(self.uuid)
+            regex = f'Deleted image {self.uuid}'
             if re.match(regex, stdout):
                 self.changed = True
 

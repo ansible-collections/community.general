@@ -169,7 +169,7 @@ class IdracRedfishUtils(RedfishUtils):
 
         except (AttributeError, KeyError) as e:
             result['ret'] = False
-            result['msg'] = "Failed to find attribute/key: " + str(e)
+            result['msg'] = f"Failed to find attribute/key: {e}"
 
         result["entries"] = manager_attributes
         return result
@@ -218,18 +218,18 @@ def main():
     timeout = module.params['timeout']
 
     # Build root URI
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = IdracRedfishUtils(creds, root_uri, timeout, module)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}"))
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}"))
 
     # Organize by Categories / Commands
 

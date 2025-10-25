@@ -192,7 +192,7 @@ class IdracRedfishUtils(RedfishUtils):
         attrs_bad = {}  # Store attrs which were not found in the system
 
         # Search for key entry and extract URI from it
-        response = self.get_request(self.root_uri + manager_uri + "/" + key)
+        response = self.get_request(f"{self.root_uri}{manager_uri}/{key}")
         if response['ret'] is False:
             return response
         result['ret'] = True
@@ -200,7 +200,7 @@ class IdracRedfishUtils(RedfishUtils):
 
         if key not in data:
             return {'ret': False,
-                    'msg': "%s: Key %s not found" % (command, key),
+                    'msg': f"{command}: Key {key} not found",
                     'warning': ""}
 
         for attr_name, attr_value in attributes.items():
@@ -219,7 +219,7 @@ class IdracRedfishUtils(RedfishUtils):
 
         warning = ""
         if attrs_bad:
-            warning = "Incorrect attributes %s" % (attrs_bad)
+            warning = f"Incorrect attributes {attrs_bad}"
 
         if not attrs_to_patch:
             return {'ret': True, 'changed': False,
@@ -227,12 +227,12 @@ class IdracRedfishUtils(RedfishUtils):
                     'warning': warning}
 
         payload = {"Attributes": attrs_to_patch}
-        response = self.patch_request(self.root_uri + manager_uri + "/" + key, payload)
+        response = self.patch_request(f"{self.root_uri}{manager_uri}/{key}", payload)
         if response['ret'] is False:
             return response
 
         return {'ret': True, 'changed': True,
-                'msg': "%s: Modified Manager attributes %s" % (command, attrs_to_patch),
+                'msg': f"{command}: Modified Manager attributes {attrs_to_patch}",
                 'warning': warning}
 
 
@@ -292,19 +292,19 @@ def main():
     resource_id = module.params['resource_id']
 
     # Build root URI
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = IdracRedfishUtils(creds, root_uri, timeout, module,
                                  resource_id=resource_id, data_modification=True)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}"))
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}"))
 
     # check for mutually exclusive commands
     try:

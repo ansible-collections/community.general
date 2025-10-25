@@ -161,7 +161,7 @@ def main():
 
     timeout = module.params['timeout']
 
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
     mgr_attributes = {'mgr_attr_name': module.params['attribute_name'],
                       'mgr_attr_value': module.params['attribute_value']}
@@ -171,8 +171,7 @@ def main():
         cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
 
     if offending:
-        module.fail_json(msg=to_native("Invalid Command(s): '%s'. Allowed Commands = %s" % (
-            offending, CATEGORY_COMMANDS_ALL[category])))
+        module.fail_json(msg=to_native(f"Invalid Command(s): '{offending}'. Allowed Commands = {CATEGORY_COMMANDS_ALL[category]}"))
 
     if category == "Manager":
         resource = rf_utils._find_managers_resource()

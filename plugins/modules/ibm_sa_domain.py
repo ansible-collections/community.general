@@ -151,7 +151,7 @@ def main():
     state = module.params['state']
 
     state_changed = False
-    msg = 'Domain \'{0}\''.format(module.params['domain'])
+    msg = f"Domain '{module.params['domain']}'"
     if state == 'present' and not domain:
         state_changed = execute_pyxcli_command(
             module, 'domain_create', xcli_client)

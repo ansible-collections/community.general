@@ -156,7 +156,7 @@ class Infinity(object):
         self.module = module
         self.auth_user = username
         self.auth_pass = password
-        self.base_url = "https://%s/rest/v1/" % (str(server_ip))
+        self.base_url = f"https://{server_ip}/rest/v1/"
 
     def _get_api_call_ansible_handler(
             self,
@@ -193,8 +193,7 @@ class Infinity(object):
         if response_raw.code not in stat_codes:
             self.module.exit_json(
                 changed=False,
-                meta=" openurl response_raw.code show error and error code is %r" %
-                (response_raw.code))
+                meta=f" openurl response_raw.code show error and error code is {response_raw.code!r}")
         else:
             if isinstance(response, str) and len(response) > 0:
                 payload = response
@@ -224,7 +223,7 @@ class Infinity(object):
         params = {}
         response = None
         if network_id:
-            resource_url = "networks/" + str(network_id)
+            resource_url = f"networks/{network_id}"
             response = self._get_api_call_ansible_handler(method, resource_url)
         if network_id is None and network_name:
             method = "get"
@@ -283,7 +282,7 @@ class Infinity(object):
             self.module.exit_json(
                 msg="You must specify the option 'network_id'.")
         if network_id:
-            resource_url = "networks/" + str(network_id) + "/reserve_ip"
+            resource_url = f"networks/{network_id}/reserve_ip"
             response = self._get_api_call_ansible_handler(method, resource_url)
             if response and response.find(
                     "[") >= 0 and response.find("]") >= 0:
@@ -306,12 +305,11 @@ class Infinity(object):
             self.module.exit_json(
                 msg="You must specify  those two options: 'network_id' and 'ip_address'.")
 
-        resource_url = "networks/" + str(network_id) + "/children"
+        resource_url = f"networks/{network_id}/children"
         response = self._get_api_call_ansible_handler(method, resource_url)
         if not response:
             self.module.exit_json(
-                msg="There is an error in release ip %s from network  %s." %
-                (ip_address, network_id))
+                msg=f"There is an error in release ip {ip_address} from network  {network_id}.")
 
         ip_list = json.loads(response)
         ip_idlist = []
@@ -321,7 +319,7 @@ class Infinity(object):
         deleted_ip_id = ''
         for ip_id in ip_idlist:
             ip_response = ''
-            resource_url = "ip_addresses/" + str(ip_id)
+            resource_url = f"ip_addresses/{ip_id}"
             ip_response = self._get_api_call_ansible_handler(
                 method,
                 resource_url,
@@ -332,13 +330,12 @@ class Infinity(object):
                 break
         if deleted_ip_id:
             method = 'delete'
-            resource_url = "ip_addresses/" + str(deleted_ip_id)
+            resource_url = f"ip_addresses/{deleted_ip_id}"
             response = self._get_api_call_ansible_handler(
                 method, resource_url, stat_codes=[204])
         else:
             self.module.exit_json(
-                msg=" When release ip, could not find the ip address %r from the given network %r' ." %
-                (ip_address, network_id))
+                msg=f" When release ip, could not find the ip address {ip_address} from the given network {network_id}' .")
 
         return response
 
@@ -358,7 +355,7 @@ class Infinity(object):
         if network_id is None and network_name:
             network_id = self.get_network_id(network_name=network_name)
         if network_id:
-            resource_url = "networks/" + str(network_id)
+            resource_url = f"networks/{network_id}"
             response = self._get_api_call_ansible_handler(
                 method, resource_url, stat_codes=[204])
         return response
@@ -386,7 +383,7 @@ class Infinity(object):
             self.module.exit_json(
                 msg="You must specify those options: 'network_id', 'reserved_network_name' and 'reserved_network_size'")
         if network_id:
-            resource_url = "networks/" + str(network_id) + "/reserve_network"
+            resource_url = f"networks/{network_id}/reserve_network"
         if not reserved_network_family:
             reserved_network_family = '4'
         if not reserved_network_type:
@@ -423,12 +420,11 @@ class Infinity(object):
             self.module.exit_json(
                 msg="You must specify those options 'network_id', 'reserved_network_name' and 'reserved_network_size'")
         matched_network_id = ""
-        resource_url = "networks/" + str(network_id) + "/children"
+        resource_url = f"networks/{network_id}/children"
         response = self._get_api_call_ansible_handler(method, resource_url)
         if not response:
             self.module.exit_json(
-                msg=" there is an error in releasing network %r  from network  %s." %
-                (network_id, released_network_name))
+                msg=f" there is an error in releasing network {network_id}  from network  {released_network_name}.")
         if response:
             response = json.loads(response)
             for child_net in response:
@@ -438,13 +434,12 @@ class Infinity(object):
         response = None
         if matched_network_id:
             method = 'delete'
-            resource_url = "networks/" + str(matched_network_id)
+            resource_url = f"networks/{matched_network_id}"
             response = self._get_api_call_ansible_handler(
                 method, resource_url, stat_codes=[204])
         else:
             self.module.exit_json(
-                msg=" When release network , could not find the network   %r from the given superent %r' " %
-                (released_network_name, network_id))
+                msg=f" When release network , could not find the network   {released_network_name} from the given superent {network_id} ")
 
         return response
 

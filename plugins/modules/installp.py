@@ -124,7 +124,7 @@ def _check_new_pkg(module, package, repository_path):
         return False, None
 
     else:
-        module.fail_json(msg="Repository path %s is not valid." % repository_path)
+        module.fail_json(msg=f"Repository path {repository_path} is not valid.")
 
 
 def _check_installed_pkg(module, package, repository_path):
@@ -139,7 +139,7 @@ def _check_installed_pkg(module, package, repository_path):
     """
 
     lslpp_cmd = module.get_bin_path('lslpp', True)
-    rc, lslpp_result, err = module.run_command([lslpp_cmd, "-lcq", "%s*" % (package, )])
+    rc, lslpp_result, err = module.run_command([lslpp_cmd, "-lcq", f"{package}*"])
 
     if rc == 1:
         package_state = ' '.join(err.split()[-2:])
@@ -184,11 +184,11 @@ def remove(module, installp_cmd, packages):
             not_found_pkg.insert(0, "Package(s) not found: ")
 
         changed = True
-        msg = "Packages removed: %s. %s " % (' '.join(removed_pkgs), ' '.join(not_found_pkg))
+        msg = f"Packages removed: {' '.join(removed_pkgs)}. {' '.join(not_found_pkg)} "
 
     else:
         changed = False
-        msg = ("No packages removed, all packages not found: %s" % ' '.join(not_found_pkg))
+        msg = f"No packages removed, all packages not found: {' '.join(not_found_pkg)}"
 
     return changed, msg
 
@@ -237,26 +237,26 @@ def install(module, installp_cmd, packages, repository_path, accept_license):
             not_found_pkgs.append(package)
 
     if len(installed_pkgs) > 0:
-        installed_msg = (" Installed: %s." % ' '.join(installed_pkgs))
+        installed_msg = f" Installed: {' '.join(installed_pkgs)}."
     else:
         installed_msg = ''
 
     if len(not_found_pkgs) > 0:
-        not_found_msg = (" Not found: %s." % ' '.join(not_found_pkgs))
+        not_found_msg = f" Not found: {' '.join(not_found_pkgs)}."
     else:
         not_found_msg = ''
 
     if len(already_installed_pkgs) > 0:
-        already_installed_msg = (" Already installed: %s." % already_installed_pkgs)
+        already_installed_msg = f" Already installed: {already_installed_pkgs}."
     else:
         already_installed_msg = ''
 
     if len(installed_pkgs) > 0:
         changed = True
-        msg = ("%s%s%s" % (installed_msg, not_found_msg, already_installed_msg))
+        msg = f"{installed_msg}{not_found_msg}{already_installed_msg}"
     else:
         changed = False
-        msg = ("No packages installed.%s%s%s" % (installed_msg, not_found_msg, already_installed_msg))
+        msg = f"No packages installed.{installed_msg}{not_found_msg}{already_installed_msg}"
 
     return changed, msg
 

@@ -266,12 +266,12 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match('( |\t)*([#;]?)( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+    return re.match(f'( |\t)*([#;]?)( |\t)*({option})( |\t)*(=|$)( |\t)*(.*)', line)
 
 
 def match_active_opt(option, line):
     option = re.escape(option)
-    return re.match('()()( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+    return re.match(f'()()( |\t)*({option})( |\t)*(=|$)( |\t)*(.*)', line)
 
 
 def update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg):
@@ -321,8 +321,8 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
     diff = dict(
         before='',
         after='',
-        before_header='%s (content)' % filename,
-        after_header='%s (content)' % filename,
+        before_header=f'{filename} (content)',
+        after_header=f'{filename} (content)',
     )
 
     if follow and os.path.islink(filename):
@@ -332,7 +332,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
 
     if not os.path.exists(target_filename):
         if not create:
-            module.fail_json(rc=257, msg='Destination %s does not exist!' % target_filename)
+            module.fail_json(rc=257, msg=f'Destination {target_filename} does not exist!')
         destpath = os.path.dirname(target_filename)
         if not os.path.exists(destpath) and not module.check_mode:
             os.makedirs(destpath)
@@ -362,7 +362,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
     fake_section_name = "ad01e11446efb704fcdbdb21f2c43757423d91c5"
 
     # Insert it at the beginning
-    ini_lines.insert(0, '[%s]' % fake_section_name)
+    ini_lines.insert(0, f'[{fake_section_name}]')
 
     # At bottom:
     ini_lines.append('[')
@@ -386,7 +386,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
     before = after = []
     section_lines = []
 
-    section_pattern = re.compile(to_text(r'^\[\s*%s\s*]' % re.escape(section.strip())))
+    section_pattern = re.compile(to_text(rf'^\[\s*{re.escape(section.strip())}\s*]'))
 
     for index, line in enumerate(ini_lines):
         # end of section:
@@ -434,7 +434,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                     matched_value = match.group(8)
                     if not matched_value and allow_no_value:
                         # replace existing option with no value line(s)
-                        newline = '%s\n' % option
+                        newline = f'{option}\n'
                         option_no_value_present = True
                     else:
                         # replace existing option=value line(s)
@@ -443,7 +443,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                     values.remove(matched_value)
                 elif not values and allow_no_value:
                     # replace existing option with no value line(s)
-                    newline = '%s\n' % option
+                    newline = f'{option}\n'
                     (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     option_no_value_present = True
                     break
@@ -482,12 +482,12 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                             changed = True
                         elif element is None and allow_no_value:
                             # insert option with no value line
-                            section_lines.insert(index, '%s\n' % option)
+                            section_lines.insert(index, f'{option}\n')
                             msg = 'option added'
                             changed = True
                 elif option and not values and allow_no_value and not option_no_value_present:
                     # insert option with no value line(s)
-                    section_lines.insert(index, '%s\n' % option)
+                    section_lines.insert(index, f'{option}\n')
                     msg = 'option added'
                     changed = True
                 break
@@ -523,7 +523,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
     del ini_lines[-1:]
 
     if not within_section and state == 'present':
-        ini_lines.append('[%s]\n' % section)
+        ini_lines.append(f'[{section}]\n')
         msg = 'section and option added'
         if section_has_values:
             for condition in section_has_values:
@@ -532,7 +532,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                         for value in condition['values']:
                             ini_lines.append(assignment_format % (condition['option'], value))
                     elif allow_no_value:
-                        ini_lines.append('%s\n' % condition['option'])
+                        ini_lines.append(f"{condition['option']}\n")
                 elif not exclusive:
                     for value in condition['values']:
                         if value not in values:
@@ -541,7 +541,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
             for value in values:
                 ini_lines.append(assignment_format % (option, value))
         elif option and not values and allow_no_value:
-            ini_lines.append('%s\n' % option)
+            ini_lines.append(f'{option}\n')
         else:
             msg = 'only section added'
         changed = True
@@ -566,8 +566,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
         try:
             module.atomic_move(tmpfile, os.path.abspath(target_filename))
         except IOError:
-            module.ansible.fail_json(msg='Unable to move temporary \
-                                   file %s to %s, IOError' % (tmpfile, target_filename), traceback=traceback.format_exc())
+            module.ansible.fail_json(msg=f'Unable to move temporary file {tmpfile} to {target_filename}, IOError', traceback=traceback.format_exc())
 
     return (changed, backup_file, diff, msg)
 

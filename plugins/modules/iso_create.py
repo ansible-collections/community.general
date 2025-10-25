@@ -159,7 +159,6 @@ except ImportError:
     HAS_PYCDLIB = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def add_file(module, iso_file=None, src_file=None, file_path=None, rock_ridge=None, use_joliet=None, use_udf=None):
@@ -170,9 +169,9 @@ def add_file(module, iso_file=None, src_file=None, file_path=None, rock_ridge=No
     # followed by a maximum 3 character extension, followed by a semicolon and a version
     file_name = os.path.basename(file_path)
     if '.' not in file_name:
-        file_in_iso_path = file_path.upper() + '.;1'
+        file_in_iso_path = f"{file_path.upper()}.;1"
     else:
-        file_in_iso_path = file_path.upper() + ';1'
+        file_in_iso_path = f"{file_path.upper()};1"
     if rock_ridge:
         rr_name = file_name
     if use_joliet:
@@ -182,7 +181,7 @@ def add_file(module, iso_file=None, src_file=None, file_path=None, rock_ridge=No
     try:
         iso_file.add_file(src_file, iso_path=file_in_iso_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path)
     except Exception as err:
-        module.fail_json(msg="Failed to add file %s to ISO file due to %s" % (src_file, to_native(err)))
+        module.fail_json(msg=f"Failed to add file {src_file} to ISO file due to {err}")
 
 
 def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_joliet=None, use_udf=None):
@@ -199,7 +198,7 @@ def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_jol
     try:
         iso_file.add_directory(iso_path=iso_dir_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path)
     except Exception as err:
-        module.fail_json(msg="Failed to directory %s to ISO file due to %s" % (dir_path, to_native(err)))
+        module.fail_json(msg=f"Failed to directory {dir_path} to ISO file due to {err}")
 
 
 def main():
@@ -224,7 +223,7 @@ def main():
         module.fail_json(msg='Please specify source file and/or directory list using src_files parameter.')
     for src_file in src_file_list:
         if not os.path.exists(src_file):
-            module.fail_json(msg="Specified source file/directory path does not exist on local machine, %s" % src_file)
+            module.fail_json(msg=f"Specified source file/directory path does not exist on local machine, {src_file}")
 
     dest_iso = module.params.get('dest_iso')
     if dest_iso and len(dest_iso) == 0:
@@ -236,7 +235,7 @@ def main():
         try:
             os.makedirs(dest_iso_dir)
         except OSError as err:
-            module.fail_json(msg='Exception caught when creating folder %s, with error %s' % (dest_iso_dir, to_native(err)))
+            module.fail_json(msg=f'Exception caught when creating folder {dest_iso_dir}, with error {err}')
 
     volume_id = module.params.get('vol_ident')
     if volume_id is None:
@@ -269,7 +268,7 @@ def main():
                 file_list = []
                 src_file = src_file.rstrip('/')
                 dir_name = os.path.basename(src_file)
-                add_directory(module, iso_file=iso_file, dir_path='/' + dir_name, rock_ridge=rock_ridge,
+                add_directory(module, iso_file=iso_file, dir_path=f"/{dir_name}", rock_ridge=rock_ridge,
                               use_joliet=use_joliet, use_udf=use_udf)
 
                 # get dir list and file list
@@ -287,7 +286,7 @@ def main():
                              use_joliet=use_joliet, use_udf=use_udf)
             # if specify a file then add this file directly to the '/' path in ISO
             else:
-                add_file(module, iso_file=iso_file, src_file=src_file, file_path='/' + os.path.basename(src_file),
+                add_file(module, iso_file=iso_file, src_file=src_file, file_path=f"/{os.path.basename(src_file)}",
                          rock_ridge=rock_ridge, use_joliet=use_joliet, use_udf=use_udf)
 
         iso_file.write(dest_iso)

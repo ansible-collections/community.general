@@ -144,7 +144,6 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
-from ansible.module_utils.common.text.converters import to_native
 
 
 VALID_DURATION_REGEX = re.compile(r'^(INF|(\d+(ns|u|µ|ms|s|m|h|d|w)))+$')
@@ -201,7 +200,7 @@ def find_retention_policy(module, client):
                 retention_policy = policy
                 break
     except requests.exceptions.ConnectionError as e:
-        module.fail_json(msg="Cannot connect to database %s on %s : %s" % (database_name, hostname, to_native(e)))
+        module.fail_json(msg=f"Cannot connect to database {database_name} on {hostname} : {e}")
 
     if retention_policy is not None:
         retention_policy["duration"] = parse_duration_literal(retention_policy["duration"], extended=True)

@@ -304,14 +304,14 @@ def imc_response(module, rawoutput, rawinput=''):
         result['output'] = rawoutput
         result['error_code'] = xmloutput.get('errorCode')
         result['error_text'] = xmloutput.get('errorDescr')
-        module.fail_json(msg='Request failed: %(error_text)s' % result, **result)
+        module.fail_json(msg=f"Request failed: {result['error_text']}", **result)
 
     return result
 
 
 def logout(module, url, cookie, timeout):
     ''' Perform a logout, if needed '''
-    data = '<aaaLogout cookie="%s" inCookie="%s"/>' % (cookie, cookie)
+    data = f'<aaaLogout cookie="{cookie}" inCookie="{cookie}"/>'
     resp, auth = fetch_url(module, url, data=data, method="POST", timeout=timeout)
 
 
@@ -371,17 +371,17 @@ def main():
         if os.path.isfile(path):
             file_exists = True
         else:
-            module.fail_json(msg='Cannot find/access path:\n%s' % path)
+            module.fail_json(msg=f'Cannot find/access path:\n{path}')
 
     start = now()
 
     # Perform login first
-    url = '%s://%s/nuova' % (protocol, hostname)
-    data = '<aaaLogin inName="%s" inPassword="%s"/>' % (username, password)
+    url = f'{protocol}://{hostname}/nuova'
+    data = f'<aaaLogin inName="{username}" inPassword="{password}"/>'
     resp, auth = fetch_url(module, url, data=data, method='POST', timeout=timeout)
     if resp is None or auth['status'] != 200:
         result['elapsed'] = (now() - start).seconds
-        module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % auth, **result)
+        module.fail_json(msg=f"Task failed with error {auth['status']}: {auth['msg']}", **result)
     result.update(imc_response(module, resp.read()))
 
     # Store cookie for future requests
@@ -414,7 +414,7 @@ def main():
             resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
             if resp is None or info['status'] != 200:
                 result['elapsed'] = (now() - start).seconds
-                module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
+                module.fail_json(msg=f"Task failed with error {info['status']}: {info['msg']}", **result)
 
             # Merge results with previous results
             rawoutput = resp.read()
