@@ -21,6 +21,11 @@ options:
     required: true
     choices: ['community.general.incus']
     type: str
+  default_groups:
+    description:
+      - Whether to generate default groups based on remote and project.
+    type: bool
+    default: true
   filters:
     description:
       - Filter expression as supported by C(incus list).
@@ -46,6 +51,8 @@ options:
     type: list
     elements: string
     default: ["local"]
+extends_documentation_fragment:
+  - ansible.builtin.constructed
 """
 
 EXAMPLES = r"""
@@ -76,7 +83,7 @@ remotes:
   - remote-2:default
 """
 
-from ansible.plugins.inventory import BaseInventoryPlugin
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible.utils.display import Display
 from json import loads
 from subprocess import check_output
@@ -84,7 +91,7 @@ from subprocess import check_output
 display = Display()
 
 
-class InventoryModule(BaseInventoryPlugin):
+class InventoryModule(BaseInventoryPlugin, Constructable):
     """Host inventory parser for Incus."""
 
     NAME = "community.general.incus"
@@ -114,7 +121,9 @@ class InventoryModule(BaseInventoryPlugin):
 
     def populate(self):
         # Create top-level "incus" group if missing.
-        self.inventory.add_group("incus")
+        default_groups = self.get_option("default_groups")
+        if default_groups:
+            self.inventory.add_group("incus")
 
         for remote in self.get_option("remotes"):
             # Split the remote name from the project name (if specified).
@@ -130,8 +139,9 @@ class InventoryModule(BaseInventoryPlugin):
 
             # Create the remote-specific group if missing.
             group_remote = f"incus_{remote_name}"
-            self.inventory.add_group(group_remote)
-            self.inventory.add_child("incus", group_remote)
+            if default_groups:
+                self.inventory.add_group(group_remote)
+                self.inventory.add_child("incus", group_remote)
 
             # Get a list of projects.
             projects = []
@@ -147,8 +157,9 @@ class InventoryModule(BaseInventoryPlugin):
             for project in projects:
                 # Create the project-specific group if missing.
                 group_project = f"{group_remote}_{project}"
-                self.inventory.add_group(group_project)
-                self.inventory.add_child(group_remote, group_project)
+                if default_groups:
+                    self.inventory.add_group(group_project)
+                    self.inventory.add_child(group_remote, group_project)
 
                 # List the instances.
                 list_cmd = [
@@ -167,56 +178,53 @@ class InventoryModule(BaseInventoryPlugin):
                         if domain:
                             host_name = f"{host_name}.{domain}"
 
-                    # Add the host to the inventory.
-                    self.inventory.add_host(host_name, group_project)
+                    # Add some extra variables.
+                    host_vars = {}
+                    host_vars["ansible_incus_remote"] = remote_name
+                    host_vars["ansible_incus_project"] = project
 
-                    # Add soem extra variables.
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_remote", remote_name
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_project", project
-                    )
+                    for prop in (
+                        "architecture",
+                        "config",
+                        "description",
+                        "devices",
+                        "ephemeral",
+                        "expanded_config",
+                        "expanded_devices",
+                        "location",
+                        "profiles",
+                        "status",
+                        "type",
+                    ):
+                        host_vars[f"ansible_incus_{prop}"] = instance[prop]
 
-                    self.inventory.set_variable(
-                        host_name,
-                        "ansible_incus_architecture",
-                        instance["architecture"],
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_config", instance["config"]
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_devices", instance["devices"]
-                    )
-                    self.inventory.set_variable(
-                        host_name,
-                        "ansible_incus_expanded_config",
-                        instance["expanded_config"],
-                    )
-                    self.inventory.set_variable(
-                        host_name,
-                        "ansible_incus_expanded_devices",
-                        instance["expanded_devices"],
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_description", instance["description"]
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_ephemeral", instance["ephemeral"]
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_location", instance["location"]
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_profiles", instance["profiles"]
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_status", instance["status"]
-                    )
-                    self.inventory.set_variable(
-                        host_name, "ansible_incus_type", instance["type"]
-                    )
+                    # Add the host to the inventory and constructed groups.
+                    self._add_host(host_name, host_vars)
+
+                    # Add the host to the built-in groups.
+                    if default_groups:
+                        self.inventory.add_host(host_name, group_project)
+
+    def _add_host(self, hostname, host_vars):
+        self.inventory.add_host(hostname, group="all")
+
+        for var_name, var_value in host_vars.items():
+            self.inventory.set_variable(hostname, var_name, var_value)
+
+        strict = self.get_option("strict")
+
+        # Add variables created by the user's Jinja2 expressions to the host
+        self._set_composite_vars(
+            self.get_option("compose"), host_vars, hostname, strict=True
+        )
+
+        # Create user-defined groups using variables and Jinja2 conditionals
+        self._add_host_to_composed_groups(
+            self.get_option("groups"), host_vars, hostname, strict=strict
+        )
+        self._add_host_to_keyed_groups(
+            self.get_option("keyed_groups"), host_vars, hostname, strict=strict
+        )
 
     def _run_incus(self, *args):
         local_cmd = ["incus"] + list(args) + ["--format=json"]
