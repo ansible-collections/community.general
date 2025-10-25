@@ -888,7 +888,7 @@ def main():
     if cid is None:
         found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', name=name)), realm)
         if len(found) > 1:
-            module.fail_json(msg='No ID given and found multiple user federations with name `{name}`. Cannot continue.'.format(name=name))
+            module.fail_json(msg=f'No ID given and found multiple user federations with name `{name}`. Cannot continue.')
         before_comp = next(iter(found), None)
         if before_comp is not None:
             cid = before_comp['id']
@@ -918,7 +918,7 @@ def main():
     # special handling of mappers list to allow change detection
     if module.params.get('mappers') is not None:
         if module.params['provider_id'] in ['kerberos', 'sssd']:
-            module.fail_json(msg='Cannot configure mappers for {type} provider.'.format(type=module.params['provider_id']))
+            module.fail_json(msg=f"Cannot configure mappers for {module.params['provider_id']} provider.")
         for change in module.params['mappers']:
             change = {k: v for k, v in change.items() if v is not None}
             if change.get('id') is None and change.get('name') is None:
@@ -932,7 +932,7 @@ def main():
             else:
                 found = [before_mapper for before_mapper in before_comp.get('mappers', []) if before_mapper['name'] == change['name']]
                 if len(found) > 1:
-                    module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=change['name']))
+                    module.fail_json(msg=f"Found multiple mappers with name `{change['name']}`. Cannot continue.")
                 if len(found) == 1:
                     old_mapper = found[0]
                 else:
@@ -988,7 +988,7 @@ def main():
         for desired_mapper in desired_mappers:
             found = [default_mapper for default_mapper in default_mappers if default_mapper['name'] == desired_mapper['name']]
             if len(found) > 1:
-                module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=desired_mapper['name']))
+                module.fail_json(msg=f"Found multiple mappers with name `{desired_mapper['name']}`. Cannot continue.")
             if len(found) == 1:
                 old_mapper = found[0]
             else:
@@ -1017,7 +1017,7 @@ def main():
         if module._diff:
             result['diff'] = dict(before='', after=sanitize(after_comp))
         result['end_state'] = sanitize(after_comp)
-        result['msg'] = "User federation {id} has been created".format(id=cid)
+        result['msg'] = f"User federation {cid} has been created"
         module.exit_json(**result)
 
     else:
@@ -1035,7 +1035,7 @@ def main():
             if desired_copy == before_copy:
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_comp)
-                result['msg'] = "No changes required to user federation {id}.".format(id=cid)
+                result['msg'] = f"No changes required to user federation {cid}."
                 module.exit_json(**result)
 
             # doing an update
@@ -1075,7 +1075,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before=before_comp_sanitized, after=after_comp_sanitized)
             result['changed'] = before_comp_sanitized != after_comp_sanitized
-            result['msg'] = "User federation {id} has been updated".format(id=cid)
+            result['msg'] = f"User federation {cid} has been updated"
             module.exit_json(**result)
 
         elif state == 'absent':
@@ -1093,7 +1093,7 @@ def main():
 
             result['end_state'] = {}
 
-            result['msg'] = "User federation {id} has been deleted".format(id=cid)
+            result['msg'] = f"User federation {cid} has been deleted"
 
     module.exit_json(**result)
 

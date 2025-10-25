@@ -354,7 +354,7 @@ def main():
 
         result['end_state'] = after_role
 
-        result['msg'] = 'Role {name} has been created'.format(name=name)
+        result['msg'] = f'Role {name} has been created'
         module.exit_json(**result)
 
     else:
@@ -380,7 +380,7 @@ def main():
             if is_struct_included(desired_role, before_role, exclude=compare_exclude):
                 result['changed'] = False
                 result['end_state'] = desired_role
-                result['msg'] = "No changes required to role {name}.".format(name=name)
+                result['msg'] = f"No changes required to role {name}."
                 module.exit_json(**result)
 
             # doing an update
@@ -404,7 +404,7 @@ def main():
 
             result['end_state'] = after_role
 
-            result['msg'] = "Role {name} has been updated".format(name=name)
+            result['msg'] = f"Role {name} has been updated"
             module.exit_json(**result)
 
         else:
@@ -425,7 +425,7 @@ def main():
 
             result['end_state'] = {}
 
-            result['msg'] = "Role {name} has been deleted".format(name=name)
+            result['msg'] = f"Role {name} has been deleted"
 
     module.exit_json(**result)
 

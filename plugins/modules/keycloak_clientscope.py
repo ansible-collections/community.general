@@ -444,8 +444,7 @@ def main():
 
         result['end_state'] = sanitize_cr(after_clientscope)
 
-        result['msg'] = 'Clientscope {name} has been created with ID {id}'.format(name=after_clientscope['name'],
-                                                                                  id=after_clientscope['id'])
+        result['msg'] = f"Clientscope {after_clientscope['name']} has been created with ID {after_clientscope['id']}"
 
     else:
         if state == 'present':
@@ -457,7 +456,7 @@ def main():
             if normalise_cr(desired_clientscope, remove_ids=True) == normalise_cr(before_clientscope, remove_ids=True):
                 result['changed'] = False
                 result['end_state'] = sanitize_cr(desired_clientscope)
-                result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])
+                result['msg'] = f"No changes required to clientscope {before_clientscope['name']}."
                 module.exit_json(**result)
 
             # doing an update
@@ -495,7 +494,7 @@ def main():
 
             result['end_state'] = after_clientscope
 
-            result['msg'] = "Clientscope {id} has been updated".format(id=after_clientscope['id'])
+            result['msg'] = f"Clientscope {after_clientscope['id']} has been updated"
             module.exit_json(**result)
 
         else:
@@ -514,7 +513,7 @@ def main():
 
             result['end_state'] = {}
 
-            result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
+            result['msg'] = f"Clientscope {before_clientscope['name']} has been deleted"
 
     module.exit_json(**result)
 

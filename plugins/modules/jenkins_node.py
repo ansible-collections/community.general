@@ -150,7 +150,6 @@ import traceback
 from xml.etree import ElementTree as et
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare(
@@ -186,7 +185,7 @@ class JenkinsNode:
         if self.labels is not None:
             for label in self.labels:
                 if " " in label:
-                    self.module.fail_json("labels must not contain spaces: got invalid label {}".format(label))
+                    self.module.fail_json(f"labels must not contain spaces: got invalid label {label}")
 
         self.instance = self.get_jenkins_instance()
         self.result = {
@@ -212,7 +211,7 @@ class JenkinsNode:
             else:
                 return jenkins.Jenkins(self.url)
         except Exception as e:
-            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
+            self.module.fail_json(msg=f'Unable to connect to Jenkins server, {e}')
 
     def configure_node(self, present):
         if not present:
@@ -275,7 +274,7 @@ class JenkinsNode:
                 # handling redirects returned when posting to resources. If the node is
                 # created OK then can ignore the error.
                 if not self.instance.node_exists(self.name):
-                    self.module.fail_json(msg="Create node failed: %s" % to_native(e), exception=traceback.format_exc())
+                    self.module.fail_json(msg=f"Create node failed: {e}", exception=traceback.format_exc())
 
                 # TODO: Remove authorization workaround.
                 self.result['warnings'].append(
@@ -309,7 +308,7 @@ class JenkinsNode:
                 # handling redirects returned when posting to resources. If the node is
                 # deleted OK then can ignore the error.
                 if self.instance.node_exists(self.name):
-                    self.module.fail_json(msg="Delete node failed: %s" % to_native(e), exception=traceback.format_exc())
+                    self.module.fail_json(msg=f"Delete node failed: {e}", exception=traceback.format_exc())
 
                 # TODO: Remove authorization workaround.
                 self.result['warnings'].append(
@@ -347,7 +346,7 @@ class JenkinsNode:
                     offline = get_offline()
 
                     if offline:
-                        self.module.fail_json(msg="Enable node failed: %s" % to_native(e), exception=traceback.format_exc())
+                        self.module.fail_json(msg=f"Enable node failed: {e}", exception=traceback.format_exc())
 
                     # TODO: Remove authorization workaround.
                     self.result['warnings'].append(
@@ -417,7 +416,7 @@ class JenkinsNode:
                     offline, _offline_message = get_offline_info()
 
                     if not offline:
-                        self.module.fail_json(msg="Disable node failed: %s" % to_native(e), exception=traceback.format_exc())
+                        self.module.fail_json(msg=f"Disable node failed: {e}", exception=traceback.format_exc())
 
                     # TODO: Remove authorization workaround.
                     self.result['warnings'].append(

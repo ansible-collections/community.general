@@ -178,8 +178,7 @@ def main():
     # "clientId"
     cid = kc.get_client_id(client_id, realm=realm)
     if not cid:
-        module.fail_json(msg='Invalid client %s for realm %s' %
-                         (client_id, realm))
+        module.fail_json(msg=f'Invalid client {client_id} for realm {realm}')
 
     # Get current state of the Authorization Scope using its name as the search
     # filter. This returns False if it is not found.
@@ -267,8 +266,7 @@ def main():
     elif not before_authz_scope and state == 'absent':
         result['changed'] = False
     else:
-        module.fail_json(msg='Unable to determine what to do with authorization scope %s of client %s in realm %s' % (
-            name, client_id, realm))
+        module.fail_json(msg=f'Unable to determine what to do with authorization scope {name} of client {client_id} in realm {realm}')
 
     module.exit_json(**result)
 

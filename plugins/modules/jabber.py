@@ -95,7 +95,6 @@ except ImportError:
     HAS_XMPP = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -138,9 +137,9 @@ def main():
     try:
         conn = xmpp.Client(server, debug=[])
         if not conn.connect(server=(host, port)):
-            module.fail_json(rc=1, msg='Failed to connect to server: %s' % (server))
+            module.fail_json(rc=1, msg=f'Failed to connect to server: {server}')
         if not conn.auth(user, password, 'Ansible'):
-            module.fail_json(rc=1, msg='Failed to authorize %s on: %s' % (user, server))
+            module.fail_json(rc=1, msg=f'Failed to authorize {user} on: {server}')
         # some old servers require this, also the sleep following send
         conn.sendInitPresence(requestRoster=0)
 
@@ -160,7 +159,7 @@ def main():
         time.sleep(1)
         conn.disconnect()
     except Exception as e:
-        module.fail_json(msg="unable to send msg: %s" % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"unable to send msg: {e}", exception=traceback.format_exc())
 
     module.exit_json(changed=False, to=to, user=user, msg=msg.getBody())
 

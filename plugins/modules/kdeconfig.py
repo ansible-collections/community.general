@@ -212,7 +212,7 @@ def run_module(module, tmpdir, kwriteconfig):
         try:
             module.atomic_move(b_tmpfile, os.path.abspath(b_path))
         except IOError:
-            module.ansible.fail_json(msg='Unable to move temporary file %s to %s, IOError' % (tmpfile, result['path']), traceback=traceback.format_exc())
+            module.ansible.fail_json(msg=f"Unable to move temporary file {tmpfile} to {result['path']}, IOError", traceback=traceback.format_exc())
 
     if result['changed']:
         module.set_fs_attributes_if_different(file_args, result['changed'])

@@ -314,11 +314,11 @@ def main():
         if group_rep is not None:
             gid = group_rep['id']
         else:
-            module.fail_json(msg='Could not fetch group %s:' % group_name)
+            module.fail_json(msg=f'Could not fetch group {group_name}:')
     if cid is None:
         cid = kc.get_client_id(client_id, realm=realm)
         if cid is None:
-            module.fail_json(msg='Could not fetch client %s:' % client_id)
+            module.fail_json(msg=f'Could not fetch client {client_id}:')
     if roles is None:
         module.exit_json(msg="Nothing to do (no roles specified).")
     else:
@@ -331,12 +331,12 @@ def main():
                 if role_id is not None:
                     role['id'] = role_id
                 else:
-                    module.fail_json(msg='Could not fetch role %s:' % (role['name']))
+                    module.fail_json(msg=f"Could not fetch role {role['name']}:")
             # Fetch missing role_name
             else:
                 role['name'] = kc.get_client_group_rolemapping_by_id(gid, cid, role['id'], realm=realm)['name']
                 if role['name'] is None:
-                    module.fail_json(msg='Could not fetch role %s' % (role['id']))
+                    module.fail_json(msg=f"Could not fetch role {role['id']}")
 
     # Get effective client-level role mappings
     available_roles_before = kc.get_client_group_available_rolemappings(gid, cid, realm=realm)
@@ -376,7 +376,7 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_group_rolemapping(gid, cid, update_roles, realm=realm)
-            result['msg'] = 'Roles %s assigned to group %s.' % (update_roles, group_name)
+            result['msg'] = f'Roles {update_roles} assigned to group {group_name}.'
             assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
@@ -388,14 +388,14 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
             kc.delete_group_rolemapping(gid, cid, update_roles, realm=realm)
-            result['msg'] = 'Roles %s removed from group %s.' % (update_roles, group_name)
+            result['msg'] = f'Roles {update_roles} removed from group {group_name}.'
             assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
     # Do nothing
     else:
         result['changed'] = False
-        result['msg'] = 'Nothing to do, roles %s are %s with group %s.' % (roles, 'mapped' if state == 'present' else 'not mapped', group_name)
+        result['msg'] = f"Nothing to do, roles {roles} are {'mapped' if state == 'present' else 'not mapped'} with group {group_name}."
         module.exit_json(**result)
 
 

@@ -665,14 +665,14 @@ def main():
                 before_realm_userprofile[param] = userprofile[param]
 
                 if changeset_copy[param] != userprofile[param] and param != 'config':
-                    changes += "%s: %s -> %s, " % (param, userprofile[param], changeset_copy[param])
+                    changes += f"{param}: {userprofile[param]} -> {changeset_copy[param]}, "
                     result['changed'] = True
 
             # Compare parameters under the "config" userprofile
             for p, v in changeset_copy['config'].items():
                 before_realm_userprofile['config'][p] = userprofile['config'][p]
                 if changeset_copy['config'][p] != userprofile['config'][p]:
-                    changes += "config.%s: %s -> %s, " % (p, userprofile['config'][p], changeset_copy['config'][p])
+                    changes += f"config.{p}: {userprofile['config'][p]} -> {changeset_copy['config'][p]}, "
                     result['changed'] = True
 
     # Check all the possible states of the resource and do what is needed to
@@ -688,12 +688,12 @@ def main():
                 result['diff'] = dict(before=before_realm_userprofile, after=changeset_copy)
 
             if module.check_mode:
-                result['msg'] = "Userprofile %s would be changed: %s" % (provider_id, changes.strip(", "))
+                result['msg'] = f"Userprofile {provider_id} would be changed: {changes.strip(', ')}"
             else:
                 kc.update_component(changeset, parent_id)
-                result['msg'] = "Userprofile %s changed: %s" % (provider_id, changes.strip(", "))
+                result['msg'] = f"Userprofile {provider_id} changed: {changes.strip(', ')}"
         else:
-            result['msg'] = "Userprofile %s was in sync" % (provider_id)
+            result['msg'] = f"Userprofile {provider_id} was in sync"
 
         result['end_state'] = changeset_copy
     elif userprofile_id and state == 'absent':
@@ -702,11 +702,11 @@ def main():
 
         if module.check_mode:
             result['changed'] = True
-            result['msg'] = "Userprofile %s would be deleted" % (provider_id)
+            result['msg'] = f"Userprofile {provider_id} would be deleted"
         else:
             kc.delete_component(userprofile_id, parent_id)
             result['changed'] = True
-            result['msg'] = "Userprofile %s deleted" % (provider_id)
+            result['msg'] = f"Userprofile {provider_id} deleted"
 
         result['end_state'] = {}
     elif not userprofile_id and state == 'present':
@@ -715,16 +715,16 @@ def main():
 
         if module.check_mode:
             result['changed'] = True
-            result['msg'] = "Userprofile %s would be created" % (provider_id)
+            result['msg'] = f"Userprofile {provider_id} would be created"
         else:
             kc.create_component(changeset, parent_id)
             result['changed'] = True
-            result['msg'] = "Userprofile %s created" % (provider_id)
+            result['msg'] = f"Userprofile {provider_id} created"
 
         result['end_state'] = changeset_copy
     elif not userprofile_id and state == 'absent':
         result['changed'] = False
-        result['msg'] = "Userprofile %s not present" % (provider_id)
+        result['msg'] = f"Userprofile {provider_id} not present"
         result['end_state'] = {}
 
     module.exit_json(**result)

@@ -334,7 +334,7 @@ with deps.declare("urllib3", reason="urllib3 is required to embed files into req
 def validate_file_exist(module, path):
 
     if path and not os.path.exists(path):
-        module.fail_json(msg="File not found: {}".format(path))
+        module.fail_json(msg=f"File not found: {path}")
 
 
 # Gets the Jenkins crumb for CSRF protection which is required for API calls
@@ -345,7 +345,7 @@ def get_jenkins_crumb(module, headers):
     if "/job" in url:
         url = url.split("/job")[0]
 
-    crumb_url = "{}/crumbIssuer/api/json".format(url)
+    crumb_url = f"{url}/crumbIssuer/api/json"
 
     response, info = fetch_url(module, crumb_url, headers=headers)
 
@@ -416,15 +416,11 @@ def target_exists(module, check_domain=False):
     headers = {"Authorization": basic_auth_header(user, token)}
 
     if module.params["type"] == "scope" or check_domain:
-        target_url = "{}/credentials/store/{}/domain/{}/api/json".format(
-            url, location, scope if check_domain else name
-        )
+        target_url = f"{url}/credentials/store/{location}/domain/{scope if check_domain else name}/api/json"
     elif module.params["type"] == "token":
         return False  # Can't check token
     else:
-        target_url = "{}/credentials/store/{}/domain/{}/credential/{}/api/json".format(
-            url, location, scope, name
-        )
+        target_url = f"{url}/credentials/store/{location}/domain/{scope}/credential/{name}/api/json"
 
     response, info = fetch_url(module, target_url, headers=headers)
     status = info.get("status", 0)
@@ -435,9 +431,7 @@ def target_exists(module, check_domain=False):
         return False
     else:
         module.fail_json(
-            msg="Unexpected status code {} when checking {} existence.".format(
-                status, name
-            )
+            msg=f"Unexpected status code {status} when checking {name} existence."
         )
 
 
@@ -455,21 +449,15 @@ def delete_target(module, headers):
     try:
 
         if type == "token":
-            delete_url = "{}/user/{}/descriptorByName/jenkins.security.ApiTokenProperty/revoke".format(
-                url, user
-            )
+            delete_url = f"{url}/user/{user}/descriptorByName/jenkins.security.ApiTokenProperty/revoke"
             body = urlencode({"tokenUuid": id})
 
         elif type == "scope":
-            delete_url = "{}/credentials/store/{}/domain/{}/doDelete".format(
-                url, location, id
-            )
+            delete_url = f"{url}/credentials/store/{location}/domain/{id}/doDelete"
 
         else:
             delete_url = (
-                "{}/credentials/store/{}/domain/{}/credential/{}/doDelete".format(
-                    url, location, scope, id
-                )
+                f"{url}/credentials/store/{location}/domain/{scope}/credential/{id}/doDelete"
             )
 
         response, info = fetch_url(
@@ -483,13 +471,11 @@ def delete_target(module, headers):
         status = info.get("status", 0)
         if not status == 200:
             module.fail_json(
-                msg="Failed to delete: HTTP {}, {}, {}".format(
-                    status, response, headers
-                )
+                msg=f"Failed to delete: HTTP {status}, {response}, {headers}"
             )
 
     except Exception as e:
-        module.fail_json(msg="Exception during delete: {}".format(str(e)))
+        module.fail_json(msg=f"Exception during delete: {e}")
 
 
 # Function to read the private key for types texts and ssh_key
@@ -499,7 +485,7 @@ def read_privateKey(module):
             private_key = f.read().strip()
             return private_key
     except Exception as e:
-        module.fail_json(msg="Failed to read private key file: {}".format(str(e)))
+        module.fail_json(msg=f"Failed to read private key file: {e}")
 
 
 # Function to builds multipart form-data body and content-type header for file credential upload.
@@ -514,7 +500,7 @@ def embed_file_into_body(module, file_path, credentials):
         with open(file_path, "rb") as f:
             file_bytes = f.read()
     except Exception as e:
-        module.fail_json(msg="Failed to read file: {}".format(str(e)))
+        module.fail_json(msg=f"Failed to read file: {e}")
         return "", ""  # Return for test purposes
 
     credentials.update(
@@ -639,7 +625,7 @@ def run_module():
     # Check if the credential/domain doesn't exist and the user wants to delete
     if not does_exist and state == "absent" and not type == "token":
         result["changed"] = False
-        result["msg"] = "{} does not exist.".format(id)
+        result["msg"] = f"{id} does not exist."
         module.exit_json(**result)
 
     if state == "present":
@@ -649,20 +635,18 @@ def run_module():
             delete_target(module, headers)
         elif does_exist and not force:
             result["changed"] = False
-            result["msg"] = "{} already exists. Use force=True to update.".format(id)
+            result["msg"] = f"{id} already exists. Use force=True to update."
             module.exit_json(**result)
 
         if type == "token":
 
-            post_url = "{}/user/{}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken".format(
-                url, jenkins_user
-            )
+            post_url = f"{url}/user/{jenkins_user}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken"
 
-            body = "newTokenName={}".format(name)
+            body = f"newTokenName={name}"
 
         elif type == "scope":
 
-            post_url = "{}/credentials/store/{}/createDomain".format(url, location)
+            post_url = f"{url}/credentials/store/{location}/createDomain"
 
             specifications = []
 
@@ -714,9 +698,7 @@ def run_module():
             elif private_key_path:
                 validate_file_exist(module, private_key_path)
 
-            post_url = "{}/credentials/store/{}/domain/{}/createCredentials".format(
-                url, location, scope
-            )
+            post_url = f"{url}/credentials/store/{location}/domain/{scope}/createCredentials"
 
             cred_class = {
                 "user_and_pass": "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl",
@@ -771,9 +753,7 @@ def run_module():
                         )
                     except Exception as e:
                         module.fail_json(
-                            msg="Failed to read or encode keystore file: {}".format(
-                                str(e)
-                            )
+                            msg=f"Failed to read or encode keystore file: {e}"
                         )
 
                     credentials.update(
@@ -793,7 +773,7 @@ def run_module():
                             private_key = f.read()
                     except Exception as e:
                         module.fail_json(
-                            msg="Failed to read PEM files: {}".format(str(e))
+                            msg=f"Failed to read PEM files: {e}"
                         )
 
                     credentials.update(
@@ -820,29 +800,27 @@ def run_module():
 
         delete_target(module, headers)
 
-        module.exit_json(changed=True, msg="{} deleted successfully.".format(id))
+        module.exit_json(changed=True, msg=f"{id} deleted successfully.")
 
     if (
         not type == "scope" and not scope == "_"
     ):  # Check if custom scope exists if adding to a custom scope
         if not target_exists(module, True):
-            module.fail_json(msg="Domain {} doesn't exists".format(scope))
+            module.fail_json(msg=f"Domain {scope} doesn't exists")
 
     try:
         response, info = fetch_url(
             module, post_url, headers=headers, data=body, method="POST"
         )
     except Exception as e:
-        module.fail_json(msg="Request to {} failed: {}".format(post_url, str(e)))
+        module.fail_json(msg=f"Request to {post_url} failed: {e}")
 
     status = info.get("status", 0)
 
     if not status == 200:
         body = response.read() if response else b""
         module.fail_json(
-            msg="Failed to {} credential".format(
-                "add/update" if state == "present" else "delete"
-            ),
+            msg=f"Failed to {'add/update' if state == 'present' else 'delete'} credential",
             details=body.decode("utf-8", errors="ignore"),
         )
 

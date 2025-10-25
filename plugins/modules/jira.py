@@ -567,7 +567,7 @@ class JIRA(StateModuleHelper):
         if self.vars.account_id:
             self.vars.fields['assignee'] = {'accountId': self.vars.account_id}
         self.vars.uri = self.vars.uri.strip('/')
-        self.vars.set('restbase', self.vars.uri + '/rest/api/2')
+        self.vars.set('restbase', f"{self.vars.uri}/rest/api/2")
 
     @cause_changes(when="success")
     def operation_create(self):
@@ -584,7 +584,7 @@ class JIRA(StateModuleHelper):
             createfields.update(self.vars.fields)
 
         data = {'fields': createfields}
-        url = self.vars.restbase + '/issue/'
+        url = f"{self.vars.restbase}/issue/"
         self.vars.meta = self.post(url, data)
 
     @cause_changes(when="success")
@@ -600,7 +600,7 @@ class JIRA(StateModuleHelper):
         if self.vars.fields:
             data.update(self.vars.fields)
 
-        url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}/comment"
         self.vars.meta = self.post(url, data)
 
     @cause_changes(when="success")
@@ -616,7 +616,7 @@ class JIRA(StateModuleHelper):
         if self.vars.fields:
             data.update(self.vars.fields)
 
-        url = self.vars.restbase + '/issue/' + self.vars.issue + '/worklog'
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}/worklog"
         self.vars.meta = self.post(url, data)
 
     @cause_changes(when="success")
@@ -624,7 +624,7 @@ class JIRA(StateModuleHelper):
         data = {
             'fields': self.vars.fields
         }
-        url = self.vars.restbase + '/issue/' + self.vars.issue
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}"
         self.vars.meta = self.put(url, data)
 
     @cause_changes(when="success")
@@ -632,27 +632,27 @@ class JIRA(StateModuleHelper):
         data = {
             "update": self.vars.fields,
         }
-        url = self.vars.restbase + '/issue/' + self.vars.issue
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}"
         self.vars.meta = self.put(url, data)
 
     def operation_fetch(self):
-        url = self.vars.restbase + '/issue/' + self.vars.issue
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}"
         self.vars.meta = self.get(url)
 
     def operation_search(self):
-        url = self.vars.restbase + '/search?jql=' + pathname2url(self.vars.jql)
+        url = f"{self.vars.restbase}/search?jql={pathname2url(self.vars.jql)}"
         if self.vars.fields:
             fields = self.vars.fields.keys()
-            url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
+            url = f"{url}&fields={'&fields='.join([pathname2url(f) for f in fields])}"
         if self.vars.maxresults:
-            url = url + '&maxResults=' + str(self.vars.maxresults)
+            url = f"{url}&maxResults={self.vars.maxresults}"
 
         self.vars.meta = self.get(url)
 
     @cause_changes(when="success")
     def operation_transition(self):
         # Find the transition id
-        turl = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
+        turl = f"{self.vars.restbase}/issue/{self.vars.issue}/transitions"
         tmeta = self.get(turl)
 
         tid = None
@@ -673,9 +673,9 @@ class JIRA(StateModuleHelper):
                     break
         else:
             if target is not None:
-                raise ValueError("Failed find valid transition for '%s'" % target)
+                raise ValueError(f"Failed find valid transition for '{target}'")
             else:
-                raise ValueError("Failed find valid transition for ID '%s'" % tid)
+                raise ValueError(f"Failed find valid transition for ID '{tid}'")
 
         fields = dict(self.vars.fields)
         if self.vars.summary is not None:
@@ -692,7 +692,7 @@ class JIRA(StateModuleHelper):
                     "add": {"body": self.vars.comment}
                 }],
             }})
-        url = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}/transitions"
         self.vars.meta = self.post(url, data)
 
     @cause_changes(when="success")
@@ -702,7 +702,7 @@ class JIRA(StateModuleHelper):
             'inwardIssue': {'key': self.vars.inwardissue},
             'outwardIssue': {'key': self.vars.outwardissue},
         }
-        url = self.vars.restbase + '/issueLink/'
+        url = f"{self.vars.restbase}/issueLink/"
         self.vars.meta = self.post(url, data)
 
     @cause_changes(when="success")
@@ -716,11 +716,11 @@ class JIRA(StateModuleHelper):
         mime = v.attachment.get('mimetype')
 
         if not os.path.isfile(filename):
-            raise ValueError('The provided filename does not exist: %s' % filename)
+            raise ValueError(f'The provided filename does not exist: {filename}')
 
         content_type, data = self._prepare_attachment(filename, content, mime)
 
-        url = v.restbase + '/issue/' + v.issue + '/attachments'
+        url = f"{v.restbase}/issue/{v.issue}/attachments"
         return True, self.post(
             url, data, content_type=content_type, additional_headers={"X-Atlassian-Token": "no-check"}
         )
@@ -759,20 +759,20 @@ class JIRA(StateModuleHelper):
             try:
                 content = base64.b64decode(content)
             except binascii.Error as e:
-                raise Exception("Unable to base64 decode file content: %s" % e)
+                raise Exception(f"Unable to base64 decode file content: {e}")
 
         lines = [
-            "--{0}".format(boundary),
-            'Content-Disposition: form-data; name="file"; filename={0}'.format(escape_quotes(name)),
-            "Content-Type: {0}".format("{0}/{1}".format(main_type, sub_type)),
+            f"--{boundary}",
+            f'Content-Disposition: form-data; name="file"; filename={escape_quotes(name)}',
+            f"Content-Type: {main_type}/{sub_type}",
             '',
             to_text(content),
-            "--{0}--".format(boundary),
+            f"--{boundary}--",
             ""
         ]
 
         return (
-            "multipart/form-data; boundary={0}".format(boundary),
+            f"multipart/form-data; boundary={boundary}",
             "\r\n".join(lines)
         )
 
@@ -802,14 +802,14 @@ class JIRA(StateModuleHelper):
         if self.vars.token is not None:
             headers.update({
                 "Content-Type": content_type,
-                "Authorization": "Bearer %s" % self.vars.token,
+                "Authorization": f"Bearer {self.vars.token}",
             })
         else:
-            auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
+            auth = to_text(base64.b64encode(to_bytes(f'{self.vars.username}:{self.vars.password}',
                                                      errors='surrogate_or_strict')))
             headers.update({
                 "Content-Type": content_type,
-                "Authorization": "Basic %s" % auth,
+                "Authorization": f"Basic {auth}",
             })
 
         response, info = fetch_url(
@@ -821,13 +821,7 @@ class JIRA(StateModuleHelper):
             try:
                 error = json.loads(info['body'])
             except Exception:
-                msg = 'The request "{method} {url}" returned the unexpected status code {status} {msg}\n{body}'.format(
-                    status=info['status'],
-                    msg=info['msg'],
-                    body=info.get('body'),
-                    url=url,
-                    method=method,
-                )
+                msg = f'The request "{method} {url}" returned the unexpected status code {info["status"]} {info["msg"]}\n{info.get("body")}'
                 self.module.fail_json(msg=to_native(msg), exception=traceback.format_exc())
             if error:
                 msg = []

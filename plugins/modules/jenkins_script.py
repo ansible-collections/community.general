@@ -112,11 +112,11 @@ from ansible.module_utils.common.text.converters import to_native
 
 def is_csrf_protection_enabled(module):
     resp, info = fetch_url(module,
-                           module.params['url'] + '/api/json',
+                           f"{module.params['url']}/api/json",
                            timeout=module.params['timeout'],
                            method='GET')
     if info["status"] != 200:
-        module.fail_json(msg="HTTP error " + str(info["status"]) + " " + info["msg"], output='')
+        module.fail_json(msg=f"HTTP error {info['status']} {info['msg']}", output='')
 
     content = to_native(resp.read())
     return json.loads(content).get('useCrumbs', False)
@@ -124,12 +124,12 @@ def is_csrf_protection_enabled(module):
 
 def get_crumb(module, cookies):
     resp, info = fetch_url(module,
-                           module.params['url'] + '/crumbIssuer/api/json',
+                           f"{module.params['url']}/crumbIssuer/api/json",
                            method='GET',
                            timeout=module.params['timeout'],
                            cookies=cookies)
     if info["status"] != 200:
-        module.fail_json(msg="HTTP error " + str(info["status"]) + " " + info["msg"], output='')
+        module.fail_json(msg=f"HTTP error {info['status']} {info['msg']}", output='')
 
     content = to_native(resp.read())
     return json.loads(content)
@@ -161,7 +161,7 @@ def main():
         try:
             script_contents = Template(module.params['script']).substitute(module.params['args'])
         except KeyError as err:
-            module.fail_json(msg="Error with templating variable: %s" % err, output='')
+            module.fail_json(msg=f"Error with templating variable: {err}", output='')
     else:
         script_contents = module.params['script']
 
@@ -173,7 +173,7 @@ def main():
         headers = {crumb['crumbRequestField']: crumb['crumb']}
 
     resp, info = fetch_url(module,
-                           module.params['url'] + "/scriptText",
+                           f"{module.params['url']}/scriptText",
                            data=urlencode({'script': script_contents}),
                            headers=headers,
                            method="POST",
@@ -181,12 +181,12 @@ def main():
                            cookies=cookies)
 
     if info["status"] != 200:
-        module.fail_json(msg="HTTP error " + str(info["status"]) + " " + info["msg"], output='')
+        module.fail_json(msg=f"HTTP error {info['status']} {info['msg']}", output='')
 
     result = to_native(resp.read())
 
     if 'Exception:' in result and 'at java.lang.Thread' in result:
-        module.fail_json(msg="script failed with stacktrace:\n " + result, output='')
+        module.fail_json(msg=f"script failed with stacktrace:\n {result}", output='')
 
     module.exit_json(
         output=result,

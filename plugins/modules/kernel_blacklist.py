@@ -65,7 +65,7 @@ class Blacklist(StateModuleHelper):
     )
 
     def __init_module__(self):
-        self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))
+        self.pattern = re.compile(rf'^blacklist\s+{re.escape(self.vars.name)}$')
         self.vars.filename = self.vars.blacklist_file
         self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
         if not self.vars.file_exists:
@@ -97,13 +97,13 @@ class Blacklist(StateModuleHelper):
         if self.vars.is_blacklisted:
             return
         self.vars.is_blacklisted = True
-        self.vars.lines = self.vars.lines + ['blacklist %s' % self.vars.name]
+        self.vars.lines = self.vars.lines + [f'blacklist {self.vars.name}']
 
     def __quit_module__(self):
         if self.has_changed() and not self.module.check_mode:
             bkp = self.module.backup_local(self.vars.filename)
             with open(self.vars.filename, "w") as fd:
-                fd.writelines(["{0}\n".format(x) for x in self.vars.lines])
+                fd.writelines([f"{x}\n" for x in self.vars.lines])
             self.module.add_cleanup_file(bkp)
 
 

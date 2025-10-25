@@ -155,8 +155,7 @@ def main():
     # Get id of the client based on client_id
     cid = kc.get_client_id(client_id, realm=realm)
     if not cid:
-        module.fail_json(msg='Invalid client %s for realm %s' %
-                         (client_id, realm))
+        module.fail_json(msg=f'Invalid client {client_id} for realm {realm}')
 
     # Get current state of the permission using its name as the search
     # filter. This returns False if it is not found.

@@ -142,19 +142,19 @@ def main():
 
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
-        module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
+        module.fail_json(msg=f"Failed to retrive realm '{realm}'")
 
     filters = []
 
     if parentId:
-        filters.append("parent=%s" % (quote(parentId, safe='')))
+        filters.append(f"parent={quote(parentId, safe='')}")
     else:
-        filters.append("parent=%s" % (quote(objRealm['id'], safe='')))
+        filters.append(f"parent={quote(objRealm['id'], safe='')}")
 
     if name:
-        filters.append("name=%s" % (quote(name, safe='')))
+        filters.append(f"name={quote(name, safe='')}")
     if providerType:
-        filters.append("type=%s" % (quote(providerType, safe='')))
+        filters.append(f"type={quote(providerType, safe='')}")
 
     result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
 

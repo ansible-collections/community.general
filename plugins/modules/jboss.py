@@ -86,15 +86,15 @@ DEFAULT_DEPLOY_PATH = '/var/lib/jbossas/standalone/deployments'
 
 
 def is_deployed(deploy_path, deployment):
-    return os.path.exists(os.path.join(deploy_path, "%s.deployed" % deployment))
+    return os.path.exists(os.path.join(deploy_path, f"{deployment}.deployed"))
 
 
 def is_undeployed(deploy_path, deployment):
-    return os.path.exists(os.path.join(deploy_path, "%s.undeployed" % deployment))
+    return os.path.exists(os.path.join(deploy_path, f"{deployment}.undeployed"))
 
 
 def is_failed(deploy_path, deployment):
-    return os.path.exists(os.path.join(deploy_path, "%s.failed" % deployment))
+    return os.path.exists(os.path.join(deploy_path, f"{deployment}.failed"))
 
 
 def main():
@@ -122,7 +122,7 @@ def main():
     if state == 'absent' and src:
         module.warn('Parameter src is ignored when state=absent')
     elif state == 'present' and not os.path.exists(src):
-        module.fail_json(msg='Source file %s does not exist.' % src)
+        module.fail_json(msg=f'Source file {src} does not exist.')
 
     deployed = is_deployed(deploy_path, deployment)
 
@@ -145,34 +145,34 @@ def main():
     if state == 'present' and not deployed:
         if is_failed(deploy_path, deployment):
             # Clean up old failed deployment
-            os.remove(os.path.join(deploy_path, "%s.failed" % deployment))
+            os.remove(os.path.join(deploy_path, f"{deployment}.failed"))
 
         module.preserved_copy(src, os.path.join(deploy_path, deployment))
         while not deployed:
             deployed = is_deployed(deploy_path, deployment)
             if is_failed(deploy_path, deployment):
-                module.fail_json(msg='Deploying %s failed.' % deployment)
+                module.fail_json(msg=f'Deploying {deployment} failed.')
             time.sleep(1)
         result['changed'] = True
 
     if state == 'present' and deployed:
         if module.sha1(src) != module.sha1(os.path.join(deploy_path, deployment)):
-            os.remove(os.path.join(deploy_path, "%s.deployed" % deployment))
+            os.remove(os.path.join(deploy_path, f"{deployment}.deployed"))
             module.preserved_copy(src, os.path.join(deploy_path, deployment))
             deployed = False
             while not deployed:
                 deployed = is_deployed(deploy_path, deployment)
                 if is_failed(deploy_path, deployment):
-                    module.fail_json(msg='Deploying %s failed.' % deployment)
+                    module.fail_json(msg=f'Deploying {deployment} failed.')
                 time.sleep(1)
             result['changed'] = True
 
     if state == 'absent' and deployed:
-        os.remove(os.path.join(deploy_path, "%s.deployed" % deployment))
+        os.remove(os.path.join(deploy_path, f"{deployment}.deployed"))
         while deployed:
             deployed = not is_undeployed(deploy_path, deployment)
             if is_failed(deploy_path, deployment):
-                module.fail_json(msg='Undeploying %s failed.' % deployment)
+                module.fail_json(msg=f'Undeploying {deployment} failed.')
             time.sleep(1)
         result['changed'] = True
 

@@ -1049,7 +1049,7 @@ def main():
 
         result['end_state'] = sanitize_cr(after_realm)
 
-        result['msg'] = 'Realm %s has been created.' % desired_realm['realm']
+        result['msg'] = f"Realm {desired_realm['realm']} has been created."
         module.exit_json(**result)
 
     else:
@@ -1083,7 +1083,7 @@ def main():
                 result['diff'] = dict(before=before_realm_sanitized,
                                       after=sanitize_cr(after_realm))
 
-            result['msg'] = 'Realm %s has been updated.' % desired_realm['realm']
+            result['msg'] = f"Realm {desired_realm['realm']} has been updated."
             module.exit_json(**result)
 
         else:
@@ -1102,7 +1102,7 @@ def main():
             result['proposed'] = {}
             result['end_state'] = {}
 
-            result['msg'] = 'Realm %s has been deleted.' % before_realm['realm']
+            result['msg'] = f"Realm {before_realm['realm']} has been deleted."
 
     module.exit_json(**result)
 

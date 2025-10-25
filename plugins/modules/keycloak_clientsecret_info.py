@@ -156,7 +156,7 @@ def main():
 
     result = {
         'clientsecret_info': clientsecret,
-        'msg': 'Get client secret successful for ID {id}'.format(id=id)
+        'msg': f'Get client secret successful for ID {id}'
     }
 
     module.exit_json(**result)
