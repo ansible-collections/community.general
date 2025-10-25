@@ -290,7 +290,7 @@ def main():
                     else:
                         module.fail_json(msg=f"bad return code ({ret['code']}) deleting host: '{ret['data']}'")
                 except Exception as e:
-                    module.fail_json(msg=f"exception deleting host: {e!s}")
+                    module.fail_json(msg=f"exception deleting host: {e}")
 
         elif icinga.diff(name, data):
             if module.check_mode:
@@ -318,7 +318,7 @@ def main():
                     else:
                         module.fail_json(msg=f"bad return code ({ret['code']}) creating host: '{ret['data']}'")
                 except Exception as e:
-                    module.fail_json(msg=f"exception creating host: {e!s}")
+                    module.fail_json(msg=f"exception creating host: {e}")
 
     module.exit_json(changed=changed, name=name, data=data)
 

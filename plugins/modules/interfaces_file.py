@@ -253,7 +253,7 @@ def read_interfaces_lines(module, line_strings):
             elif currently_processing == "NONE":
                 lines.append(lineDict(line))
             else:
-                module.fail_json(msg=f"misplaced option {line} in line {int(i)}")
+                module.fail_json(msg=f"misplaced option {line} in line {i}")
                 return None, None
     return lines, ifaces
 
