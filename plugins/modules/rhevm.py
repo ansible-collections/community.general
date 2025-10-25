@@ -824,7 +824,7 @@ class RHEVConn(object):
 
                     HOST = self.get_Host(host_name)
                     state = HOST.status.state
-                    setMsg(f"State before setting to maintenance: {state!s}")
+                    setMsg(f"State before setting to maintenance: {state}")
                     HOST.deactivate()
                     while state != 'maintenance':
                         HOST = self.get_Host(host_name)
@@ -1090,7 +1090,7 @@ class RHEV(object):
                     bootselect = True
 
         for disk in disks:
-            diskname = f"{name}_Disk{counter!s}_{disk.get('name', '').replace('/', '_')}"
+            diskname = f"{name}_Disk{counter}_{disk.get('name', '').replace('/', '_')}"
             disksize = disk.get('size', 1)
             diskdomain = disk.get('domain', None)
             if diskdomain is None:
