@@ -192,7 +192,7 @@ class ZfsDelegateAdmin(object):
                 elif line.startswith('\teveryone '):
                     perms[scope]['e'] = line.split()[1].split(',')
             except ValueError:
-                self.module.fail_json(msg="Cannot parse user/group permission output by `zfs allow`: '%s'" % line)
+                self.module.fail_json(msg=f"Cannot parse user/group permission output by `zfs allow`: '{line}'")
         return perms
 
     def run_zfs_raw(self, subcommand=None, args=None):
@@ -201,13 +201,13 @@ class ZfsDelegateAdmin(object):
         cmd = [self.zfs_path, subcommand or self.subcommand] + (args or []) + [self.name]
         rc, out, err = self.module.run_command(cmd)
         if rc:
-            self.module.fail_json(msg='Command `%s` failed: %s' % (' '.join(cmd), err))
+            self.module.fail_json(msg=f"Command `{' '.join(cmd)}` failed: {err}")
         return out
 
     def run_zfs(self, args):
         """ Run zfs allow/unallow with appropriate options as per module arguments.
         """
-        args = self.recursive_opt + ['-' + self.scope] + args
+        args = self.recursive_opt + [f"-{self.scope}"] + args
         if self.perms:
             args.append(','.join(self.perms))
         return self.run_zfs_raw(args=args)
@@ -219,7 +219,7 @@ class ZfsDelegateAdmin(object):
         stdout = ''
         for scope, ent_type in product(('ld', 'l', 'd'), ('u', 'g')):
             for ent in self.initial_perms[scope][ent_type].keys():
-                stdout += self.run_zfs(['-%s' % ent_type, ent])
+                stdout += self.run_zfs([f'-{ent_type}', ent])
                 changed = True
         for scope in ('ld', 'l', 'd'):
             if self.initial_perms[scope]['e']:
@@ -233,7 +233,7 @@ class ZfsDelegateAdmin(object):
         stdout = ''
         for ent_type, entities in (('u', self.users), ('g', self.groups)):
             if entities:
-                stdout += self.run_zfs(['-%s' % ent_type, ','.join(entities)])
+                stdout += self.run_zfs([f'-{ent_type}', ','.join(entities)])
         if self.everyone:
             stdout += self.run_zfs(['-e'])
         return (self.initial_perms != self.current_perms, stdout)

@@ -122,18 +122,18 @@ def main():
     diff = None
 
     groups = list(ldap_search(
-        '(&(objectClass=posixGroup)(cn={0}))'.format(name),
+        f'(&(objectClass=posixGroup)(cn={name}))',
         attr=['cn']
     ))
     if position != '':
         container = position
     else:
         if ou != '':
-            ou = 'ou={0},'.format(ou)
+            ou = f'ou={ou},'
         if subpath != '':
-            subpath = '{0},'.format(subpath)
-        container = '{0}{1}{2}'.format(subpath, ou, base_dn())
-    group_dn = 'cn={0},{1}'.format(name, container)
+            subpath = f'{subpath},'
+        container = f'{subpath}{ou}{base_dn()}'
+    group_dn = f'cn={name},{container}'
 
     exists = bool(len(groups))
 
@@ -154,7 +154,7 @@ def main():
                     grp.modify()
         except Exception:
             module.fail_json(
-                msg="Creating/editing group {0} in {1} failed".format(name, container)
+                msg=f"Creating/editing group {name} in {container} failed"
             )
 
     if state == 'absent' and exists:
@@ -165,7 +165,7 @@ def main():
             changed = True
         except Exception:
             module.fail_json(
-                msg="Removing group {0} failed".format(name)
+                msg=f"Removing group {name} failed"
             )
 
     module.exit_json(

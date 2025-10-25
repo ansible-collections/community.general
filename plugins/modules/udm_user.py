@@ -480,18 +480,18 @@ def main():
     diff = None
 
     users = list(ldap_search(
-        '(&(objectClass=posixAccount)(uid={0}))'.format(username),
+        f'(&(objectClass=posixAccount)(uid={username}))',
         attr=['uid']
     ))
     if position != '':
         container = position
     else:
         if ou != '':
-            ou = 'ou={0},'.format(ou)
+            ou = f'ou={ou},'
         if subpath != '':
-            subpath = '{0},'.format(subpath)
-        container = '{0}{1}{2}'.format(subpath, ou, base_dn())
-    user_dn = 'uid={0},{1}'.format(username, container)
+            subpath = f'{subpath},'
+        container = f'{subpath}{ou}{base_dn()}'
+    user_dn = f'uid={username},{container}'
 
     exists = bool(len(users))
 
@@ -503,14 +503,9 @@ def main():
                 obj = umc_module_for_edit('users/user', user_dn)
 
             if module.params['displayName'] is None:
-                module.params['displayName'] = '{0} {1}'.format(
-                    module.params['firstname'],
-                    module.params['lastname']
-                )
+                module.params['displayName'] = f"{module.params['firstname']} {module.params['lastname']}"
             if module.params['unixhome'] is None:
-                module.params['unixhome'] = '/home/{0}'.format(
-                    module.params['username']
-                )
+                module.params['unixhome'] = f"/home/{module.params['username']}"
             for k in obj.keys():
                 if (k != 'password' and
                         k != 'groups' and
@@ -546,17 +541,12 @@ def main():
                     obj.modify()
         except Exception:
             module.fail_json(
-                msg="Creating/editing user {0} in {1} failed".format(
-                    username,
-                    container
-                )
+                msg=f"Creating/editing user {username} in {container} failed"
             )
         try:
             groups = module.params['groups']
             if groups:
-                filter = '(&(objectClass=posixGroup)(|(cn={0})))'.format(
-                    ')(cn='.join(groups)
-                )
+                filter = f"(&(objectClass=posixGroup)(|(cn={')(cn='.join(groups)})))"
                 group_dns = list(ldap_search(filter, attr=['dn']))
                 for dn in group_dns:
                     grp = umc_module_for_edit('groups/group', dn[0])
@@ -567,7 +557,7 @@ def main():
                         changed = True
         except Exception:
             module.fail_json(
-                msg="Adding groups to user {0} failed".format(username)
+                msg=f"Adding groups to user {username} failed"
             )
 
     if state == 'absent' and exists:
@@ -578,7 +568,7 @@ def main():
             changed = True
         except Exception:
             module.fail_json(
-                msg="Removing user {0} failed".format(username)
+                msg=f"Removing user {username} failed"
             )
 
     module.exit_json(

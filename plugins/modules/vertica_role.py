@@ -127,9 +127,9 @@ def get_role_facts(cursor, role=''):
 def update_roles(role_facts, cursor, role,
                  existing, required):
     for assigned_role in set(existing) - set(required):
-        cursor.execute("revoke {0} from {1}".format(assigned_role, role))
+        cursor.execute(f"revoke {assigned_role} from {role}")
     for assigned_role in set(required) - set(existing):
-        cursor.execute("grant {0} to {1}".format(assigned_role, role))
+        cursor.execute(f"grant {assigned_role} to {role}")
 
 
 def check(role_facts, role, assigned_roles):
@@ -144,7 +144,7 @@ def check(role_facts, role, assigned_roles):
 def present(role_facts, cursor, role, assigned_roles):
     role_key = role.lower()
     if role_key not in role_facts:
-        cursor.execute("create role {0}".format(role))
+        cursor.execute(f"create role {role}")
         update_roles(role_facts, cursor, role, [], assigned_roles)
         role_facts.update(get_role_facts(cursor, role))
         return True
@@ -164,7 +164,7 @@ def absent(role_facts, cursor, role, assigned_roles):
     if role_key in role_facts:
         update_roles(role_facts, cursor, role,
                      role_facts[role_key]['assigned_roles'], [])
-        cursor.execute("drop role {0} cascade".format(role_facts[role_key]['name']))
+        cursor.execute(f"drop role {role_facts[role_key]['name']} cascade")
         del role_facts[role_key]
         return True
     else:
@@ -205,18 +205,17 @@ def main():
     try:
         dsn = (
             "Driver=Vertica;"
-            "Server={0};"
-            "Port={1};"
-            "Database={2};"
-            "User={3};"
-            "Password={4};"
-            "ConnectionLoadBalance={5}"
-        ).format(module.params['cluster'], module.params['port'], db,
-                 module.params['login_user'], module.params['login_password'], 'true')
+            f"Server={module.params['cluster']};"
+            f"Port={module.params['port']};"
+            f"Database={db};"
+            f"User={module.params['login_user']};"
+            f"Password={module.params['login_password']};"
+            f"ConnectionLoadBalance=true"
+        )
         db_conn = pyodbc.connect(dsn, autocommit=True)
         cursor = db_conn.cursor()
     except Exception as e:
-        module.fail_json(msg="Unable to connect to database: {0}.".format(to_native(e)))
+        module.fail_json(msg=f"Unable to connect to database: {e}.")
 
     try:
         role_facts = get_role_facts(cursor)

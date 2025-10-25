@@ -503,13 +503,13 @@ def main():
     diff = None
 
     obj = list(ldap_search(
-        '(&(objectClass=univentionShare)(cn={0}))'.format(name),
+        f'(&(objectClass=univentionShare)(cn={name}))',
         attr=['cn']
     ))
 
     exists = bool(len(obj))
-    container = 'cn=shares,ou={0},{1}'.format(module.params['ou'], base_dn())
-    dn = 'cn={0},{1}'.format(name, container)
+    container = f"cn=shares,ou={module.params['ou']},{base_dn()}"
+    dn = f'cn={name},{container}'
 
     if state == 'present':
         try:
@@ -518,7 +518,7 @@ def main():
             else:
                 obj = umc_module_for_edit('shares/share', dn)
 
-            module.params['printablename'] = '{0} ({1})'.format(name, module.params['host'])
+            module.params['printablename'] = f"{name} ({module.params['host']})"
             for k in obj.keys():
                 if module.params[k] is True:
                     module.params[k] = '1'
@@ -540,11 +540,7 @@ def main():
                     obj.modify()
         except Exception as err:
             module.fail_json(
-                msg='Creating/editing share {0} in {1} failed: {2}'.format(
-                    name,
-                    container,
-                    err,
-                )
+                msg=f'Creating/editing share {name} in {container} failed: {err}'
             )
 
     if state == 'absent' and exists:
@@ -555,11 +551,7 @@ def main():
             changed = True
         except Exception as err:
             module.fail_json(
-                msg='Removing share {0} in {1} failed: {2}'.format(
-                    name,
-                    container,
-                    err,
-                )
+                msg=f'Removing share {name} in {container} failed: {err}'
             )
 
     module.exit_json(

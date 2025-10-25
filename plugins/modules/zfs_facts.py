@@ -188,7 +188,7 @@ class ZFSFacts(object):
             cmd.append('-r')
         if self.depth != 0:
             cmd.append('-d')
-            cmd.append('%d' % self.depth)
+            cmd.append(f'{self.depth}')
         if self.type:
             cmd.append('-t')
             cmd.append(','.join(self.type))
@@ -197,7 +197,7 @@ class ZFSFacts(object):
         (rc, out, err) = self.module.run_command(cmd)
 
         if rc != 0:
-            self.module.fail_json(msg='Error while trying to get facts about ZFS dataset: %s' % self.name,
+            self.module.fail_json(msg=f'Error while trying to get facts about ZFS dataset: {self.name}',
                                   stderr=err,
                                   rc=rc)
 
@@ -242,7 +242,7 @@ def main():
         result['recurse'] = zfs_facts.recurse
 
     if not zfs_facts.dataset_exists():
-        module.fail_json(msg='ZFS dataset %s does not exist!' % zfs_facts.name)
+        module.fail_json(msg=f'ZFS dataset {zfs_facts.name} does not exist!')
 
     result['ansible_facts'] = zfs_facts.get_facts()
 

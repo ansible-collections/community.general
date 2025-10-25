@@ -110,7 +110,7 @@ def _parse_repos(module):
     elif rc == 6:
         return []
     else:
-        module.fail_json(msg='Failed to execute "%s"' % " ".join(cmd), rc=rc, stdout=stdout, stderr=stderr)
+        module.fail_json(msg=f'Failed to execute "{" ".join(cmd)}"', rc=rc, stdout=stdout, stderr=stderr)
 
 
 def main():

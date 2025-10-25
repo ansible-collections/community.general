@@ -123,7 +123,6 @@ import traceback
 from os import getenv
 from os.path import isfile
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 TAIGA_IMP_ERR = None
 try:
@@ -169,28 +168,28 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
         user_id = api.me().id
         project_list = [x for x in api.projects.list(member=user_id) if x.name == project_name]
         if len(project_list) != 1:
-            return False, changed, "Unable to find project %s" % project_name, {}
+            return False, changed, f"Unable to find project {project_name}", {}
         project = project_list[0]
         project_id = project.id
 
         priority_list = [x for x in api.priorities.list(project=project_id) if x.name == issue_priority]
         if len(priority_list) != 1:
-            return False, changed, "Unable to find issue priority %s for project %s" % (issue_priority, project_name), {}
+            return False, changed, f"Unable to find issue priority {issue_priority} for project {project_name}", {}
         priority_id = priority_list[0].id
 
         status_list = [x for x in api.issue_statuses.list(project=project_id) if x.name == issue_status]
         if len(status_list) != 1:
-            return False, changed, "Unable to find issue status %s for project %s" % (issue_status, project_name), {}
+            return False, changed, f"Unable to find issue status {issue_status} for project {project_name}", {}
         status_id = status_list[0].id
 
         type_list = [x for x in project.list_issue_types() if x.name == issue_type]
         if len(type_list) != 1:
-            return False, changed, "Unable to find issue type %s for project %s" % (issue_type, project_name), {}
+            return False, changed, f"Unable to find issue type {issue_type} for project {project_name}", {}
         type_id = type_list[0].id
 
         severity_list = [x for x in project.list_severities() if x.name == issue_severity]
         if len(severity_list) != 1:
-            return False, changed, "Unable to find severity %s for project %s" % (issue_severity, project_name), {}
+            return False, changed, f"Unable to find severity {issue_severity} for project {project_name}", {}
         severity_id = severity_list[0].id
 
         issue = {
@@ -243,10 +242,10 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
 
         else:
             # More than 1 matching issue
-            return False, changed, "More than one issue with subject %s in project %s" % (issue_subject, project_name), {}
+            return False, changed, f"More than one issue with subject {issue_subject} in project {project_name}", {}
 
     except TaigaException as exc:
-        msg = "An exception happened: %s" % to_native(exc)
+        msg = f"An exception happened: {exc}"
         return False, changed, msg, {}
 
 
@@ -284,7 +283,7 @@ def main():
     issue_attachment_description = module.params['attachment_description']
     if issue_attachment:
         if not isfile(issue_attachment):
-            msg = "%s is not a file" % issue_attachment
+            msg = f"{issue_attachment} is not a file"
             module.fail_json(msg=msg)
     issue_tags = module.params['tags']
     state = module.params['state']

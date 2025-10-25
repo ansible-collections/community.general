@@ -175,7 +175,7 @@ def append_flags(module, xbps_path, cmd, skip_repo=False):
         cmd = cmd + ["-r", module.params["root"]]
     if module.params["repositories"] and cmd[0] != xbps_path["remove"] and not skip_repo:
         for repo in module.params["repositories"]:
-            cmd = cmd + ["--repository=%s" % repo]
+            cmd = cmd + [f"--repository={repo}"]
 
     return cmd
 
@@ -273,14 +273,13 @@ def remove_packages(module, xbps_path, packages):
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
-            module.fail_json(msg="failed to remove %s" % (package))
+            module.fail_json(msg=f"failed to remove {package}")
 
         changed_packages.append(package)
 
     if len(changed_packages) > 0:
 
-        module.exit_json(changed=True, msg="removed %s package(s)" %
-                         len(changed_packages), packages=changed_packages)
+        module.exit_json(changed=True, msg=f"removed {len(changed_packages)} package(s)", packages=changed_packages)
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
@@ -311,12 +310,10 @@ def install_packages(module, xbps_path, state, packages):
         module.params['upgrade_xbps'] = False
         install_packages(module, xbps_path, state, packages)
     elif rc != 0 and not (state == 'latest' and rc == 17):
-        module.fail_json(msg="failed to install %s packages(s)"
-                         % (len(toInstall)),
+        module.fail_json(msg=f"failed to install {len(toInstall)} packages(s)",
                          packages=toInstall)
 
-    module.exit_json(changed=True, msg="installed %s package(s)"
-                     % (len(toInstall)),
+    module.exit_json(changed=True, msg=f"installed {len(toInstall)} package(s)",
                      packages=toInstall)
 
 
@@ -332,11 +329,9 @@ def check_packages(module, xbps_path, packages, state):
     if would_be_changed:
         if state == "absent":
             state = "removed"
-        module.exit_json(changed=True, msg="%s package(s) would be %s" % (
-            len(would_be_changed), state),
-            packages=would_be_changed)
+        module.exit_json(changed=True, msg=f"{len(would_be_changed)} package(s) would be {state}", packages=would_be_changed)
     else:
-        module.exit_json(changed=False, msg="package(s) already %s" % state,
+        module.exit_json(changed=False, msg=f"package(s) already {state}",
                          packages=[])
 
 
@@ -382,8 +377,7 @@ def main():
     xbps_path['remove'] = module.get_bin_path('xbps-remove', True)
 
     if not os.path.exists(xbps_path['install']):
-        module.fail_json(msg="cannot find xbps, in path %s"
-                         % (xbps_path['install']))
+        module.fail_json(msg=f"cannot find xbps, in path {xbps_path['install']}")
 
     p = module.params
 

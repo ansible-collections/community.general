@@ -150,20 +150,20 @@ def main():
             ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
             subnet_offset = ipaddr_rev.find(zone)
             if subnet_offset == -1:
-                raise Exception("reversed IP address {0} is not part of zone.".format(ipaddr_rev))
+                raise Exception(f"reversed IP address {ipaddr_rev} is not part of zone.")
             workname = ipaddr_rev[0:subnet_offset - 1]
         except Exception as e:
             module.fail_json(
-                msg='handling PTR record for {0} in zone {1} failed: {2}'.format(name, zone, e)
+                msg=f'handling PTR record for {name} in zone {zone} failed: {e}'
             )
 
     obj = list(ldap_search(
-        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(zone, workname),
+        f'(&(objectClass=dNSZone)(zoneName={zone})(relativeDomainName={workname}))',
         attr=['dNSZone']
     ))
     exists = bool(len(obj))
-    container = 'zoneName={0},cn=dns,{1}'.format(zone, base_dn())
-    dn = 'relativeDomainName={0},{1}'.format(workname, container)
+    container = f'zoneName={zone},cn=dns,{base_dn()}'
+    dn = f'relativeDomainName={workname},{container}'
 
     if state == 'present':
         try:
@@ -171,19 +171,19 @@ def main():
                 so = forward_zone.lookup(
                     config(),
                     uldap(),
-                    '(zone={0})'.format(zone),
+                    f'(zone={zone})',
                     scope='domain',
                 ) or reverse_zone.lookup(
                     config(),
                     uldap(),
-                    '(zoneName={0})'.format(zone),
+                    f'(zoneName={zone})',
                     scope='domain',
                 )
                 if not so == 0:
-                    raise Exception("Did not find zone '{0}' in Univention".format(zone))
-                obj = umc_module_for_add('dns/{0}'.format(type), container, superordinate=so[0])
+                    raise Exception(f"Did not find zone '{zone}' in Univention")
+                obj = umc_module_for_add(f'dns/{type}', container, superordinate=so[0])
             else:
-                obj = umc_module_for_edit('dns/{0}'.format(type), dn)
+                obj = umc_module_for_edit(f'dns/{type}', dn)
 
             if type == 'ptr_record':
                 obj['ip'] = name
@@ -201,18 +201,18 @@ def main():
                     obj.modify()
         except Exception as e:
             module.fail_json(
-                msg='Creating/editing dns entry {0} in {1} failed: {2}'.format(name, container, e)
+                msg=f'Creating/editing dns entry {name} in {container} failed: {e}'
             )
 
     if state == 'absent' and exists:
         try:
-            obj = umc_module_for_edit('dns/{0}'.format(type), dn)
+            obj = umc_module_for_edit(f'dns/{type}', dn)
             if not module.check_mode:
                 obj.remove()
             changed = True
         except Exception as e:
             module.fail_json(
-                msg='Removing dns entry {0} in {1} failed: {2}'.format(name, container, e)
+                msg=f'Removing dns entry {name} in {container} failed: {e}'
             )
 
     module.exit_json(

@@ -163,7 +163,7 @@ class Zfs(object):
                 elif prop == 'volblocksize':
                     cmd += ['-b', value]
                 else:
-                    cmd += ['-o', '%s=%s' % (prop, value)]
+                    cmd += ['-o', f'{prop}={value}']
         if origin and action == 'clone':
             cmd.append(origin)
         cmd.append(self.name)
@@ -182,7 +182,7 @@ class Zfs(object):
         if self.module.check_mode:
             self.changed = True
             return
-        cmd = [self.zfs_cmd, 'set', prop + '=' + str(value), self.name]
+        cmd = [self.zfs_cmd, 'set', f"{prop}={value!s}", self.name]
         self.module.run_command(cmd, check_rc=True)
 
     def set_properties_if_changed(self):
@@ -200,7 +200,7 @@ class Zfs(object):
         for prop in self.extra_zfs_properties:
             value = self.get_property(prop, updated_properties)
             if value is None:
-                self.module.fail_json(msg="zfsprop was not present after being successfully set: %s" % prop)
+                self.module.fail_json(msg=f"zfsprop was not present after being successfully set: {prop}")
             if self.get_property(prop, current_properties) != value:
                 self.changed = True
             if prop in diff['after']['extra_zfs_properties']:

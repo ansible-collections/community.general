@@ -542,12 +542,12 @@ def main():
                         # ufw does not like it when the insert number is larger than the
                         # maximal rule number for IPv4/IPv6.
                         insert_to = None
-                cmd.append([insert_to is not None, "insert %s" % insert_to])
+                cmd.append([insert_to is not None, f"insert {insert_to}"])
             cmd.append([value])
             cmd.append([params['direction'], params['direction']])
-            cmd.append([params['interface'], "on %s" % params['interface']])
-            cmd.append([params['interface_in'], "in on %s" % params['interface_in']])
-            cmd.append([params['interface_out'], "out on %s" % params['interface_out']])
+            cmd.append([params['interface'], f"on {params['interface']}"])
+            cmd.append([params['interface_in'], f"in on {params['interface_in']}"])
+            cmd.append([params['interface_out'], f"out on {params['interface_out']}"])
             cmd.append([module.boolean(params['log']), 'log'])
 
             for (key, template) in [('from_ip', "from %s"), ('from_port', "port %s"),
@@ -559,7 +559,7 @@ def main():
             ufw_major, ufw_minor, dummy = ufw_version()
             # comment is supported only in ufw version after 0.35
             if (ufw_major == 0 and ufw_minor >= 35) or ufw_major > 0:
-                cmd.append([params['comment'], "comment '%s'" % params['comment']])
+                cmd.append([params['comment'], f"comment '{params['comment']}'"])
 
             rules_dry = execute(cmd)
 

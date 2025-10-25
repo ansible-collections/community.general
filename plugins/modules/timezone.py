@@ -97,7 +97,7 @@ class Timezone(object):
                 if rc == 0:
                     return super(Timezone, SystemdTimezone).__new__(SystemdTimezone)
                 else:
-                    module.debug('timedatectl command was found but not usable: %s. using other method.' % stderr)
+                    module.debug(f'timedatectl command was found but not usable: {stderr}. using other method.')
                     return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
             else:
                 return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
@@ -121,7 +121,7 @@ class Timezone(object):
             if AIXoslevel >= 61:
                 return super(Timezone, AIXTimezone).__new__(AIXTimezone)
             else:
-                module.fail_json(msg='AIX os level must be >= 61 for timezone module (Target: %s).' % AIXoslevel)
+                module.fail_json(msg=f'AIX os level must be >= 61 for timezone module (Target: {AIXoslevel}).')
         else:
             # Not supported yet
             return super(Timezone, Timezone).__new__(Timezone)
@@ -173,7 +173,7 @@ class Timezone(object):
         """
         (rc, stdout, stderr) = self.module.run_command(list(commands), check_rc=True)
         if kwargs.get('log', False):
-            self.msg.append('executed `%s`' % ' '.join(commands))
+            self.msg.append(f"executed `{' '.join(commands)}`")
         return stdout
 
     def diff(self, phase1='before', phase2='after'):
@@ -243,9 +243,9 @@ class Timezone(object):
 
     def _verify_timezone(self):
         tz = self.value['name']['planned']
-        tzfile = '/usr/share/zoneinfo/%s' % tz
+        tzfile = f'/usr/share/zoneinfo/{tz}'
         if not os.path.isfile(tzfile):
-            self.abort('given timezone "%s" is not available' % tz)
+            self.abort(f'given timezone "{tz}" is not available')
         return tzfile
 
 
@@ -391,7 +391,7 @@ class NosystemdTimezone(Timezone):
                         self.regexps['name'] = self.dist_regexps['redhat']
                         self.tzline_format = self.dist_tzline_format['redhat']
                 else:
-                    self.abort('could not read configuration file "%s"' % self.conf_files['name'])
+                    self.abort(f'could not read configuration file "{self.conf_files["name"]}"')
             else:
                 # The key for timezone might be `ZONE` or `TIMEZONE`
                 # (the former is used in RHEL/CentOS and the latter is used in SUSE linux).
@@ -434,7 +434,7 @@ class NosystemdTimezone(Timezone):
             if self._allow_ioerror(err, key):
                 lines = []
             else:
-                self.abort('tried to configure %s using a file "%s", but could not read it' % (key, filename))
+                self.abort(f'tried to configure {key} using a file "{filename}", but could not read it')
         # Find the all matched lines
         matched_indices = []
         for i, line in enumerate(lines):
@@ -454,8 +454,8 @@ class NosystemdTimezone(Timezone):
             with open(filename, 'w') as file:
                 file.writelines(lines)
         except IOError:
-            self.abort('tried to configure %s using a file "%s", but could not write to it' % (key, filename))
-        self.msg.append('Added 1 line and deleted %s line(s) on %s' % (len(matched_indices), filename))
+            self.abort(f'tried to configure {key} using a file "{filename}", but could not write to it')
+        self.msg.append(f'Added 1 line and deleted {len(matched_indices)} line(s) on {filename}')
 
     def _get_value_from_config(self, key, phase):
         filename = self.conf_files[key]
@@ -471,7 +471,7 @@ class NosystemdTimezone(Timezone):
                 elif key == 'name':
                     return 'n/a'
             else:
-                self.abort('tried to configure %s using a file "%s", but could not read it' % (key, filename))
+                self.abort(f'tried to configure {key} using a file "{filename}", but could not read it')
         else:
             try:
                 value = self.regexps[key].search(status).group(1)
@@ -489,7 +489,7 @@ class NosystemdTimezone(Timezone):
                         # the timezone config file, so we ignore this error.
                         return 'n/a'
                     else:
-                        self.abort('tried to configure %s using a file "%s", but could not find a valid value in it' % (key, filename))
+                        self.abort(f'tried to configure {key} using a file "{filename}", but could not find a valid value in it')
             else:
                 if key == 'hwclock':
                     # convert yes/no -> UTC/local
@@ -542,12 +542,12 @@ class NosystemdTimezone(Timezone):
                     # If /etc/localtime is not a symlink best we can do is compare it with
                     # the 'planned' zone info file and return 'n/a' if they are different.
                     try:
-                        if not filecmp.cmp('/etc/localtime', '/usr/share/zoneinfo/' + planned):
+                        if not filecmp.cmp('/etc/localtime', f"/usr/share/zoneinfo/{planned}"):
                             return 'n/a'
                     except Exception:
                         return 'n/a'
         else:
-            self.abort('unknown parameter "%s"' % key)
+            self.abort(f'unknown parameter "{key}"')
         return value
 
     def set_timezone(self, value):
@@ -568,7 +568,7 @@ class NosystemdTimezone(Timezone):
         if self.conf_files['hwclock'] is not None:
             self._edit_file(filename=self.conf_files['hwclock'],
                             regexp=self.regexps['hwclock'],
-                            value='UTC=%s\n' % utc,
+                            value=f'UTC={utc}\n',
                             key='hwclock')
         self.execute(self.update_hwclock, '--systohc', option, log=True)
 
@@ -578,7 +578,7 @@ class NosystemdTimezone(Timezone):
         elif key == 'hwclock':
             self.set_hwclock(value)
         else:
-            self.abort('unknown parameter "%s"' % key)
+            self.abort(f'unknown parameter "{key}"')
 
 
 class SmartOSTimezone(Timezone):
@@ -611,7 +611,7 @@ class SmartOSTimezone(Timezone):
             except Exception:
                 self.module.fail_json(msg='Failed to read /etc/default/init')
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
     def set(self, key, value):
         """Set the requested timezone through sm-set-timezone, an invalid timezone name
@@ -627,11 +627,11 @@ class SmartOSTimezone(Timezone):
 
             # sm-set-timezone knows no state and will always set the timezone.
             # XXX: https://github.com/joyent/smtools/pull/2
-            m = re.match(r'^\* Changed (to)? timezone (to)? (%s).*' % value, stdout.splitlines()[1])
+            m = re.match(rf'^\* Changed (to)? timezone (to)? ({value}).*', stdout.splitlines()[1])
             if not (m and m.groups()[-1] == value):
                 self.module.fail_json(msg='Failed to set timezone')
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
 
 class DarwinTimezone(Timezone):
@@ -665,7 +665,7 @@ class DarwinTimezone(Timezone):
         out = self.execute(self.systemsetup, '-listtimezones').splitlines()[1:]
         tz_list = list(map(lambda x: x.strip(), out))
         if tz not in tz_list:
-            self.abort('given timezone "%s" is not available' % tz)
+            self.abort(f'given timezone "{tz}" is not available')
         return tz
 
     def get(self, key, phase):
@@ -674,13 +674,13 @@ class DarwinTimezone(Timezone):
             value = self.regexps[key].search(status).group(1)
             return value
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
     def set(self, key, value):
         if key == 'name':
             self.execute(self.systemsetup, '-settimezone', value, log=True)
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
 
 class BSDTimezone(Timezone):
@@ -733,18 +733,18 @@ class BSDTimezone(Timezone):
         if key == 'name':
             return self.__get_timezone()
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
     def set(self, key, value):
         if key == 'name':
             # First determine if the requested timezone is valid by looking in
             # the zoneinfo directory.
-            zonefile = '/usr/share/zoneinfo/' + value
+            zonefile = f"/usr/share/zoneinfo/{value}"
             try:
                 if not os.path.isfile(zonefile):
-                    self.module.fail_json(msg='%s is not a recognized timezone' % value)
+                    self.module.fail_json(msg=f'{value} is not a recognized timezone')
             except Exception:
-                self.module.fail_json(msg='Failed to stat %s' % zonefile)
+                self.module.fail_json(msg=f'Failed to stat {zonefile}')
 
             # Now (somewhat) atomically update the symlink by creating a new
             # symlink and move it into place. Otherwise we have to remove the
@@ -752,7 +752,7 @@ class BSDTimezone(Timezone):
             # create a race condition in case another process tries to read
             # /etc/localtime between removal and creation.
             suffix = "".join([random.choice(string.ascii_letters + string.digits) for x in range(0, 10)])
-            new_localtime = '/etc/localtime.' + suffix
+            new_localtime = f"/etc/localtime.{suffix}"
 
             try:
                 os.symlink(zonefile, new_localtime)
@@ -761,7 +761,7 @@ class BSDTimezone(Timezone):
                 os.remove(new_localtime)
                 self.module.fail_json(msg='Could not update /etc/localtime')
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
 
 class AIXTimezone(Timezone):
@@ -804,7 +804,7 @@ class AIXTimezone(Timezone):
         if key == 'name':
             return self.__get_timezone()
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
     def set(self, key, value):
         """Set the requested timezone through chtz, an invalid timezone name
@@ -826,12 +826,12 @@ class AIXTimezone(Timezone):
 
             # First determine if the requested timezone is valid by looking in the zoneinfo
             #  directory.
-            zonefile = '/usr/share/lib/zoneinfo/' + value
+            zonefile = f"/usr/share/lib/zoneinfo/{value}"
             try:
                 if not os.path.isfile(zonefile):
-                    self.module.fail_json(msg='%s is not a recognized timezone.' % value)
+                    self.module.fail_json(msg=f'{value} is not a recognized timezone.')
             except Exception:
-                self.module.fail_json(msg='Failed to check %s.' % zonefile)
+                self.module.fail_json(msg=f'Failed to check {zonefile}.')
 
             # Now set the TZ using chtz
             cmd = ['chtz', value]
@@ -844,11 +844,11 @@ class AIXTimezone(Timezone):
             #  change.
             TZ = self.__get_timezone()
             if TZ != value:
-                msg = 'TZ value does not match post-change (Actual: %s, Expected: %s).' % (TZ, value)
+                msg = f'TZ value does not match post-change (Actual: {TZ}, Expected: {value}).'
                 self.module.fail_json(msg=msg)
 
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f'{key} is not a supported option on target platform')
 
 
 def main():
@@ -879,8 +879,7 @@ def main():
         # Examine if the current state matches planned state
         (after, planned) = tz.diff('after', 'planned').values()
         if after != planned:
-            tz.abort('still not desired state, though changes have made - '
-                     'planned: %s, after: %s' % (str(planned), str(after)))
+            tz.abort(f'still not desired state, though changes have made - planned: {planned}, after: {after}')
         diff = tz.diff('before', 'after')
 
     changed = (diff['before'] != diff['after'])

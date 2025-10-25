@@ -417,19 +417,19 @@ from ansible.module_utils.common.text.converters import to_native
 def get_vm_prop(module, uuid, prop):
     # Lookup a property for the given VM.
     # Returns the property, or None if not found.
-    cmd = [module.vmadm, 'lookup', '-j', '-o', prop, 'uuid={0}'.format(uuid)]
+    cmd = [module.vmadm, 'lookup', '-j', '-o', prop, f'uuid={uuid}']
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
         module.fail_json(
-            msg='Could not perform lookup of {0} on {1}'.format(prop, uuid), exception=stderr)
+            msg=f'Could not perform lookup of {prop} on {uuid}', exception=stderr)
 
     try:
         stdout_json = json.loads(stdout)
     except Exception as e:
         module.fail_json(
-            msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(prop),
+            msg=f'Invalid JSON returned by vmadm for uuid lookup of {prop}',
             details=to_native(e), exception=traceback.format_exc())
 
     if stdout_json:
@@ -439,13 +439,13 @@ def get_vm_prop(module, uuid, prop):
 def get_vm_uuid(module, alias):
     # Lookup the uuid that goes with the given alias.
     # Returns the uuid or '' if not found.
-    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid', 'alias={0}'.format(alias)]
+    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid', f'alias={alias}']
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
         module.fail_json(
-            msg='Could not retrieve UUID of {0}'.format(alias), exception=stderr)
+            msg=f'Could not retrieve UUID of {alias}', exception=stderr)
 
     # If no VM was found matching the given alias, we get back an empty array.
     # That is not an error condition as we might be explicitly checking for its
@@ -454,7 +454,7 @@ def get_vm_uuid(module, alias):
         stdout_json = json.loads(stdout)
     except Exception as e:
         module.fail_json(
-            msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(alias),
+            msg=f'Invalid JSON returned by vmadm for uuid lookup of {alias}',
             details=to_native(e), exception=traceback.format_exc())
 
     if stdout_json:
@@ -493,7 +493,7 @@ def new_vm(module, uuid, vm_state):
         if match:
             vm_uuid = match.groups()[0]
             if not is_valid_uuid(vm_uuid):
-                module.fail_json(msg='Invalid UUID for VM {0}?'.format(vm_uuid))
+                module.fail_json(msg=f'Invalid UUID for VM {vm_uuid}?')
         else:
             module.fail_json(msg='Could not retrieve UUID of newly created(?) VM')
 
@@ -501,14 +501,14 @@ def new_vm(module, uuid, vm_state):
         if vm_state != 'running':
             ret = set_vm_state(module, vm_uuid, vm_state)
             if not ret:
-                module.fail_json(msg='Could not set VM {0} to state {1}'.format(vm_uuid, vm_state))
+                module.fail_json(msg=f'Could not set VM {vm_uuid} to state {vm_state}')
 
     try:
         os.unlink(payload_file)
     except Exception as e:
         # Since the payload may contain sensitive information, fail hard
         # if we cannot remove the file so the operator knows about it.
-        module.fail_json(msg='Could not remove temporary JSON payload file {0}: {1}'.format(payload_file, to_native(e)),
+        module.fail_json(msg=f'Could not remove temporary JSON payload file {payload_file}: {e}',
                          exception=traceback.format_exc())
 
     return changed, vm_uuid
@@ -577,7 +577,7 @@ def create_payload(module, uuid):
         with open(fname, 'w') as fh:
             fh.write(vmdef_json)
     except Exception as e:
-        module.fail_json(msg='Could not save JSON payload: %s' % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f'Could not save JSON payload: {e}', exception=traceback.format_exc())
 
     return fname
 
@@ -591,7 +591,7 @@ def vm_state_transition(module, uuid, vm_state):
     elif ret:
         return True
     else:
-        module.fail_json(msg='Failed to set VM {0} to state {1}'.format(uuid, vm_state))
+        module.fail_json(msg=f'Failed to set VM {uuid} to state {vm_state}')
 
 
 def is_valid_uuid(uuid):
@@ -606,7 +606,7 @@ def validate_uuids(module):
     ]
 
     if failed:
-        module.fail_json(msg='No valid UUID(s) found for: {0}'.format(", ".join(failed)))
+        module.fail_json(msg=f"No valid UUID(s) found for: {', '.join(failed)}")
 
 
 def manage_all_vms(module, vm_state):

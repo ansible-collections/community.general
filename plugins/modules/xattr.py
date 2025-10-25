@@ -96,7 +96,6 @@ import os
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def get_xattr_keys(module, path, follow):
@@ -155,7 +154,7 @@ def _run_xattr(module, cmd, check_rc=True):
     try:
         (rc, out, err) = module.run_command(cmd, check_rc=check_rc)
     except Exception as e:
-        module.fail_json(msg="%s!" % to_native(e))
+        module.fail_json(msg=f"{e}!")
 
     # result = {'raw': out}
     result = {}
@@ -197,7 +196,7 @@ def main():
     res = {}
 
     if key is None and state in ['absent', 'present']:
-        module.fail_json(msg="%s needs a key parameter" % state)
+        module.fail_json(msg=f"{state} needs a key parameter")
 
     # Prepend the key with the namespace if defined
     if (
@@ -205,7 +204,7 @@ def main():
             namespace is not None and
             len(namespace) > 0 and
             not (namespace == 'user' and key.startswith('user.'))):
-        key = '%s.%s' % (namespace, key)
+        key = f'{namespace}.{key}'
 
     if state == 'present' or value is not None:
         current = get_xattr(module, path, key, follow)
@@ -214,7 +213,7 @@ def main():
                 res = set_xattr(module, path, key, value, follow)
             changed = True
         res = current
-        msg = "%s set to %s" % (key, value)
+        msg = f"{key} set to {value}"
     elif state == 'absent':
         current = get_xattr(module, path, key, follow)
         if current is not None and key in current:
@@ -222,7 +221,7 @@ def main():
                 res = rm_xattr(module, path, key, follow)
             changed = True
         res = current
-        msg = "%s removed" % (key)
+        msg = f"{key} removed"
     elif state == 'keys':
         res = get_xattr_keys(module, path, follow)
         msg = "returning all keys"
@@ -231,7 +230,7 @@ def main():
         msg = "dumping all"
     else:
         res = get_xattr(module, path, key, follow)
-        msg = "returning %s" % key
+        msg = f"returning {key}"
 
     module.exit_json(changed=changed, msg=msg, xattr=res)
 

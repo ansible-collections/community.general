@@ -124,7 +124,7 @@ def convert_time(time):
         return ('0', 'seconds')
     for unit in units:
         if time >= unit[0]:
-            return ('{0}'.format(time // unit[0]), unit[1])
+            return (f'{time // unit[0]}', unit[1])
 
 
 def main():
@@ -178,22 +178,22 @@ def main():
     diff = None
 
     obj = list(ldap_search(
-        '(&(objectClass=dNSZone)(zoneName={0}))'.format(zone),
+        f'(&(objectClass=dNSZone)(zoneName={zone}))',
         attr=['dNSZone']
     ))
 
     exists = bool(len(obj))
-    container = 'cn=dns,{0}'.format(base_dn())
-    dn = 'zoneName={0},{1}'.format(zone, container)
+    container = f'cn=dns,{base_dn()}'
+    dn = f'zoneName={zone},{container}'
     if contact == '':
-        contact = 'root@{0}.'.format(zone)
+        contact = f'root@{zone}.'
 
     if state == 'present':
         try:
             if not exists:
-                obj = umc_module_for_add('dns/{0}'.format(type), container)
+                obj = umc_module_for_add(f'dns/{type}', container)
             else:
-                obj = umc_module_for_edit('dns/{0}'.format(type), dn)
+                obj = umc_module_for_edit(f'dns/{type}', dn)
             obj['zone'] = zone
             obj['nameserver'] = nameserver
             obj['a'] = interfaces
@@ -217,18 +217,18 @@ def main():
                     obj.modify()
         except Exception as e:
             module.fail_json(
-                msg='Creating/editing dns zone {0} failed: {1}'.format(zone, e)
+                msg=f'Creating/editing dns zone {zone} failed: {e}'
             )
 
     if state == 'absent' and exists:
         try:
-            obj = umc_module_for_edit('dns/{0}'.format(type), dn)
+            obj = umc_module_for_edit(f'dns/{type}', dn)
             if not module.check_mode:
                 obj.remove()
             changed = True
         except Exception as e:
             module.fail_json(
-                msg='Removing dns zone {0} failed: {1}'.format(zone, e)
+                msg=f'Removing dns zone {zone} failed: {e}'
             )
 
     module.exit_json(

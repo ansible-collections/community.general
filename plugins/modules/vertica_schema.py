@@ -164,14 +164,14 @@ def update_roles(schema_facts, cursor, schema,
                  existing, required,
                  create_existing, create_required):
     for role in set(existing + create_existing) - set(required + create_required):
-        cursor.execute("drop role {0} cascade".format(role))
+        cursor.execute(f"drop role {role} cascade")
     for role in set(create_existing) - set(create_required):
-        cursor.execute("revoke create on schema {0} from {1}".format(schema, role))
+        cursor.execute(f"revoke create on schema {schema} from {role}")
     for role in set(required + create_required) - set(existing + create_existing):
-        cursor.execute("create role {0}".format(role))
-        cursor.execute("grant usage on schema {0} to {1}".format(schema, role))
+        cursor.execute(f"create role {role}")
+        cursor.execute(f"grant usage on schema {schema} to {role}")
     for role in set(create_required) - set(create_existing):
-        cursor.execute("grant create on schema {0} to {1}".format(schema, role))
+        cursor.execute(f"grant create on schema {schema} to {role}")
 
 
 def check(schema_facts, schema, usage_roles, create_roles, owner):
@@ -190,9 +190,9 @@ def check(schema_facts, schema, usage_roles, create_roles, owner):
 def present(schema_facts, cursor, schema, usage_roles, create_roles, owner):
     schema_key = schema.lower()
     if schema_key not in schema_facts:
-        query_fragments = ["create schema {0}".format(schema)]
+        query_fragments = [f"create schema {schema}"]
         if owner:
-            query_fragments.append("authorization {0}".format(owner))
+            query_fragments.append(f"authorization {owner}")
         cursor.execute(' '.join(query_fragments))
         update_roles(schema_facts, cursor, schema, [], usage_roles, [], create_roles)
         schema_facts.update(get_schema_facts(cursor, schema))
@@ -200,10 +200,7 @@ def present(schema_facts, cursor, schema, usage_roles, create_roles, owner):
     else:
         changed = False
         if owner and owner.lower() != schema_facts[schema_key]['owner'].lower():
-            raise NotSupportedError((
-                "Changing schema owner is not supported. "
-                "Current owner: {0}."
-            ).format(schema_facts[schema_key]['owner']))
+            raise NotSupportedError(f"Changing schema owner is not supported. Current owner: {schema_facts[schema_key]['owner']}.")
         if sorted(usage_roles) != sorted(schema_facts[schema_key]['usage_roles']) or \
            sorted(create_roles) != sorted(schema_facts[schema_key]['create_roles']):
 
@@ -222,7 +219,7 @@ def absent(schema_facts, cursor, schema, usage_roles, create_roles):
         update_roles(schema_facts, cursor, schema,
                      schema_facts[schema_key]['usage_roles'], [], schema_facts[schema_key]['create_roles'], [])
         try:
-            cursor.execute("drop schema {0} restrict".format(schema_facts[schema_key]['name']))
+            cursor.execute(f"drop schema {schema_facts[schema_key]['name']} restrict")
         except pyodbc.Error:
             raise CannotDropError("Dropping schema failed due to dependencies.")
         del schema_facts[schema_key]
@@ -272,18 +269,17 @@ def main():
     try:
         dsn = (
             "Driver=Vertica;"
-            "Server={0};"
-            "Port={1};"
-            "Database={2};"
-            "User={3};"
-            "Password={4};"
-            "ConnectionLoadBalance={5}"
-        ).format(module.params['cluster'], module.params['port'], db,
-                 module.params['login_user'], module.params['login_password'], 'true')
+            f"Server={module.params['cluster']};"
+            f"Port={module.params['port']};"
+            f"Database={db};"
+            f"User={module.params['login_user']};"
+            f"Password={module.params['login_password']};"
+            f"ConnectionLoadBalance=true"
+        )
         db_conn = pyodbc.connect(dsn, autocommit=True)
         cursor = db_conn.cursor()
     except Exception as e:
-        module.fail_json(msg="Unable to connect to database: {0}.".format(to_native(e)))
+        module.fail_json(msg=f"Unable to connect to database: {e}.")
 
     try:
         schema_facts = get_schema_facts(cursor)

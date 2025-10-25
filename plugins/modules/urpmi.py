@@ -131,13 +131,13 @@ def remove_packages(module, packages, root):
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
-            module.fail_json(msg="failed to remove %s" % (package))
+            module.fail_json(msg=f"failed to remove {package}")
 
         remove_c += 1
 
     if remove_c > 0:
 
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
+        module.exit_json(changed=True, msg=f"removed {remove_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
@@ -147,7 +147,7 @@ def install_packages(module, pkgspec, root, force=True, no_recommends=True):
     packages = ""
     for package in pkgspec:
         if not query_package_provides(module, package, root):
-            packages += "'%s' " % package
+            packages += f"'{package}' "
 
     if len(packages) != 0:
         if no_recommends:
@@ -167,20 +167,20 @@ def install_packages(module, pkgspec, root, force=True, no_recommends=True):
 
         for package in pkgspec:
             if not query_package_provides(module, package, root):
-                module.fail_json(msg="'urpmi %s' failed: %s" % (package, err))
+                module.fail_json(msg=f"'urpmi {package}' failed: {err}")
 
         # urpmi always have 0 for exit code if --force is used
         if rc:
-            module.fail_json(msg="'urpmi %s' failed: %s" % (packages, err))
+            module.fail_json(msg=f"'urpmi {packages}' failed: {err}")
         else:
-            module.exit_json(changed=True, msg="%s present(s)" % packages)
+            module.exit_json(changed=True, msg=f"{packages} present(s)")
     else:
         module.exit_json(changed=False)
 
 
 def root_option(root):
     if root:
-        return ["--root=%s" % (root)]
+        return [f"--root={root}"]
     else:
         return []
 

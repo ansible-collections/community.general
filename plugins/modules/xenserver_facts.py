@@ -103,7 +103,7 @@ def get_pifs(session):
     devicenums = range(0, 7)
     for pif in pifs.values():
         for eth in devicenums:
-            interface_name = "eth%s" % (eth)
+            interface_name = f"eth{eth}"
             bond_name = interface_name.replace('eth', 'bond')
             if pif['device'] == interface_name:
                 xs_pifs[interface_name] = pif

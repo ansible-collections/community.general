@@ -364,8 +364,7 @@ class XCCRedfishUtils(RedfishUtils):
                     if 'PATCH' not in methods:
                         # if Allow header present and PATCH missing, return error
                         return {'ret': False,
-                                'msg': "%s action not found and PATCH not allowed"
-                                       % '#VirtualMedia.EjectMedia'}
+                                'msg': "#VirtualMedia.EjectMedia action not found and PATCH not allowed"}
                 return self.virtual_media_eject_via_patch(uri)
             else:
                 # POST to the EjectMedia Action
@@ -387,13 +386,11 @@ class XCCRedfishUtils(RedfishUtils):
         elif uri and not eject:
             # already ejected: return success but changed=False
             return {'ret': True, 'changed': False,
-                    'msg': "VirtualMedia image '%s' already ejected" %
-                           image_url}
+                    'msg': f"VirtualMedia image '{image_url}' already ejected"}
         else:
             # return failure (no resources matching image_url found)
             return {'ret': False, 'changed': False,
-                    'msg': "No VirtualMedia resource found with image '%s' "
-                           "inserted" % image_url}
+                    'msg': f"No VirtualMedia resource found with image '{image_url}' inserted"}
 
     def virtual_media_eject(self, options):
         if options:
@@ -441,7 +438,7 @@ class XCCRedfishUtils(RedfishUtils):
                     'msg': "No VirtualMedia image inserted"}
         else:
             return {'ret': True, 'changed': True,
-                    'msg': "VirtualMedia %s ejected" % str(ejected_media_list)}
+                    'msg': f"VirtualMedia {ejected_media_list!s} ejected"}
 
     def virtual_media_insert(self, options):
         param_map = {
@@ -484,7 +481,7 @@ class XCCRedfishUtils(RedfishUtils):
         # see if image already inserted; if so, nothing to do
         if self._virt_media_image_inserted(resources, image_url):
             return {'ret': True, 'changed': False,
-                    'msg': "VirtualMedia '%s' already inserted" % image_url}
+                    'msg': f"VirtualMedia '{image_url}' already inserted"}
 
         # find an empty slot to insert the media
         # try first with strict media_type matching
@@ -496,9 +493,7 @@ class XCCRedfishUtils(RedfishUtils):
                 resources, media_types, media_match_strict=False)
         if not uri:
             return {'ret': False,
-                    'msg': "Unable to find an available VirtualMedia resource "
-                           "%s" % ('supporting ' + str(media_types)
-                                   if media_types else '')}
+                    'msg': f'Unable to find an available VirtualMedia resource {f"supporting {media_types}" if media_types else ""}'}
 
         # confirm InsertMedia action found
         if ('Actions' not in data or
@@ -510,8 +505,7 @@ class XCCRedfishUtils(RedfishUtils):
                 if 'PATCH' not in methods:
                     # if Allow header present and PATCH missing, return error
                     return {'ret': False,
-                            'msg': "%s action not found and PATCH not allowed"
-                            % '#VirtualMedia.InsertMedia'}
+                            'msg': "#VirtualMedia.InsertMedia action not found and PATCH not allowed"}
             return self.virtual_media_insert_via_patch(options, param_map,
                                                        uri, data)
 
@@ -578,7 +572,7 @@ class XCCRedfishUtils(RedfishUtils):
         data = response['data']
         for key in request_body.keys():
             if key not in data:
-                return {'ret': False, 'msg': "Key %s not found. Supported key list: %s" % (key, str(data.keys()))}
+                return {'ret': False, 'msg': f"Key {key} not found. Supported key list: {data.keys()}"}
 
         # perform patch
         response = self.patch_request(self.root_uri + resource_uri, request_body)
@@ -609,7 +603,7 @@ class XCCRedfishUtils(RedfishUtils):
             return response
         if 'Actions' not in response['data']:
             if resource_uri_has_actions:
-                return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
+                return {'ret': False, 'msg': f"Actions property not found in {action_base_uri}"}
             else:
                 response['data']['Actions'] = {}
 
@@ -645,8 +639,8 @@ class XCCRedfishUtils(RedfishUtils):
 
         if not action_found and resource_uri_has_actions:
             return {'ret': False,
-                    'msg': 'Specified resource_uri is not a supported action target uri, please specify a supported target uri instead. Supported uri: %s'
-                    % (str(action_target_uri_list))}
+                    'msg': (f'Specified resource_uri is not a supported action target uri, please specify a supported target uri instead. '
+                            f'Supported uri: {action_target_uri_list}')}
 
         # check request_body with parameter name defined by @Redfish.ActionInfo
         if action_info_uri is not None:
@@ -661,8 +655,8 @@ class XCCRedfishUtils(RedfishUtils):
                         break
                 if not key_found:
                     return {'ret': False,
-                            'msg': 'Invalid property %s found in request_body. Please refer to @Redfish.ActionInfo Parameters: %s'
-                            % (key, str(response['data']['Parameters']))}
+                            'msg': (f"Invalid property {key} found in request_body. "
+                                    f"Please refer to @Redfish.ActionInfo Parameters: {response['data']['Parameters']}")}
 
         # perform post
         response = self.post_request(self.root_uri + resource_uri, request_body)
@@ -750,18 +744,18 @@ def main():
     request_body = module.params['request_body']
 
     # Build root URI
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = XCCRedfishUtils(creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, CATEGORY_COMMANDS_ALL.keys())))
+        module.fail_json(msg=to_native(f"Invalid Category '{category}'. Valid Categories = {CATEGORY_COMMANDS_ALL.keys()}"))
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}"))
 
     # Organize by Categories / Commands
     if category == "Manager":
