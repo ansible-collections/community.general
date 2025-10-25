@@ -342,6 +342,11 @@ end_state:
   description: Representation of the user after module execution.
   returned: on success
   type: dict
+user_created:
+  description: Indicates whether a user was created.
+  returned: in success
+  type: bool
+  version_added: 12.0.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -457,7 +462,8 @@ def main():
 
     result['proposed'] = changeset
     result['existing'] = before_user
-
+    # Default values for user_created
+    result['user_created'] = False
     changed = False
 
     # Cater for when it doesn't exist (an empty dict)
@@ -493,12 +499,18 @@ def main():
                 result['diff'] = dict(before='', after=desired_user)
 
             if module.check_mode:
+                # Set user_created flag explicit for check_mode
+                # create_user could have failed, but we don't know for sure until we try to create the user.'
+                result['user_created'] = True
                 module.exit_json(**result)
+
             # Create the user
             after_user = kc.create_user(userrep=desired_user, realm=realm)
             result["msg"] = 'User %s created' % (desired_user['username'])
             # Add user ID to new representation
             desired_user['id'] = after_user["id"]
+            # Set user_created flag
+            result['user_created'] = True
         else:
             excludes = [
                 "access",
