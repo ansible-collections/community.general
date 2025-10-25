@@ -105,7 +105,7 @@ def install_plugin(module, plugin_bin, plugin_name, version, proxy_host, proxy_p
         cmd_args.extend(["--version", version])
 
     if proxy_host and proxy_port:
-        cmd_args.extend(["-DproxyHost=%s" % proxy_host, "-DproxyPort=%s" % proxy_port])
+        cmd_args.extend([f"-DproxyHost={proxy_host}", f"-DproxyPort={proxy_port}"])
 
     cmd = " ".join(cmd_args)
 

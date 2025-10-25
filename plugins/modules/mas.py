@@ -140,11 +140,11 @@ class Mas(object):
             rc, out, err = self.run([command, str(id)])
             if rc != 0:
                 self.module.fail_json(
-                    msg="Error running command '{0}' on app '{1}': {2}".format(command, str(id), out.rstrip())
+                    msg=f"Error running command '{command}' on app '{id}': {out.rstrip()}"
                 )
 
         # No error or dry run
-        self.__dict__['count_' + command] += 1
+        self.__dict__[f"count_{command}"] += 1
 
     def check_mas_tool(self):
         ''' Verifies that the `mas` tool is available in a recent version '''
@@ -156,7 +156,7 @@ class Mas(object):
         # Is the version recent enough?
         rc, out, err = self.run(['version'])
         if rc != 0 or not out.strip() or LooseVersion(out.strip()) < LooseVersion('1.5.0'):
-            self.module.fail_json(msg='`mas` tool in version 1.5.0+ needed, got ' + out.strip())
+            self.module.fail_json(msg=f"`mas` tool in version 1.5.0+ needed, got {out.strip()}")
 
     def check_signin(self):
         ''' Verifies that the user is signed in to the Mac App Store '''
@@ -178,11 +178,11 @@ class Mas(object):
 
         msgs = []
         if self.count_install > 0:
-            msgs.append('Installed {0} app(s)'.format(self.count_install))
+            msgs.append(f'Installed {self.count_install} app(s)')
         if self.count_upgrade > 0:
-            msgs.append('Upgraded {0} app(s)'.format(self.count_upgrade))
+            msgs.append(f'Upgraded {self.count_upgrade} app(s)')
         if self.count_uninstall > 0:
-            msgs.append('Uninstalled {0} app(s)'.format(self.count_uninstall))
+            msgs.append(f'Uninstalled {self.count_uninstall} app(s)')
 
         if msgs:
             self.result['changed'] = True
@@ -250,7 +250,7 @@ class Mas(object):
 
             rc, out, err = self.run(['upgrade'])
             if rc != 0:
-                self.module.fail_json(msg='Could not upgrade all apps: ' + out.rstrip())
+                self.module.fail_json(msg=f"Could not upgrade all apps: {out.rstrip()}")
 
         self.count_upgrade += len(outdated)
 

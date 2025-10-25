@@ -290,8 +290,7 @@ def main():
                 secure_state = True
             except ssl.SSLError as e:
                 if secure == 'always':
-                    module.fail_json(rc=1, msg='Unable to start an encrypted session to %s:%s: %s' %
-                                               (host, port, to_native(e)), exception=traceback.format_exc())
+                    module.fail_json(rc=1, msg=f'Unable to start an encrypted session to {host}:{port}: {to_native(e)}', exception=traceback.format_exc())
             except Exception:
                 pass
 
@@ -300,12 +299,12 @@ def main():
             code, smtpmessage = smtp.connect(host, port)
 
     except smtplib.SMTPException as e:
-        module.fail_json(rc=1, msg='Unable to Connect %s:%s: %s' % (host, port, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(rc=1, msg=f'Unable to Connect {host}:{port}: {to_native(e)}', exception=traceback.format_exc())
 
     try:
         smtp.ehlo()
     except smtplib.SMTPException as e:
-        module.fail_json(rc=1, msg='Helo failed for host %s:%s: %s' % (host, port, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(rc=1, msg=f'Helo failed for host {host}:{port}: {to_native(e)}', exception=traceback.format_exc())
 
     if int(code) > 0:
         if not secure_state and secure in ('starttls', 'try'):
@@ -314,26 +313,25 @@ def main():
                     smtp.starttls()
                     secure_state = True
                 except smtplib.SMTPException as e:
-                    module.fail_json(rc=1, msg='Unable to start an encrypted session to %s:%s: %s' %
-                                     (host, port, to_native(e)), exception=traceback.format_exc())
+                    module.fail_json(rc=1, msg=f'Unable to start an encrypted session to {host}:{port}: {e}', exception=traceback.format_exc())
                 try:
                     smtp.ehlo()
                 except smtplib.SMTPException as e:
-                    module.fail_json(rc=1, msg='Helo failed for host %s:%s: %s' % (host, port, to_native(e)), exception=traceback.format_exc())
+                    module.fail_json(rc=1, msg=f'Helo failed for host {host}:{port}: {e}', exception=traceback.format_exc())
             else:
                 if secure == 'starttls':
-                    module.fail_json(rc=1, msg='StartTLS is not offered on server %s:%s' % (host, port))
+                    module.fail_json(rc=1, msg=f'StartTLS is not offered on server {host}:{port}')
 
     if username and password:
         if smtp.has_extn('AUTH'):
             try:
                 smtp.login(username, password)
             except smtplib.SMTPAuthenticationError:
-                module.fail_json(rc=1, msg='Authentication to %s:%s failed, please check your username and/or password' % (host, port))
+                module.fail_json(rc=1, msg=f'Authentication to {host}:{port} failed, please check your username and/or password')
             except smtplib.SMTPException:
-                module.fail_json(rc=1, msg='No Suitable authentication method was found on %s:%s' % (host, port))
+                module.fail_json(rc=1, msg=f'No Suitable authentication method was found on {host}:{port}')
         else:
-            module.fail_json(rc=1, msg="No Authentication on the server at %s:%s" % (host, port))
+            module.fail_json(rc=1, msg=f"No Authentication on the server at {host}:{port}")
 
     if not secure_state and (username and password):
         module.warn('Username and Password was sent without encryption')
@@ -353,7 +351,7 @@ def main():
                 h_val = to_native(Header(h_val, charset))
                 msg.add_header(h_key, h_val)
             except Exception:
-                module.warn("Skipping header '%s', unable to parse" % hdr)
+                module.warn(f"Skipping header '{hdr}', unable to parse")
 
     if 'X-Mailer' not in msg:
         msg.add_header('X-Mailer', 'Ansible mail module')
@@ -374,7 +372,7 @@ def main():
         addr_list.append(parseaddr(addr)[1])    # address only, w/o phrase
     msg['Cc'] = ", ".join(cc_list)
 
-    part = MIMEText(body + "\n\n", _subtype=subtype, _charset=charset)
+    part = MIMEText(f"{body}\n\n", _subtype=subtype, _charset=charset)
     msg.attach(part)
 
     # NOTE: Backward compatibility with old syntax using space as delimiter is not retained
@@ -388,22 +386,20 @@ def main():
             part.add_header('Content-disposition', 'attachment', filename=os.path.basename(filename))
             msg.attach(part)
         except Exception as e:
-            module.fail_json(rc=1, msg="Failed to send community.general.mail: can't attach file %s: %s" %
-                             (filename, to_native(e)), exception=traceback.format_exc())
+            module.fail_json(rc=1, msg=f"Failed to send community.general.mail: can't attach file {filename}: {e}", exception=traceback.format_exc())
 
     composed = msg.as_string()
 
     try:
         result = smtp.sendmail(sender_addr, set(addr_list), composed)
     except Exception as e:
-        module.fail_json(rc=1, msg="Failed to send mail to '%s': %s" %
-                         (", ".join(set(addr_list)), to_native(e)), exception=traceback.format_exc())
+        module.fail_json(rc=1, msg=f"Failed to send mail to '{', '.join(set(addr_list))}': {e}", exception=traceback.format_exc())
 
     smtp.quit()
 
     if result:
         for key in result:
-            module.warn("Failed to send mail to '%s': %s %s" % (key, result[key][0], result[key][1]))
+            module.warn(f"Failed to send mail to '{key}': {result[key][0]} {result[key][1]}")
         module.exit_json(msg='Failed to send mail to at least one recipient', result=result)
 
     module.exit_json(msg='Mail sent successfully', result=result)

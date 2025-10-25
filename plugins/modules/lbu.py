@@ -104,7 +104,7 @@ def run_module():
         if module.params[param]:
             paths = run_lbu(param, '-l').split('\n')
             for path in module.params[param]:
-                if os.path.normpath('/' + path)[1:] not in paths:
+                if os.path.normpath(f"/{path}")[1:] not in paths:
                     update = True
 
     if module.params['commit']:

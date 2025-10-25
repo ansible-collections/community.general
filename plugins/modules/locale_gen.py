@@ -135,9 +135,7 @@ class LocaleGen(StateModuleHelper):
                 version="13.0.0", collection_name="community.general"
             )
         else:
-            self.do_raise('{0} and {1} are missing. Is the package "locales" installed?'.format(
-                VAR_LIB_LOCALES, ETC_LOCALE_GEN
-            ))
+            self.do_raise(f'{VAR_LIB_LOCALES} and {ETC_LOCALE_GEN} are missing. Is the package "locales" installed?')
 
         self.runner = locale_runner(self.module)
 
@@ -176,7 +174,7 @@ class LocaleGen(StateModuleHelper):
         locales_not_found = self.locale_get_not_present(locales_not_found)
 
         if locales_not_found:
-            self.do_raise("The following locales you have entered are not available on your system: {0}".format(', '.join(locales_not_found)))
+            self.do_raise(f"The following locales you have entered are not available on your system: {', '.join(locales_not_found)}")
 
     def is_present(self):
         return not self.locale_get_not_present(self.vars.name)
@@ -210,11 +208,11 @@ class LocaleGen(StateModuleHelper):
         locale_regexes = []
 
         for name in names:
-            search_string = r'^#?\s*%s (?P<charset>.+)' % re.escape(name)
+            search_string = rf'^#?\s*{re.escape(name)} (?P<charset>.+)'
             if enabled:
-                new_string = r'%s \g<charset>' % (name)
+                new_string = rf'{name} \g<charset>'
             else:
-                new_string = r'# %s \g<charset>' % (name)
+                new_string = rf'# {name} \g<charset>'
             re_search = re.compile(search_string)
             locale_regexes.append([re_search, new_string])
 

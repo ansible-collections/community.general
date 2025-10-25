@@ -241,15 +241,15 @@ class ManageIQgroup(object):
         if tenant_id:
             tenant = self.client.get_entity('tenants', tenant_id)
             if not tenant:
-                self.module.fail_json(msg="Tenant with id '%s' not found in manageiq" % str(tenant_id))
+                self.module.fail_json(msg=f"Tenant with id '{tenant_id}' not found in manageiq")
             return tenant
         else:
             if tenant_name:
                 tenant_res = self.client.collections.tenants.find_by(name=tenant_name)
                 if not tenant_res:
-                    self.module.fail_json(msg="Tenant '%s' not found in manageiq" % tenant_name)
+                    self.module.fail_json(msg=f"Tenant '{tenant_name}' not found in manageiq")
                 if len(tenant_res) > 1:
-                    self.module.fail_json(msg="Multiple tenants found in manageiq with name '%s'" % tenant_name)
+                    self.module.fail_json(msg=f"Multiple tenants found in manageiq with name '{tenant_name}'")
                 tenant = tenant_res[0]
                 return tenant
             else:
@@ -266,15 +266,15 @@ class ManageIQgroup(object):
         if role_id:
             role = self.client.get_entity('roles', role_id)
             if not role:
-                self.module.fail_json(msg="Role with id '%s' not found in manageiq" % str(role_id))
+                self.module.fail_json(msg=f"Role with id '{role_id}' not found in manageiq")
             return role
         else:
             if role_name:
                 role_res = self.client.collections.roles.find_by(name=role_name)
                 if not role_res:
-                    self.module.fail_json(msg="Role '%s' not found in manageiq" % role_name)
+                    self.module.fail_json(msg=f"Role '{role_name}' not found in manageiq")
                 if len(role_res) > 1:
-                    self.module.fail_json(msg="Multiple roles found in manageiq with name '%s'" % role_name)
+                    self.module.fail_json(msg=f"Multiple roles found in manageiq with name '{role_name}'")
                 return role_res[0]
             else:
                 # No role name or role id supplied
@@ -316,17 +316,17 @@ class ManageIQgroup(object):
             msg: a short message describing the operation executed.
         """
         try:
-            url = '%s/groups/%s' % (self.api_url, group['id'])
+            url = f"{self.api_url}/groups/{group['id']}"
             result = self.client.post(url, action='delete')
         except Exception as e:
-            self.module.fail_json(msg="failed to delete group %s: %s" % (group['description'], str(e)))
+            self.module.fail_json(msg=f"failed to delete group {group['description']}: {e}")
 
         if result['success'] is False:
             self.module.fail_json(msg=result['message'])
 
         return dict(
             changed=True,
-            msg="deleted group %s with id %s" % (group['description'], group['id']))
+            msg=f"deleted group {group['description']} with id {group['id']}")
 
     def edit_group(self, group, description, role, tenant, norm_managed_filters, managed_filters_merge_mode,
                    belongsto_filters, belongsto_filters_merge_mode):
@@ -383,18 +383,18 @@ class ManageIQgroup(object):
         if not changed:
             return dict(
                 changed=False,
-                msg="group %s is not changed." % group['description'])
+                msg=f"group {group['description']} is not changed.")
 
         # try to update group
         try:
             self.client.post(group['href'], action='edit', resource=resource)
             changed = True
         except Exception as e:
-            self.module.fail_json(msg="failed to update group %s: %s" % (group['name'], str(e)))
+            self.module.fail_json(msg=f"failed to update group {group['name']}: {e!s}")
 
         return dict(
             changed=changed,
-            msg="successfully updated the group %s with id %s" % (group['description'], group['id']))
+            msg=f"successfully updated the group {group['description']} with id {group['id']}")
 
     def edit_group_edit_filters(self, current_filters, norm_managed_filters, managed_filters_merge_mode,
                                 belongsto_filters, belongsto_filters_merge_mode):
@@ -457,9 +457,9 @@ class ManageIQgroup(object):
         # check for required arguments
         for key, value in dict(description=description).items():
             if value in (None, ''):
-                self.module.fail_json(msg="missing required argument: %s" % key)
+                self.module.fail_json(msg=f"missing required argument: {key}")
 
-        url = '%s/groups' % self.api_url
+        url = f'{self.api_url}/groups'
 
         resource = {'description': description}
 
@@ -476,11 +476,11 @@ class ManageIQgroup(object):
         try:
             result = self.client.post(url, action='create', resource=resource)
         except Exception as e:
-            self.module.fail_json(msg="failed to create group %s: %s" % (description, str(e)))
+            self.module.fail_json(msg=f"failed to create group {description}: {e}")
 
         return dict(
             changed=True,
-            msg="successfully created group %s" % description,
+            msg=f"successfully created group {description}",
             group_id=result['results'][0]['id']
         )
 
@@ -514,9 +514,9 @@ class ManageIQgroup(object):
         for cat_key in managed_filters:
             cat_array = []
             if not isinstance(managed_filters[cat_key], list):
-                module.fail_json(msg='Entry "{0}" of managed_filters must be a list!'.format(cat_key))
+                module.fail_json(msg=f'Entry "{cat_key}" of managed_filters must be a list!')
             for tags in managed_filters[cat_key]:
-                miq_managed_tag = "/managed/" + cat_key + "/" + tags
+                miq_managed_tag = f"/managed/{cat_key}/{tags}"
                 cat_array.append(miq_managed_tag)
             # Do not add empty categories. ManageIQ will remove all categories that are not supplied
             if cat_array:
@@ -609,7 +609,7 @@ def main():
         else:
             res_args = dict(
                 changed=False,
-                msg="group '%s' does not exist in manageiq" % description)
+                msg=f"group '{description}' does not exist in manageiq")
 
     # group should exist
     if state == "present":

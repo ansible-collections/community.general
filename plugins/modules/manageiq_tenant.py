@@ -189,7 +189,7 @@ class ManageIQTenant(object):
         if parent_id:
             parent_tenant_res = self.client.collections.tenants.find_by(id=parent_id)
             if not parent_tenant_res:
-                self.module.fail_json(msg="Parent tenant with id '%s' not found in manageiq" % str(parent_id))
+                self.module.fail_json(msg=f"Parent tenant with id '{parent_id}' not found in manageiq")
             parent_tenant = parent_tenant_res[0]
             tenants = self.client.collections.tenants.find_by(name=name)
 
@@ -209,10 +209,10 @@ class ManageIQTenant(object):
             if parent:
                 parent_tenant_res = self.client.collections.tenants.find_by(name=parent)
                 if not parent_tenant_res:
-                    self.module.fail_json(msg="Parent tenant '%s' not found in manageiq" % parent)
+                    self.module.fail_json(msg=f"Parent tenant '{parent}' not found in manageiq")
 
                 if len(parent_tenant_res) > 1:
-                    self.module.fail_json(msg="Multiple parent tenants not found in manageiq with name '%s'" % parent)
+                    self.module.fail_json(msg=f"Multiple parent tenants not found in manageiq with name '{parent}'")
 
                 parent_tenant = parent_tenant_res[0]
                 parent_id = int(parent_tenant['id'])
@@ -254,10 +254,10 @@ class ManageIQTenant(object):
             dict with `msg` and `changed`
         """
         try:
-            url = '%s/tenants/%s' % (self.api_url, tenant['id'])
+            url = f"{self.api_url}/tenants/{tenant['id']}"
             result = self.client.post(url, action='delete')
         except Exception as e:
-            self.module.fail_json(msg="failed to delete tenant %s: %s" % (tenant['name'], str(e)))
+            self.module.fail_json(msg=f"failed to delete tenant {tenant['name']}: {e}")
 
         if result['success'] is False:
             self.module.fail_json(msg=result['message'])
@@ -276,18 +276,18 @@ class ManageIQTenant(object):
         if self.compare_tenant(tenant, name, description):
             return dict(
                 changed=False,
-                msg="tenant %s is not changed." % tenant['name'],
+                msg=f"tenant {tenant['name']} is not changed.",
                 tenant=tenant['_data'])
 
         # try to update tenant
         try:
             result = self.client.post(tenant['href'], action='edit', resource=resource)
         except Exception as e:
-            self.module.fail_json(msg="failed to update tenant %s: %s" % (tenant['name'], str(e)))
+            self.module.fail_json(msg=f"failed to update tenant {tenant['name']}: {e}")
 
         return dict(
             changed=True,
-            msg="successfully updated the tenant with id %s" % (tenant['id']))
+            msg=f"successfully updated the tenant with id {tenant['id']}")
 
     def create_tenant(self, name, description, parent_tenant):
         """ Creates the tenant in manageiq.
@@ -299,9 +299,9 @@ class ManageIQTenant(object):
         # check for required arguments
         for key, value in dict(name=name, description=description, parent_id=parent_id).items():
             if value in (None, ''):
-                self.module.fail_json(msg="missing required argument: %s" % key)
+                self.module.fail_json(msg=f"missing required argument: {key}")
 
-        url = '%s/tenants' % self.api_url
+        url = f'{self.api_url}/tenants'
 
         resource = {'name': name, 'description': description, 'parent': {'id': parent_id}}
 
@@ -309,11 +309,11 @@ class ManageIQTenant(object):
             result = self.client.post(url, action='create', resource=resource)
             tenant_id = result['results'][0]['id']
         except Exception as e:
-            self.module.fail_json(msg="failed to create tenant %s: %s" % (name, str(e)))
+            self.module.fail_json(msg=f"failed to create tenant {name}: {e}")
 
         return dict(
             changed=True,
-            msg="successfully created tenant '%s' with id '%s'" % (name, tenant_id),
+            msg=f"successfully created tenant '{name}' with id '{tenant_id}'",
             tenant_id=tenant_id)
 
     def tenant_quota(self, tenant, quota_key):
@@ -322,7 +322,7 @@ class ManageIQTenant(object):
             the quota for the tenant, or None if the tenant quota was not found.
         """
 
-        tenant_quotas = self.client.get("%s/quotas?expand=resources&filter[]=name=%s" % (tenant['href'], quota_key))
+        tenant_quotas = self.client.get(f"{tenant['href']}/quotas?expand=resources&filter[]=name={quota_key}")
 
         return tenant_quotas['resources']
 
@@ -332,7 +332,7 @@ class ManageIQTenant(object):
             the quotas for the tenant, or None if no tenant quotas were not found.
         """
 
-        tenant_quotas = self.client.get("%s/quotas?expand=resources" % (tenant['href']))
+        tenant_quotas = self.client.get(f"{tenant['href']}/quotas?expand=resources")
 
         return tenant_quotas['resources']
 
@@ -366,7 +366,7 @@ class ManageIQTenant(object):
                 if current_quota:
                     res = self.delete_tenant_quota(tenant, current_quota)
                 else:
-                    res = dict(changed=False, msg="tenant quota '%s' does not exist" % quota_key)
+                    res = dict(changed=False, msg=f"tenant quota '{quota_key}' does not exist")
 
             if res['changed']:
                 changed = True
@@ -387,19 +387,19 @@ class ManageIQTenant(object):
         if current_quota['value'] == quota_value:
             return dict(
                 changed=False,
-                msg="tenant quota %s already has value %s" % (quota_key, quota_value))
+                msg=f"tenant quota {quota_key} already has value {quota_value}")
         else:
 
-            url = '%s/quotas/%s' % (tenant['href'], current_quota['id'])
+            url = f"{tenant['href']}/quotas/{current_quota['id']}"
             resource = {'value': quota_value}
             try:
                 self.client.post(url, action='edit', resource=resource)
             except Exception as e:
-                self.module.fail_json(msg="failed to update tenant quota %s: %s" % (quota_key, str(e)))
+                self.module.fail_json(msg=f"failed to update tenant quota {quota_key}: {e}")
 
             return dict(
                 changed=True,
-                msg="successfully updated tenant quota %s" % quota_key)
+                msg=f"successfully updated tenant quota {quota_key}")
 
     def create_tenant_quota(self, tenant, quota_key, quota_value):
         """ Creates the tenant quotas in manageiq.
@@ -407,16 +407,16 @@ class ManageIQTenant(object):
         Returns:
             result
         """
-        url = '%s/quotas' % (tenant['href'])
+        url = f"{tenant['href']}/quotas"
         resource = {'name': quota_key, 'value': quota_value}
         try:
             self.client.post(url, action='create', resource=resource)
         except Exception as e:
-            self.module.fail_json(msg="failed to create tenant quota %s: %s" % (quota_key, str(e)))
+            self.module.fail_json(msg=f"failed to create tenant quota {quota_key}: {e}")
 
         return dict(
             changed=True,
-            msg="successfully created tenant quota %s" % quota_key)
+            msg=f"successfully created tenant quota {quota_key}")
 
     def delete_tenant_quota(self, tenant, quota):
         """ deletes the tenant quotas in manageiq.
@@ -427,7 +427,7 @@ class ManageIQTenant(object):
         try:
             result = self.client.post(quota['href'], action='delete')
         except Exception as e:
-            self.module.fail_json(msg="failed to delete tenant quota '%s': %s" % (quota['name'], str(e)))
+            self.module.fail_json(msg=f"failed to delete tenant quota '{quota['name']}': {e}")
 
         return dict(changed=True, msg=result['message'])
 
@@ -512,9 +512,9 @@ def main():
         # if we do not have a tenant, nothing to do
         else:
             if parent_id:
-                msg = "tenant '%s' with parent_id %i does not exist in manageiq" % (name, parent_id)
+                msg = f"tenant '{name}' with parent_id {int(parent_id)} does not exist in manageiq"
             else:
-                msg = "tenant '%s' with parent '%s' does not exist in manageiq" % (name, parent)
+                msg = f"tenant '{name}' with parent '{parent}' does not exist in manageiq"
 
             res_args = dict(
                 changed=False,

@@ -246,7 +246,7 @@ class LXDProjectManagement(object):
 
     def _get_project_json(self):
         return self.client.do(
-            'GET', '/1.0/projects/{0}'.format(self.name),
+            'GET', f'/1.0/projects/{self.name}',
             ok_error_codes=[404]
         )
 
@@ -287,7 +287,7 @@ class LXDProjectManagement(object):
 
     def _rename_project(self):
         config = {'name': self.new_name}
-        self.client.do('POST', '/1.0/projects/{0}'.format(self.name), config)
+        self.client.do('POST', f'/1.0/projects/{self.name}', config)
         self.actions.append('rename')
         self.name = self.new_name
 
@@ -357,11 +357,11 @@ class LXDProjectManagement(object):
         else:
             config = self.config.copy()
         # upload config to lxd
-        self.client.do('PUT', '/1.0/projects/{0}'.format(self.name), config)
+        self.client.do('PUT', f'/1.0/projects/{self.name}', config)
         self.actions.append('apply_projects_configs')
 
     def _delete_project(self):
-        self.client.do('DELETE', '/1.0/projects/{0}'.format(self.name))
+        self.client.do('DELETE', f'/1.0/projects/{self.name}')
         self.actions.append('delete')
 
     def run(self):

@@ -65,10 +65,10 @@ def gather_lldp(module):
                 path = path.split(".")
                 path_components, final = path[:-1], path[-1]
             elif final in current_dict and isinstance(current_dict[final], str):
-                current_dict[final] += '\n' + entry
+                current_dict[final] += f"\n{entry}"
                 continue
             elif final in current_dict and isinstance(current_dict[final], list):
-                current_dict[final][-1] += '\n' + entry
+                current_dict[final][-1] += f"\n{entry}"
                 continue
             else:
                 continue

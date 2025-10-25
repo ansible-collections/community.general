@@ -150,7 +150,7 @@ def main():
     result = dict(changed=False, msg="OK")
 
     # define webhook
-    webhook_url = "{0}/hooks/{1}".format(module.params['url'], module.params['api_key'])
+    webhook_url = f"{module.params['url']}/hooks/{module.params['api_key']}"
     result['webhook_url'] = webhook_url
 
     # define payload
@@ -182,7 +182,7 @@ def main():
         # something's wrong
         if info['status'] != 200:
             # some problem
-            result['msg'] = "Failed to send mattermost message, the error was: {0}".format(info['msg'])
+            result['msg'] = f"Failed to send mattermost message, the error was: {info['msg']}"
             module.fail_json(**result)
 
     # Looks good

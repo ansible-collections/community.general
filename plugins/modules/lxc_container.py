@@ -697,8 +697,8 @@ class LxcContainerManagement(object):
         for key, value in parsed_options:
             key = key.strip()
             value = value.strip()
-            new_entry = '%s = %s\n' % (key, value)
-            keyre = re.compile(r'%s(\s+)?=' % key)
+            new_entry = f'{key} = {value}\n'
+            keyre = re.compile(rf'{key}(\s+)?=')
             for option_line in container_config:
                 # Look for key in config
                 if keyre.match(option_line):
@@ -784,7 +784,7 @@ class LxcContainerManagement(object):
 
         rc, return_data, err = self.module.run_command(build_command)
         if rc != 0:
-            message = "Failed executing %s." % os.path.basename(clone_cmd)
+            message = f"Failed executing {os.path.basename(clone_cmd)}."
             self.failure(
                 err=err, rc=rc, msg=message, command=' '.join(
                     build_command
@@ -843,7 +843,7 @@ class LxcContainerManagement(object):
             build_command.extend([
                 '--logfile',
                 os.path.join(
-                    log_path, 'lxc-%s.log' % self.container_name
+                    log_path, f'lxc-{self.container_name}.log'
                 ),
                 '--logpriority',
                 self.module.params.get(
@@ -938,11 +938,9 @@ class LxcContainerManagement(object):
             time.sleep(1)
         self.failure(
             lxc_container=self._container_data(),
-            error='Failed to start container [ %s ]' % self.container_name,
+            error=f'Failed to start container [ {self.container_name} ]',
             rc=1,
-            msg='The container [ %s ] failed to start. Check to lxc is'
-                ' available and that the container is in a functional'
-                ' state.' % self.container_name
+            msg=f'The container [ {self.container_name} ] failed to start. Check to lxc is available and that the container is in a functional state.'
         )
 
     def _check_archive(self):
@@ -1002,12 +1000,10 @@ class LxcContainerManagement(object):
         else:
             self.failure(
                 lxc_container=self._container_data(),
-                error='Failed to destroy container'
-                      ' [ %s ]' % self.container_name,
+                error=f'Failed to destroy container [ {self.container_name} ]',
                 rc=1,
-                msg='The container [ %s ] failed to be destroyed. Check'
-                    ' that lxc is available and that the container is in a'
-                    ' functional state.' % self.container_name
+                msg=(f'The container [ {self.container_name} ] failed to be destroyed. '
+                     'Check that lxc is available and that the container is in a functional state.')
             )
 
     def _frozen(self, count=0):
@@ -1129,12 +1125,9 @@ class LxcContainerManagement(object):
             elif not self._container_startup():
                 self.failure(
                     lxc_container=self._container_data(),
-                    error='Failed to start container'
-                          ' [ %s ]' % self.container_name,
+                    error=f'Failed to start container [ {self.container_name} ]',
                     rc=1,
-                    msg='The container [ %s ] failed to start. Check to lxc is'
-                        ' available and that the container is in a functional'
-                        ' state.' % self.container_name
+                    msg=f'The container [ {self.container_name} ] failed to start. Check to lxc is available and that the container is in a functional state.'
                 )
 
             # Return data
@@ -1210,7 +1203,7 @@ class LxcContainerManagement(object):
             self.failure(
                 err=err,
                 rc=rc,
-                msg='failed to read vg %s' % vg_name,
+                msg=f'failed to read vg {vg_name}',
                 command=' '.join(build_command)
             )
 
@@ -1241,7 +1234,7 @@ class LxcContainerManagement(object):
             self.failure(
                 err=err,
                 rc=rc,
-                msg='failed to read lv %s' % lv,
+                msg=f'failed to read lv {lv}',
                 command=' '.join(build_command)
             )
 
@@ -1267,8 +1260,7 @@ class LxcContainerManagement(object):
 
         if free_space < float(snapshot_size_gb):
             message = (
-                'Snapshot size [ %s ] is > greater than [ %s ] on volume group'
-                ' [ %s ]' % (snapshot_size_gb, free_space, vg)
+                f'Snapshot size [ {snapshot_size_gb} ] is > greater than [ {free_space} ] on volume group [ {vg} ]'
             )
             self.failure(
                 error='Not enough space to create snapshot',
@@ -1283,15 +1275,14 @@ class LxcContainerManagement(object):
             snapshot_name,
             "-s",
             os.path.join(vg, source_lv),
-            "-L%sg" % snapshot_size_gb
+            f"-L{snapshot_size_gb}g"
         ]
         rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
                 rc=rc,
-                msg='Failed to Create LVM snapshot %s/%s --> %s'
-                    % (vg, source_lv, snapshot_name)
+                msg=f'Failed to Create LVM snapshot {vg}/{source_lv} --> {snapshot_name}'
             )
 
     def _lvm_lv_mount(self, lv_name, mount_point):
@@ -1307,7 +1298,7 @@ class LxcContainerManagement(object):
 
         build_command = [
             self.module.get_bin_path('mount', True),
-            "/dev/%s/%s" % (vg, lv_name),
+            f"/dev/{vg}/{lv_name}",
             mount_point,
         ]
         rc, stdout, err = self.module.run_command(build_command)
@@ -1315,8 +1306,7 @@ class LxcContainerManagement(object):
             self.failure(
                 err=err,
                 rc=rc,
-                msg='failed to mountlvm lv %s/%s to %s'
-                    % (vg, lv_name, mount_point)
+                msg=f'failed to mountlvm lv {vg}/{lv_name} to {mount_point}'
             )
 
     def _create_tar(self, source_dir):
@@ -1336,17 +1326,11 @@ class LxcContainerManagement(object):
         compression_type = LXC_COMPRESSION_MAP[archive_compression]
 
         # remove trailing / if present.
-        archive_name = '%s.%s' % (
-            os.path.join(
-                archive_path,
-                self.container_name
-            ),
-            compression_type['extension']
-        )
+        archive_name = f"{os.path.join(archive_path, self.container_name)}.{compression_type['extension']}"
 
         build_command = [
             self.module.get_bin_path('tar', True),
-            '--directory=%s' % os.path.realpath(source_dir),
+            f'--directory={os.path.realpath(source_dir)}',
             compression_type['argument'],
             archive_name,
             '.'
@@ -1379,14 +1363,14 @@ class LxcContainerManagement(object):
         build_command = [
             self.module.get_bin_path('lvremove', True),
             "-f",
-            "%s/%s" % (vg, lv_name),
+            f"{vg}/{lv_name}",
         ]
         rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
                 rc=rc,
-                msg='Failed to remove LVM LV %s/%s' % (vg, lv_name),
+                msg=f'Failed to remove LVM LV {vg}/{lv_name}',
                 command=' '.join(build_command)
             )
 
@@ -1442,7 +1426,7 @@ class LxcContainerManagement(object):
             self.failure(
                 err=err,
                 rc=rc,
-                msg='failed to unmount [ %s ]' % mount_point,
+                msg=f'failed to unmount [ {mount_point} ]',
                 command=' '.join(build_command)
             )
 
@@ -1460,7 +1444,7 @@ class LxcContainerManagement(object):
         build_command = [
             self.module.get_bin_path('mount', True),
             '-t', 'overlayfs',
-            '-o', 'lowerdir=%s,upperdir=%s' % (lowerdir, upperdir),
+            '-o', f'lowerdir={lowerdir},upperdir={upperdir}',
             'overlayfs',
             mount_point,
         ]
@@ -1469,8 +1453,7 @@ class LxcContainerManagement(object):
             self.failure(
                 err=err,
                 rc=rc,
-                msg='failed to mount overlayfs:%s:%s to %s -- Command: %s'
-                    % (lowerdir, upperdir, mount_point, build_command)
+                msg=f'failed to mount overlayfs:{lowerdir}:{upperdir} to {mount_point} -- Command: {build_command}'
             )
 
     def _container_create_tar(self):
@@ -1506,7 +1489,7 @@ class LxcContainerManagement(object):
         mount_point = os.path.join(work_dir, 'rootfs')
 
         # Set the snapshot name if needed
-        snapshot_name = '%s_lxc_snapshot' % self.container_name
+        snapshot_name = f'{self.container_name}_lxc_snapshot'
 
         container_state = self._get_state()
         try:
@@ -1542,11 +1525,9 @@ class LxcContainerManagement(object):
                     )
                 else:
                     self.failure(
-                        err='snapshot [ %s ] already exists' % snapshot_name,
+                        err=f'snapshot [ {snapshot_name} ] already exists',
                         rc=1,
-                        msg='The snapshot [ %s ] already exists. Please clean'
-                            ' up old snapshot of containers before continuing.'
-                            % snapshot_name
+                        msg=f'The snapshot [ {snapshot_name} ] already exists. Please clean up old snapshot of containers before continuing.'
                     )
             elif overlayfs_backed:
                 lowerdir, upperdir = lxc_rootfs.split(':')[1:]
@@ -1581,11 +1562,9 @@ class LxcContainerManagement(object):
     def check_count(self, count, method):
         if count > 1:
             self.failure(
-                error='Failed to %s container' % method,
+                error=f'Failed to {method} container',
                 rc=1,
-                msg='The container [ %s ] failed to %s. Check to lxc is'
-                    ' available and that the container is in a functional'
-                    ' state.' % (self.container_name, method)
+                msg=f'The container [ {self.container_name} ] failed to {method}. Check to lxc is available and that the container is in a functional state.'
             )
 
     def failure(self, **kwargs):

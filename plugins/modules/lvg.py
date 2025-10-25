@@ -366,7 +366,7 @@ def reset_uuid_pv(module, device):
         pvchange_rc, pvchange_out, pvchange_err = module.run_command(pvchange_cmd_with_opts)
         dummy, new_uuid, dummy = module.run_command(pvs_cmd_with_opts, check_rc=True)
         if orig_uuid.strip() == new_uuid.strip():
-            module.fail_json(msg="PV (%s) UUID change failed" % (device), rc=pvchange_rc, err=pvchange_err, out=pvchange_out)
+            module.fail_json(msg=f"PV ({device}) UUID change failed", rc=pvchange_rc, err=pvchange_err, out=pvchange_out)
         else:
             changed = True
 
@@ -437,17 +437,17 @@ def main():
         # check given devices
         for test_dev in dev_list:
             if not os.path.exists(test_dev):
-                module.fail_json(msg="Device %s not found." % test_dev)
+                module.fail_json(msg=f"Device {test_dev} not found.")
 
         # get pv list
         pvs_cmd = module.get_bin_path('pvs', True)
         if dev_list:
             pvs_filter_pv_name = ' || '.join(
-                'pv_name = {0}'.format(x)
+                f'pv_name = {x}'
                 for x in itertools.chain(dev_list, module.params['pvs'])
             )
-            pvs_filter_vg_name = 'vg_name = {0}'.format(vg)
-            pvs_filter = ["--select", "{0} || {1}".format(pvs_filter_pv_name, pvs_filter_vg_name)]
+            pvs_filter_vg_name = f'vg_name = {vg}'
+            pvs_filter = ["--select", f"{pvs_filter_pv_name} || {pvs_filter_vg_name}"]
         else:
             pvs_filter = []
         rc, current_pvs, err = module.run_command([pvs_cmd, "--noheadings", "-o", "pv_name,vg_name", "--separator", ";"] + pvs_filter)
@@ -458,7 +458,7 @@ def main():
         pvs = parse_pvs(module, current_pvs)
         used_pvs = [pv for pv in pvs if pv['name'] in dev_list and pv['vg_name'] and pv['vg_name'] != vg]
         if used_pvs:
-            module.fail_json(msg="Device %s is already in %s volume group." % (used_pvs[0]['name'], used_pvs[0]['vg_name']))
+            module.fail_json(msg=f"Device {used_pvs[0]['name']} is already in {used_pvs[0]['vg_name']} volume group.")
 
     if this_vg is None:
         if present_state:
@@ -474,13 +474,13 @@ def main():
                     if rc == 0:
                         changed = True
                     else:
-                        module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
+                        module.fail_json(msg=f"Creating physical volume '{current_dev}' failed", rc=rc, err=err)
                 vgcreate_cmd = module.get_bin_path('vgcreate')
                 rc, dummy, err = module.run_command([vgcreate_cmd] + vgoptions + ['-s', pesize, vg] + dev_list)
                 if rc == 0:
                     changed = True
                 else:
-                    module.fail_json(msg="Creating volume group '%s' failed" % vg, rc=rc, err=err)
+                    module.fail_json(msg=f"Creating volume group '{vg}' failed", rc=rc, err=err)
     else:
         if state == 'absent':
             if module.check_mode:
@@ -493,9 +493,9 @@ def main():
                     if rc == 0:
                         module.exit_json(changed=True)
                     else:
-                        module.fail_json(msg="Failed to remove volume group %s" % (vg), rc=rc, err=err)
+                        module.fail_json(msg=f"Failed to remove volume group {vg}", rc=rc, err=err)
                 else:
-                    module.fail_json(msg="Refuse to remove non-empty volume group %s without force=true" % (vg))
+                    module.fail_json(msg=f"Refuse to remove non-empty volume group {vg} without force=true")
         # activate/deactivate existing VG
         elif state == 'active':
             changed = activate_vg(module=module, vg=vg, active=True)
@@ -535,14 +535,14 @@ def main():
                             if rc == 0:
                                 changed = True
                             else:
-                                module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
+                                module.fail_json(msg=f"Creating physical volume '{current_dev}' failed", rc=rc, err=err)
                         # add PV to our VG
                         vgextend_cmd = module.get_bin_path('vgextend', True)
                         rc, dummy, err = module.run_command([vgextend_cmd, vg] + devs_to_add)
                         if rc == 0:
                             changed = True
                         else:
-                            module.fail_json(msg="Unable to extend %s by %s." % (vg, ' '.join(devs_to_add)), rc=rc, err=err)
+                            module.fail_json(msg=f"Unable to extend {vg} by {' '.join(devs_to_add)}.", rc=rc, err=err)
 
                     # remove some PV from our VG
                     if devs_to_remove:
@@ -551,7 +551,7 @@ def main():
                         if rc == 0:
                             changed = True
                         else:
-                            module.fail_json(msg="Unable to reduce %s by %s." % (vg, ' '.join(devs_to_remove)), rc=rc, err=err)
+                            module.fail_json(msg=f"Unable to reduce {vg} by {' '.join(devs_to_remove)}.", rc=rc, err=err)
 
     module.exit_json(changed=changed)
 

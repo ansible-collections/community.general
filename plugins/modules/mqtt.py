@@ -134,7 +134,6 @@ except ImportError:
     HAS_PAHOMQTT = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 # ===========================================
@@ -191,7 +190,7 @@ def main():
     tls_version = module.params.get("tls_version", None)
 
     if client_id is None:
-        client_id = "%s_%s" % (socket.getfqdn(), os.getpid())
+        client_id = f"{socket.getfqdn()}_{os.getpid()}"
 
     if payload and payload == 'None':
         payload = None
@@ -235,7 +234,7 @@ def main():
         )
     except Exception as e:
         module.fail_json(
-            msg="unable to publish to MQTT broker %s" % to_native(e),
+            msg=f"unable to publish to MQTT broker {e}",
             exception=traceback.format_exc()
         )
 

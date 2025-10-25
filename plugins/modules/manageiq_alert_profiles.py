@@ -96,15 +96,15 @@ class ManageIQAlertProfiles(object):
         self.module = self.manageiq.module
         self.api_url = self.manageiq.api_url
         self.client = self.manageiq.client
-        self.url = '{api_url}/alert_definition_profiles'.format(api_url=self.api_url)
+        self.url = f'{self.api_url}/alert_definition_profiles'
 
     def get_profiles(self):
         """ Get all alert profiles from ManageIQ
         """
         try:
-            response = self.client.get(self.url + '?expand=alert_definitions,resources')
+            response = self.client.get(f"{self.url}?expand=alert_definitions,resources")
         except Exception as e:
-            self.module.fail_json(msg="Failed to query alert profiles: {error}".format(error=e))
+            self.module.fail_json(msg=f"Failed to query alert profiles: {e}")
         return response.get('resources') or []
 
     def get_alerts(self, alert_descriptions):
@@ -136,7 +136,7 @@ class ManageIQAlertProfiles(object):
         try:
             result = self.client.post(self.url, resource=profile_dict, action="create")
         except Exception as e:
-            self.module.fail_json(msg="Creating profile failed {error}".format(error=e))
+            self.module.fail_json(msg=f"Creating profile failed {e}")
 
         # now that it has been created, we can assign the alerts
         self.assign_or_unassign(result['results'][0], alerts, "assign")
@@ -151,28 +151,26 @@ class ManageIQAlertProfiles(object):
         try:
             self.client.post(profile['href'], action="delete")
         except Exception as e:
-            self.module.fail_json(msg="Deleting profile failed: {error}".format(error=e))
+            self.module.fail_json(msg=f"Deleting profile failed: {e}")
 
-        msg = "Successfully deleted profile {name}".format(name=profile['name'])
+        msg = f"Successfully deleted profile {profile['name']}"
         return dict(changed=True, msg=msg)
 
     def get_alert_href(self, alert):
         """ Get an absolute href for an alert
         """
-        return "{url}/alert_definitions/{id}".format(url=self.api_url, id=alert['id'])
+        return f"{self.api_url}/alert_definitions/{alert['id']}"
 
     def assign_or_unassign(self, profile, resources, action):
         """ Assign or unassign alerts to profile, and validate the result.
         """
         alerts = [dict(href=href) for href in resources]
 
-        subcollection_url = profile['href'] + '/alert_definitions'
+        subcollection_url = f"{profile['href']}/alert_definitions"
         try:
             result = self.client.post(subcollection_url, resources=alerts, action=action)
             if len(result['results']) != len(alerts):
-                msg = "Failed to {action} alerts to profile '{name}'," +\
-                      "expected {expected} alerts to be {action}ed," +\
-                      "but only {changed} were {action}ed"
+                msg = "Failed to {action} alerts to profile '{name}',expected {expected} alerts to be {action}ed,but only {changed} were {action}ed"
                 msg = msg.format(action=action,
                                  name=profile['name'],
                                  expected=len(alerts),
@@ -190,7 +188,7 @@ class ManageIQAlertProfiles(object):
         """
         changed = False
         # we need to use client.get to query the alert definitions
-        old_profile = self.client.get(old_profile['href'] + '?expand=alert_definitions')
+        old_profile = self.client.get(f"{old_profile['href']}?expand=alert_definitions")
 
         # figure out which alerts we need to assign / unassign
         # alerts listed by the user:
@@ -242,9 +240,9 @@ class ManageIQAlertProfiles(object):
                 self.module.fail_json(msg=msg)
 
         if changed:
-            msg = "Profile {name} updated successfully".format(name=desired_profile['name'])
+            msg = f"Profile {desired_profile['name']} updated successfully"
         else:
-            msg = "No update needed for profile {name}".format(name=desired_profile['name'])
+            msg = f"No update needed for profile {desired_profile['name']}"
         return dict(changed=changed, msg=msg)
 
 

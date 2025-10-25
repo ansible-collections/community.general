@@ -309,7 +309,7 @@ def create_or_delete(args=None):
         retvals['failed'] = _has_failed
         retvals['msg'] = msg
         if response.status_code is not None:
-            retvals['stderr'] = "API returned an error: {0}" . format(response.status_code)
+            retvals['stderr'] = f"API returned an error: {response.status_code}"
         else:
             retvals['stderr'] = response.stderr
         return retvals
@@ -319,9 +319,9 @@ def create_or_delete(args=None):
     if not zone_exists:
         has_failed = True
         if counter == 0:
-            stderr = "DNS zone {0} does not exist." . format(args['zone'])
+            stderr = f"DNS zone {args['zone']} does not exist."
         elif counter > 1:
-            stderr = "{0} matches multiple zones." . format(args['zone'])
+            stderr = f"{args['zone']} matches multiple zones."
         retvals['failed'] = has_failed
         retvals['msg'] = stderr
         retvals['stderr'] = stderr

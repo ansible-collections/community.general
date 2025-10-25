@@ -277,7 +277,7 @@ def ss_parse(raw):
 
     if len(lines) == 0 or not lines[0].startswith('Netid '):
         # unexpected stdout from ss
-        raise EnvironmentError('Unknown stdout format of `ss`: {0}'.format(raw))
+        raise EnvironmentError(f'Unknown stdout format of `ss`: {raw}')
 
     # skip headers (-H arg is not present on e.g. Ubuntu 16)
     lines = lines[1:]
@@ -294,8 +294,8 @@ def ss_parse(raw):
         except ValueError:
             # unexpected stdout from ss
             raise EnvironmentError(
-                'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and \
-                 optionally "Process", but got something else: {0}'.format(line)
+                'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and'
+                f'optionally "Process", but got something else: {line}'
             )
 
         conns = regex_conns.search(local_addr_port)
@@ -395,7 +395,7 @@ def main():
                     break
 
         if bin_path is None:
-            raise EnvironmentError('Unable to find any of the supported commands in PATH: {0}'.format(", ".join(sorted(commands_map))))
+            raise EnvironmentError(f"Unable to find any of the supported commands in PATH: {', '.join(sorted(commands_map))}")
 
         # which ports are listening for connections?
         args = commands_map[command]['args']

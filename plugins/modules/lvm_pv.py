@@ -90,7 +90,7 @@ def get_pv_size(module, device):
 def rescan_device(module, device):
     """Perform storage rescan for the device."""
     base_device = os.path.basename(device)
-    is_partition = "/sys/class/block/{0}/partition".format(base_device)
+    is_partition = f"/sys/class/block/{base_device}/partition"
 
     # Determine parent device if partition exists
     parent_device = base_device
@@ -101,10 +101,7 @@ def rescan_device(module, device):
         )
 
     # Determine rescan path
-    rescan_path = "/sys/block/{0}/device/{1}".format(
-        parent_device,
-        "rescan_controller" if base_device.startswith('nvme') else "rescan"
-    )
+    rescan_path = f"/sys/block/{parent_device}/device/{'rescan_controller' if base_device.startswith('nvme') else 'rescan'}"
 
     if os.path.exists(rescan_path):
         try:
@@ -112,9 +109,9 @@ def rescan_device(module, device):
                 f.write('1')
             return True
         except IOError as e:
-            module.warn("Failed to rescan device {0}: {1}".format(device, str(e)))
+            module.warn(f"Failed to rescan device {device}: {e!s}")
     else:
-        module.warn("Rescan path does not exist for device {0}".format(device))
+        module.warn(f"Rescan path does not exist for device {device}")
         return False
 
 
@@ -138,7 +135,7 @@ def main():
 
     # Validate device existence for present state
     if state == 'present' and not os.path.exists(device):
-        module.fail_json(msg="Device %s not found" % device)
+        module.fail_json(msg=f"Device {device} not found")
 
     is_pv = get_pv_status(module, device)
 
@@ -191,9 +188,9 @@ def main():
 
     # Generate final message
     if actions:
-        msg = "PV %s: %s" % (device, ', '.join(actions))
+        msg = f"PV {device}: {', '.join(actions)}"
     else:
-        msg = "No changes needed for PV %s" % device
+        msg = f"No changes needed for PV {device}"
     module.exit_json(changed=changed, msg=msg)
 
 
