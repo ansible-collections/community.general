@@ -117,7 +117,7 @@ class IdracRedfishUtils(RedfishUtils):
         data = response['data']
 
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
 
         bios_uri = data[key]["@odata.id"]
 
@@ -132,14 +132,14 @@ class IdracRedfishUtils(RedfishUtils):
 
         payload = {"TargetSettingsURI": set_bios_attr_uri}
         response = self.post_request(
-            self.root_uri + self.manager_uri + "/" + jobs, payload)
+            f"{self.root_uri}{self.manager_uri}/{jobs}", payload)
         if response['ret'] is False:
             return response
 
         response_output = response['resp'].__dict__
         job_id_full = response_output["headers"]["Location"]
         job_id = re.search("JID_.+", job_id_full).group()
-        return {'ret': True, 'msg': "Config job %s created" % job_id, 'job_id': job_id_full}
+        return {'ret': True, 'msg': f"Config job {job_id} created", 'job_id': job_id_full}
 
 
 CATEGORY_COMMANDS_ALL = {
@@ -192,19 +192,19 @@ def main():
     resource_id = module.params['resource_id']
 
     # Build root URI
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = IdracRedfishUtils(creds, root_uri, timeout, module,
                                  resource_id=resource_id, data_modification=True)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}"))
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}"))
 
     # Organize by Categories / Commands
 

@@ -253,7 +253,7 @@ def read_interfaces_lines(module, line_strings):
             elif currently_processing == "NONE":
                 lines.append(lineDict(line))
             else:
-                module.fail_json(msg="misplaced option %s in line %d" % (line, i))
+                module.fail_json(msg=f"misplaced option {line} in line {int(i)}")
                 return None, None
     return lines, ifaces
 
@@ -289,7 +289,7 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
 
     if len(iface_lines) < 1:
         # interface not found
-        module.fail_json(msg="Error: interface %s not found" % iface)
+        module.fail_json(msg=f"Error: interface {iface} not found")
         return changed, None
 
     iface_options = get_interface_options(iface_lines)
@@ -325,7 +325,7 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
                 for target_option in target_options:
                     lines = [ln for ln in lines if ln != target_option]
     else:
-        module.fail_json(msg="Error: unsupported state %s, has to be either present or absent" % state)
+        module.fail_json(msg=f"Error: unsupported state {state}, has to be either present or absent")
 
     return changed, lines
 
@@ -339,7 +339,7 @@ def addOptionAfterLine(option, value, iface, lines, last_line_dict, iface_option
                 if address_family is not None and ln.get('address_family') != address_family:
                     continue
                 changed = True
-                ln['line'] = re.sub(ln.get('params', {}).get('method', '') + '$', value, ln.get('line'))
+                ln['line'] = re.sub(f"{ln.get('params', {}).get('method', '')}$", value, ln.get('line'))
                 ln['params']['method'] = value
         return changed, lines
 
@@ -352,7 +352,7 @@ def addOptionAfterLine(option, value, iface, lines, last_line_dict, iface_option
         # interface has no options, ident
         prefix += "    "
 
-    line = prefix + "%s %s" % (option, value) + last_line[suffix_start:]
+    line = f"{prefix}{option} {value}{last_line[suffix_start:]}"
     option_dict = optionDict(line, iface, option, value, address_family)
     index = len(lines) - lines[::-1].index(last_line_dict)
     lines.insert(index, option_dict)

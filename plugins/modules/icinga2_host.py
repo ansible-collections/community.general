@@ -154,7 +154,7 @@ class icinga2_api:
             'Accept': 'application/json',
             'X-HTTP-Method-Override': method,
         }
-        url = self.module.params.get("url") + "/" + path
+        url = f"{self.module.params.get('url')}/{path}"
         rsp, info = fetch_url(module=self.module, url=url, data=data, headers=headers, method=method, use_proxy=self.module.params['use_proxy'])
         body = ''
         if rsp:
@@ -171,7 +171,7 @@ class icinga2_api:
 
     def exists(self, hostname):
         data = {
-            "filter": "match(\"" + hostname + "\", host.name)",
+            "filter": f"match(\"{hostname}\", host.name)",
         }
         ret = self.call_url(
             path="v1/objects/hosts",
@@ -184,7 +184,7 @@ class icinga2_api:
 
     def create(self, hostname, data):
         ret = self.call_url(
-            path="v1/objects/hosts/" + hostname,
+            path=f"v1/objects/hosts/{hostname}",
             data=self.module.jsonify(data),
             method="PUT"
         )
@@ -193,7 +193,7 @@ class icinga2_api:
     def delete(self, hostname):
         data = {"cascade": 1}
         ret = self.call_url(
-            path="v1/objects/hosts/" + hostname,
+            path=f"v1/objects/hosts/{hostname}",
             data=self.module.jsonify(data),
             method="DELETE"
         )
@@ -201,7 +201,7 @@ class icinga2_api:
 
     def modify(self, hostname, data):
         ret = self.call_url(
-            path="v1/objects/hosts/" + hostname,
+            path=f"v1/objects/hosts/{hostname}",
             data=self.module.jsonify(data),
             method="POST"
         )
@@ -209,7 +209,7 @@ class icinga2_api:
 
     def diff(self, hostname, data):
         ret = self.call_url(
-            path="v1/objects/hosts/" + hostname,
+            path=f"v1/objects/hosts/{hostname}",
             method="GET"
         )
         changed = False
@@ -263,7 +263,7 @@ def main():
         icinga = icinga2_api(module=module)
         icinga.check_connection()
     except Exception as e:
-        module.fail_json(msg="unable to connect to Icinga. Exception message: %s" % (e))
+        module.fail_json(msg=f"unable to connect to Icinga. Exception message: {e}")
 
     data = {
         'templates': template,
@@ -275,7 +275,7 @@ def main():
             'vars.made_by': "ansible"
         }
     }
-    data['attrs'].update({'vars.' + key: value for key, value in variables.items()})
+    data['attrs'].update({f"vars.{key}": value for key, value in variables.items()})
 
     changed = False
     if icinga.exists(name):
@@ -288,9 +288,9 @@ def main():
                     if ret['code'] == 200:
                         changed = True
                     else:
-                        module.fail_json(msg="bad return code (%s) deleting host: '%s'" % (ret['code'], ret['data']))
+                        module.fail_json(msg=f"bad return code ({ret['code']}) deleting host: '{ret['data']}'")
                 except Exception as e:
-                    module.fail_json(msg="exception deleting host: " + str(e))
+                    module.fail_json(msg=f"exception deleting host: {e!s}")
 
         elif icinga.diff(name, data):
             if module.check_mode:
@@ -304,7 +304,7 @@ def main():
             if ret['code'] == 200:
                 changed = True
             else:
-                module.fail_json(msg="bad return code (%s) modifying host: '%s'" % (ret['code'], ret['data']))
+                module.fail_json(msg=f"bad return code ({ret['code']}) modifying host: '{ret['data']}'")
 
     else:
         if state == "present":
@@ -316,9 +316,9 @@ def main():
                     if ret['code'] == 200:
                         changed = True
                     else:
-                        module.fail_json(msg="bad return code (%s) creating host: '%s'" % (ret['code'], ret['data']))
+                        module.fail_json(msg=f"bad return code ({ret['code']}) creating host: '{ret['data']}'")
                 except Exception as e:
-                    module.fail_json(msg="exception creating host: " + str(e))
+                    module.fail_json(msg=f"exception creating host: {e!s}")
 
     module.exit_json(changed=changed, name=name, data=data)
 

@@ -149,7 +149,7 @@ def main():
 
     timeout = module.params['timeout']
 
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
 
     # Build Category list
@@ -177,10 +177,10 @@ def main():
                 for cmd in command_list:
                     # Fail if even one command given is invalid
                     if cmd not in CATEGORY_COMMANDS_ALL[category]:
-                        module.fail_json(msg="Invalid Command: %s" % cmd)
+                        module.fail_json(msg=f"Invalid Command: {cmd}")
         else:
             # Fail if even one category given is invalid
-            module.fail_json(msg="Invalid Category: %s" % category)
+            module.fail_json(msg=f"Invalid Category: {category}")
 
         # Organize by Categories / Commands
         if category == "Sessions":

@@ -222,7 +222,7 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 
     try:
         colornumber = colornumbers[color]
-        colortext = "\x03" + colornumber
+        colortext = f"\x03{colornumber}"
     except Exception:
         colortext = ""
 
@@ -241,9 +241,9 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
     irc.connect((server, int(port)))
 
     if passwd:
-        irc.send(to_bytes('PASS %s\r\n' % passwd))
-    irc.send(to_bytes('NICK %s\r\n' % nick))
-    irc.send(to_bytes('USER %s %s %s :ansible IRC\r\n' % (nick, nick, nick)))
+        irc.send(to_bytes(f'PASS {passwd}\r\n'))
+    irc.send(to_bytes(f'NICK {nick}\r\n'))
+    irc.send(to_bytes(f'USER {nick} {nick} {nick} :ansible IRC\r\n'))
     motd = ''
     start = time.time()
     while 1:
@@ -260,33 +260,33 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 
     if channel:
         if key:
-            irc.send(to_bytes('JOIN %s %s\r\n' % (channel, key)))
+            irc.send(to_bytes(f'JOIN {channel} {key}\r\n'))
         else:
-            irc.send(to_bytes('JOIN %s\r\n' % channel))
+            irc.send(to_bytes(f'JOIN {channel}\r\n'))
 
         join = ''
         start = time.time()
         while 1:
             join += to_native(irc.recv(1024))
-            if re.search(r'^:\S+ 366 %s %s :' % (nick, channel), join, flags=re.M | re.I):
+            if re.search(rf'^:\S+ 366 {nick} {channel} :', join, flags=re.M | re.I):
                 break
             elif time.time() - start > timeout:
                 raise Exception('Timeout waiting for IRC JOIN response')
             time.sleep(0.5)
 
         if topic is not None:
-            irc.send(to_bytes('TOPIC %s :%s\r\n' % (channel, topic)))
+            irc.send(to_bytes(f'TOPIC {channel} :{topic}\r\n'))
             time.sleep(1)
 
     if nick_to:
         for nick in nick_to:
-            irc.send(to_bytes('PRIVMSG %s :%s\r\n' % (nick, message)))
+            irc.send(to_bytes(f'PRIVMSG {nick} :{message}\r\n'))
     if channel:
-        irc.send(to_bytes('PRIVMSG %s :%s\r\n' % (channel, message)))
+        irc.send(to_bytes(f'PRIVMSG {channel} :{message}\r\n'))
     time.sleep(1)
     if part:
         if channel:
-            irc.send(to_bytes('PART %s\r\n' % channel))
+            irc.send(to_bytes(f'PART {channel}\r\n'))
         irc.send(to_bytes('QUIT\r\n'))
         time.sleep(1)
     irc.close()
@@ -345,7 +345,7 @@ def main():
     try:
         send_msg(msg, server, port, channel, nick_to, key, topic, nick, color, passwd, timeout, use_tls, validate_certs, part, style)
     except Exception as e:
-        module.fail_json(msg="unable to send to IRC: %s" % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"unable to send to IRC: {e}", exception=traceback.format_exc())
 
     module.exit_json(changed=False, channel=channel, nick=nick,
                      msg=msg)

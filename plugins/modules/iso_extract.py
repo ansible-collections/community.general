@@ -129,13 +129,13 @@ def main():
 
     # When executable was provided and binary not found, warn user !
     if module.params['executable'] is not None and not binary:
-        module.warn("Executable '%s' is not found on the system, trying to mount ISO instead." % executable)
+        module.warn(f"Executable '{executable}' is not found on the system, trying to mount ISO instead.")
 
     if not os.path.exists(dest):
-        module.fail_json(msg="Directory '%s' does not exist" % dest)
+        module.fail_json(msg=f"Directory '{dest}' does not exist")
 
     if not os.path.exists(os.path.dirname(image)):
-        module.fail_json(msg="ISO image '%s' does not exist" % image)
+        module.fail_json(msg=f"ISO image '{image}' does not exist")
 
     result['files'] = []
     extract_files = list(files)
@@ -159,9 +159,9 @@ def main():
 
     # Use 7zip when we have a binary, otherwise try to mount
     if binary:
-        cmd = [binary, 'x', image, '-o%s' % tmp_dir]
+        cmd = [binary, 'x', image, f'-o{tmp_dir}']
         if password:
-            cmd += ["-p%s" % password]
+            cmd += [f"-p{password}"]
         cmd += extract_files
     else:
         cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
@@ -177,15 +177,15 @@ def main():
         shutil.rmtree(tmp_dir)
 
         if binary:
-            module.fail_json(msg="Failed to extract from ISO image '%s' to '%s'" % (image, tmp_dir), **result)
+            module.fail_json(msg=f"Failed to extract from ISO image '{image}' to '{tmp_dir}'", **result)
         else:
-            module.fail_json(msg="Failed to mount ISO image '%s' to '%s', and we could not find executable '%s'." % (image, tmp_dir, executable), **result)
+            module.fail_json(msg=f"Failed to mount ISO image '{image}' to '{tmp_dir}', and we could not find executable '{executable}'.", **result)
 
     try:
         for f in extract_files:
             tmp_src = os.path.join(tmp_dir, f)
             if not os.path.exists(tmp_src):
-                module.fail_json(msg="Failed to extract '%s' from ISO image" % f, **result)
+                module.fail_json(msg=f"Failed to extract '{f}' from ISO image", **result)
 
             src_checksum = module.sha1(tmp_src)
 

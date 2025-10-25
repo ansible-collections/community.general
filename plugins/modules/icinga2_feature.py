@@ -81,8 +81,8 @@ class Icinga2FeatureHelper:
                                       "Ensure icinga2 is installed and present in binary path.")
 
         # If feature is already in good state, just exit
-        if (re.search("Disabled features:.* %s[ \n]" % self.feature_name, out) and self.state == "absent") or \
-                (re.search("Enabled features:.* %s[ \n]" % self.feature_name, out) and self.state == "present"):
+        if (re.search(f"Disabled features:.* {self.feature_name}[ \n]", out) and self.state == "absent") or \
+                (re.search(f"Enabled features:.* {self.feature_name}[ \n]", out) and self.state == "present"):
             self.module.exit_json(changed=False)
 
         if self.module.check_mode:
@@ -95,10 +95,7 @@ class Icinga2FeatureHelper:
         change_applied = False
         if self.state == "present":
             if rc != 0:
-                self.module.fail_json(msg="Failed to %s feature %s."
-                                          " icinga2 command returned %s" % (feature_enable_str,
-                                                                            self.feature_name,
-                                                                            out))
+                self.module.fail_json(msg=f"Failed to {feature_enable_str} feature {self.feature_name}. icinga2 command returned {out}")
 
             if re.search("already enabled", out) is None:
                 change_applied = True
@@ -106,10 +103,10 @@ class Icinga2FeatureHelper:
             if rc == 0:
                 change_applied = True
             # RC is not 0 for this already disabled feature, handle it as no change applied
-            elif re.search("Cannot disable feature '%s'. Target file .* does not exist" % self.feature_name, out):
+            elif re.search(f"Cannot disable feature '{self.feature_name}'. Target file .* does not exist", out):
                 change_applied = False
             else:
-                self.module.fail_json(msg="Failed to disable feature. Command returns %s" % out)
+                self.module.fail_json(msg=f"Failed to disable feature. Command returns {out}")
 
         self.module.exit_json(changed=change_applied)
 
