@@ -208,16 +208,30 @@ def add_or_update_pritunl_user(module):
         for key in user_params.keys():
             # When a param is not specified grab existing ones to prevent from changing it with the PUT request
             if user_params[key] is None:
-                user_params[key] = users[0][key]
+                if key in users[0]:
+                    user_params[key] = users[0][key]
+                else:
+                    user_params[key] = None
 
             # 'groups' and 'mac_addresses' are list comparison
             if key == "groups" or key == "mac_addresses":
-                if set(users[0][key]) != set(user_params[key]):
+                if key in users[0]:
+                    remote_list = users[0][key]
+                else:
+                    remote_list = None
+                if remote_list is None:
+                    remote_list = []
+                local_list = user_params[key] or []
+                if set(remote_list) != set(local_list):
                     user_params_changed = True
 
             # otherwise it is either a boolean or a string
             else:
-                if users[0][key] != user_params[key]:
+                if key in users[0]:
+                    remote_val = users[0][key]
+                else:
+                    remote_val = None
+                if remote_val != user_params[key]:
                     user_params_changed = True
 
         # Trigger a PUT on the API to update the current user if settings have changed
