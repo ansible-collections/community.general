@@ -237,9 +237,9 @@ def get_otptoken_dict(ansible_to_ipa, uniqueid=None, newuniqueid=None, otptype=N
     if enabled is not None:
         otptoken[ansible_to_ipa['enabled']] = False if enabled else True
     if notbefore is not None:
-        otptoken[ansible_to_ipa['notbefore']] = notbefore + 'Z'
+        otptoken[ansible_to_ipa['notbefore']] = f"{notbefore}Z"
     if notafter is not None:
-        otptoken[ansible_to_ipa['notafter']] = notafter + 'Z'
+        otptoken[ansible_to_ipa['notafter']] = f"{notafter}Z"
     if vendor is not None:
         otptoken[ansible_to_ipa['vendor']] = vendor
     if model is not None:
@@ -333,8 +333,7 @@ def validate_modifications(ansible_to_ipa, module, ipa_otptoken,
                 ipa_value = ipa_otptoken[ansible_to_ipa[parameter]]
             else:
                 if len(ipa_otptoken[ansible_to_ipa[parameter]]) != 1:
-                    module.fail_json(msg=("Invariant fail: Return value from IPA is not a list " +
-                                          "of length 1.  Please open a bug report for the module."))
+                    module.fail_json(msg="Invariant fail: Return value from IPA is not a list of length 1.  Please open a bug report for the module.")
                 if parameter == 'secretkey':
                     # We stored the secret key in base32 since we had assumed that would need to
                     # be the format if we were contacting IPA to create it.  However, we are
@@ -358,11 +357,9 @@ def validate_modifications(ansible_to_ipa, module, ipa_otptoken,
 
             if mod_value != ipa_value:
                 modifications_valid = False
-                fail_message = ("Parameter '" + parameter + "' cannot be changed once " +
-                                "the OTP is created and the requested value specified here (" +
-                                str(mod_value) +
-                                ") differs from what is set in the IPA server ("
-                                + str(ipa_value) + ")")
+                fail_message = (f"Parameter '{parameter}' cannot be changed once " +
+                                f"the OTP is created and the requested value specified here ({mod_value}) " +
+                                f"differs from what is set in the IPA server ({ipa_value})")
                 module.fail_json(msg=fail_message)
 
     return modifications_valid
@@ -422,9 +419,8 @@ def ensure(module, client):
         # Check to see if the new unique id is already taken in use
         ipa_otptoken_new = client.otptoken_find(name=module_otptoken[ansible_to_ipa['newuniqueid']])
         if ipa_otptoken_new:
-            module.fail_json(msg=("Requested rename through newuniqueid to " +
-                                  module_otptoken[ansible_to_ipa['newuniqueid']] +
-                                  " failed because the new unique id is already in use"))
+            module.fail_json(msg=(f"Requested rename through newuniqueid to {module_otptoken[ansible_to_ipa['newuniqueid']]} "
+                                  "failed because the new unique id is already in use"))
 
     changed = False
     if state == 'present':

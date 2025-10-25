@@ -188,51 +188,51 @@ class ResourceRecord(object):
 
     def create_naptrrecord(self):
         # create NAPTR record with the given params
-        record = ('naptrrecord %s -set ttl=%s;container=%s;order=%s;preference=%s;flags="%s";service="%s";replacement="%s"'
-                  % (self.dnsname, self.ttl, self.container, self.order, self.preference, self.flags, self.service, self.replacement))
+        record = (f'naptrrecord {self.dnsname} -set ttl={self.ttl};container={self.container};order={self.order};'
+                  f'preference={self.preference};flags="{self.flags}";service="{self.service}";replacement="{self.replacement}"')
         return record
 
     def create_srvrecord(self):
         # create SRV record with the given params
-        record = ('srvrecord %s -set ttl=%s;container=%s;priority=%s;weight=%s;port=%s;target=%s'
-                  % (self.dnsname, self.ttl, self.container, self.priority, self.weight, self.port, self.target))
+        record = (f'srvrecord {self.dnsname} -set ttl={self.ttl};container={self.container};priority={self.priority};'
+                  f'weight={self.weight};port={self.port};target={self.target}')
         return record
 
     def create_arecord(self):
         # create A record with the given params
         if self.dnstype == 'AAAA':
-            record = 'aaaarecord %s %s -set ttl=%s;container=%s' % (self.dnsname, self.address, self.ttl, self.container)
+            record = f'aaaarecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}'
         else:
-            record = 'arecord %s %s -set ttl=%s;container=%s' % (self.dnsname, self.address, self.ttl, self.container)
+            record = f'arecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}'
 
         return record
 
     def list_record(self, record):
         # check if the record exists via list on ipwcli
-        search = 'list %s' % (record.replace(';', '&&').replace('set', 'where'))
+        search = f"list {record.replace(';', '&&').replace('set', 'where')}"
         cmd = [
             self.module.get_bin_path('ipwcli', True),
-            '-user=%s' % self.user,
-            '-password=%s' % self.password,
+            f'-user={self.user}',
+            f'-password={self.password}',
         ]
         rc, out, err = self.module.run_command(cmd, data=search)
 
         if 'Invalid username or password' in out:
             self.module.fail_json(msg='access denied at ipwcli login: Invalid username or password')
 
-        if (('ARecord %s' % self.dnsname in out and rc == 0) or ('SRVRecord %s' % self.dnsname in out and rc == 0) or
-                ('NAPTRRecord %s' % self.dnsname in out and rc == 0)):
+        if ((f'ARecord {self.dnsname}' in out and rc == 0) or (f'SRVRecord {self.dnsname}' in out and rc == 0) or
+                (f'NAPTRRecord {self.dnsname}' in out and rc == 0)):
             return True, rc, out, err
 
         return False, rc, out, err
 
     def deploy_record(self, record):
         # check what happens if create fails on ipworks
-        stdin = 'create %s' % (record)
+        stdin = f'create {record}'
         cmd = [
             self.module.get_bin_path('ipwcli', True),
-            '-user=%s' % self.user,
-            '-password=%s' % self.password,
+            f'-user={self.user}',
+            f'-password={self.password}',
         ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 
@@ -246,11 +246,11 @@ class ResourceRecord(object):
 
     def delete_record(self, record):
         # check what happens if create fails on ipworks
-        stdin = 'delete %s' % (record.replace(';', '&&').replace('set', 'where'))
+        stdin = f"delete {record.replace(';', '&&').replace('set', 'where')}"
         cmd = [
             self.module.get_bin_path('ipwcli', True),
-            '-user=%s' % self.user,
-            '-password=%s' % self.password,
+            f'-user={self.user}',
+            f'-password={self.password}',
         ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 

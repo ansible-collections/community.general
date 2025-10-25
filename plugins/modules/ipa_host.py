@@ -279,7 +279,7 @@ def ensure(module, client):
                 return changed, client.host_add(name=name, host=module_host)
         else:
             if state in ['disabled', 'enabled']:
-                module.fail_json(msg="No host with name " + ipa_host + " found")
+                module.fail_json(msg=f"No host with name {ipa_host} found")
 
             diff = get_host_diff(client, ipa_host, module_host)
             if len(diff) > 0:

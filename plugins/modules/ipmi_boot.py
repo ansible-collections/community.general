@@ -185,7 +185,7 @@ def main():
         ipmi_cmd = command.Command(
             bmc=name, userid=user, password=password, port=port, kg=key
         )
-        module.debug('ipmi instantiated - name: "%s"' % name)
+        module.debug(f'ipmi instantiated - name: "{name}"')
         current = ipmi_cmd.get_bootdev()
         # uefimode may not supported by BMC, so use desired value as default
         current.setdefault('uefimode', uefiboot)

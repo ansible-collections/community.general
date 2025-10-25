@@ -267,7 +267,8 @@ def write_state(b_path, lines, changed):
     # Populate a temporary file
     tmpfd, tmpfile = tempfile.mkstemp()
     with os.fdopen(tmpfd, 'w') as f:
-        f.write("{0}\n".format("\n".join(lines)))
+        joined_lines = "\n".join(lines)
+        f.write(f"{joined_lines}\n")
 
     # Prepare to copy temporary file to the final destination
     if not os.path.exists(b_path):
@@ -278,7 +279,7 @@ def write_state(b_path, lines, changed):
                 os.makedirs(b_destdir)
             except Exception as err:
                 module.fail_json(
-                    msg='Error creating %s: %s' % (destdir, to_native(err)),
+                    msg=f'Error creating {destdir}: {err}',
                     initial_state=lines)
         changed = True
 
@@ -292,7 +293,7 @@ def write_state(b_path, lines, changed):
         except Exception as err:
             path = to_native(b_path, errors='surrogate_or_strict')
             module.fail_json(
-                msg='Error saving state into %s: %s' % (path, to_native(err)),
+                msg=f'Error saving state into {path}: {err}',
                 initial_state=lines)
 
     return changed
@@ -311,9 +312,9 @@ def initialize_from_null_state(initializer, initcommand, fallbackcmd, table):
     commandline += ['-t', table]
     dummy = module.run_command(commandline, check_rc=True)
     (rc, out, err) = module.run_command(initcommand, check_rc=True)
-    if '*%s' % table not in out.splitlines():
+    if f'*{table}' not in out.splitlines():
         # The last resort.
-        iptables_input = '*%s\n:OUTPUT ACCEPT\nCOMMIT\n' % table
+        iptables_input = f'*{table}\n:OUTPUT ACCEPT\nCOMMIT\n'
         dummy = module.run_command(fallbackcmd, data=iptables_input, check_rc=True)
         (rc, out, err) = module.run_command(initcommand, check_rc=True)
 
@@ -412,18 +413,18 @@ def main():
         COMMANDARGS.extend(['--table', table])
 
     if wait is not None:
-        TESTCOMMAND.extend(['--wait', '%d' % wait])
+        TESTCOMMAND.extend(['--wait', f'{wait}'])
 
     if modprobe is not None:
         b_modprobe = to_bytes(modprobe, errors='surrogate_or_strict')
         if not os.path.exists(b_modprobe):
-            module.fail_json(msg="modprobe %s not found" % modprobe)
+            module.fail_json(msg=f"modprobe {modprobe} not found")
         if not os.path.isfile(b_modprobe):
-            module.fail_json(msg="modprobe %s not a file" % modprobe)
+            module.fail_json(msg=f"modprobe {modprobe} not a file")
         if not os.access(b_modprobe, os.R_OK):
-            module.fail_json(msg="modprobe %s not readable" % modprobe)
+            module.fail_json(msg=f"modprobe {modprobe} not readable")
         if not os.access(b_modprobe, os.X_OK):
-            module.fail_json(msg="modprobe %s not executable" % modprobe)
+            module.fail_json(msg=f"modprobe {modprobe} not executable")
         COMMANDARGS.extend(['--modprobe', modprobe])
         INITIALIZER.extend(['--modprobe', modprobe])
         INITCOMMAND.extend(['--modprobe', modprobe])
@@ -437,11 +438,11 @@ def main():
 
     if state == 'restored':
         if not os.path.exists(b_path):
-            module.fail_json(msg="Source %s not found" % path)
+            module.fail_json(msg=f"Source {path} not found")
         if not os.path.isfile(b_path):
-            module.fail_json(msg="Source %s not a file" % path)
+            module.fail_json(msg=f"Source {path} not a file")
         if not os.access(b_path, os.R_OK):
-            module.fail_json(msg="Source %s not readable" % path)
+            module.fail_json(msg=f"Source {path} not readable")
         state_to_restore = read_state(b_path)
         cmd = None
     else:
@@ -461,16 +462,16 @@ def main():
     if table is None:
         if state == 'restored':
             for t in TABLES:
-                if '*%s' % t in state_to_restore:
-                    if len(stdout) == 0 or '*%s' % t not in stdout.splitlines():
+                if f'*{t}' in state_to_restore:
+                    if len(stdout) == 0 or f'*{t}' not in stdout.splitlines():
                         (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, FALLBACKCMD, t)
         elif len(stdout) == 0:
             (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, FALLBACKCMD, 'filter')
 
-    elif state == 'restored' and '*%s' % table not in state_to_restore:
-        module.fail_json(msg="Table %s to restore not defined in %s" % (table, path))
+    elif state == 'restored' and f'*{table}' not in state_to_restore:
+        module.fail_json(msg=f"Table {table} to restore not defined in {path}")
 
-    elif len(stdout) == 0 or '*%s' % table not in stdout.splitlines():
+    elif len(stdout) == 0 or f'*{table}' not in stdout.splitlines():
         (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, FALLBACKCMD, table)
 
     initial_state = filter_and_format_state(stdout)
@@ -500,7 +501,7 @@ def main():
     MAINCOMMAND.insert(0, bin_iptables_restore)
 
     if wait is not None:
-        MAINCOMMAND.extend(['--wait', '%d' % wait])
+        MAINCOMMAND.extend(['--wait', f'{wait}'])
 
     if _back is not None:
         b_back = to_bytes(_back, errors='surrogate_or_strict')
@@ -516,7 +517,7 @@ def main():
 
     TESTCOMMAND = list(MAINCOMMAND)
     TESTCOMMAND.insert(1, '--test')
-    error_msg = "Source %s is not suitable for input to %s" % (path, os.path.basename(bin_iptables_restore))
+    error_msg = f"Source {path} is not suitable for input to {os.path.basename(bin_iptables_restore)}"
 
     # Due to a bug in iptables-nft-restore --test, we have to validate tables
     # one by one (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=960003).
@@ -544,7 +545,8 @@ def main():
     if module.check_mode:
         tmpfd, tmpfile = tempfile.mkstemp()
         with os.fdopen(tmpfd, 'w') as f:
-            f.write("{0}\n".format("\n".join(initial_state)))
+            joined_initial_state = "\n".join(initial_state)
+            f.write(f"{joined_initial_state}\n")
 
         if filecmp.cmp(tmpfile, b_path):
             restored_state = initial_state
@@ -555,7 +557,7 @@ def main():
         # Let time enough to the plugin to retrieve async status of the module
         # in case of bad option type/value and the like.
         if _back is not None:
-            b_starter = to_bytes('%s.starter' % _back, errors='surrogate_or_strict')
+            b_starter = to_bytes(f'{_back}.starter', errors='surrogate_or_strict')
             while True:
                 if os.path.exists(b_starter):
                     os.remove(b_starter)
@@ -633,8 +635,7 @@ def main():
     tables_rollback = parse_per_table_state(stdout)
 
     msg = (
-        "Failed to confirm state restored from %s after %ss. "
-        "Firewall has been rolled back to its initial state." % (path, _timeout)
+        f"Failed to confirm state restored from {path} after {_timeout}s. Firewall has been rolled back to its initial state."
     )
 
     module.fail_json(

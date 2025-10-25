@@ -100,16 +100,14 @@ class IpinfoioFacts(object):
         try:
             info['status'] == 200
         except AssertionError:
-            self.module.fail_json(msg='Could not get {0} page, '
-                                  'check for connectivity!'.format(self.url))
+            self.module.fail_json(msg=f'Could not get {self.url} page, check for connectivity!')
         else:
             try:
                 content = response.read()
                 result = self.module.from_json(content.decode('utf8'))
             except ValueError:
                 self.module.fail_json(
-                    msg='Failed to parse the ipinfo.io response: '
-                    '{0} {1}'.format(self.url, content))
+                    msg=f'Failed to parse the ipinfo.io response: {self.url} {content}')
             else:
                 return result
 

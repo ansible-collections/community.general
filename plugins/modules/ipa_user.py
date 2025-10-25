@@ -217,7 +217,7 @@ def get_user_dict(displayname=None, givenname=None, krbpasswordexpiration=None, 
     if displayname is not None:
         user['displayname'] = displayname
     if krbpasswordexpiration is not None:
-        user['krbpasswordexpiration'] = krbpasswordexpiration + "Z"
+        user['krbpasswordexpiration'] = f"{krbpasswordexpiration}Z"
     if givenname is not None:
         user['givenname'] = givenname
     if loginshell is not None:
@@ -305,12 +305,12 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
         key_fp = ':'.join(a + b for a, b in zip(fp_plain[::2], fp_plain[1::2])).upper()
     elif hash_algo == 'sha256':
         fp_plain = base64.b64encode(hashlib.sha256(key).digest()).decode('ascii').rstrip('=')
-        key_fp = 'SHA256:{fp}'.format(fp=fp_plain)
+        key_fp = f'SHA256:{fp_plain}'
     if len(parts) < 3:
-        return "%s (%s)" % (key_fp, key_type)
+        return f"{key_fp} ({key_type})"
     else:
         comment = parts[2]
-        return "%s %s (%s)" % (key_fp, comment, key_type)
+        return f"{key_fp} {comment} ({key_type})"
 
 
 def ensure(module, client):

@@ -76,10 +76,10 @@ class IpifyFacts(object):
         result = {
             'ipify_public_ip': None
         }
-        (response, info) = fetch_url(module=module, url=self.api_url + "?format=json", force=True, timeout=self.timeout)
+        (response, info) = fetch_url(module=module, url=f"{self.api_url}?format=json", force=True, timeout=self.timeout)
 
         if not response:
-            module.fail_json(msg="No valid or no response from url %s within %s seconds (timeout)" % (self.api_url, self.timeout))
+            module.fail_json(msg=f"No valid or no response from url {self.api_url} within {self.timeout} seconds (timeout)")
 
         data = json.loads(to_text(response.read()))
         result['ipify_public_ip'] = data.get('ip')
