@@ -191,18 +191,21 @@ def main():
 
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
-        module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
+        module.fail_json(msg="Failed to retrieve realm '{realm}'".format(realm=realm))
 
     objClient = kc.get_client_by_clientid(clientid, realm)
     if not objClient:
-        module.fail_json(msg="Failed to retrive client '{realm}.{clientid}'".format(realm=realm, clientid=clientid))
+        module.fail_json(msg="Failed to retrieve client '{realm}.{clientid}'".format(realm=realm, clientid=clientid))
     if objClient["fullScopeAllowed"] and state == "present":
         module.fail_json(msg="FullScopeAllowed is active for Client '{realm}.{clientid}'".format(realm=realm, clientid=clientid))
 
     if client_scope_id:
         objClientScope = kc.get_client_by_clientid(client_scope_id, realm)
+        
+        #SUGGESTED FIX
+        # objClientScope = kc.get_clientscope_by_clientscopeid(client_scope_id, realm)
         if not objClientScope:
-            module.fail_json(msg="Failed to retrive client '{realm}.{client_scope_id}'".format(realm=realm, client_scope_id=client_scope_id))
+            module.fail_json(msg="Failed to retrieve client '{realm}.{client_scope_id}'".format(realm=realm, client_scope_id=client_scope_id))
         before_role_mapping = kc.get_client_role_scope_from_client(objClient["id"], objClientScope["id"], realm)
     else:
         before_role_mapping = kc.get_client_role_scope_from_realm(objClient["id"], realm)
@@ -210,8 +213,13 @@ def main():
     if client_scope_id:
         # retrive all role from client_scope
         client_scope_roles_by_name = kc.get_client_roles_by_id(objClientScope["id"], realm)
+    
+    #SUGGESTED FIX
+    # if objClient:
+    #     # retrieve all role from client
+    #     client_scope_roles_by_name = kc.get_client_roles_by_id(objClient["id"], realm)
     else:
-        # retrive all role from realm
+        # retrieve all role from realm
         client_scope_roles_by_name = kc.get_realm_roles(realm)
 
     # convert to indexed Dict by name
@@ -224,10 +232,10 @@ def main():
         for role_name in role_names:
             if role_name not in client_scope_roles_by_name:
                 if client_scope_id:
-                    module.fail_json(msg="Failed to retrive role '{realm}.{client_scope_id}.{role_name}'"
+                    module.fail_json(msg="Failed to retrieve role '{realm}.{client_scope_id}.{role_name}'"
                                      .format(realm=realm, client_scope_id=client_scope_id, role_name=role_name))
                 else:
-                    module.fail_json(msg="Failed to retrive role '{realm}.{role_name}'".format(realm=realm, role_name=role_name))
+                    module.fail_json(msg="Failed to retrieve role '{realm}.{role_name}'".format(realm=realm, role_name=role_name))
             if role_name not in role_mapping_by_name:
                 role_mapping_to_manipulate.append(client_scope_roles_by_name[role_name])
                 role_mapping_by_name[role_name] = client_scope_roles_by_name[role_name]
