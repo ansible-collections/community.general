@@ -151,8 +151,11 @@ class Monit(object):
         """
         monit_command = "validate" if validate else "status"
         check_rc = False if validate else True  # 'validate' always has rc = 1
+
+        time.sleep(1)
         command = [self.monit_bin_path, monit_command] + self.command_args + [self.process_name]
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
+        # raise Exception('HH')
         return self._parse_status(out, err)
 
     def _parse_status(self, output, err):
@@ -171,9 +174,12 @@ class Monit(object):
         if ' - ' not in status_val:
             status_val = status_val.replace(' ', '_')
             try:
+                # raise Exception(f'II1A {getattr(Status, status_val)=}')
+                # raise Exception(f'II1 {status_val=} {dir(Status)=}')
                 return getattr(Status, status_val)
             except AttributeError:
                 self.module.warn("Unknown monit status '%s', treating as execution failed" % status_val)
+                raise Exception('II2')
                 return Status.EXECUTION_FAILED
         else:
             status_val, substatus = status_val.split(' - ')
@@ -185,6 +191,7 @@ class Monit(object):
 
             if state == 'pending':
                 status = status.pending()
+            raise Exception('II3')
             return status
 
     def is_process_present(self):
@@ -201,9 +208,11 @@ class Monit(object):
 
     def wait_for_status_change(self, current_status):
         running_status = self.get_status()
+        raise Exception('JJ')
         if running_status.value != current_status.value or current_status.value == StatusValue.EXECUTION_FAILED:
             return running_status
 
+        raise Exception('GG')
         loop_count = 0
         while running_status.value == current_status.value:
             if loop_count >= self._status_change_retry_count:
@@ -213,6 +222,7 @@ class Monit(object):
             time.sleep(0.5)
             validate = loop_count % 2 == 0  # force recheck of status every second try
             running_status = self.get_status(validate)
+        raise Exception('FF')
         return running_status
 
     def wait_for_monit_to_stop_pending(self, current_status=None):
@@ -255,17 +265,28 @@ class Monit(object):
     def change_state(self, state, expected_status, invert_expected=None):
         current_status = self.get_status()
         self.run_command(STATE_COMMAND_MAP[state])
+        # if state == 'stopped':
+        #     raise Exception('EE')
         status = self.wait_for_status_change(current_status)
+        if state == 'stopped':
+            raise Exception('DD')
         status = self.wait_for_monit_to_stop_pending(status)
         status_match = status.value == expected_status.value
+        if state == 'stopped':
+            raise Exception('CC')
         if invert_expected:
             status_match = not status_match
+        if state == 'stopped':
+            raise Exception('BB')
         if status_match:
             self.exit_success(state=state)
+        if state == 'stopped':
+            raise Exception('AA')
         self.exit_fail('%s process not %s' % (self.process_name, state), status)
 
     def stop(self):
         self.change_state('stopped', Status.NOT_MONITORED)
+        raise Exception('INSIDE-AFTER: Failed to stop process')
 
     def unmonitor(self):
         self.change_state('unmonitored', Status.NOT_MONITORED)
@@ -323,6 +344,7 @@ def main():
     if running and state == 'stopped':
         exit_if_check_mode()
         monit.stop()
+        raise Exception('OUTSIDE-AFTER: Failed to stop process')
 
     if running and state == 'unmonitored':
         exit_if_check_mode()

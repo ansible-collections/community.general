@@ -10,4 +10,4 @@ skip/macos
 skip/freebsd
 skip/aix
 skip/rhel  # FIXME
-unstable  # TODO: the tests fail a lot; 'unstable' only requires them to pass when the module itself has been modified
+# unstable  # TODO: the tests fail a lot; 'unstable' only requires them to pass when the module itself has been modified
