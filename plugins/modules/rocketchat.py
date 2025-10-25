@@ -174,7 +174,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
         if channel[0] == '#' or channel[0] == '@':
             payload['channel'] = channel
         else:
-            payload['channel'] = '#' + channel
+            payload['channel'] = f"#{channel}"
     if username is not None:
         payload['username'] = username
     if icon_emoji is not None:
@@ -196,7 +196,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
 
     payload = module.jsonify(payload)
     if is_pre740:
-        payload = "payload=" + payload
+        payload = f"payload={payload}"
     return payload
 
 
@@ -212,7 +212,7 @@ def do_notify_rocketchat(module, domain, token, protocol, payload, is_pre740):
         headers = {'Content-type': 'application/json'}
     response, info = fetch_url(module, rocketchat_incoming_webhook, data=payload, headers=headers)
     if info['status'] != 200:
-        module.fail_json(msg="failed to send message, return status=%s" % str(info['status']))
+        module.fail_json(msg=f"failed to send message, return status={info['status']}")
 
 
 def main():

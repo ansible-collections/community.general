@@ -177,35 +177,33 @@ def main():
     try:
         old_value = redis.connection.get(key)
     except Exception as e:
-        msg = 'Failed to get value of key: {0} with exception: {1}'.format(
-            key, str(e))
+        msg = f'Failed to get value of key: {key} with exception: {e}'
         result['msg'] = msg
         module.fail_json(**result)
 
     if state == 'absent':
         if module.check_mode:
             if old_value is None:
-                msg = 'Key: {0} not present'.format(key)
+                msg = f'Key: {key} not present'
                 result['msg'] = msg
                 module.exit_json(**result)
             else:
-                msg = 'Deleted key: {0}'.format(key)
+                msg = f'Deleted key: {key}'
                 result['msg'] = msg
                 module.exit_json(**result)
         try:
             ret = redis.connection.delete(key)
             if ret == 0:
-                msg = 'Key: {0} not present'.format(key)
+                msg = f'Key: {key} not present'
                 result['msg'] = msg
                 module.exit_json(**result)
             else:
-                msg = 'Deleted key: {0}'.format(key)
+                msg = f'Deleted key: {key}'
                 result['msg'] = msg
                 result['changed'] = True
                 module.exit_json(**result)
         except Exception as e:
-            msg = 'Failed to delete key: {0} with exception: {1}'.format(
-                key, str(e))
+            msg = f'Failed to delete key: {key} with exception: {e}'
             result['msg'] = msg
             module.fail_json(**result)
 
@@ -213,38 +211,36 @@ def main():
     try:
         old_value = redis.connection.get(key)
     except Exception as e:
-        msg = 'Failed to get value of key: {0} with exception: {1}'.format(
-            key, str(e))
+        msg = f'Failed to get value of key: {key} with exception: {e}'
         result['msg'] = msg
         module.fail_json(**result)
 
     result['old_value'] = old_value
     if old_value == value and keepttl is not False and px is None:
-        msg = 'Key {0} already has desired value'.format(key)
+        msg = f'Key {key} already has desired value'
         result['msg'] = msg
         result['value'] = value
         module.exit_json(**result)
     if module.check_mode:
-        result['msg'] = 'Set key: {0}'.format(key)
+        result['msg'] = f'Set key: {key}'
         result['value'] = value
         module.exit_json(**result)
     try:
         ret = redis.connection.set(**set_args)
         if ret is None:
             if nx:
-                msg = 'Could not set key: {0}. Key already present.'.format(
-                    key)
+                msg = f'Could not set key: {key}. Key already present.'
             else:
-                msg = 'Could not set key: {0}. Key not present.'.format(key)
+                msg = f'Could not set key: {key}. Key not present.'
             result['msg'] = msg
             module.fail_json(**result)
-        msg = 'Set key: {0}'.format(key)
+        msg = f'Set key: {key}'
         result['msg'] = msg
         result['changed'] = True
         result['value'] = value
         module.exit_json(**result)
     except Exception as e:
-        msg = 'Failed to set key: {0} with exception: {2}'.format(key, str(e))
+        msg = f'Failed to set key: {key} with exception: {e}'
         result['msg'] = msg
         module.fail_json(**result)
 

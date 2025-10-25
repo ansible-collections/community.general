@@ -128,12 +128,9 @@ class RundeckACLManager:
     def __init__(self, module):
         self.module = module
         if module.params.get("project"):
-            self.endpoint = "project/%s/acl/%s.aclpolicy" % (
-                self.module.params["project"],
-                self.module.params["name"],
-            )
+            self.endpoint = f"project/{self.module.params['project']}/acl/{self.module.params['name']}.aclpolicy"
         else:
-            self.endpoint = "system/acl/%s.aclpolicy" % self.module.params["name"]
+            self.endpoint = f"system/acl/{self.module.params['name']}.aclpolicy"
 
     def get_acl(self):
         resp, info = api_request(
@@ -160,12 +157,11 @@ class RundeckACLManager:
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_acl())
             elif info["status"] == 400:
-                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it is a valid ACL" %
-                                          self.module.params["name"])
+                self.module.fail_json(msg=f"Unable to validate acl {self.module.params['name']}. Please ensure it is a valid ACL")
             elif info["status"] == 409:
-                self.module.fail_json(msg="ACL %s already exists" % self.module.params["name"])
+                self.module.fail_json(msg=f"ACL {self.module.params['name']} already exists")
             else:
-                self.module.fail_json(msg="Unhandled HTTP status %d, please report the bug" % info["status"],
+                self.module.fail_json(msg=f"Unhandled HTTP status {info['status']}, please report the bug",
                                       before={}, after=self.get_acl())
         else:
             if facts["contents"] == self.module.params["policy"]:
@@ -184,10 +180,9 @@ class RundeckACLManager:
             if info["status"] == 200:
                 self.module.exit_json(changed=True, before=facts, after=self.get_acl())
             elif info["status"] == 400:
-                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it is a valid ACL" %
-                                          self.module.params["name"])
+                self.module.fail_json(msg=f"Unable to validate acl {self.module.params['name']}. Please ensure it is a valid ACL")
             elif info["status"] == 404:
-                self.module.fail_json(msg="ACL %s doesn't exists. Cannot update." % self.module.params["name"])
+                self.module.fail_json(msg=f"ACL {self.module.params['name']} doesn't exists. Cannot update.")
 
     def remove_acl(self):
         facts = self.get_acl()

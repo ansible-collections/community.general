@@ -223,7 +223,6 @@ except ImportError:
     HAS_REDIS_PACKAGE = False
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.redis import (
     fail_imports, redis_auth_argument_spec, redis_auth_params)
 
@@ -253,7 +252,7 @@ def main():
     try:
         client.ping()
     except Exception as e:
-        module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
     info = client.info()
 

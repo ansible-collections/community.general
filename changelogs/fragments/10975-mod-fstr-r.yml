@@ -1,0 +1,22 @@
+minor_changes:
+  - read_csv - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redfish_command - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redfish_config - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redfish_info - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redhat_subscription - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redis - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redis_data - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redis_data_incr - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redis_data_info - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - redis_info - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rhevm - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rhsm_release - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rhsm_repository - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - riak - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rocketchat - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rollbar_deployment - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rundeck_acl_policy - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rundeck_job_executions_info - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rundeck_job_run - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - rundeck_project - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).
+  - runit - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10975).

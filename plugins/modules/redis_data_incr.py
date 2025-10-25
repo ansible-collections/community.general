@@ -126,17 +126,14 @@ def main():
             if res is not None:
                 value = float(res)
         except ValueError as e:
-            msg = 'Value: {0} of key: {1} is not incrementable(int or float)'.format(
-                res, key)
+            msg = f'Value: {res} of key: {key} is not incrementable(int or float)'
             result['msg'] = msg
             module.fail_json(**result)
         except Exception as e:
-            msg = 'Failed to get value of key: {0} with exception: {1}'.format(
-                key, str(e))
+            msg = f'Failed to get value of key: {key} with exception: {e}'
             result['msg'] = msg
             module.fail_json(**result)
-        msg = 'Incremented key: {0} by {1} to {2}'.format(
-            key, increment, value + increment)
+        msg = f'Incremented key: {key} by {increment} to {value + increment}'
         result['msg'] = msg
         result['value'] = float(value + increment)
         module.exit_json(**result)
@@ -144,42 +141,37 @@ def main():
     if increment_float is not None:
         try:
             value = redis.connection.incrbyfloat(key, increment)
-            msg = 'Incremented key: {0} by {1} to {2}'.format(
-                key, increment, value)
+            msg = f'Incremented key: {key} by {increment} to {value}'
             result['msg'] = msg
             result['value'] = float(value)
             result['changed'] = True
             module.exit_json(**result)
         except Exception as e:
-            msg = 'Failed to increment key: {0} by {1} with exception: {2}'.format(
-                key, increment, str(e))
+            msg = f'Failed to increment key: {key} by {increment} with exception: {e}'
             result['msg'] = msg
             module.fail_json(**result)
     elif increment_int is not None:
         try:
             value = redis.connection.incrby(key, increment)
-            msg = 'Incremented key: {0} by {1} to {2}'.format(
-                key, increment, value)
+            msg = f'Incremented key: {key} by {increment} to {value}'
             result['msg'] = msg
             result['value'] = float(value)
             result['changed'] = True
             module.exit_json(**result)
         except Exception as e:
-            msg = 'Failed to increment key: {0} by {1} with exception: {2}'.format(
-                key, increment, str(e))
+            msg = f'Failed to increment key: {key} by {increment} with exception: {e}'
             result['msg'] = msg
             module.fail_json(**result)
     else:
         try:
             value = redis.connection.incr(key)
-            msg = 'Incremented key: {0} to {1}'.format(key, value)
+            msg = f'Incremented key: {key} to {value}'
             result['msg'] = msg
             result['value'] = float(value)
             result['changed'] = True
             module.exit_json(**result)
         except Exception as e:
-            msg = 'Failed to increment key: {0} with exception: {1}'.format(
-                key, str(e))
+            msg = f'Failed to increment key: {key} with exception: {e}'
             result['msg'] = msg
             module.fail_json(**result)
 

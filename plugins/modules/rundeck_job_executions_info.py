@@ -149,8 +149,7 @@ class RundeckJobExecutionsInfo(object):
     def job_executions(self):
         response, info = api_request(
             module=self.module,
-            endpoint="job/%s/executions?offset=%s&max=%s&status=%s"
-                     % (quote(self.job_id), self.offset, self.max, self.status),
+            endpoint=f"job/{quote(self.job_id)}/executions?offset={self.offset}&max={self.max}&status={self.status}",
             method="GET"
         )
 

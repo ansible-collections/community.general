@@ -109,7 +109,7 @@ class Rhsm(object):
         if rc == 0 and out == 'This system has no repositories available through subscriptions.\n':
             self.module.fail_json(msg='This system has no repositories available through subscriptions')
         elif rc == 1:
-            self.module.fail_json(msg='subscription-manager failed with the following error: %s' % err)
+            self.module.fail_json(msg=f'subscription-manager failed with the following error: {err}')
         else:
             return rc, out, err
 
@@ -181,22 +181,22 @@ def repository_modify(module, rhsm, state, name, purge=False):
 
     for repoid in matched_existing_repo:
         if len(matched_existing_repo[repoid]) == 0:
-            results.append("%s is not a valid repository ID" % repoid)
-            module.fail_json(results=results, msg="%s is not a valid repository ID" % repoid)
+            results.append(f"{repoid} is not a valid repository ID")
+            module.fail_json(results=results, msg=f"{repoid} is not a valid repository ID")
         for repo in matched_existing_repo[repoid]:
             if state in ['disabled', 'absent']:
                 if repo['enabled']:
                     changed = True
-                    diff_before += "Repository '%s' is enabled for this system\n" % repo['id']
-                    diff_after += "Repository '%s' is disabled for this system\n" % repo['id']
-                results.append("Repository '%s' is disabled for this system" % repo['id'])
+                    diff_before += f"Repository '{repo['id']}' is enabled for this system\n"
+                    diff_after += f"Repository '{repo['id']}' is disabled for this system\n"
+                results.append(f"Repository '{repo['id']}' is disabled for this system")
                 rhsm_arguments += ['--disable', repo['id']]
             elif state in ['enabled', 'present']:
                 if not repo['enabled']:
                     changed = True
-                    diff_before += "Repository '%s' is disabled for this system\n" % repo['id']
-                    diff_after += "Repository '%s' is enabled for this system\n" % repo['id']
-                results.append("Repository '%s' is enabled for this system" % repo['id'])
+                    diff_before += f"Repository '{repo['id']}' is disabled for this system\n"
+                    diff_after += f"Repository '{repo['id']}' is enabled for this system\n"
+                results.append(f"Repository '{repo['id']}' is enabled for this system")
                 rhsm_arguments += ['--enable', repo['id']]
 
     # Disable all enabled repos on the system that are not in the task and not
@@ -208,9 +208,9 @@ def repository_modify(module, rhsm, state, name, purge=False):
         if len(difference) > 0:
             for repoid in difference:
                 changed = True
-                diff_before.join("Repository '{repoid}'' is enabled for this system\n".format(repoid=repoid))
-                diff_after.join("Repository '{repoid}' is disabled for this system\n".format(repoid=repoid))
-                results.append("Repository '{repoid}' is disabled for this system".format(repoid=repoid))
+                diff_before.join(f"Repository '{repoid}'' is enabled for this system\n")
+                diff_after.join(f"Repository '{repoid}' is disabled for this system\n")
+                results.append(f"Repository '{repoid}' is disabled for this system")
                 rhsm_arguments.extend(['--disable', repoid])
             for updated_repo in updated_repo_list:
                 if updated_repo['id'] in difference:
