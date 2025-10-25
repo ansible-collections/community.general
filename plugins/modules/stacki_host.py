@@ -157,7 +157,7 @@ class StackiHost(object):
                   'Content-type': 'application/x-www-form-urlencoded', 'Cookie': cred_a.headers.get('Set-Cookie')}
 
         # Endpoint to get final authentication header
-        login_endpoint = self.endpoint + "/login"
+        login_endpoint = f"{self.endpoint}/login"
 
         # Get Final CSRF and Session ID
         login_req = self.do_request(login_endpoint, headers=header, payload=urlencode(auth_creds), method='POST')
@@ -194,7 +194,7 @@ class StackiHost(object):
         self.do_request(self.endpoint, payload=json.dumps({"cmd": "sync host config"}), headers=self.header, method="POST")
 
     def stack_force_install(self, result):
-        data = {'cmd': "set host boot {0} action=install".format(self.hostname)}
+        data = {'cmd': f"set host boot {self.hostname} action=install"}
         self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
         changed = True
 
@@ -207,8 +207,7 @@ class StackiHost(object):
         data = dict()
         changed = False
 
-        data['cmd'] = "add host {0} rack={1} rank={2} appliance={3}"\
-            .format(self.hostname, self.rack, self.rank, self.appliance)
+        data['cmd'] = f"add host {self.hostname} rack={self.rack} rank={self.rank} appliance={self.appliance}"
         self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
 
         self.stack_sync()
@@ -219,8 +218,7 @@ class StackiHost(object):
     def stack_remove(self, result):
         data = dict()
 
-        data['cmd'] = "remove host {0}"\
-            .format(self.hostname)
+        data['cmd'] = f"remove host {self.hostname}"
         self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
 
         self.stack_sync()
@@ -260,15 +258,14 @@ def main():
         stacki.stack_force_install(result)
     # If state is present, but host exists, and force_install and false, do nothing
     elif module.params['state'] == 'present' and host_exists and not module.params['force_install']:
-        result['stdout'] = "{0} already exists. Set 'force_install' to true to bootstrap"\
-            .format(module.params['name'])
+        result['stdout'] = f"{module.params['name']} already exists. Set 'force_install' to true to bootstrap"
     # Otherwise, state is present, but host doesn't exists, require more params to add host
     elif module.params['state'] == 'present' and not host_exists:
         for param in ['appliance', 'rack', 'rank', 'prim_intf', 'prim_intf_ip', 'network', 'prim_intf_mac']:
             if not module.params[param]:
                 missing_params.append(param)
         if len(missing_params) > 0:
-            module.fail_json(msg="missing required arguments: {0}".format(missing_params))
+            module.fail_json(msg=f"missing required arguments: {missing_params}")
 
         stacki.stack_add(result)
     # If state is absent, and host exists, lets remove it.

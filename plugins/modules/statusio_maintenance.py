@@ -196,7 +196,7 @@ def get_api_auth_headers(api_id, api_key, url, statuspage):
 
     try:
         response = open_url(
-            url + "/v2/component/list/" + statuspage, headers=headers)
+            f"{url}/v2/component/list/{statuspage}", headers=headers)
         data = json.loads(response.read())
         if data['status']['message'] == 'Authentication failed':
             return 1, None, None, "Authentication failed: " \
@@ -288,7 +288,7 @@ def create_maintenance(auth_headers, url, statuspage, host_ids,
     for val in host_ids:
         component_id.append(val['component_id'])
         container_id.append(val['container_id'])
-    infrastructure_id = [i + '-' + j for i, j in zip(component_id, container_id)]
+    infrastructure_id = [f"{i}-{j}" for i, j in zip(component_id, container_id)]
     try:
         values = json.dumps({
             "statuspage_id": statuspage,
@@ -307,7 +307,7 @@ def create_maintenance(auth_headers, url, statuspage, host_ids,
             "maintenance_notify_1_hr": str(int(maintenance_notify_1_hr))
         })
         response = open_url(
-            url + "/v2/maintenance/schedule", data=values,
+            f"{url}/v2/maintenance/schedule", data=values,
             headers=auth_headers)
         data = json.loads(response.read())
 
@@ -325,7 +325,7 @@ def delete_maintenance(auth_headers, url, statuspage, maintenance_id):
             "maintenance_id": maintenance_id,
         })
         response = open_url(
-            url=url + "/v2/maintenance/delete",
+            url=f"{url}/v2/maintenance/delete",
             data=values,
             headers=auth_headers)
         data = json.loads(response.read())
@@ -388,7 +388,7 @@ def main():
             (rc, auth_headers, auth_content, error) = \
                 get_api_auth_headers(api_id, api_key, url, statuspage)
             if rc != 0:
-                module.fail_json(msg="Failed to get auth keys: %s" % error)
+                module.fail_json(msg=f"Failed to get auth keys: {error}")
         else:
             auth_headers = {}
             auth_content = {}
@@ -397,7 +397,7 @@ def main():
             (rc, returned_date, error) = get_date_time(
                 start_date, start_time, minutes)
             if rc != 0:
-                module.fail_json(msg="Failed to set date/time: %s" % error)
+                module.fail_json(msg=f"Failed to set date/time: {error}")
 
         if not components and not containers:
             return module.fail_json(msg="A Component or Container must be "
@@ -410,13 +410,13 @@ def main():
                 (rc, host_ids, error) = get_component_ids(auth_content,
                                                           components)
                 if rc != 0:
-                    module.fail_json(msg="Failed to find component %s" % error)
+                    module.fail_json(msg=f"Failed to find component {error}")
 
             if containers:
                 (rc, host_ids, error) = get_container_ids(auth_content,
                                                           containers)
                 if rc != 0:
-                    module.fail_json(msg="Failed to find container %s" % error)
+                    module.fail_json(msg=f"Failed to find container {error}")
 
         if module.check_mode:
             module.exit_json(changed=True)
@@ -431,8 +431,7 @@ def main():
                 module.exit_json(changed=True, result="Successfully created "
                                                       "maintenance")
             else:
-                module.fail_json(msg="Failed to create maintenance: %s"
-                                 % error)
+                module.fail_json(msg=f"Failed to create maintenance: {error}")
 
     if state == "absent":
 
@@ -440,7 +439,7 @@ def main():
             (rc, auth_headers, auth_content, error) = \
                 get_api_auth_headers(api_id, api_key, url, statuspage)
             if rc != 0:
-                module.fail_json(msg="Failed to get auth keys: %s" % error)
+                module.fail_json(msg=f"Failed to get auth keys: {error}")
         else:
             auth_headers = {}
 
@@ -456,7 +455,7 @@ def main():
                 )
             else:
                 module.fail_json(
-                    msg="Failed to delete maintenance: %s" % error)
+                    msg=f"Failed to delete maintenance: {error}")
 
 
 if __name__ == '__main__':

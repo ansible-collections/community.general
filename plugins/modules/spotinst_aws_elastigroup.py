@@ -895,7 +895,7 @@ def handle_elastigroup(client, module):
     if should_create is True:
         if state == 'present':
             eg = expand_elastigroup(module, is_update=False)
-            module.debug(str(" [INFO] " + message + "\n"))
+            module.debug(f" [INFO] {message}\n")
             group = client.create_elastigroup(group=eg)
             group_id = group['id']
             message = 'Created group Successfully.'
@@ -923,7 +923,7 @@ def handle_elastigroup(client, module):
                     message = 'Updated and started rolling the group successfully.'
 
             except SpotinstClientException as exc:
-                message = 'Updated group successfully, but failed to perform roll. Error:' + str(exc)
+                message = f"Updated group successfully, but failed to perform roll. Error:{exc}"
             has_changed = True
 
         elif state == 'absent':
@@ -933,7 +933,7 @@ def handle_elastigroup(client, module):
                 if "GROUP_DOESNT_EXIST" in exc.message:
                     pass
                 else:
-                    module.fail_json(msg="Error while attempting to delete group : " + exc.message)
+                    module.fail_json(msg=f"Error while attempting to delete group : {exc.message}")
 
             message = 'Deleted group successfully.'
             has_changed = True

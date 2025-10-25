@@ -119,16 +119,16 @@ def main():
 
     decrypt_cmd = [cmd, "decrypt"]
     if name:
-        decrypt_cmd.append("--name=" + name)
+        decrypt_cmd.append(f"--name={name}")
     else:
         decrypt_cmd.append("--name=")
-    decrypt_cmd.append("--newline=" + ("yes" if newline else "no"))
+    decrypt_cmd.append(f"--newline={'yes' if newline else 'no'}")
     if timestamp:
-        decrypt_cmd.append("--timestamp=" + timestamp)
+        decrypt_cmd.append(f"--timestamp={timestamp}")
     if transcode:
-        decrypt_cmd.append("--transcode=" + transcode)
+        decrypt_cmd.append(f"--transcode={transcode}")
     if user:
-        decrypt_cmd.append("--uid=" + user)
+        decrypt_cmd.append(f"--uid={user}")
     decrypt_cmd.extend(["-", "-"])
 
     rc, stdout, stderr = module.run_command(decrypt_cmd, data=secret, binary_data=True)

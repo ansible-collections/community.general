@@ -180,14 +180,14 @@ def main():
                 rc, output = install_package(module, depot, name)
 
                 if not rc:
-                    msg = "Package upgraded, Before " + version_installed + " Now " + version_depot
+                    msg = f"Package upgraded, Before {version_installed} Now {version_depot}"
                     changed = True
 
                 else:
                     module.fail_json(name=name, msg=output, rc=rc)
 
         else:
-            output = "Software package not in repository " + depot
+            output = f"Software package not in repository {depot}"
             module.fail_json(name=name, msg=output, rc=rc)
 
     elif state == 'absent' and installed is True:

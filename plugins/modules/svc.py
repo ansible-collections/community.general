@@ -143,15 +143,15 @@ class Svc(object):
 
         self.svc_cmd = module.get_bin_path('svc', opt_dirs=self.extra_paths)
         self.svstat_cmd = module.get_bin_path('svstat', opt_dirs=self.extra_paths)
-        self.svc_full = '/'.join([self.service_dir, self.name])
-        self.src_full = '/'.join([self.service_src, self.name])
+        self.svc_full = f"{self.service_dir}/{self.name}"
+        self.src_full = f"{self.service_src}/{self.name}"
 
         self.enabled = os.path.lexists(self.svc_full)
         if self.enabled:
-            self.downed = os.path.lexists('%s/down' % self.svc_full)
+            self.downed = os.path.lexists(f'{self.svc_full}/down')
             self.get_status()
         else:
-            self.downed = os.path.lexists('%s/down' % self.src_full)
+            self.downed = os.path.lexists(f'{self.src_full}/down')
             self.state = 'stopped'
 
     def enable(self):
@@ -159,18 +159,18 @@ class Svc(object):
             try:
                 os.symlink(self.src_full, self.svc_full)
             except OSError as e:
-                self.module.fail_json(path=self.src_full, msg='Error while linking: %s' % to_native(e))
+                self.module.fail_json(path=self.src_full, msg=f'Error while linking: {to_native(e)}')
         else:
-            self.module.fail_json(msg="Could not find source for service to enable (%s)." % self.src_full)
+            self.module.fail_json(msg=f"Could not find source for service to enable ({self.src_full}).")
 
     def disable(self):
         try:
             os.unlink(self.svc_full)
         except OSError as e:
-            self.module.fail_json(path=self.svc_full, msg='Error while unlinking: %s' % to_native(e))
+            self.module.fail_json(path=self.svc_full, msg=f'Error while unlinking: {e}')
         self.execute_command([self.svc_cmd, '-dx', self.src_full])
 
-        src_log = '%s/log' % self.src_full
+        src_log = f'{self.src_full}/log'
         if os.path.exists(src_log):
             self.execute_command([self.svc_cmd, '-dx', src_log])
 
@@ -228,7 +228,7 @@ class Svc(object):
         try:
             rc, out, err = self.module.run_command(cmd)
         except Exception as e:
-            self.module.fail_json(msg="failed to execute: %s" % to_native(e), exception=traceback.format_exc())
+            self.module.fail_json(msg=f"failed to execute: {e}", exception=traceback.format_exc())
         return (rc, out, err)
 
     def report(self):
@@ -274,7 +274,7 @@ def main():
                 else:
                     svc.disable()
             except (OSError, IOError) as e:
-                module.fail_json(msg="Could not change service link: %s" % to_native(e))
+                module.fail_json(msg=f"Could not change service link: {e}")
 
     if state is not None and state != svc.state:
         changed = True
@@ -284,14 +284,14 @@ def main():
     if downed is not None and downed != svc.downed:
         changed = True
         if not module.check_mode:
-            d_file = "%s/down" % svc.svc_full
+            d_file = f"{svc.svc_full}/down"
             try:
                 if downed:
                     open(d_file, "a").close()
                 else:
                     os.unlink(d_file)
             except (OSError, IOError) as e:
-                module.fail_json(msg="Could not change downed file: %s " % (to_native(e)))
+                module.fail_json(msg=f"Could not change downed file: {e} ")
 
     module.exit_json(changed=changed, svc=svc.report())
 

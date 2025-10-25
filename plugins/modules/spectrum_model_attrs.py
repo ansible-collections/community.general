@@ -143,7 +143,6 @@ changed_attrs:
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import fetch_url
 from urllib.parse import quote
 import json
@@ -158,7 +157,7 @@ class spectrum_model_attrs:
         # If the user did not define a full path to the restul space in url:
         # params, add what we believe it to be.
         if not re.search('\\/.+', self.url.split('://')[1]):
-            self.url = "%s/spectrum/restful" % self.url.rstrip('/')
+            self.url = f"{self.url.rstrip('/')}/spectrum/restful"
         # Align these with what is defined in OneClick's UI under:
         # Locator -> Devices -> By Model Name -> <enter any model> ->
         #    Attributes tab.
@@ -208,7 +207,7 @@ class spectrum_model_attrs:
         :rtype: str
         """
 
-        return "%s/%s" % (self.url.rstrip('/'), path.lstrip('/'))
+        return f"{self.url.rstrip('/')}/{path.lstrip('/')}"
 
     def attr_id(self, name):
         """
@@ -261,7 +260,7 @@ class spectrum_model_attrs:
         """
 
         # Build the update URL
-        update_url = self.build_url("/model/%s?" % model_handle)
+        update_url = self.build_url(f"/model/{model_handle}?")
         for name, val in list(attrs.items()):
             if val is None:
                 # None values should be converted to empty strings
@@ -270,7 +269,7 @@ class spectrum_model_attrs:
             if not update_url.endswith('?'):
                 update_url += "&"
 
-            update_url += "attr=%s&val=%s" % (self.attr_id(name) or name, val)
+            update_url += f"attr={self.attr_id(name) or name}&val={val}"
 
         # POST to /model to update the attributes, or fail.
         resp, info = fetch_url(self.module, update_url, method="PUT",
@@ -283,7 +282,7 @@ class spectrum_model_attrs:
         else:
             body = "" if resp is None else resp.read()
         if status_code != 200:
-            self.result['msg'] = "HTTP PUT error %s: %s: %s" % (status_code, update_url, body)
+            self.result['msg'] = f"HTTP PUT error {status_code}: {update_url}: {body}"
             self.module.fail_json(**self.result)
 
         # Load and parse the JSON response and either fail or set results.
@@ -330,7 +329,7 @@ class spectrum_model_attrs:
             rqstd_attrs += '<rs:requested-attribute id="%s" />' % (self.attr_id(ra) or ra)
 
         # Build the complete XML search query for HTTP POST.
-        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rs:model-request throttlesize="5"
 xmlns:rs="http://www.ca.com/spectrum/restful/schema/request"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -338,13 +337,13 @@ xsi:schemaLocation="http://www.ca.com/spectrum/restful/schema/request ../../../x
     <rs:target-models>
         <rs:models-search>
             <rs:search-criteria xmlns="http://www.ca.com/spectrum/restful/schema/filter">
-                {0}
+                {search_criteria}
             </rs:search-criteria>
         </rs:models-search>
     </rs:target-models>
- {1}
+ {rqstd_attrs}
  </rs:model-request>
-""".format(search_criteria, rqstd_attrs)
+"""
 
         # POST to /models and fail on errors.
         url = self.build_url("/models")
@@ -358,7 +357,7 @@ xsi:schemaLocation="http://www.ca.com/spectrum/restful/schema/request ../../../x
         else:
             body = "" if resp is None else resp.read()
         if status_code != 200:
-            self.result['msg'] = "HTTP POST error %s: %s: %s" % (status_code, url, body)
+            self.result['msg'] = f"HTTP POST error {status_code}: {url}: {body}"
             self.module.fail_json(**self.result)
 
         # Parse through the XML response and fail on any detected errors.
@@ -367,15 +366,13 @@ xsi:schemaLocation="http://www.ca.com/spectrum/restful/schema/request ../../../x
         error = root.attrib['error']
         model_responses = root.find('ca:model-responses', self.resp_namespace)
         if total_models < 1:
-            self.result['msg'] = "No models found matching search criteria `%s'" % search_criteria
+            self.result['msg'] = f"No models found matching search criteria `{search_criteria}'"
             self.module.fail_json(**self.result)
         elif total_models > 1:
-            self.result['msg'] = "More than one model found (%s): `%s'" % (total_models, ET.tostring(model_responses,
-                                                                                                     encoding='unicode'))
+            self.result['msg'] = f"More than one model found ({total_models}): `{ET.tostring(model_responses, encoding='unicode')}'"
             self.module.fail_json(**self.result)
         if error != "EndOfResults":
-            self.result['msg'] = "Unexpected search response `%s': %s" % (error, ET.tostring(model_responses,
-                                                                                             encoding='unicode'))
+            self.result['msg'] = f"Unexpected search response `{error}': {ET.tostring(model_responses, encoding='unicode')}"
             self.module.fail_json(**self.result)
         model = model_responses.find('ca:model', self.resp_namespace)
         attrs = model.findall('ca:attribute', self.resp_namespace)
@@ -516,9 +513,7 @@ def run_module():
         sm = spectrum_model_attrs(module)
         sm.ensure_model_attrs()
     except Exception as e:
-        module.fail_json(msg="Failed to ensure attribute(s) on `%s' with "
-                             "exception: %s" % (module.params['name'],
-                                                to_native(e)))
+        module.fail_json(msg=f"Failed to ensure attribute(s) on `{module.params['name']}' with exception: {e}")
 
 
 def main():

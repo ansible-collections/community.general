@@ -223,7 +223,7 @@ def main():
             # Stdout is normally empty but for some packages can be
             # very long and is not often useful
             if len(out) > 75:
-                out = out[:75] + '...'
+                out = f"{out[:75]}..."
 
     elif state == 'absent':
         if package_installed(module, name, category):

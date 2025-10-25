@@ -173,9 +173,9 @@ class SimpleinitMSB(object):
         if not self.enable ^ self.service_enabled():
             return
 
-        action = "boot" + ("enable" if self.enable else "disable")
+        action = f"boot{'enable' if self.enable else 'disable'}"
 
-        (rc, out, err) = self.execute_command("%s %s %s" % (self.telinit_cmd, action, self.name))
+        (rc, out, err) = self.execute_command(f"{self.telinit_cmd} {action} {self.name}")
 
         self.changed = True
 
@@ -195,11 +195,11 @@ class SimpleinitMSB(object):
     def service_enabled(self):
         self.service_exists()
 
-        (rc, out, err) = self.execute_command("%s %sd" % (self.telinit_cmd, self.enable))
+        (rc, out, err) = self.execute_command(f"{self.telinit_cmd} {self.enable}d")
 
         service_enabled = False if self.enable else True
 
-        rex = re.compile(r'^%s$' % self.name)
+        rex = re.compile(rf'^{self.name}$')
 
         for line in out.splitlines():
             if rex.match(line):
@@ -209,11 +209,11 @@ class SimpleinitMSB(object):
         return service_enabled
 
     def service_exists(self):
-        (rc, out, err) = self.execute_command("%s list" % self.telinit_cmd)
+        (rc, out, err) = self.execute_command(f"{self.telinit_cmd} list")
 
         service_exists = False
 
-        rex = re.compile(r'^\w+\s+%s$' % self.name)
+        rex = re.compile(rf'^\w+\s+{self.name}$')
 
         for line in out.splitlines():
             if rex.match(line):
@@ -221,14 +221,14 @@ class SimpleinitMSB(object):
                 break
 
         if not service_exists:
-            self.module.fail_json(msg='telinit could not find the requested service: %s' % self.name)
+            self.module.fail_json(msg=f'telinit could not find the requested service: {self.name}')
 
     def service_control(self):
         self.service_exists()
 
-        svc_cmd = "%s run %s" % (self.telinit_cmd, self.name)
+        svc_cmd = f"{self.telinit_cmd} run {self.name}"
 
-        rc_state, stdout, stderr = self.execute_command("%s %s" % (svc_cmd, self.action), daemon=True)
+        rc_state, stdout, stderr = self.execute_command(f"{svc_cmd} {self.action}", daemon=True)
 
         return (rc_state, stdout, stderr)
 

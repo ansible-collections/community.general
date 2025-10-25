@@ -153,8 +153,8 @@ def main():
     elif protocol == 'tcp':
         client = tcp_statsd_client(host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
 
-    metric_name = '%s/%s' % (metric_prefix, metric) if metric_prefix else metric
-    metric_display_value = '%s (delta=%s)' % (value, delta) if metric_type == 'gauge' else value
+    metric_name = f'{metric_prefix}/{metric}' if metric_prefix else metric
+    metric_display_value = f'{value} (delta={delta})' if metric_type == 'gauge' else value
 
     try:
         if metric_type == 'counter':
@@ -163,13 +163,13 @@ def main():
             client.gauge(metric, value, delta=delta)
 
     except Exception as exc:
-        module.fail_json(msg='Failed sending to StatsD %s' % str(exc))
+        module.fail_json(msg=f'Failed sending to StatsD {exc}')
 
     finally:
         if protocol == 'tcp':
             client.close()
 
-    module.exit_json(msg="Sent %s %s -> %s to StatsD" % (metric_type, metric_name, str(metric_display_value)), changed=True)
+    module.exit_json(msg=f"Sent {metric_type} {metric_name} -> {metric_display_value!s} to StatsD", changed=True)
 
 
 if __name__ == '__main__':

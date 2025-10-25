@@ -120,7 +120,6 @@ import syslog
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def get_facility(facility):
@@ -202,7 +201,7 @@ def main():
         result['changed'] = True
 
     except Exception as exc:
-        module.fail_json(error='Failed to write to syslog %s' % to_native(exc), exception=traceback.format_exc(), **result)
+        module.fail_json(error=f'Failed to write to syslog {exc}', exception=traceback.format_exc(), **result)
 
     module.exit_json(**result)
 

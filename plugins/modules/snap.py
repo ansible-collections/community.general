@@ -277,7 +277,7 @@ class Snap(StateModuleHelper):
                           "The output format of 'snap set' may have changed. Aborting!")
 
         for key, value in json_subtree.items():
-            full_key = key if prefix is None else prefix + "." + key
+            full_key = key if prefix is None else f"{prefix}.{key}"
 
             if isinstance(value, (str, float, bool, numbers.Integral)):
                 option_map[full_key] = str(value)
@@ -307,7 +307,7 @@ class Snap(StateModuleHelper):
             return option_map
         except Exception as e:
             self.do_raise(
-                msg="Parsing option map returned by 'snap get {0}' triggers exception '{1}', output:\n'{2}'".format(snap_name, str(e), out))
+                msg=f"Parsing option map returned by 'snap get {snap_name}' triggers exception '{e}', output:\n'{out}'")
 
     def names_from_snaps(self, snaps):
         def process_one(rc, out, err):
@@ -353,7 +353,7 @@ class Snap(StateModuleHelper):
             match = [c for n, c in installed if n == name]
             if not match:
                 return Snap.NOT_INSTALLED
-            if channel and match[0] not in (channel, "latest/{0}".format(channel)):
+            if channel and match[0] not in (channel, f"latest/{channel}"):
                 return Snap.CHANNEL_MISMATCH
             else:
                 return Snap.INSTALLED
@@ -376,7 +376,7 @@ class Snap(StateModuleHelper):
         result = out.splitlines()[1]
         match = self.__disable_re.match(result)
         if not match:
-            self.do_raise(msg="Unable to parse 'snap list {0}' output:\n{1}".format(snap_name, out))
+            self.do_raise(msg=f"Unable to parse 'snap list {snap_name}' output:\n{out}")
         notes = match.group('notes')
         return "disabled" not in notes.split(',')
 
@@ -405,10 +405,9 @@ class Snap(StateModuleHelper):
         match = classic_snap_pattern.match(err)
         if match:
             err_pkg = match.group('package_name')
-            msg = "Couldn't install {name} because it requires classic confinement".format(name=err_pkg)
+            msg = f"Couldn't install {err_pkg} because it requires classic confinement"
         else:
-            msg = "Ooops! Snap installation failed while executing '{cmd}', please examine logs and " \
-                  "error output for more details.".format(cmd=self.vars.cmd)
+            msg = f"Ooops! Snap installation failed while executing '{self.vars.cmd}', please examine logs and error output for more details."
         self.do_raise(msg=msg)
 
     def state_present(self):
@@ -441,14 +440,14 @@ class Snap(StateModuleHelper):
                 match = self.__set_param_re.match(option_string)
 
                 if not match:
-                    msg = "Cannot parse set option '{option_string}'".format(option_string=option_string)
+                    msg = f"Cannot parse set option '{option_string}'"
                     self.do_raise(msg)
 
                 snap_prefix = match.group("snap_prefix")
                 selected_snap_name = snap_prefix[:-1] if snap_prefix else None
 
                 if selected_snap_name is not None and selected_snap_name not in self.vars.name:
-                    msg = "Snap option '{option_string}' refers to snap which is not in the list of snap names".format(option_string=option_string)
+                    msg = f"Snap option '{option_string}' refers to snap which is not in the list of snap names"
                     self.do_raise(msg)
 
                 if selected_snap_name is None or (snap_name is not None and snap_name == selected_snap_name):
@@ -456,8 +455,8 @@ class Snap(StateModuleHelper):
                     value = match.group("value").strip()
 
                     if key not in option_map or key in option_map and option_map[key] != value:
-                        option_without_prefix = key + "=" + value
-                        option_with_prefix = option_string if selected_snap_name is not None else snap_name + ":" + option_string
+                        option_without_prefix = f"{key}={value}"
+                        option_with_prefix = option_string if selected_snap_name is not None else f"{snap_name}:{option_string}"
                         options_changed.append(option_without_prefix)
                         overall_options_changed.append(option_with_prefix)
 
@@ -469,11 +468,10 @@ class Snap(StateModuleHelper):
                         rc, out, err = ctx.run(name=snap_name, options=options_changed)
                     if rc != 0:
                         if 'has no "configure" hook' in err:
-                            msg = "Snap '{snap}' does not have any configurable options".format(snap=snap_name)
+                            msg = f"Snap '{snap_name}' does not have any configurable options"
                             self.do_raise(msg)
 
-                        msg = "Cannot set options '{options}' for snap '{snap}': error={error}".format(
-                            options=" ".join(options_changed), snap=snap_name, error=err)
+                        msg = f"Cannot set options '{' '.join(options_changed)}' for snap '{snap_name}': error={err}"
                         self.do_raise(msg)
 
         if overall_options_changed:
@@ -491,8 +489,7 @@ class Snap(StateModuleHelper):
         self.vars.run_info = run_info
         if rc == 0:
             return
-        msg = "Ooops! Snap operation failed while executing '{cmd}', please examine logs and " \
-              "error output for more details.".format(cmd=self.vars.cmd)
+        msg = f"Ooops! Snap operation failed while executing '{self.vars.cmd}', please examine logs and error output for more details."
         self.do_raise(msg=msg)
 
     def state_absent(self):

@@ -204,27 +204,27 @@ class DefineOid(object):
             dp = ""
 
         # From SNMPv2-MIB
-        self.sysDescr = dp + "1.3.6.1.2.1.1.1.0"
-        self.sysObjectId = dp + "1.3.6.1.2.1.1.2.0"
-        self.sysUpTime = dp + "1.3.6.1.2.1.1.3.0"
-        self.sysContact = dp + "1.3.6.1.2.1.1.4.0"
-        self.sysName = dp + "1.3.6.1.2.1.1.5.0"
-        self.sysLocation = dp + "1.3.6.1.2.1.1.6.0"
+        self.sysDescr = f"{dp}1.3.6.1.2.1.1.1.0"
+        self.sysObjectId = f"{dp}1.3.6.1.2.1.1.2.0"
+        self.sysUpTime = f"{dp}1.3.6.1.2.1.1.3.0"
+        self.sysContact = f"{dp}1.3.6.1.2.1.1.4.0"
+        self.sysName = f"{dp}1.3.6.1.2.1.1.5.0"
+        self.sysLocation = f"{dp}1.3.6.1.2.1.1.6.0"
 
         # From IF-MIB
-        self.ifIndex = dp + "1.3.6.1.2.1.2.2.1.1"
-        self.ifDescr = dp + "1.3.6.1.2.1.2.2.1.2"
-        self.ifMtu = dp + "1.3.6.1.2.1.2.2.1.4"
-        self.ifSpeed = dp + "1.3.6.1.2.1.2.2.1.5"
-        self.ifPhysAddress = dp + "1.3.6.1.2.1.2.2.1.6"
-        self.ifAdminStatus = dp + "1.3.6.1.2.1.2.2.1.7"
-        self.ifOperStatus = dp + "1.3.6.1.2.1.2.2.1.8"
-        self.ifAlias = dp + "1.3.6.1.2.1.31.1.1.1.18"
+        self.ifIndex = f"{dp}1.3.6.1.2.1.2.2.1.1"
+        self.ifDescr = f"{dp}1.3.6.1.2.1.2.2.1.2"
+        self.ifMtu = f"{dp}1.3.6.1.2.1.2.2.1.4"
+        self.ifSpeed = f"{dp}1.3.6.1.2.1.2.2.1.5"
+        self.ifPhysAddress = f"{dp}1.3.6.1.2.1.2.2.1.6"
+        self.ifAdminStatus = f"{dp}1.3.6.1.2.1.2.2.1.7"
+        self.ifOperStatus = f"{dp}1.3.6.1.2.1.2.2.1.8"
+        self.ifAlias = f"{dp}1.3.6.1.2.1.31.1.1.1.18"
 
         # From IP-MIB
-        self.ipAdEntAddr = dp + "1.3.6.1.2.1.4.20.1.1"
-        self.ipAdEntIfIndex = dp + "1.3.6.1.2.1.4.20.1.2"
-        self.ipAdEntNetMask = dp + "1.3.6.1.2.1.4.20.1.3"
+        self.ipAdEntAddr = f"{dp}1.3.6.1.2.1.4.20.1.1"
+        self.ipAdEntIfIndex = f"{dp}1.3.6.1.2.1.4.20.1.2"
+        self.ipAdEntNetMask = f"{dp}1.3.6.1.2.1.4.20.1.3"
 
 
 def decode_hex(hexstring):

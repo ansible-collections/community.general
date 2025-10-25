@@ -138,7 +138,7 @@ def request(resource, xml=None, method=None):
         "Accept": "application/xml"
     }
 
-    url = module.params['oneclick_url'] + '/spectrum/restful/' + resource
+    url = f"{module.params['oneclick_url']}/spectrum/restful/{resource}"
 
     response, info = fetch_url(module, url, data=xml, method=method, headers=headers, timeout=45)
 
@@ -163,7 +163,7 @@ def get_ip():
     try:
         device_ip = gethostbyname(module.params.get('device'))
     except gaierror:
-        module.fail_json(msg="failed to resolve device ip address for '%s'" % module.params.get('device'))
+        module.fail_json(msg=f"failed to resolve device ip address for '{module.params.get('device')}'")
 
     return device_ip
 
@@ -171,10 +171,10 @@ def get_ip():
 def get_device(device_ip):
     """Query OneClick for the device using the IP Address"""
     resource = '/models'
-    landscape_min = "0x%x" % int(module.params.get('landscape'), 16)
-    landscape_max = "0x%x" % (int(module.params.get('landscape'), 16) + 0x100000)
+    landscape_min = f"0x{int(module.params.get('landscape'), 16):x}"
+    landscape_max = f"0x{int(module.params.get('landscape'), 16) + 0x100000:x}"
 
-    xml = """<?xml version="1.0" encoding="UTF-8"?>
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
         <rs:model-request throttlesize="5"
         xmlns:rs="http://www.ca.com/spectrum/restful/schema/request"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -190,19 +190,19 @@ def get_device(device_ip):
                                 </equals>
                                 <greater-than>
                                     <attribute id="0x129fa">
-                                        <value>{mh_min}</value>
+                                        <value>{landscape_min}</value>
                                     </attribute>
                                 </greater-than>
                                 <less-than>
                                     <attribute id="0x129fa">
-                                        <value>{mh_max}</value>
+                                        <value>{landscape_max}</value>
                                     </attribute>
                                 </less-than>
                             </and>
                         </filtered-models>
                         <action>FIND_DEV_MODELS_BY_IP</action>
                         <attribute id="AttributeID.NETWORK_ADDRESS">
-                            <value>{search_ip}</value>
+                            <value>{device_ip}</value>
                         </attribute>
                     </action-models>
                 </rs:search-criteria>
@@ -210,7 +210,7 @@ def get_device(device_ip):
             </rs:target-models>
             <rs:requested-attribute id="0x12d7f" /> <!--Network Address-->
         </rs:model-request>
-        """.format(search_ip=device_ip, mh_min=landscape_min, mh_max=landscape_max)
+        """
 
     result = post(resource, xml=xml)
 
@@ -225,7 +225,7 @@ def get_device(device_ip):
     model = root.find('ca:model-responses', namespace).find('ca:model', namespace)
 
     if model.get('error'):
-        module.fail_json(msg="error checking device: %s" % model.get('error'))
+        module.fail_json(msg=f"error checking device: {model.get('error')}")
 
     # get the attributes
     model_handle = model.get('mh')
@@ -233,7 +233,7 @@ def get_device(device_ip):
     model_address = model.find('./*[@id="0x12d7f"]').text
 
     # derive the landscape handler from the model handler of the device
-    model_landscape = "0x%x" % int(int(model_handle, 16) // 0x100000 * 0x100000)
+    model_landscape = f"0x{int(model_handle, 16) // 0x100000 * 0x100000:x}"
 
     device = dict(
         model_handle=model_handle,
@@ -254,14 +254,14 @@ def add_device():
         device = dict(
             model_handle=None,
             address=device_ip,
-            landscape="0x%x" % int(module.params.get('landscape'), 16))
+            landscape=f"0x{int(module.params.get('landscape'), 16):x}")
         module.exit_json(changed=True, device=device)
 
-    resource = 'model?ipaddress=' + device_ip + '&commstring=' + module.params.get('community')
-    resource += '&landscapeid=' + module.params.get('landscape')
+    resource = f"model?ipaddress={device_ip}&commstring={module.params.get('community')}"
+    resource += f"&landscapeid={module.params.get('landscape')}"
 
     if module.params.get('agentport', None):
-        resource += '&agentport=' + str(module.params.get('agentport', 161))
+        resource += f"&agentport={module.params.get('agentport', 161)}"
 
     result = post(resource)
     root = ET.fromstring(result)
@@ -273,7 +273,7 @@ def add_device():
     model = root.find('ca:model', namespace)
 
     model_handle = model.get('mh')
-    model_landscape = "0x%x" % int(int(model_handle, 16) // 0x100000 * 0x100000)
+    model_landscape = f"0x{int(model_handle, 16) // 0x100000 * 0x100000:x}"
 
     device = dict(
         model_handle=model_handle,
@@ -294,7 +294,7 @@ def remove_device():
     if module.check_mode:
         module.exit_json(changed=True)
 
-    resource = '/model/' + device['model_handle']
+    resource = f"/model/{device['model_handle']}"
     result = delete(resource)
 
     root = ET.fromstring(result)
@@ -304,7 +304,7 @@ def remove_device():
 
     if error != 'Success':
         error_message = root.find('ca:error-message', namespace).text
-        module.fail_json(msg="%s %s" % (error, error_message))
+        module.fail_json(msg=f"{error} {error_message}")
 
     module.exit_json(changed=True)
 
