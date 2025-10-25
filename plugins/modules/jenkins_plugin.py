@@ -555,7 +555,7 @@ class JenkinsPlugin(object):
         if not self.module.check_mode:
             # Install the plugin (with dependencies)
             install_script = (
-                f"d = Jenkins.instance.updateCenter.getPlugin(\"{self.params['name']}\").deploy(); d.get();")
+                f"""d = Jenkins.instance.updateCenter.getPlugin("{self.params['name']}").deploy(); d.get();""")
 
             if self.params['with_dependencies']:
                 install_script = (

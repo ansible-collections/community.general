@@ -363,7 +363,7 @@ def _download_cert_url(module, executable, url, port):
     """ Fetches the certificate from the remote URL using `keytool -printcert...`
           The PEM formatted string is returned """
     proxy_opts = build_proxy_options()
-    fetch_cmd = [executable, "-printcert", "-rfc", "-sslserver"] + proxy_opts + [f"{url}:{int(port)}"]
+    fetch_cmd = [executable, "-printcert", "-rfc", "-sslserver"] + proxy_opts + [f"{url}:{port}"]```
 
     # Fetch SSL certificate from remote host.
     (fetch_rc, fetch_out, fetch_err) = module.run_command(fetch_cmd, check_rc=False)
