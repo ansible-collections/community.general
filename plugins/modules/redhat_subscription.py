@@ -292,7 +292,7 @@ class Rhsm(object):
         self.module = module
 
     def update_plugin_conf(self, plugin, enabled=True):
-        plugin_conf = '/etc/yum/pluginconf.d/%s.conf' % plugin
+        plugin_conf = f'/etc/yum/pluginconf.d/{plugin}.conf'
 
         if isfile(plugin_conf):
             tmpfd, tmpfile = tempfile.mkstemp()
@@ -336,7 +336,7 @@ class Rhsm(object):
         options = []
         for k, v in sorted(kwargs.items()):
             if re.search(r'^(server|rhsm)_', k) and v is not None:
-                options.append('--%s=%s' % (k.replace('_', '.', 1), v))
+                options.append(f"--{k.replace('_', '.', 1)}={v}")
 
         # When there is nothing to configure, then it is not necessary
         # to run config command, because it only returns current
@@ -411,7 +411,7 @@ class Rhsm(object):
             bus.flush()
 
         except dbus.exceptions.DBusException as e:
-            self.module.debug('Failed to connect to system D-Bus bus, will use CLI: %s' % e)
+            self.module.debug(f'Failed to connect to system D-Bus bus, will use CLI: {e}')
             return False
 
         self.module.debug('Verified system D-Bus bus as usable')
@@ -755,7 +755,7 @@ class Rhsm(object):
         '''
         items = []
         if serials is not None and serials:
-            items = ["--serial=%s" % s for s in serials]
+            items = [f"--serial={s}" for s in serials]
         if serials is None:
             items = ["--all"]
 
@@ -790,7 +790,7 @@ class Rhsm(object):
                     args.extend(['--quantity', to_native(quantity)])
                 rc, stderr, stdout = self.module.run_command(args, check_rc=True)
             else:
-                self.module.fail_json(msg='Pool ID: %s not in list of available pools' % pool_id)
+                self.module.fail_json(msg=f'Pool ID: {pool_id} not in list of available pools')
         return pool_ids
 
     def update_subscriptions_by_pool_ids(self, pool_ids):
@@ -851,7 +851,7 @@ class RhsmPool(object):
         return int(getattr(self, 'QuantityUsed'))
 
     def subscribe(self):
-        args = "subscription-manager attach --pool %s" % self.get_pool_id()
+        args = f"subscription-manager attach --pool {self.get_pool_id()}"
         rc, stdout, stderr = self.module.run_command(args, check_rc=True)
         if rc == 0:
             return True
@@ -956,8 +956,7 @@ class SysPurpose(object):
             elif key == 'sync':
                 pass
             else:
-                raise KeyError("Attribute: %s not in list of allowed attributes: %s" %
-                               (key, self.ALLOWED_ATTRIBUTES))
+                raise KeyError(f"Attribute: {key} not in list of allowed attributes: {self.ALLOWED_ATTRIBUTES}")
         current_syspurpose = self._read_syspurpose()
         if current_syspurpose != syspurpose:
             syspurpose_changed = True
@@ -1101,7 +1100,7 @@ def main():
         try:
             syspurpose_changed = SysPurpose().update_syspurpose(syspurpose)
         except Exception as err:
-            module.fail_json(msg="Failed to update syspurpose attributes: %s" % to_native(err))
+            module.fail_json(msg=f"Failed to update syspurpose attributes: {to_native(err)}")
 
     # Ensure system is registered
     if state == 'present':
@@ -1115,12 +1114,12 @@ def main():
                 try:
                     rhsm.sync_syspurpose()
                 except Exception as e:
-                    module.fail_json(msg="Failed to synchronize syspurpose attributes: %s" % to_native(e))
+                    module.fail_json(msg=f"Failed to synchronize syspurpose attributes: {to_native(e)}")
             if pool_ids:
                 try:
                     result = rhsm.update_subscriptions_by_pool_ids(pool_ids)
                 except Exception as e:
-                    module.fail_json(msg="Failed to update subscriptions for '%s': %s" % (server_hostname, to_native(e)))
+                    module.fail_json(msg=f"Failed to update subscriptions for '{server_hostname}': {to_native(e)}")
                 else:
                     module.exit_json(**result)
             else:
@@ -1144,10 +1143,10 @@ def main():
                 else:
                     subscribed_pool_ids = []
             except Exception as e:
-                module.fail_json(msg="Failed to register with '%s': %s" % (server_hostname, to_native(e)))
+                module.fail_json(msg=f"Failed to register with '{server_hostname}': {to_native(e)}")
             else:
                 module.exit_json(changed=True,
-                                 msg="System successfully registered to '%s'." % server_hostname,
+                                 msg=f"System successfully registered to '{server_hostname}'.",
                                  subscribed_pool_ids=subscribed_pool_ids)
 
     # Ensure system is *not* registered
@@ -1158,9 +1157,9 @@ def main():
             try:
                 rhsm.unregister()
             except Exception as e:
-                module.fail_json(msg="Failed to unregister: %s" % to_native(e))
+                module.fail_json(msg=f"Failed to unregister: {e}")
             else:
-                module.exit_json(changed=True, msg="System successfully unregistered from %s." % server_hostname)
+                module.exit_json(changed=True, msg=f"System successfully unregistered from {server_hostname}.")
 
 
 if __name__ == '__main__':

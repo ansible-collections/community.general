@@ -127,7 +127,7 @@ def main():
     while True:
         if time.time() > timeout:
             module.fail_json(msg='Timeout, could not fetch Riak stats.')
-        (response, info) = fetch_url(module, 'http://%s/stats' % (http_conn), force=True, timeout=5)
+        (response, info) = fetch_url(module, f'http://{http_conn}/stats', force=True, timeout=5)
         if info['status'] == 200:
             stats_raw = response.read()
             break
@@ -211,7 +211,7 @@ def main():
                 module.fail_json(msg='Timeout waiting for handoffs.')
 
     if wait_for_service:
-        cmd = riak_admin_bin + ['wait_for_service', 'riak_%s' % wait_for_service, node_name]
+        cmd = riak_admin_bin + ['wait_for_service', f'riak_{wait_for_service}', node_name]
         rc, out, err = module.run_command(cmd)
         result['service'] = out
 

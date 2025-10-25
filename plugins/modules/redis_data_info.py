@@ -93,16 +93,15 @@ def main():
     try:
         value = redis.connection.get(key)
     except Exception as e:
-        msg = 'Failed to get value of key "{0}" with exception: {1}'.format(
-            key, str(e))
+        msg = f'Failed to get value of key "{key}" with exception: {e}'
         result['msg'] = msg
         module.fail_json(**result)
 
     if value is None:
-        msg = 'Key "{0}" does not exist in database'.format(key)
+        msg = f'Key "{key}" does not exist in database'
         result['exists'] = False
     else:
-        msg = 'Got key "{0}"'.format(key)
+        msg = f'Got key "{key}"'
         result['value'] = value
         result['exists'] = True
     result['msg'] = msg
