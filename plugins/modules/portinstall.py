@@ -77,7 +77,7 @@ def query_package(module, name):
         pkgng = False
         pkg_glob_path = module.get_bin_path('pkg_glob', True)
         # TODO: convert run_comand() argument to list!
-        rc, out, err = module.run_command("%s -e `pkg_glob %s`" % (pkg_info_path, shlex_quote(name)), use_unsafe_shell=True)
+        rc, out, err = module.run_command(f"{pkg_info_path} -e `pkg_glob {shlex_quote(name)}`", use_unsafe_shell=True)
         pkg_info_path = [pkg_info_path]
     else:
         pkgng = True
@@ -122,7 +122,7 @@ def remove_packages(module, packages):
     pkg_delete_path = module.get_bin_path('pkg_delete', False)
     if not pkg_delete_path:
         pkg_delete_path = module.get_bin_path('pkg', True)
-        pkg_delete_path = pkg_delete_path + " delete -y"
+        pkg_delete_path = f"{pkg_delete_path} delete -y"
 
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
@@ -131,22 +131,21 @@ def remove_packages(module, packages):
             continue
 
         # TODO: convert run_comand() argument to list!
-        rc, out, err = module.run_command("%s `%s %s`" % (pkg_delete_path, pkg_glob_path, shlex_quote(package)), use_unsafe_shell=True)
+        rc, out, err = module.run_command(f"{pkg_delete_path} `{pkg_glob_path} {shlex_quote(package)}`", use_unsafe_shell=True)
 
         if query_package(module, package):
             name_without_digits = re.sub('[0-9]', '', package)
             # TODO: convert run_comand() argument to list!
-            rc, out, err = module.run_command("%s `%s %s`" % (pkg_delete_path, pkg_glob_path,
-                                                              shlex_quote(name_without_digits)),
+            rc, out, err = module.run_command(f"{pkg_delete_path} `{pkg_glob_path} {shlex_quote(name_without_digits)}`",
                                               use_unsafe_shell=True)
             if query_package(module, package):
-                module.fail_json(msg="failed to remove %s: %s" % (package, out))
+                module.fail_json(msg=f"failed to remove {package}: {out}")
 
         remove_c += 1
 
     if remove_c > 0:
 
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
+        module.exit_json(changed=True, msg=f"removed {remove_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
@@ -177,16 +176,16 @@ def install_packages(module, packages, use_packages):
         if matches == 1:
             rc, out, err = module.run_command([portinstall_path, "--batch"] + portinstall_params + [package])
             if not query_package(module, package):
-                module.fail_json(msg="failed to install %s: %s" % (package, out))
+                module.fail_json(msg=f"failed to install {package}: {out}")
         elif matches == 0:
-            module.fail_json(msg="no matches for package %s" % (package))
+            module.fail_json(msg=f"no matches for package {package}")
         else:
-            module.fail_json(msg="%s matches found for package name %s" % (matches, package))
+            module.fail_json(msg=f"{matches} matches found for package name {package}")
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="present %s package(s)" % (install_c))
+        module.exit_json(changed=True, msg=f"present {install_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already present")
 

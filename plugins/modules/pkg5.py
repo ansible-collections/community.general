@@ -106,7 +106,7 @@ def main():
     # Try to spot where this has happened and fix it.
     for fragment in params['name']:
         if re.search(r'^\d+(?:\.\d+)*', fragment) and packages and re.search(r'@[^,]*$', packages[-1]):
-            packages[-1] += ',' + fragment
+            packages[-1] += f",{fragment}"
         else:
             packages.append(fragment)
 
@@ -151,7 +151,7 @@ def ensure(module, state, packages, params):
         accept_licenses = []
 
     if params['be_name']:
-        beadm = ['--be-name=' + module.params['be_name']]
+        beadm = [f"--be-name={module.params['be_name']}"]
     else:
         beadm = []
 

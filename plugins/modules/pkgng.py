@@ -196,7 +196,7 @@ def upgrade_packages(module, run_pkgng):
         upgraded_c += int(match)
 
     if upgraded_c > 0:
-        return (True, "updated %s package(s)" % upgraded_c, out, err)
+        return (True, f"updated {upgraded_c} package(s)", out, err)
     return (False, "no packages need upgrades", out, err)
 
 
@@ -216,12 +216,12 @@ def remove_packages(module, run_pkgng, packages):
             stderr += err
 
         if not module.check_mode and query_package(module, run_pkgng, package):
-            module.fail_json(msg="failed to remove %s: %s" % (package, out), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"failed to remove {package}: {out}", stdout=stdout, stderr=stderr)
 
         remove_c += 1
 
     if remove_c > 0:
-        return (True, "removed %s package(s)" % remove_c, stdout, stderr)
+        return (True, f"removed {remove_c} package(s)", stdout, stderr)
 
     return (False, "package(s) already absent", stdout, stderr)
 
@@ -237,7 +237,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
         stdout += out
         stderr += err
         if rc != 0:
-            module.fail_json(msg="Could not update catalogue [%d]: %s %s" % (rc, out, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Could not update catalogue [{rc}]: {out} {err}", stdout=stdout, stderr=stderr)
 
     for package in packages:
         already_installed = query_package(module, run_pkgng, package)
@@ -280,22 +280,22 @@ def install_packages(module, run_pkgng, packages, cached, state):
             if verified:
                 action_count[action] += 1
             else:
-                module.fail_json(msg="failed to %s %s" % (action, package), stdout=stdout, stderr=stderr)
+                module.fail_json(msg=f"failed to {action} {package}", stdout=stdout, stderr=stderr)
 
     if sum(action_count.values()) > 0:
         past_tense = {'install': 'installed', 'upgrade': 'upgraded'}
         messages = []
         for (action, count) in action_count.items():
-            messages.append("%s %s package%s" % (past_tense.get(action, action), count, "s" if count != 1 else ""))
+            messages.append(f"{past_tense.get(action, action)} {count} package{'s' if count != 1 else ''}")
 
         return (True, '; '.join(messages), stdout, stderr)
 
-    return (False, "package(s) already %s" % (state), stdout, stderr)
+    return (False, f"package(s) already {state}", stdout, stderr)
 
 
 def annotation_query(module, run_pkgng, package, tag):
     rc, out, err = run_pkgng('info', '-A', package)
-    match = re.search(r'^\s*(?P<tag>%s)\s*:\s*(?P<value>\w+)' % tag, out, flags=re.MULTILINE)
+    match = re.search(rf'^\s*(?P<tag>{tag})\s*:\s*(?P<value>\w+)', out, flags=re.MULTILINE)
     if match:
         return match.group('value')
     return False
@@ -308,14 +308,12 @@ def annotation_add(module, run_pkgng, package, tag, value):
         if not module.check_mode:
             rc, out, err = run_pkgng('annotate', '-y', '-A', package, tag, data=value, binary_data=True)
             if rc != 0:
-                module.fail_json(msg="could not annotate %s: %s"
-                                 % (package, out), stderr=err)
+                module.fail_json(msg=f"could not annotate {package}: {out}", stderr=err)
         return True
     elif _value != value:
         # Annotation exists, but value differs
         module.fail_json(
-            msg="failed to annotate %s, because %s is already set to %s, but should be set to %s"
-            % (package, tag, _value, value))
+            msg=f"failed to annotate {package}, because {tag} is already set to {_value}, but should be set to {value}")
         return False
     else:
         # Annotation exists, nothing to do
@@ -328,8 +326,7 @@ def annotation_delete(module, run_pkgng, package, tag, value):
         if not module.check_mode:
             rc, out, err = run_pkgng('annotate', '-y', '-D', package, tag)
             if rc != 0:
-                module.fail_json(msg="could not delete annotation to %s: %s"
-                                 % (package, out), stderr=err)
+                module.fail_json(msg=f"could not delete annotation to {package}: {out}", stderr=err)
         return True
     return False
 
@@ -338,8 +335,7 @@ def annotation_modify(module, run_pkgng, package, tag, value):
     _value = annotation_query(module, run_pkgng, package, tag)
     if not _value:
         # No such tag
-        module.fail_json(msg="could not change annotation to %s: tag %s does not exist"
-                         % (package, tag))
+        module.fail_json(msg=f"could not change annotation to {package}: tag {tag} does not exist")
     elif _value == value:
         # No change in value
         return False
@@ -351,10 +347,9 @@ def annotation_modify(module, run_pkgng, package, tag, value):
             # Check the output for a success message
             if (
                 rc != 0
-                and re.search(r'^%s-[^:]+: Modified annotation tagged: %s' % (package, tag), out, flags=re.MULTILINE) is None
+                and re.search(rf'^{package}-[^:]+: Modified annotation tagged: {tag}', out, flags=re.MULTILINE) is None
             ):
-                module.fail_json(msg="failed to annotate %s, could not change annotation %s to %s: %s"
-                                 % (package, tag, value, out), stderr=err)
+                module.fail_json(msg=f"failed to annotate {package}, could not change annotation {tag} to {value}: {out}", stderr=err)
         return True
 
 
@@ -382,8 +377,7 @@ def annotate_packages(module, run_pkgng, packages, annotations):
 
             if annotation is None:
                 module.fail_json(
-                    msg="failed to annotate %s, invalid annotate string: %s"
-                    % (package, annotation_string)
+                    msg=f"failed to annotate {package}, invalid annotate string: {annotation_string}"
                 )
 
             annotation = annotation.groupdict()
@@ -391,7 +385,7 @@ def annotate_packages(module, run_pkgng, packages, annotations):
                 annotate_c += 1
 
     if annotate_c > 0:
-        return (True, "added %s annotations." % annotate_c)
+        return (True, f"added {annotate_c} annotations.")
     return (False, "changed no annotations")
 
 
@@ -414,7 +408,7 @@ def autoremove_packages(module, run_pkgng):
         stdout += out
         stderr += err
 
-    return (True, "autoremoved %d package(s)" % (autoremove_c), stdout, stderr)
+    return (True, f"autoremoved {autoremove_c} package(s)", stdout, stderr)
 
 
 def main():
@@ -452,7 +446,7 @@ def main():
         if rootdir_not_supported:
             module.fail_json(msg="To use option 'rootdir' pkg version must be 1.5 or greater")
         else:
-            dir_arg = "--rootdir=%s" % (p["rootdir"])
+            dir_arg = f"--rootdir={p['rootdir']}"
 
     if p["ignore_osver"]:
         ignore_osver_not_supported = pkgng_older_than(module, pkgng_path, [1, 11, 0])
@@ -460,10 +454,10 @@ def main():
             module.fail_json(msg="To use option 'ignore_osver' pkg version must be 1.11 or greater")
 
     if p["chroot"] is not None:
-        dir_arg = '--chroot=%s' % (p["chroot"])
+        dir_arg = f"--chroot={p['chroot']}"
 
     if p["jail"] is not None:
-        dir_arg = '--jail=%s' % (p["jail"])
+        dir_arg = f"--jail={p['jail']}"
 
     # as of pkg-1.1.4, PACKAGESITE is deprecated in favor of repository definitions
     # in /usr/local/etc/pkg/repos
@@ -484,7 +478,7 @@ def main():
             if repo_flag_not_supported:
                 pkgng_env['PACKAGESITE'] = p['pkgsite']
             else:
-                cmd.append('--repository=%s' % (p['pkgsite'],))
+                cmd.append(f"--repository={p['pkgsite']}")
 
         # If environ_update is specified to be "passed through"
         # to module.run_command, then merge its values into pkgng_env

@@ -116,8 +116,7 @@ def get_pritunl_user(module):
 
     if len(org_obj_list) == 0:
         module.fail_json(
-            msg="Can not list users from the organization '%s' which does not exist"
-            % org_name
+            msg=f"Can not list users from the organization '{org_name}' which does not exist"
         )
 
     org_id = org_obj_list[0]["id"]

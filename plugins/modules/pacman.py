@@ -261,7 +261,7 @@ class Package(object):
         return self.name < o.name
 
     def __repr__(self):
-        return 'Package("%s", "%s", %s)' % (self.name, self.source, self.source_is_URL)
+        return f'Package("{self.name}", "{self.source}", {self.source_is_URL})'
 
 
 VersionTuple = namedtuple("VersionTuple", ["current", "latest"])
@@ -403,13 +403,13 @@ class Pacman(object):
                     continue
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
-                    before.append("%s-%s-%s" % (name, self.inventory["installed_pkgs"][name], self.inventory["pkg_reasons"][name]))
+                    before.append(f"{name}-{self.inventory['installed_pkgs'][name]}-{self.inventory['pkg_reasons'][name]}")
                 if name in pkgs_to_set_reason:
-                    after.append("%s-%s-%s" % (name, version, self.m.params["reason"]))
+                    after.append(f"{name}-{version}-{self.m.params['reason']}")
                 elif name in self.inventory["pkg_reasons"]:
-                    after.append("%s-%s-%s" % (name, version, self.inventory["pkg_reasons"][name]))
+                    after.append(f"{name}-{version}-{self.inventory['pkg_reasons'][name]}")
                 else:
-                    after.append("%s-%s" % (name, version))
+                    after.append(f"{name}-{version}")
                 to_be_installed.append(name)
 
             return (to_be_installed, before, after)
@@ -437,15 +437,17 @@ class Pacman(object):
 
         self.changed = True
 
+        _before_joined = '\n'.join(sorted(before))
+        _after_joined = '\n'.join(sorted(after))
         self.exit_params["diff"] = {
-            "before": "\n".join(sorted(before)) + "\n" if before else "",
-            "after": "\n".join(sorted(after)) + "\n" if after else "",
+            "before": f"{_before_joined}\n" if before else "",
+            "after": f"{_after_joined}\n" if after else "",
         }
 
         changed_reason_pkgs = [p for p in pkgs_to_set_reason if p not in installed_pkgs]
 
         if self.m.check_mode:
-            self.add_exit_infos("Would have installed %d packages" % (len(installed_pkgs) + len(changed_reason_pkgs)))
+            self.add_exit_infos(f"Would have installed {len(installed_pkgs) + len(changed_reason_pkgs)} packages")
             self.exit_params["packages"] = sorted(installed_pkgs + changed_reason_pkgs)
             return
 
@@ -478,7 +480,7 @@ class Pacman(object):
             self.add_exit_infos(stdout=stdout, stderr=stderr)
 
         self.exit_params["packages"] = sorted(installed_pkgs + changed_reason_pkgs)
-        self.add_exit_infos("Installed %d package(s)" % (len(installed_pkgs) + len(changed_reason_pkgs)))
+        self.add_exit_infos(f"Installed {len(installed_pkgs) + len(changed_reason_pkgs)} package(s)")
 
     def remove_packages(self, pkgs):
         # filter out pkgs that are already absent
@@ -509,14 +511,15 @@ class Pacman(object):
 
         removed_pkgs = stdout.split()
         self.exit_params["packages"] = removed_pkgs
+        _remove_pkgs_joined = '\n'.join(removed_pkgs)
         self.exit_params["diff"] = {
-            "before": "\n".join(removed_pkgs) + "\n",  # trailing \n to avoid diff complaints
+            "before": f"{_remove_pkgs_joined}\n",  # trailing \n to avoid diff complaints
             "after": "",
         }
 
         if self.m.check_mode:
             self.exit_params["packages"] = removed_pkgs
-            self.add_exit_infos("Would have removed %d packages" % len(removed_pkgs))
+            self.add_exit_infos(f"Would have removed {len(removed_pkgs)} packages")
             return
 
         nosave_args = ["--nosave"] if self.m.params["remove_nosave"] else []
@@ -527,7 +530,7 @@ class Pacman(object):
             self.fail("failed to remove package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
         self._invalidate_database()
         self.exit_params["packages"] = removed_pkgs
-        self.add_exit_infos("Removed %d package(s)" % len(removed_pkgs), stdout=stdout, stderr=stderr)
+        self.add_exit_infos(f"Removed {len(removed_pkgs)} package(s)", stdout=stdout, stderr=stderr)
 
     def upgrade(self):
         """Runs pacman --sync --sysupgrade if there are upgradable packages"""
@@ -541,14 +544,14 @@ class Pacman(object):
         # Build diff based on inventory first.
         diff = {"before": "", "after": ""}
         for pkg, versions in self.inventory["upgradable_pkgs"].items():
-            diff["before"] += "%s-%s\n" % (pkg, versions.current)
-            diff["after"] += "%s-%s\n" % (pkg, versions.latest)
+            diff["before"] += f"{pkg}-{versions.current}\n"
+            diff["after"] += f"{pkg}-{versions.latest}\n"
         self.exit_params["diff"] = diff
         self.exit_params["packages"] = self.inventory["upgradable_pkgs"].keys()
 
         if self.m.check_mode:
             self.add_exit_infos(
-                "%d packages would have been upgraded" % (len(self.inventory["upgradable_pkgs"]))
+                f"{len(self.inventory['upgradable_pkgs'])} packages would have been upgraded"
             )
         else:
             cmd = [
@@ -654,7 +657,7 @@ class Pacman(object):
                             continue  # Don't bark for unavailable packages when trying to remove them
                         else:
                             self.fail(
-                                msg="Failed to list package %s" % (pkg),
+                                msg=f"Failed to list package {pkg}",
                                 cmd=cmd,
                                 stdout=stdout,
                                 stderr=stderr,
@@ -764,7 +767,7 @@ class Pacman(object):
                     continue
                 s = l.split()
                 if len(s) != 4:
-                    self.fail(msg="Invalid line: %s" % l)
+                    self.fail(msg=f"Invalid line: {l}")
 
                 pkg = s[0]
                 current = s[1]

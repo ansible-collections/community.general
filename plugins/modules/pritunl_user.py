@@ -185,7 +185,7 @@ def add_or_update_pritunl_user(module):
 
     if len(org_obj_list) == 0:
         module.fail_json(
-            msg="Can not add user to organization '%s' which does not exist" % org_name
+            msg=f"Can not add user to organization '{org_name}' which does not exist"
         )
 
     org_id = org_obj_list[0]["id"]
@@ -273,8 +273,7 @@ def remove_pritunl_user(module):
 
     if len(org_obj_list) == 0:
         module.fail_json(
-            msg="Can not remove user '%s' from a non existing organization '%s'"
-            % (user_name, org_name)
+            msg=f"Can not remove user '{user_name}' from a non existing organization '{org_name}'"
         )
 
     org_id = org_obj_list[0]["id"]

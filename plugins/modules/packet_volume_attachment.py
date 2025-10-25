@@ -133,7 +133,6 @@ device_id:
 import uuid
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils.common.text.converters import to_native
 
 HAS_PACKET_SDK = True
 
@@ -172,7 +171,7 @@ def get_device_selector(spec):
 
 
 def do_attach(packet_conn, vol_id, dev_id):
-    api_method = "storage/{0}/attachments".format(vol_id)
+    api_method = f"storage/{vol_id}/attachments"
     packet_conn.call_api(
         api_method,
         params={"device_id": dev_id},
@@ -189,11 +188,10 @@ def do_detach(packet_conn, vol, dev_id=None):
 
 def validate_selected(l, resource_type, spec):
     if len(l) > 1:
-        _msg = ("more than one {0} matches specification {1}: {2}".format(
-                resource_type, spec, l))
+        _msg = f"more than one {resource_type} matches specification {spec}: {l}"
         raise Exception(_msg)
     if len(l) == 0:
-        _msg = "no {0} matches specification: {1}".format(resource_type, spec)
+        _msg = f"no {resource_type} matches specification: {spec}"
         raise Exception(_msg)
 
 
@@ -211,7 +209,7 @@ def act_on_volume_attachment(target_state, module, packet_conn):
     if devspec is None and target_state == 'present':
         raise Exception("If you want to attach a volume, you must specify a device.")
     project_id = module.params.get("project_id")
-    volumes_api_method = "projects/{0}/storage".format(project_id)
+    volumes_api_method = f"projects/{project_id}/storage"
     volumes = packet_conn.call_api(volumes_api_method,
                                    params={'include': 'facility,attachments.device'})['volumes']
     v_match = get_volume_selector(volspec)
@@ -222,7 +220,7 @@ def act_on_volume_attachment(target_state, module, packet_conn):
 
     device = None
     if devspec is not None:
-        devices_api_method = "projects/{0}/devices".format(project_id)
+        devices_api_method = f"projects/{project_id}/devices"
         devices = packet_conn.call_api(devices_api_method)['devices']
         d_match = get_device_selector(devspec)
         matching_devices = [d for d in devices if d_match(d)]
@@ -239,8 +237,7 @@ def act_on_volume_attachment(target_state, module, packet_conn):
         elif device['id'] not in attached_device_ids:
             # Don't reattach volume which is attached to a different device.
             # Rather fail than force remove a device on state == 'present'.
-            raise Exception("volume {0} is already attached to device {1}".format(
-                            volume, attached_device_ids))
+            raise Exception(f"volume {volume} is already attached to device {attached_device_ids}")
     else:
         if device is None:
             if len(attached_device_ids) > 0:
@@ -273,8 +270,7 @@ def main():
         module.fail_json(msg='packet required for this module')
 
     if not module.params.get('auth_token'):
-        _fail_msg = ("if Packet API token is not in environment variable {0}, "
-                     "the auth_token parameter is required".format(PACKET_API_TOKEN_ENV_VAR))
+        _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
     auth_token = module.params.get('auth_token')
@@ -292,9 +288,9 @@ def main():
                 **act_on_volume_attachment(state, module, packet_conn))
         except Exception as e:
             module.fail_json(
-                msg="failed to set volume_attachment state {0}: {1}".format(state, to_native(e)))
+                msg=f"failed to set volume_attachment state {state}: {e}")
     else:
-        module.fail_json(msg="{0} is not a valid state for this module".format(state))
+        module.fail_json(msg=f"{state} is not a valid state for this module")
 
 
 if __name__ == '__main__':

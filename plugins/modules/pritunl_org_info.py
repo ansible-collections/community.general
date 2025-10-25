@@ -97,7 +97,7 @@ def get_pritunl_organizations(module):
 
     if org_name and len(organizations) == 0:
         # When an org_name is provided but no organization match return an error
-        module.fail_json(msg="Organization '%s' does not exist" % org_name)
+        module.fail_json(msg=f"Organization '{org_name}' does not exist")
 
     result = {}
     result["changed"] = False

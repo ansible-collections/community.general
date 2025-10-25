@@ -123,7 +123,7 @@ class PSAdapter(object, metaclass=abc.ABCMeta):
         try:
             regex = re.compile(pattern, flags)
         except re.error as e:
-            raise PSAdapterError("'%s' is not a valid regular expression: %s" % (pattern, to_native(e)))
+            raise PSAdapterError(f"'{pattern}' is not a valid regular expression: {e}")
 
         return [p.pid for p in self._process_iter(*self.PATTERN_ATTRS) if self._matches_regex(p, regex)]
 

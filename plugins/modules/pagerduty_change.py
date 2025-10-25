@@ -145,7 +145,7 @@ def main():
             module.exit_json(changed=True)
         else:
             module.fail_json(
-                msg='Checking the PagerDuty change event API returned an unexpected response: %d' % (info['status']))
+                msg=f"Checking the PagerDuty change event API returned an unexpected response: {info['status']}")
 
     custom_details = {}
 
@@ -192,7 +192,7 @@ def main():
         module.exit_json(changed=True)
     else:
         module.fail_json(
-            msg='Creating PagerDuty change event failed with %d' % (info['status']))
+            msg=f"Creating PagerDuty change event failed with {info['status']}")
 
 
 if __name__ == '__main__':

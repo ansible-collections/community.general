@@ -294,7 +294,7 @@ def query_set(module, set_, action):
 
     if set_ in system_sets:
         if action == 'unmerge':
-            module.fail_json(msg='set %s cannot be removed' % set_)
+            module.fail_json(msg=f'set {set_} cannot be removed')
         return False
 
     world_sets_path = '/var/lib/portage/world_sets'
@@ -440,7 +440,7 @@ def unmerge_packages(module, packages):
 
     for flag in ['quiet', 'verbose']:
         if p[flag]:
-            args.append('--%s' % flag)
+            args.append(f'--{flag}')
 
     cmd, (rc, out, err) = run_emerge(module, packages, *args)
 
@@ -470,7 +470,7 @@ def cleanup_packages(module, packages):
 
     for flag in ['quiet', 'verbose']:
         if p[flag]:
-            args.append('--%s' % flag)
+            args.append(f'--{flag}')
 
     cmd, (rc, out, err) = run_emerge(module, packages, *args)
     if rc != 0:
@@ -572,8 +572,7 @@ def main():
     if p['depclean']:
         if packages and p['state'] not in portage_absent_states:
             module.fail_json(
-                msg='Depclean can only be used with package when the state is '
-                    'one of: %s' % portage_absent_states,
+                msg=f'Depclean can only be used with package when the state is one of: {portage_absent_states}',
             )
 
         cleanup_packages(module, packages)

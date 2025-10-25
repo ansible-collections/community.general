@@ -174,10 +174,10 @@ def main():
     for dep in module.params['dependencies']:
         match = pkg_dep_re.match(dep)
         if not match:
-            module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
+            module.fail_json(msg=f"Failed to parse version requirement '{dep}'. Must be formatted like 'ansible>2.6'")
         pkg, op, version = match.groups()
         if op is not None and op not in operations:
-            module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
+            module.fail_json(msg=f"Failed to parse version requirement '{dep}'. Operator must be one of >, <, <=, >=, or ==")
         try:
             existing = pkg_resources.get_distribution(pkg).version
         except pkg_resources.DistributionNotFound:

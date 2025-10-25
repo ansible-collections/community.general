@@ -245,7 +245,7 @@ class PacmanKey(object):
     def gpg(self, args, keyring=None, **kwargs):
         cmd = [self.gpg_binary]
         if keyring:
-            cmd.append('--homedir={keyring}'.format(keyring=keyring))
+            cmd.append(f'--homedir={keyring}')
         cmd.extend(['--no-permission-warning', '--with-colons', '--quiet', '--batch', '--no-tty'])
         return self.module.run_command(cmd + args, **kwargs)
 
@@ -273,16 +273,16 @@ class PacmanKey(object):
         """
         sanitised_keyid = keyid.strip().upper().replace(' ', '').replace('0X', '')
         if len(sanitised_keyid) != self.keylength:
-            self.module.fail_json(msg="key ID is not full-length: %s" % sanitised_keyid)
+            self.module.fail_json(msg=f"key ID is not full-length: {sanitised_keyid}")
         if not self.is_hexadecimal(sanitised_keyid):
-            self.module.fail_json(msg="key ID is not hexadecimal: %s" % sanitised_keyid)
+            self.module.fail_json(msg=f"key ID is not hexadecimal: {sanitised_keyid}")
         return sanitised_keyid
 
     def fetch_key(self, url):
         """Downloads a key from url"""
         response, info = fetch_url(self.module, url)
         if info['status'] != 200:
-            self.module.fail_json(msg="failed to fetch key at %s, error was %s" % (url, info['msg']))
+            self.module.fail_json(msg=f"failed to fetch key at {url}, error was {info['msg']}")
         return to_native(response.read())
 
     def recv_key(self, keyring, keyid, keyserver):
@@ -326,7 +326,7 @@ class PacmanKey(object):
 
         extracted_keyid = gpg_get_first_attr_of_kind(stdout.splitlines(), 'fpr', 'user_id')
         if extracted_keyid != keyid:
-            self.module.fail_json(msg="key ID does not match. expected %s, got %s" % (keyid, extracted_keyid))
+            self.module.fail_json(msg=f"key ID does not match. expected {keyid}, got {extracted_keyid}")
 
     def key_validity(self, keyring, keyid):
         "Check if the key ID is in pacman's keyring and not expired"
@@ -335,7 +335,7 @@ class PacmanKey(object):
             if stderr.find("No public key") >= 0:
                 return []
             else:
-                self.module.fail_json(msg="gpg returned an error: %s" % stderr)
+                self.module.fail_json(msg=f"gpg returned an error: {stderr}")
         return gpg_get_all_attrs_of_kind(stdout.splitlines(), 'uid', 'is_fully_valid')
 
     def key_is_trusted(self, keyring, keyid):

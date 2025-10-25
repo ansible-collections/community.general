@@ -117,10 +117,10 @@ def set_publisher(module, params):
 
     if params['origin'] is not None:
         args.append('--remove-origin=*')
-        args.extend(['--add-origin=' + u for u in params['origin']])
+        args.extend([f"--add-origin={u}" for u in params['origin']])
     if params['mirror'] is not None:
         args.append('--remove-mirror=*')
-        args.extend(['--add-mirror=' + u for u in params['mirror']])
+        args.extend([f"--add-mirror={u}" for u in params['mirror']])
 
     if params['sticky'] is not None and params['sticky']:
         args.append('--sticky')

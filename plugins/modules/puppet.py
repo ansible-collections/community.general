@@ -196,7 +196,7 @@ from ansible.module_utils.basic import AnsibleModule
 def _write_structured_data(basedir, basename, data):
     if not os.path.exists(basedir):
         os.makedirs(basedir)
-    file_path = os.path.join(basedir, "{0}.json".format(basename))
+    file_path = os.path.join(basedir, f"{basename}.json")
     # This is more complex than you might normally expect because we want to
     # open the file with only u+rw set. Also, we use the stat constants
     # because ansible still supports python 2.4 and the octal syntax changed
@@ -246,8 +246,7 @@ def main():
     if p['manifest']:
         if not os.path.exists(p['manifest']):
             module.fail_json(
-                msg="Manifest file %(manifest)s not found." % dict(
-                    manifest=p['manifest']))
+                msg=f"Manifest file {dict(manifest=p['manifest'])['manifest']} not found.")
 
     # Check if puppet is disabled here
     if not p['manifest']:
@@ -290,11 +289,11 @@ def main():
     elif rc == 124:
         # timeout
         module.exit_json(
-            rc=rc, msg="%s timed out" % ctx.cmd, stdout=stdout, stderr=stderr)
+            rc=rc, msg=f"{ctx.cmd} timed out", stdout=stdout, stderr=stderr)
     else:
         # failure
         module.fail_json(
-            rc=rc, msg="%s failed with return code: %d" % (ctx.cmd, rc),
+            rc=rc, msg=f"{ctx.cmd} failed with return code: {rc}",
             stdout=stdout, stderr=stderr)
 
 

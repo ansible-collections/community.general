@@ -152,7 +152,6 @@ import uuid
 import re
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils.common.text.converters import to_native
 
 HAS_PACKET_SDK = True
 
@@ -163,7 +162,7 @@ except ImportError:
 
 
 NAME_RE = r'({0}|{0}{1}*{0})'.format(r'[a-zA-Z0-9]', r'[a-zA-Z0-9\-]')
-HOSTNAME_RE = r'({0}\.)*{0}$'.format(NAME_RE)
+HOSTNAME_RE = rf'({NAME_RE}\.)*{NAME_RE}$'
 PROJECT_MAX_DEVICES = 100
 
 
@@ -188,7 +187,7 @@ def is_valid_uuid(myuuid):
 def get_existing_devices(module, packet_conn):
     project_id = module.params.get('project_id')
     if not is_valid_uuid(project_id):
-        raise Exception("Project ID {0} does not seem to be valid".format(project_id))
+        raise Exception(f"Project ID {project_id} does not seem to be valid")
 
     per_page = module.params.get('device_count')
     return packet_conn.list_devices(
@@ -199,12 +198,12 @@ def get_specified_device_identifiers(module):
     if module.params.get('device_id'):
         _d_id = module.params.get('device_id')
         if not is_valid_uuid(_d_id):
-            raise Exception("Device ID '{0}' does not seem to be valid".format(_d_id))
+            raise Exception(f"Device ID '{_d_id}' does not seem to be valid")
         return {'device_id': _d_id, 'hostname': None}
     elif module.params.get('hostname'):
         _hn = module.params.get('hostname')
         if not is_valid_hostname(_hn):
-            raise Exception("Hostname '{0}' does not seem to be valid".format(_hn))
+            raise Exception(f"Hostname '{_hn}' does not seem to be valid")
         return {'hostname': _hn, 'device_id': None}
     else:
         return {'hostname': None, 'device_id': None}
@@ -217,7 +216,7 @@ def parse_subnet_cidr(cidr):
     try:
         prefixlen = int(prefixlen)
     except ValueError:
-        raise Exception("Wrong prefix length in CIDR expression {0}".format(cidr))
+        raise Exception(f"Wrong prefix length in CIDR expression {cidr}")
     return addr, prefixlen
 
 
@@ -253,17 +252,16 @@ def act_on_assignment(target_state, module, packet_conn):
         hn = specified_identifier['hostname']
         matching_devices = [d for d in all_devices if d.hostname == hn]
         if len(matching_devices) > 1:
-            raise Exception("There are more than one devices matching given hostname {0}".format(hn))
+            raise Exception(f"There are more than one devices matching given hostname {hn}")
         if len(matching_devices) == 0:
-            raise Exception("There is no device matching given hostname {0}".format(hn))
+            raise Exception(f"There is no device matching given hostname {hn}")
         device = matching_devices[0]
 
     return_dict['device_id'] = device.id
     assignment_dicts = [i for i in device.ip_addresses
                         if i['address'] == address and i['cidr'] == prefixlen]
     if len(assignment_dicts) > 1:
-        raise Exception("IP address {0} is assigned more than once for device {1}".format(
-                        specified_cidr, device.hostname))
+        raise Exception(f"IP address {specified_cidr} is assigned more than once for device {device.hostname}")
 
     if target_state == "absent":
         if len(assignment_dicts) == 1:
@@ -273,7 +271,7 @@ def act_on_assignment(target_state, module, packet_conn):
     elif target_state == "present":
         if len(assignment_dicts) == 0:
             new_assignment = packet_conn.call_api(
-                "devices/{0}/ips".format(device.id), "POST", {"address": "{0}".format(specified_cidr)})
+                f"devices/{device.id}/ips", "POST", {"address": f"{specified_cidr}"})
             return_dict['changed'] = True
             return_dict['subnet'] = new_assignment
     return return_dict
@@ -306,8 +304,7 @@ def main():
         module.fail_json(msg='packet required for this module')
 
     if not module.params.get('auth_token'):
-        _fail_msg = ("if Packet API token is not in environment variable {0}, "
-                     "the auth_token parameter is required".format(PACKET_API_TOKEN_ENV_VAR))
+        _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
     auth_token = module.params.get('auth_token')
@@ -320,7 +317,7 @@ def main():
         module.exit_json(**act_on_assignment(state, module, packet_conn))
     except Exception as e:
         module.fail_json(
-            msg="failed to set IP subnet to state {0}, error: {1}".format(state, to_native(e)))
+            msg=f"failed to set IP subnet to state {state}, error: {e}")
 
 
 if __name__ == '__main__':

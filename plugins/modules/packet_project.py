@@ -172,8 +172,7 @@ def act_on_project(target_state, module, packet_conn):
         result_dict['id'] = matching_projects[0].id
     else:
         if len(matching_projects) > 1:
-            _msg = ("More than projects matched for module call with state = absent: "
-                    "{0}".format(to_native(matching_projects)))
+            _msg = f"More than projects matched for module call with state = absent: {to_native(matching_projects)}"
             module.fail_json(msg=_msg)
 
         if len(matching_projects) == 1:
@@ -184,8 +183,7 @@ def act_on_project(target_state, module, packet_conn):
             try:
                 p.delete()
             except Exception as e:
-                _msg = ("while trying to remove project {0}, id {1}, got error: {2}".format(
-                        p.name, p.id, to_native(e)))
+                _msg = f"while trying to remove project {p.name}, id {p.id}, got error: {e}"
                 module.fail_json(msg=_msg)
     return result_dict
 
@@ -215,8 +213,7 @@ def main():
         module.fail_json(msg='packet required for this module')
 
     if not module.params.get('auth_token'):
-        _fail_msg = ("if Packet API token is not in environment variable {0}, "
-                     "the auth_token parameter is required".format(PACKET_API_TOKEN_ENV_VAR))
+        _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
     auth_token = module.params.get('auth_token')
@@ -233,9 +230,9 @@ def main():
             module.exit_json(**act_on_project(state, module, packet_conn))
         except Exception as e:
             module.fail_json(
-                msg="failed to set project state {0}: {1}".format(state, to_native(e)))
+                msg=f"failed to set project state {state}: {e}")
     else:
-        module.fail_json(msg="{0} is not a valid state for this module".format(state))
+        module.fail_json(msg=f"{state} is not a valid state for this module")
 
 
 if __name__ == '__main__':
