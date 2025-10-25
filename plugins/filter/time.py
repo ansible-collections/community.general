@@ -5,6 +5,9 @@
 from __future__ import annotations
 
 import re
+
+from datetime import timedelta, datetime
+
 from ansible.errors import AnsibleFilterError
 
 
@@ -128,7 +131,33 @@ def to_years(human_time, **kwargs):
     return to_time_unit(human_time, 'y', **kwargs)
 
 
-class FilterModule(object):
+def time_delta(date_time, **kwargs):
+    ''' Return datetime after calculating time delta '''
+    if not isinstance(date_time, str):
+        raise AnsibleFilterError('time_delta accepts datetime in string format')
+    date_format = "%Y-%m-%d %H:%M:%S"
+    if 'date_format' in kwargs:
+        date_format = kwargs.get('date_format')
+
+    delta = {
+        'days': kwargs.get('days', 0),
+        'microseconds': kwargs.get('microseconds', 0),
+        'milliseconds': kwargs.get('milliseconds', 0),
+        'minutes': kwargs.get('minutes', 0),
+        'hours': kwargs.get('hours', 0),
+        'weeks': kwargs.get('weeks', 0),
+    }
+    try:
+        source_date = datetime.strptime(date_time, date_format)
+    except ValueError:
+        raise AnsibleFilterError(
+            f'Failed to parse provided string into datetime format "{date_format}" provided.'
+        )
+
+    return str(source_date + timedelta(**delta))
+
+
+class FilterModule:
     ''' Ansible time jinja2 filters '''
 
     def filters(self):
@@ -142,6 +171,7 @@ class FilterModule(object):
             'to_weeks': to_weeks,
             'to_months': to_months,
             'to_years': to_years,
+            'time_delta': time_delta,
         }
 
         return filters
