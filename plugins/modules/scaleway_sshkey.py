@@ -115,8 +115,7 @@ def core(module):
     organization_json = response.json
 
     if not response.ok:
-        module.fail_json(msg='Error getting ssh key [{0}: {1}]'.format(
-            status_code, response.json['message']))
+        module.fail_json(msg=f"Error getting ssh key [{status_code}: {response.json['message']}]")
 
     user_id = extract_user_id(organization_json)
     present_sshkeys = []
@@ -136,13 +135,12 @@ def core(module):
         present_sshkeys.append(ssh_pub_key)
         payload = sshkey_user_patch(present_sshkeys)
 
-        response = account_api.patch('/users/%s' % user_id, data=payload)
+        response = account_api.patch(f'/users/{user_id}', data=payload)
 
         if response.ok:
             module.exit_json(changed=True, data=response.json)
 
-        module.fail_json(msg='Error creating ssh key [{0}: {1}]'.format(
-            response.status_code, response.json))
+        module.fail_json(msg=f'Error creating ssh key [{response.status_code}: {response.json}]')
 
     elif state in ('absent',):
         if ssh_pub_key not in present_sshkeys:
@@ -154,13 +152,12 @@ def core(module):
         present_sshkeys.remove(ssh_pub_key)
         payload = sshkey_user_patch(present_sshkeys)
 
-        response = account_api.patch('/users/%s' % user_id, data=payload)
+        response = account_api.patch(f'/users/{user_id}', data=payload)
 
         if response.ok:
             module.exit_json(changed=True, data=response.json)
 
-        module.fail_json(msg='Error deleting ssh key [{0}: {1}]'.format(
-            response.status_code, response.json))
+        module.fail_json(msg=f'Error deleting ssh key [{response.status_code}: {response.json}]')
 
 
 def main():

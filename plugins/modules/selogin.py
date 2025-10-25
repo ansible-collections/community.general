@@ -107,7 +107,6 @@ except ImportError:
 
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def semanage_login_add(module, login, seuser, do_reload, serange='s0', sestore=''):
@@ -152,7 +151,7 @@ def semanage_login_add(module, login, seuser, do_reload, serange='s0', sestore='
                     selogin.modify(login, seuser, serange)
 
     except (ValueError, KeyError, OSError, RuntimeError) as e:
-        module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
     return change
 
@@ -190,7 +189,7 @@ def semanage_login_del(module, login, seuser, do_reload, sestore=''):
                 selogin.delete(login)
 
     except (ValueError, KeyError, OSError, RuntimeError) as e:
-        module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
     return change
 
@@ -243,7 +242,7 @@ def main():
     elif state == 'absent':
         result['changed'] = semanage_login_del(module, login, seuser, do_reload)
     else:
-        module.fail_json(msg='Invalid value of argument "state": {0}'.format(state))
+        module.fail_json(msg=f'Invalid value of argument "state": {state}')
 
     module.exit_json(**result)
 

@@ -138,7 +138,7 @@ def read_serverless_config(module):
             config = yaml.safe_load(sls_config.read())
             return config
     except IOError as e:
-        module.fail_json(msg="Could not open serverless.yml in {0}. err: {1}".format(full_path, str(e)))
+        module.fail_json(msg=f"Could not open serverless.yml in {full_path}. err: {e}")
 
 
 def get_service_name(module, stage):
@@ -147,9 +147,9 @@ def get_service_name(module, stage):
         module.fail_json(msg="Could not read `service` key from serverless.yml file")
 
     if stage:
-        return "{0}-{1}".format(config['service'], stage)
+        return f"{config['service']}-{stage}"
 
-    return "{0}-{1}".format(config['service'], config.get('stage', 'dev'))
+    return f"{config['service']}-{config.get('stage', 'dev')}"
 
 
 def main():
@@ -179,16 +179,16 @@ def main():
     serverless_bin_path = module.params.get('serverless_bin_path')
 
     if serverless_bin_path is not None:
-        command = serverless_bin_path + " "
+        command = f"{serverless_bin_path} "
     else:
-        command = module.get_bin_path("serverless") + " "
+        command = f"{module.get_bin_path('serverless')} "
 
     if state == 'present':
         command += 'deploy '
     elif state == 'absent':
         command += 'remove '
     else:
-        module.fail_json(msg="State must either be 'present' or 'absent'. Received: {0}".format(state))
+        module.fail_json(msg=f"State must either be 'present' or 'absent'. Received: {state}")
 
     if state == 'present':
         if not deploy:
@@ -197,19 +197,19 @@ def main():
             command += '--force '
 
     if region:
-        command += '--region {0} '.format(region)
+        command += f'--region {region} '
     if stage:
-        command += '--stage {0} '.format(stage)
+        command += f'--stage {stage} '
     if verbose:
         command += '--verbose '
 
     rc, out, err = module.run_command(command, cwd=service_path)
     if rc != 0:
-        if state == 'absent' and "-{0}' does not exist".format(stage) in out:
+        if state == 'absent' and f"-{stage}' does not exist" in out:
             module.exit_json(changed=False, state='absent', command=command,
                              out=out, service_name=get_service_name(module, stage))
 
-        module.fail_json(msg="Failure when executing Serverless command. Exited {0}.\nstdout: {1}\nstderr: {2}".format(rc, out, err))
+        module.fail_json(msg=f"Failure when executing Serverless command. Exited {rc}.\nstdout: {out}\nstderr: {err}")
 
     # gather some facts about the deployment
     module.exit_json(changed=True, state='present', out=out, command=command,

@@ -127,9 +127,9 @@ from ansible.module_utils.basic import AnsibleModule
 
 def get_nics_info(api, compute_id, private_network_id):
 
-    response = api.get('servers/' + compute_id + '/private_nics')
+    response = api.get(f"servers/{compute_id}/private_nics")
     if not response.ok:
-        msg = "Error during get servers information: %s: '%s' (%s)" % (response.info['msg'], response.json['message'], response.json)
+        msg = f"Error during get servers information: {response.info['msg']}: '{response.json['message']}' ({response.json})"
         api.module.fail_json(msg=msg)
 
     i = 0
@@ -155,10 +155,10 @@ def present_strategy(api, compute_id, private_network_id):
     if api.module.check_mode:
         return changed, {"status": "a private network would be add to a server"}
 
-    response = api.post(path='servers/' + compute_id + '/private_nics', data=data)
+    response = api.post(path=f"servers/{compute_id}/private_nics", data=data)
 
     if not response.ok:
-        api.module.fail_json(msg='Error when adding a private network to a server [{0}: {1}]'.format(response.status_code, response.json))
+        api.module.fail_json(msg=f'Error when adding a private network to a server [{response.status_code}: {response.json}]')
 
     return changed, response.json
 
@@ -174,11 +174,10 @@ def absent_strategy(api, compute_id, private_network_id):
     if api.module.check_mode:
         return changed, {"status": "private network would be destroyed"}
 
-    response = api.delete('servers/' + compute_id + '/private_nics/' + nic['id'])
+    response = api.delete(f"servers/{compute_id}/private_nics/{nic['id']}")
 
     if not response.ok:
-        api.module.fail_json(msg='Error deleting private network from server [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f'Error deleting private network from server [{response.status_code}: {response.json}]')
 
     return changed, response.json
 

@@ -86,19 +86,19 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 def patch_user_data(compute_api, server_id, key, value):
     compute_api.module.debug("Starting patching user_data attributes")
 
-    path = "servers/%s/user_data/%s" % (server_id, key)
+    path = f"servers/{server_id}/user_data/{key}"
     response = compute_api.patch(path=path, data=value, headers={"Content-Type": "text/plain"})
     if not response.ok:
-        msg = 'Error during user_data patching: %s %s' % (response.status_code, response.body)
+        msg = f'Error during user_data patching: {response.status_code} {response.body}'
         compute_api.module.fail_json(msg=msg)
 
     return response
 
 
 def delete_user_data(compute_api, server_id, key):
-    compute_api.module.debug("Starting deleting user_data attributes: %s" % key)
+    compute_api.module.debug(f"Starting deleting user_data attributes: {key}")
 
-    response = compute_api.delete(path="servers/%s/user_data/%s" % (server_id, key))
+    response = compute_api.delete(path=f"servers/{server_id}/user_data/{key}")
 
     if not response.ok:
         msg = 'Error during user_data deleting: (%s) %s' % response.status_code, response.body
@@ -110,10 +110,10 @@ def delete_user_data(compute_api, server_id, key):
 def get_user_data(compute_api, server_id, key):
     compute_api.module.debug("Starting patching user_data attributes")
 
-    path = "servers/%s/user_data/%s" % (server_id, key)
+    path = f"servers/{server_id}/user_data/{key}"
     response = compute_api.get(path=path)
     if not response.ok:
-        msg = 'Error during user_data patching: %s %s' % (response.status_code, response.body)
+        msg = f'Error during user_data patching: {response.status_code} {response.body}'
         compute_api.module.fail_json(msg=msg)
 
     return response.json
@@ -128,7 +128,7 @@ def core(module):
     module.params['api_url'] = SCALEWAY_LOCATION[region]["api_endpoint"]
     compute_api = Scaleway(module=module)
 
-    user_data_list = compute_api.get(path="servers/%s/user_data" % server_id)
+    user_data_list = compute_api.get(path=f"servers/{server_id}/user_data")
     if not user_data_list.ok:
         msg = 'Error during user_data fetching: %s %s' % user_data_list.status_code, user_data_list.body
         compute_api.module.fail_json(msg=msg)
@@ -148,7 +148,7 @@ def core(module):
 
             changed = True
             if compute_api.module.check_mode:
-                module.exit_json(changed=changed, msg={"status": "User-data of %s would be patched." % server_id})
+                module.exit_json(changed=changed, msg={"status": f"User-data of {server_id} would be patched."})
 
             delete_user_data(compute_api=compute_api, server_id=server_id, key=key)
 
@@ -158,7 +158,7 @@ def core(module):
 
             changed = True
             if compute_api.module.check_mode:
-                module.exit_json(changed=changed, msg={"status": "User-data of %s would be patched." % server_id})
+                module.exit_json(changed=changed, msg={"status": f"User-data of {server_id} would be patched."})
 
             patch_user_data(compute_api=compute_api, server_id=server_id, key=key, value=value)
 

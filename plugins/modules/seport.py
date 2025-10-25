@@ -128,7 +128,6 @@ except ImportError:
     HAVE_SEOBJECT = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def get_runtime_status(ignore_selinux_state=False):
@@ -229,7 +228,7 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange='s0', ses
                 seport.modify(port, proto, serange, setype)
 
     except (ValueError, IOError, KeyError, OSError, RuntimeError) as e:
-        module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
     return change
 
@@ -270,7 +269,7 @@ def semanage_port_del(module, ports, proto, setype, do_reload, sestore='', local
                     seport.delete(port, proto)
 
     except (ValueError, IOError, KeyError, OSError, RuntimeError) as e:
-        module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
     return change
 
@@ -319,7 +318,7 @@ def main():
     elif state == 'absent':
         result['changed'] = semanage_port_del(module, ports, proto, setype, do_reload, local=local)
     else:
-        module.fail_json(msg='Invalid value of argument "state": {0}'.format(state))
+        module.fail_json(msg=f'Invalid value of argument "state": {state}')
 
     module.exit_json(**result)
 

@@ -160,8 +160,7 @@ def present_strategy(api, wished_ip):
 
     response = api.get('ips')
     if not response.ok:
-        api.module.fail_json(msg='Error getting IPs [{0}: {1}]'.format(
-            response.status_code, response.json['message']))
+        api.module.fail_json(msg=f"Error getting IPs [{response.status_code}: {response.json['message']}]")
 
     ips_list = response.json["ips"]
     ip_lookup = {ip["id"]: ip for ip in ips_list}
@@ -176,9 +175,7 @@ def present_strategy(api, wished_ip):
                                      data=payload_from_wished_ip(wished_ip))
 
         if not creation_response.ok:
-            msg = "Error during ip creation: %s: '%s' (%s)" % (creation_response.info['msg'],
-                                                               creation_response.json['message'],
-                                                               creation_response.json)
+            msg = f"Error during ip creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
             api.module.fail_json(msg=msg)
         return changed, creation_response.json["ip"]
 
@@ -192,12 +189,11 @@ def present_strategy(api, wished_ip):
     if api.module.check_mode:
         return changed, {"status": "IP attributes would be changed."}
 
-    ip_patch_response = api.patch(path="ips/%s" % target_ip["id"],
+    ip_patch_response = api.patch(path=f"ips/{target_ip['id']}",
                                   data=patch_payload)
 
     if not ip_patch_response.ok:
-        api.module.fail_json(msg='Error during IP attributes update: [{0}: {1}]'.format(
-            ip_patch_response.status_code, ip_patch_response.json['message']))
+        api.module.fail_json(msg=f"Error during IP attributes update: [{ip_patch_response.status_code}: {ip_patch_response.json['message']}]")
 
     return changed, ip_patch_response.json["ip"]
 
@@ -211,8 +207,7 @@ def absent_strategy(api, wished_ip):
     ips_list = ips_json["ips"]
 
     if not response.ok:
-        api.module.fail_json(msg='Error getting IPs [{0}: {1}]'.format(
-            status_code, response.json['message']))
+        api.module.fail_json(msg=f"Error getting IPs [{status_code}: {response.json['message']}]")
 
     ip_lookup = {ip["id"]: ip for ip in ips_list}
     if wished_ip["id"] not in ip_lookup.keys():
@@ -222,10 +217,9 @@ def absent_strategy(api, wished_ip):
     if api.module.check_mode:
         return changed, {"status": "IP would be destroyed"}
 
-    response = api.delete('/ips/' + wished_ip["id"])
+    response = api.delete(f"/ips/{wished_ip['id']}")
     if not response.ok:
-        api.module.fail_json(msg='Error deleting IP [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f'Error deleting IP [{response.status_code}: {response.json}]')
 
     return changed, response.json
 

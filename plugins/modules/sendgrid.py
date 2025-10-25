@@ -155,7 +155,7 @@ def post_sendgrid_api(module, username, password, from_address, to_addresses,
         to_addresses_api = ''
         for recipient in to_addresses:
             recipient = to_bytes(recipient, errors='surrogate_or_strict')
-            to_addresses_api += '&to[]=%s' % recipient
+            to_addresses_api += f'&to[]={recipient}'
         encoded_data += to_addresses_api
 
         headers = {'User-Agent': AGENT,
@@ -194,7 +194,7 @@ def post_sendgrid_api(module, username, password, from_address, to_addresses,
                 message.add_attachment(name, f)
 
         if from_name:
-            message.set_from('%s <%s.' % (from_name, from_address))
+            message.set_from(f'{from_name} <{from_address}.')
         else:
             message.set_from(from_address)
 
@@ -262,10 +262,10 @@ def main():
 
     if not HAS_SENDGRID:
         if info['status'] != 200:
-            module.fail_json(msg="unable to send email through SendGrid API: %s" % info['msg'])
+            module.fail_json(msg=f"unable to send email through SendGrid API: {info['msg']}")
     else:
         if response != 200:
-            module.fail_json(msg="unable to send email through SendGrid API: %s" % info['message'])
+            module.fail_json(msg=f"unable to send email through SendGrid API: {info['message']}")
 
     module.exit_json(msg=subject, changed=False)
 

@@ -125,7 +125,7 @@ def get_private_network(api, name, page=1):
     page_size = 10
     response = api.get('private-networks', params={'name': name, 'order_by': 'name_asc', 'page': page, 'page_size': page_size})
     if not response.ok:
-        msg = "Error during get private network creation: %s: '%s' (%s)" % (response.info['msg'], response.json['message'], response.json)
+        msg = f"Error during get private network creation: {response.info['msg']}: '{response.json['message']}' ({response.json})"
         api.module.fail_json(msg=msg)
 
     if response.json['total_count'] == 0:
@@ -160,9 +160,9 @@ def present_strategy(api, wished_private_network):
             if api.module.check_mode:
                 return changed, {"status": "private network would be updated"}
 
-            response = api.patch(path='private-networks/' + private_network['id'], data=data)
+            response = api.patch(path=f"private-networks/{private_network['id']}", data=data)
             if not response.ok:
-                api.module.fail_json(msg='Error updating private network [{0}: {1}]'.format(response.status_code, response.json))
+                api.module.fail_json(msg=f'Error updating private network [{response.status_code}: {response.json}]')
 
             return changed, response.json
 
@@ -179,7 +179,7 @@ def present_strategy(api, wished_private_network):
     response = api.post(path='private-networks/', data=data)
 
     if not response.ok:
-        api.module.fail_json(msg='Error creating private network [{0}: {1}]'.format(response.status_code, response.json))
+        api.module.fail_json(msg=f'Error creating private network [{response.status_code}: {response.json}]')
 
     return changed, response.json
 
@@ -195,11 +195,10 @@ def absent_strategy(api, wished_private_network):
     if api.module.check_mode:
         return changed, {"status": "private network would be destroyed"}
 
-    response = api.delete('private-networks/' + private_network['id'])
+    response = api.delete(f"private-networks/{private_network['id']}")
 
     if not response.ok:
-        api.module.fail_json(msg='Error deleting private network [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f'Error deleting private network [{response.status_code}: {response.json}]')
 
     return changed, response.json
 

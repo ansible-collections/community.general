@@ -161,10 +161,9 @@ def absent_strategy(api, wished_cr):
         return changed, {"status": "Container registry would be destroyed"}
 
     api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES, force_wait=True)
-    response = api.delete(path=api.api_path + "/%s" % target_cr["id"])
+    response = api.delete(path=f"{api.api_path}/{target_cr['id']}")
     if not response.ok:
-        api.module.fail_json(msg='Error deleting container registry [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f'Error deleting container registry [{response.status_code}: {response.json}]')
 
     api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES)
     return changed, response.json
@@ -189,13 +188,11 @@ def present_strategy(api, wished_cr):
                                      data=payload_cr)
 
         if not creation_response.ok:
-            msg = "Error during container registry creation: %s: '%s' (%s)" % (creation_response.info['msg'],
-                                                                               creation_response.json['message'],
-                                                                               creation_response.json)
+            msg = f"Error during container registry creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
             api.module.fail_json(msg=msg)
 
         api.wait_to_complete_state_transition(resource=creation_response.json, stable_states=STABLE_STATES)
-        response = api.get(path=api.api_path + "/%s" % creation_response.json["id"])
+        response = api.get(path=f"{api.api_path}/{creation_response.json['id']}")
         return changed, response.json
 
     target_cr = cr_lookup[wished_cr["name"]]
@@ -211,15 +208,14 @@ def present_strategy(api, wished_cr):
     if api.module.check_mode:
         return changed, {"status": "Container registry attributes would be changed."}
 
-    cr_patch_response = api.patch(path=api.api_path + "/%s" % target_cr["id"],
+    cr_patch_response = api.patch(path=f"{api.api_path}/{target_cr['id']}",
                                   data=patch_payload)
 
     if not cr_patch_response.ok:
-        api.module.fail_json(msg='Error during container registry attributes update: [{0}: {1}]'.format(
-            cr_patch_response.status_code, cr_patch_response.json['message']))
+        api.module.fail_json(msg=f"Error during container registry attributes update: [{cr_patch_response.status_code}: {cr_patch_response.json['message']}]")
 
     api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES)
-    response = api.get(path=api.api_path + "/%s" % target_cr["id"])
+    response = api.get(path=f"{api.api_path}/{target_cr['id']}")
     return changed, response.json
 
 
@@ -240,7 +236,7 @@ def core(module):
     }
 
     api = Scaleway(module=module)
-    api.api_path = "registry/v1/regions/%s/namespaces" % region
+    api.api_path = f"registry/v1/regions/{region}/namespaces"
 
     changed, summary = state_strategy[wished_container_registry["state"]](api=api, wished_cr=wished_container_registry)
 

@@ -102,18 +102,15 @@ def info_strategy(api, wished_cn):
     cn_lookup = {cn["name"]: cn for cn in cn_list}
 
     if wished_cn["name"] not in cn_lookup:
-        msg = "Error during container lookup: Unable to find container named '%s' in namespace '%s'" % (wished_cn["name"],
-                                                                                                        wished_cn["namespace_id"])
+        msg = f"Error during container lookup: Unable to find container named '{wished_cn['name']}' in namespace '{wished_cn['namespace_id']}'"
 
         api.module.fail_json(msg=msg)
 
     target_cn = cn_lookup[wished_cn["name"]]
 
-    response = api.get(path=api.api_path + "/%s" % target_cn["id"])
+    response = api.get(path=f"{api.api_path}/{target_cn['id']}")
     if not response.ok:
-        msg = "Error during container lookup: %s: '%s' (%s)" % (response.info['msg'],
-                                                                response.json['message'],
-                                                                response.json)
+        msg = f"Error during container lookup: {response.info['msg']}: '{response.json['message']}' ({response.json})"
         api.module.fail_json(msg=msg)
 
     return response.json
@@ -127,7 +124,7 @@ def core(module):
     }
 
     api = Scaleway(module=module)
-    api.api_path = "containers/v1beta1/regions/%s/containers" % region
+    api.api_path = f"containers/v1beta1/regions/{region}/containers"
 
     summary = info_strategy(api=api, wished_cn=wished_container)
 

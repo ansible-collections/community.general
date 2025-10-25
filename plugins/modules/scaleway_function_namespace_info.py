@@ -93,18 +93,15 @@ def info_strategy(api, wished_fn):
     fn_lookup = {fn["name"]: fn for fn in fn_list}
 
     if wished_fn["name"] not in fn_lookup:
-        msg = "Error during function namespace lookup: Unable to find function namespace named '%s' in project '%s'" % (wished_fn["name"],
-                                                                                                                        wished_fn["project_id"])
+        msg = f"Error during function namespace lookup: Unable to find function namespace named '{wished_fn['name']}' in project '{wished_fn['project_id']}'"
 
         api.module.fail_json(msg=msg)
 
     target_fn = fn_lookup[wished_fn["name"]]
 
-    response = api.get(path=api.api_path + "/%s" % target_fn["id"])
+    response = api.get(path=f"{api.api_path}/{target_fn['id']}")
     if not response.ok:
-        msg = "Error during function namespace lookup: %s: '%s' (%s)" % (response.info['msg'],
-                                                                         response.json['message'],
-                                                                         response.json)
+        msg = f"Error during function namespace lookup: {response.info['msg']}: '{response.json['message']}' ({response.json})"
         api.module.fail_json(msg=msg)
 
     return response.json
@@ -118,7 +115,7 @@ def core(module):
     }
 
     api = Scaleway(module=module)
-    api.api_path = "functions/v1beta1/regions/%s/namespaces" % region
+    api.api_path = f"functions/v1beta1/regions/{region}/namespaces"
 
     summary = info_strategy(api=api, wished_fn=wished_function_namespace)
 
