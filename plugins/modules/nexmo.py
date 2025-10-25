@@ -89,7 +89,7 @@ def send_msg(module):
     }
     for number in module.params.get('dest'):
         msg['to'] = number
-        url = "%s?%s" % (NEXMO_API, urlencode(msg))
+        url = f"{NEXMO_API}?{urlencode(msg)}"
 
         headers = dict(Accept='application/json')
         response, info = fetch_url(module, url, headers=headers)

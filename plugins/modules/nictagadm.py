@@ -137,11 +137,11 @@ class NicTag(object):
 
         if self.mtu:
             cmd.append('-p')
-            cmd.append('mtu=' + str(self.mtu))
+            cmd.append(f"mtu={self.mtu}")
 
         if self.mac:
             cmd.append('-p')
-            cmd.append('mac=' + str(self.mac))
+            cmd.append(f"mac={self.mac}")
 
         cmd.append(self.name)
 

@@ -514,7 +514,7 @@ def create_load_balancer(module, oneandone_conn):
             datacenter_id = get_datacenter(oneandone_conn, datacenter)
             if datacenter_id is None:
                 module.fail_json(
-                    msg='datacenter %s not found.' % datacenter)
+                    msg=f'datacenter {datacenter} not found.')
 
         for rule in rules:
             load_balancer_rule = oneandone.client.LoadBalancerRule(
@@ -660,7 +660,7 @@ def main():
                       'persistence_time', 'method', 'rules'):
             if not module.params.get(param):
                 module.fail_json(
-                    msg="%s parameter is required for new load balancers." % param)
+                    msg=f"{param} parameter is required for new load balancers.")
         try:
             (changed, load_balancer) = create_load_balancer(module, oneandone_conn)
         except Exception as ex:
