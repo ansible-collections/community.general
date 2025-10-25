@@ -20,6 +20,11 @@ options:
     required: true
     type: list
     elements: string
+  exclude:
+    description:
+      - A regular expression string to exclude files. Applies to the base name of the file or directory.
+    type: str
+    version_added: 12.0.0
 """
 
 EXAMPLES = r"""
@@ -55,6 +60,11 @@ EXAMPLES = r"""
 - name: list all files under web/
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.filetree', 'web/') }}"
+
+- name: list all files under web/; exclude .git and .node_modules
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.filetree', 'web/', exclude='^(\.git|\.node_modules)$') }}
 """
 
 RETURN = r"""
@@ -118,6 +128,7 @@ import os
 import pwd
 import grp
 import stat
+import re
 
 HAVE_SELINUX = False
 try:
@@ -206,6 +217,10 @@ class LookupModule(LookupBase):
 
         basedir = self.get_basedir(variables)
 
+        # Regular expression for exclude
+        exclude = self.get_option('exclude')
+        exclude_pattern = re.compile(exclude) if exclude else None
+
         ret = []
         for term in terms:
             term_file = os.path.basename(term)
@@ -213,6 +228,12 @@ class LookupModule(LookupBase):
             path = os.path.join(dwimmed_path, term_file)
             display.debug(f"Walking '{path}'")
             for root, dirs, files in os.walk(path, topdown=True):
+
+                # Filter files and directories using a regular expression
+                if exclude_pattern is not None:
+                    dirs[:] = [d for d in dirs if not exclude_pattern.match(d)]
+                    files[:] = [f for f in files if not exclude_pattern.match(f)]
+
                 for entry in dirs + files:
                     relpath = os.path.relpath(os.path.join(root, entry), path)
 
