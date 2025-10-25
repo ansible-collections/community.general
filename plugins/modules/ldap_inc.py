@@ -202,7 +202,7 @@ def main():
                     result = mod.connection.search_ext_s(
                         base=mod.dn,
                         scope=ldap.SCOPE_BASE,
-                        filterstr="(%s=*)" % mod.attr,
+                        filterstr=f"({mod.attr}=*)",
                         attrlist=[mod.attr])
                     if len(result) != 1:
                         module.fail_json(msg="The entry does not exist or does not contain the specified attribute.")
@@ -216,14 +216,14 @@ def main():
                         break
                     except ldap.NO_SUCH_ATTRIBUTE:
                         if tries == max_tries:
-                            module.fail_json(msg="The increment could not be applied after " + str(max_tries) + " tries.")
+                            module.fail_json(msg=f"The increment could not be applied after {max_tries} tries.")
                             return
 
         else:
             result = mod.connection.search_ext_s(
                 base=mod.dn,
                 scope=ldap.SCOPE_BASE,
-                filterstr="(%s=*)" % mod.attr,
+                filterstr=f"({mod.attr}=*)",
                 attrlist=[mod.attr])
             if len(result) == 1:
                 ret = str(int(result[0][1][mod.attr][0]) + mod.increment)

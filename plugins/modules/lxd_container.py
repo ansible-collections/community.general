@@ -479,10 +479,10 @@ class LXDContainerManagement(object):
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
-            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
+            self.key_file = f"{os.environ['HOME']}/.config/lxc/client.key"
         self.cert_file = self.module.params.get('client_cert')
         if self.cert_file is None:
-            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
+            self.cert_file = f"{os.environ['HOME']}/.config/lxc/client.crt"
         self.debug = self.module._verbosity >= 4
 
         try:
@@ -506,7 +506,7 @@ class LXDContainerManagement(object):
         # LXD (3.19) Rest API provides instances endpoint, failback to containers and virtual-machines
         # https://documentation.ubuntu.com/lxd/en/latest/rest-api/#instances-containers-and-virtual-machines
         self.api_endpoint = '/1.0/instances'
-        check_api_endpoint = self.client.do('GET', '{0}?project='.format(self.api_endpoint), ok_error_codes=[404])
+        check_api_endpoint = self.client.do('GET', f'{self.api_endpoint}?project=', ok_error_codes=[404])
 
         if check_api_endpoint['error_code'] == 404:
             if self.type == 'container':
@@ -528,15 +528,15 @@ class LXDContainerManagement(object):
                 self.config[attr] = param_val
 
     def _get_instance_json(self):
-        url = '{0}/{1}'.format(self.api_endpoint, self.name)
+        url = f'{self.api_endpoint}/{self.name}'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         return self.client.do('GET', url, ok_error_codes=[404])
 
     def _get_instance_state_json(self):
-        url = '{0}/{1}/state'.format(self.api_endpoint, self.name)
+        url = f'{self.api_endpoint}/{self.name}/state'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         return self.client.do('GET', url, ok_error_codes=[404])
 
     @staticmethod
@@ -546,9 +546,9 @@ class LXDContainerManagement(object):
         return ANSIBLE_LXD_STATES[resp_json['metadata']['status']]
 
     def _change_state(self, action, force_stop=False):
-        url = '{0}/{1}/state'.format(self.api_endpoint, self.name)
+        url = f'{self.api_endpoint}/{self.name}/state'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
@@ -563,7 +563,7 @@ class LXDContainerManagement(object):
         if self.project:
             url_params['project'] = self.project
         if url_params:
-            url = '{0}?{1}'.format(url, urlencode(url_params))
+            url = f'{url}?{urlencode(url_params)}'
         config = self.config.copy()
         config['name'] = self.name
         if self.type not in self.api_endpoint:
@@ -585,9 +585,9 @@ class LXDContainerManagement(object):
         self.actions.append('restart')
 
     def _delete_instance(self):
-        url = '{0}/{1}'.format(self.api_endpoint, self.name)
+        url = f'{self.api_endpoint}/{self.name}'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         if not self.module.check_mode:
             self.client.do('DELETE', url)
         self.actions.append('delete')
@@ -732,9 +732,9 @@ class LXDContainerManagement(object):
                 else:
                     body_json[param] = self.config[param]
         self.diff['after']['instance'] = body_json
-        url = '{0}/{1}'.format(self.api_endpoint, self.name)
+        url = f'{self.api_endpoint}/{self.name}'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         if not self.module.check_mode:
             self.client.do('PUT', url, body_json=body_json)
         self.actions.append('apply_instance_configs')

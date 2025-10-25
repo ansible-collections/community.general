@@ -129,9 +129,9 @@ def get_facts(args=None):
         retvals['failed'] = has_failed
         retvals['msg'] = msg
         if response.status_code is not None:
-            retvals['stderr'] = "API returned an error: {0}" . format(response.status_code)
+            retvals['stderr'] = f"API returned an error: {response.status_code}"
         else:
-            retvals['stderr'] = "{0}" . format(response.stderr)
+            retvals['stderr'] = f"{response.stderr}"
         return retvals
 
     # we don't want to return the same thing twice

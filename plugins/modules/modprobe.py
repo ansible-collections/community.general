@@ -107,9 +107,9 @@ class Modprobe(object):
 
         self.changed = False
 
-        self.re_find_module = re.compile(r'^ *{0} *(?:[#;].*)?\n?\Z'.format(self.name))
-        self.re_find_params = re.compile(r'^options {0} \w+=\S+ *(?:[#;].*)?\n?\Z'.format(self.name))
-        self.re_get_params_and_values = re.compile(r'^options {0} (\w+=\S+) *(?:[#;].*)?\n?\Z'.format(self.name))
+        self.re_find_module = re.compile(rf'^ *{self.name} *(?:[#;].*)?\n?\Z')
+        self.re_find_params = re.compile(rf'^options {self.name} \w+=\S+ *(?:[#;].*)?\n?\Z')
+        self.re_get_params_and_values = re.compile(rf'^options {self.name} (\w+=\S+) *(?:[#;].*)?\n?\Z')
 
     def load_module(self):
         command = [self.modprobe_bin]
@@ -162,20 +162,19 @@ class Modprobe(object):
 
     def create_module_file(self):
         file_path = os.path.join(MODULES_LOAD_LOCATION,
-                                 self.name + '.conf')
+                                 f"{self.name}.conf")
         if not self.check_mode:
             with open(file_path, 'w') as file:
-                file.write(self.name + '\n')
+                file.write(f"{self.name}\n")
 
     @property
     def module_options_file_content(self):
-        file_content = ['options {0} {1}'.format(self.name, param)
-                        for param in self.params.split()]
-        return '\n'.join(file_content) + '\n'
+        file_content = '\n'.join([f'options {self.name} {param}' for param in self.params.split()])
+        return f"{file_content}\n"
 
     def create_module_options_file(self):
         new_file_path = os.path.join(PARAMETERS_FILES_LOCATION,
-                                     self.name + '.conf')
+                                     f"{self.name}.conf")
         if not self.check_mode:
             with open(new_file_path, 'w') as file:
                 file.write(self.module_options_file_content)
@@ -189,7 +188,7 @@ class Modprobe(object):
             content_changed = False
             for index, line in enumerate(file_content):
                 if self.re_find_params.match(line):
-                    file_content[index] = '#' + line
+                    file_content[index] = f"#{line}"
                     content_changed = True
 
             if not self.check_mode and content_changed:
@@ -205,7 +204,7 @@ class Modprobe(object):
             content_changed = False
             for index, line in enumerate(file_content):
                 if self.re_find_module.match(line):
-                    file_content[index] = '#' + line
+                    file_content[index] = f"#{line}"
                     content_changed = True
 
             if not self.check_mode and content_changed:
@@ -252,14 +251,14 @@ class Modprobe(object):
         is_loaded = False
         try:
             with open('/proc/modules') as modules:
-                module_name = self.name.replace('-', '_') + ' '
+                module_name = f"{self.name.replace('-', '_')} "
                 for line in modules:
                     if line.startswith(module_name):
                         is_loaded = True
                         break
 
             if not is_loaded:
-                module_file = '/' + self.name + '.ko'
+                module_file = f"/{self.name}.ko"
                 builtin_path = os.path.join('/lib/modules/', RELEASE_VER, 'modules.builtin')
                 with open(builtin_path) as builtins:
                     for line in builtins:

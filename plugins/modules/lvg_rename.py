@@ -82,15 +82,15 @@ class LvgRename(object):
 
         if old_vg_exists:
             if new_vg_exists:
-                self.module.fail_json(msg='The new VG name (%s) is already in use.' % (self.vg_new))
+                self.module.fail_json(msg=f'The new VG name ({self.vg_new}) is already in use.')
             else:
                 self._rename_vg()
         else:
             if new_vg_exists:
-                self.result['msg'] = 'The new VG (%s) already exists, nothing to do.' % (self.vg_new)
+                self.result['msg'] = f'The new VG ({self.vg_new}) already exists, nothing to do.'
                 self.module.exit_json(**self.result)
             else:
-                self.module.fail_json(msg='Both current (%s) and new (%s) VG are missing.' % (self.vg, self.vg_new))
+                self.module.fail_json(msg=f'Both current ({self.vg}) and new ({self.vg_new}) VG are missing.')
 
         self.module.exit_json(**self.result)
 
@@ -141,7 +141,7 @@ class LvgRename(object):
             self.result['diff'] = {'before': {'vg': self.vg}, 'after': {'vg': self.vg_new}}
 
         if self.module.check_mode:
-            self.result['msg'] = "Running in check mode. The module would rename VG %s to %s." % (self.vg, self.vg_new)
+            self.result['msg'] = f"Running in check mode. The module would rename VG {self.vg} to {self.vg_new}."
             self.result['changed'] = True
         else:
             vgrename_cmd_with_opts = [vgrename_cmd, self.vg, self.vg_new]

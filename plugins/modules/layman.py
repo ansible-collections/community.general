@@ -125,13 +125,13 @@ def download_url(module, url, dest):
     module.params['http_agent'] = USERAGENT
     response, info = fetch_url(module, url)
     if info['status'] != 200:
-        raise ModuleError("Failed to get %s: %s" % (url, info['msg']))
+        raise ModuleError(f"Failed to get {url}: {info['msg']}")
 
     try:
         with open(dest, 'w') as f:
             shutil.copyfileobj(response, f)
     except IOError as e:
-        raise ModuleError("Failed to write: %s" % str(e))
+        raise ModuleError(f"Failed to write: {e}")
 
 
 def install_overlay(module, name, list_url=None):
@@ -156,16 +156,15 @@ def install_overlay(module, name, list_url=None):
         return False
 
     if module.check_mode:
-        mymsg = 'Would add layman repo \'' + name + '\''
+        mymsg = f"Would add layman repo '{name}'"
         module.exit_json(changed=True, msg=mymsg)
 
     if not layman.is_repo(name):
         if not list_url:
-            raise ModuleError("Overlay '%s' is not on the list of known "
-                              "overlays and URL of the remote list was not provided." % name)
+            raise ModuleError(f"Overlay '{name}' is not on the list of known overlays and URL of the remote list was not provided.")
 
         overlay_defs = layman_conf.get_option('overlay_defs')
-        dest = path.join(overlay_defs, name + '.xml')
+        dest = path.join(overlay_defs, f"{name}.xml")
 
         download_url(module, list_url, dest)
 
@@ -193,7 +192,7 @@ def uninstall_overlay(module, name):
         return False
 
     if module.check_mode:
-        mymsg = 'Would remove layman repo \'' + name + '\''
+        mymsg = f"Would remove layman repo '{name}'"
         module.exit_json(changed=True, msg=mymsg)
 
     layman.delete_repos(name)

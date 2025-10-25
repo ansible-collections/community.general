@@ -87,12 +87,12 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
         return StatusValue(self.value, True)
 
     def __getattr__(self, item):
-        if item in ('is_%s' % status for status in self.ALL_STATUS):
+        if item in (f'is_{status}' for status in self.ALL_STATUS):
             return self.value == getattr(self, item[3:].upper())
         raise AttributeError(item)
 
     def __str__(self):
-        return "%s%s" % (self.value, " (pending)" if self.is_pending else "")
+        return f"{self.value}{' (pending)' if self.is_pending else ''}"
 
 
 class Status(object):
@@ -157,7 +157,7 @@ class Monit(object):
 
     def _parse_status(self, output, err):
         escaped_monit_services = '|'.join([re.escape(x) for x in MONIT_SERVICES])
-        pattern = "(%s) '%s'" % (escaped_monit_services, re.escape(self.process_name))
+        pattern = f"({escaped_monit_services}) '{re.escape(self.process_name)}'"
         if not re.search(pattern, output, re.IGNORECASE):
             return Status.MISSING
 
@@ -173,7 +173,7 @@ class Monit(object):
             try:
                 return getattr(Status, status_val)
             except AttributeError:
-                self.module.warn("Unknown monit status '%s', treating as execution failed" % status_val)
+                self.module.warn(f"Unknown monit status '{status_val}', treating as execution failed")
                 return Status.EXECUTION_FAILED
         else:
             status_val, substatus = status_val.split(' - ')
@@ -190,7 +190,7 @@ class Monit(object):
     def is_process_present(self):
         command = [self.monit_bin_path, 'summary'] + self.command_args
         rc, out, err = self.module.run_command(command, check_rc=True)
-        return bool(re.findall(r'\b%s\b' % self.process_name, out))
+        return bool(re.findall(rf'\b{self.process_name}\b', out))
 
     def is_process_running(self):
         return self.get_status().is_ok
@@ -262,7 +262,7 @@ class Monit(object):
             status_match = not status_match
         if status_match:
             self.exit_success(state=state)
-        self.exit_fail('%s process not %s' % (self.process_name, state), status)
+        self.exit_fail(f'{self.process_name} process not {state}', status)
 
     def stop(self):
         self.change_state('stopped', Status.NOT_MONITORED)
@@ -306,7 +306,7 @@ def main():
     present = monit.is_process_present()
 
     if not present and not state == 'present':
-        module.fail_json(msg='%s process not presently configured with monit' % name, name=name)
+        module.fail_json(msg=f'{name} process not presently configured with monit', name=name)
 
     if state == 'present':
         if present:

@@ -127,7 +127,6 @@ from abc import ABCMeta, abstractmethod
 from time import sleep
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class ServiceState:
@@ -156,15 +155,13 @@ class Plist:
         if filename is not None:
             self.__filename = filename
         else:
-            self.__filename = '%s.plist' % service
+            self.__filename = f'{service}.plist'
 
         state, pid, dummy, dummy = LaunchCtlList(module, self.__service).run()
 
         self.__file = self.__find_service_plist(self.__filename)
         if self.__file is None:
-            msg = 'Unable to find the plist file %s for service %s' % (
-                self.__filename, self.__service,
-            )
+            msg = f'Unable to find the plist file {self.__filename} for service {self.__service}'
             if pid is None and state == ServiceState.UNLOADED:
                 msg += ' and it was not found among active services'
             module.fail_json(msg=msg)
@@ -202,8 +199,7 @@ class Plist:
             with open(self.__file, 'rb') as plist_fp:
                 service_plist = plistlib.load(plist_fp)
         except Exception as e:
-            module.fail_json(msg="Failed to read plist file "
-                                 "%s due to %s" % (self.__file, to_native(e)))
+            module.fail_json(msg=f"Failed to read plist file {self.__file} due to {e}")
         return service_plist
 
     def __write_plist_file(self, module, service_plist=None):
@@ -214,8 +210,7 @@ class Plist:
             with open(self.__file, 'wb') as plist_fp:
                 plistlib.dump(service_plist, plist_fp)
         except Exception as e:
-            module.fail_json(msg="Failed to write to plist file "
-                                 " %s due to %s" % (self.__file, to_native(e)))
+            module.fail_json(msg=f"Failed to write to plist file  {self.__file} due to {e}")
 
     def __handle_param_enabled(self, module):
         if module.params['enabled'] is not None:
@@ -282,7 +277,7 @@ class LaunchCtlTask(metaclass=ABCMeta):
         rc, out, err = self._launchctl("list")
         if rc != 0:
             self._module.fail_json(
-                msg='Failed to get status of %s' % (self._launch))
+                msg=f'Failed to get status of {self._launch}')
 
         state = ServiceState.UNLOADED
         service_pid = "-"
@@ -348,11 +343,10 @@ class LaunchCtlTask(metaclass=ABCMeta):
             'load', 'unload'] else self._service if command in ['start', 'stop'] else ""
 
         rc, out, err = self._module.run_command(
-            '%s %s %s' % (self._launch, command, service_or_plist))
+            f'{self._launch} {command} {service_or_plist}')
 
         if rc != 0:
-            msg = "Unable to %s '%s' (%s): '%s'" % (
-                command, self._service, self._plist.get_file(), err)
+            msg = f"Unable to {command} '{self._service}' ({self._plist.get_file()}): '{err}'"
             self._module.fail_json(msg=msg)
 
         return (rc, out, err)

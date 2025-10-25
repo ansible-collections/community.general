@@ -155,7 +155,7 @@ def query_port(module, port_path, name, state="present"):
 
         rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
-        if rc == 0 and out.strip().startswith(name + " "):
+        if rc == 0 and out.strip().startswith(f"{name} "):
             return True
 
         return False
@@ -184,13 +184,13 @@ def remove_ports(module, port_path, ports, stdout, stderr):
         stdout += out
         stderr += err
         if query_port(module, port_path, port):
-            module.fail_json(msg="Failed to remove %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to remove {port}: {err}", stdout=stdout, stderr=stderr)
 
         remove_c += 1
 
     if remove_c > 0:
 
-        module.exit_json(changed=True, msg="Removed %s port(s)" % remove_c, stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Removed {remove_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already absent", stdout=stdout, stderr=stderr)
 
@@ -208,12 +208,12 @@ def install_ports(module, port_path, ports, variant, stdout, stderr):
         stdout += out
         stderr += err
         if not query_port(module, port_path, port):
-            module.fail_json(msg="Failed to install %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to install {port}: {err}", stdout=stdout, stderr=stderr)
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="Installed %s port(s)" % (install_c), stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Installed {install_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already present", stdout=stdout, stderr=stderr)
 
@@ -225,7 +225,7 @@ def activate_ports(module, port_path, ports, stdout, stderr):
 
     for port in ports:
         if not query_port(module, port_path, port):
-            module.fail_json(msg="Failed to activate %s, port(s) not present" % (port), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to activate {port}, port(s) not present", stdout=stdout, stderr=stderr)
 
         if query_port(module, port_path, port, state="active"):
             continue
@@ -235,12 +235,12 @@ def activate_ports(module, port_path, ports, stdout, stderr):
         stderr += err
 
         if not query_port(module, port_path, port, state="active"):
-            module.fail_json(msg="Failed to activate %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to activate {port}: {err}", stdout=stdout, stderr=stderr)
 
         activate_c += 1
 
     if activate_c > 0:
-        module.exit_json(changed=True, msg="Activated %s port(s)" % (activate_c), stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Activated {activate_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already active", stdout=stdout, stderr=stderr)
 
@@ -252,7 +252,7 @@ def deactivate_ports(module, port_path, ports, stdout, stderr):
 
     for port in ports:
         if not query_port(module, port_path, port):
-            module.fail_json(msg="Failed to deactivate %s, port(s) not present" % (port), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to deactivate {port}, port(s) not present", stdout=stdout, stderr=stderr)
 
         if not query_port(module, port_path, port, state="active"):
             continue
@@ -261,12 +261,12 @@ def deactivate_ports(module, port_path, ports, stdout, stderr):
         stdout += out
         stderr += err
         if query_port(module, port_path, port, state="active"):
-            module.fail_json(msg="Failed to deactivate %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to deactivate {port}: {err}", stdout=stdout, stderr=stderr)
 
         deactivated_c += 1
 
     if deactivated_c > 0:
-        module.exit_json(changed=True, msg="Deactivated %s port(s)" % (deactivated_c), stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Deactivated {deactivated_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already inactive", stdout=stdout, stderr=stderr)
 

@@ -256,10 +256,10 @@ class LXDProfileManagement(object):
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
-            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
+            self.key_file = f"{os.environ['HOME']}/.config/lxc/client.key"
         self.cert_file = self.module.params.get('client_cert')
         if self.cert_file is None:
-            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
+            self.cert_file = f"{os.environ['HOME']}/.config/lxc/client.crt"
         self.debug = self.module._verbosity >= 4
 
         try:
@@ -290,9 +290,9 @@ class LXDProfileManagement(object):
                 self.config[attr] = param_val
 
     def _get_profile_json(self):
-        url = '/1.0/profiles/{0}'.format(self.name)
+        url = f'/1.0/profiles/{self.name}'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         return self.client.do('GET', url, ok_error_codes=[404])
 
     @staticmethod
@@ -327,16 +327,16 @@ class LXDProfileManagement(object):
     def _create_profile(self):
         url = '/1.0/profiles'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         config = self.config.copy()
         config['name'] = self.name
         self.client.do('POST', url, config)
         self.actions.append('create')
 
     def _rename_profile(self):
-        url = '/1.0/profiles/{0}'.format(self.name)
+        url = f'/1.0/profiles/{self.name}'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         config = {'name': self.new_name}
         self.client.do('POST', url, config)
         self.actions.append('rename')
@@ -445,16 +445,16 @@ class LXDProfileManagement(object):
             config = self._generate_new_config(config)
 
         # upload config to lxd
-        url = '/1.0/profiles/{0}'.format(self.name)
+        url = f'/1.0/profiles/{self.name}'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         self.client.do('PUT', url, config)
         self.actions.append('apply_profile_configs')
 
     def _delete_profile(self):
-        url = '/1.0/profiles/{0}'.format(self.name)
+        url = f'/1.0/profiles/{self.name}'
         if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+            url = f'{url}?{urlencode(dict(project=self.project))}'
         self.client.do('DELETE', url)
         self.actions.append('delete')
 

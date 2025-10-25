@@ -116,29 +116,29 @@ def db_exists(conn, cursor, db):
 
 
 def db_create(conn, cursor, db):
-    cursor.execute("CREATE DATABASE [%s]" % db)
+    cursor.execute(f"CREATE DATABASE [{db}]")
     return db_exists(conn, cursor, db)
 
 
 def db_delete(conn, cursor, db):
     try:
-        cursor.execute("ALTER DATABASE [%s] SET single_user WITH ROLLBACK IMMEDIATE" % db)
+        cursor.execute(f"ALTER DATABASE [{db}] SET single_user WITH ROLLBACK IMMEDIATE")
     except Exception:
         pass
-    cursor.execute("DROP DATABASE [%s]" % db)
+    cursor.execute(f"DROP DATABASE [{db}]")
     return not db_exists(conn, cursor, db)
 
 
 def db_import(conn, cursor, module, db, target):
     if os.path.isfile(target):
         with open(target, 'r') as backup:
-            sqlQuery = "USE [%s]\n" % db
+            sqlQuery = f"USE [{db}]\n"
             for line in backup:
                 if line is None:
                     break
                 elif line.startswith('GO'):
                     cursor.execute(sqlQuery)
-                    sqlQuery = "USE [%s]\n" % db
+                    sqlQuery = f"USE [{db}]\n"
                 else:
                     sqlQuery += line
             cursor.execute(sqlQuery)
@@ -178,7 +178,7 @@ def main():
 
     login_querystring = login_host
     if login_port != "1433":
-        login_querystring = "%s:%s" % (login_host, login_port)
+        login_querystring = f"{login_host}:{login_port}"
 
     if login_user != "" and login_password == "":
         module.fail_json(msg="when supplying login_user arguments login_password must be provided")
@@ -189,7 +189,7 @@ def main():
     except Exception as e:
         if "Unknown database" in str(e):
             errno, errstr = e.args
-            module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
+            module.fail_json(msg=f"ERROR: {errno} {errstr}")
         else:
             module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
                                  "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
@@ -202,7 +202,7 @@ def main():
             try:
                 changed = db_delete(conn, cursor, db)
             except Exception as e:
-                module.fail_json(msg="error deleting database: " + str(e))
+                module.fail_json(msg=f"error deleting database: {e}")
         elif state == "import":
             conn.autocommit(autocommit)
             rc, stdout, stderr = db_import(conn, cursor, module, db, target)
@@ -216,12 +216,12 @@ def main():
             try:
                 changed = db_create(conn, cursor, db)
             except Exception as e:
-                module.fail_json(msg="error creating database: " + str(e))
+                module.fail_json(msg=f"error creating database: {e}")
         elif state == "import":
             try:
                 changed = db_create(conn, cursor, db)
             except Exception as e:
-                module.fail_json(msg="error creating database: " + str(e))
+                module.fail_json(msg=f"error creating database: {e}")
 
             conn.autocommit(autocommit)
             rc, stdout, stderr = db_import(conn, cursor, module, db, target)
