@@ -120,9 +120,6 @@ EXAMPLES = r"""
 import os
 import ssl
 import traceback
-import platform
-
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 HAS_PAHOMQTT = True
 PAHOMQTT_IMP_ERR = None
@@ -142,17 +139,16 @@ from ansible.module_utils.common.text.converters import to_native
 #
 
 def main():
-    tls_map = {}
-
-    try:
-        tls_map['tlsv1.2'] = ssl.PROTOCOL_TLSv1_2
-    except AttributeError:
-        pass
-
-    try:
-        tls_map['tlsv1.1'] = ssl.PROTOCOL_TLSv1_1
-    except AttributeError:
-        pass
+    # From https://docs.python.org/3/library/ssl.html#constants, this:
+    #
+    # > Deprecated since version 3.6: OpenSSL has deprecated all version specific protocols. Use the default protocol PROTOCOL_TLS_SERVER or
+    # > PROTOCOL_TLS_CLIENT with SSLContext.minimum_version and SSLContext.maximum_version instead.
+    #
+    # @TODO: update the use of `ssl` constants
+    tls_map = {
+        'tlsv1.2': ssl.PROTOCOL_TLSv1_2,
+        'tlsv1.1': ssl.PROTOCOL_TLSv1_1,
+    }
 
     module = AnsibleModule(
         argument_spec=dict(
@@ -203,16 +199,7 @@ def main():
     tls = None
     if ca_certs is not None:
         if tls_version:
-            tls_version = tls_map.get(tls_version, ssl.PROTOCOL_SSLv23)
-        else:
-            if LooseVersion(platform.python_version()) <= LooseVersion("3.5.2"):
-                # Specifying `None` on later versions of python seems sufficient to
-                # instruct python to autonegotiate the SSL/TLS connection. On versions
-                # 3.5.2 and lower though we need to specify the version.
-                #
-                # Note that this is an alias for PROTOCOL_TLS, but PROTOCOL_TLS was
-                # not available until 3.5.3.
-                tls_version = ssl.PROTOCOL_SSLv23
+            tls_version = tls_map.get(tls_version, ssl.PROTOCOL_TLS)
 
         tls = {
             'ca_certs': ca_certs,
