@@ -305,6 +305,7 @@ def main():
         argument_spec=arg_spec,
         required_if=[('state', 'absent', ['name'])],
         supports_check_mode=True,
+        mutually_exclusive=[('path', 'global')],
     )
 
     name = module.params['name']
@@ -312,9 +313,6 @@ def main():
     version = module.params['version']
     glbl = module.params['global']
     state = module.params['state']
-
-    if not path and not glbl:
-        module.fail_json(msg='path must be specified when not using global')
 
     npm = Npm(module,
               name=name,
