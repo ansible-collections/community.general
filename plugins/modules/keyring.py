@@ -76,10 +76,7 @@ EXAMPLES = r"""
     state: absent
 """
 
-try:
-    from shlex import quote
-except ImportError:
-    from pipes import quote
+from shlex import quote
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
