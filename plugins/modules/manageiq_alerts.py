@@ -169,15 +169,15 @@ class ManageIQAlerts(object):
         self.module = self.manageiq.module
         self.api_url = self.manageiq.api_url
         self.client = self.manageiq.client
-        self.alerts_url = '{api_url}/alert_definitions'.format(api_url=self.api_url)
+        self.alerts_url = f'{self.api_url}/alert_definitions'
 
     def get_alerts(self):
         """ Get all alerts from ManageIQ
         """
         try:
-            response = self.client.get(self.alerts_url + '?expand=resources')
+            response = self.client.get(f"{self.alerts_url}?expand=resources")
         except Exception as e:
-            self.module.fail_json(msg="Failed to query alerts: {error}".format(error=e))
+            self.module.fail_json(msg=f"Failed to query alerts: {e}")
         return response.get('resources', [])
 
     def validate_hash_expression(self, expression):
@@ -186,7 +186,7 @@ class ManageIQAlerts(object):
         # hash expressions must have the following fields
         for key in ['options', 'eval_method', 'mode']:
             if key not in expression:
-                msg = "Hash expression is missing required field {key}".format(key=key)
+                msg = f"Hash expression is missing required field {key}"
                 self.module.fail_json(msg)
 
     def create_alert_dict(self, params):
@@ -234,8 +234,7 @@ class ManageIQAlerts(object):
         """ Delete an alert
         """
         try:
-            result = self.client.post('{url}/{id}'.format(url=self.alerts_url,
-                                                          id=alert['id']),
+            result = self.client.post(f"{self.alerts_url}/{alert['id']}",
                                       action="delete")
             msg = "Alert {description} deleted: {details}"
             msg = msg.format(description=alert['description'], details=result)
@@ -254,7 +253,7 @@ class ManageIQAlerts(object):
             return dict(changed=False, msg="No update needed")
         else:
             try:
-                url = '{url}/{id}'.format(url=self.alerts_url, id=existing_alert['id'])
+                url = f"{self.alerts_url}/{existing_alert['id']}"
                 result = self.client.post(url, action="edit", resource=new_alert)
 
                 # make sure that the update was indeed successful by comparing

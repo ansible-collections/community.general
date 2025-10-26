@@ -234,7 +234,7 @@ class LdapSearch(LdapGeneric):
                 else:
                     return ldap_entries
         except ldap.NO_SUCH_OBJECT:
-            self.module.fail_json(msg="Base not found: {0}".format(self.dn))
+            self.module.fail_json(msg=f"Base not found: {self.dn}")
 
 
 if __name__ == '__main__':

@@ -133,17 +133,17 @@ class MkSysB(ModuleHelper):
         extended_attrs=cmd_runner_fmt.as_bool("-a"),
         backup_crypt_files=cmd_runner_fmt.as_bool_not("-Z"),
         backup_dmapi_fs=cmd_runner_fmt.as_bool("-A"),
-        combined_path=cmd_runner_fmt.as_func(cmd_runner_fmt.unpack_args(lambda p, n: ["%s/%s" % (p, n)])),
+        combined_path=cmd_runner_fmt.as_func(cmd_runner_fmt.unpack_args(lambda p, n: [f"{p}/{n}"])),
     )
 
     def __init_module__(self):
         if not os.path.isdir(self.vars.storage_path):
-            self.do_raise("Storage path %s is not valid." % self.vars.storage_path)
+            self.do_raise(f"Storage path {self.vars.storage_path} is not valid.")
 
     def __run__(self):
         def process(rc, out, err):
             if rc != 0:
-                self.do_raise("mksysb failed: {0}".format(out))
+                self.do_raise(f"mksysb failed: {out}")
 
         runner = CmdRunner(
             self.module,

@@ -96,12 +96,12 @@ def follow_log(module, le_path, logs, name=None, logtype=None):
         rc, out, err = module.run_command(cmd)
 
         if not query_log_status(module, le_path, log):
-            module.fail_json(msg="failed to follow '%s': %s" % (log, err.strip()))
+            module.fail_json(msg=f"failed to follow '{log}': {err.strip()}")
 
         followed_count += 1
 
     if followed_count > 0:
-        module.exit_json(changed=True, msg="followed %d log(s)" % (followed_count,))
+        module.exit_json(changed=True, msg=f"followed {followed_count} log(s)")
 
     module.exit_json(changed=False, msg="logs(s) already followed")
 
@@ -122,12 +122,12 @@ def unfollow_log(module, le_path, logs):
         rc, out, err = module.run_command([le_path, 'rm', log])
 
         if query_log_status(module, le_path, log):
-            module.fail_json(msg="failed to remove '%s': %s" % (log, err.strip()))
+            module.fail_json(msg=f"failed to remove '{log}': {err.strip()}")
 
         removed_count += 1
 
     if removed_count > 0:
-        module.exit_json(changed=True, msg="removed %d package(s)" % removed_count)
+        module.exit_json(changed=True, msg=f"removed {removed_count} package(s)")
 
     module.exit_json(changed=False, msg="logs(s) already unfollowed")
 

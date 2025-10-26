@@ -59,7 +59,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def send_msg(module, token, msg, api, port):
 
-    message = "{0} {1}\n".format(token, msg)
+    message = f"{token} {msg}\n"
 
     api_ip = socket.gethostbyname(api)
 
@@ -69,7 +69,7 @@ def send_msg(module, token, msg, api, port):
         if not module.check_mode:
             s.send(message)
     except Exception as e:
-        module.fail_json(msg="failed to send message, msg=%s" % e)
+        module.fail_json(msg=f"failed to send message, msg={e}")
     s.close()
 
 
@@ -93,7 +93,7 @@ def main():
         send_msg(module, token, msg, api, port)
         changed = True
     except Exception as e:
-        module.fail_json(msg="unable to send msg: %s" % e)
+        module.fail_json(msg=f"unable to send msg: {e}")
 
     module.exit_json(changed=changed, msg=msg)
 

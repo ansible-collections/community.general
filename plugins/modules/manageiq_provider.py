@@ -629,7 +629,7 @@ class ManageIQProvider(object):
         zone = self.manageiq.find_collection_resource_by('zones', name=name)
         if not zone:  # zone doesn't exist
             self.module.fail_json(
-                msg="zone %s does not exist in manageiq" % (name))
+                msg=f"zone {name} does not exist in manageiq")
 
         return zone['id']
 
@@ -661,7 +661,7 @@ class ManageIQProvider(object):
             endpoint = endpoints.get(endpoint_key)
             if endpoint:
                 # get role and authtype
-                role = endpoint.get('role') or provider_defaults.get(endpoint_key + '_role', 'default')
+                role = endpoint.get('role') or provider_defaults.get(f"{endpoint_key}_role", 'default')
                 if role == 'default':
                     authtype = provider_defaults.get('authtype') or role
                 else:
@@ -695,10 +695,10 @@ class ManageIQProvider(object):
             a short message describing the operation executed.
         """
         try:
-            url = '%s/providers/%s' % (self.api_url, provider['id'])
+            url = f"{self.api_url}/providers/{provider['id']}"
             result = self.client.post(url, action='delete')
         except Exception as e:
-            self.module.fail_json(msg="failed to delete provider %s: %s" % (provider['name'], str(e)))
+            self.module.fail_json(msg=f"failed to delete provider {provider['name']}: {e}")
 
         return dict(changed=True, msg=result['message'])
 
@@ -710,7 +710,7 @@ class ManageIQProvider(object):
         Returns:
             a short message describing the operation executed.
         """
-        url = '%s/providers/%s' % (self.api_url, provider['id'])
+        url = f"{self.api_url}/providers/{provider['id']}"
 
         resource = dict(
             name=name,
@@ -739,11 +739,11 @@ class ManageIQProvider(object):
         try:
             result = self.client.post(url, action='edit', resource=resource)
         except Exception as e:
-            self.module.fail_json(msg="failed to update provider %s: %s" % (provider['name'], str(e)))
+            self.module.fail_json(msg=f"failed to update provider {provider['name']}: {e}")
 
         return dict(
             changed=True,
-            msg="successfully updated the provider %s: %s" % (provider['name'], result))
+            msg=f"successfully updated the provider {provider['name']}: {result}")
 
     def create_provider(self, name, provider_type, endpoints, zone_id, provider_region,
                         host_default_vnc_port_start, host_default_vnc_port_end,
@@ -772,14 +772,14 @@ class ManageIQProvider(object):
 
         # try to create a new provider
         try:
-            url = '%s/providers' % (self.api_url)
+            url = f'{self.api_url}/providers'
             result = self.client.post(url, type=supported_providers()[provider_type]['class_name'], **resource)
         except Exception as e:
-            self.module.fail_json(msg="failed to create provider %s: %s" % (name, str(e)))
+            self.module.fail_json(msg=f"failed to create provider {name}: {e}")
 
         return dict(
             changed=True,
-            msg="successfully created the provider %s: %s" % (name, result['results']))
+            msg=f"successfully created the provider {name}: {result['results']}")
 
     def refresh(self, provider, name):
         """ Trigger provider refresh.
@@ -788,14 +788,14 @@ class ManageIQProvider(object):
             a short message describing the operation executed.
         """
         try:
-            url = '%s/providers/%s' % (self.api_url, provider['id'])
+            url = f"{self.api_url}/providers/{provider['id']}"
             result = self.client.post(url, action='refresh')
         except Exception as e:
-            self.module.fail_json(msg="failed to refresh provider %s: %s" % (name, str(e)))
+            self.module.fail_json(msg=f"failed to refresh provider {name}: {e}")
 
         return dict(
             changed=True,
-            msg="refreshing provider %s" % name)
+            msg=f"refreshing provider {name}")
 
 
 def main():
@@ -858,7 +858,7 @@ def main():
         else:
             res_args = dict(
                 changed=False,
-                msg="provider %s: does not exist in manageiq" % (name))
+                msg=f"provider {name}: does not exist in manageiq")
 
     # provider should exist
     if state == "present":
@@ -878,7 +878,7 @@ def main():
         # check supported_providers types
         if provider_type not in supported_providers().keys():
             manageiq_provider.module.fail_json(
-                msg="provider_type %s is not supported" % (provider_type))
+                msg=f"provider_type {provider_type} is not supported")
 
         # build "connection_configurations" objects from user requested endpoints
         # "provider" is a required endpoint, if we have it, we have endpoints
@@ -903,7 +903,7 @@ def main():
         else:
             res_args = dict(
                 changed=False,
-                msg="provider %s: does not exist in manageiq" % (name))
+                msg=f"provider {name}: does not exist in manageiq")
 
     module.exit_json(**res_args)
 

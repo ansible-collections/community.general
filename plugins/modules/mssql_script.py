@@ -317,7 +317,7 @@ def run_module():
 
     login_querystring = login_host
     if login_port != 1433:
-        login_querystring = "%s:%s" % (login_host, login_port)
+        login_querystring = f"{login_host}:{login_port}"
 
     if login_user is not None and login_password is None:
         module.fail_json(
@@ -330,7 +330,7 @@ def run_module():
     except Exception as e:
         if "Unknown database" in str(e):
             errno, errstr = e.args
-            module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
+            module.fail_json(msg=f"ERROR: {errno} {errstr}")
         else:
             module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
                                  "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
@@ -388,7 +388,7 @@ def run_module():
                 # Rollback transaction before failing the module in case of error
                 if transaction:
                     conn.rollback()
-                error_msg = '%s: %s' % (type(e).__name__, str(e))
+                error_msg = f'{type(e).__name__}: {e}'
                 module.fail_json(msg="query failed", query=query, error=error_msg, **result)
 
     # Commit transaction before exiting the module in case of no error

@@ -117,7 +117,7 @@ def post_annotation(module):
     name = module.params['name']
     title = module.params['title']
 
-    url = 'https://metrics-api.librato.com/v1/annotations/%s' % name
+    url = f'https://metrics-api.librato.com/v1/annotations/{name}'
     params = {}
     params['title'] = title
 
@@ -145,9 +145,9 @@ def post_annotation(module):
     response_body = info['body']
     if info['status'] != 201:
         if info['status'] >= 400:
-            module.fail_json(msg="Request Failed. Response code: " + response_code + " Response body: " + response_body)
+            module.fail_json(msg=f"Request Failed. Response code: {response_code} Response body: {response_body}")
         else:
-            module.fail_json(msg="Request Failed. Response code: " + response_code)
+            module.fail_json(msg=f"Request Failed. Response code: {response_code}")
     response = response.read()
     module.exit_json(changed=True, annotation=response)
 

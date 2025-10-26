@@ -194,7 +194,7 @@ class LdapAttrs(LdapGeneric):
         if isinstance(values, list):
             for index, value in enumerate(values):
                 cleaned_value = re.sub(r'^\{\d+\}', '', value)
-                ordered_values.append('{' + str(index) + '}' + cleaned_value)
+                ordered_values.append(f"{{{index!s}}}{cleaned_value}")
 
         return ordered_values
 
@@ -254,7 +254,7 @@ class LdapAttrs(LdapGeneric):
                 results = self.connection.search_s(
                     self.dn, ldap.SCOPE_BASE, attrlist=[name])
             except ldap.LDAPError as e:
-                self.fail("Cannot search for attribute %s" % name, e)
+                self.fail(f"Cannot search for attribute {name}", e)
 
             current = results[0][1].get(name, [])
 
@@ -277,7 +277,7 @@ class LdapAttrs(LdapGeneric):
         """ True if the target attribute has the given value. """
         try:
             escaped_value = ldap.filter.escape_filter_chars(to_text(value))
-            filterstr = "(%s=%s)" % (name, escaped_value)
+            filterstr = f"({name}={escaped_value})"
             dns = self.connection.search_s(self.dn, ldap.SCOPE_BASE, filterstr)
             is_present = len(dns) == 1
         except ldap.NO_SUCH_OBJECT:
