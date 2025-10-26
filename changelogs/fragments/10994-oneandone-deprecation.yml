@@ -1,0 +1,8 @@
+deprecated_features:
+  - oneandone module utils - DNS fails to resolve the API endpoint used by the module. The module is deprecated and will be removed in community.general 12.0.0 (https://github.com/ansible-collections/community.general/issues/10994).
+  - oneandone_firewall_policy - DNS fails to resolve the API endpoint used by the module. The module is deprecated and will be removed in community.general 12.0.0 (https://github.com/ansible-collections/community.general/issues/10994).
+  - oneandone_load_balancer - DNS fails to resolve the API endpoint used by the module. The module is deprecated and will be removed in community.general 12.0.0 (https://github.com/ansible-collections/community.general/issues/10994).
+  - oneandone_monitoring_policy - DNS fails to resolve the API endpoint used by the module. The module is deprecated and will be removed in community.general 12.0.0 (https://github.com/ansible-collections/community.general/issues/10994).
+  - oneandone_private_network - DNS fails to resolve the API endpoint used by the module. The module is deprecated and will be removed in community.general 12.0.0 (https://github.com/ansible-collections/community.general/issues/10994).
+  - oneandone_public_ip - DNS fails to resolve the API endpoint used by the module. The module is deprecated and will be removed in community.general 12.0.0 (https://github.com/ansible-collections/community.general/issues/10994).
+  - oneandone_server - DNS fails to resolve the API endpoint used by the module. The module is deprecated and will be removed in community.general 12.0.0 (https://github.com/ansible-collections/community.general/issues/10994).
