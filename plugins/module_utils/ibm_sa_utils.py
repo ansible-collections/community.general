@@ -57,8 +57,7 @@ def connect_ssl(module):
                                                            endpoints)
     except errors.CommandFailedConnectionError as e:
         module.fail_json(
-            msg="Connection with Spectrum Accelerate system has "
-            "failed: {[0]}.".format(to_native(e)))
+            msg=f"Connection with Spectrum Accelerate system has failed: {e}.")
 
 
 def spectrum_accelerate_spec():

@@ -53,7 +53,8 @@ def render(to_render):
                     yield f"{key}=[{','.join(recurse(item))}]"
                 continue
             if isinstance(value, str):
-                yield '{0:}="{1:}"'.format(key, value.replace('\\', '\\\\').replace('"', '\\"'))
+                _value = value.replace('\\', '\\\\').replace('"', '\\"')
+                yield f'{key}="{_value}"'
                 continue
             yield f'{key}="{value}"'
     return '\n'.join(recurse(to_render))

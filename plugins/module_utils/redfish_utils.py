@@ -2952,7 +2952,7 @@ class RedfishUtils(object):
                 resources, media_types, media_match_strict=False, vendor=vendor)
         if not uri:
             return {'ret': False,
-                    'msg': f"Unable to find an available VirtualMedia resource {('supporting ' + str(media_types)) if media_types else ''}"}
+                    'msg': f"Unable to find an available VirtualMedia resource {f'supporting {media_types}' if media_types else ''}"}
 
         # confirm InsertMedia action found
         if ('Actions' not in data or
