@@ -1,0 +1,6 @@
+minor_changes:
+  - ibm_sa_utils module utils - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10979).
+  - online module utils - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10979).
+  - opennebula module utils - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10979).
+  - redfish_utils module utils - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10979).
+  - scaleway module utils - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10979).
