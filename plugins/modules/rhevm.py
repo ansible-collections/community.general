@@ -364,7 +364,7 @@ class RHEVConn(object):
         port = module.params.get('port')
         insecure_api = module.params.get('insecure_api')
 
-        url = "https://%s:%s" % (server, port)
+        url = f"https://{server}:{port}"
 
         try:
             api = API(url=url, username=user, password=password, insecure=str(insecure_api))
@@ -432,11 +432,11 @@ class RHEVConn(object):
         try:
             VM.disks.add(newdisk)
             VM.update()
-            setMsg("Successfully added disk " + diskname)
+            setMsg(f"Successfully added disk {diskname}")
             setChanged()
         except Exception as e:
             setFailed()
-            setMsg("Error attaching " + diskname + "disk, please recheck and remove any leftover configuration.")
+            setMsg(f"Error attaching {diskname}disk, please recheck and remove any leftover configuration.")
             setMsg(str(e))
             return False
 
@@ -446,15 +446,15 @@ class RHEVConn(object):
             while currentdisk.status.state != 'ok':
                 currentdisk = VM.disks.get(name=diskname)
                 if attempt == 100:
-                    setMsg("Error, disk %s, state %s" % (diskname, str(currentdisk.status.state)))
+                    setMsg(f"Error, disk {diskname}, state {currentdisk.status.state}")
                     raise Exception()
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg("The disk  " + diskname + " is ready.")
+            setMsg(f"The disk  {diskname} is ready.")
         except Exception as e:
             setFailed()
-            setMsg("Error getting the state of " + diskname + ".")
+            setMsg(f"Error getting the state of {diskname}.")
             setMsg(str(e))
             return False
         return True
@@ -472,11 +472,11 @@ class RHEVConn(object):
         try:
             VM.nics.add(newnic)
             VM.update()
-            setMsg("Successfully added iface " + nicname)
+            setMsg(f"Successfully added iface {nicname}")
             setChanged()
         except Exception as e:
             setFailed()
-            setMsg("Error attaching " + nicname + " iface, please recheck and remove any leftover configuration.")
+            setMsg(f"Error attaching {nicname} iface, please recheck and remove any leftover configuration.")
             setMsg(str(e))
             return False
 
@@ -486,15 +486,15 @@ class RHEVConn(object):
             while currentnic.active is not True:
                 currentnic = VM.nics.get(name=nicname)
                 if attempt == 100:
-                    setMsg("Error, iface %s, state %s" % (nicname, str(currentnic.active)))
+                    setMsg(f"Error, iface {nicname}, state {currentnic.active}")
                     raise Exception()
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg("The iface  " + nicname + " is ready.")
+            setMsg(f"The iface  {nicname} is ready.")
         except Exception as e:
             setFailed()
-            setMsg("Error getting the state of " + nicname + ".")
+            setMsg(f"Error getting the state of {nicname}.")
             setMsg(str(e))
             return False
         return True
@@ -596,7 +596,7 @@ class RHEVConn(object):
 
     def set_Disk(self, diskname, disksize, diskinterface, diskboot):
         DISK = self.get_disk(diskname)
-        setMsg("Checking disk " + diskname)
+        setMsg(f"Checking disk {diskname}")
         if DISK.get_bootable() != diskboot:
             try:
                 DISK.set_bootable(diskboot)
@@ -648,15 +648,15 @@ class RHEVConn(object):
         checkFail()
         if NIC.name != newname:
             NIC.name = newname
-            setMsg('Updating iface name to ' + newname)
+            setMsg(f"Updating iface name to {newname}")
             setChanged()
         if str(NIC.network.id) != str(NETWORK.id):
             NIC.set_network(NETWORK)
-            setMsg('Updating iface network to ' + vlan)
+            setMsg(f"Updating iface network to {vlan}")
             setChanged()
         if NIC.interface != interface:
             NIC.interface = interface
-            setMsg('Updating iface interface to ' + interface)
+            setMsg(f"Updating iface interface to {interface}")
             setChanged()
         try:
             NIC.update()
@@ -711,7 +711,7 @@ class RHEVConn(object):
             try:
                 for iface in ifaces:
                     try:
-                        setMsg('creating host interface ' + iface['name'])
+                        setMsg(f"creating host interface {iface['name']}")
                         if 'management' in iface:
                             manageip = iface['ip']
                         if 'boot_protocol' not in iface:
@@ -742,7 +742,7 @@ class RHEVConn(object):
                                         )
                                     )
                                 except Exception as e:
-                                    setMsg('Failed to create the bond for  ' + iface['name'])
+                                    setMsg(f"Failed to create the bond for  {iface['name']}")
                                     setFailed()
                                     setMsg(str(e))
                                     return False
@@ -759,9 +759,9 @@ class RHEVConn(object):
                                         override_configuration=True,
                                         bonding=tmpiface)
                                     networklist.append(tmpnetwork)
-                                    setMsg('Applying network ' + iface['name'])
+                                    setMsg(f"Applying network {iface['name']}")
                                 except Exception as e:
-                                    setMsg('Failed to set' + iface['name'] + ' as network interface')
+                                    setMsg(f"Failed to set{iface['name']} as network interface")
                                     setFailed()
                                     setMsg(str(e))
                                     return False
@@ -776,7 +776,7 @@ class RHEVConn(object):
                                         gateway=iface['gateway']
                                     ))
                                 networklist.append(tmpnetwork)
-                                setMsg('Applying network ' + iface['name'])
+                                setMsg(f"Applying network {iface['name']}")
                         else:
                             tmpiface = params.HostNIC(
                                 name=iface['name'],
@@ -789,7 +789,7 @@ class RHEVConn(object):
                                 ))
                         ifacelist[iface['name']] = tmpiface
                     except Exception as e:
-                        setMsg('Failed to set ' + iface['name'])
+                        setMsg(f"Failed to set {iface['name']}")
                         setFailed()
                         setMsg(str(e))
                         return False
@@ -824,7 +824,7 @@ class RHEVConn(object):
 
                     HOST = self.get_Host(host_name)
                     state = HOST.status.state
-                    setMsg('State before setting to maintenance: ' + str(state))
+                    setMsg(f"State before setting to maintenance: {state}")
                     HOST.deactivate()
                     while state != 'maintenance':
                         HOST = self.get_Host(host_name)
@@ -953,7 +953,7 @@ class RHEVConn(object):
         try:
             VM.placement_policy.host = HOST
             VM.update()
-            setMsg("Set startup host to " + vmhost)
+            setMsg(f"Set startup host to {vmhost}")
             setChanged()
         except Exception as e:
             setMsg("Failed to set startup host.")
@@ -976,7 +976,7 @@ class RHEVConn(object):
                     ),
                 )
                 setChanged()
-                setMsg("VM migrated to " + vmhost)
+                setMsg(f"VM migrated to {vmhost}")
             except Exception as e:
                 setMsg("Failed to set startup host.")
                 setMsg(str(e))
@@ -1090,7 +1090,7 @@ class RHEV(object):
                     bootselect = True
 
         for disk in disks:
-            diskname = name + "_Disk" + str(counter) + "_" + disk.get('name', '').replace('/', '_')
+            diskname = f"{name}_Disk{counter}_{disk.get('name', '').replace('/', '_')}"
             disksize = disk.get('size', 1)
             diskdomain = disk.get('domain', None)
             if diskdomain is None:
@@ -1207,7 +1207,7 @@ class RHEV(object):
             return False
 
         if state == VM.status.state:
-            setMsg("VM state was already " + state)
+            setMsg(f"VM state was already {state}")
         else:
             if state == "up":
                 setMsg("VM is going to start")
@@ -1222,7 +1222,7 @@ class RHEV(object):
                 checkFail()
                 self.setPower(vmname, "up", timeout)
             checkFail()
-            setMsg("the vm state is set to " + state)
+            setMsg(f"the vm state is set to {state}")
         return True
 
     def setCD(self, vmname, cd_drive):

@@ -187,12 +187,12 @@ def main():
         with open(path, 'rb') as f:
             data = f.read()
     except (IOError, OSError) as e:
-        module.fail_json(msg="Unable to open file: %s" % to_native(e))
+        module.fail_json(msg=f"Unable to open file: {e}")
 
     reader = read_csv(data, dialect, fieldnames)
 
     if key and key not in reader.fieldnames:
-        module.fail_json(msg="Key '%s' was not found in the CSV header fields: %s" % (key, ', '.join(reader.fieldnames)))
+        module.fail_json(msg=f"Key '{key}' was not found in the CSV header fields: {', '.join(reader.fieldnames)}")
 
     data_dict = dict()
     data_list = list()
@@ -202,15 +202,15 @@ def main():
             for row in reader:
                 data_list.append(row)
         except CSVError as e:
-            module.fail_json(msg="Unable to process file: %s" % to_native(e))
+            module.fail_json(msg=f"Unable to process file: {e}")
     else:
         try:
             for row in reader:
                 if unique and row[key] in data_dict:
-                    module.fail_json(msg="Key '%s' is not unique for value '%s'" % (key, row[key]))
+                    module.fail_json(msg=f"Key '{key}' is not unique for value '{row[key]}'")
                 data_dict[row[key]] = row
         except CSVError as e:
-            module.fail_json(msg="Unable to process file: %s" % to_native(e))
+            module.fail_json(msg=f"Unable to process file: {e}")
 
     module.exit_json(dict=data_dict, list=data_list)
 

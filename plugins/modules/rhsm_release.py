@@ -117,7 +117,7 @@ def main():
 
     # sanity check: the target release at least looks like a valid release
     if target_release and not release_matcher.findall(target_release):
-        module.fail_json(msg='"{0}" does not appear to be a valid release.'.format(target_release))
+        module.fail_json(msg=f'"{target_release}" does not appear to be a valid release.')
 
     # Will fail with useful error from s-m if system not subscribed
     current_release = get_release(module)

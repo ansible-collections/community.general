@@ -87,7 +87,6 @@ import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class Sv(object):
@@ -113,8 +112,8 @@ class Sv(object):
 
         self.svc_cmd = module.get_bin_path('sv', opt_dirs=self.extra_paths, required=True)
         self.svstat_cmd = module.get_bin_path('sv', opt_dirs=self.extra_paths)
-        self.svc_full = '/'.join([self.service_dir, self.name])
-        self.src_full = '/'.join([self.service_src, self.name])
+        self.svc_full = f"{self.service_dir}/{self.name}"
+        self.src_full = f"{self.service_src}/{self.name}"
 
         self.enabled = os.path.lexists(self.svc_full)
         if self.enabled:
@@ -127,16 +126,16 @@ class Sv(object):
             try:
                 os.symlink(self.src_full, self.svc_full)
             except OSError as e:
-                self.module.fail_json(path=self.src_full, msg='Error while linking: %s' % to_native(e))
+                self.module.fail_json(path=self.src_full, msg=f'Error while linking: {e}')
         else:
-            self.module.fail_json(msg="Could not find source for service to enable (%s)." % self.src_full)
+            self.module.fail_json(msg=f"Could not find source for service to enable ({self.src_full}).")
 
     def disable(self):
         self.execute_command([self.svc_cmd, 'force-stop', self.src_full])
         try:
             os.unlink(self.svc_full)
         except OSError as e:
-            self.module.fail_json(path=self.svc_full, msg='Error while unlinking: %s' % to_native(e))
+            self.module.fail_json(path=self.svc_full, msg=f'Error while unlinking: {e}')
 
     def get_status(self):
         (rc, out, err) = self.execute_command([self.svstat_cmd, 'status', self.svc_full])
@@ -203,7 +202,7 @@ class Sv(object):
         try:
             (rc, out, err) = self.module.run_command(cmd)
         except Exception as e:
-            self.module.fail_json(msg="failed to execute: %s" % to_native(e))
+            self.module.fail_json(msg=f"failed to execute: {e}")
         return rc, out, err
 
     def report(self):
@@ -243,7 +242,7 @@ def main():
                 else:
                     sv.disable()
             except (OSError, IOError) as e:
-                module.fail_json(msg="Could not change service link: %s" % to_native(e))
+                module.fail_json(msg=f"Could not change service link: {e}")
 
     if state is not None and state != sv.state:
         changed = True

@@ -150,7 +150,6 @@ else:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.formatters import human_to_bytes
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.redis import (
     fail_imports, redis_auth_argument_spec, redis_auth_params)
 import re
@@ -231,7 +230,7 @@ def main():
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
         # Check if we are already in the mode that we want
         info = r.info()
@@ -282,7 +281,7 @@ def main():
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
         # Do the stuff
         # (Check Check_mode before commands so the commands aren't evaluated
@@ -297,7 +296,7 @@ def main():
             if module.check_mode or flush(r, db):
                 module.exit_json(changed=True, flushed=True, db=db)
             else:  # Flush never fails :)
-                module.fail_json(msg="Unable to flush '%d' database" % db)
+                module.fail_json(msg=f"Unable to flush '{db}' database")
     elif command == 'config':
         name = module.params['name']
 
@@ -314,12 +313,12 @@ def main():
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
         try:
             old_value = r.config_get(name)[name]
         except Exception as e:
-            module.fail_json(msg="unable to read config: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to read config: {e}", exception=traceback.format_exc())
         changed = old_value != value
 
         if module.check_mode or not changed:
@@ -328,7 +327,7 @@ def main():
             try:
                 r.config_set(name, value)
             except Exception as e:
-                module.fail_json(msg="unable to write config: %s" % to_native(e), exception=traceback.format_exc())
+                module.fail_json(msg=f"unable to write config: {e}", exception=traceback.format_exc())
             module.exit_json(changed=changed, name=name, value=value)
     else:
         module.fail_json(msg='A valid command must be provided')

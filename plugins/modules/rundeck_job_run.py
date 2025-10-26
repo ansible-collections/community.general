@@ -207,7 +207,7 @@ class RundeckJobRun(object):
         for k, v in self.job_options.items():
             if not isinstance(v, str):
                 self.module.exit_json(
-                    msg="Job option '%s' value must be a string" % k,
+                    msg=f"Job option '{k}' value must be a string",
                     execution_info={}
                 )
 
@@ -217,17 +217,17 @@ class RundeckJobRun(object):
         due = datetime.now() + timedelta(seconds=self.wait_execution_timeout)
 
         while not timeout:
-            endpoint = "execution/%d" % execution_id
+            endpoint = f"execution/{execution_id}"
             response = api_request(module=self.module, endpoint=endpoint)[0]
             output = api_request(module=self.module,
-                                 endpoint="execution/%d/output" % execution_id)
+                                 endpoint=f"execution/{execution_id}/output")
             log_output = "\n".join([x["log"] for x in output[0]["entries"]])
             response.update({"output": log_output})
 
             if response["status"] == "aborted":
                 break
             elif response["status"] == "scheduled":
-                self.module.exit_json(msg="Job scheduled to run at %s" % self.run_at_time,
+                self.module.exit_json(msg=f"Job scheduled to run at {self.run_at_time}",
                                       execution_info=response,
                                       changed=True)
             elif response["status"] == "failed":
@@ -250,7 +250,7 @@ class RundeckJobRun(object):
     def job_run(self):
         response, info = api_request(
             module=self.module,
-            endpoint="job/%s/run" % quote(self.job_id),
+            endpoint=f"job/{quote(self.job_id)}/run",
             method="POST",
             data={
                 "loglevel": self.loglevel,
@@ -273,7 +273,7 @@ class RundeckJobRun(object):
             if self.abort_on_timeout:
                 api_request(
                     module=self.module,
-                    endpoint="execution/%s/abort" % response['id'],
+                    endpoint=f"execution/{response['id']}/abort",
                     method="GET"
                 )
 
