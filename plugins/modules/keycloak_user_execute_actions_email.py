@@ -54,7 +54,7 @@ options:
       - UPDATE_PASSWORD
   client_id:
     description:
-      - Optional client id used for the redirect link.
+      - Optional client ID used for the redirect link.
     aliases: [clientId]
     type: str
   redirect_uri:
