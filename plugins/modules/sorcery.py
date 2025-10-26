@@ -211,7 +211,7 @@ NA = "N/A"
 def get_sorcery_ver(module):
     """ Get Sorcery version. """
 
-    cmd_sorcery = "%s --version" % SORCERY['sorcery']
+    cmd_sorcery = f"{SORCERY['sorcery']} --version"
 
     rc, stdout, stderr = module.run_command(cmd_sorcery)
 
@@ -231,7 +231,7 @@ def codex_fresh(codex, module):
 
     for grimoire in codex:
         lastupdate_path = os.path.join(SORCERY_STATE_DIR,
-                                       grimoire + ".lastupdate")
+                                       f"{grimoire}.lastupdate")
 
         try:
             mtime = os.stat(lastupdate_path).st_mtime
@@ -254,7 +254,7 @@ def codex_list(module, skip_new=False):
 
     codex = {}
 
-    cmd_scribe = "%s index" % SORCERY['scribe']
+    cmd_scribe = f"{SORCERY['scribe']} index"
 
     rc, stdout, stderr = module.run_command(cmd_scribe)
 
@@ -295,12 +295,12 @@ def update_sorcery(module):
     else:
         sorcery_ver = get_sorcery_ver(module)
 
-        cmd_sorcery = "%s update" % SORCERY['sorcery']
+        cmd_sorcery = f"{SORCERY['sorcery']} update"
 
         rc, stdout, stderr = module.run_command(cmd_sorcery)
 
         if rc != 0:
-            module.fail_json(msg="unable to update Sorcery: " + stdout)
+            module.fail_json(msg=f"unable to update Sorcery: {stdout}")
 
         if sorcery_ver != get_sorcery_ver(module):
             changed = True
@@ -333,15 +333,15 @@ def update_codex(module):
             # SILENT is required as a workaround for query() in libgpg
             module.run_command_environ_update.update(dict(SILENT='1'))
 
-            cmd_scribe = "%s update" % SORCERY['scribe']
+            cmd_scribe = f"{SORCERY['scribe']} update"
 
             if params['repository']:
-                cmd_scribe += ' %s' % ' '.join(codex.keys())
+                cmd_scribe += f" {' '.join(codex.keys())}"
 
             rc, stdout, stderr = module.run_command(cmd_scribe)
 
             if rc != 0:
-                module.fail_json(msg="unable to update Codex: " + stdout)
+                module.fail_json(msg=f"unable to update Codex: {stdout}")
 
             if codex != codex_list(module):
                 changed = True
@@ -387,7 +387,7 @@ def match_depends(module):
         match = rex.match(d)
 
         if not match:
-            module.fail_json(msg="wrong depends line for spell '%s'" % spell)
+            module.fail_json(msg=f"wrong depends line for spell '{spell}'")
 
         # normalize status
         if not match.group('status') or match.group('status') == '+':
@@ -400,19 +400,19 @@ def match_depends(module):
     # drop providers spec
     depends_list = [s.split('(')[0] for s in depends]
 
-    cmd_gaze = "%s -q version %s" % (SORCERY['gaze'], ' '.join(depends_list))
+    cmd_gaze = f"{SORCERY['gaze']} -q version {' '.join(depends_list)}"
 
     rc, stdout, stderr = module.run_command(cmd_gaze)
 
     if rc != 0:
-        module.fail_json(msg="wrong dependencies for spell '%s'" % spell)
+        module.fail_json(msg=f"wrong dependencies for spell '{spell}'")
 
     fi = fileinput.input(sorcery_depends, inplace=True)
 
     try:
         try:
             for line in fi:
-                if line.startswith(spell + ':'):
+                if line.startswith(f"{spell}:"):
                     match = None
 
                     for d in depends:
@@ -426,8 +426,7 @@ def match_depends(module):
                             d_p = re.escape(d[d_offset:])
 
                         # .escape() is needed mostly for the spells like 'libsigc++'
-                        rex = re.compile("%s:(?:%s|%s):(?P<lstatus>on|off):optional:" %
-                                         (re.escape(spell), re.escape(d), d_p))
+                        rex = re.compile(f"{re.escape(spell)}:(?:{re.escape(d)}|{d_p}):(?P<lstatus>on|off):optional:")
 
                         match = rex.match(line)
 
@@ -460,7 +459,7 @@ def match_depends(module):
         try:
             with open(sorcery_depends, 'a') as fl:
                 for k in depends_new:
-                    fl.write("%s:%s:%s:optional::\n" % (spell, k, depends[k]))
+                    fl.write(f"{spell}:{k}:{depends[k]}:optional::\n")
         except IOError:
             module.fail_json(msg="I/O error on the depends file")
 
@@ -494,19 +493,19 @@ def manage_grimoires(module):
                 todo = set(grimoires) - set(codex)
 
             if not todo:
-                return (False, "all grimoire(s) are already %sed" % action[:5])
+                return (False, f"all grimoire(s) are already {action[:5]}ed")
 
             if module.check_mode:
-                return (True, "would have %sed grimoire(s)" % action[:5])
+                return (True, f"would have {action[:5]}ed grimoire(s)")
 
-            cmd_scribe = "%s %s %s" % (SORCERY['scribe'], action, ' '.join(todo))
+            cmd_scribe = f"{SORCERY['scribe']} {action} {' '.join(todo)}"
 
             rc, stdout, stderr = module.run_command(cmd_scribe)
 
             if rc != 0:
-                module.fail_json(msg="failed to %s one or more grimoire(s): %s" % (action, stdout))
+                module.fail_json(msg=f"failed to {action} one or more grimoire(s): {stdout}")
 
-            return (True, "successfully %sed one or more grimoire(s)" % action[:5])
+            return (True, f"successfully {action[:5]}ed one or more grimoire(s)")
         else:
             module.fail_json(msg="unsupported operation on '*' repository value")
     else:
@@ -517,19 +516,19 @@ def manage_grimoires(module):
             grimoire = grimoires[0]
 
             if grimoire in codex:
-                return (False, "grimoire %s already exists" % grimoire)
+                return (False, f"grimoire {grimoire} already exists")
 
             if module.check_mode:
-                return (True, "would have added grimoire %s from %s" % (grimoire, url))
+                return (True, f"would have added grimoire {grimoire} from {url}")
 
-            cmd_scribe = "%s add %s from %s" % (SORCERY['scribe'], grimoire, url)
+            cmd_scribe = f"{SORCERY['scribe']} add {grimoire} from {url}"
 
             rc, stdout, stderr = module.run_command(cmd_scribe)
 
             if rc != 0:
-                module.fail_json(msg="failed to add grimoire %s from %s: %s" % (grimoire, url, stdout))
+                module.fail_json(msg=f"failed to add grimoire {grimoire} from {url}: {stdout}")
 
-            return (True, "successfully added grimoire %s from %s" % (grimoire, url))
+            return (True, f"successfully added grimoire {grimoire} from {url}")
         else:
             module.fail_json(msg="unsupported operation on repository value")
 
@@ -552,14 +551,14 @@ def manage_spells(module):
         if params['state'] == 'latest':
             # back up original queue
             try:
-                os.rename(sorcery_queue, sorcery_queue + ".backup")
+                os.rename(sorcery_queue, f"{sorcery_queue}.backup")
             except IOError:
                 module.fail_json(msg="failed to backup the update queue")
 
             # see update_codex()
             module.run_command_environ_update.update(dict(SILENT='1'))
 
-            cmd_sorcery = "%s queue" % SORCERY['sorcery']
+            cmd_sorcery = f"{SORCERY['sorcery']} queue"
 
             rc, stdout, stderr = module.run_command(cmd_sorcery)
 
@@ -574,13 +573,13 @@ def manage_spells(module):
             if queue_size != 0:
                 if module.check_mode:
                     try:
-                        os.rename(sorcery_queue + ".backup", sorcery_queue)
+                        os.rename(f"{sorcery_queue}.backup", sorcery_queue)
                     except IOError:
                         module.fail_json(msg="failed to restore the update queue")
 
                     return (True, "would have updated the system")
 
-                cmd_cast = "%s --queue" % SORCERY['cast']
+                cmd_cast = f"{SORCERY['cast']} --queue"
 
                 rc, stdout, stderr = module.run_command(cmd_cast)
 
@@ -594,12 +593,12 @@ def manage_spells(module):
             if module.check_mode:
                 return (True, "would have rebuilt the system")
 
-            cmd_sorcery = "%s rebuild" % SORCERY['sorcery']
+            cmd_sorcery = f"{SORCERY['sorcery']} rebuild"
 
             rc, stdout, stderr = module.run_command(cmd_sorcery)
 
             if rc != 0:
-                module.fail_json(msg="failed to rebuild the system: " + stdout)
+                module.fail_json(msg=f"failed to rebuild the system: {stdout}")
 
             return (True, "successfully rebuilt the system")
         else:
@@ -607,14 +606,13 @@ def manage_spells(module):
     else:
         if params['state'] in ('present', 'latest', 'rebuild', 'absent'):
             # extract versions from the 'gaze' command
-            cmd_gaze = "%s -q version %s" % (SORCERY['gaze'], ' '.join(spells))
+            cmd_gaze = f"{SORCERY['gaze']} -q version {' '.join(spells)}"
 
             rc, stdout, stderr = module.run_command(cmd_gaze)
 
             # fail if any of spells cannot be found
             if rc != 0:
-                module.fail_json(msg="failed to locate spell(s) in the list (%s)" %
-                                 ', '.join(spells))
+                module.fail_json(msg=f"failed to locate spell(s) in the list ({', '.join(spells)})")
 
             cast_queue = []
             dispel_queue = []
@@ -665,12 +663,12 @@ def manage_spells(module):
                 if module.check_mode:
                     return (True, "would have cast spell(s)")
 
-                cmd_cast = "%s -c %s" % (SORCERY['cast'], ' '.join(cast_queue))
+                cmd_cast = f"{SORCERY['cast']} -c {' '.join(cast_queue)}"
 
                 rc, stdout, stderr = module.run_command(cmd_cast)
 
                 if rc != 0:
-                    module.fail_json(msg="failed to cast spell(s): " + stdout)
+                    module.fail_json(msg=f"failed to cast spell(s): {stdout}")
 
                 return (True, "successfully cast spell(s)")
             elif params['state'] != 'absent':
@@ -680,12 +678,12 @@ def manage_spells(module):
                 if module.check_mode:
                     return (True, "would have dispelled spell(s)")
 
-                cmd_dispel = "%s %s" % (SORCERY['dispel'], ' '.join(dispel_queue))
+                cmd_dispel = f"{SORCERY['dispel']} {' '.join(dispel_queue)}"
 
                 rc, stdout, stderr = module.run_command(cmd_dispel)
 
                 if rc != 0:
-                    module.fail_json(msg="failed to dispel spell(s): " + stdout)
+                    module.fail_json(msg=f"failed to dispel spell(s): {stdout}")
 
                 return (True, "successfully dispelled spell(s)")
             else:
@@ -751,7 +749,7 @@ def main():
         state_msg = "no change in state"
         state_changed = False
 
-    module.exit_json(changed=state_changed, msg=state_msg + ": " + '; '.join(x[1] for x in changed.values()))
+    module.exit_json(changed=state_changed, msg=f"{state_msg}: {'; '.join((x[1] for x in changed.values()))}")
 
 
 if __name__ == '__main__':

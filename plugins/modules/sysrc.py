@@ -147,8 +147,8 @@ class Sysrc(StateModuleHelper):
         return None
 
     def _modify(self, op, changed):
-        (rc, out, err) = self._sysrc("%s%s=%s%s" % (self.vars.name, op, self.vars.delim, self.vars.value))
-        if out.startswith("%s:" % self.vars.name):
+        (rc, out, err) = self._sysrc(f"{self.vars.name}{op}={self.vars.delim}{self.vars.value}")
+        if out.startswith(f"{self.vars.name}:"):
             return changed(out.split(' -> ')[1].strip().split(self.vars.delim))
 
         return False
@@ -161,7 +161,7 @@ class Sysrc(StateModuleHelper):
 
         (rc, out, err) = self.module.run_command(cmd)
         if "Permission denied" in err:
-            self.module.fail_json(msg="Permission denied for %s" % self.vars.path)
+            self.module.fail_json(msg=f"Permission denied for {self.vars.path}")
 
         return rc, out, err
 
@@ -184,7 +184,7 @@ class Sysrc(StateModuleHelper):
             return
 
         if not self.check_mode:
-            self._sysrc("%s=%s" % (self.vars.name, self.vars.value))
+            self._sysrc(f"{self.vars.name}={self.vars.value}")
 
         self.changed = True
 

@@ -224,7 +224,6 @@ import os
 from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser, HAS_PARAMIKO, PARAMIKO_IMPORT_ERROR
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
@@ -260,7 +259,7 @@ class SSHConfig(object):
         try:
             self.config = ConfigParser(self.config_file)
         except FileNotFoundError:
-            self.module.fail_json(msg="Failed to find %s" % self.config_file)
+            self.module.fail_json(msg=f"Failed to find {self.config_file}")
         self.config.load()
 
     def check_ssh_config_path(self):
@@ -272,7 +271,7 @@ class SSHConfig(object):
             self.identity_file = os.path.join(dirname, self.identity_file)
 
             if not os.path.exists(self.identity_file):
-                self.module.fail_json(msg='IdentityFile %s does not exist' % self.params['identity_file'])
+                self.module.fail_json(msg=f"IdentityFile {self.params['identity_file']} does not exist")
 
     def ensure_state(self):
         hosts_result = self.config.search_host(self.host)
@@ -298,14 +297,13 @@ class SSHConfig(object):
         if self.params.get('other_options'):
             for key, value in self.params.get('other_options').items():
                 if key.lower() != key:
-                    self.module.fail_json(msg="The other_options key {key!r} must be lower case".format(key=key))
+                    self.module.fail_json(msg=f"The other_options key {key} must be lower case")
                 if key not in args:
                     if not isinstance(value, str):
-                        self.module.fail_json(msg="The other_options value provided for key {key!r} must be a string, got {type}".format(key=key,
-                                                                                                                                         type=type(value)))
+                        self.module.fail_json(msg=f"The other_options value provided for key {key} must be a string, got {type(value)}")
                     args[key] = value
                 else:
-                    self.module.fail_json(msg="Multiple values provided for key {key!r}".format(key=key))
+                    self.module.fail_json(msg=f"Multiple values provided for key {key}")
 
         config_changed = False
         hosts_changed = []
@@ -349,7 +347,7 @@ class SSHConfig(object):
                 self.config.write_to_ssh_config()
             except PermissionError as perm_exec:
                 self.module.fail_json(
-                    msg="Failed to write to %s due to permission issue: %s" % (self.config_file, to_native(perm_exec)))
+                    msg=f"Failed to write to {self.config_file} due to permission issue: {perm_exec}")
             # Make sure we set the permission
             perm_mode = '0600'
             if self.config_file == '/etc/ssh/ssh_config':

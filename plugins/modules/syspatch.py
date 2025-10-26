@@ -106,7 +106,7 @@ def syspatch_run(module):
     rc, out, err = module.run_command([cmd] + check_flag)
 
     if rc != 0:
-        module.fail_json(msg="Command %s failed rc=%d, out=%s, err=%s" % (cmd, rc, out, err))
+        module.fail_json(msg=f"Command {cmd} failed rc={rc}, out={out}, err={err}")
 
     if len(out) > 0:
         # Changes pending
@@ -123,7 +123,7 @@ def syspatch_run(module):
         # Workaround syspatch ln bug:
         # http://openbsd-archive.7691.n7.nabble.com/Warning-applying-latest-syspatch-td354250.html
         if rc != 0 and err != 'ln: /usr/X11R6/bin/X: No such file or directory\n':
-            module.fail_json(msg="Command %s failed rc=%d, out=%s, err=%s" % (cmd, rc, out, err))
+            module.fail_json(msg=f"Command {cmd} failed rc={rc}, out={out}, err={err}")
         elif out.lower().find('create unique kernel') >= 0:
             # Kernel update applied
             reboot_needed = True

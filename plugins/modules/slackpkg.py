@@ -83,7 +83,7 @@ def query_package(module, slackpkg_path, name):
     # Exception for kernel-headers package on x86_64
     if name == 'kernel-headers' and machine == 'x86_64':
         machine = 'x86'
-    pattern = re.compile('^%s-[^-]+-(%s|noarch|fw)-[^-]+$' % (re.escape(name), re.escape(machine)))
+    pattern = re.compile(f'^{re.escape(name)}-[^-]+-({re.escape(machine)}|noarch|fw)-[^-]+$')
     packages = [f for f in os.listdir('/var/log/packages') if pattern.match(f)]
 
     if len(packages) > 0:
@@ -107,13 +107,13 @@ def remove_packages(module, slackpkg_path, packages):
 
         if not module.check_mode and query_package(module, slackpkg_path,
                                                    package):
-            module.fail_json(msg="failed to remove %s: %s" % (package, out))
+            module.fail_json(msg=f"failed to remove {package}: {out}")
 
         remove_c += 1
 
     if remove_c > 0:
 
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
+        module.exit_json(changed=True, msg=f"removed {remove_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
@@ -132,14 +132,13 @@ def install_packages(module, slackpkg_path, packages):
 
         if not module.check_mode and not query_package(module, slackpkg_path,
                                                        package):
-            module.fail_json(msg="failed to install %s: %s" % (package, out),
+            module.fail_json(msg=f"failed to install {package}: {out}",
                              stderr=err)
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="present %s package(s)"
-                         % (install_c))
+        module.exit_json(changed=True, msg=f"present {install_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already present")
 
@@ -154,14 +153,13 @@ def upgrade_packages(module, slackpkg_path, packages):
 
         if not module.check_mode and not query_package(module, slackpkg_path,
                                                        package):
-            module.fail_json(msg="failed to install %s: %s" % (package, out),
+            module.fail_json(msg=f"failed to install {package}: {out}",
                              stderr=err)
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="present %s package(s)"
-                         % (install_c))
+        module.exit_json(changed=True, msg=f"present {install_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already present")
 

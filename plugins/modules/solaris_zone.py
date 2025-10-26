@@ -196,20 +196,20 @@ class Zone(object):
             t = tempfile.NamedTemporaryFile(delete=False, mode='wt')
 
             if self.sparse:
-                t.write('create %s\n' % self.create_options)
+                t.write(f'create {self.create_options}\n')
                 self.msg.append('creating sparse-root zone')
             else:
-                t.write('create -b %s\n' % self.create_options)
+                t.write(f'create -b {self.create_options}\n')
                 self.msg.append('creating whole-root zone')
 
-            t.write('set zonepath=%s\n' % self.path)
-            t.write('%s\n' % self.config)
+            t.write(f'set zonepath={self.path}\n')
+            t.write(f'{self.config}\n')
             t.close()
 
             cmd = [self.zonecfg_cmd, '-z', self.name, '-f', t.name]
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to create zone. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to create zone. {out + err}')
             os.unlink(t.name)
 
         self.changed = True
@@ -220,7 +220,7 @@ class Zone(object):
             cmd = [self.zoneadm_cmd, '-z', self.name, 'install', self.install_options]
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to install zone. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to install zone. {out + err}')
             if int(self.os_minor) == 10:
                 self.configure_sysid()
             self.configure_password()
@@ -234,20 +234,20 @@ class Zone(object):
                 cmd = [self.zoneadm_cmd, '-z', self.name, 'uninstall', '-F']
                 (rc, out, err) = self.module.run_command(cmd)
                 if rc != 0:
-                    self.module.fail_json(msg='Failed to uninstall zone. %s' % (out + err))
+                    self.module.fail_json(msg=f'Failed to uninstall zone. {out + err}')
             self.changed = True
             self.msg.append('zone uninstalled')
 
     def configure_sysid(self):
-        if os.path.isfile('%s/root/etc/.UNCONFIGURED' % self.path):
-            os.unlink('%s/root/etc/.UNCONFIGURED' % self.path)
+        if os.path.isfile(f'{self.path}/root/etc/.UNCONFIGURED'):
+            os.unlink(f'{self.path}/root/etc/.UNCONFIGURED')
 
-        open('%s/root/noautoshutdown' % self.path, 'w').close()
+        open(f'{self.path}/root/noautoshutdown', 'w').close()
 
-        with open('%s/root/etc/nodename' % self.path, 'w') as node:
+        with open(f'{self.path}/root/etc/nodename', 'w') as node:
             node.write(self.name)
 
-        with open('%s/root/etc/.sysIDtool.state' % self.path, 'w') as id:
+        with open(f'{self.path}/root/etc/.sysIDtool.state', 'w') as id:
             id.write('1       # System previously configured?\n')
             id.write('1       # Bootparams succeeded?\n')
             id.write('1       # System is on a network?\n')
@@ -262,23 +262,23 @@ class Zone(object):
             id.write('vt100')
 
     def configure_ssh_keys(self):
-        rsa_key_file = '%s/root/etc/ssh/ssh_host_rsa_key' % self.path
-        dsa_key_file = '%s/root/etc/ssh/ssh_host_dsa_key' % self.path
+        rsa_key_file = f'{self.path}/root/etc/ssh/ssh_host_rsa_key'
+        dsa_key_file = f'{self.path}/root/etc/ssh/ssh_host_dsa_key'
 
         if not os.path.isfile(rsa_key_file):
             cmd = [self.ssh_keygen_cmd, '-f', rsa_key_file, '-t', 'rsa', '-N', '']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to create rsa key. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to create rsa key. {out + err}')
 
         if not os.path.isfile(dsa_key_file):
             cmd = [self.ssh_keygen_cmd, '-f', dsa_key_file, '-t', 'dsa', '-N', '']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to create dsa key. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to create dsa key. {out + err}')
 
     def configure_password(self):
-        shadow = '%s/root/etc/shadow' % self.path
+        shadow = f'{self.path}/root/etc/shadow'
         if self.root_password:
             with open(shadow, 'r') as f:
                 lines = f.readlines()
@@ -298,7 +298,7 @@ class Zone(object):
             cmd = [self.zoneadm_cmd, '-z', self.name, 'boot']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to boot zone. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to boot zone. {out + err}')
 
             """
             The boot command can return before the zone has fully booted. This is especially
@@ -311,7 +311,7 @@ class Zone(object):
             while True:
                 if elapsed > self.timeout:
                     self.module.fail_json(msg='timed out waiting for zone to boot')
-                rc = os.system('ps -z %s -o args|grep "ttymon.*-d /dev/console" > /dev/null 2>/dev/null' % self.name)
+                rc = os.system(f'ps -z {self.name} -o args|grep "ttymon.*-d /dev/console" > /dev/null 2>/dev/null')
                 if rc == 0:
                     break
                 time.sleep(10)
@@ -328,7 +328,7 @@ class Zone(object):
             cmd = [self.zonecfg_cmd, '-z', self.name, 'delete', '-F']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to delete zone. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to delete zone. {out + err}')
         self.changed = True
         self.msg.append('zone deleted')
 
@@ -337,7 +337,7 @@ class Zone(object):
             cmd = [self.zoneadm_cmd, '-z', self.name, 'halt']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to stop zone. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to stop zone. {out + err}')
         self.changed = True
         self.msg.append('zone stopped')
 
@@ -346,7 +346,7 @@ class Zone(object):
             cmd = [self.zoneadm_cmd, '-z', self.name, 'detach']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to detach zone. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to detach zone. {out + err}')
         self.changed = True
         self.msg.append('zone detached')
 
@@ -355,7 +355,7 @@ class Zone(object):
             cmd = [self.zoneadm_cmd, '-z', self.name, 'attach', self.attach_options]
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
-                self.module.fail_json(msg='Failed to attach zone. %s' % (out + err))
+                self.module.fail_json(msg=f'Failed to attach zone. {out + err}')
         self.changed = True
         self.msg.append('zone attached')
 
@@ -473,7 +473,7 @@ def main():
     elif state == 'attached':
         zone.state_attached()
     else:
-        module.fail_json(msg='Invalid state: %s' % state)
+        module.fail_json(msg=f'Invalid state: {state}')
 
     module.exit_json(changed=zone.changed, msg=', '.join(zone.msg))
 

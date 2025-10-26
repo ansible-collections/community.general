@@ -163,7 +163,7 @@ def create_cpg(
         disk_type):
     try:
         if not validate_set_size(raid_type, set_size):
-            return (False, False, "Set size %s not part of RAID set %s" % (set_size, raid_type))
+            return (False, False, f"Set size {set_size} not part of RAID set {raid_type}")
         if not client_obj.cpgExists(cpg_name):
 
             disk_patterns = []
@@ -195,8 +195,8 @@ def create_cpg(
         else:
             return (True, False, "CPG already present")
     except exceptions.ClientException as e:
-        return (False, False, "CPG creation failed | %s" % (e))
-    return (True, True, "Created CPG %s successfully." % cpg_name)
+        return (False, False, f"CPG creation failed | {e}")
+    return (True, True, f"Created CPG {cpg_name} successfully.")
 
 
 def delete_cpg(
@@ -208,8 +208,8 @@ def delete_cpg(
         else:
             return (True, False, "CPG does not exist")
     except exceptions.ClientException as e:
-        return (False, False, "CPG delete failed | %s" % e)
-    return (True, True, "Deleted CPG %s successfully." % cpg_name)
+        return (False, False, f"CPG delete failed | {e}")
+    return (True, True, f"Deleted CPG {cpg_name} successfully.")
 
 
 def main():
@@ -235,7 +235,7 @@ def main():
     disk_type = module.params["disk_type"]
     secure = module.params["secure"]
 
-    wsapi_url = 'https://%s:8080/api/v1' % storage_system_ip
+    wsapi_url = f'https://{storage_system_ip}:8080/api/v1'
     try:
         client_obj = client.HPE3ParClient(wsapi_url, secure)
     except exceptions.SSLCertFailed:
@@ -245,7 +245,7 @@ def main():
     except exceptions.UnsupportedVersion:
         module.fail_json(msg="Unsupported WSAPI version")
     except Exception as e:
-        module.fail_json(msg="Initializing client failed. %s" % e)
+        module.fail_json(msg=f"Initializing client failed. {e}")
 
     if storage_system_username is None or storage_system_password is None:
         module.fail_json(msg="Storage system username or password is None")
@@ -269,7 +269,7 @@ def main():
                 disk_type
             )
         except Exception as e:
-            module.fail_json(msg="CPG create failed | %s" % e)
+            module.fail_json(msg=f"CPG create failed | {e}")
         finally:
             client_obj.logout()
 
@@ -281,7 +281,7 @@ def main():
                 cpg_name
             )
         except Exception as e:
-            module.fail_json(msg="CPG create failed | %s" % e)
+            module.fail_json(msg=f"CPG create failed | {e}")
         finally:
             client_obj.logout()
 

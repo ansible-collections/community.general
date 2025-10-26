@@ -158,7 +158,7 @@ def main():
             supervisorctl_args = [supervisorctl_path]
         else:
             module.fail_json(
-                msg="Provided path to supervisorctl does not exist or isn't executable: %s" % supervisorctl_path)
+                msg=f"Provided path to supervisorctl does not exist or isn't executable: {supervisorctl_path}")
     else:
         supervisorctl_args = [module.get_bin_path('supervisorctl', True)]
 
@@ -222,7 +222,7 @@ def main():
             module.exit_json(changed=True)
         for process_name in to_take_action_on:
             rc, out, err = run_supervisorctl(action, process_name, check_rc=True)
-            if '%s: %s' % (process_name, expected_result) not in out:
+            if f'{process_name}: {expected_result}' not in out:
                 module.fail_json(msg=out)
 
         if exit_module:
@@ -249,7 +249,7 @@ def main():
             module.exit_json(changed=True)
         run_supervisorctl('reread', check_rc=True)
         rc, out, err = run_supervisorctl('remove', name)
-        if '%s: removed process group' % name in out:
+        if f'{name}: removed process group' in out:
             module.exit_json(changed=True, name=name, state=state)
         else:
             module.fail_json(msg=out, name=name, state=state)
@@ -262,7 +262,7 @@ def main():
             module.exit_json(changed=True)
         run_supervisorctl('reread', check_rc=True)
         dummy, out, dummy = run_supervisorctl('add', name)
-        if '%s: added process group' % name in out:
+        if f'{name}: added process group' in out:
             module.exit_json(changed=True, name=name, state=state)
         else:
             module.fail_json(msg=out, name=name, state=state)
@@ -278,7 +278,7 @@ def main():
         take_action_on_processes(processes, lambda s: s in ('RUNNING', 'STARTING'), 'stop', 'stopped')
 
     if state == 'signalled':
-        take_action_on_processes(processes, lambda s: s in ('RUNNING',), "signal %s" % signal, 'signalled')
+        take_action_on_processes(processes, lambda s: s in ('RUNNING',), f"signal {signal}", 'signalled')
 
 
 if __name__ == '__main__':

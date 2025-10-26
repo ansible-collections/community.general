@@ -296,12 +296,12 @@ def get_category_base_props(category):
 
 def validate_unit_and_properties(runner, unit, extra_properties, units_info, property_cache):
     if not unit_exists(unit, units_info):
-        module.fail_json(msg="Unit '{0}' does not exist or is inaccessible.".format(unit))
+        module.fail_json(msg=f"Unit '{unit}' does not exist or is inaccessible.")
 
     category = determine_category(unit)
 
     if not category:
-        module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
+        module.fail_json(msg=f"Could not determine the category for unit '{unit}'.")
 
     state_props = ['LoadState', 'ActiveState', 'SubState']
     props = get_category_base_props(category)
@@ -315,7 +315,7 @@ def validate_unit_and_properties(runner, unit, extra_properties, units_info, pro
     if extra_properties:
         missing_props = [prop for prop in extra_properties if prop.lower() not in unit_data]
         if missing_props:
-            module.fail_json(msg="The following properties do not exist for unit '{0}': {1}".format(unit, ", ".join(missing_props)))
+            module.fail_json(msg=f"The following properties do not exist for unit '{unit}': {', '.join(missing_props)}")
 
     return True
 
@@ -333,7 +333,7 @@ def process_wildcards(selected_units, all_units, module):
                 resolved_units[match] = True
 
     if not resolved_units:
-        module.fail_json(msg="No units match any of the provided patterns: {}".format(", ".join(non_matching_patterns)))
+        module.fail_json(msg=f"No units match any of the provided patterns: {', '.join(non_matching_patterns)}")
 
     return resolved_units, non_matching_patterns
 
@@ -346,7 +346,7 @@ def process_unit(runner, unit, extra_properties, units_info, property_cache, sta
     category = determine_category(unit)
 
     if not category:
-        module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
+        module.fail_json(msg=f"Could not determine the category for unit '{unit}'.")
 
     props = get_category_base_props(category)
     full_props = set(props + state_props + extra_properties)

@@ -108,7 +108,7 @@ def sysupgrade_run(module):
     rc, out, err = module.run_command(cmd + run_flag)
 
     if rc != 0:
-        module.fail_json(msg="Command %s failed rc=%d, out=%s, err=%s" % (cmd, rc, out, err))
+        module.fail_json(msg=f"Command {cmd} failed rc={rc}, out={out}, err={err}")
     elif out.lower().find('already on latest snapshot') >= 0:
         changed = False
     elif out.lower().find('upgrade on next reboot') >= 0:

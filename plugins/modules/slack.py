@@ -323,9 +323,9 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
             if channel.startswith(('#', '@', 'C0', 'GF', 'G0', 'CP')):
                 payload['channel'] = channel
             else:
-                payload['channel'] = '#' + channel
+                payload['channel'] = f"#{channel}"
         elif prepend_hash == 'always':
-            payload['channel'] = '#' + channel
+            payload['channel'] = f"#{channel}"
         elif prepend_hash == 'never':
             payload['channel'] = channel
     if thread_id is not None:
@@ -383,7 +383,7 @@ def get_slack_message(module, domain, token, channel, ts):
     headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ' + token
+        'Authorization': f"Bearer {token}"
     }
     qs = urlencode({
         'channel': channel,
@@ -392,17 +392,17 @@ def get_slack_message(module, domain, token, channel, ts):
         'inclusive': 'true',
     })
     domain = validate_slack_domain(domain)
-    url = (SLACK_CONVERSATIONS_HISTORY_WEBAPI % domain) + '?' + qs
+    url = f"{SLACK_CONVERSATIONS_HISTORY_WEBAPI % domain}?{qs}"
     response, info = fetch_url(module=module, url=url, headers=headers, method='GET')
     if info['status'] != 200:
         module.fail_json(msg="failed to get slack message")
     data = module.from_json(response.read())
     if data.get('ok') is False:
-        module.fail_json(msg="failed to get slack message: %s" % data)
+        module.fail_json(msg=f"failed to get slack message: {data}")
     if len(data['messages']) < 1:
-        module.fail_json(msg="no messages matching ts: %s" % ts)
+        module.fail_json(msg=f"no messages matching ts: {ts}")
     if len(data['messages']) > 1:
-        module.fail_json(msg="more than 1 message matching ts: %s" % ts)
+        module.fail_json(msg=f"more than 1 message matching ts: {ts}")
     return data['messages'][0]
 
 
@@ -427,7 +427,7 @@ def do_notify_slack(module, domain, token, payload):
         'Accept': 'application/json',
     }
     if use_webapi:
-        headers['Authorization'] = 'Bearer ' + token
+        headers['Authorization'] = f"Bearer {token}"
 
     data = module.jsonify(payload)
     response, info = fetch_url(module=module, url=slack_uri, headers=headers, method='POST', data=data)
@@ -437,7 +437,7 @@ def do_notify_slack(module, domain, token, payload):
             obscured_incoming_webhook = slack_uri
         else:
             obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % (domain, '[obscured]')
-        module.fail_json(msg=" failed to send %s to %s: %s" % (data, obscured_incoming_webhook, info['msg']))
+        module.fail_json(msg=f" failed to send {data} to {obscured_incoming_webhook}: {info['msg']}")
 
     # each API requires different handling
     if use_webapi:
@@ -487,8 +487,7 @@ def main():
 
     color_choices = ['normal', 'good', 'warning', 'danger']
     if color not in color_choices and not is_valid_hex_color(color):
-        module.fail_json(msg="Color value specified should be either one of %r "
-                             "or any valid hex value with length 3 or 6." % color_choices)
+        module.fail_json(msg=f"Color value specified should be either one of {color_choices} or any valid hex value with length 3 or 6.")
 
     changed = True
 

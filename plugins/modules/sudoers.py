@@ -215,22 +215,14 @@ class Sudoers(object):
         if self.user:
             owner = self.user
         elif self.group:
-            owner = '%{group}'.format(group=self.group)
+            owner = f'%{self.group}'
 
         commands_str = ', '.join(self.commands)
         noexec_str = 'NOEXEC:' if self.noexec else ''
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
         setenv_str = 'SETENV:' if self.setenv else ''
-        runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
-        return "{owner} {host}={runas}{noexec}{nopasswd}{setenv} {commands}\n".format(
-            owner=owner,
-            host=self.host,
-            runas=runas_str,
-            noexec=noexec_str,
-            nopasswd=nopasswd_str,
-            setenv=setenv_str,
-            commands=commands_str
-        )
+        runas_str = f'({self.runas})' if self.runas is not None else ''
+        return f"{owner} {self.host}={runas_str}{noexec_str}{nopasswd_str}{setenv_str} {commands_str}\n"
 
     def validate(self):
         if self.validation == 'absent':
@@ -244,7 +236,7 @@ class Sudoers(object):
         rc, stdout, stderr = self.module.run_command(check_command, data=self.content())
 
         if rc != 0:
-            self.module.fail_json(msg='Failed to validate sudoers rule:\n{stdout}'.format(stdout=stdout or stderr), stdout=stdout, stderr=stderr)
+            self.module.fail_json(msg=f'Failed to validate sudoers rule:\n{stdout or stderr}', stdout=stdout, stderr=stderr)
 
     def run(self):
         if self.state == 'absent':

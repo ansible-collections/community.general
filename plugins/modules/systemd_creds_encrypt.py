@@ -115,17 +115,17 @@ def main():
 
     encrypt_cmd = [cmd, "encrypt"]
     if name:
-        encrypt_cmd.append("--name=" + name)
+        encrypt_cmd.append(f"--name={name}")
     else:
         encrypt_cmd.append("--name=")
     if not_after:
-        encrypt_cmd.append("--not-after=" + not_after)
+        encrypt_cmd.append(f"--not-after={not_after}")
     if pretty:
         encrypt_cmd.append("--pretty")
     if timestamp:
-        encrypt_cmd.append("--timestamp=" + timestamp)
+        encrypt_cmd.append(f"--timestamp={timestamp}")
     if user:
-        encrypt_cmd.append("--uid=" + user)
+        encrypt_cmd.append(f"--uid={user}")
     encrypt_cmd.extend(["-", "-"])
 
     rc, stdout, stderr = module.run_command(encrypt_cmd, data=secret, binary_data=True)
