@@ -32,8 +32,7 @@ def test_ksu_basic(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, task['become_user'], ksu_flags,
-                                                              default_exe, success, default_cmd), cmd) is not None)
+    assert (re.match(f"""{ksu_exe} {task['become_user']} {ksu_flags} -e {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None)
 
 
 def test_ksu(mocker, parser, reset_cli_args):
@@ -55,8 +54,7 @@ def test_ksu(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, task['become_user'], ksu_flags,
-                                                              default_exe, success, default_cmd), cmd) is not None)
+    assert (re.match(f"""{ksu_exe} {task['become_user']} {ksu_flags} -e {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None)
 
 
 def test_ksu_varoptions(mocker, parser, reset_cli_args):
@@ -81,5 +79,4 @@ def test_ksu_varoptions(mocker, parser, reset_cli_args):
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, var_options['ansible_become_user'], ksu_flags,
-                                                              default_exe, success, default_cmd), cmd) is not None)
+    assert (re.match(f"""{ksu_exe} {var_options['ansible_become_user']} {ksu_flags} -e {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None)

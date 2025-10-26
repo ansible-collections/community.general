@@ -132,7 +132,7 @@ def test_how_many_dots(identifier, id_type, quoted_identifier, msg):
     assert pg_quote_identifier(identifier, id_type) == quoted_identifier
 
     with pytest.raises(SQLParseError) as ex:
-        pg_quote_identifier('%s.more' % identifier, id_type)
+        pg_quote_identifier(f'{identifier}.more', id_type)
 
     ex.match(msg)
 

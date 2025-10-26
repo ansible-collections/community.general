@@ -31,8 +31,7 @@ def test_pbrun_basic(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s  'echo %s; %s'""" % (pbrun_exe, pbrun_flags,
-                                                  success, default_cmd), cmd) is not None
+    assert re.match(f"""{pbrun_exe} {pbrun_flags}  'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_pbrun(mocker, parser, reset_cli_args):
@@ -54,8 +53,7 @@ def test_pbrun(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, task['become_user'],
-                                                       success, default_cmd), cmd) is not None
+    assert re.match(f"""{pbrun_exe} {pbrun_flags} -u {task['become_user']} 'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_pbrun_var_varoptions(mocker, parser, reset_cli_args):
@@ -80,5 +78,4 @@ def test_pbrun_var_varoptions(mocker, parser, reset_cli_args):
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, var_options['ansible_become_user'],
-                                                       success, default_cmd), cmd) is not None
+    assert re.match(f"""{pbrun_exe} {pbrun_flags} -u {var_options['ansible_become_user']} 'echo {success}; {default_cmd}'""", cmd) is not None

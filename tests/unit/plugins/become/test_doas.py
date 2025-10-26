@@ -31,8 +31,7 @@ def test_doas_basic(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s  %s  %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, default_exe, success,
-                                                          default_cmd), cmd) is not None)
+    assert (re.match(f"""{doas_exe}  {doas_flags}  {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None)
 
 
 def test_doas(mocker, parser, reset_cli_args):
@@ -54,8 +53,7 @@ def test_doas(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, task['become_user'], default_exe, success,
-                                                              default_cmd), cmd) is not None)
+    assert (re.match(f"""{doas_exe} {doas_flags} -u {task['become_user']} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None)
 
 
 def test_doas_varoptions(mocker, parser, reset_cli_args):
@@ -80,5 +78,4 @@ def test_doas_varoptions(mocker, parser, reset_cli_args):
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, var_options['ansible_become_user'], default_exe, success,
-                                                              default_cmd), cmd) is not None)
+    assert (re.match(f"""{doas_exe} {doas_flags} -u {var_options['ansible_become_user']} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None)

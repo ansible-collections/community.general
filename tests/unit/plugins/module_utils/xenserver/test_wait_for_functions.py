@@ -70,7 +70,7 @@ def test_wait_for_vm_ip_address_xenapi_failure(mock_xenapi_failure, xenserver, f
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.wait_for_vm_ip_address(fake_ansible_module, fake_xenapi_ref('VM'))
 
-    assert exc_info.value.kwargs['msg'] == "XAPI ERROR: %s" % mock_xenapi_failure[1]
+    assert exc_info.value.kwargs['msg'] == f"XAPI ERROR: {mock_xenapi_failure[1]}"
 
 
 @pytest.mark.parametrize('bad_power_state',
@@ -89,8 +89,8 @@ def test_wait_for_vm_ip_address_bad_power_state(mocker, fake_ansible_module, Xen
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.wait_for_vm_ip_address(fake_ansible_module, fake_xenapi_ref('VM'))
 
-    assert exc_info.value.kwargs['msg'] == ("Cannot wait for VM IP address when VM is in state '%s'!" %
-                                            xenserver.xapi_to_module_vm_power_state(bad_power_state.lower()))
+    assert exc_info.value.kwargs['msg'] == (
+        f"Cannot wait for VM IP address when VM is in state '{xenserver.xapi_to_module_vm_power_state(bad_power_state.lower())}'!")
 
 
 @pytest.mark.parametrize('bad_guest_metrics_ref, bad_guest_metrics',
@@ -170,7 +170,7 @@ def test_wait_for_task_xenapi_failure(mock_xenapi_failure, fake_ansible_module, 
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.wait_for_task(fake_ansible_module, fake_xenapi_ref('task'))
 
-    assert exc_info.value.kwargs['msg'] == "XAPI ERROR: %s" % mock_xenapi_failure[1]
+    assert exc_info.value.kwargs['msg'] == f"XAPI ERROR: {mock_xenapi_failure[1]}"
 
 
 def test_wait_for_task_timeout(mocker, fake_ansible_module, XenAPI, xenserver):

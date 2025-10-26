@@ -7,7 +7,7 @@ from __future__ import annotations
 
 
 def fake_xenapi_ref(xenapi_class):
-    return "OpaqueRef:fake-xenapi-%s-ref" % xenapi_class
+    return f"OpaqueRef:fake-xenapi-{xenapi_class}-ref"
 
 
 testcase_bad_xenapi_refs = {

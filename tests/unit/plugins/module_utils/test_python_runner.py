@@ -162,11 +162,7 @@ def test_runner_context(runner_input, cmd_execution, expected):
 
     orig_results = tuple(cmd_execution[x] for x in ('rc', 'out', 'err'))
 
-    print("arg_spec={0}\nparams={1}\narg_formats={2}\n".format(
-        arg_spec,
-        params,
-        arg_formats,
-    ))
+    print(f"arg_spec={arg_spec}\nparams={params}\narg_formats={arg_formats}\n")
 
     module = MagicMock()
     type(module).argument_spec = PropertyMock(return_value=arg_spec)
@@ -196,7 +192,7 @@ def test_runner_context(runner_input, cmd_execution, expected):
 
     def _assert_run_info_env_path(actual, expected):
         actual2 = set(actual.split(":"))
-        assert expected in actual2, "Missing expected path {0} in output PATH: {1}".format(expected, actual)
+        assert expected in actual2, f"Missing expected path {expected} in output PATH: {actual}"
 
     def _assert_run_info(actual, expected):
         reduced = {k: actual[k] for k in expected.keys()}
@@ -204,7 +200,7 @@ def test_runner_context(runner_input, cmd_execution, expected):
         expected, exp_path = _extract_path(expected)
         if exp_path is not None:
             _assert_run_info_env_path(act_path, exp_path)
-        assert reduced == expected, "{0}".format(reduced)
+        assert reduced == expected, f"{reduced}"
 
     def _assert_run(expected, ctx, results):
         _assert_run_info(ctx.run_info, expected['run_info'])

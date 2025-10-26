@@ -27,10 +27,10 @@ class FakeEtcd3Client(MagicMock):
 
     def get_prefix(self, key):
         for i in range(1, 4):
-            yield self.get('{0}_{1}'.format(key, i))
+            yield self.get(f'{key}_{i}')
 
     def get(self, key):
-        return ("{0} value".format(key), FakeKVMetadata(key, None))
+        return (f"{key} value", FakeKVMetadata(key, None))
 
 
 class TestLookupModule(unittest.TestCase):

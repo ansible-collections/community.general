@@ -45,7 +45,7 @@ class MockLPass(LPass):
 
         field_group = show_p.add_mutually_exclusive_group(required=True)
         for field in MOCK_ENTRIES[0].keys():
-            field_group.add_argument("--{0}".format(field), default=False, action='store_true')
+            field_group.add_argument(f"--{field}", default=False, action='store_true')
         field_group.add_argument('--field', default=None)
         show_p.add_argument('selector', help='Unique Name or ID')
 
@@ -73,8 +73,7 @@ class MockLPass(LPass):
 
         if args.subparser_name == 'show':
             if self._mock_logged_out:
-                return mock_exit(error='Error: Could not find decryption key.' +
-                                 ' Perhaps you need to login with `lpass login`.', rc=1)
+                return mock_exit(error="Error: Could not find decryption key. Perhaps you need to login with `lpass login`.", rc=1)
 
             if self._mock_disconnected:
                 return mock_exit(error='Error: Couldn\'t resolve host name.', rc=1)

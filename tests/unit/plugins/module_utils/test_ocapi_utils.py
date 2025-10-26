@@ -43,10 +43,10 @@ class TestOcapiUtils(unittest.TestCase):
 
         # Check the returned binary data
         boundary = m.group(1)
-        expected_content_text = '--%s\r\n' % boundary
-        expected_content_text += 'Content-Disposition: form-data; name="FirmwareFile"; filename="%s"\r\n' % filename
+        expected_content_text = f'--{boundary}\r\n'
+        expected_content_text += f'Content-Disposition: form-data; name="FirmwareFile"; filename="{filename}"\r\n'
         expected_content_text += 'Content-Type: application/octet-stream\r\n\r\n'
         expected_content_bytes = bytearray(expected_content_text, 'utf-8')
         expected_content_bytes += file_contents
-        expected_content_bytes += bytearray('\r\n--%s--' % boundary, 'utf-8')
+        expected_content_bytes += bytearray(f'\r\n--{boundary}--', 'utf-8')
         self.assertEqual(expected_content_bytes, b_form_data)

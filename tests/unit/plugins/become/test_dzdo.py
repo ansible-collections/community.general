@@ -31,8 +31,7 @@ def test_dzdo_basic(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s  %s -c 'echo %s; %s'""" % (dzdo_exe, dzdo_flags, default_exe,
-                                                        success, default_cmd), cmd) is not None
+    assert re.match(f"""{dzdo_exe} {dzdo_flags}  {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_dzdo(mocker, parser, reset_cli_args):
@@ -54,8 +53,7 @@ def test_dzdo(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (dzdo_exe, dzdo_flags, task['become_user'], default_exe,
-                                                             success, default_cmd), cmd) is not None
+    assert re.match(f"""{dzdo_exe} {dzdo_flags} -u {task['become_user']} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
     task['become_pass'] = 'testpass'
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
@@ -85,8 +83,7 @@ def test_dzdo_varoptions(mocker, parser, reset_cli_args):
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (dzdo_exe, dzdo_flags, var_options['ansible_become_user'], default_exe,
-                                                             success, default_cmd), cmd) is not None
+    assert re.match(f"""{dzdo_exe} {dzdo_flags} -u {var_options['ansible_become_user']} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
     var_options['ansible_become_pass'] = 'testpass'
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)

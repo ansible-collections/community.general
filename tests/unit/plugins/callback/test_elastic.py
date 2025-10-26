@@ -20,8 +20,7 @@ class TestOpentelemetry(unittest.TestCase):
     @patch('ansible_collections.community.general.plugins.callback.elastic.socket')
     def setUp(self, mock_socket):
         if sys.version_info < ELASTIC_MINIMUM_PYTHON_VERSION:
-            self.skipTest("Python %s+ is needed for Elastic" %
-                          ",".join(map(str, ELASTIC_MINIMUM_PYTHON_VERSION)))
+            self.skipTest(f"Python {'.'.join(map(str, ELASTIC_MINIMUM_PYTHON_VERSION))}+ is needed for Elastic")
         mock_socket.gethostname.return_value = 'my-host'
         mock_socket.gethostbyname.return_value = '1.2.3.4'
         self.elastic = ElasticSource(display=None)

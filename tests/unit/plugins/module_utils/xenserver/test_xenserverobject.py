@@ -27,7 +27,7 @@ def test_xenserverobject_xenapi_failure(mock_xenapi_failure, fake_ansible_module
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.XenServerObject(fake_ansible_module)
 
-    assert exc_info.value.kwargs['msg'] == "XAPI ERROR: %s" % mock_xenapi_failure[1]
+    assert exc_info.value.kwargs['msg'] == f"XAPI ERROR: {mock_xenapi_failure[1]}"
 
 
 def test_xenserverobject(mocker, fake_ansible_module, XenAPI, xenserver):
