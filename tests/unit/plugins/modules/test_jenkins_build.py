@@ -37,7 +37,7 @@ class JenkinsBuildMock():
             response["result"] = "ABSENT"
             return response
         except Exception as e:
-            fail_json(msg='Unable to fetch build information, {0}'.format(e))
+            fail_json(msg=f'Unable to fetch build information, {e}')
 
 
 class JenkinsMock():
@@ -49,7 +49,7 @@ class JenkinsMock():
 
     def get_build_info(self, name, build_number):
         if name == "host-delete":
-            raise jenkins.JenkinsException("job {0} number {1} does not exist".format(name, build_number))
+            raise jenkins.JenkinsException(f"job {name} number {build_number} does not exist")
         elif name == "create-detached":
             return {
                 "building": True,
@@ -87,7 +87,7 @@ class JenkinsMockIdempotent():
         return None
 
     def delete_build(self, name, build_number):
-        raise jenkins.NotFoundException("job {0} number {1} does not exist".format(name, build_number))
+        raise jenkins.NotFoundException(f"job {name} number {build_number} does not exist")
 
     def stop_build(self, name, build_number):
         return None

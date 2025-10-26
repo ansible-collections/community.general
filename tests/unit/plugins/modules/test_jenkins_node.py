@@ -62,7 +62,7 @@ def assert_xml_equal(x, y):
     if not isinstance(y, str):
         y = et.tostring(y)
 
-    raise AssertionError("{} != {}".format(x, y))
+    raise AssertionError(f"{x} != {y}")
 
 
 @fixture(autouse=True)

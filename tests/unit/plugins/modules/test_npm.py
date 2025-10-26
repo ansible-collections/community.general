@@ -17,9 +17,9 @@ class NPMModuleTestCase(ModuleTestCase):
     def setUp(self):
         super(NPMModuleTestCase, self).setUp()
         ansible_module_path = "ansible_collections.community.general.plugins.modules.npm.AnsibleModule"
-        self.mock_run_command = patch('%s.run_command' % ansible_module_path)
+        self.mock_run_command = patch(f'{ansible_module_path}.run_command')
         self.module_main_command = self.mock_run_command.start()
-        self.mock_get_bin_path = patch('%s.get_bin_path' % ansible_module_path)
+        self.mock_get_bin_path = patch(f'{ansible_module_path}.get_bin_path')
         self.get_bin_path = self.mock_get_bin_path.start()
         self.get_bin_path.return_value = '/testbin/npm'
 

@@ -27,12 +27,12 @@ class TestLvgRename(ModuleTestCase):
 
         self.mock_run_responses = {}
 
-        patched_module_get_bin_path = patch('%s.AnsibleModule.get_bin_path' % (self.module_path))
+        patched_module_get_bin_path = patch(f'{self.module_path}.AnsibleModule.get_bin_path')
         self.mock_module_get_bin_path = patched_module_get_bin_path.start()
         self.mock_module_get_bin_path.return_value = '/mocpath'
         self.addCleanup(patched_module_get_bin_path.stop)
 
-        patched_module_run_command = patch('%s.AnsibleModule.run_command' % (self.module_path))
+        patched_module_run_command = patch(f'{self.module_path}.AnsibleModule.run_command')
         self.mock_module_run_command = patched_module_run_command.start()
         self.addCleanup(patched_module_run_command.stop)
 

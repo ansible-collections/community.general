@@ -369,5 +369,5 @@ def test_user_agent_created_properly():
     except ImportError:
         ansible_version = 'unknown'
 
-    expected_user_agent = 'Ansible-linode_v4_module/%s' % ansible_version
+    expected_user_agent = f'Ansible-linode_v4_module/{ansible_version}'
     assert expected_user_agent == get_user_agent('linode_v4_module')

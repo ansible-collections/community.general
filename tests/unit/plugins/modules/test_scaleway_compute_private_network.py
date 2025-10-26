@@ -74,7 +74,7 @@ def test_scaleway_add_nic(capfd):
     os.environ['SCW_API_TOKEN'] = 'notrealtoken'
     pnid = 'b589b4cd-ef5g-678h-90i1-jk2345678l90'
     cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
-    url = 'servers/' + cid + '/private_nics'
+    url = f"servers/{cid}/private_nics"
 
     with set_module_args({
         "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
@@ -103,7 +103,7 @@ def test_scaleway_add_existing_nic(capfd):
     os.environ['SCW_API_TOKEN'] = 'notrealtoken'
     pnid = 'b589b4cd-ef5g-678h-90i1-jk2345678l90'
     cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
-    url = 'servers/' + cid + '/private_nics'
+    url = f"servers/{cid}/private_nics"
 
     with set_module_args({
         "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
@@ -130,8 +130,8 @@ def test_scaleway_remove_existing_nic(capfd):
     pnid = 'b589b4cd-ef5g-678h-90i1-jk2345678l90'
     cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
     nicid = 'c123b4cd-ef5g-678h-90i1-jk2345678l90'
-    url = 'servers/' + cid + '/private_nics'
-    urlremove = 'servers/' + cid + '/private_nics/' + nicid
+    url = f"servers/{cid}/private_nics"
+    urlremove = f"servers/{cid}/private_nics/{nicid}"
 
     with set_module_args({
         "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
@@ -161,7 +161,7 @@ def test_scaleway_remove_absent_nic(capfd):
     os.environ['SCW_API_TOKEN'] = 'notrealtoken'
     pnid = 'b589b4cd-ef5g-678h-90i1-jk2345678l90'
     cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
-    url = 'servers/' + cid + '/private_nics'
+    url = f"servers/{cid}/private_nics"
 
     with set_module_args({
         "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",

@@ -205,7 +205,7 @@ class TestWdcRedfishInfo(unittest.TestCase):
                 elif uri.endswith("/UpdateService"):
                     return MOCK_SUCCESSFUL_RESPONSE_WITH_SIMPLE_UPDATE_BUT_NO_FW_ACTIVATE
                 else:
-                    raise RuntimeError("Illegal call to get_request in test: " + uri)
+                    raise RuntimeError(f"Illegal call to get_request in test: {uri}")
 
             with patch("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils.get_request") as mock_get_request:
                 mock_get_request.side_effect = mock_get_request_function

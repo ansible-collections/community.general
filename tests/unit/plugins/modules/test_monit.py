@@ -103,8 +103,8 @@ class MonitTest(unittest.TestCase):
 def test_status_value(status_name):
     value = getattr(monit.StatusValue, status_name.upper())
     status = monit.StatusValue(value)
-    assert getattr(status, 'is_%s' % status_name)
-    assert not all(getattr(status, 'is_%s' % name) for name in monit.StatusValue.ALL_STATUS if name != status_name)
+    assert getattr(status, f'is_{status_name}')
+    assert not all(getattr(status, f'is_{name}') for name in monit.StatusValue.ALL_STATUS if name != status_name)
 
 
 BASIC_OUTPUT_CASES = [

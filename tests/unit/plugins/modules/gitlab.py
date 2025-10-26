@@ -55,7 +55,7 @@ def python_gitlab_version_match_requirement():
 # Skip unittest test case if python version don't match requirement
 def unitest_python_version_check_requirement(unittest_testcase):
     if not python_version_match_requirement():
-        unittest_testcase.skipTest("Python %s+ is needed for python-gitlab" % ",".join(map(str, GITLAB_MINIMUM_PYTHON_VERSION)))
+        unittest_testcase.skipTest(f"Python {'.'.join(map(str, GITLAB_MINIMUM_PYTHON_VERSION))}+ is needed for python-gitlab")
 
 
 '''

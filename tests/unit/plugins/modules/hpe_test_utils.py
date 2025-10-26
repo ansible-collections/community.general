@@ -18,7 +18,7 @@ class OneViewBaseTest(object):
     @pytest.fixture(autouse=True)
     def setUp(self, mock_ansible_module, mock_ov_client, request):
         marker = request.node.get_marker('resource')
-        self.resource = getattr(mock_ov_client, "%s" % (marker.args))
+        self.resource = getattr(mock_ov_client, f"{marker.args}")
         self.mock_ov_client = mock_ov_client
         self.mock_ansible_module = mock_ansible_module
 
@@ -27,7 +27,7 @@ class OneViewBaseTest(object):
         resource_name = type(self).__name__.replace('Test', '')
         resource_module_path_name = resource_name.replace('Module', '')
         resource_module_path_name = re.findall('[A-Z][^A-Z]*', resource_module_path_name)
-        resource_module_path_name = 'oneview_' + str.join('_', resource_module_path_name).lower()
+        resource_module_path_name = f"oneview_{str.join('_', resource_module_path_name).lower()}"
 
         ansible_collections = __import__('ansible_collections')
         oneview_module = ansible_collections.community.general.plugins.modules
@@ -40,7 +40,7 @@ class OneViewBaseTest(object):
             EXAMPLES = yaml.safe_load(testing_module.EXAMPLES)
 
         except yaml.scanner.ScannerError:
-            message = "Something went wrong while parsing yaml from {0}.EXAMPLES".format(self.testing_class.__module__)
+            message = f"Something went wrong while parsing yaml from {self.testing_class.__module__}.EXAMPLES"
             raise Exception(message)
         return testing_module
 
@@ -114,7 +114,7 @@ class OneViewBaseTestCase(object):
         self.mock_ov_client = self.mock_ov_client_from_json_file.return_value
 
         # Define Ansible Module Mock
-        patcher_ansible = patch(ONEVIEW_MODULE_UTILS_PATH + '.AnsibleModule')
+        patcher_ansible = patch(f"{ONEVIEW_MODULE_UTILS_PATH}.AnsibleModule")
         test_case.addCleanup(patcher_ansible.stop)
         mock_ansible_module = patcher_ansible.start()
         self.mock_ansible_module = Mock()
@@ -142,7 +142,7 @@ class OneViewBaseTestCase(object):
             self.EXAMPLES = yaml.safe_load(self.testing_module.EXAMPLES)
 
         except yaml.scanner.ScannerError:
-            message = "Something went wrong while parsing yaml from {0}.EXAMPLES".format(self.testing_class.__module__)
+            message = f"Something went wrong while parsing yaml from {self.testing_class.__module__}.EXAMPLES"
             raise Exception(message)
 
 

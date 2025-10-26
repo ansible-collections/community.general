@@ -88,31 +88,31 @@ def get_exception_message(ansible_exit_json):
 def mock_get_request(*args, **kwargs):
     """Mock for get_request."""
     url = args[1]
-    if url == "https://" + MOCK_BASE_URI:
+    if url == f"https://{MOCK_BASE_URI}":
         return MOCK_SUCCESSFUL_HTTP_RESPONSE
-    elif url == "https://" + MOCK_BASE_URI + '/Jobs/' + MOCK_JOB_NAME_IN_PROGRESS:
+    elif url == f"https://{MOCK_BASE_URI}/Jobs/{MOCK_JOB_NAME_IN_PROGRESS}":
         return MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS
-    elif url == "https://" + MOCK_BASE_URI + '/Jobs/' + MOCK_JOB_NAME_COMPLETE:
+    elif url == f"https://{MOCK_BASE_URI}/Jobs/{MOCK_JOB_NAME_COMPLETE}":
         return MOCK_HTTP_RESPONSE_JOB_COMPLETE
-    elif url == "https://" + MOCK_BASE_URI + '/Jobs/' + MOCK_JOB_NAME_DOES_NOT_EXIST:
+    elif url == f"https://{MOCK_BASE_URI}/Jobs/{MOCK_JOB_NAME_DOES_NOT_EXIST}":
         return MOCK_404_RESPONSE
     else:
-        raise RuntimeError("Illegal GET call to: " + args[1])
+        raise RuntimeError(f"Illegal GET call to: {args[1]}")
 
 
 def mock_put_request(*args, **kwargs):
     """Mock put_request.  PUT should never happen so it will raise an error."""
-    raise RuntimeError("Illegal PUT call to: " + args[1])
+    raise RuntimeError(f"Illegal PUT call to: {args[1]}")
 
 
 def mock_delete_request(*args, **kwargs):
     """Mock delete request.  DELETE should never happen so it will raise an error."""
-    raise RuntimeError("Illegal DELETE call to: " + args[1])
+    raise RuntimeError(f"Illegal DELETE call to: {args[1]}")
 
 
 def mock_post_request(*args, **kwargs):
     """Mock post_request.  POST should never happen so it will raise an error."""
-    raise RuntimeError("Illegal POST call to: " + args[1])
+    raise RuntimeError(f"Illegal POST call to: {args[1]}")
 
 
 class TestOcapiInfo(unittest.TestCase):

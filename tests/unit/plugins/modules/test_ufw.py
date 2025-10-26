@@ -30,10 +30,8 @@ To                         Action      From
 --                         ------      ----"""
 
 
-ufw_status_verbose_with_port_7000 = ufw_verbose_header + """
-7000/tcp                   ALLOW IN    Anywhere
-7000/tcp (v6)              ALLOW IN    Anywhere (v6)
-"""
+ufw_status_verbose_with_port_7000 = (
+    f"{ufw_verbose_header}\n7000/tcp                   ALLOW IN    Anywhere\n7000/tcp (v6)              ALLOW IN    Anywhere (v6)\n")
 
 user_rules_with_port_7000 = """### tuple ### allow tcp 7000 0.0.0.0/0 any 0.0.0.0/0 in
 ### tuple ### allow tcp 7000 ::/0 any ::/0 in
@@ -43,10 +41,8 @@ user_rules_with_ipv6 = """### tuple ### allow udp 5353 0.0.0.0/0 any 224.0.0.251
 ### tuple ### allow udp 5353 ::/0 any ff02::fb in
 """
 
-ufw_status_verbose_with_ipv6 = ufw_verbose_header + """
-5353/udp                   ALLOW IN    224.0.0.251
-5353/udp                   ALLOW IN    ff02::fb
-"""
+ufw_status_verbose_with_ipv6 = (
+    f"{ufw_verbose_header}\n5353/udp                   ALLOW IN    224.0.0.251\n5353/udp                   ALLOW IN    ff02::fb\n")
 
 ufw_status_verbose_nothing = ufw_verbose_header
 

@@ -62,7 +62,7 @@ def test_acl_create(api_request_mock, project, prefix):
     # should have done GET → POST → GET
     assert api_request_mock.call_count == 3
     args, kwargs = api_request_mock.call_args_list[1]
-    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
+    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
     assert kwargs['method'] == 'POST'
 
 
@@ -91,7 +91,7 @@ def test_acl_unchanged(api_request_mock, project, prefix):
     # only a single GET
     assert api_request_mock.call_count == 1
     args, kwargs = api_request_mock.call_args
-    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
+    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
     # default method is GET
     assert kwargs.get('method', 'GET') == 'GET'
 
@@ -123,7 +123,7 @@ def test_acl_remove(api_request_mock, project, prefix):
     # GET → DELETE
     assert api_request_mock.call_count == 2
     args, kwargs = api_request_mock.call_args_list[1]
-    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
+    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
     assert kwargs['method'] == 'DELETE'
 
 
@@ -151,5 +151,5 @@ def test_acl_remove_nonexistent(api_request_mock, project, prefix):
     # only the initial GET
     assert api_request_mock.call_count == 1
     args, kwargs = api_request_mock.call_args
-    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
+    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
     assert kwargs.get('method', 'GET') == 'GET'

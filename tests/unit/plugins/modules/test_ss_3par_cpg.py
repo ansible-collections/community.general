@@ -197,7 +197,7 @@ def test_create_cpg(mock_client):
                                   8,
                                   'MAG',
                                   'FC'
-                                  ) == (True, True, "Created CPG %s successfully." % 'test_cpg')
+                                  ) == (True, True, "Created CPG test_cpg successfully.")
 
     mock_client.HPE3ParClient.cpgExists.return_value = True
     assert ss_3par_cpg.create_cpg(mock_client.HPE3ParClient,
@@ -235,7 +235,7 @@ def test_delete_cpg(mock_client):
 
     assert ss_3par_cpg.delete_cpg(mock_client.HPE3ParClient,
                                   'test_cpg'
-                                  ) == (True, True, "Deleted CPG %s successfully." % 'test_cpg')
+                                  ) == (True, True, "Deleted CPG test_cpg successfully.")
 
     mock_client.HPE3ParClient.cpgExists.return_value = False
 

@@ -101,63 +101,63 @@ def is_changed(ansible_exit_json):
 def mock_get_request(*args, **kwargs):
     """Mock for get_request."""
     url = args[1]
-    if url == 'https://' + MOCK_BASE_URI:
+    if url == f"https://{MOCK_BASE_URI}":
         return MOCK_SUCCESSFUL_HTTP_RESPONSE_LED_INDICATOR_OFF_WITH_ETAG
     elif url == "mock_location":
         return MOCK_SUCCESSFUL_HTTP_RESPONSE
-    raise RuntimeError("Illegal call to get_request in test: " + args[1])
+    raise RuntimeError(f"Illegal call to get_request in test: {args[1]}")
 
 
 def mock_get_request_job_does_not_exist(*args, **kwargs):
     """Mock for get_request."""
     url = args[1]
-    if url == 'https://' + MOCK_BASE_URI:
+    if url == f"https://{MOCK_BASE_URI}":
         return MOCK_SUCCESSFUL_HTTP_RESPONSE_LED_INDICATOR_OFF_WITH_ETAG
-    elif url == urljoin('https://' + MOCK_BASE_URI, "Jobs/" + MOCK_JOB_NAME):
+    elif url == urljoin(f"https://{MOCK_BASE_URI}", f"Jobs/{MOCK_JOB_NAME}"):
         return MOCK_404_RESPONSE
-    raise RuntimeError("Illegal call to get_request in test: " + args[1])
+    raise RuntimeError(f"Illegal call to get_request in test: {args[1]}")
 
 
 def mock_get_request_job_in_progress(*args, **kwargs):
     url = args[1]
-    if url == 'https://' + MOCK_BASE_URI:
+    if url == f"https://{MOCK_BASE_URI}":
         return MOCK_SUCCESSFUL_HTTP_RESPONSE_LED_INDICATOR_OFF_WITH_ETAG
-    elif url == urljoin('https://' + MOCK_BASE_URI, "Jobs/" + MOCK_JOB_NAME):
+    elif url == urljoin(f"https://{MOCK_BASE_URI}", f"Jobs/{MOCK_JOB_NAME}"):
         return MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS
-    raise RuntimeError("Illegal call to get_request in test: " + args[1])
+    raise RuntimeError(f"Illegal call to get_request in test: {args[1]}")
 
 
 def mock_get_request_job_complete(*args, **kwargs):
     url = args[1]
-    if url == 'https://' + MOCK_BASE_URI:
+    if url == f"https://{MOCK_BASE_URI}":
         return MOCK_SUCCESSFUL_HTTP_RESPONSE_LED_INDICATOR_OFF_WITH_ETAG
-    elif url == urljoin('https://' + MOCK_BASE_URI, "Jobs/" + MOCK_JOB_NAME):
+    elif url == urljoin(f"https://{MOCK_BASE_URI}", f"Jobs/{MOCK_JOB_NAME}"):
         return MOCK_HTTP_RESPONSE_JOB_COMPLETE
-    raise RuntimeError("Illegal call to get_request in test: " + args[1])
+    raise RuntimeError(f"Illegal call to get_request in test: {args[1]}")
 
 
 def mock_put_request(*args, **kwargs):
     """Mock put_request."""
     url = args[1]
-    if url == 'https://' + MOCK_BASE_URI:
+    if url == f"https://{MOCK_BASE_URI}":
         return MOCK_SUCCESSFUL_HTTP_RESPONSE_WITH_LOCATION_HEADER
-    raise RuntimeError("Illegal PUT call to: " + args[1])
+    raise RuntimeError(f"Illegal PUT call to: {args[1]}")
 
 
 def mock_delete_request(*args, **kwargs):
     """Mock delete request."""
     url = args[1]
-    if url == urljoin('https://' + MOCK_BASE_URI, 'Jobs/' + MOCK_JOB_NAME):
+    if url == urljoin(f"https://{MOCK_BASE_URI}", f"Jobs/{MOCK_JOB_NAME}"):
         return MOCK_SUCCESSFUL_HTTP_RESPONSE
-    raise RuntimeError("Illegal DELETE call to: " + args[1])
+    raise RuntimeError(f"Illegal DELETE call to: {args[1]}")
 
 
 def mock_post_request(*args, **kwargs):
     """Mock post_request."""
     url = args[1]
-    if url == urljoin('https://' + MOCK_BASE_URI, OPERATING_SYSTEM_URI):
+    if url == urljoin(f"https://{MOCK_BASE_URI}", OPERATING_SYSTEM_URI):
         return MOCK_SUCCESSFUL_HTTP_RESPONSE
-    raise RuntimeError("Illegal POST call to: " + args[1])
+    raise RuntimeError(f"Illegal POST call to: {args[1]}")
 
 
 def mock_http_request_conflict(*args, **kwargs):
@@ -167,7 +167,7 @@ def mock_http_request_conflict(*args, **kwargs):
 
 def mock_invalid_http_request(*args, **kwargs):
     """Mock to make an HTTP request invalid.  Raises an exception."""
-    raise RuntimeError("Illegal HTTP call to " + args[1])
+    raise RuntimeError(f"Illegal HTTP call to {args[1]}")
 
 
 class TestOcapiCommand(unittest.TestCase):
