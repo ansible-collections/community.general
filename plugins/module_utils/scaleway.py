@@ -180,13 +180,11 @@ class Scaleway(object):
         self.name = None
 
     def get_resources(self):
-        results = self.get('/%s' % self.name)
+        results = self.get(f'/{self.name}')
 
         if not results.ok:
-            raise ScalewayException('Error fetching {0} ({1}) [{2}: {3}]'.format(
-                self.name, '%s/%s' % (self.module.params.get('api_url'), self.name),
-                results.status_code, results.json['message']
-            ))
+            raise ScalewayException(
+                f"Error fetching {self.name} ({self.module.params.get('api_url')}/{self.name}) [{results.status_code}: {results.json['message']}]")
 
         return results.json.get(self.name)
 
@@ -198,7 +196,7 @@ class Scaleway(object):
 
         if path[0] == '/':
             path = path[1:]
-        return '%s/%s?%s' % (self.module.params.get('api_url'), path, query_string)
+        return f"{self.module.params.get('api_url')}/{path}?{query_string}"
 
     def send(self, method, path, data=None, headers=None, params=None):
         url = self._url_builder(path=path, params=params)
@@ -223,7 +221,7 @@ class Scaleway(object):
 
     @staticmethod
     def get_user_agent_string(module):
-        return "ansible %s Python %s" % (module.ansible_version, sys.version.split(' ', 1)[0])
+        return f"ansible {module.ansible_version} Python {sys.version.split(' ', 1)[0]}"
 
     def get(self, path, data=None, headers=None, params=None):
         return self.send(method='GET', path=path, data=data, headers=headers, params=params)
@@ -247,21 +245,21 @@ class Scaleway(object):
         self.module.warn(str(x))
 
     def fetch_state(self, resource):
-        self.module.debug("fetch_state of resource: %s" % resource["id"])
-        response = self.get(path=self.api_path + "/%s" % resource["id"])
+        self.module.debug(f"fetch_state of resource: {resource['id']}")
+        response = self.get(path=f"{self.api_path}/{resource['id']}")
 
         if response.status_code == 404:
             return "absent"
 
         if not response.ok:
-            msg = 'Error during state fetching: (%s) %s' % (response.status_code, response.json)
+            msg = f'Error during state fetching: ({response.status_code}) {response.json}'
             self.module.fail_json(msg=msg)
 
         try:
-            self.module.debug("Resource %s in state: %s" % (resource["id"], response.json["status"]))
+            self.module.debug(f"Resource {resource['id']} in state: {response.json['status']}")
             return response.json["status"]
         except KeyError:
-            self.module.fail_json(msg="Could not fetch state in %s" % response.json)
+            self.module.fail_json(msg=f"Could not fetch state in {response.json}")
 
     def fetch_paginated_resources(self, resource_key, **pagination_kwargs):
         response = self.get(
@@ -270,9 +268,7 @@ class Scaleway(object):
 
         status_code = response.status_code
         if not response.ok:
-            self.module.fail_json(msg='Error getting {0} [{1}: {2}]'.format(
-                resource_key,
-                response.status_code, response.json['message']))
+            self.module.fail_json(msg=f"Error getting {resource_key} [{response.status_code}: {response.json['message']}]")
 
         return response.json[resource_key]
 
@@ -311,7 +307,7 @@ class Scaleway(object):
             state = self.fetch_state(resource)
             if state in stable_states:
                 self.module.debug("It seems that the resource is not in transition anymore.")
-                self.module.debug("load-balancer in state: %s" % self.fetch_state(resource))
+                self.module.debug(f"load-balancer in state: {self.fetch_state(resource)}")
                 break
 
             time.sleep(wait_sleep_time)

@@ -60,26 +60,24 @@ class Online(object):
     def __init__(self, module):
         self.module = module
         self.headers = {
-            'Authorization': "Bearer %s" % self.module.params.get('api_token'),
+            'Authorization': f"Bearer {self.module.params.get('api_token')}",
             'User-Agent': self.get_user_agent_string(module),
             'Content-type': 'application/json',
         }
         self.name = None
 
     def get_resources(self):
-        results = self.get('/%s' % self.name)
+        results = self.get(f'/{self.name}')
         if not results.ok:
-            raise OnlineException('Error fetching {0} ({1}) [{2}: {3}]'.format(
-                self.name, '%s/%s' % (self.module.params.get('api_url'), self.name),
-                results.status_code, results.json['message']
-            ))
+            raise OnlineException(
+                f"Error fetching {self.name} ({self.module.params.get('api_url')}/{self.name}) [{results.status_code}: {results.json['message']}]")
 
         return results.json
 
     def _url_builder(self, path):
         if path[0] == '/':
             path = path[1:]
-        return '%s/%s' % (self.module.params.get('api_url'), path)
+        return f"{self.module.params.get('api_url')}/{path}"
 
     def send(self, method, path, data=None, headers=None):
         url = self._url_builder(path)
@@ -101,7 +99,7 @@ class Online(object):
 
     @staticmethod
     def get_user_agent_string(module):
-        return "ansible %s Python %s" % (module.ansible_version, sys.version.split(' ', 1)[0])
+        return f"ansible {module.ansible_version} Python {sys.version.split(' ', 1)[0]}"
 
     def get(self, path, data=None, headers=None):
         return self.send('GET', path, data, headers)
