@@ -1,0 +1,7 @@
+minor_changes:
+  - oneandone_firewall_policy - improve parameters validations and documentation (https://github.com/ansible-collections/community.general/pull/10982).
+  - oneandone_load_balancer - improve parameters validations and documentation (https://github.com/ansible-collections/community.general/pull/10982).
+  - oneandone_monitoring_policy - improve parameters validations and documentation (https://github.com/ansible-collections/community.general/pull/10982).
+  - oneandone_private_network - improve parameters validations and documentation (https://github.com/ansible-collections/community.general/pull/10982).
+  - oneandone_public_ip - improve parameters validations and documentation (https://github.com/ansible-collections/community.general/pull/10982).
+  - oneandone_server - improve parameters validations and documentation (https://github.com/ansible-collections/community.general/pull/10982).
