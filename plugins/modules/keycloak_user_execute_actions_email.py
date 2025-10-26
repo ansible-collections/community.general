@@ -135,8 +135,8 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 def main():
     argument_spec = keycloak_argument_spec()
     # Avoid alias collision as in keycloak_user: clear auth_username aliases locally
-    if isinstance(argument_spec.get('auth_username'), dict):
-        argument_spec['auth_username']['aliases'] = []
+    argument_spec['auth_username']['aliases'] = []
+
     meta_args = dict(
         realm=dict(type='str', default='master'),
         id=dict(type='str'),
