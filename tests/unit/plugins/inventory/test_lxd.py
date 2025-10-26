@@ -97,7 +97,7 @@ def test_build_inventory_groups_with_no_groupselection(inventory):
     group_comparative_data = {'all': [], 'ungrouped': []}
 
     eq = True
-    print("data: {0}".format(generated_data))
+    print(f"data: {generated_data}")
     for key, value in group_comparative_data.items():
         if generated_data[key] != value:
             eq = False

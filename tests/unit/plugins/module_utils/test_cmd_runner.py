@@ -55,8 +55,8 @@ def test_arg_format(func, value, expected, exception):
     fmt_func = func()
     try:
         actual = fmt_func(value)
-        print("formatted string = {0}".format(actual))
-        assert actual == expected, "actual = {0}".format(actual)
+        print(f"formatted string = {actual}")
+        assert actual == expected, f"actual = {actual}"
     except Exception as e:
         if exception is None:
             raise
@@ -192,7 +192,7 @@ TC_RUNNER = dict(
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
                 args_order=['aa', 'bb'],
-                output_process=lambda rc, out, err: '-/-'.join([str(rc), out, err])
+                output_process=lambda rc, out, err: f"{rc!s}-/-{out}-/-{err}"
             ),
         ),
         dict(runner_ctx_run_args=dict(bb=True), rc=0, out="ni", err="nu"),
@@ -302,11 +302,7 @@ def test_runner_context(runner_input, cmd_execution, expected):
 
     orig_results = tuple(cmd_execution[x] for x in ('rc', 'out', 'err'))
 
-    print("arg_spec={0}\nparams={1}\narg_formats={2}\n".format(
-        arg_spec,
-        params,
-        arg_formats,
-    ))
+    print(f"arg_spec={arg_spec}\nparams={params}\narg_formats={arg_formats}\n")
 
     module = MagicMock()
     type(module).argument_spec = PropertyMock(return_value=arg_spec)
@@ -323,7 +319,7 @@ def test_runner_context(runner_input, cmd_execution, expected):
 
     def _assert_run_info(actual, expected):
         reduced = {k: actual[k] for k in expected.keys()}
-        assert reduced == expected, "{0}".format(reduced)
+        assert reduced == expected, f"{reduced}"
 
     def _assert_run(runner_input, cmd_execution, expected, ctx, results):
         _assert_run_info(ctx.run_info, expected['run_info'])

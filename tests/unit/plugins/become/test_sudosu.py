@@ -33,8 +33,7 @@ def test_sudosu(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s  su -l %s %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags, task['become_user'],
-                                                                  default_exe, success, default_cmd), cmd) is not None)
+    assert (re.match(f"""{sudo_exe} {sudo_flags}  su -l {task['become_user']} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None)
 
     task = {
         'become_user': 'foo',

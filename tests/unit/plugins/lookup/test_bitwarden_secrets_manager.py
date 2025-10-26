@@ -62,7 +62,7 @@ class MockBitwardenSecretsManager(BitwardenSecretsManager):
         else:
             # This should never happen unless there's an error in the test MOCK_SECRETS.
             # The real Bitwarden Secrets Manager assigns each secret a unique ID.
-            raise ValueError("More than 1 secret found with id: '{0}'. Impossible!".format(secret_id))
+            raise ValueError(f"More than 1 secret found with id: '{secret_id}'. Impossible!")
 
         return out, err, rc
 

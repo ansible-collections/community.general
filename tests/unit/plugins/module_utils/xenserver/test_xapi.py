@@ -111,7 +111,7 @@ def test_xapi_connect_login_failure(mocker, fake_ansible_module, XenAPI, xenserv
     with pytest.raises(FailJsonException) as exc_info:
         xapi_session = xenserver.XAPI.connect(fake_ansible_module)
 
-    assert exc_info.value.kwargs['msg'] == "Unable to log on to XenServer at http://%s as %s: %s" % (hostname, username, fake_error_msg)
+    assert exc_info.value.kwargs['msg'] == f"Unable to log on to XenServer at http://{hostname} as {username}: {fake_error_msg}"
 
 
 @pytest.mark.parametrize('fake_ansible_module', testcase_module_remote_conn_scheme['params'], ids=testcase_module_remote_conn_scheme['ids'], indirect=True)
@@ -137,7 +137,7 @@ def test_xapi_connect_remote_no_scheme(mocker, fake_ansible_module, XenAPI, xens
     hostname = fake_ansible_module.params['hostname']
     ignore_ssl = not fake_ansible_module.params['validate_certs']
 
-    XenAPI.Session.assert_called_once_with("http://%s" % hostname, ignore_ssl=ignore_ssl)
+    XenAPI.Session.assert_called_once_with(f"http://{hostname}", ignore_ssl=ignore_ssl)
 
 
 def test_xapi_connect_support_ignore_ssl(mocker, fake_ansible_module, XenAPI, xenserver):
@@ -151,7 +151,7 @@ def test_xapi_connect_support_ignore_ssl(mocker, fake_ansible_module, XenAPI, xe
     hostname = fake_ansible_module.params['hostname']
     ignore_ssl = not fake_ansible_module.params['validate_certs']
 
-    XenAPI.Session.assert_called_with("http://%s" % hostname)
+    XenAPI.Session.assert_called_with(f"http://{hostname}")
 
 
 def test_xapi_connect_no_disconnect_atexit(mocker, fake_ansible_module, XenAPI, xenserver):

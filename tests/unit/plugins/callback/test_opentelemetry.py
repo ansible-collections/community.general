@@ -21,8 +21,7 @@ class TestOpentelemetry(unittest.TestCase):
     def setUp(self, mock_socket):
         # TODO: this python version validation won't be needed as long as the _time_ns call is mocked.
         if sys.version_info < OPENTELEMETRY_MINIMUM_PYTHON_VERSION:
-            self.skipTest("Python %s+ is needed for OpenTelemetry" %
-                          ",".join(map(str, OPENTELEMETRY_MINIMUM_PYTHON_VERSION)))
+            self.skipTest(f"Python {'.'.join(map(str, OPENTELEMETRY_MINIMUM_PYTHON_VERSION))}+ is needed for OpenTelemetry")
 
         mock_socket.gethostname.return_value = 'my-host'
         mock_socket.gethostbyname.return_value = '1.2.3.4'

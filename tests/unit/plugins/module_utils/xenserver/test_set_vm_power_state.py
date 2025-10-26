@@ -198,7 +198,7 @@ def test_set_vm_power_state_xenapi_failure(mock_xenapi_failure, fake_ansible_mod
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.set_vm_power_state(fake_ansible_module, fake_xenapi_ref('VM'), "poweredon")
 
-    assert exc_info.value.kwargs['msg'] == "XAPI ERROR: %s" % mock_xenapi_failure[1]
+    assert exc_info.value.kwargs['msg'] == f"XAPI ERROR: {mock_xenapi_failure[1]}"
 
 
 def test_set_vm_power_state_bad_power_state(mocker, fake_ansible_module, XenAPI, xenserver):
@@ -350,7 +350,7 @@ def test_set_vm_power_state_transition_async(mocker,
 
     mocked_returns = {
         "VM.get_power_state.return_value": power_state_current,
-        "%s.return_value" % activated_xenapi_method: fake_xenapi_ref('task'),
+        f"{activated_xenapi_method}.return_value": fake_xenapi_ref('task'),
     }
 
     mocked_xenapi.configure_mock(**mocked_returns)

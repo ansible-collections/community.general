@@ -20,7 +20,7 @@ TSS_IMPORT_PATH = 'ansible_collections.community.general.plugins.lookup.tss'
 
 
 def make_absolute(name):
-    return '.'.join([TSS_IMPORT_PATH, name])
+    return f"{TSS_IMPORT_PATH}.{name}"
 
 
 class SecretServerError(Exception):

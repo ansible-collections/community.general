@@ -134,7 +134,7 @@ def test_op_set_token_with_config(op_fixture, mocker, request):
     op = request.getfixturevalue(op_fixture)
     token = "F5417F77529B41B595D7F9D6F76EC057"
     mocker.patch("os.path.isfile", return_value=True)
-    mocker.patch.object(op._cli, "signin", return_value=(0, token + "\n", ""))
+    mocker.patch.object(op._cli, "signin", return_value=(0, f"{token}\n", ""))
 
     op.set_token()
 
@@ -183,7 +183,7 @@ def test_op_set_token_without_config(op_fixture, request, mocker):
     token = "B988E8A2680A4A348962751A96861FA1"
     mocker.patch("os.path.isfile", return_value=False)
     mocker.patch.object(op._cli, "signin", return_value=(99, "", ""))
-    mocker.patch.object(op._cli, "full_signin", return_value=(0, token + "\n", ""))
+    mocker.patch.object(op._cli, "full_signin", return_value=(0, f"{token}\n", ""))
 
     op.set_token()
 
