@@ -300,9 +300,9 @@ def preflight_validation(bin_path, project_path, version, variables_args=None, p
     if project_path is None or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
-        module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
+        module.fail_json(msg=f"Path for Terraform binary '{bin_path}' doesn't exist on this host - check the path and try again please.")
     if not os.path.isdir(project_path):
-        module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
+        module.fail_json(msg=f"Path for Terraform project '{project_path}' doesn't exist on this host - check the path and try again please.")
     cmd = [bin_path, 'validate']
     if no_color:
         cmd.append('-no-color')
@@ -316,7 +316,7 @@ def _state_args(state_file):
     if not state_file:
         return []
     if not os.path.exists(state_file):
-        module.warn('Could not find state_file "{0}", the process will not destroy any resources, please check your state file path.'.format(state_file))
+        module.warn(f'Could not find state_file "{state_file}", the process will not destroy any resources, please check your state file path.')
     return ['-state', state_file]
 
 
@@ -328,7 +328,7 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
         for key, val in backend_config.items():
             command.extend([
                 '-backend-config',
-                '{0}={1}'.format(key, val)
+                f'{key}={val}'
             ])
     if backend_config_files:
         for f in backend_config_files:
@@ -351,7 +351,7 @@ def get_workspace_context(bin_path, project_path, no_color=True):
 
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
-        module.warn("Failed to list Terraform workspaces:\n{0}".format(err))
+        module.warn(f"Failed to list Terraform workspaces:\n{err}")
     for item in out.split('\n'):
         stripped_item = item.strip()
         if not stripped_item:
@@ -424,24 +424,15 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
     elif rc == 1:
         # failure to plan
         module.fail_json(
-            msg='Terraform plan could not be created\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
-                out=out,
-                err=err,
-                cmd=' '.join(plan_command),
-                args=' '.join([shlex_quote(arg) for arg in variables_args])
-            )
+            msg=(f"Terraform plan could not be created\nSTDOUT: {out}\nSTDERR: {err}\n"
+                 f"COMMAND: {' '.join(plan_command)} {' '.join([shlex_quote(arg) for arg in variables_args])}")
         )
     elif rc == 2:
         # changes, but successful
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
-    module.fail_json(msg='Terraform plan failed with unexpected exit code {rc}.\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
-        rc=rc,
-        out=out,
-        err=err,
-        cmd=' '.join(plan_command),
-        args=' '.join([shlex_quote(arg) for arg in variables_args])
-    ))
+    module.fail_json(msg=f"Terraform plan failed with unexpected exit code {rc}.\nSTDOUT: {out}\nSTDERR: {err}\n"
+                         f"COMMAND: {' '.join(plan_command)} {' '.join([shlex_quote(arg) for arg in variables_args])}")
 
 
 def get_diff(diff_output):
@@ -578,7 +569,7 @@ def main():
         command.extend(DESTROY_ARGS)
 
     if state == 'present' and module.params.get('parallelism') is not None:
-        command.append('-parallelism=%d' % module.params.get('parallelism'))
+        command.append(f"-parallelism={module.params.get('parallelism')}")
 
     def format_args(vars):
         if isinstance(vars, str):
@@ -595,11 +586,11 @@ def main():
         if isinstance(vars, dict):
             for k, v in vars.items():
                 if isinstance(v, dict):
-                    ret_out.append('{0}={{{1}}}'.format(k, process_complex_args(v)))
+                    ret_out.append(f'{k}={{{process_complex_args(v)}}}')
                 elif isinstance(v, list):
-                    ret_out.append("{0}={1}".format(k, process_complex_args(v)))
+                    ret_out.append(f"{k}={process_complex_args(v)}")
                 elif isinstance(v, (int, float, str, bool)):
-                    ret_out.append('{0}={1}'.format(k, format_args(v)))
+                    ret_out.append(f'{k}={format_args(v)}')
                 else:
                     # only to handle anything unforeseen
                     module.fail_json(msg="Supported types are, dictionaries, lists, strings, integers, boolean and float.")
@@ -607,16 +598,16 @@ def main():
             l_out = []
             for item in vars:
                 if isinstance(item, dict):
-                    l_out.append("{{{0}}}".format(process_complex_args(item)))
+                    l_out.append(f"{{{process_complex_args(item)}}}")
                 elif isinstance(item, list):
-                    l_out.append("{0}".format(process_complex_args(item)))
+                    l_out.append(f"{process_complex_args(item)}")
                 elif isinstance(item, (str, int, float, bool)):
                     l_out.append(format_args(item))
                 else:
                     # only to handle anything unforeseen
                     module.fail_json(msg="Supported types are, dictionaries, lists, strings, integers, boolean and float.")
 
-            ret_out.append("[{0}]".format(",".join(l_out)))
+            ret_out.append(f"[{','.join(l_out)}]")
         return ",".join(ret_out)
 
     variables_args = []
@@ -625,30 +616,30 @@ def main():
             if isinstance(v, dict):
                 variables_args.extend([
                     '-var',
-                    '{0}={{{1}}}'.format(k, process_complex_args(v))
+                    f'{k}={{{process_complex_args(v)}}}'
                 ])
             elif isinstance(v, list):
                 variables_args.extend([
                     '-var',
-                    '{0}={1}'.format(k, process_complex_args(v))
+                    f'{k}={process_complex_args(v)}'
                 ])
             # on the top-level we need to pass just the python string with necessary
             # terraform string escape sequences
             elif isinstance(v, str):
                 variables_args.extend([
                     '-var',
-                    "{0}={1}".format(k, v)
+                    f"{k}={v}"
                 ])
             else:
                 variables_args.extend([
                     '-var',
-                    '{0}={1}'.format(k, format_args(v))
+                    f'{k}={format_args(v)}'
                 ])
     else:
         for k, v in variables.items():
             variables_args.extend([
                 '-var',
-                '{0}={1}'.format(k, v)
+                f'{k}={v}'
             ])
 
     if variables_files:
@@ -663,7 +654,7 @@ def main():
         else:
             command.append('-lock=false')
     if module.params.get('lock_timeout') is not None:
-        command.append('-lock-timeout=%ds' % module.params.get('lock_timeout'))
+        command.append(f"-lock-timeout={module.params.get('lock_timeout')}s")
 
     for t in (module.params.get('targets') or []):
         command.extend(['-target', t])
@@ -676,10 +667,10 @@ def main():
     if state == 'absent':
         command.extend(variables_args)
     elif state == 'present' and plan_file:
-        if any([os.path.isfile(project_path + "/" + plan_file), os.path.isfile(plan_file)]):
+        if any([os.path.isfile(f"{project_path}/{plan_file}"), os.path.isfile(plan_file)]):
             command.append(plan_file)
         else:
-            module.fail_json(msg='Could not find plan_file "{0}", check the path and try again.'.format(plan_file))
+            module.fail_json(msg=f'Could not find plan_file "{plan_file}", check the path and try again.')
     else:
         plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
                                                                      module.params.get('targets'), state, APPLY_ARGS, plan_file, no_color)
@@ -726,11 +717,10 @@ def main():
     rc, outputs_text, outputs_err = module.run_command(outputs_command, cwd=project_path)
     outputs = {}
     if rc == 1:
-        module.warn("Could not get Terraform outputs. This usually means none have been defined.\nstdout: {0}\nstderr: {1}".format(outputs_text, outputs_err))
+        module.warn(f"Could not get Terraform outputs. This usually means none have been defined.\nstdout: {outputs_text}\nstderr: {outputs_err}")
     elif rc != 0:
         module.fail_json(
-            msg="Failure when getting Terraform outputs. "
-                "Exited {0}.\nstdout: {1}\nstderr: {2}".format(rc, outputs_text, outputs_err),
+            msg=f"Failure when getting Terraform outputs. Exited {rc}.\nstdout: {outputs_text}\nstderr: {outputs_err}",
             command=' '.join(outputs_command))
     else:
         outputs = json.loads(outputs_text)

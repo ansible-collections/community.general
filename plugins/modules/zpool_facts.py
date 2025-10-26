@@ -181,7 +181,7 @@ def main():
         if zpool_facts.pool_exists():
             result['ansible_facts'] = zpool_facts.get_facts()
         else:
-            module.fail_json(msg='ZFS pool %s does not exist!' % zpool_facts.name)
+            module.fail_json(msg=f'ZFS pool {zpool_facts.name} does not exist!')
     else:
         result['ansible_facts'] = zpool_facts.get_facts()
 

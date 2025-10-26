@@ -123,7 +123,7 @@ def present(configuration_facts, cursor, parameter_name, current_value):
     parameter_key = parameter_name.lower()
     changed = False
     if current_value and current_value.lower() != configuration_facts[parameter_key]['current_value'].lower():
-        cursor.execute("select set_config_parameter('{0}', '{1}')".format(parameter_name, current_value))
+        cursor.execute(f"select set_config_parameter('{parameter_name}', '{current_value}')")
         changed = True
     if changed:
         configuration_facts.update(get_configuration_facts(cursor, parameter_name))
@@ -159,18 +159,17 @@ def main():
     try:
         dsn = (
             "Driver=Vertica;"
-            "Server={0};"
-            "Port={1};"
-            "Database={2};"
-            "User={3};"
-            "Password={4};"
-            "ConnectionLoadBalance={5}"
-        ).format(module.params['cluster'], module.params['port'], db,
-                 module.params['login_user'], module.params['login_password'], 'true')
+            f"Server={module.params['cluster']};"
+            f"Port={module.params['port']};"
+            f"Database={db};"
+            f"User={module.params['login_user']};"
+            f"Password={module.params['login_password']};"
+            f"ConnectionLoadBalance=true"
+        )
         db_conn = pyodbc.connect(dsn, autocommit=True)
         cursor = db_conn.cursor()
     except Exception as e:
-        module.fail_json(msg="Unable to connect to database: {0}.".format(to_native(e)),
+        module.fail_json(msg=f"Unable to connect to database: {e}.",
                          exception=traceback.format_exc())
 
     try:

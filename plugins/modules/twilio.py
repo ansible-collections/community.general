@@ -114,8 +114,7 @@ from ansible.module_utils.urls import fetch_url
 
 def post_twilio_api(module, account_sid, auth_token, msg, from_number,
                     to_number, media_url=None):
-    URI = "https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json" \
-        % (account_sid,)
+    URI = f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json"
     AGENT = "Ansible"
 
     data = {'From': from_number, 'To': to_number, 'Body': msg}
@@ -168,7 +167,7 @@ def main():
             if 'body' in info:
                 body = module.from_json(info['body'])
                 body_message = body['message']
-            module.fail_json(msg="unable to send message to %s: %s" % (number, body_message))
+            module.fail_json(msg=f"unable to send message to {number}: {body_message}")
 
     module.exit_json(msg=msg, changed=False)
 

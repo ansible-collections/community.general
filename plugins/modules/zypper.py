@@ -273,7 +273,6 @@ import os.path
 import xml
 import re
 from xml.dom.minidom import parseString as parseXML
-from ansible.module_utils.common.text.converters import to_native
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
@@ -353,7 +352,7 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
     try:
         dom = parseXML(stdout)
     except xml.parsers.expat.ExpatError as exc:
-        m.fail_json(msg="Failed to parse zypper xml output: %s" % to_native(exc),
+        m.fail_json(msg=f"Failed to parse zypper xml output: {exc}",
                     rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
 
     if rc == 104:
@@ -403,7 +402,7 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
     if m.params['simple_errors']:
         stdout = get_simple_errors(dom) or stdout
 
-    m.fail_json(msg='Zypper run command failed with return code %s.' % rc, rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
+    m.fail_json(msg=f'Zypper run command failed with return code {rc}.', rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
 
 
 def get_simple_errors(dom):
@@ -475,7 +474,7 @@ def set_diff(m, retvals, result):
         for p in result:
             group = result[p]['group']
             if group == 'to-upgrade':
-                versions = ' (' + result[p]['oldversion'] + ' => ' + result[p]['version'] + ')'
+                versions = f" ({result[p]['oldversion']} => {result[p]['version']})"
                 packages['upgraded'].append(p + versions)
             elif group == 'to-install':
                 packages['installed'].append(p)
@@ -485,13 +484,13 @@ def set_diff(m, retvals, result):
     output = ''
     for state in packages:
         if packages[state]:
-            output += state + ': ' + ', '.join(packages[state]) + '\n'
+            output += f"{state}: {', '.join(packages[state])}\n"
     if 'diff' not in retvals:
         retvals['diff'] = {}
     if 'prepared' not in retvals['diff']:
         retvals['diff']['prepared'] = output
     else:
-        retvals['diff']['prepared'] += '\n' + output
+        retvals['diff']['prepared'] += f"\n{output}"
 
 
 def package_present(m, name, want_latest):

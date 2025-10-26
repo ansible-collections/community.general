@@ -112,7 +112,7 @@ def main():
     if api_args['parse_mode'] == 'plain':
         del api_args['parse_mode']
 
-    url = 'https://api.telegram.org/bot{token}/{api_method}'.format(token=token, api_method=api_method)
+    url = f'https://api.telegram.org/bot{token}/{api_method}'
 
     if module.check_mode:
         module.exit_json(changed=False)
@@ -127,11 +127,7 @@ def main():
     else:
         body = json.loads(info['body'])
         module.fail_json(
-            msg="Failed to send message, return status = {status}\n"
-                "url = {api_url}\n"
-                "api_args = {api_args}".format(
-                    status=info['status'], api_url=url, api_args=api_args
-                ),
+            msg=f"Failed to send message, return status = {info['status']}\nurl = {url}\napi_args = {api_args}",
             telegram_error=body['description'],
         )
 

@@ -113,7 +113,7 @@ def create_volume(module, array):
             'Ansible volume',
             size)
         if vol:
-            module.log(msg='Created volume {0}'.format(vol['id']))
+            module.log(msg=f"Created volume {vol['id']}")
             changed = True
         else:
             module.fail_json(msg='Volume create failed.')
@@ -157,7 +157,7 @@ def delete_volume(module, array, volume):
         ok = array.delete_volume(
             volume['id'])
         if ok:
-            module.log(msg='Volume {0} deleted.'.format(vol_name))
+            module.log(msg=f'Volume {vol_name} deleted.')
             changed = True
         else:
             raise Exception

@@ -96,9 +96,9 @@ def send_message(module, client_id, client_secret, topic, msg):
     """
     try:
         access_token = get_access_token(module, client_id, client_secret)
-        url = 'https://typetalk.com/api/v1/topics/%d' % topic
+        url = f'https://typetalk.com/api/v1/topics/{topic}'
         headers = {
-            'Authorization': 'Bearer %s' % access_token,
+            'Authorization': f'Bearer {access_token}',
         }
         do_request(module, url, {'message': msg}, headers)
         return True, {'access_token': access_token}
@@ -128,7 +128,7 @@ def main():
 
     res, error = send_message(module, client_id, client_secret, topic, msg)
     if not res:
-        module.fail_json(msg='fail to send message with response code %s' % error.code)
+        module.fail_json(msg=f'fail to send message with response code {error.code}')
 
     module.exit_json(changed=True, topic=topic, msg=msg)
 

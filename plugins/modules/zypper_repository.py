@@ -182,7 +182,7 @@ def _parse_repos(module):
     elif rc == 6:
         return []
     else:
-        module.fail_json(msg='Failed to execute "%s"' % " ".join(cmd), rc=rc, stdout=stdout, stderr=stderr)
+        module.fail_json(msg=f'Failed to execute "{" ".join(cmd)}"', rc=rc, stdout=stdout, stderr=stderr)
 
 
 def _repo_changes(module, realrepo, repocmp):
@@ -242,7 +242,7 @@ def repo_exists(module, repodata, overwrite_multiple):
             # Found two repos and want to overwrite_multiple
             return (True, True, repos)
         else:
-            errmsg = 'More than one repo matched "%s": "%s".' % (name, repos)
+            errmsg = f'More than one repo matched "{name}": "{repos}".'
             errmsg += ' Use overwrite_multiple to allow more than one repo to be overwritten'
             module.fail_json(msg=errmsg)
 
@@ -413,7 +413,7 @@ def main():
 
         # No support for .repo file with zero or more than one repository
         if len(repofile.sections()) != 1:
-            err = "Invalid format, .repo file contains %s repositories, expected 1" % len(repofile.sections())
+            err = f"Invalid format, .repo file contains {len(repofile.sections())} repositories, expected 1"
             module.fail_json(msg=err)
 
         section = repofile.sections()[0]
@@ -464,7 +464,7 @@ def main():
     if rc == 0:
         module.exit_json(changed=True, repodata=repodata, state=state)
     else:
-        module.fail_json(msg="Zypper failed with rc %s" % rc, rc=rc, stdout=stdout, stderr=stderr, repodata=repodata, state=state)
+        module.fail_json(msg=f"Zypper failed with rc {rc}", rc=rc, stdout=stdout, stderr=stderr, repodata=repodata, state=state)
 
 
 if __name__ == '__main__':

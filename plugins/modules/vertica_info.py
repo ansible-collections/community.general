@@ -240,18 +240,17 @@ def main():
     try:
         dsn = (
             "Driver=Vertica;"
-            "Server=%s;"
-            "Port=%s;"
-            "Database=%s;"
-            "User=%s;"
-            "Password=%s;"
-            "ConnectionLoadBalance=%s"
-        ) % (module.params['cluster'], module.params['port'], db,
-             module.params['login_user'], module.params['login_password'], 'true')
+            f"Server={module.params['cluster']};"
+            f"Port={module.params['port']};"
+            f"Database={db};"
+            f"User={module.params['login_user']};"
+            f"Password={module.params['login_password']};"
+            f"ConnectionLoadBalance=true"
+        )
         db_conn = pyodbc.connect(dsn, autocommit=True)
         cursor = db_conn.cursor()
     except Exception as e:
-        module.fail_json(msg="Unable to connect to database: %s." % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"Unable to connect to database: {e}.", exception=traceback.format_exc())
 
     try:
         schema_facts = get_schema_facts(cursor)

@@ -192,7 +192,7 @@ class XFConfProperty(StateModuleHelper):
     def __init_module__(self):
         self.runner = xfconf_runner(self.module)
         self.vars.version = get_xfconf_version(self.runner)
-        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property, self.vars.channel)
+        self.does_not = f'Property "{self.vars.property}" does not exist on channel "{self.vars.channel}".'
         self.vars.set('previous_value', self._get())
         self.vars.set('type', self.vars.value_type)
         self.vars.set_meta('value', initial_value=self.vars.previous_value)
@@ -201,7 +201,7 @@ class XFConfProperty(StateModuleHelper):
         if err.rstrip() == self.does_not:
             return None
         if rc or len(err):
-            self.do_raise('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
+            self.do_raise(f'xfconf-query failed with error (rc={rc}): {err}')
 
         result = out.rstrip()
         if 'Value is an array with' in result:

@@ -166,10 +166,10 @@ class Zpool(object):
                 force=cmd_runner_fmt.as_bool('-f'),
                 dry_run=cmd_runner_fmt.as_bool('-n'),
                 pool_properties=cmd_runner_fmt.as_func(
-                    lambda props: sum([['-o', '{}={}'.format(prop, value)] for prop, value in (props or {}).items()], [])
+                    lambda props: sum([['-o', f'{prop}={value}'] for prop, value in (props or {}).items()], [])
                 ),
                 filesystem_properties=cmd_runner_fmt.as_func(
-                    lambda props: sum([['-O', '{}={}'.format(prop, value)] for prop, value in (props or {}).items()], [])
+                    lambda props: sum([['-O', f'{prop}={value}'] for prop, value in (props or {}).items()], [])
                 ),
                 mountpoint=cmd_runner_fmt.as_opt_val('-m'),
                 altroot=cmd_runner_fmt.as_opt_val('-R'),
@@ -257,7 +257,7 @@ class Zpool(object):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
                     with self.zpool_runner('subcommand assignment name', check_rc=True) as ctx:
-                        rc, stdout, stderr = ctx.run(subcommand='set', assignment='{}={}'.format(prop, value))
+                        rc, stdout, stderr = ctx.run(subcommand='set', assignment=f'{prop}={value}')
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'pool_properties': before}, 'after': {'pool_properties': after}}
@@ -286,7 +286,7 @@ class Zpool(object):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
                     with self.zfs_runner('subcommand assignment name', check_rc=True) as ctx:
-                        rc, stdout, stderr = ctx.run(subcommand='set', assignment='{}={}'.format(prop, value))
+                        rc, stdout, stderr = ctx.run(subcommand='set', assignment=f'{prop}={value}')
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'filesystem_properties': before}, 'after': {'filesystem_properties': after}}
@@ -410,7 +410,7 @@ class Zpool(object):
     def add_vdevs(self):
         invalid_properties = [k for k in self.pool_properties if k != 'ashift']
         if invalid_properties:
-            self.module.warn("zpool add only supports 'ashift', ignoring: {}".format(invalid_properties))
+            self.module.warn(f"zpool add only supports 'ashift', ignoring: {invalid_properties}")
 
         diff = self.diff_layout()
         before_vdevs = diff['before']['vdevs']
@@ -544,7 +544,7 @@ def main():
         for idx, vdev in enumerate(vdevs, start=1):
             disks = vdev.get('disks')
             if not isinstance(disks, list) or len(disks) == 0:
-                module.fail_json(msg="vdev #{idx}: at least one disk is required (got: {disks!r})".format(idx=idx, disks=disks))
+                module.fail_json(msg=f"vdev #{idx}: at least one disk is required (got: {disks!r})")
 
     result = dict(
         name=name,
@@ -574,7 +574,7 @@ def main():
                 prepared = ''
                 for diff in (add_vdev_diff, remove_vdev_diff):
                     if 'prepared' in diff:
-                        prepared += (diff['prepared'] if not prepared else '\n' + diff['prepared'])
+                        prepared += (diff['prepared'] if not prepared else f"\n{diff['prepared']}")
                 result['diff']['prepared'] = prepared
         else:
             if module.check_mode:

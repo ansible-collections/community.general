@@ -156,7 +156,7 @@ class Yarn(object):
         self.name_version = None
 
         if kwargs['version'] and self.name is not None:
-            self.name_version = self.name + '@' + str(self.version)
+            self.name_version = f"{self.name}@{self.version!s}"
         elif self.name is not None:
             self.name_version = self.name
 
@@ -186,7 +186,7 @@ class Yarn(object):
                     # Module will make directory if not exists.
                     os.makedirs(self.path)
                 if not os.path.isdir(self.path):
-                    self.module.fail_json(msg="Path provided %s is not a directory" % self.path)
+                    self.module.fail_json(msg=f"Path provided {self.path} is not a directory")
                 cwd = self.path
 
                 if not os.path.isfile(os.path.join(self.path, 'package.json')):
@@ -204,7 +204,7 @@ class Yarn(object):
                 if json.loads(line)['type'] == 'error':
                     self.module.fail_json(msg=err)
         except Exception:
-            self.module.fail_json(msg="Unexpected stderr output from Yarn: %s" % err, stderr=err)
+            self.module.fail_json(msg=f"Unexpected stderr output from Yarn: {err}", stderr=err)
 
     def list(self):
         cmd = ['list', '--depth=0', '--json']

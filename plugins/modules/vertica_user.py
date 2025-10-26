@@ -166,12 +166,12 @@ def update_roles(user_facts, cursor, user,
                  existing_all, existing_default, required):
     del_roles = list(set(existing_all) - set(required))
     if del_roles:
-        cursor.execute("revoke {0} from {1}".format(','.join(del_roles), user))
+        cursor.execute(f"revoke {','.join(del_roles)} from {user}")
     new_roles = list(set(required) - set(existing_all))
     if new_roles:
-        cursor.execute("grant {0} to {1}".format(','.join(new_roles), user))
+        cursor.execute(f"grant {','.join(new_roles)} to {user}")
     if required:
-        cursor.execute("alter user {0} default role {1}".format(user, ','.join(required)))
+        cursor.execute(f"alter user {user} default role {','.join(required)}")
 
 
 def check(user_facts, user, profile, resource_pool,
@@ -200,39 +200,38 @@ def present(user_facts, cursor, user, profile, resource_pool,
             locked, password, expired, ldap, roles):
     user_key = user.lower()
     if user_key not in user_facts:
-        query_fragments = ["create user {0}".format(user)]
+        query_fragments = [f"create user {user}"]
         if locked:
             query_fragments.append("account lock")
         if password or ldap:
             if password:
-                query_fragments.append("identified by '{0}'".format(password))
+                query_fragments.append(f"identified by '{password}'")
             else:
                 query_fragments.append("identified by '$ldap$'")
         if expired or ldap:
             query_fragments.append("password expire")
         if profile:
-            query_fragments.append("profile {0}".format(profile))
+            query_fragments.append(f"profile {profile}")
         if resource_pool:
-            query_fragments.append("resource pool {0}".format(resource_pool))
+            query_fragments.append(f"resource pool {resource_pool}")
         cursor.execute(' '.join(query_fragments))
         if resource_pool and resource_pool != 'general':
-            cursor.execute("grant usage on resource pool {0} to {1}".format(
-                resource_pool, user))
+            cursor.execute(f"grant usage on resource pool {resource_pool} to {user}")
         update_roles(user_facts, cursor, user, [], [], roles)
         user_facts.update(get_user_facts(cursor, user))
         return True
     else:
         changed = False
-        query_fragments = ["alter user {0}".format(user)]
+        query_fragments = [f"alter user {user}"]
         if locked is not None and locked != (user_facts[user_key]['locked'] == 'True'):
             if locked:
                 state = 'lock'
             else:
                 state = 'unlock'
-            query_fragments.append("account {0}".format(state))
+            query_fragments.append(f"account {state}")
             changed = True
         if password and password != user_facts[user_key]['password']:
-            query_fragments.append("identified by '{0}'".format(password))
+            query_fragments.append(f"identified by '{password}'")
             changed = True
         if ldap:
             if ldap != (user_facts[user_key]['expired'] == 'True'):
@@ -245,16 +244,14 @@ def present(user_facts, cursor, user, profile, resource_pool,
             else:
                 raise NotSupportedError("Unexpiring user password is not supported.")
         if profile and profile != user_facts[user_key]['profile']:
-            query_fragments.append("profile {0}".format(profile))
+            query_fragments.append(f"profile {profile}")
             changed = True
         if resource_pool and resource_pool != user_facts[user_key]['resource_pool']:
-            query_fragments.append("resource pool {0}".format(resource_pool))
+            query_fragments.append(f"resource pool {resource_pool}")
             if user_facts[user_key]['resource_pool'] != 'general':
-                cursor.execute("revoke usage on resource pool {0} from {1}".format(
-                    user_facts[user_key]['resource_pool'], user))
+                cursor.execute(f"revoke usage on resource pool {user_facts[user_key]['resource_pool']} from {user}")
             if resource_pool != 'general':
-                cursor.execute("grant usage on resource pool {0} to {1}".format(
-                    resource_pool, user))
+                cursor.execute(f"grant usage on resource pool {resource_pool} to {user}")
             changed = True
         if changed:
             cursor.execute(' '.join(query_fragments))
@@ -274,7 +271,7 @@ def absent(user_facts, cursor, user, roles):
         update_roles(user_facts, cursor, user,
                      user_facts[user_key]['roles'], user_facts[user_key]['default_roles'], [])
         try:
-            cursor.execute("drop user {0}".format(user_facts[user_key]['name']))
+            cursor.execute(f"drop user {user_facts[user_key]['name']}")
         except pyodbc.Error:
             raise CannotDropError("Dropping user failed due to dependencies.")
         del user_facts[user_key]
@@ -335,18 +332,17 @@ def main():
     try:
         dsn = (
             "Driver=Vertica;"
-            "Server={0};"
-            "Port={1};"
-            "Database={2};"
-            "User={3};"
-            "Password={4};"
-            "ConnectionLoadBalance={5}"
-        ).format(module.params['cluster'], module.params['port'], db,
-                 module.params['login_user'], module.params['login_password'], 'true')
+            f"Server={module.params['cluster']};"
+            f"Port={module.params['port']};"
+            f"Database={db};"
+            f"User={module.params['login_user']};"
+            f"Password={module.params['login_password']};"
+            f"ConnectionLoadBalance=true"
+        )
         db_conn = pyodbc.connect(dsn, autocommit=True)
         cursor = db_conn.cursor()
     except Exception as e:
-        module.fail_json(msg="Unable to connect to database: {0}.".format(e))
+        module.fail_json(msg=f"Unable to connect to database: {e}.")
 
     try:
         user_facts = get_user_facts(cursor)

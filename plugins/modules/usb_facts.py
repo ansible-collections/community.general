@@ -79,7 +79,7 @@ def parse_lsusb(module, lsusb_path):
     for line in stdout.splitlines():
         match = re.match(regex, line)
         if not match:
-            module.fail_json(msg="failed to parse unknown lsusb output %s" % (line), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"failed to parse unknown lsusb output {line}", stdout=stdout, stderr=stderr)
         current_device = {
             'bus': match.group(1),
             'device': match.group(2),
@@ -90,7 +90,7 @@ def parse_lsusb(module, lsusb_path):
     return_value = {
         "usb_devices": usb_devices
     }
-    module.exit_json(msg="parsed %s USB devices" % (len(usb_devices)), stdout=stdout, stderr=stderr, ansible_facts=return_value)
+    module.exit_json(msg=f"parsed {len(usb_devices)} USB devices", stdout=stdout, stderr=stderr, ansible_facts=return_value)
 
 
 def main():

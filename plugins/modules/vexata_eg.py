@@ -102,7 +102,7 @@ def get_vg_id(module, array):
         if len(vg) == 1:
             return vg[0]['id']
         else:
-            module.fail_json(msg='Volume group {0} was not found.'.format(name))
+            module.fail_json(msg=f'Volume group {name} was not found.')
     except Exception:
         module.fail_json(msg='Error while attempting to retrieve volume groups.')
 
@@ -116,7 +116,7 @@ def get_ig_id(module, array):
         if len(ig) == 1:
             return ig[0]['id']
         else:
-            module.fail_json(msg='Initiator group {0} was not found.'.format(name))
+            module.fail_json(msg=f'Initiator group {name} was not found.')
     except Exception:
         module.fail_json(msg='Error while attempting to retrieve initiator groups.')
 
@@ -130,7 +130,7 @@ def get_pg_id(module, array):
         if len(pg) == 1:
             return pg[0]['id']
         else:
-            module.fail_json(msg='Port group {0} was not found.'.format(name))
+            module.fail_json(msg=f'Port group {name} was not found.')
     except Exception:
         module.fail_json(msg='Error while attempting to retrieve port groups.')
 
@@ -151,12 +151,12 @@ def create_eg(module, array):
             'Ansible export group',
             (vg_id, ig_id, pg_id))
         if eg:
-            module.log(msg='Created export group {0}'.format(eg_name))
+            module.log(msg=f'Created export group {eg_name}')
             changed = True
         else:
             raise Exception
     except Exception:
-        module.fail_json(msg='Export group {0} create failed.'.format(eg_name))
+        module.fail_json(msg=f'Export group {eg_name} create failed.')
     module.exit_json(changed=changed)
 
 
@@ -170,12 +170,12 @@ def delete_eg(module, array, eg):
         ok = array.delete_eg(
             eg['id'])
         if ok:
-            module.log(msg='Export group {0} deleted.'.format(eg_name))
+            module.log(msg=f'Export group {eg_name} deleted.')
             changed = True
         else:
             raise Exception
     except Exception:
-        module.fail_json(msg='Export group {0} delete failed.'.format(eg_name))
+        module.fail_json(msg=f'Export group {eg_name} delete failed.')
     module.exit_json(changed=changed)
 
 

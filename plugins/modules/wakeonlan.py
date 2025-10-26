@@ -84,17 +84,17 @@ def wakeonlan(module, mac, broadcast, port):
 
     # If we don't end up with 12 hexadecimal characters, fail
     if len(mac) != 12:
-        module.fail_json(msg="Incorrect MAC address length: %s" % mac_orig)
+        module.fail_json(msg=f"Incorrect MAC address length: {mac_orig}")
 
     # Test if it converts to an integer, otherwise fail
     try:
         int(mac, 16)
     except ValueError:
-        module.fail_json(msg="Incorrect MAC address format: %s" % mac_orig)
+        module.fail_json(msg=f"Incorrect MAC address format: {mac_orig}")
 
     # Create payload for magic packet
     data = b''
-    padding = ''.join(['FFFFFFFFFFFF', mac * 20])
+    padding = f"FFFFFFFFFFFF{mac * 20}"
     for i in range(0, len(padding), 2):
         data = b''.join([data, struct.pack('B', int(padding[i: i + 2], 16))])
 
