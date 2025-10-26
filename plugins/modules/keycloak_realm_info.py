@@ -124,7 +124,7 @@ def main():
     realm_info = kc.get_realm_info_by_id(realm=realm)
 
     result['realm_info'] = realm_info
-    result['msg'] = 'Get realm public info successful for ID {realm}'.format(realm=realm)
+    result['msg'] = f'Get realm public info successful for ID {realm}'
     module.exit_json(**result)
 
 

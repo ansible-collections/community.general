@@ -150,7 +150,6 @@ except ImportError:
     HAS_JENKINS = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def get_jenkins_connection(module):
@@ -246,7 +245,7 @@ def main():
         jobs = get_jobs(module)
     except jenkins.JenkinsException as err:
         module.fail_json(
-            msg='Unable to connect to Jenkins server, %s' % to_native(err),
+            msg=f'Unable to connect to Jenkins server, {err}',
             exception=traceback.format_exc())
 
     module.exit_json(changed=False, jobs=jobs)

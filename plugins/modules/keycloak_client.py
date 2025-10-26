@@ -827,7 +827,7 @@ def check_optional_scopes_not_default(desired_client, clientScopesBehavior, modu
         return
     for scope in desired_client['optionalClientScopes']:
         if scope in desired_client['defaultClientScopes']:
-            module.fail_json(msg='Client scope %s cannot be both default and optional' % scope)
+            module.fail_json(msg=f'Client scope {scope} cannot be both default and optional')
 
 
 def normalise_cr(clientrep, remove_ids=False):
@@ -941,7 +941,7 @@ def get_authentication_flow_id(flow_name, realm, kc):
     flow = kc.get_authentication_flow_by_alias(flow_name, realm)
     if flow:
         return flow["id"]
-    kc.module.fail_json(msg='Authentification flow %s not found in realm %s' % (flow_name, realm))
+    kc.module.fail_json(msg=f'Authentification flow {flow_name} not found in realm {realm}')
 
 
 def flow_binding_from_dict_to_model(newClientFlowBinding, realm, kc):
@@ -1353,7 +1353,7 @@ def main():
 
         result['end_state'] = sanitize_cr(after_client)
 
-        result['msg'] = 'Client %s has been created.' % desired_client['clientId']
+        result['msg'] = f"Client {desired_client['clientId']} has been created."
         module.exit_json(**result)
 
     else:
@@ -1367,7 +1367,7 @@ def main():
             if before_norm == desired_norm:
                 result['changed'] = False
                 result['end_state'] = sanitize_cr(before_client)
-                result['msg'] = 'No changes required for Client %s.' % desired_client['clientId']
+                result['msg'] = f"No changes required for Client {desired_client['clientId']}."
                 module.exit_json(**result)
 
             # Process an update
@@ -1397,7 +1397,7 @@ def main():
 
             result['end_state'] = sanitize_cr(after_client)
 
-            result['msg'] = 'Client %s has been updated.' % desired_client['clientId']
+            result['msg'] = f"Client {desired_client['clientId']} has been updated."
             module.exit_json(**result)
 
         else:
@@ -1416,7 +1416,7 @@ def main():
 
             result['end_state'] = {}
 
-            result['msg'] = 'Client %s has been deleted.' % before_client['clientId']
+            result['msg'] = f"Client {before_client['clientId']} has been deleted."
 
     module.exit_json(**result)
 

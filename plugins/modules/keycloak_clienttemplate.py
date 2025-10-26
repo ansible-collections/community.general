@@ -392,7 +392,7 @@ def main():
 
         result['end_state'] = after_clientt
 
-        result['msg'] = 'Client template %s has been created.' % desired_clientt['name']
+        result['msg'] = f"Client template {desired_clientt['name']} has been created."
         module.exit_json(**result)
 
     else:
@@ -420,7 +420,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before=before_clientt, after=after_clientt)
 
-            result['msg'] = 'Client template %s has been updated.' % desired_clientt['name']
+            result['msg'] = f"Client template {desired_clientt['name']} has been updated."
             module.exit_json(**result)
 
         else:
@@ -439,7 +439,7 @@ def main():
 
             result['end_state'] = {}
 
-            result['msg'] = 'Client template %s has been deleted.' % before_clientt['name']
+            result['msg'] = f"Client template {before_clientt['name']} has been deleted."
 
     module.exit_json(**result)
 

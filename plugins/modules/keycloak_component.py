@@ -255,7 +255,7 @@ def main():
                 before_component[param] = component[param]
 
                 if changeset_copy[param] != component[param] and param != 'config':
-                    changes += "%s: %s -> %s, " % (param, component[param], changeset_copy[param])
+                    changes += f"{param}: {component[param]} -> {changeset_copy[param]}, "
                     result['changed'] = True
             # Compare parameters under the "config" key
             for p, v in changeset_copy['config'].items():
@@ -264,7 +264,7 @@ def main():
                 except KeyError:
                     before_component['config'][p] = []
                 if changeset_copy['config'][p] != component['config'][p]:
-                    changes += "config.%s: %s -> %s, " % (p, component['config'][p], changeset_copy['config'][p])
+                    changes += f"config.{p}: {component['config'][p]} -> {changeset_copy['config'][p]}, "
                     result['changed'] = True
 
     # Check all the possible states of the resource and do what is needed to
@@ -276,12 +276,12 @@ def main():
                 result['diff'] = dict(before=before_component, after=changeset_copy)
 
             if module.check_mode:
-                result['msg'] = "Component %s would be changed: %s" % (name, changes.strip(", "))
+                result['msg'] = f"Component {name} would be changed: {changes.strip(', ')}"
             else:
                 kc.update_component(changeset, parent_id)
-                result['msg'] = "Component %s changed: %s" % (name, changes.strip(", "))
+                result['msg'] = f"Component {name} changed: {changes.strip(', ')}"
         else:
-            result['msg'] = "Component %s was in sync" % (name)
+            result['msg'] = f"Component {name} was in sync"
 
         result['end_state'] = changeset_copy
     elif component_id and state == 'absent':
@@ -290,11 +290,11 @@ def main():
 
         if module.check_mode:
             result['changed'] = True
-            result['msg'] = "Component %s would be deleted" % (name)
+            result['msg'] = f"Component {name} would be deleted"
         else:
             kc.delete_component(component_id, parent_id)
             result['changed'] = True
-            result['msg'] = "Component %s deleted" % (name)
+            result['msg'] = f"Component {name} deleted"
 
         result['end_state'] = {}
     elif not component_id and state == 'present':
@@ -303,16 +303,16 @@ def main():
 
         if module.check_mode:
             result['changed'] = True
-            result['msg'] = "Component %s would be created" % (name)
+            result['msg'] = f"Component {name} would be created"
         else:
             kc.create_component(changeset, parent_id)
             result['changed'] = True
-            result['msg'] = "Component %s created" % (name)
+            result['msg'] = f"Component {name} created"
 
         result['end_state'] = changeset_copy
     elif not component_id and state == 'absent':
         result['changed'] = False
-        result['msg'] = "Component %s not present" % (name)
+        result['msg'] = f"Component {name} not present"
         result['end_state'] = {}
 
     module.exit_json(**result)

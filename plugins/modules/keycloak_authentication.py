@@ -288,7 +288,7 @@ def create_or_update_executions(kc, config, realm='master'):
                         exec_found = True
                         if new_exec['index'] is None:
                             new_exec_index = exec_index
-                        before += str(existing_executions[exec_index]) + '\n'
+                        before += f"{existing_executions[exec_index]}\n"
                     execution = existing_executions[exec_index].copy()
                     # Remove exec from list in case 2 exec with same name
                     existing_executions[exec_index].clear()
@@ -297,13 +297,13 @@ def create_or_update_executions(kc, config, realm='master'):
                     execution = kc.get_executions_representation(config, realm=realm)[exec_index]
                     exec_found = True
                     exec_index = new_exec_index
-                    after += str(new_exec) + '\n'
+                    after += f"{new_exec}\n"
                 elif new_exec["displayName"] is not None:
                     kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm, flowType=new_exec["subFlowType"])
                     execution = kc.get_executions_representation(config, realm=realm)[exec_index]
                     exec_found = True
                     exec_index = new_exec_index
-                    after += str(new_exec) + '\n'
+                    after += f"{new_exec}\n"
                 if exec_found:
                     changed = True
                     if exec_index != -1:
@@ -326,11 +326,10 @@ def create_or_update_executions(kc, config, realm='master'):
                             kc.update_authentication_executions(flow_alias_parent, updated_exec, realm=realm)
                         diff = exec_index - new_exec_index
                         kc.change_execution_priority(updated_exec["id"], diff, realm=realm)
-                        after += str(kc.get_executions_representation(config, realm=realm)[new_exec_index]) + '\n'
+                        after += f"{kc.get_executions_representation(config, realm=realm)[new_exec_index]}\n"
         return changed, dict(before=before, after=after)
     except Exception as e:
-        kc.module.fail_json(msg='Could not create or update executions for authentication flow %s in realm %s: %s'
-                            % (config["alias"], realm, str(e)))
+        kc.module.fail_json(msg=f"Could not create or update executions for authentication flow {config['alias']} in realm {realm}: {e}")
 
 
 def main():
@@ -404,7 +403,7 @@ def main():
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
             result['end_state'] = {}
-            result['msg'] = new_auth_repr["alias"] + ' absent'
+            result['msg'] = f"{new_auth_repr['alias']} absent"
             module.exit_json(**result)
 
         elif state == 'present':
@@ -425,7 +424,7 @@ def main():
 
             # If the authentication still not exist on the server, raise an exception.
             if auth_repr is None:
-                result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
+                result['msg'] = f"Authentication just created not found: {new_auth_repr}"
                 module.fail_json(**result)
 
             # Configure the executions for the flow
@@ -456,7 +455,7 @@ def main():
                     auth_repr = kc.create_empty_auth_flow(config=new_auth_repr, realm=realm)
                 # If the authentication still not exist on the server, raise an exception.
                 if auth_repr is None:
-                    result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
+                    result['msg'] = f"Authentication just created not found: {new_auth_repr}"
                     module.fail_json(**result)
             # Configure the executions for the flow
 
@@ -487,8 +486,7 @@ def main():
             # delete it
             kc.delete_authentication_flow_by_id(id=auth_repr["id"], realm=realm)
 
-            result['msg'] = 'Authentication flow: {alias} id: {id} is deleted'.format(alias=new_auth_repr['alias'],
-                                                                                      id=auth_repr["id"])
+            result['msg'] = f"Authentication flow: {new_auth_repr['alias']} id: {auth_repr['id']} is deleted"
 
     module.exit_json(**result)
 

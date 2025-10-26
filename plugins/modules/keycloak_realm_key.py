@@ -392,14 +392,14 @@ def main():
                 before_realm_key[param] = key[param]
 
                 if changeset_copy[param] != key[param] and param != 'config':
-                    changes += "%s: %s -> %s, " % (param, key[param], changeset_copy[param])
+                    changes += f"{param}: {key[param]} -> {changeset_copy[param]}, "
                     result['changed'] = True
 
             # Compare parameters under the "config" key
             for p, v in changeset_copy['config'].items():
                 before_realm_key['config'][p] = key['config'][p]
                 if changeset_copy['config'][p] != key['config'][p]:
-                    changes += "config.%s: %s -> %s, " % (p, key['config'][p], changeset_copy['config'][p])
+                    changes += f"config.{p}: {key['config'][p]} -> {changeset_copy['config'][p]}, "
                     result['changed'] = True
 
     # Sanitize linefeeds for the privateKey. Without this the JSON payload
@@ -418,16 +418,16 @@ def main():
                 result['diff'] = dict(before=before_realm_key, after=changeset_copy)
 
             if module.check_mode:
-                result['msg'] = "Realm key %s would be changed: %s" % (name, changes.strip(", "))
+                result['msg'] = f"Realm key {name} would be changed: {changes.strip(', ')}"
             else:
                 kc.update_component(changeset, parent_id)
-                result['msg'] = "Realm key %s changed: %s" % (name, changes.strip(", "))
+                result['msg'] = f"Realm key {name} changed: {changes.strip(', ')}"
         elif not result['changed'] and force:
             kc.update_component(changeset, parent_id)
             result['changed'] = True
-            result['msg'] = "Realm key %s was forcibly updated" % (name)
+            result['msg'] = f"Realm key {name} was forcibly updated"
         else:
-            result['msg'] = "Realm key %s was in sync" % (name)
+            result['msg'] = f"Realm key {name} was in sync"
 
         result['end_state'] = changeset_copy
     elif key_id and state == 'absent':
@@ -438,11 +438,11 @@ def main():
 
         if module.check_mode:
             result['changed'] = True
-            result['msg'] = "Realm key %s would be deleted" % (name)
+            result['msg'] = f"Realm key {name} would be deleted"
         else:
             kc.delete_component(key_id, parent_id)
             result['changed'] = True
-            result['msg'] = "Realm key %s deleted" % (name)
+            result['msg'] = f"Realm key {name} deleted"
 
         result['end_state'] = {}
     elif not key_id and state == 'present':
@@ -451,16 +451,16 @@ def main():
 
         if module.check_mode:
             result['changed'] = True
-            result['msg'] = "Realm key %s would be created" % (name)
+            result['msg'] = f"Realm key {name} would be created"
         else:
             kc.create_component(changeset, parent_id)
             result['changed'] = True
-            result['msg'] = "Realm key %s created" % (name)
+            result['msg'] = f"Realm key {name} created"
 
         result['end_state'] = changeset_copy
     elif not key_id and state == 'absent':
         result['changed'] = False
-        result['msg'] = "Realm key %s not present" % (name)
+        result['msg'] = f"Realm key {name} not present"
         result['end_state'] = {}
 
     module.exit_json(**result)

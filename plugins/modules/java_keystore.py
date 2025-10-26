@@ -183,7 +183,7 @@ import re
 import tempfile
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 
 try:
     from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
@@ -257,7 +257,7 @@ class JavaKeystore:
                         backend=backend
                     )
             except (OSError, ValueError) as e:
-                self.module.fail_json(msg="Unable to read the provided certificate: %s" % to_native(e))
+                self.module.fail_json(msg=f"Unable to read the provided certificate: {e}")
 
             fp = cert.fingerprint(hashes.SHA256()).hex().upper()
             fingerprint = ':'.join([fp[i:i + 2] for i in range(0, len(fp), 2)])
@@ -281,9 +281,7 @@ class JavaKeystore:
             current_certificate_match = re.search(r"=([\w:]+)", current_certificate_fingerprint_out)
             if not current_certificate_match:
                 return self.module.fail_json(
-                    msg="Unable to find the current certificate fingerprint in %s" % (
-                        current_certificate_fingerprint_out
-                    ),
+                    msg=f"Unable to find the current certificate fingerprint in {current_certificate_fingerprint_out}",
                     cmd=current_certificate_fingerprint_cmd,
                     rc=rc
                 )
@@ -299,12 +297,11 @@ class JavaKeystore:
         (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = self.module.run_command(
             stored_certificate_fingerprint_cmd, data=self.password, check_rc=False)
         if rc != 0:
-            if "keytool error: java.lang.Exception: Alias <%s> does not exist" % self.name \
+            if f"keytool error: java.lang.Exception: Alias <{self.name}> does not exist" \
                     in stored_certificate_fingerprint_out:
                 return "alias mismatch"
             if re.match(
-                    r'keytool error: java\.io\.IOException: ' +
-                    '[Kk]eystore( was tampered with, or)? password was incorrect',
+                    r"keytool error: java\.io\.IOException: [Kk]eystore( was tampered with, or)? password was incorrect",
                     stored_certificate_fingerprint_out
             ):
                 return "password mismatch"
@@ -321,7 +318,7 @@ class JavaKeystore:
         stored_certificate_match = re.search(r"SHA256: ([\w:]+)", stored_certificate_fingerprint_out)
         if not stored_certificate_match:
             return self.module.fail_json(
-                msg="Unable to find the stored certificate fingerprint in %s" % stored_certificate_fingerprint_out,
+                msg=f"Unable to find the stored certificate fingerprint in {stored_certificate_fingerprint_out}",
                 cmd=stored_certificate_fingerprint_cmd,
                 rc=rc
             )
@@ -370,11 +367,11 @@ class JavaKeystore:
                     )
             except (OSError, TypeError, ValueError, UnsupportedAlgorithm) as e:
                 self.module.fail_json(
-                    msg="The following error occurred while loading the provided private_key: %s" % to_native(e)
+                    msg=f"The following error occurred while loading the provided private_key: {e}"
                 )
         except (OSError, ValueError, UnsupportedAlgorithm) as e:
             self.module.fail_json(
-                msg="The following error occurred while loading the provided private_key: %s" % to_native(e)
+                msg=f"The following error occurred while loading the provided private_key: {e}"
             )
         try:
             with open(self.certificate_path, 'rb') as cert_file:
@@ -384,7 +381,7 @@ class JavaKeystore:
                 )
         except (OSError, ValueError, UnsupportedAlgorithm) as e:
             self.module.fail_json(
-                msg="The following error occurred while loading the provided certificate: %s" % to_native(e)
+                msg=f"The following error occurred while loading the provided certificate: {e}"
             )
 
         if self.password:
@@ -414,8 +411,8 @@ class JavaKeystore:
         if self.keypass:
             export_p12_cmd.append("-passin")
             export_p12_cmd.append("stdin")
-            cmd_stdin = "%s\n" % self.keypass
-        cmd_stdin += "%s\n%s" % (self.password, self.password)
+            cmd_stdin = f"{self.keypass}\n"
+        cmd_stdin += f"{self.password}\n{self.password}"
 
         (rc, export_p12_out, export_p12_err) = self.module.run_command(
             export_p12_cmd, data=cmd_stdin, environ_update=None, check_rc=False
@@ -464,13 +461,13 @@ class JavaKeystore:
 
         keystore_backup = None
         if self.exists():
-            keystore_backup = self.keystore_path + '.tmpbak'
+            keystore_backup = f"{self.keystore_path}.tmpbak"
             # Preserve properties of the source file
             self.module.preserved_copy(self.keystore_path, keystore_backup)
             os.remove(self.keystore_path)
 
         (rc, import_keystore_out, import_keystore_err) = self.module.run_command(
-            import_keystore_cmd, data='%s\n%s\n%s' % (self.password, self.password, self.password), check_rc=False
+            import_keystore_cmd, data=f'{self.password}\n{self.password}\n{self.password}', check_rc=False
         )
 
         self.result = dict(msg=import_keystore_out, cmd=import_keystore_cmd, rc=rc)

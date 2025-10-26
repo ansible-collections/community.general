@@ -81,10 +81,9 @@ except ImportError:
 
 
 def _alternate_retrieval_method(module):
-    get_argument = 'echo "%s" | gnome-keyring-daemon --unlock\nkeyring get %s %s\n' % (
-        quote(module.params["keyring_password"]),
-        quote(module.params["service"]),
-        quote(module.params["username"]),
+    get_argument = (
+        f'echo "{quote(module.params["keyring_password"])}" | gnome-keyring-daemon --unlock\n'
+        f'keyring get {quote(module.params["service"])} {quote(module.params["username"])}\n'
     )
     dummy, stdout, dummy = module.run_command(
         "dbus-run-session -- /bin/bash",
@@ -129,16 +128,10 @@ def run_module():
         passphrase = _alternate_retrieval_method(module)
 
     if passphrase is not None:
-        result["msg"] = "Successfully retrieved password for %s@%s" % (
-            module.params["service"],
-            module.params["username"],
-        )
+        result["msg"] = f"Successfully retrieved password for {module.params['service']}@{module.params['username']}"
         result["passphrase"] = passphrase
     if passphrase is None:
-        result["msg"] = "Password for %s@%s does not exist." % (
-            module.params["service"],
-            module.params["username"],
-        )
+        result["msg"] = f"Password for {module.params['service']}@{module.params['username']} does not exist."
     module.exit_json(**result)
 
 

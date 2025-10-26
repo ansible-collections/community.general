@@ -294,8 +294,7 @@ def main():
     # Get id of the client based on client_id
     cid = kc.get_client_id(client_id, realm=realm)
     if not cid:
-        module.fail_json(msg='Invalid client %s for realm %s' %
-                         (client_id, realm))
+        module.fail_json(msg=f'Invalid client {client_id} for realm {realm}')
 
     # Get current state of the permission using its name as the search
     # filter. This returns False if it is not found.
@@ -324,7 +323,7 @@ def main():
         if resources:
             r = kc.get_authz_resource_by_name(resources[0], cid, realm)
             if not r:
-                module.fail_json(msg='Unable to find authorization resource with name %s for client %s in realm %s' % (resources[0], cid, realm))
+                module.fail_json(msg=f'Unable to find authorization resource with name {resources[0]} for client {cid} in realm {realm}')
             else:
                 payload['resources'].append(r['_id'])
 
@@ -336,7 +335,7 @@ def main():
         for scope in scopes:
             s = kc.get_authz_authorization_scope_by_name(scope, cid, realm)
             if r and not s['id'] in resource_scopes:
-                module.fail_json(msg='Resource %s does not include scope %s for client %s in realm %s' % (resources[0], scope, client_id, realm))
+                module.fail_json(msg=f'Resource {resources[0]} does not include scope {scope} for client {client_id} in realm {realm}')
             else:
                 payload['scopes'].append(s['id'])
 
@@ -345,7 +344,7 @@ def main():
             for resource in resources:
                 r = kc.get_authz_resource_by_name(resource, cid, realm)
                 if not r:
-                    module.fail_json(msg='Unable to find authorization resource with name %s for client %s in realm %s' % (resource, cid, realm))
+                    module.fail_json(msg=f'Unable to find authorization resource with name {resource} for client {cid} in realm {realm}')
                 else:
                     payload['resources'].append(r['_id'])
 
@@ -357,7 +356,7 @@ def main():
             if p:
                 payload['policies'].append(p['id'])
             else:
-                module.fail_json(msg='Unable to find authorization policy with name %s for client %s in realm %s' % (policy, client_id, realm))
+                module.fail_json(msg=f'Unable to find authorization policy with name {policy} for client {client_id} in realm {realm}')
 
     # Add "id" to payload for update operations
     if permission:
@@ -367,8 +366,8 @@ def main():
         # existing permission's type - something that can't be done without a
         # full delete -> (re)create cycle.
         if permission['type'] != payload['type']:
-            module.fail_json(msg='Modifying the type of permission (scope/resource) is not supported: \
-                                  permission %s of client %s in realm %s unchanged' % (permission['id'], cid, realm))
+            module.fail_json(msg=(f"Modifying the type of permission (scope/resource) is not supported: "
+                                  f"permission {permission['id']} of client {cid} in realm {realm} unchanged"))
 
     # Updating an authorization  permission is tricky for several reasons.
     # Firstly, the current permission is retrieved using a _policy_ endpoint,
@@ -419,8 +418,7 @@ def main():
     elif not permission and state == 'absent':
         result['changed'] = False
     else:
-        module.fail_json(msg='Unable to determine what to do with permission %s of client %s in realm %s' % (
-            name, client_id, realm))
+        module.fail_json(msg=f'Unable to determine what to do with permission {name} of client {client_id} in realm {realm}')
 
     module.exit_json(**result)
 

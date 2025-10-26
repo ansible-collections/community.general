@@ -122,9 +122,7 @@ def main():
     keys_metadata = kc.get_realm_keys_metadata_by_id(realm=realm)
 
     result["keys_metadata"] = keys_metadata
-    result["msg"] = "Get realm keys metadata successful for ID {realm}".format(
-        realm=realm
-    )
+    result["msg"] = f"Get realm keys metadata successful for ID {realm}"
     module.exit_json(**result)
 
 

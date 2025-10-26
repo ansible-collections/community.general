@@ -216,7 +216,7 @@ def get_kibana_version(module, plugin_bin, allow_root):
 
     rc, out, err = module.run_command(cmd_args)
     if rc != 0:
-        module.fail_json(msg="Failed to get Kibana version : %s" % err)
+        module.fail_json(msg=f"Failed to get Kibana version : {err}")
 
     return out.strip()
 
@@ -258,7 +258,7 @@ def main():
         module.exit_json(changed=False, name=name, state=state)
 
     if version:
-        name = name + '/' + version
+        name = f"{name}/{version}"
 
     if state == "present":
         if force:

@@ -422,8 +422,7 @@ def main():
 
         result['end_state'] = after_group
 
-        result['msg'] = 'Group {name} has been created with ID {id}'.format(name=after_group['name'],
-                                                                            id=after_group['id'])
+        result['msg'] = f"Group {after_group['name']} has been created with ID {after_group['id']}"
         module.exit_json(**result)
 
     else:
@@ -434,7 +433,7 @@ def main():
             if desired_group == before_group:
                 result['changed'] = False
                 result['end_state'] = desired_group
-                result['msg'] = "No changes required to group {name}.".format(name=before_group['name'])
+                result['msg'] = f"No changes required to group {before_group['name']}."
                 module.exit_json(**result)
 
             # doing an update
@@ -453,7 +452,7 @@ def main():
 
             result['end_state'] = after_group
 
-            result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
+            result['msg'] = f"Group {after_group['id']} has been updated"
             module.exit_json(**result)
 
         else:
@@ -472,7 +471,7 @@ def main():
 
             result['end_state'] = {}
 
-            result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])
+            result['msg'] = f"Group {before_group['name']} has been deleted"
 
     module.exit_json(**result)
 
