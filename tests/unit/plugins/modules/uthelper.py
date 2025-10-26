@@ -203,6 +203,12 @@ class TestCaseMock:
     def build_mock(cls, mock_specs):
         return cls(mock_specs)
 
+    def __str__(self):
+        return f"<{self.__class__.__name__} specs={self.mock_specs}>"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.mock_specs})"
+
     def __init__(self, mock_specs):
         self.mock_specs = mock_specs
 
@@ -218,12 +224,6 @@ class TestCaseMock:
 
 class RunCommandMock(TestCaseMock):
     name = "run_command"
-
-    def __str__(self):
-        return "<RunCommandMock specs={specs}>".format(specs=self.mock_specs)
-
-    def __repr__(self):
-        return "RunCommandMock({specs})".format(specs=self.mock_specs)
 
     def fixtures(self):
         @pytest.fixture
