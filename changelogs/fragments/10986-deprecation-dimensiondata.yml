@@ -1,0 +1,6 @@
+deprecated_features:
+  - dimensiondata doc_fragments plugin - fragments is deprecated and will be removed in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10986).
+  - dimensiondata_wait doc_fragments plugin - fragments is deprecated and will be removed in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10986).
+  - dimensiondata module_utils plugin - utils is deprecated and will be removed in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10986).
+  - dimensiondata_network modules plugin - module is deprecated and will be removed in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10986).
+  - dimensiondata_vlan modules plugin - module is deprecated and will be removed in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10986).
