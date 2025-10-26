@@ -205,11 +205,11 @@ plugin_routing:
     dimensiondata_network:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Service and its endpoints are not longer available.
+        warning_text: Service and its endpoints are no longer available.
     dimensiondata_vlan:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Service and its endpoints are not longer available.
+        warning_text: Service and its endpoints are no longer available.
     docker_compose:
       redirect: community.docker.docker_compose
     docker_config:
@@ -1053,11 +1053,11 @@ plugin_routing:
     dimensiondata:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Service and its endpoints are not longer available.
+        warning_text: Service and its endpoints are no longer available.
     dimensiondata_wait:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Service and its endpoints are not longer available.
+        warning_text: Service and its endpoints are no longer available.
     docker:
       redirect: community.docker.docker
     hetzner:
@@ -1112,7 +1112,7 @@ plugin_routing:
     dimensiondata:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Service and its endpoints are not longer available.
+        warning_text: Service and its endpoints are no longer available.
     docker.common:
       redirect: community.docker.common
     docker.swarm:
