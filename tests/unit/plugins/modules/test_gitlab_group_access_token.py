@@ -56,7 +56,7 @@ class TestGitlabGroupAccessToken(GitlabModuleTestCase):
     def setUp(self):
         super(TestGitlabGroupAccessToken, self).setUp()
         if not python_gitlab_version_match_requirement():
-            self.skipTest("python-gitlab %s+ is needed for gitlab_group_access_token" % ",".join(map(str, PYTHON_GITLAB_MINIMAL_VERSION)))
+            self.skipTest(f"python-gitlab {'.'.join(map(str, PYTHON_GITLAB_MINIMAL_VERSION))}+ is needed for gitlab_group_access_token")
 
         self.moduleUtil = GitLabGroupAccessToken(module=self.mock_module, gitlab_instance=self.gitlab_instance)
 

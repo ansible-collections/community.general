@@ -155,7 +155,7 @@ def test__get_json_data(mocker):
     jenkins_plugin = JenkinsPlugin(module)
 
     json_data = jenkins_plugin._get_json_data(
-        "{url}".format(url=GITHUB_DATA['url']),
+        f"{GITHUB_DATA['url']}",
         'CSRF')
 
     assert isinstance(json_data, Mapping)
@@ -191,7 +191,7 @@ def test__new_fallback_urls(mocker):
 
 
 def isInList(l, i):
-    print("checking if %s in %s" % (i, l))
+    print(f"checking if {i} in {l}")
     for item in l:
         if item == i:
             return True

@@ -38,7 +38,7 @@ class JenkinsBuildMock():
             response["result"] = "ABSENT"
             return response
         except Exception as e:
-            fail_json(msg='Unable to fetch build information, {0}'.format(e))
+            fail_json(msg=f'Unable to fetch build information, {e}')
 
 
 class JenkinsMock():

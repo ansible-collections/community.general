@@ -29,7 +29,7 @@ class ModuleMocked:
         move(src, dst)
 
     def backup_local(self, path):
-        backupp = os.path.join("/tmp", os.path.basename(path) + ".bak")
+        backupp = os.path.join("/tmp", f"{os.path.basename(path)}.bak")
         copyfile(path, backupp)
         return backupp
 
@@ -68,12 +68,12 @@ class TestInterfacesFileModule(unittest.TestCase):
 
     def compareInterfacesLinesToFile(self, interfaces_lines, path, testname=None):
         if not testname:
-            testname = "%s.%s" % (path, inspect.stack()[1][3])
+            testname = f"{path}.{inspect.stack()[1][3]}"
         self.compareStringWithFile("".join([d['line'] for d in interfaces_lines if 'line' in d]), testname)
 
     def compareInterfacesToFile(self, ifaces, path, testname=None):
         if not testname:
-            testname = "%s.%s.json" % (path, inspect.stack()[1][3])
+            testname = f"{path}.{inspect.stack()[1][3]}.json"
 
         testfilepath = os.path.join(golden_output_path, testname)
         string = json.dumps(ifaces, sort_keys=True, indent=4, separators=(',', ': '))
@@ -196,12 +196,12 @@ class TestInterfacesFileModule(unittest.TestCase):
                         dummy, lines = interfaces_file.set_interface_option(module, lines, options['iface'], options['option'],
                                                                             options['value'], options['state'])
                     except AnsibleFailJson as e:
-                        fail_json_iterations.append("[%d] fail_json message: %s\noptions:\n%s" %
-                                                    (i, str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
-                self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                        fail_json_iterations.append(
+                            f"[{i}] fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}")
+                self.compareStringWithFile("\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt")
 
-                self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
 
     def test_revert(self):
         testcases = {
@@ -229,14 +229,14 @@ class TestInterfacesFileModule(unittest.TestCase):
                             dummy, lines = interfaces_file.set_interface_option(module, lines,
                                                                                 options['iface'], options['option'], options['value'], options['state'])
                         except AnsibleFailJson as e:
-                            fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
-                                                        (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
+                            fail_json_iterations.append(
+                                f"fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}")
                         interfaces_file.write_changes(module, [d['line'] for d in lines if 'line' in d], path)
 
-                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt")
 
-                    self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                    self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                    self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                    self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
                     if testfile not in ["no_leading_spaces"]:
                         # skip if eth0 has MTU value
                         self.compareFileToBackup(path, backupp)
@@ -270,17 +270,16 @@ class TestInterfacesFileModule(unittest.TestCase):
                             changed_again, lines = interfaces_file.set_interface_option(module, lines, options['iface'],
                                                                                         options['option'], options['value'], options['state'])
                             self.assertFalse(changed_again,
-                                             msg='Second request for change should return false for {0} running on {1}'.format(testname,
-                                                                                                                               testfile))
+                                             msg=f'Second request for change should return false for {testname} running on {testfile}')
                     except AnsibleFailJson as e:
-                        fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
-                                                    (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
+                        fail_json_iterations.append(
+                            f"fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}")
                     interfaces_file.write_changes(module, [d['line'] for d in lines if 'line' in d], path)
 
-                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt")
 
-                    self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                    self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                    self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                    self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
                     # Restore backup
                     move(backupp, path)
 
@@ -544,13 +543,13 @@ class TestInterfacesFileModule(unittest.TestCase):
                         dummy, lines = interfaces_file.set_interface_option(module, lines, options['iface'], options['option'],
                                                                             options['value'], options['state'], options['address_family'])
                     except AnsibleFailJson as e:
-                        fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
-                                                    (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
+                        fail_json_iterations.append(
+                            f"fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}")
                     interfaces_file.write_changes(module, [d['line'] for d in lines if 'line' in d], path)
 
-                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt")
 
-                    self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                    self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                    self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                    self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
                     # Restore backup
                     move(backupp, path)

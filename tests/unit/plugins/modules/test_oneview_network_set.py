@@ -29,7 +29,7 @@ PARAMS_WITH_CHANGES = dict(
     config='config.json',
     state='present',
     data=dict(name=NETWORK_SET['name'],
-              newName=NETWORK_SET['name'] + " - Renamed",
+              newName=f"{NETWORK_SET['name']} - Renamed",
               networkUris=['/rest/ethernet-networks/aaa-bbb-ccc', 'Name of a Network'])
 )
 
@@ -80,7 +80,7 @@ class NetworkSetModuleSpec(unittest.TestCase,
         )
 
     def test_update_when_data_has_modified_attributes(self):
-        data_merged = dict(name=NETWORK_SET['name'] + " - Renamed",
+        data_merged = dict(name=f"{NETWORK_SET['name']} - Renamed",
                            networkUris=['/rest/ethernet-networks/aaa-bbb-ccc',
                                         '/rest/ethernet-networks/ddd-eee-fff']
                            )
@@ -109,7 +109,7 @@ class NetworkSetModuleSpec(unittest.TestCase,
 
         self.mock_ansible_module.fail_json.assert_called_once_with(
             exception=mock.ANY,
-            msg=NetworkSetModule.MSG_ETHERNET_NETWORK_NOT_FOUND + "Name of a Network"
+            msg=f"{NetworkSetModule.MSG_ETHERNET_NETWORK_NOT_FOUND}Name of a Network"
         )
 
     def test_should_remove_network(self):

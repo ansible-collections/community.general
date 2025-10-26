@@ -222,7 +222,7 @@ def mock_get_request_enclosure_single_tenant(*args, **kwargs):
     elif args[1].endswith("/UpdateService"):
         return MOCK_SUCCESSFUL_RESPONSE_WITH_SIMPLE_UPDATE_AND_FW_ACTIVATE
     else:
-        raise RuntimeError("Illegal call to get_request in test: " + args[1])
+        raise RuntimeError(f"Illegal call to get_request in test: {args[1]}")
 
 
 def mock_get_request_enclosure_multi_tenant(*args, **kwargs):
@@ -240,7 +240,7 @@ def mock_get_request_enclosure_multi_tenant(*args, **kwargs):
     elif args[1].endswith("/IOModuleBFRU"):
         return MOCK_GET_IOM_B_MULTI_TENANAT
     else:
-        raise RuntimeError("Illegal call to get_request in test: " + args[1])
+        raise RuntimeError(f"Illegal call to get_request in test: {args[1]}")
 
 
 def mock_get_request(*args, **kwargs):
@@ -252,7 +252,7 @@ def mock_get_request(*args, **kwargs):
     elif args[1].endswith("Chassis/Enclosure"):
         return MOCK_SUCCESSFUL_RESPONSE_CHASSIS_ENCLOSURE
     else:
-        raise RuntimeError("Illegal call to get_request in test: " + args[1])
+        raise RuntimeError(f"Illegal call to get_request in test: {args[1]}")
 
 
 def mock_post_request(*args, **kwargs):
@@ -268,7 +268,7 @@ def mock_post_request(*args, **kwargs):
                 "ret": True,
                 "data": ACTION_WAS_SUCCESSFUL_MESSAGE
             }
-    raise RuntimeError("Illegal POST call to: " + args[1])
+    raise RuntimeError(f"Illegal POST call to: {args[1]}")
 
 
 def mock_get_firmware_inventory_version_1_2_3(*args, **kwargs):
@@ -570,10 +570,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         """Test Update and Activate when target is not in the correct state."""
         mock_status_code = 999
         mock_status_description = "mock status description"
-        expected_error_message = "Target is not ready for FW update.  Current status: {0} ({1})".format(
-            mock_status_code,
-            mock_status_description
-        )
+        expected_error_message = f"Target is not ready for FW update.  Current status: {mock_status_code} ({mock_status_description})"
         with set_module_args({
             'category': 'Update',
             'command': 'UpdateAndActivate',
@@ -646,7 +643,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
             }
         }):
 
-            tar_name = "empty_tarfile{0}.tar".format(uuid.uuid4())
+            tar_name = f"empty_tarfile{uuid.uuid4()}.tar"
             empty_tarfile = tarfile.open(os.path.join(self.tempdir, tar_name), "w")
             empty_tarfile.close()
             with patch('ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file') as mock_fetch_file:
@@ -885,10 +882,10 @@ class TestWdcRedfishCommand(unittest.TestCase):
 
         This can be used for a mock FW update.
         """
-        tar_name = "tarfile{0}.tar".format(uuid.uuid4())
+        tar_name = f"tarfile{uuid.uuid4()}.tar"
 
         bundle_tarfile = tarfile.open(os.path.join(self.tempdir, tar_name), "w")
-        package_filename = "oobm-{0}.pkg".format(mock_firmware_version)
+        package_filename = f"oobm-{mock_firmware_version}.pkg"
         package_filename_path = os.path.join(self.tempdir, package_filename)
         with open(package_filename_path, "w"):
             pass

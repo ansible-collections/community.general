@@ -22,7 +22,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
-            (0, "%s-1.21.0 = C/C++ package manager" % package, None),
+            (0, f"{package}-1.21.0 = C/C++ package manager", None),
         ]
 
         # when
@@ -38,7 +38,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
-            (0, "%s = C/C++ package manager" % package, None),
+            (0, f"{package} = C/C++ package manager", None),
         ]
 
         # when
@@ -102,7 +102,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
-            (1, None, "No results found for %s" % package),
+            (1, None, f"No results found for {package}"),
         ]
 
         # when
@@ -118,7 +118,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         parseable_flag_supported = 0
         mock_module.run_command.side_effect = [
             (parseable_flag_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
-            (0, "%s-1.21.0;=;C/C++ package manager" % package, None),
+            (0, f"{package}-1.21.0;=;C/C++ package manager", None),
         ]
 
         # when
@@ -134,7 +134,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
-            (0, "%s-1.21.0 = C/C++ package manager" % package, None),
+            (0, f"{package}-1.21.0 = C/C++ package manager", None),
         ]
 
         # when

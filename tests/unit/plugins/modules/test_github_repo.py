@@ -29,7 +29,7 @@ def get_orgs_mock(url, request):
     headers = {'content-type': 'application/json'}
     content = {
         "login": org,
-        "url": "https://api.github.com/orgs/{0}".format(org)
+        "url": f"https://api.github.com/orgs/{org}"
     }
     content = json.dumps(content).encode("utf-8")
     return response(200, content, headers, None, 5, request)
@@ -63,8 +63,8 @@ def get_repo_mock(url, request):
     headers = {'content-type': 'application/json'}
     content = {
         "name": repo,
-        "full_name": "{0}/{1}".format(org, repo),
-        "url": "https://api.github.com/repos/{0}/{1}".format(org, repo),
+        "full_name": f"{org}/{repo}",
+        "url": f"https://api.github.com/repos/{org}/{repo}",
         "private": False,
         "description": "This your first repo!",
         "default_branch": "master",
@@ -85,8 +85,8 @@ def get_private_repo_mock(url, request):
     headers = {'content-type': 'application/json'}
     content = {
         "name": repo,
-        "full_name": "{0}/{1}".format(org, repo),
-        "url": "https://api.github.com/repos/{0}/{1}".format(org, repo),
+        "full_name": f"{org}/{repo}",
+        "url": f"https://api.github.com/repos/{org}/{repo}",
         "private": True,
         "description": "This your first repo!",
         "default_branch": "master",
@@ -107,7 +107,7 @@ def create_new_org_repo_mock(url, request):
     # https://docs.github.com/en/rest/reference/repos#create-an-organization-repository
     content = {
         "name": repo['name'],
-        "full_name": "{0}/{1}".format(org, repo['name']),
+        "full_name": f"{org}/{repo['name']}",
         "private": repo.get('private', False),
         "description": repo.get('description')
     }
@@ -123,7 +123,7 @@ def create_new_user_repo_mock(url, request):
     # https://docs.github.com/en/rest/reference/repos#create-a-repository-for-the-authenticated-user
     content = {
         "name": repo['name'],
-        "full_name": "{0}/{1}".format("octocat", repo['name']),
+        "full_name": f"octocat/{repo['name']}",
         "private": repo.get('private', False),
         "description": repo.get('description')
     }
@@ -143,8 +143,8 @@ def patch_repo_mock(url, request):
     # https://docs.github.com/en/rest/reference/repos#update-a-repository
     content = {
         "name": repo,
-        "full_name": "{0}/{1}".format(org, repo),
-        "url": "https://api.github.com/repos/{0}/{1}".format(org, repo),
+        "full_name": f"{org}/{repo}",
+        "url": f"https://api.github.com/repos/{org}/{repo}",
         "private": body.get('private', False),
         "description": body.get('description'),
         "default_branch": "master",

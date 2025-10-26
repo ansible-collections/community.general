@@ -17,7 +17,7 @@ def get_bin_path(self, arg, required=False):
         return '/usr/bin/lsusb'
     else:
         if required:
-            fail_json(msg='%r not found !' % arg)
+            fail_json(msg=f'{arg!r} not found !')
 
 
 class TestUsbFacts(unittest.TestCase):
@@ -61,7 +61,7 @@ class TestUsbFacts(unittest.TestCase):
     def test_parsing_multiple_lines(self):
         input = ""
         for data in self.testing_data:
-            input += ("%s\n" % data["input"])
+            input += f"{data['input']}\n"
         with mock.patch.object(basic.AnsibleModule, 'run_command') as mock_run_command:
             mock_run_command.return_value = 0, input, None
             with self.assertRaises(AnsibleExitJson) as result:

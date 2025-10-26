@@ -20,7 +20,7 @@ def mock_ov_client():
 
 @pytest.fixture
 def mock_ansible_module():
-    patcher_ansible = patch(ONEVIEW_MODULE_UTILS_PATH + '.AnsibleModule')
+    patcher_ansible = patch(f"{ONEVIEW_MODULE_UTILS_PATH}.AnsibleModule")
     patcher_ansible = patcher_ansible.start()
     ansible_module = Mock()
     patcher_ansible.return_value = ansible_module

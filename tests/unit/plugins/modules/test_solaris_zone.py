@@ -103,7 +103,7 @@ def test_zone_create_invalid_names(mocked_zone_create, capfd):
             {
                 "name": invalid_name,
                 "state": "installed",
-                "path": "/zones/" + invalid_name,
+                "path": f"/zones/{invalid_name}",
                 "_ansible_check_mode": False,
             }
         ):

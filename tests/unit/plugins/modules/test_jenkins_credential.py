@@ -143,7 +143,7 @@ def test_clean_data_removes_extraneous_fields():
     }
     expected = {"id": "cred1", "description": "test"}
     result = jenkins_credential.clean_data(data)
-    assert result == expected, "Expected {}, got {}".format(expected, result)
+    assert result == expected, f"Expected {expected}, got {result}"
 
 
 @patch(
