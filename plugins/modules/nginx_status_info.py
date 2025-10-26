@@ -117,7 +117,7 @@ class NginxStatusInfo(object):
         }
         (response, info) = fetch_url(module=module, url=self.url, force=True, timeout=self.timeout)
         if not response:
-            module.fail_json(msg="No valid or no response from url %s within %s seconds (timeout)" % (self.url, self.timeout))
+            module.fail_json(msg=f"No valid or no response from url {self.url} within {self.timeout} seconds (timeout)")
 
         data = to_text(response.read(), errors='surrogate_or_strict')
         if not data:

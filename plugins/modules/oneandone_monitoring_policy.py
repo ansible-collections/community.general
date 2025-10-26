@@ -1007,7 +1007,7 @@ def main():
         for param in ('name', 'agent', 'email', 'thresholds', 'ports', 'processes'):
             if not module.params.get(param):
                 module.fail_json(
-                    msg="%s parameter is required for a new monitoring policy." % param)
+                    msg=f"{param} parameter is required for a new monitoring policy.")
         try:
             (changed, monitoring_policy) = create_monitoring_policy(module, oneandone_conn)
         except Exception as ex:

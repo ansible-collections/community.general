@@ -521,8 +521,7 @@ def main():
 
     if not module.params.get('auth_token'):
         module.fail_json(
-            msg='The "auth_token" parameter or ' +
-            'ONEANDONE_AUTH_TOKEN environment variable is required.')
+            msg='The "auth_token" parameter or ONEANDONE_AUTH_TOKEN environment variable is required.')
 
     if not module.params.get('api_url'):
         oneandone_conn = oneandone.client.OneAndOneService(
@@ -555,7 +554,7 @@ def main():
         for param in ('name', 'rules'):
             if not module.params.get(param):
                 module.fail_json(
-                    msg="%s parameter is required for new firewall policies." % param)
+                    msg=f"{param} parameter is required for new firewall policies.")
         try:
             (changed, firewall_policy) = create_firewall_policy(module, oneandone_conn)
         except Exception as e:

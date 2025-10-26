@@ -240,7 +240,7 @@ STATES = ("PENDING", "DEPLOYING", "RUNNING", "UNDEPLOYING", "WARNING", "DONE",
 
 def get_all_templates(module, auth):
     try:
-        all_templates = open_url(url=(auth.url + "/service_template"), method="GET", force_basic_auth=True, url_username=auth.user, url_password=auth.password)
+        all_templates = open_url(url=f"{auth.url}/service_template", method="GET", force_basic_auth=True, url_username=auth.user, url_password=auth.password)
     except Exception as e:
         module.fail_json(msg=str(e))
 
@@ -264,14 +264,14 @@ def get_template(module, auth, pred):
     if found <= 0:
         return None
     elif found > 1:
-        module.fail_json(msg="There is no template with unique name: " + template_name)
+        module.fail_json(msg=f"There is no template with unique name: {template_name}")
     else:
         return found_template
 
 
 def get_all_services(module, auth):
     try:
-        response = open_url(auth.url + "/service", method="GET", force_basic_auth=True, url_username=auth.user, url_password=auth.password)
+        response = open_url(f"{auth.url}/service", method="GET", force_basic_auth=True, url_username=auth.user, url_password=auth.password)
     except Exception as e:
         module.fail_json(msg=str(e))
 
@@ -294,8 +294,7 @@ def get_service(module, auth, pred):
 
     # fail if there are more services with same name
     if found > 1:
-        module.fail_json(msg="There are multiple services with a name: '" +
-                         service_name + "'. You have to use a unique service name or use 'service_id' instead.")
+        module.fail_json(msg=f"There are multiple services with a name: '{service_name}'. You have to use a unique service name or use 'service_id' instead.")
     elif found <= 0:
         return None
     else:
@@ -354,7 +353,7 @@ def create_service(module, auth, template_id, service_name, custom_attrs, unique
     }
 
     try:
-        response = open_url(auth.url + "/service_template/" + str(template_id) + "/action", method="POST",
+        response = open_url(f"{auth.url}/service_template/{template_id!s}/action", method="POST",
                             data=module.jsonify(data), force_basic_auth=True, url_username=auth.user, url_password=auth.password)
     except Exception as e:
         module.fail_json(msg=str(e))
@@ -370,10 +369,10 @@ def wait_for_service_to_become_ready(module, auth, service_id, wait_timeout):
 
     while (time.time() - start_time) < wait_timeout:
         try:
-            status_result = open_url(auth.url + "/service/" + str(service_id), method="GET",
+            status_result = open_url(f"{auth.url}/service/{service_id!s}", method="GET",
                                      force_basic_auth=True, url_username=auth.user, url_password=auth.password)
         except Exception as e:
-            module.fail_json(msg="Request for service status has failed. Error message: " + str(e))
+            module.fail_json(msg=f"Request for service status has failed. Error message: {e!s}")
 
         status_result = module.from_json(status_result.read())
         service_state = status_result["DOCUMENT"]["TEMPLATE"]["BODY"]["state"]
@@ -387,7 +386,7 @@ def wait_for_service_to_become_ready(module, auth, service_id, wait_timeout):
                     log_message = log_message + log_info["message"]
                     break
 
-            module.fail_json(msg="Deploying is unsuccessful. Service state: " + STATES[service_state] + ". Error message: " + log_message)
+            module.fail_json(msg=f"Deploying is unsuccessful. Service state: {STATES[service_state]}. Error message: {log_message}")
 
         time.sleep(1)
 
@@ -404,7 +403,7 @@ def change_service_permissions(module, auth, service_id, permissions):
     }
 
     try:
-        status_result = open_url(auth.url + "/service/" + str(service_id) + "/action", method="POST", force_basic_auth=True,
+        status_result = open_url(f"{auth.url}/service/{service_id!s}/action", method="POST", force_basic_auth=True,
                                  url_username=auth.user, url_password=auth.password, data=module.jsonify(data))
     except Exception as e:
         module.fail_json(msg=str(e))
@@ -419,7 +418,7 @@ def change_service_owner(module, auth, service_id, owner_id):
     }
 
     try:
-        status_result = open_url(auth.url + "/service/" + str(service_id) + "/action", method="POST", force_basic_auth=True,
+        status_result = open_url(f"{auth.url}/service/{service_id!s}/action", method="POST", force_basic_auth=True,
                                  url_username=auth.user, url_password=auth.password, data=module.jsonify(data))
     except Exception as e:
         module.fail_json(msg=str(e))
@@ -435,7 +434,7 @@ def change_service_group(module, auth, service_id, group_id):
     }
 
     try:
-        status_result = open_url(auth.url + "/service/" + str(service_id) + "/action", method="POST", force_basic_auth=True,
+        status_result = open_url(f"{auth.url}/service/{service_id!s}/action", method="POST", force_basic_auth=True,
                                  url_username=auth.user, url_password=auth.password, data=module.jsonify(data))
     except Exception as e:
         module.fail_json(msg=str(e))
@@ -449,13 +448,13 @@ def change_role_cardinality(module, auth, service_id, role, cardinality, force):
     }
 
     try:
-        status_result = open_url(auth.url + "/service/" + str(service_id) + "/role/" + role, method="PUT",
+        status_result = open_url(f"{auth.url}/service/{service_id!s}/role/{role}", method="PUT",
                                  force_basic_auth=True, url_username=auth.user, url_password=auth.password, data=module.jsonify(data))
     except Exception as e:
         module.fail_json(msg=str(e))
 
     if status_result.getcode() != 204:
-        module.fail_json(msg="Failed to change cardinality for role: " + role + ". Return code: " + str(status_result.getcode()))
+        module.fail_json(msg=f"Failed to change cardinality for role: {role}. Return code: {status_result.getcode()!s}")
 
 
 def check_change_service_owner(module, service, owner_id):
@@ -510,7 +509,7 @@ def check_change_role_cardinality(module, service, role_name, cardinality):
         if role["name"] == role_name:
             return int(role["cardinality"]) != cardinality
 
-    module.fail_json(msg="There is no role with name: " + role_name)
+    module.fail_json(msg=f"There is no role with name: {role_name}")
 
 
 def create_service_and_operation(module, auth, template_id, service_name, owner_id, group_id, permissions, custom_attrs, unique, wait, wait_timeout):
@@ -553,7 +552,7 @@ def service_operation(module, auth, service_id=None, owner_id=None, group_id=Non
         service_id = service["ID"]
 
     if not service:
-        module.fail_json(msg="There is no service with id: " + str(service_id))
+        module.fail_json(msg=f"There is no service with id: {service_id!s}")
 
     if owner_id:
         if check_change_service_owner(module, service, owner_id):
@@ -603,9 +602,9 @@ def delete_service(module, auth, service_id):
         return service_info
 
     try:
-        result = open_url(auth.url + '/service/' + str(service_id), method="DELETE", force_basic_auth=True, url_username=auth.user, url_password=auth.password)
+        result = open_url(f"{auth.url}/service/{service_id!s}", method="DELETE", force_basic_auth=True, url_username=auth.user, url_password=auth.password)
     except Exception as e:
-        module.fail_json(msg="Service deletion has failed. Error message: " + str(e))
+        module.fail_json(msg=f"Service deletion has failed. Error message: {e}")
 
     return service_info
 
@@ -721,9 +720,9 @@ def main():
         template_id = get_template_id(module, auth, requested_template_id, requested_template_name)
         if not template_id:
             if requested_template_id:
-                module.fail_json(msg="There is no template with template_id: " + str(requested_template_id))
+                module.fail_json(msg=f"There is no template with template_id: {requested_template_id!s}")
             elif requested_template_name:
-                module.fail_json(msg="There is no template with name: " + requested_template_name)
+                module.fail_json(msg=f"There is no template with name: {requested_template_name}")
 
     if unique and not service_name:
         module.fail_json(msg="You cannot use unique without passing service_name!")
@@ -744,7 +743,7 @@ def main():
             service_id = get_service_id_by_name(module, auth, service_name)
         # The task should be failed when we want to manage a non-existent service identified by its name
         if not service_id and state == 'present':
-            module.fail_json(msg="There is no service with name: " + service_name)
+            module.fail_json(msg=f"There is no service with name: {service_name}")
 
         if state == 'absent':
             result = delete_service(module, auth, service_id)

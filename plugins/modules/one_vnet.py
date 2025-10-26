@@ -297,7 +297,7 @@ class NetworksModule(OpenNebulaModule):
         needs_creation = False
         if not template and desired_state != 'absent':
             if id:
-                module.fail_json(msg="There is no template with id=" + str(id))
+                module.fail_json(msg=f"There is no template with id={id}")
             else:
                 needs_creation = True
 
@@ -394,7 +394,7 @@ class NetworksModule(OpenNebulaModule):
     def create_template(self, name, template_data):
         if not self.module.check_mode:
             # -1 means that network won't be added to any cluster which happens by default
-            self.one.vn.allocate("NAME = \"" + name + "\"\n" + template_data, -1)
+            self.one.vn.allocate(f'NAME = "{name}"\n{template_data}', -1)
 
         result = self.get_template_info(self.get_template_by_name(name))
         result['changed'] = True

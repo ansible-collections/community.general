@@ -151,7 +151,7 @@ class NetworkSetInfoModule(OneViewModuleBase):
         name = self.module.params.get('name')
 
         if 'withoutEthernet' in self.options:
-            filter_by_name = ("\"'name'='%s'\"" % name) if name else ''
+            filter_by_name = f"\"'name'='{name}'\"" if name else ''
             network_sets = self.oneview_client.network_sets.get_all_without_ethernet(filter=filter_by_name)
         elif name:
             network_sets = self.oneview_client.network_sets.get_by('name', name)
