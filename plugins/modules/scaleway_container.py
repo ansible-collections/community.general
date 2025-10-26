@@ -283,10 +283,9 @@ def absent_strategy(api, wished_cn):
         return changed, {"status": "Container would be destroyed"}
 
     api.wait_to_complete_state_transition(resource=target_cn, stable_states=STABLE_STATES, force_wait=True)
-    response = api.delete(path=api.api_path + "/%s" % target_cn["id"])
+    response = api.delete(path=f"{api.api_path}/{target_cn['id']}")
     if not response.ok:
-        api.module.fail_json(msg='Error deleting container [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f'Error deleting container [{response.status_code}: {response.json}]')
 
     api.wait_to_complete_state_transition(resource=target_cn, stable_states=STABLE_STATES)
     return changed, response.json
@@ -314,13 +313,11 @@ def present_strategy(api, wished_cn):
                                      data=payload_cn)
 
         if not creation_response.ok:
-            msg = "Error during container creation: %s: '%s' (%s)" % (creation_response.info['msg'],
-                                                                      creation_response.json['message'],
-                                                                      creation_response.json)
+            msg = f"Error during container creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
             api.module.fail_json(msg=msg)
 
         api.wait_to_complete_state_transition(resource=creation_response.json, stable_states=STABLE_STATES)
-        response = api.get(path=api.api_path + "/%s" % creation_response.json["id"])
+        response = api.get(path=f"{api.api_path}/{creation_response.json['id']}")
         return changed, response.json
 
     target_cn = cn_lookup[wished_cn["name"]]
@@ -339,15 +336,14 @@ def present_strategy(api, wished_cn):
     if api.module.check_mode:
         return changed, {"status": "Container attributes would be changed."}
 
-    cn_patch_response = api.patch(path=api.api_path + "/%s" % target_cn["id"],
+    cn_patch_response = api.patch(path=f"{api.api_path}/{target_cn['id']}",
                                   data=patch_payload)
 
     if not cn_patch_response.ok:
-        api.module.fail_json(msg='Error during container attributes update: [{0}: {1}]'.format(
-            cn_patch_response.status_code, cn_patch_response.json['message']))
+        api.module.fail_json(msg=f"Error during container attributes update: [{cn_patch_response.status_code}: {cn_patch_response.json['message']}]")
 
     api.wait_to_complete_state_transition(resource=target_cn, stable_states=STABLE_STATES)
-    response = api.get(path=api.api_path + "/%s" % target_cn["id"])
+    response = api.get(path=f"{api.api_path}/{target_cn['id']}")
     return changed, response.json
 
 
@@ -382,7 +378,7 @@ def core(module):
     }
 
     api = Scaleway(module=module)
-    api.api_path = "containers/v1beta1/regions/%s/containers" % region
+    api.api_path = f"containers/v1beta1/regions/{region}/containers"
 
     changed, summary = state_strategy[wished_container["state"]](api=api, wished_cn=wished_container)
 

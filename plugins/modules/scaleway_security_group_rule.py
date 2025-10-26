@@ -162,11 +162,10 @@ def get_sgr_from_api(security_group_rules, security_group_rule):
 def present_strategy(api, security_group_id, security_group_rule):
     ret = {'changed': False}
 
-    response = api.get('security_groups/%s/rules' % security_group_id)
+    response = api.get(f'security_groups/{security_group_id}/rules')
     if not response.ok:
         api.module.fail_json(
-            msg='Error getting security group rules "%s": "%s" (%s)' %
-            (response.info['msg'], response.json['message'], response.json))
+            msg=f'Error getting security group rules "{response.info["msg"]}": "{response.json["message"]}" ({response.json})')
 
     existing_rule = get_sgr_from_api(
         response.json['rules'], security_group_rule)
@@ -177,13 +176,12 @@ def present_strategy(api, security_group_id, security_group_rule):
             return ret
 
         # Create Security Group Rule
-        response = api.post('/security_groups/%s/rules' % security_group_id,
+        response = api.post(f'/security_groups/{security_group_id}/rules',
                             data=payload_from_object(security_group_rule))
 
         if not response.ok:
             api.module.fail_json(
-                msg='Error during security group rule creation: "%s": "%s" (%s)' %
-                (response.info['msg'], response.json['message'], response.json))
+                msg=f'Error during security group rule creation: "{response.info["msg"]}": "{response.json["message"]}" ({response.json})')
         ret['scaleway_security_group_rule'] = response.json['rule']
 
     else:
@@ -195,11 +193,10 @@ def present_strategy(api, security_group_id, security_group_rule):
 def absent_strategy(api, security_group_id, security_group_rule):
     ret = {'changed': False}
 
-    response = api.get('security_groups/%s/rules' % security_group_id)
+    response = api.get(f'security_groups/{security_group_id}/rules')
     if not response.ok:
         api.module.fail_json(
-            msg='Error getting security group rules "%s": "%s" (%s)' %
-            (response.info['msg'], response.json['message'], response.json))
+            msg=f'Error getting security group rules "{response.info["msg"]}": "{response.json["message"]}" ({response.json})')
 
     existing_rule = get_sgr_from_api(
         response.json['rules'], security_group_rule)
@@ -212,12 +209,10 @@ def absent_strategy(api, security_group_id, security_group_rule):
         return ret
 
     response = api.delete(
-        '/security_groups/%s/rules/%s' %
-        (security_group_id, existing_rule['id']))
+        f"/security_groups/{security_group_id}/rules/{existing_rule['id']}")
     if not response.ok:
         api.module.fail_json(
-            msg='Error deleting security group rule "%s": "%s" (%s)' %
-            (response.info['msg'], response.json['message'], response.json))
+            msg=f'Error deleting security group rule "{response.info["msg"]}": "{response.json["message"]}" ({response.json})')
 
     return ret
 

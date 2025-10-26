@@ -141,8 +141,7 @@ def core(module):
         project = organization
 
     if not response.ok:
-        module.fail_json(msg='Error getting volume [{0}: {1}]'.format(
-            status_code, response.json['message']))
+        module.fail_json(msg=f"Error getting volume [{status_code}: {response.json['message']}]")
 
     volumeByName = None
     for volume in volumes_json['volumes']:
@@ -160,8 +159,7 @@ def core(module):
         if response.ok:
             module.exit_json(changed=True, data=response.json)
 
-        module.fail_json(msg='Error creating volume [{0}: {1}]'.format(
-            response.status_code, response.json))
+        module.fail_json(msg=f'Error creating volume [{response.status_code}: {response.json}]')
 
     elif state in ('absent',):
         if volumeByName is None:
@@ -170,12 +168,11 @@ def core(module):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        response = account_api.delete('/volumes/' + volumeByName['id'])
+        response = account_api.delete(f"/volumes/{volumeByName['id']}")
         if response.status_code == 204:
             module.exit_json(changed=True, data=response.json)
 
-        module.fail_json(msg='Error deleting volume [{0}: {1}]'.format(
-            response.status_code, response.json))
+        module.fail_json(msg=f'Error deleting volume [{response.status_code}: {response.json}]')
 
 
 def main():

@@ -199,15 +199,15 @@ def wait_to_complete_state_transition(module, account_api, backup=None):
     while now() < end:
         module.debug('We are going to wait for the backup to finish its transition')
 
-        response = account_api.get('/rdb/v1/regions/%s/backups/%s' % (module.params.get('region'), backup['id']))
+        response = account_api.get(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}")
         if not response.ok:
-            module.fail_json(msg='Error getting backup [{0}: {1}]'.format(response.status_code, response.json))
+            module.fail_json(msg=f'Error getting backup [{response.status_code}: {response.json}]')
             break
         response_json = response.json
 
         if response_json['status'] in stable_states:
             module.debug('It seems that the backup is not in transition anymore.')
-            module.debug('Backup in state: %s' % response_json['status'])
+            module.debug(f"Backup in state: {response_json['status']}")
             return response_json
         time.sleep(wait_sleep_time)
     else:
@@ -235,13 +235,13 @@ def present_strategy(module, account_api, backup):
         if expiration_date is not None:
             payload['expires_at'] = expiration_date
 
-        response = account_api.patch('/rdb/v1/regions/%s/backups/%s' % (module.params.get('region'), backup['id']),
+        response = account_api.patch(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}",
                                      payload)
         if response.ok:
             result = wait_to_complete_state_transition(module, account_api, response.json)
             module.exit_json(changed=True, metadata=result)
 
-        module.fail_json(msg='Error modifying backup [{0}: {1}]'.format(response.status_code, response.json))
+        module.fail_json(msg=f'Error modifying backup [{response.status_code}: {response.json}]')
 
     if module.check_mode:
         module.exit_json(changed=True)
@@ -250,13 +250,13 @@ def present_strategy(module, account_api, backup):
     if expiration_date is not None:
         payload['expires_at'] = expiration_date
 
-    response = account_api.post('/rdb/v1/regions/%s/backups' % module.params.get('region'), payload)
+    response = account_api.post(f"/rdb/v1/regions/{module.params.get('region')}/backups", payload)
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
         module.exit_json(changed=True, metadata=result)
 
-    module.fail_json(msg='Error creating backup [{0}: {1}]'.format(response.status_code, response.json))
+    module.fail_json(msg=f'Error creating backup [{response.status_code}: {response.json}]')
 
 
 def absent_strategy(module, account_api, backup):
@@ -266,17 +266,17 @@ def absent_strategy(module, account_api, backup):
     if module.check_mode:
         module.exit_json(changed=True)
 
-    response = account_api.delete('/rdb/v1/regions/%s/backups/%s' % (module.params.get('region'), backup['id']))
+    response = account_api.delete(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}")
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
         module.exit_json(changed=True, metadata=result)
 
-    module.fail_json(msg='Error deleting backup [{0}: {1}]'.format(response.status_code, response.json))
+    module.fail_json(msg=f'Error deleting backup [{response.status_code}: {response.json}]')
 
 
 def exported_strategy(module, account_api, backup):
     if backup is None:
-        module.fail_json(msg=('Backup "%s" not found' % module.params['id']))
+        module.fail_json(msg=f'Backup "{module.params["id"]}" not found')
 
     if backup['download_url'] is not None:
         module.exit_json(changed=False, metadata=backup)
@@ -286,18 +286,18 @@ def exported_strategy(module, account_api, backup):
 
     backup = wait_to_complete_state_transition(module, account_api, backup)
     response = account_api.post(
-        '/rdb/v1/regions/%s/backups/%s/export' % (module.params.get('region'), backup['id']), {})
+        f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}/export", {})
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
         module.exit_json(changed=True, metadata=result)
 
-    module.fail_json(msg='Error exporting backup [{0}: {1}]'.format(response.status_code, response.json))
+    module.fail_json(msg=f'Error exporting backup [{response.status_code}: {response.json}]')
 
 
 def restored_strategy(module, account_api, backup):
     if backup is None:
-        module.fail_json(msg=('Backup "%s" not found' % module.params['id']))
+        module.fail_json(msg=f'Backup "{module.params["id"]}" not found')
 
     database_name = module.params['database_name']
     instance_id = module.params['instance_id']
@@ -308,14 +308,14 @@ def restored_strategy(module, account_api, backup):
     backup = wait_to_complete_state_transition(module, account_api, backup)
 
     payload = {'database_name': database_name, 'instance_id': instance_id}
-    response = account_api.post('/rdb/v1/regions/%s/backups/%s/restore' % (module.params.get('region'), backup['id']),
+    response = account_api.post(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}/restore",
                                 payload)
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
         module.exit_json(changed=True, metadata=result)
 
-    module.fail_json(msg='Error restoring backup [{0}: {1}]'.format(response.status_code, response.json))
+    module.fail_json(msg=f'Error restoring backup [{response.status_code}: {response.json}]')
 
 
 state_strategy = {
@@ -335,7 +335,7 @@ def core(module):
     if backup_id is None:
         backup_by_id = None
     else:
-        response = account_api.get('/rdb/v1/regions/%s/backups/%s' % (module.params.get('region'), backup_id))
+        response = account_api.get(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup_id}")
         status_code = response.status_code
         backup_json = response.json
         backup_by_id = None
@@ -344,7 +344,7 @@ def core(module):
         elif response.ok:
             backup_by_id = backup_json
         else:
-            module.fail_json(msg='Error getting backup [{0}: {1}]'.format(status_code, response.json['message']))
+            module.fail_json(msg=f"Error getting backup [{status_code}: {response.json['message']}]")
 
     state_strategy[state](module, account_api, backup_by_id)
 

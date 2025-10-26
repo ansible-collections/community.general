@@ -258,10 +258,9 @@ def absent_strategy(api, wished_fn):
         return changed, {"status": "Function would be destroyed"}
 
     api.wait_to_complete_state_transition(resource=target_fn, stable_states=STABLE_STATES, force_wait=True)
-    response = api.delete(path=api.api_path + "/%s" % target_fn["id"])
+    response = api.delete(path=f"{api.api_path}/{target_fn['id']}")
     if not response.ok:
-        api.module.fail_json(msg='Error deleting function [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f'Error deleting function [{response.status_code}: {response.json}]')
 
     api.wait_to_complete_state_transition(resource=target_fn, stable_states=STABLE_STATES)
     return changed, response.json
@@ -289,13 +288,11 @@ def present_strategy(api, wished_fn):
                                      data=payload_fn)
 
         if not creation_response.ok:
-            msg = "Error during function creation: %s: '%s' (%s)" % (creation_response.info['msg'],
-                                                                     creation_response.json['message'],
-                                                                     creation_response.json)
+            msg = f"Error during function creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
             api.module.fail_json(msg=msg)
 
         api.wait_to_complete_state_transition(resource=creation_response.json, stable_states=STABLE_STATES)
-        response = api.get(path=api.api_path + "/%s" % creation_response.json["id"])
+        response = api.get(path=f"{api.api_path}/{creation_response.json['id']}")
         return changed, response.json
 
     target_fn = fn_lookup[wished_fn["name"]]
@@ -315,15 +312,14 @@ def present_strategy(api, wished_fn):
     if api.module.check_mode:
         return changed, {"status": "Function attributes would be changed."}
 
-    fn_patch_response = api.patch(path=api.api_path + "/%s" % target_fn["id"],
+    fn_patch_response = api.patch(path=f"{api.api_path}/{target_fn['id']}",
                                   data=patch_payload)
 
     if not fn_patch_response.ok:
-        api.module.fail_json(msg='Error during function attributes update: [{0}: {1}]'.format(
-            fn_patch_response.status_code, fn_patch_response.json['message']))
+        api.module.fail_json(msg=f"Error during function attributes update: [{fn_patch_response.status_code}: {fn_patch_response.json['message']}]")
 
     api.wait_to_complete_state_transition(resource=target_fn, stable_states=STABLE_STATES)
-    response = api.get(path=api.api_path + "/%s" % target_fn["id"])
+    response = api.get(path=f"{api.api_path}/{target_fn['id']}")
     return changed, response.json
 
 
@@ -355,7 +351,7 @@ def core(module):
     }
 
     api = Scaleway(module=module)
-    api.api_path = "functions/v1beta1/regions/%s/functions" % region
+    api.api_path = f"functions/v1beta1/regions/{region}/functions"
 
     changed, summary = state_strategy[wished_function["state"]](api=api, wished_fn=wished_function)
 

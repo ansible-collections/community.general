@@ -83,7 +83,7 @@ def main():
         if executable:
             break
     else:
-        module.fail_json(msg='Unable to find either %s' % ', '.join(possibles))
+        module.fail_json(msg=f"Unable to find either {', '.join(possibles)}")
 
     if module.check_mode:
         module.exit_json(msg=msg, changed=False)

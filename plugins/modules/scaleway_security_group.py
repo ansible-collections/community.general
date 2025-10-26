@@ -153,7 +153,7 @@ def present_strategy(api, security_group):
 
     response = api.get('security_groups')
     if not response.ok:
-        api.module.fail_json(msg='Error getting security groups "%s": "%s" (%s)' % (response.info['msg'], response.json['message'], response.json))
+        api.module.fail_json(msg=f'Error getting security groups "{response.info["msg"]}": "{response.json["message"]}" ({response.json})')
 
     security_group_lookup = {sg['name']: sg for sg in response.json['security_groups']}
 
@@ -169,7 +169,7 @@ def present_strategy(api, security_group):
                             data=payload_from_security_group(security_group))
 
         if not response.ok:
-            msg = 'Error during security group creation: "%s": "%s" (%s)' % (response.info['msg'], response.json['message'], response.json)
+            msg = f'Error during security group creation: "{response.info["msg"]}": "{response.json["message"]}" ({response.json})'
             api.module.fail_json(msg=msg)
         ret['scaleway_security_group'] = response.json['security_group']
 
@@ -184,7 +184,7 @@ def absent_strategy(api, security_group):
     ret = {'changed': False}
 
     if not response.ok:
-        api.module.fail_json(msg='Error getting security groups "%s": "%s" (%s)' % (response.info['msg'], response.json['message'], response.json))
+        api.module.fail_json(msg=f'Error getting security groups "{response.info["msg"]}": "{response.json["message"]}" ({response.json})')
 
     security_group_lookup = {sg['name']: sg for sg in response.json['security_groups']}
     if security_group['name'] not in security_group_lookup.keys():
@@ -194,9 +194,9 @@ def absent_strategy(api, security_group):
     if api.module.check_mode:
         return ret
 
-    response = api.delete('/security_groups/' + security_group_lookup[security_group['name']]['id'])
+    response = api.delete(f"/security_groups/{security_group_lookup[security_group['name']]['id']}")
     if not response.ok:
-        api.module.fail_json(msg='Error deleting security group "%s": "%s" (%s)' % (response.info['msg'], response.json['message'], response.json))
+        api.module.fail_json(msg=f'Error deleting security group "{response.info["msg"]}": "{response.json["message"]}" ({response.json})')
 
     return ret
 
