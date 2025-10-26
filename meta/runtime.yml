@@ -46,6 +46,7 @@ action_groups:
     - keycloak_user_federation
     - keycloak_user_rolemapping
     - keycloak_userprofile
+    - keycloak_user_execute_actions_email
   scaleway:
     - scaleway_compute
     - scaleway_compute_private_network
