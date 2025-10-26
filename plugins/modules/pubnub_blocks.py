@@ -396,8 +396,7 @@ def pubnub_block(module, account, keyset):
     # requested to start/stop.
     if block is None and params['state'] in ['started', 'stopped']:
         block_name = params.get('name')
-        module.fail_json(msg="'{0}' block doesn't exists.".format(block_name),
-                         changed=account.changed, module_cache=dict(account))
+        module.fail_json(msg=f"'{block_name}' block doesn't exists.", changed=account.changed, module_cache=dict(account))
 
     if block is None and params['state'] == 'present':
         block = Block(name=params.get('name'),

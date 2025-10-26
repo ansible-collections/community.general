@@ -245,7 +245,7 @@ def parse_unit(size_str, unit=''):
         matches = re.search(r'^(\d+),(\d+),(\d+)$', size_str)
         if matches is None:
             module.fail_json(
-                msg="Error interpreting parted size output: '%s'" % size_str
+                msg=f"Error interpreting parted size output: '{size_str}'"
             )
 
         size = {
@@ -427,13 +427,13 @@ def get_unlabeled_device_info(device, unit):
     label.
     """
     device_name = os.path.basename(device)
-    base = "/sys/block/%s" % device_name
+    base = f"/sys/block/{device_name}"
 
-    vendor = read_record(base + "/device/vendor", "Unknown")
-    model = read_record(base + "/device/model", "model")
-    logic_block = int(read_record(base + "/queue/logical_block_size", 0))
-    phys_block = int(read_record(base + "/queue/physical_block_size", 0))
-    size_bytes = int(read_record(base + "/size", 0)) * logic_block
+    vendor = read_record(f"{base}/device/vendor", "Unknown")
+    model = read_record(f"{base}/device/model", "model")
+    logic_block = int(read_record(f"{base}/queue/logical_block_size", 0))
+    phys_block = int(read_record(f"{base}/queue/physical_block_size", 0))
+    size_bytes = int(read_record(f"{base}/size", 0)) * logic_block
 
     size, unit = format_disk_size(size_bytes, unit)
 
@@ -445,7 +445,7 @@ def get_unlabeled_device_info(device, unit):
             'unit': unit,
             'logical_block': logic_block,
             'physical_block': phys_block,
-            'model': "%s %s" % (vendor, model),
+            'model': f"{vendor} {model}",
         },
         'partitions': []
     }
@@ -469,8 +469,7 @@ def get_device_info(device, unit):
     rc, out, err = module.run_command(command)
     if rc != 0 and 'unrecognised disk label' not in err:
         module.fail_json(msg=(
-            "Error while getting device information with parted "
-            "script: '%s'" % " ".join(command)),
+            f"Error while getting device information with parted script: '{' '.join(command)}'"),
             rc=rc, out=out, err=err
         )
 
@@ -570,7 +569,7 @@ def parted(script, device, align):
 
         if rc != 0:
             module.fail_json(
-                msg="Error while running parted script: %s" % " ".join(command).strip(),
+                msg=f"Error while running parted script: {' '.join(command).strip()}",
                 rc=rc, out=out, err=err
             )
 
@@ -739,7 +738,7 @@ def main():
             # Assign name to the partition
             if name is not None and partition.get('name', None) != name:
                 # The double quotes need to be included in the arg passed to parted
-                script += ['name', str(number), '"%s"' % name]
+                script += ['name', str(number), f'"{name}"']
 
             # Manage flags
             if flags:

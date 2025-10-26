@@ -279,7 +279,6 @@ import uuid
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 HAS_PACKET_SDK = True
 try:
@@ -289,7 +288,7 @@ except ImportError:
 
 
 NAME_RE = r'({0}|{0}{1}*{0})'.format(r'[a-zA-Z0-9]', r'[a-zA-Z0-9\-]')
-HOSTNAME_RE = r'({0}\.)*{0}$'.format(NAME_RE)
+HOSTNAME_RE = rf'({NAME_RE}\.)*{NAME_RE}$'
 MAX_DEVICES = 100
 
 PACKET_DEVICE_STATES = (
@@ -407,7 +406,7 @@ def get_hostname_list(module):
     if isinstance(hostnames, str):
         hostnames = listify_string_name_or_id(hostnames)
     if not isinstance(hostnames, list):
-        raise Exception("name %s is not convertible to list" % hostnames)
+        raise Exception(f"name {hostnames} is not convertible to list")
 
     # at this point, hostnames is a list
     hostnames = [h.strip() for h in hostnames]
@@ -428,11 +427,10 @@ def get_hostname_list(module):
 
     for hn in hostnames:
         if not is_valid_hostname(hn):
-            raise Exception("Hostname '%s' does not seem to be valid" % hn)
+            raise Exception(f"Hostname '{hn}' does not seem to be valid")
 
     if len(hostnames) > MAX_DEVICES:
-        raise Exception("You specified too many hostnames, max is %d" %
-                        MAX_DEVICES)
+        raise Exception(f"You specified too many hostnames, max is {MAX_DEVICES}")
     return hostnames
 
 
@@ -446,11 +444,10 @@ def get_device_id_list(module):
 
     for di in device_ids:
         if not is_valid_uuid(di):
-            raise Exception("Device ID '%s' does not seem to be valid" % di)
+            raise Exception(f"Device ID '{di}' does not seem to be valid")
 
     if len(device_ids) > MAX_DEVICES:
-        raise Exception("You specified too many devices, max is %d" %
-                        MAX_DEVICES)
+        raise Exception(f"You specified too many devices, max is {MAX_DEVICES}")
     return device_ids
 
 
@@ -458,8 +455,7 @@ def create_single_device(module, packet_conn, hostname):
 
     for param in ('hostnames', 'operating_system', 'plan'):
         if not module.params.get(param):
-            raise Exception("%s parameter is required for new device."
-                            % param)
+            raise Exception(f"{param} parameter is required for new device.")
     project_id = module.params.get('project_id')
     plan = module.params.get('plan')
     tags = module.params.get('tags')
@@ -472,7 +468,7 @@ def create_single_device(module, packet_conn, hostname):
     if operating_system != 'custom_ipxe':
         for param in ('ipxe_script_url', 'always_pxe'):
             if module.params.get(param):
-                raise Exception('%s parameter is not valid for non custom_ipxe operating_system.' % param)
+                raise Exception(f'{param} parameter is not valid for non custom_ipxe operating_system.')
 
     device = packet_conn.create_device(
         project_id=project_id,
@@ -525,8 +521,7 @@ def wait_for_public_IPv(module, packet_conn, created_devices):
             return refreshed
         time.sleep(5)
 
-    raise Exception("Waiting for IPv%d address timed out. Hostnames: %s"
-                    % (address_family, [d.hostname for d in created_devices]))
+    raise Exception(f"Waiting for IPv{address_family} address timed out. Hostnames: {[d.hostname for d in created_devices]}")
 
 
 def get_existing_devices(module, packet_conn):
@@ -588,9 +583,7 @@ def act_on_devices(module, packet_conn, target_state):
                     changed = True
             else:
                 _msg = (
-                    "I don't know how to process existing device %s from state %s "
-                    "to state %s" %
-                    (d.hostname, d.state, target_state))
+                    f"I don't know how to process existing device {d.hostname} from state {d.state} to state {target_state}")
                 raise Exception(_msg)
 
     # At last create missing devices
@@ -649,9 +642,7 @@ def main():
         module.fail_json(msg='packet required for this module')
 
     if not module.params.get('auth_token'):
-        _fail_msg = ("if Packet API token is not in environment variable %s, "
-                     "the auth_token parameter is required" %
-                     PACKET_API_TOKEN_ENV_VAR)
+        _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
     auth_token = module.params.get('auth_token')
@@ -663,8 +654,7 @@ def main():
     try:
         module.exit_json(**act_on_devices(module, packet_conn, state))
     except Exception as e:
-        module.fail_json(msg='failed to set device state %s, error: %s' %
-                         (state, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(msg=f'failed to set device state {state}, error: {e}', exception=traceback.format_exc())
 
 
 if __name__ == '__main__':

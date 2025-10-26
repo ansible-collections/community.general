@@ -96,7 +96,6 @@ packages:
 import json
 import os
 
-from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.facts.packages import CLIMgr
 
@@ -111,7 +110,7 @@ class PIP(CLIMgr):
     def list_installed(self):
         rc, out, err = self.module.run_command([self._cli, 'list', '-l', '--format=json'])
         if rc != 0:
-            raise Exception("Unable to list packages rc=%s : %s" % (rc, err))
+            raise Exception(f"Unable to list packages rc={rc} : {err}")
         return json.loads(out)
 
     def get_package_details(self, package):
@@ -135,7 +134,7 @@ def main():
     for pip in clients:
 
         if not os.path.basename(pip).startswith('pip'):
-            module.warn('Skipping invalid pip client: %s' % (pip))
+            module.warn(f'Skipping invalid pip client: {pip}')
             continue
         try:
             pip_mgr = PIP(pip, module)
@@ -143,11 +142,11 @@ def main():
                 found += 1
                 packages[pip] = pip_mgr.get_packages()
         except Exception as e:
-            module.warn('Failed to retrieve packages with %s: %s' % (pip, to_text(e)))
+            module.warn(f'Failed to retrieve packages with {pip}: {e}')
             continue
 
     if found == 0:
-        module.fail_json(msg='Unable to use any of the supplied pip clients: %s' % clients)
+        module.fail_json(msg=f'Unable to use any of the supplied pip clients: {clients}')
 
     # return info
     results['packages'] = packages

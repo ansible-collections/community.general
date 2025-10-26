@@ -155,10 +155,10 @@ def _assert_is_valid_value(module, item, value, prefix=''):
         except ValueError:
             valid = False
         if not valid:
-            module.fail_json(msg="%s Value of %r for item %r is invalid. Value must be a number in the range -20 to 19 inclusive. "
-                                 "Refer to the limits.conf(5) manual pages for more details." % (prefix, value, item))
+            module.fail_json(msg=f"{prefix} Value of {value!r} for item {item!r} is invalid. Value must be a number in the range -20 to 19 inclusive. "
+                                 "Refer to the limits.conf(5) manual pages for more details.")
     elif not (value in ['unlimited', 'infinity', '-1'] or value.isdigit()):
-        module.fail_json(msg="%s Value of %r for item %r is invalid. Value must either be 'unlimited', 'infinity' or -1, all of "
+        module.fail_json(msg=f"{prefix} Value of {value!r} for item {item!r} is invalid. Value must either be 'unlimited', 'infinity' or -1, all of "
                              "which indicate no limit, or a limit of 0 or larger. Refer to the limits.conf(5) manual pages for "
                              "more details." % (prefix, value, item))
 
@@ -201,14 +201,14 @@ def main():
 
     if os.path.isfile(limits_conf):
         if not os.access(limits_conf, os.W_OK):
-            module.fail_json(msg="%s is not writable. Use sudo" % limits_conf)
+            module.fail_json(msg=f"{limits_conf} is not writable. Use sudo")
     else:
         limits_conf_dir = os.path.dirname(limits_conf)
         if os.path.isdir(limits_conf_dir) and os.access(limits_conf_dir, os.W_OK):
             does_not_exist = True
             changed = True
         else:
-            module.fail_json(msg="directory %s is not writable (check presence, access rights, use sudo)" % limits_conf_dir)
+            module.fail_json(msg=f"directory {limits_conf_dir} is not writable (check presence, access rights, use sudo)")
 
     if use_max and use_min:
         module.fail_json(msg="Cannot use use_min and use_max at the same time.")
@@ -269,7 +269,7 @@ def main():
         actual_value = line_fields[3]
 
         _assert_is_valid_value(module, line_item, actual_value,
-                               prefix="Invalid configuration found in '%s'." % limits_conf)
+                               prefix=f"Invalid configuration found in '{limits_conf}'.")
 
         # Found the line
         if line_domain == domain and line_type == limit_type and line_item == limit_item:
@@ -307,8 +307,8 @@ def main():
             if new_value != actual_value:
                 changed = True
                 if new_comment:
-                    new_comment = "\t#" + new_comment
-                new_limit = domain + "\t" + limit_type + "\t" + limit_item + "\t" + new_value + new_comment + "\n"
+                    new_comment = f"\t#{new_comment}"
+                new_limit = f"{domain}\t{limit_type}\t{limit_item}\t{new_value}{new_comment}\n"
                 message = new_limit
                 nf.write(new_limit)
             else:
@@ -320,8 +320,8 @@ def main():
     if not found:
         changed = True
         if new_comment:
-            new_comment = "\t#" + new_comment
-        new_limit = domain + "\t" + limit_type + "\t" + limit_item + "\t" + new_value + new_comment + "\n"
+            new_comment = f"\t#{new_comment}"
+        new_limit = f"{domain}\t{limit_type}\t{limit_item}\t{new_value}{new_comment}\n"
         message = new_limit
         nf.write(new_limit)
 

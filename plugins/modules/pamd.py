@@ -259,8 +259,8 @@ class PamdLine(object):
 
     def validate(self):
         if not self.is_valid:
-            return False, "Rule is not valid " + self.line
-        return True, "Rule is valid " + self.line
+            return False, f"Rule is not valid {self.line}"
+        return True, f"Rule is valid {self.line}"
 
     # Method to check if a rule matches the type, control and path.
     def matches(self, rule_type, rule_control, rule_path, rule_args=None):
@@ -334,13 +334,13 @@ class PamdRule(PamdLine):
 
     def __str__(self):
         if self.rule_args:
-            return '{0: <11}{1} {2} {3}'.format(self.rule_type, self.rule_control, self.rule_path, ' '.join(self.rule_args))
-        return '{0: <11}{1} {2}'.format(self.rule_type, self.rule_control, self.rule_path)
+            return f"{self.rule_type: <11}{self.rule_control} {self.rule_path} {' '.join(self.rule_args)}"
+        return f'{self.rule_type: <11}{self.rule_control} {self.rule_path}'
 
     @property
     def rule_control(self):
         if isinstance(self._control, list):
-            return '[' + ' '.join(self._control) + ']'
+            return f"[{' '.join(self._control)}]"
         return self._control
 
     @rule_control.setter
@@ -384,21 +384,21 @@ class PamdRule(PamdLine):
     def validate(self):
         # Validate the rule type
         if self.rule_type not in VALID_TYPES:
-            return False, "Rule type, " + self.rule_type + ", is not valid in rule " + self.line
+            return False, f"Rule type, {self.rule_type}, is not valid in rule {self.line}"
         # Validate the rule control
         if isinstance(self._control, str) and self.rule_control not in PamdRule.valid_simple_controls:
-            return False, "Rule control, " + self.rule_control + ", is not valid in rule " + self.line
+            return False, f"Rule control, {self.rule_control}, is not valid in rule {self.line}"
         elif isinstance(self._control, list):
             for control in self._control:
                 value, action = control.split("=")
                 if value not in PamdRule.valid_control_values:
-                    return False, "Rule control value, " + value + ", is not valid in rule " + self.line
+                    return False, f"Rule control value, {value}, is not valid in rule {self.line}"
                 if action not in PamdRule.valid_control_actions and not PamdRule.is_action_unsigned_int(action):
-                    return False, "Rule control action, " + action + ", is not valid in rule " + self.line
+                    return False, f"Rule control action, {action}, is not valid in rule {self.line}"
 
         # TODO: Validate path
 
-        return True, "Rule is valid " + self.line
+        return True, f"Rule is valid {self.line}"
 
 
 # PamdService encapsulates an entire service and contains one or more rules.  It seems the best way is to do this
@@ -638,7 +638,7 @@ class PamdService(object):
             # Handle new key value arguments
             if key_value_new_args_set.difference(key_value_current_args_set):
                 for key in key_value_new_args_set.difference(key_value_current_args_set):
-                    new_args_to_add.append(key + '=' + key_value_new_args[key])
+                    new_args_to_add.append(f"{key}={key_value_new_args[key]}")
 
             if new_args_to_add:
                 current_rule.rule_args += new_args_to_add
@@ -648,8 +648,8 @@ class PamdService(object):
             if key_value_new_args_set.intersection(key_value_current_args_set):
                 for key in key_value_new_args_set.intersection(key_value_current_args_set):
                     if key_value_current_args[key] != key_value_new_args[key]:
-                        arg_index = current_rule.rule_args.index(key + '=' + key_value_current_args[key])
-                        current_rule.rule_args[arg_index] = str(key + '=' + key_value_new_args[key])
+                        arg_index = current_rule.rule_args.index(f"{key}={key_value_current_args[key]}")
+                        current_rule.rule_args[arg_index] = str(f"{key}={key_value_new_args[key]}")
                         rule_changed = True
 
             if rule_changed:
@@ -696,7 +696,7 @@ class PamdService(object):
         lines = []
         current_line = self._head
 
-        mark = "# Updated by Ansible - %s" % datetime.now().isoformat()
+        mark = f"# Updated by Ansible - {datetime.now().isoformat()}"
         while current_line is not None:
             lines.append(str(current_line))
             current_line = current_line.next
@@ -710,7 +710,8 @@ class PamdService(object):
             else:
                 lines.insert(1, mark)
 
-        return '\n'.join(lines) + '\n'
+        lines_joined = '\n'.join(lines)
+        return f"{lines_joined}\n"
 
 
 def parse_module_arguments(module_arguments, return_none=False):
@@ -770,7 +771,7 @@ def main():
             content = service_file_obj.read()
     except IOError as e:
         # If unable to read the file, fail out
-        module.fail_json(msg='Unable to open/read PAM module file %s with error %s.' % (fname, str(e)))
+        module.fail_json(msg=f'Unable to open/read PAM module file {fname} with error {e}.')
 
     # Assuming we didn't fail, create the service
     service = PamdService(content)
@@ -827,7 +828,7 @@ def main():
                 fd.write(str(service))
 
         except IOError:
-            module.fail_json(msg='Unable to create temporary file %s' % temp_file)
+            module.fail_json(msg=f'Unable to create temporary file {temp_file}')
 
         module.atomic_move(temp_file.name, os.path.realpath(fname))
 

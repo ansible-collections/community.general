@@ -201,7 +201,7 @@ def get_volume_selector(module):
     if module.params.get('id'):
         i = module.params.get('id')
         if not is_valid_uuid(i):
-            raise Exception("Volume ID '{0}' is not a valid UUID".format(i))
+            raise Exception(f"Volume ID '{i}' is not a valid UUID")
         return lambda v: v['id'] == i
     elif module.params.get('name'):
         n = module.params.get('name')
@@ -214,7 +214,7 @@ def get_volume_selector(module):
 def get_or_fail(params, key):
     item = params.get(key)
     if item is None:
-        raise Exception("{0} must be specified for new volume".format(key))
+        raise Exception(f"{key} must be specified for new volume")
     return item
 
 
@@ -222,7 +222,7 @@ def act_on_volume(target_state, module, packet_conn):
     return_dict = {'changed': False}
     s = get_volume_selector(module)
     project_id = module.params.get("project_id")
-    api_method = "projects/{0}/storage".format(project_id)
+    api_method = f"projects/{project_id}/storage"
     all_volumes = packet_conn.call_api(api_method, "GET")['volumes']
     matching_volumes = [v for v in all_volumes if s(v)]
 
@@ -249,13 +249,12 @@ def act_on_volume(target_state, module, packet_conn):
 
     else:
         if len(matching_volumes) > 1:
-            _msg = ("More than one volume matches in module call for absent state: {0}".format(
-                    to_native(matching_volumes)))
+            _msg = f"More than one volume matches in module call for absent state: {to_native(matching_volumes)}"
             module.fail_json(msg=_msg)
 
         if len(matching_volumes) == 1:
             volume = matching_volumes[0]
-            packet_conn.call_api("storage/{0}".format(volume['id']), "DELETE")
+            packet_conn.call_api(f"storage/{volume['id']}", "DELETE")
             return_dict['changed'] = True
             for k in ['id', 'name', 'description']:
                 return_dict[k] = volume[k]
@@ -296,8 +295,7 @@ def main():
         module.fail_json(msg='packet required for this module')
 
     if not module.params.get('auth_token'):
-        _fail_msg = ("if Packet API token is not in environment variable {0}, "
-                     "the auth_token parameter is required".format(PACKET_API_TOKEN_ENV_VAR))
+        _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
     auth_token = module.params.get('auth_token')
@@ -314,10 +312,9 @@ def main():
             module.exit_json(**act_on_volume(state, module, packet_conn))
         except Exception as e:
             module.fail_json(
-                msg="failed to set volume state {0}: {1}".format(
-                    state, to_native(e)))
+                msg=f"failed to set volume state {state}: {to_native(e)}")
     else:
-        module.fail_json(msg="{0} is not a valid state for this module".format(state))
+        module.fail_json(msg=f"{state} is not a valid state for this module")
 
 
 if __name__ == '__main__':

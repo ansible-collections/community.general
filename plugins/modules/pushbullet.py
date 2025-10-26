@@ -181,7 +181,7 @@ def main():
             target.push_note(title, body)
         module.exit_json(changed=False, msg="OK")
     except PushError as e:
-        module.fail_json(msg="An error occurred, Pushbullet's response: %s" % str(e))
+        module.fail_json(msg=f"An error occurred, Pushbullet's response: {e}")
 
     module.fail_json(msg="An unknown error has occurred")
 

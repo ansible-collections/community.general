@@ -104,7 +104,7 @@ class Pushover(object):
     def run(self, priority, msg, title, device):
         ''' Do, whatever it is, we do. '''
 
-        url = '%s/1/messages.json' % (self.base_uri)
+        url = f'{self.base_uri}/1/messages.json'
 
         # parse config
         options = dict(user=self.user,
@@ -149,7 +149,7 @@ def main():
     except Exception:
         module.fail_json(msg='Unable to send msg via pushover')
 
-    module.exit_json(msg='message sent successfully: %s' % response, changed=False)
+    module.exit_json(msg=f'message sent successfully: {response}', changed=False)
 
 
 if __name__ == '__main__':

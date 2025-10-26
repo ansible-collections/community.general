@@ -226,7 +226,7 @@ def check(module, name, state, service_id, integration_key, api_key, incident_ke
     url = 'https://api.pagerduty.com/incidents'
     headers = {
         "Content-type": "application/json",
-        "Authorization": "Token token=%s" % api_key,
+        "Authorization": f"Token token={api_key}",
         'Accept': 'application/vnd.pagerduty+json;version=2'
     }
 
@@ -246,8 +246,7 @@ def check(module, name, state, service_id, integration_key, api_key, incident_ke
     response, info = http_call(module, url, method='get', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="failed to check current incident status."
-                             "Reason: %s" % info['msg'])
+        module.fail_json(msg=f"failed to check current incident status.Reason: {info['msg']}")
 
     incidents = json.loads(response.read())["incidents"]
     msg = "No corresponding incident"
@@ -281,8 +280,7 @@ def send_event_v1(module, service_key, event_type, desc,
     response, info = fetch_url(module, url, method='post',
                                headers=headers, data=json.dumps(data))
     if info['status'] != 200:
-        module.fail_json(msg="failed to %s. Reason: %s" %
-                         (event_type, info['msg']))
+        module.fail_json(msg=f"failed to {event_type}. Reason: {info['msg']}")
     json_out = json.loads(response.read())
     return json_out
 
@@ -309,8 +307,7 @@ def send_event_v2(module, service_key, event_type, payload, link,
     response, info = fetch_url(module, url, method="post",
                                headers=headers, data=json.dumps(data))
     if info["status"] != 202:
-        module.fail_json(msg="failed to %s. Reason: %s" %
-                         (event_type, info['msg']))
+        module.fail_json(msg=f"failed to {event_type}. Reason: {info['msg']}")
     json_out = json.loads(response.read())
     return json_out, True
 

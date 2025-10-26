@@ -268,7 +268,7 @@ class pulp_server(object):
         ssl_client_key=None,
         add_export_distributor=False
     ):
-        url = "%s/pulp/api/v2/repositories/" % self.host
+        url = f"{self.host}/pulp/api/v2/repositories/"
         data = dict()
         data['id'] = repo_id
         data['distributors'] = []
@@ -346,7 +346,7 @@ class pulp_server(object):
             return True
 
     def delete_repo(self, repo_id):
-        url = "%s/pulp/api/v2/repositories/%s/" % (self.host, repo_id)
+        url = f"{self.host}/pulp/api/v2/repositories/{repo_id}/"
         response, info = fetch_url(self.module, url, data='', method='DELETE')
 
         if info['status'] != 202:
@@ -369,7 +369,7 @@ class pulp_server(object):
         return self.repo_cache[repo_id]
 
     def publish_repo(self, repo_id, publish_distributor):
-        url = "%s/pulp/api/v2/repositories/%s/actions/publish/" % (self.host, repo_id)
+        url = f"{self.host}/pulp/api/v2/repositories/{repo_id}/actions/publish/"
 
         # If there's no distributor specified, we will publish them all
         if publish_distributor is None:
@@ -414,7 +414,7 @@ class pulp_server(object):
         return True
 
     def sync_repo(self, repo_id):
-        url = "%s/pulp/api/v2/repositories/%s/actions/sync/" % (self.host, repo_id)
+        url = f"{self.host}/pulp/api/v2/repositories/{repo_id}/actions/sync/"
         response, info = fetch_url(self.module, url, data='', method='POST')
 
         if info['status'] != 202:
@@ -430,11 +430,11 @@ class pulp_server(object):
         return True
 
     def update_repo_distributor_config(self, repo_id, **kwargs):
-        url = "%s/pulp/api/v2/repositories/%s/distributors/" % (self.host, repo_id)
+        url = f"{self.host}/pulp/api/v2/repositories/{repo_id}/distributors/"
         repo_config = self.get_repo_config_by_id(repo_id)
 
         for distributor in repo_config['distributors']:
-            distributor_url = "%s%s/" % (url, distributor['id'])
+            distributor_url = f"{url}{distributor['id']}/"
             data = dict()
             data['distributor_config'] = dict()
 
@@ -455,7 +455,7 @@ class pulp_server(object):
                     url=url)
 
     def update_repo_importer_config(self, repo_id, **kwargs):
-        url = "%s/pulp/api/v2/repositories/%s/importers/" % (self.host, repo_id)
+        url = f"{self.host}/pulp/api/v2/repositories/{repo_id}/importers/"
         data = dict()
         importer_config = dict()
 
@@ -483,7 +483,7 @@ class pulp_server(object):
                 url=url)
 
     def set_repo_list(self):
-        url = "%s/pulp/api/v2/repositories/?details=true" % self.host
+        url = f"{self.host}/pulp/api/v2/repositories/?details=true"
         response, info = fetch_url(self.module, url, method='GET')
 
         if info['status'] != 200:
@@ -497,7 +497,7 @@ class pulp_server(object):
 
     def verify_tasks_completed(self, response_dict):
         for task in response_dict['spawned_tasks']:
-            task_url = "%s%s" % (self.host, task['_href'])
+            task_url = f"{self.host}{task['_href']}"
 
             while True:
                 response, info = fetch_url(

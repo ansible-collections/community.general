@@ -289,15 +289,14 @@ class PersistentMemory(object):
         # in case command[] has number
         cmd = [str(part) for part in command]
 
-        self.module.log(msg='pmem_run_command: execute: %s' % cmd)
+        self.module.log(msg=f'pmem_run_command: execute: {cmd}')
 
         rc, out, err = self.module.run_command(cmd)
 
-        self.module.log(msg='pmem_run_command: result: %s' % out)
+        self.module.log(msg=f'pmem_run_command: result: {out}')
 
         if returnCheck and rc != 0:
-            self.module.fail_json(msg='Error while running: %s' %
-                                  cmd, rc=rc, out=out, err=err)
+            self.module.fail_json(msg=f'Error while running: {cmd}', rc=rc, out=out, err=err)
 
         return out
 
@@ -363,7 +362,7 @@ class PersistentMemory(object):
                         return 'The format of size: NNN TB|GB|MB|KB|T|G|M|K|B'
 
                     if size_byte % aligns[0] != 0:
-                        return 'size: %s should be align with %d' % (ns['size'], aligns[0])
+                        return f"size: {ns['size']} should be align with {aligns[0]}"
 
                     is_space_enough = False
                     for i, avail in enumerate(available_size):
@@ -373,7 +372,7 @@ class PersistentMemory(object):
                             break
 
                     if is_space_enough is False:
-                        return 'There is not available region for size: %s' % ns['size']
+                        return f"There is not available region for size: {ns['size']}"
 
                     ns['size_byte'] = size_byte
 
@@ -381,7 +380,7 @@ class PersistentMemory(object):
                     return 'size option is required to configure multiple namespaces'
 
                 if ns['type'] not in types:
-                    return 'type %s is not supported in this system. Supported type: %s' % (ns['type'], types)
+                    return f"type {ns['type']} is not supported in this system. Supported type: {types}"
 
             return None
 
@@ -410,7 +409,7 @@ class PersistentMemory(object):
 
             for skt in self.socket:
                 if skt['id'] not in socket_ids:
-                    return 'Invalid socket number: %d' % skt['id']
+                    return f"Invalid socket number: {skt['id']}"
 
             return None
 
@@ -494,9 +493,9 @@ class PersistentMemory(object):
 
             if reserved is None:
                 res = 100 - memmode - appdirect
-                ipmctl_opts += ['memorymode=%d' % memmode, 'reserved=%d' % res]
+                ipmctl_opts += [f'memorymode={memmode}', f'reserved={res}']
             else:
-                ipmctl_opts += ['memorymode=%d' % memmode, 'reserved=%d' % reserved]
+                ipmctl_opts += [f'memorymode={memmode}', f'reserved={reserved}']
 
             if self.interleaved:
                 ipmctl_opts += ['PersistentMemoryType=AppDirect']
@@ -515,12 +514,12 @@ class PersistentMemory(object):
             rc = True
             for line in ipmctl_out.splitlines():
                 if warning.match(line):
-                    errmsg = '%s (command: %s)' % (line, command)
+                    errmsg = f'{line} (command: {command})'
                     rc = False
                     break
                 elif error.match(line):
                     if not ignore_error:
-                        errmsg = '%s (command: %s)' % (line, command)
+                        errmsg = f'{line} (command: {command})'
                         rc = False
                         break
 

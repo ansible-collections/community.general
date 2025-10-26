@@ -157,7 +157,6 @@ import json
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class Pnpm(object):
@@ -178,14 +177,14 @@ class Pnpm(object):
         self.alias_name_ver = None
 
         if self.alias is not None:
-            self.alias_name_ver = self.alias + "@npm:"
+            self.alias_name_ver = f"{self.alias}@npm:"
 
         if self.name is not None:
             self.alias_name_ver = (self.alias_name_ver or "") + self.name
             if self.version is not None:
-                self.alias_name_ver = self.alias_name_ver + "@" + str(self.version)
+                self.alias_name_ver = f"{self.alias_name_ver}@{self.version!s}"
             else:
-                self.alias_name_ver = self.alias_name_ver + "@latest"
+                self.alias_name_ver = f"{self.alias_name_ver}@latest"
 
     def _exec(self, args, run_in_check_mode=False, check_rc=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
@@ -216,7 +215,7 @@ class Pnpm(object):
                     os.makedirs(self.path)
 
                 if not os.path.isdir(self.path):
-                    self.module.fail_json(msg="Path %s is not a directory" % self.path)
+                    self.module.fail_json(msg=f"Path {self.path} is not a directory")
 
                 if not self.alias_name_ver and not os.path.isfile(
                     os.path.join(self.path, "package.json")
@@ -249,7 +248,7 @@ class Pnpm(object):
             data = json.loads(out)
         except Exception as e:
             self.module.fail_json(
-                msg="Failed to parse pnpm output with error %s" % to_native(e)
+                msg=f"Failed to parse pnpm output with error {e}"
             )
 
         if "error" in data:
@@ -326,7 +325,7 @@ class Pnpm(object):
             data = json.loads(out)
         except Exception as e:
             self.module.fail_json(
-                msg="Failed to parse pnpm output with error %s" % to_native(e)
+                msg=f"Failed to parse pnpm output with error {e}"
             )
 
         return data.keys()

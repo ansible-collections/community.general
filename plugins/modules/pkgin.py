@@ -151,7 +151,7 @@ def query_package(module, name):
 
     # Use "pkgin search" to find the package. The regular expression will
     # only match on the complete name.
-    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", "^%s$" % name])
+    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", f"^{name}$"])
 
     # rc will not be 0 unless the search was a success
     if rc == 0:
@@ -214,14 +214,14 @@ def format_action_message(module, action, count):
             "count": count}
 
     if module.check_mode:
-        message = "would have %(actioned)s %(count)d package" % vars
+        message = f"would have {vars['actioned']} {vars['count']} package"
     else:
-        message = "%(actioned)s %(count)d package" % vars
+        message = f"{vars['actioned']} {vars['count']} package"
 
     if count == 1:
         return message
     else:
-        return message + "s"
+        return f"{message}s"
 
 
 def format_pkgin_command(module, command, package=None):
@@ -258,7 +258,7 @@ def remove_packages(module, packages):
             format_pkgin_command(module, "remove", package))
 
         if not module.check_mode and query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
-            module.fail_json(msg="failed to remove %s: %s" % (package, out), stdout=out, stderr=err)
+            module.fail_json(msg=f"failed to remove {package}: {out}", stdout=out, stderr=err)
 
         remove_c += 1
 
@@ -277,13 +277,13 @@ def install_packages(module, packages):
         if query_result in [PackageState.PRESENT, PackageState.OUTDATED]:
             continue
         elif query_result is PackageState.NOT_FOUND:
-            module.fail_json(msg="failed to find package %s for installation" % package)
+            module.fail_json(msg=f"failed to find package {package} for installation")
 
         rc, out, err = module.run_command(
             format_pkgin_command(module, "install", package))
 
         if not module.check_mode and not query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
-            module.fail_json(msg="failed to install %s: %s" % (package, out), stdout=out, stderr=err)
+            module.fail_json(msg=f"failed to install {package}: {out}", stdout=out, stderr=err)
 
         install_c += 1
 
@@ -319,7 +319,7 @@ def do_upgrade_packages(module, full=False):
         if re.search('^(.*\n|)nothing to do.\n$', out):
             module.exit_json(changed=False, msg="nothing left to upgrade")
     else:
-        module.fail_json(msg="could not %s packages" % cmd, stdout=out, stderr=err)
+        module.fail_json(msg=f"could not {cmd} packages", stdout=out, stderr=err)
 
 
 def upgrade_packages(module):
