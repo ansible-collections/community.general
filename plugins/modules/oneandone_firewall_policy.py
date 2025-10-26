@@ -10,6 +10,10 @@ module: oneandone_firewall_policy
 short_description: Configure 1&1 firewall policy
 description:
   - Create, remove, reconfigure, update firewall policies. This module has a dependency on 1and1 >= 1.0.
+deprecated:
+  removed_in: 12.0.0
+  why: DNS fails to resolve the API endpoint used by the module.
+  alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
