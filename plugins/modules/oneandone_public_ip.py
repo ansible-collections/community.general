@@ -12,6 +12,7 @@ description:
   - Create, update, and remove public IPs. This module has a dependency on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.oneandone
 attributes:
   check_mode:
     support: full
@@ -25,15 +26,6 @@ options:
     required: false
     default: 'present'
     choices: ["present", "absent", "update"]
-  auth_token:
-    description:
-      - Authenticating API token provided by 1&1.
-    type: str
-  api_url:
-    description:
-      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
-    type: str
-    required: false
   reverse_dns:
     description:
       - Reverse DNS name. maxLength=256.
@@ -112,8 +104,7 @@ public_ip:
   returned: always
 """
 
-import os
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
     get_datacenter,
     get_public_ip,
@@ -264,12 +255,8 @@ def delete_public_ip(module, oneandone_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str', no_log=True,
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN')),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
+            auth_token=dict(type='str', fallback=(env_fallback, ["ONEANDONE_AUTH_TOKEN"]), no_log=True, required=True),
+            api_url=dict(type='str', fallback=(env_fallback, ['ONEANDONE_API_URL'])),
             public_ip_id=dict(type='str'),
             reverse_dns=dict(type='str'),
             datacenter=dict(
@@ -283,15 +270,15 @@ def main():
             wait_interval=dict(type='int', default=5),
             state=dict(type='str', default='present', choices=['present', 'absent', 'update']),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=[
+            ('state', 'absent', ['public_ip_id']),
+            ('state', 'update', ['public_ip_id']),
+        ],
     )
 
     if not HAS_ONEANDONE_SDK:
         module.fail_json(msg='1and1 required for this module')
-
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='auth_token parameter is required.')
 
     if not module.params.get('api_url'):
         oneandone_conn = oneandone.client.OneAndOneService(
@@ -303,17 +290,11 @@ def main():
     state = module.params.get('state')
 
     if state == 'absent':
-        if not module.params.get('public_ip_id'):
-            module.fail_json(
-                msg="'public_ip_id' parameter is required to delete a public ip.")
         try:
             (changed, public_ip) = delete_public_ip(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
     elif state == 'update':
-        if not module.params.get('public_ip_id'):
-            module.fail_json(
-                msg="'public_ip_id' parameter is required to update a public ip.")
         try:
             (changed, public_ip) = update_public_ip(module, oneandone_conn)
         except Exception as e:

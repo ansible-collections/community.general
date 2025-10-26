@@ -13,6 +13,7 @@ description:
     on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.oneandone
 attributes:
   check_mode:
     support: full
@@ -26,15 +27,6 @@ options:
     required: false
     default: present
     choices: ["present", "absent", "update"]
-  auth_token:
-    description:
-      - Authenticating API token provided by 1&1.
-    type: str
-  api_url:
-    description:
-      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
-    type: str
-    required: false
   name:
     description:
       - Monitoring policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128.
@@ -415,8 +407,7 @@ monitoring_policy:
   returned: always
 """
 
-import os
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
     get_monitoring_policy,
     get_server,
@@ -940,12 +931,10 @@ def remove_monitoring_policy(module, oneandone_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str', no_log=True,
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN')),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
+            auth_token=dict(type='str', fallback=(
+                env_fallback, ["ONEANDONE_AUTH_TOKEN"]), no_log=True, required=True),
+            api_url=dict(type='str', fallback=(
+                env_fallback, ['ONEANDONE_API_URL'])),
             name=dict(type='str'),
             monitoring_policy=dict(type='str'),
             agent=dict(type='str'),
@@ -967,15 +956,16 @@ def main():
             wait_interval=dict(type='int', default=5),
             state=dict(type='str', default='present', choices=['present', 'absent', 'update']),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=[
+            ('state', 'absent', ['name']),
+            ('state', 'update', ['monitoring_policy']),
+            ('state', 'present', ['name', 'agent', 'email', 'thresholds', 'ports', 'processes']),
+        ],
     )
 
     if not HAS_ONEANDONE_SDK:
         module.fail_json(msg='1and1 required for this module')
-
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='auth_token parameter is required.')
 
     if not module.params.get('api_url'):
         oneandone_conn = oneandone.client.OneAndOneService(
@@ -987,27 +977,17 @@ def main():
     state = module.params.get('state')
 
     if state == 'absent':
-        if not module.params.get('name'):
-            module.fail_json(
-                msg="'name' parameter is required to delete a monitoring policy.")
         try:
             (changed, monitoring_policy) = remove_monitoring_policy(module, oneandone_conn)
         except Exception as ex:
             module.fail_json(msg=str(ex))
     elif state == 'update':
-        if not module.params.get('monitoring_policy'):
-            module.fail_json(
-                msg="'monitoring_policy' parameter is required to update a monitoring policy.")
         try:
             (changed, monitoring_policy) = update_monitoring_policy(module, oneandone_conn)
         except Exception as ex:
             module.fail_json(msg=str(ex))
 
     elif state == 'present':
-        for param in ('name', 'agent', 'email', 'thresholds', 'ports', 'processes'):
-            if not module.params.get(param):
-                module.fail_json(
-                    msg=f"{param} parameter is required for a new monitoring policy.")
         try:
             (changed, monitoring_policy) = create_monitoring_policy(module, oneandone_conn)
         except Exception as ex:

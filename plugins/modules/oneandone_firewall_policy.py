@@ -12,6 +12,7 @@ description:
   - Create, remove, reconfigure, update firewall policies. This module has a dependency on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.oneandone
 attributes:
   check_mode:
     support: full
@@ -25,15 +26,6 @@ options:
     type: str
     default: 'present'
     choices: ["present", "absent", "update"]
-  auth_token:
-    description:
-      - Authenticating API token provided by 1&1.
-    type: str
-  api_url:
-    description:
-      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
-    type: str
-    required: false
   name:
     description:
       - Firewall policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128.
@@ -65,7 +57,7 @@ options:
     default: []
   add_rules:
     description:
-      - List of rules that are added to an existing firewall policy. It is syntax is the same as the one used for rules parameter.
+      - List of rules that are added to an existing firewall policy. Its syntax is the same as the one used for rules parameter.
         Used in combination with update state.
     type: list
     elements: dict
@@ -196,8 +188,7 @@ firewall_policy:
   returned: always
 """
 
-import os
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
     get_firewall_policy,
     get_server,
@@ -494,12 +485,8 @@ def remove_firewall_policy(module, oneandone_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str', no_log=True,
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN')),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
+            auth_token=dict(type='str', fallback=(env_fallback, ["ONEANDONE_AUTH_TOKEN"]), no_log=True, required=True),
+            api_url=dict(type='str', fallback=(env_fallback, ['ONEANDONE_API_URL'])),
             name=dict(type='str'),
             firewall_policy=dict(type='str'),
             description=dict(type='str'),
@@ -513,15 +500,16 @@ def main():
             wait_interval=dict(type='int', default=5),
             state=dict(type='str', default='present', choices=['present', 'absent', 'update']),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=[
+            ('state', 'absent', ['name']),
+            ('state', 'update', ['firewall_policy']),
+            ('state', 'present', ['name', 'rules']),
+        ],
     )
 
     if not HAS_ONEANDONE_SDK:
         module.fail_json(msg='1and1 required for this module')
-
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='The "auth_token" parameter or ONEANDONE_AUTH_TOKEN environment variable is required.')
 
     if not module.params.get('api_url'):
         oneandone_conn = oneandone.client.OneAndOneService(
@@ -533,28 +521,18 @@ def main():
     state = module.params.get('state')
 
     if state == 'absent':
-        if not module.params.get('name'):
-            module.fail_json(
-                msg="'name' parameter is required to delete a firewall policy.")
         try:
             (changed, firewall_policy) = remove_firewall_policy(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
 
     elif state == 'update':
-        if not module.params.get('firewall_policy'):
-            module.fail_json(
-                msg="'firewall_policy' parameter is required to update a firewall policy.")
         try:
             (changed, firewall_policy) = update_firewall_policy(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
 
     elif state == 'present':
-        for param in ('name', 'rules'):
-            if not module.params.get(param):
-                module.fail_json(
-                    msg=f"{param} parameter is required for new firewall policies.")
         try:
             (changed, firewall_policy) = create_firewall_policy(module, oneandone_conn)
         except Exception as e:

@@ -13,6 +13,7 @@ description:
     for it to be 'running' before returning.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.oneandone
 attributes:
   check_mode:
     support: full
@@ -25,14 +26,6 @@ options:
     type: str
     default: present
     choices: ["present", "absent", "running", "stopped"]
-  auth_token:
-    description:
-      - Authenticating API token provided by 1&1. Overrides the E(ONEANDONE_AUTH_TOKEN) environment variable.
-    type: str
-  api_url:
-    description:
-      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
-    type: str
   datacenter:
     description:
       - The datacenter location.
@@ -198,9 +191,8 @@ servers:
   returned: always
 """
 
-import os
 import time
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
     get_datacenter,
     get_fixed_instance_size,
@@ -592,13 +584,8 @@ def _auto_increment_description(count, description):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN'),
-                no_log=True),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
+            auth_token=dict(type='str', fallback=(env_fallback, ["ONEANDONE_AUTH_TOKEN"]), no_log=True, required=True),
+            api_url=dict(type='str', fallback=(env_fallback, ['ONEANDONE_API_URL'])),
             hostname=dict(type='str'),
             description=dict(type='str'),
             appliance=dict(type='str'),
@@ -627,15 +614,17 @@ def main():
         supports_check_mode=True,
         mutually_exclusive=(['fixed_instance_size', 'vcore'], ['fixed_instance_size', 'cores_per_processor'],
                             ['fixed_instance_size', 'ram'], ['fixed_instance_size', 'hdds'],),
-        required_together=(['vcore', 'cores_per_processor', 'ram', 'hdds'],)
+        required_together=(['vcore', 'cores_per_processor', 'ram', 'hdds'],),
+        required_if=[
+            ('state', 'absent', ['server']),
+            ('state', 'running', ['server']),
+            ('state', 'stopped', ['server']),
+            ('state', 'present', ['hostname', 'appliance', 'datacenter']),
+        ],
     )
 
     if not HAS_ONEANDONE_SDK:
         module.fail_json(msg='1and1 required for this module')
-
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='The "auth_token" parameter or ONEANDONE_AUTH_TOKEN environment variable is required.')
 
     if not module.params.get('api_url'):
         oneandone_conn = oneandone.client.OneAndOneService(
@@ -647,30 +636,18 @@ def main():
     state = module.params.get('state')
 
     if state == 'absent':
-        if not module.params.get('server'):
-            module.fail_json(
-                msg="'server' parameter is required for deleting a server.")
         try:
             (changed, servers) = remove_server(module, oneandone_conn)
         except Exception as ex:
             module.fail_json(msg=str(ex))
 
     elif state in ('running', 'stopped'):
-        if not module.params.get('server'):
-            module.fail_json(
-                msg="'server' parameter is required for starting/stopping a server.")
         try:
             (changed, servers) = startstop_server(module, oneandone_conn)
         except Exception as ex:
             module.fail_json(msg=str(ex))
 
     elif state == 'present':
-        for param in ('hostname',
-                      'appliance',
-                      'datacenter'):
-            if not module.params.get(param):
-                module.fail_json(
-                    msg=f"{param} parameter is required for new server.")
         try:
             (changed, servers) = create_server(module, oneandone_conn)
         except Exception as ex:
