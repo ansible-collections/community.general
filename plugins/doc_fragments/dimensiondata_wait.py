@@ -8,6 +8,12 @@ from __future__ import annotations
 # Authors:
 #   - Adam Friedman  <tintoy@tintoy.io>
 
+#
+# DEPRECATED
+#
+# This doc fragment is deprecated and will be removed in community.general 13.0.0
+#
+
 
 class ModuleDocFragment(object):
 

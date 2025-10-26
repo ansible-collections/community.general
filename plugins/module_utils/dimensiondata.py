@@ -13,6 +13,12 @@
 
 from __future__ import annotations
 
+#
+# DEPRECATED
+#
+# This module utils is deprecated and will be removed in community.general 13.0.0
+#
+
 import configparser
 import os
 import re

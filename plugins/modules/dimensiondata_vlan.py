@@ -18,6 +18,10 @@ extends_documentation_fragment:
 
 description:
   - Manage VLANs in Cloud Control network domains.
+deprecated:
+  removed_in: 13.0.0
+  why: Service and its endpoints are not longer available.
+  alternative: There is none.
 author: 'Adam Friedman (@tintoy)'
 attributes:
   check_mode:

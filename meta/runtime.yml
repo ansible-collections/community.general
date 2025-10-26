@@ -202,6 +202,14 @@ plugin_routing:
       tombstone:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
+    dimensiondata_network:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are not longer available.
+    dimensiondata_vlan:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are not longer available.
     docker_compose:
       redirect: community.docker.docker_compose
     docker_config:
@@ -1042,6 +1050,14 @@ plugin_routing:
   doc_fragments:
     _gcp:
       redirect: community.google._gcp
+    dimensiondata:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are not longer available.
+    dimensiondata_wait:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are not longer available.
     docker:
       redirect: community.docker.docker
     hetzner:
@@ -1093,6 +1109,10 @@ plugin_routing:
         warning_text: This doc fragment was used by rax modules, that relied on the deprecated
           package pyrax.
   module_utils:
+    dimensiondata:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are not longer available.
     docker.common:
       redirect: community.docker.common
     docker.swarm:
