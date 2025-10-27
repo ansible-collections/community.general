@@ -4,9 +4,16 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from functools import wraps
 
 from ansible.module_utils.common.collections import is_sequence
+
+if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
+    ArgFormatType = Callable[[t.Any], list[str]]
 
 
 def _ensure_list(value):

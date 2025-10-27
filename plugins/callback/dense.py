@@ -485,4 +485,4 @@ class CallbackModule(CallbackModule_default):
 
 # When using -vv or higher, simply do the default action
 if display.verbosity >= 2 or not HAS_OD:
-    CallbackModule = CallbackModule_default
+    CallbackModule = CallbackModule_default  # type: ignore

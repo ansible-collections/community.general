@@ -4,11 +4,15 @@
 
 from __future__ import annotations
 
+import typing as t
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+
+if t.TYPE_CHECKING:
+    from .cmd_runner_fmt import ArgFormatType
 
 
 django_std_args = dict(
@@ -32,7 +36,7 @@ _pks = dict(
     primary_keys=dict(type="list", elements="str"),
 )
 
-_django_std_arg_fmts = dict(
+_django_std_arg_fmts: dict[str, ArgFormatType] = dict(
     all=cmd_runner_fmt.as_bool("--all"),
     app=cmd_runner_fmt.as_opt_val("--app"),
     apps=cmd_runner_fmt.as_list(),
@@ -95,11 +99,11 @@ class _DjangoRunner(PythonRunner):
 
 class DjangoModuleHelper(ModuleHelper):
     module = {}
-    django_admin_cmd = None
-    arg_formats = {}
-    django_admin_arg_order = ()
-    _django_args = []
-    _check_mode_arg = ""
+    django_admin_cmd: str | None = None
+    arg_formats: dict[str, ArgFormatType] = {}
+    django_admin_arg_order: tuple[str, ...] | str = ()
+    _django_args: list[str] = []
+    _check_mode_arg: str = ""
 
     def __init__(self):
         self.module["argument_spec"], self.arg_formats = self._build_args(self.module.get("argument_spec", {}),

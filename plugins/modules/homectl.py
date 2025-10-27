@@ -273,6 +273,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.basic import jsonify
 from ansible.module_utils.common.text.formatters import human_to_bytes
 
+CRYPT_IMPORT_ERROR: str | None
 try:
     import crypt
 except ImportError:
@@ -282,6 +283,7 @@ else:
     HAS_CRYPT = True
     CRYPT_IMPORT_ERROR = None
 
+LEGACYCRYPT_IMPORT_ERROR: str | None
 try:
     import legacycrypt
     if not HAS_CRYPT:

@@ -112,7 +112,9 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 with deps.declare("passlib"):
-    from passlib.apache import HtpasswdFile, htpasswd_context
+    # Apparently the type infos don't know htpasswd_context, which *does* exist
+    # (but isn't mentioned in the documentation for some reason)
+    from passlib.apache import HtpasswdFile, htpasswd_context  # type: ignore[attr-defined]
     from passlib.context import CryptContext
 
 

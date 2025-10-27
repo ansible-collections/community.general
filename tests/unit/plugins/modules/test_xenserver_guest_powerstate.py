@@ -126,7 +126,7 @@ testcase_module_params_wait = {
 }
 
 
-@pytest.mark.parametrize('power_state', testcase_set_powerstate['params'], ids=testcase_set_powerstate['ids'])
+@pytest.mark.parametrize('power_state', testcase_set_powerstate['params'], ids=testcase_set_powerstate['ids'])  # type: ignore
 def test_xenserver_guest_powerstate_set_power_state(mocker, fake_ansible_module, XenAPI, xenserver_guest_powerstate, power_state):
     """Tests power state change handling."""
     mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref',
@@ -163,8 +163,8 @@ def test_xenserver_guest_powerstate_set_power_state(mocker, fake_ansible_module,
 
 
 @pytest.mark.parametrize('patch_ansible_module',
-                         testcase_module_params_state_present['params'],
-                         ids=testcase_module_params_state_present['ids'],
+                         testcase_module_params_state_present['params'],  # type: ignore
+                         ids=testcase_module_params_state_present['ids'],  # type: ignore
                          indirect=True)
 def test_xenserver_guest_powerstate_present(mocker, patch_ansible_module, capfd, XenAPI, xenserver_guest_powerstate):
     """
@@ -209,8 +209,8 @@ def test_xenserver_guest_powerstate_present(mocker, patch_ansible_module, capfd,
 
 
 @pytest.mark.parametrize('patch_ansible_module',
-                         testcase_module_params_state_other['params'],
-                         ids=testcase_module_params_state_other['ids'],
+                         testcase_module_params_state_other['params'],  # type: ignore
+                         ids=testcase_module_params_state_other['ids'],  # type: ignore
                          indirect=True)
 def test_xenserver_guest_powerstate_other(mocker, patch_ansible_module, capfd, XenAPI, xenserver_guest_powerstate):
     """
@@ -255,8 +255,8 @@ def test_xenserver_guest_powerstate_other(mocker, patch_ansible_module, capfd, X
 
 
 @pytest.mark.parametrize('patch_ansible_module',
-                         testcase_module_params_wait['params'],
-                         ids=testcase_module_params_wait['ids'],
+                         testcase_module_params_wait['params'],  # type: ignore
+                         ids=testcase_module_params_wait['ids'],  # type: ignore
                          indirect=True)
 def test_xenserver_guest_powerstate_wait(mocker, patch_ansible_module, capfd, XenAPI, xenserver_guest_powerstate):
     """

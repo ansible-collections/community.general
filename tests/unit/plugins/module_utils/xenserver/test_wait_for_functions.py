@@ -56,7 +56,7 @@ testcase_wait_for_task_all_statuses = {
 }
 
 
-@pytest.mark.parametrize('vm_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])
+@pytest.mark.parametrize('vm_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])  # type: ignore
 def test_wait_for_vm_ip_address_bad_vm_ref(fake_ansible_module, xenserver, vm_ref):
     """Tests failure on bad vm_ref."""
     with pytest.raises(FailJsonException) as exc_info:
@@ -94,8 +94,8 @@ def test_wait_for_vm_ip_address_bad_power_state(mocker, fake_ansible_module, Xen
 
 
 @pytest.mark.parametrize('bad_guest_metrics_ref, bad_guest_metrics',
-                         testcase_wait_for_vm_ip_address_bad_guest_metrics['params'],
-                         ids=testcase_wait_for_vm_ip_address_bad_guest_metrics['ids'])
+                         testcase_wait_for_vm_ip_address_bad_guest_metrics['params'],  # type: ignore
+                         ids=testcase_wait_for_vm_ip_address_bad_guest_metrics['ids'])  # type: ignore
 def test_wait_for_vm_ip_address_timeout(mocker, fake_ansible_module, XenAPI, xenserver, bad_guest_metrics_ref, bad_guest_metrics):
     """Tests timeout."""
     mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
@@ -156,7 +156,7 @@ def test_wait_for_vm_ip_address(mocker, fake_ansible_module, XenAPI, xenserver):
     assert fake_guest_metrics == mocked_returns['VM_guest_metrics.get_record.side_effect'][1]
 
 
-@pytest.mark.parametrize('task_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])
+@pytest.mark.parametrize('task_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])  # type: ignore
 def test_wait_for_task_bad_task_ref(fake_ansible_module, xenserver, task_ref):
     """Tests failure on bad task_ref."""
     with pytest.raises(FailJsonException) as exc_info:
@@ -193,8 +193,8 @@ def test_wait_for_task_timeout(mocker, fake_ansible_module, XenAPI, xenserver):
 
 
 @pytest.mark.parametrize('task_status, result',
-                         testcase_wait_for_task_all_statuses['params'],
-                         ids=testcase_wait_for_task_all_statuses['ids'])
+                         testcase_wait_for_task_all_statuses['params'],  # type: ignore
+                         ids=testcase_wait_for_task_all_statuses['ids'])  # type: ignore
 def test_wait_for_task(mocker, fake_ansible_module, XenAPI, xenserver, task_status, result):
     """Tests regular invocation."""
     mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)

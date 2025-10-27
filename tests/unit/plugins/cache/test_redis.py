@@ -19,7 +19,7 @@ def test_redis_cachemodule():
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': connection}), RedisCache)
 
 
-def test_redis_cachemodule():
+def test_redis_cachemodule_2():
     # The _uri option is required for the redis plugin
     connection = '[::1]:6379:1'
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': connection}), RedisCache)

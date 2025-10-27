@@ -43,7 +43,7 @@ from ansible.plugins.loader import action_loader, module_loader
 try:
     from ansible.errors import AnsiblePluginRemovedError
 except ImportError:
-    AnsiblePluginRemovedError = Exception
+    AnsiblePluginRemovedError = Exception  # type: ignore
 
 
 def a_module(term):

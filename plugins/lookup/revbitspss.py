@@ -65,6 +65,7 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 from ansible.errors import AnsibleError
 
+ANOTHER_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from pam.revbits_ansible.server import SecretServer
 except ImportError as imp_exc:

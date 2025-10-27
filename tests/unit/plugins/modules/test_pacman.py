@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import typing as t
 from unittest import mock
 from ansible.module_utils import basic
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
@@ -110,7 +111,7 @@ valid_inventory = {
     },
 }
 
-empty_inventory = {
+empty_inventory: dict[str, dict[str, t.Any]] = {
     "installed_pkgs": {},
     "available_pkgs": {},
     "installed_groups": {},

@@ -106,7 +106,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
         self._connected = True
 
-    @ensure_connect
+    @ensure_connect  # type: ignore  # TODO: for some reason, the type infos for ensure_connect suck...
     def exec_command(self, cmd, in_data=None, sudoable=False):
         """Run specified command in a running QubesVM """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)

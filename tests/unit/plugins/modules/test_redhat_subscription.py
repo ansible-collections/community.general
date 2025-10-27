@@ -856,7 +856,7 @@ Entitlement Type:    Physical
 ]
 
 
-TEST_CASES_IDS = [item[1]['id'] for item in TEST_CASES]
+TEST_CASES_IDS: list[str] = [item[1]['id'] for item in TEST_CASES]  # type: ignore
 
 
 @pytest.mark.parametrize('patch_ansible_module, testcase', TEST_CASES, ids=TEST_CASES_IDS, indirect=['patch_ansible_module'])
@@ -1212,7 +1212,7 @@ System Purpose Status: Matched
 ]
 
 
-SYSPURPOSE_TEST_CASES_IDS = [item[1]['id'] for item in SYSPURPOSE_TEST_CASES]
+SYSPURPOSE_TEST_CASES_IDS: list[str] = [item[1]['id'] for item in SYSPURPOSE_TEST_CASES]  # type: ignore
 
 
 @pytest.mark.parametrize('patch_ansible_module, testcase', SYSPURPOSE_TEST_CASES, ids=SYSPURPOSE_TEST_CASES_IDS, indirect=['patch_ansible_module'])

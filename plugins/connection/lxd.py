@@ -108,10 +108,10 @@ class Connection(ConnectionBase):
             self._display.vvv(f"ESTABLISH LXD CONNECTION FOR USER: {self.get_option('remote_user')}", host=self._host())
             self._connected = True
 
-    def _build_command(self, cmd) -> str:
+    def _build_command(self, cmd) -> list[str]:
         """build the command to execute on the lxd host"""
 
-        exec_cmd = [self._lxc_cmd]
+        exec_cmd: list[str] = [self._lxc_cmd]
 
         if self.get_option("project"):
             exec_cmd.extend(["--project", self.get_option("project")])

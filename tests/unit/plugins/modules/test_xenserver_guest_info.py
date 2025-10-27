@@ -45,7 +45,7 @@ testcase_module_params = {
 }
 
 
-@pytest.mark.parametrize('patch_ansible_module', testcase_module_params['params'], ids=testcase_module_params['ids'], indirect=True)
+@pytest.mark.parametrize('patch_ansible_module', testcase_module_params['params'], ids=testcase_module_params['ids'], indirect=True)  # type: ignore
 def test_xenserver_guest_info(mocker, capfd, XenAPI, xenserver_guest_info):
     """
     Tests regular module invocation including parsing and propagation of

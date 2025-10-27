@@ -184,7 +184,7 @@ testcase_set_vm_power_state_transitions_async = {
 }
 
 
-@pytest.mark.parametrize('vm_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])
+@pytest.mark.parametrize('vm_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])  # type: ignore
 def test_set_vm_power_state_bad_vm_ref(fake_ansible_module, xenserver, vm_ref):
     """Tests failure on bad vm_ref."""
     with pytest.raises(FailJsonException) as exc_info:
@@ -222,8 +222,8 @@ def test_set_vm_power_state_bad_power_state(mocker, fake_ansible_module, XenAPI,
 
 
 @pytest.mark.parametrize('power_state_desired, power_state_current, error_msg',
-                         testcase_set_vm_power_state_bad_transitions['params'],
-                         ids=testcase_set_vm_power_state_bad_transitions['ids'])
+                         testcase_set_vm_power_state_bad_transitions['params'],  # type: ignore
+                         ids=testcase_set_vm_power_state_bad_transitions['ids'])  # type: ignore
 def test_set_vm_power_state_bad_transition(mocker, fake_ansible_module, XenAPI, xenserver, power_state_desired, power_state_current, error_msg):
     """Tests failure on bad power state transition."""
     mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
@@ -245,8 +245,8 @@ def test_set_vm_power_state_bad_transition(mocker, fake_ansible_module, XenAPI, 
 
 
 @pytest.mark.parametrize('power_state, error_msg',
-                         testcase_set_vm_power_state_task_timeout['params'],
-                         ids=testcase_set_vm_power_state_task_timeout['ids'])
+                         testcase_set_vm_power_state_task_timeout['params'],  # type: ignore
+                         ids=testcase_set_vm_power_state_task_timeout['ids'])  # type: ignore
 def test_set_vm_power_state_task_timeout(mocker, fake_ansible_module, XenAPI, xenserver, power_state, error_msg):
     """Tests failure on async task timeout."""
     mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
@@ -272,8 +272,8 @@ def test_set_vm_power_state_task_timeout(mocker, fake_ansible_module, XenAPI, xe
 
 
 @pytest.mark.parametrize('power_state_desired, power_state_current',
-                         testcase_set_vm_power_state_no_transitions['params'],
-                         ids=testcase_set_vm_power_state_no_transitions['ids'])
+                         testcase_set_vm_power_state_no_transitions['params'],  # type: ignore
+                         ids=testcase_set_vm_power_state_no_transitions['ids'])  # type: ignore
 def test_set_vm_power_state_no_transition(mocker, fake_ansible_module, XenAPI, xenserver, power_state_desired, power_state_current):
     """Tests regular invocation without power state transition."""
     mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
@@ -295,8 +295,8 @@ def test_set_vm_power_state_no_transition(mocker, fake_ansible_module, XenAPI, x
 
 
 @pytest.mark.parametrize('power_state_desired, power_state_current, power_state_resulting, activated_xenapi_method',
-                         testcase_set_vm_power_state_transitions['params'],
-                         ids=testcase_set_vm_power_state_transitions['ids'])
+                         testcase_set_vm_power_state_transitions['params'],  # type: ignore
+                         ids=testcase_set_vm_power_state_transitions['ids'])  # type: ignore
 def test_set_vm_power_state_transition(mocker,
                                        fake_ansible_module,
                                        XenAPI,
@@ -332,8 +332,8 @@ def test_set_vm_power_state_transition(mocker,
 
 
 @pytest.mark.parametrize('power_state_desired, power_state_current, power_state_resulting, activated_xenapi_method',
-                         testcase_set_vm_power_state_transitions_async['params'],
-                         ids=testcase_set_vm_power_state_transitions_async['ids'])
+                         testcase_set_vm_power_state_transitions_async['params'],  # type: ignore
+                         ids=testcase_set_vm_power_state_transitions_async['ids'])  # type: ignore
 def test_set_vm_power_state_transition_async(mocker,
                                              fake_ansible_module,
                                              XenAPI,
@@ -375,8 +375,8 @@ def test_set_vm_power_state_transition_async(mocker,
 
 
 @pytest.mark.parametrize('power_state_desired, power_state_current, power_state_resulting, activated_xenapi_method',
-                         testcase_set_vm_power_state_transitions['params'],
-                         ids=testcase_set_vm_power_state_transitions['ids'])
+                         testcase_set_vm_power_state_transitions['params'],  # type: ignore
+                         ids=testcase_set_vm_power_state_transitions['ids'])  # type: ignore
 def test_set_vm_power_state_transition_check_mode(mocker,
                                                   fake_ansible_module,
                                                   XenAPI,

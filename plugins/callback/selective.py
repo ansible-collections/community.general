@@ -46,13 +46,13 @@ from ansible.module_utils.common.text.converters import to_text
 DONT_COLORIZE = False
 COLORS = {
     'normal': '\033[0m',
-    'ok': f'\x1b[{C.COLOR_CODES[C.COLOR_OK]}m',
+    'ok': f'\x1b[{C.COLOR_CODES[C.COLOR_OK]}m',  # type: ignore
     'bold': '\033[1m',
     'not_so_bold': '\033[1m\033[34m',
-    'changed': f'\x1b[{C.COLOR_CODES[C.COLOR_CHANGED]}m',
-    'failed': f'\x1b[{C.COLOR_CODES[C.COLOR_ERROR]}m',
+    'changed': f'\x1b[{C.COLOR_CODES[C.COLOR_CHANGED]}m',  # type: ignore
+    'failed': f'\x1b[{C.COLOR_CODES[C.COLOR_ERROR]}m',  # type: ignore
     'endc': '\033[0m',
-    'skipped': f'\x1b[{C.COLOR_CODES[C.COLOR_SKIP]}m',
+    'skipped': f'\x1b[{C.COLOR_CODES[C.COLOR_SKIP]}m',  # type: ignore
 }
 
 

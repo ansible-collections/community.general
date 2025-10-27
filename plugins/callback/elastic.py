@@ -90,6 +90,7 @@ from ansible.errors import AnsibleError, AnsibleRuntimeError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.plugins.callback import CallbackBase
 
+ELASTIC_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from elasticapm import Client, capture_span, trace_parent_from_string, instrument, label
 except ImportError as imp_exc:

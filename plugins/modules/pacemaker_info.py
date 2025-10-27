@@ -74,7 +74,7 @@ class PacemakerInfo(ModuleHelper):
         "constraint_info": "constraint",
         "property_info": "property"
     }
-    output_params = info_vars.keys()
+    output_params = sorted(info_vars.keys())
 
     def __init_module__(self):
         self.runner = pacemaker_runner(self.module)

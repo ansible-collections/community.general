@@ -65,6 +65,7 @@ _value:
 
 from ansible.errors import AnsibleError
 
+ANOTHER_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from fqdn import FQDN
 except ImportError as imp_exc:

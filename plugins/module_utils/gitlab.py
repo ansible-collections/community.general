@@ -6,6 +6,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible.module_utils.basic import missing_required_lib
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
@@ -15,7 +17,7 @@ from urllib.parse import urljoin
 import traceback
 
 
-def _determine_list_all_kwargs(version):
+def _determine_list_all_kwargs(version) -> dict[str, t.Any]:
     gitlab_version = LooseVersion(version)
     if gitlab_version >= LooseVersion('4.0.0'):
         # 4.0.0 removed 'as_list'
@@ -27,14 +29,14 @@ def _determine_list_all_kwargs(version):
         return {'as_list': False, 'all': True, 'per_page': 100}
 
 
-GITLAB_IMP_ERR = None
+GITLAB_IMP_ERR: str | None = None
 try:
     import gitlab
     import requests
     HAS_GITLAB_PACKAGE = True
     list_all_kwargs = _determine_list_all_kwargs(gitlab.__version__)
 except Exception:
-    gitlab = None
+    gitlab = None  # type: ignore
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
     list_all_kwargs = {}

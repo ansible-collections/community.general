@@ -56,7 +56,7 @@ class TestArchive(ModuleTestCase):
         )
 
 
-PATHS = (
+PATHS: tuple[tuple[list[str | bytes], str | bytes], ...] = (
     ([], ''),
     (['/'], '/'),
     ([b'/'], b'/'),
@@ -68,5 +68,5 @@ PATHS = (
 
 
 @pytest.mark.parametrize("paths,root", PATHS)
-def test_common_path(paths, root):
+def test_common_path(paths: list[str | bytes], root: str | bytes) -> None:
     assert common_path(paths) == root

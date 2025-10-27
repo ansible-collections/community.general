@@ -53,7 +53,7 @@ __all__ = [
 ]
 
 
-_singletons = {}
+_singletons: dict[str, object] = {}
 
 
 def ldap_module():
@@ -61,7 +61,7 @@ def ldap_module():
     return orig_ldap
 
 
-def _singleton(name, constructor):
+def _singleton(name: str, constructor):
     if name in _singletons:
         return _singletons[name]
     _singletons[name] = constructor()

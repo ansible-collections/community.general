@@ -63,7 +63,7 @@ testcase_module_remote_conn_scheme = {
 }
 
 
-@pytest.mark.parametrize('fake_ansible_module', testcase_module_local_conn['params'], ids=testcase_module_local_conn['ids'], indirect=True)
+@pytest.mark.parametrize('fake_ansible_module', testcase_module_local_conn['params'], ids=testcase_module_local_conn['ids'], indirect=True)  # type: ignore
 def test_xapi_connect_local_session(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests that connection to localhost uses XenAPI.xapi_local() function."""
     mocker.patch('XenAPI.xapi_local')
@@ -73,7 +73,7 @@ def test_xapi_connect_local_session(mocker, fake_ansible_module, XenAPI, xenserv
     XenAPI.xapi_local.assert_called_once()
 
 
-@pytest.mark.parametrize('fake_ansible_module', testcase_module_local_conn['params'], ids=testcase_module_local_conn['ids'], indirect=True)
+@pytest.mark.parametrize('fake_ansible_module', testcase_module_local_conn['params'], ids=testcase_module_local_conn['ids'], indirect=True)  # type: ignore
 def test_xapi_connect_local_login(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests that connection to localhost uses empty username and password."""
     mocker.patch.object(XenAPI.Session, 'login_with_password', create=True)
@@ -114,7 +114,12 @@ def test_xapi_connect_login_failure(mocker, fake_ansible_module, XenAPI, xenserv
     assert exc_info.value.kwargs['msg'] == f"Unable to log on to XenServer at http://{hostname} as {username}: {fake_error_msg}"
 
 
-@pytest.mark.parametrize('fake_ansible_module', testcase_module_remote_conn_scheme['params'], ids=testcase_module_remote_conn_scheme['ids'], indirect=True)
+@pytest.mark.parametrize(
+    'fake_ansible_module',
+    testcase_module_remote_conn_scheme['params'],  # type: ignore
+    ids=testcase_module_remote_conn_scheme['ids'],  # type: ignore
+    indirect=True,
+)
 def test_xapi_connect_remote_scheme(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests that explicit scheme in hostname param is preserved."""
     mocker.patch('XenAPI.Session')
@@ -127,7 +132,7 @@ def test_xapi_connect_remote_scheme(mocker, fake_ansible_module, XenAPI, xenserv
     XenAPI.Session.assert_called_once_with(hostname, ignore_ssl=ignore_ssl)
 
 
-@pytest.mark.parametrize('fake_ansible_module', testcase_module_remote_conn['params'], ids=testcase_module_remote_conn['ids'], indirect=True)
+@pytest.mark.parametrize('fake_ansible_module', testcase_module_remote_conn['params'], ids=testcase_module_remote_conn['ids'], indirect=True)  # type: ignore
 def test_xapi_connect_remote_no_scheme(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests that proper scheme is prepended to hostname without scheme."""
     mocker.patch('XenAPI.Session')

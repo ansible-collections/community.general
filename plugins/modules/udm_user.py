@@ -328,6 +328,7 @@ from ansible_collections.community.general.plugins.module_utils.univention_umc i
     base_dn,
 )
 
+CRYPT_IMPORT_ERROR: str | None
 try:
     import crypt
 except ImportError:
@@ -337,6 +338,7 @@ else:
     HAS_CRYPT = True
     CRYPT_IMPORT_ERROR = None
 
+LEGACYCRYPT_IMPORT_ERROR: str | None
 try:
     import legacycrypt
     if not HAS_CRYPT:

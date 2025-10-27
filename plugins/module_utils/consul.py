@@ -9,6 +9,7 @@ from __future__ import annotations
 import copy
 import json
 import re
+import typing as t
 from urllib import error as urllib_error
 from urllib.parse import urlencode
 
@@ -118,12 +119,12 @@ class _ConsulModule:
     As such backwards incompatible changes can occur even in bugfix releases.
     """
 
-    api_endpoint = None  # type: str
-    unique_identifiers = None  # type: list
-    result_key = None  # type: str
-    create_only_fields = set()
-    operational_attributes = set()
-    params = {}
+    api_endpoint: str | None = None
+    unique_identifiers: list | None = None
+    result_key: str | None = None
+    create_only_fields: set[str] = set()
+    operational_attributes: set[str] = set()
+    params: dict[str, t.Any] = {}
 
     def __init__(self, module):
         self._module = module

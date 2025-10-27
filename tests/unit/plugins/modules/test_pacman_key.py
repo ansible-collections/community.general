@@ -682,7 +682,7 @@ def patch_get_bin_path(mocker):
 @pytest.mark.parametrize(
     'patch_ansible_module, expected',
     TESTCASES,
-    ids=[item[1]['id'] for item in TESTCASES],
+    ids=[item[1]['id'] for item in TESTCASES],  # type: ignore
     indirect=['patch_ansible_module']
 )
 @pytest.mark.usefixtures('patch_ansible_module')

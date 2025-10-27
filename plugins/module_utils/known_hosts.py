@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 try:
     from hashlib import sha1
 except ImportError:
-    import sha as sha1
+    import sha as sha1  # type: ignore[no-redef]
 
 HASHED_KEY_MAGIC = "|1|"
 
