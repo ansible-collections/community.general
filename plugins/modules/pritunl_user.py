@@ -212,12 +212,7 @@ def add_or_update_pritunl_user(module):
 
             # 'groups' and 'mac_addresses' are list comparison
             if key == "groups" or key == "mac_addresses":
-                if key in users[0]:
-                    remote_list = users[0][key]
-                else:
-                    remote_list = None
-                if remote_list is None:
-                    remote_list = []
+                remote_list = users[0].get(key) or []
                 local_list = user_params[key] or []
                 if set(remote_list) != set(local_list):
                     user_params_changed = True
