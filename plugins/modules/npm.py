@@ -306,6 +306,7 @@ def main():
         required_if=[('state', 'absent', ['name'])],
         supports_check_mode=True,
         mutually_exclusive=[('path', 'global')],
+        required_if=[("global", False, ["path"]), ("path", "", ["global"])],
     )
 
     name = module.params['name']
