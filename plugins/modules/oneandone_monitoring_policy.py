@@ -12,7 +12,7 @@ description:
   - Create, remove, update monitoring policies (and add/remove ports, processes, and servers). This module has a dependency
     on 1and1 >= 1.0.
 deprecated:
-  removed_in: 12.0.0
+  removed_in: 13.0.0
   why: DNS fails to resolve the API endpoint used by the module.
   alternative: There is none.
 extends_documentation_fragment:

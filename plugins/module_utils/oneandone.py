@@ -9,7 +9,7 @@ import time
 #
 # DEPRECATED
 #
-# This module utils is deprecated and will be removed in community.general 12.0.0
+# This module utils is deprecated and will be removed in community.general 13.0.0
 #
 
 

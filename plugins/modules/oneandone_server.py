@@ -12,7 +12,7 @@ description:
   - Create, destroy, update, start, stop, and reboot a 1&1 Host server. When the server is created it can optionally wait
     for it to be 'running' before returning.
 deprecated:
-  removed_in: 12.0.0
+  removed_in: 13.0.0
   why: DNS fails to resolve the API endpoint used by the module.
   alternative: There is none.
 extends_documentation_fragment:
