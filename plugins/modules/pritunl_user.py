@@ -208,10 +208,7 @@ def add_or_update_pritunl_user(module):
         for key in user_params.keys():
             # When a param is not specified grab existing ones to prevent from changing it with the PUT request
             if user_params[key] is None:
-                if key in users[0]:
-                    user_params[key] = users[0][key]
-                else:
-                    user_params[key] = None
+                user_params[key] = users[0].get(key)
 
             # 'groups' and 'mac_addresses' are list comparison
             if key == "groups" or key == "mac_addresses":
