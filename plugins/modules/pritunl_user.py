@@ -219,11 +219,7 @@ def add_or_update_pritunl_user(module):
 
             # otherwise it is either a boolean or a string
             else:
-                if key in users[0]:
-                    remote_val = users[0][key]
-                else:
-                    remote_val = None
-                if remote_val != user_params[key]:
+                if users[0].get(key) != user_params[key]:
                     user_params_changed = True
 
         # Trigger a PUT on the API to update the current user if settings have changed
