@@ -111,6 +111,12 @@ options:
     aliases:
       - adminEventsEnabled
     type: bool
+  admin_permissions_enabled:
+    description:
+      - The realm admin permissions enabled.
+    aliases:
+      - adminPermissionsEnabled
+    type: bool
   admin_theme:
     description:
       - The realm admin theme.
@@ -870,6 +876,7 @@ def main():
         ),
         admin_events_details_enabled=dict(type="bool", aliases=["adminEventsDetailsEnabled"]),
         admin_events_enabled=dict(type="bool", aliases=["adminEventsEnabled"]),
+        admin_permissions_enabled=dict(type='bool', aliases=['adminPermissionsEnabled']),
         admin_theme=dict(type="str", aliases=["adminTheme"]),
         attributes=dict(type="dict"),
         browser_flow=dict(type="str", aliases=["browserFlow"]),
