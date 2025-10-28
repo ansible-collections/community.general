@@ -117,6 +117,7 @@ options:
     aliases:
       - adminPermissionsEnabled
     type: bool
+    version_added: 12.0.0
   admin_theme:
     description:
       - The realm admin theme.
