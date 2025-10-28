@@ -235,7 +235,7 @@ class OmapiHostManager:
             fields_to_update = {}
 
             if 'ip-address' not in response_obj or \
-                    unpack_ip(response_obj['ip-address']) != self.module.params['ip']:
+                    response_obj['ip-address'] != self.module.params['ip']:
                 fields_to_update['ip-address'] = pack_ip(self.module.params['ip'])
 
             # Name cannot be changed
