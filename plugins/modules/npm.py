@@ -308,7 +308,6 @@ def main():
             ('state', 'absent', ['name']),
             ("global", False, ["path"]),
         ],
-        required_one_of=[('path', 'global')],
         supports_check_mode=True,
     )
 
