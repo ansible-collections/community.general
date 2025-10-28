@@ -238,6 +238,9 @@ files:
     maintainers: vbotka
   $inventories/icinga2.py:
     maintainers: BongoEADGC6
+  $inventories/incus.py:
+    labels: incus
+    maintainers: stgraber
   $inventories/linode.py:
     keywords: linode dynamic inventory script
     labels: cloud linode
