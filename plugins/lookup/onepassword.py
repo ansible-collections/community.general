@@ -610,7 +610,8 @@ class OnePass(object):
 
     def _get_cli_class(self, cli_class=None):
         if cli_class is not None:
-            return cli_class(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
+            return cli_class(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token,
+                             self.account_id, self.connect_host, self.connect_token)
 
         version = OnePassCLIBase.get_current_version()
         for cls in OnePassCLIBase.__subclasses__():
