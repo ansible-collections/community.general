@@ -495,27 +495,27 @@ plugin_routing:
         warning_text: Use community.general.one_image_info instead.
     oneandone_firewall_policy:
       deprecation:
-        removal_version: 12.0.0
+        removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_load_balancer:
       deprecation:
-        removal_version: 12.0.0
+        removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_monitoring_policy:
       deprecation:
-        removal_version: 12.0.0
+        removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_private_network:
       deprecation:
-        removal_version: 12.0.0
+        removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_public_ip:
       deprecation:
-        removal_version: 12.0.0
+        removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_server:
       deprecation:
-        removal_version: 12.0.0
+        removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     onepassword_facts:
       tombstone:
@@ -1139,7 +1139,7 @@ plugin_routing:
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     oneandone:
       deprecation:
-        removal_version: 12.0.0
+        removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     postgresql:
       redirect: community.postgresql.postgresql
