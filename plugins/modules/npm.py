@@ -40,7 +40,8 @@ options:
     description:
       - Install the node.js library globally.
       - When O(global=true), then O(path) is not used to install the packages.
-    required: false
+     required: false
+     default: false
     type: bool
   executable:
     description:
