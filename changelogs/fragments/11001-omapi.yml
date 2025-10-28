@@ -1,2 +1,2 @@
 bugfixes:
-  - "omapi_host: fix JSON serialisation error message"
+  - "omapi_host - make return values compatible with ansible-core 2.19 (https://github.com/ansible-collections/community.general/pull/11001)."
