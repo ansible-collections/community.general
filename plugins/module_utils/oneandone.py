@@ -6,6 +6,12 @@ from __future__ import annotations
 
 import time
 
+#
+# DEPRECATED
+#
+# This module utils is deprecated and will be removed in community.general 13.0.0
+#
+
 
 class OneAndOneResources:
     firewall_policy = 'firewall_policy'
