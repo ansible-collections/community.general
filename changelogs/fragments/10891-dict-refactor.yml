@@ -1,6 +1,0 @@
-minor_changes:
-  - dependent lookup plugin - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
-  - scaleway module_utils - improve code readability, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
-  - pacemaker_cluster.py - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
-  - pacemaker_resource.py - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
-  - pacemaker_stonith.py - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
