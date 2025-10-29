@@ -362,7 +362,7 @@ def main():
         ansible_nagios.act()
 
 
-class Nagios(object):
+class Nagios:
     """
     Perform common tasks in Nagios related to downtime and
     notifications.

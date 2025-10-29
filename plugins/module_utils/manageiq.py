@@ -74,7 +74,7 @@ def manageiq_entities():
     }
 
 
-class ManageIQ(object):
+class ManageIQ:
     """
         class encapsulating ManageIQ API client.
     """
@@ -177,7 +177,7 @@ class ManageIQ(object):
             self.module.fail_json(msg=msg)
 
 
-class ManageIQPolicies(object):
+class ManageIQPolicies:
     """
         Object to execute policies management operations of manageiq resources.
     """
@@ -329,7 +329,7 @@ class ManageIQPolicies(object):
             msg=f"Successfully {action}ed profiles: {profiles}")
 
 
-class ManageIQTags(object):
+class ManageIQTags:
     """
         Object to execute tags management operations of manageiq resources.
     """

@@ -146,7 +146,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitlabIssue(object):
+class GitlabIssue:
 
     def __init__(self, module, project, gitlab_instance):
         self._gitlab = gitlab_instance

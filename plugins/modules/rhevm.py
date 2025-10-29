@@ -352,7 +352,7 @@ changed = False
 failed = False
 
 
-class RHEVConn(object):
+class RHEVConn:
     'Connection to RHEV-M'
 
     def __init__(self, module):
@@ -998,7 +998,7 @@ class RHEVConn(object):
         return True
 
 
-class RHEV(object):
+class RHEV:
     def __init__(self, module):
         self.module = module
 

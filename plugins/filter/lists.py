@@ -188,7 +188,7 @@ def do_symmetric_difference(a, b):
     return sym_diff
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Ansible lists jinja2 filters '''
 
     def filters(self):

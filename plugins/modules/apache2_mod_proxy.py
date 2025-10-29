@@ -236,7 +236,7 @@ def regexp_extraction(string, _regexp, groups=1):
     return None
 
 
-class BalancerMember(object):
+class BalancerMember:
     """ Apache 2.4 mod_proxy LB balancer member.
     attributes:
         read-only:
@@ -322,7 +322,7 @@ class BalancerMember(object):
         }
 
 
-class Balancer(object):
+class Balancer:
     """ Apache httpd 2.4 mod_proxy balancer object"""
 
     def __init__(self, module, host, suffix, tls=False):

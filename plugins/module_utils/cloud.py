@@ -89,7 +89,7 @@ def _full_jitter_backoff(retries=10, delay=3, max_delay=60, _random=random):
     return backoff_gen
 
 
-class CloudRetry(object):
+class CloudRetry:
     """ CloudRetry can be used by any cloud provider, in order to implement a
         backoff algorithm/retry effect based on Status Code from Exceptions.
     """

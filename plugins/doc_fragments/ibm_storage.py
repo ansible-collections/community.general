@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
 
     # ibm_storage documentation fragment
     DOCUMENTATION = r"""

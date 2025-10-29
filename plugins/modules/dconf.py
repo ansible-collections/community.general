@@ -147,7 +147,7 @@ with deps.declare("psutil"):
     import psutil
 
 
-class DBusWrapper(object):
+class DBusWrapper:
     """
     Helper class that can be used for running a command with a working D-Bus
     session.
@@ -248,7 +248,7 @@ class DBusWrapper(object):
         return rc, out, err
 
 
-class DconfPreference(object):
+class DconfPreference:
 
     def __init__(self, module, check_mode=False):
         """

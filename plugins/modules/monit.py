@@ -95,7 +95,7 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
         return f"{self.value}{' (pending)' if self.is_pending else ''}"
 
 
-class Status(object):
+class Status:
     MISSING = StatusValue(StatusValue.MISSING)
     OK = StatusValue(StatusValue.OK)
     RUNNING = StatusValue(StatusValue.OK)
@@ -105,7 +105,7 @@ class Status(object):
     EXECUTION_FAILED = StatusValue(StatusValue.EXECUTION_FAILED)
 
 
-class Monit(object):
+class Monit:
     def __init__(self, module, monit_bin_path, service_name, timeout):
         self.module = module
         self.monit_bin_path = monit_bin_path

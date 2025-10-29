@@ -222,7 +222,7 @@ USER_AGENT = 'ansible-community.general.ipbase_info/0.1.0'
 BASE_URL = 'https://api.ipbase.com/v2/info'
 
 
-class IpbaseInfo(object):
+class IpbaseInfo:
 
     def __init__(self, module):
         self.module = module

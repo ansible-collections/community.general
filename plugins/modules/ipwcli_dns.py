@@ -164,7 +164,7 @@ record:
 from ansible.module_utils.basic import AnsibleModule
 
 
-class ResourceRecord(object):
+class ResourceRecord:
 
     def __init__(self, module):
         self.module = module

@@ -12,7 +12,7 @@ from ansible_collections.community.general.plugins.modules import alerta_custome
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
-class MockedReponse(object):
+class MockedReponse:
     def __init__(self, data):
         self.data = data
 

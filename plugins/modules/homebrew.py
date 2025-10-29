@@ -202,7 +202,7 @@ def _check_package_in_json(json_output, package_type):
 # /utils ------------------------------------------------------------------ }}}
 
 
-class Homebrew(object):
+class Homebrew:
     '''A class to manage Homebrew packages.'''
 
     # class validations -------------------------------------------- {{{

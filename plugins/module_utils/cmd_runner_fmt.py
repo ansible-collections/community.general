@@ -20,7 +20,7 @@ def _ensure_list(value):
     return list(value) if is_sequence(value) else [value]
 
 
-class _ArgFormat(object):
+class _ArgFormat:
     def __init__(self, func, ignore_none=True, ignore_missing_value=False):
         self.func = func
         self.ignore_none = ignore_none

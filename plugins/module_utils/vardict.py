@@ -8,7 +8,7 @@ from __future__ import annotations
 import copy
 
 
-class _Variable(object):
+class _Variable:
     NOTHING = object()
 
     def __init__(self, diff=False, output=True, change=None, fact=False, verbosity=0):
@@ -104,7 +104,7 @@ class _Variable(object):
         )
 
 
-class VarDict(object):
+class VarDict:
     reserved_names = ('__vars__', '_var', 'var', 'set_meta', 'get_meta', 'set', 'output', 'diff', 'facts', 'has_changed', 'as_dict')
 
     def __init__(self):

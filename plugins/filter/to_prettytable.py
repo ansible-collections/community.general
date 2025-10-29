@@ -400,7 +400,7 @@ def to_prettytable(data, *args, **kwargs):
     return to_text(table)
 
 
-class FilterModule(object):
+class FilterModule:
     """Ansible core jinja2 filters."""
 
     def filters(self):

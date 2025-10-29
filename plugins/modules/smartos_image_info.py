@@ -69,7 +69,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 
 
-class ImageFacts(object):
+class ImageFacts:
 
     def __init__(self, module):
         self.module = module

@@ -23,7 +23,7 @@ class BtrfsModuleException(Exception):
     pass
 
 
-class BtrfsCommands(object):
+class BtrfsCommands:
 
     """
     Provides access to a subset of the Btrfs command line
@@ -102,7 +102,7 @@ class BtrfsCommands(object):
         result = self.__module.run_command(command, check_rc=True)
 
 
-class BtrfsInfoProvider(object):
+class BtrfsInfoProvider:
 
     """
     Utility providing details of the currently available btrfs filesystems
@@ -174,7 +174,7 @@ class BtrfsInfoProvider(object):
         raise BtrfsModuleException(f"Failed to find subvolid for mountpoint in options '{mount_options}'")
 
 
-class BtrfsSubvolume(object):
+class BtrfsSubvolume:
 
     """
     Wrapper class providing convenience methods for inspection of a btrfs subvolume
@@ -252,7 +252,7 @@ class BtrfsSubvolume(object):
         return self.__info['parent']
 
 
-class BtrfsFilesystem(object):
+class BtrfsFilesystem:
 
     """
     Wrapper class providing convenience methods for inspection of a btrfs filesystem
@@ -411,7 +411,7 @@ class BtrfsFilesystem(object):
         }
 
 
-class BtrfsFilesystemsProvider(object):
+class BtrfsFilesystemsProvider:
 
     """
     Provides methods to query available btrfs filesystems

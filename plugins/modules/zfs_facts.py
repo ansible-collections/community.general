@@ -158,7 +158,7 @@ from ansible.module_utils.basic import AnsibleModule
 SUPPORTED_TYPES = ['all', 'filesystem', 'volume', 'snapshot', 'bookmark']
 
 
-class ZFSFacts(object):
+class ZFSFacts:
     def __init__(self, module):
 
         self.module = module

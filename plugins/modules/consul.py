@@ -395,7 +395,7 @@ def parse_service(module):
     )
 
 
-class ConsulService(object):
+class ConsulService:
 
     def __init__(self, service_id=None, name=None, address=None, port=-1,
                  tags=None, loaded=None):
@@ -458,7 +458,7 @@ class ConsulService(object):
         return data
 
 
-class ConsulCheck(object):
+class ConsulCheck:
 
     def __init__(self, check_id, name, node=None, host='localhost',
                  script=None, interval=None, ttl=None, notes=None, tcp=None, http=None, timeout=None, service_id=None):

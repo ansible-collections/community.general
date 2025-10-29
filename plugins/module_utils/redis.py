@@ -89,7 +89,7 @@ def redis_auth_params(module):
     return params
 
 
-class RedisAnsible(object):
+class RedisAnsible:
     '''Base class for Redis module'''
 
     def __init__(self, module):

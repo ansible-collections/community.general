@@ -63,7 +63,7 @@ class FormatError(CmdRunnerException):
         return f"Failed to format parameter {self.name} with value {self.value}: {self.exc}"
 
 
-class CmdRunner(object):
+class CmdRunner:
     """
     Wrapper for ``AnsibleModule.run_command()``.
 
@@ -129,7 +129,7 @@ class CmdRunner(object):
     context = __call__
 
 
-class _CmdRunnerContext(object):
+class _CmdRunnerContext:
     def __init__(self, runner, args_order, output_process, check_mode_skip, check_mode_return, **kwargs):
         self.runner = runner
         self.args_order = tuple(args_order)

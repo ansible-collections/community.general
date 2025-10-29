@@ -125,7 +125,7 @@ from urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 
 
-class StackiHost(object):
+class StackiHost:
 
     def __init__(self, module):
         self.module = module

@@ -16,7 +16,7 @@ def _create_regex_group_complement(s):
     return re.compile(group)
 
 
-class HomebrewValidate(object):
+class HomebrewValidate:
     # class regexes ------------------------------------------------ {{{
     VALID_PATH_CHARS = rf"""
         \w                  # alphanumeric characters (i.e., [a-zA-Z0-9_])

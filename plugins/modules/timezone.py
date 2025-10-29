@@ -73,7 +73,7 @@ import filecmp
 from ansible.module_utils.basic import AnsibleModule, get_distribution
 
 
-class Timezone(object):
+class Timezone:
     """This is a generic Timezone manipulation class that is subclassed based on platform.
 
     A subclass may wish to override the following action methods:

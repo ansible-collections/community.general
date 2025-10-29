@@ -96,7 +96,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Bower(object):
+class Bower:
     def __init__(self, module, **kwargs):
         self.module = module
         self.name = kwargs['name']

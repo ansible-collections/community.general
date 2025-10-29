@@ -791,7 +791,7 @@ except ImportError:
     SUPPORTS_DATA_TAGGING = False
 
 
-class DummyStdout(object):
+class DummyStdout:
     def flush(self):
         pass
 

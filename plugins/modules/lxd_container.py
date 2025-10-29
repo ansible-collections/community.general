@@ -454,7 +454,7 @@ CONFIG_PARAMS = [
 CONFIG_CREATION_PARAMS = ['source', 'type']
 
 
-class LXDContainerManagement(object):
+class LXDContainerManagement:
     def __init__(self, module):
         """Management of LXC containers via Ansible.
 

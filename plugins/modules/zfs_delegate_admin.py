@@ -116,7 +116,7 @@ from itertools import product
 from ansible.module_utils.basic import AnsibleModule
 
 
-class ZfsDelegateAdmin(object):
+class ZfsDelegateAdmin:
     def __init__(self, module):
         self.module = module
         self.name = module.params.get('name')

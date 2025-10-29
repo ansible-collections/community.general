@@ -284,7 +284,7 @@ from ansible.module_utils import distro
 SUBMAN_CMD = None
 
 
-class Rhsm(object):
+class Rhsm:
 
     REDHAT_REPO = "/etc/yum.repos.d/redhat.repo"
 
@@ -831,7 +831,7 @@ class Rhsm(object):
         rc, stdout, stderr = self.module.run_command(args, check_rc=False)
 
 
-class RhsmPool(object):
+class RhsmPool:
     '''
         Convenience class for housing subscription information
     '''
@@ -859,7 +859,7 @@ class RhsmPool(object):
             return False
 
 
-class RhsmPools(object):
+class RhsmPools:
     """
         This class is used for manipulating pools subscriptions with RHSM
     """
@@ -928,7 +928,7 @@ class RhsmPools(object):
                 yield product
 
 
-class SysPurpose(object):
+class SysPurpose:
     """
     This class is used for reading and writing to syspurpose.json file
     """

@@ -71,7 +71,7 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 )
 
 
-class AzureLogAnalyticsSource(object):
+class AzureLogAnalyticsSource:
     def __init__(self):
         self.ansible_check_mode = False
         self.ansible_playbook = ""

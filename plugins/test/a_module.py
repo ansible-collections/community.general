@@ -62,7 +62,7 @@ def a_module(term):
         return False
 
 
-class TestModule(object):
+class TestModule:
     ''' Ansible jinja2 tests '''
 
     def tests(self):

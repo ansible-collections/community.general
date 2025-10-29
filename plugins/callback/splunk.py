@@ -100,7 +100,7 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 )
 
 
-class SplunkHTTPCollectorSource(object):
+class SplunkHTTPCollectorSource:
     def __init__(self):
         self.ansible_check_mode = False
         self.ansible_playbook = ""

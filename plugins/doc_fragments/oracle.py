@@ -11,7 +11,7 @@ from __future__ import annotations
 #
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     DOCUMENTATION = r"""
 requirements:
   - Python SDK for Oracle Cloud Infrastructure U(https://oracle-cloud-infrastructure-python-sdk.readthedocs.io)

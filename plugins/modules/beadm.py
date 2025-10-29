@@ -142,7 +142,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-class BE(object):
+class BE:
     def __init__(self, module):
         self.module = module
 

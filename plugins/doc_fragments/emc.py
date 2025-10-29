@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
 
     # Documentation fragment for VNX (emc_vnx)
     EMC_VNX = r'''

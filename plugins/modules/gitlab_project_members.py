@@ -166,7 +166,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitLabProjectMembers(object):
+class GitLabProjectMembers:
     def __init__(self, module, gl):
         self._module = module
         self._gitlab = gl

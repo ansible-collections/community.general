@@ -41,7 +41,7 @@ def version_sort(value, reverse=False):
     return sorted(value, key=LooseVersion, reverse=reverse)
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Version sort filter '''
 
     def filters(self):

@@ -12,7 +12,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.exceptions im
 from ansible_collections.community.general.plugins.module_utils.mh.deco import module_fails_on_exception
 
 
-class ModuleHelperBase(object):
+class ModuleHelperBase:
     module: dict[str, t.Any] | None = None  # TODO: better spec using t.TypedDict
     ModuleHelperException = _MHE
     _delegated_to_module: tuple[str, ...] = (

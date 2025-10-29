@@ -756,7 +756,7 @@ def get_xenserver_version(module):
     return xenserver_version
 
 
-class XAPI(object):
+class XAPI:
     """Class for XAPI session management."""
     _xapi_session = None
 
@@ -820,7 +820,7 @@ class XAPI(object):
         return cls._xapi_session
 
 
-class XenServerObject(object):
+class XenServerObject:
     """Base class for all XenServer objects.
 
     This class contains active XAPI session reference and common

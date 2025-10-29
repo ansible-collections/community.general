@@ -23,7 +23,7 @@ DELETE_HEADERS = {'accept': 'application/json'}
 HEALTH_OK = 5
 
 
-class OcapiUtils(object):
+class OcapiUtils:
 
     def __init__(self, creds, base_uri, proxy_slot_number, timeout, module):
         self.root_uri = base_uri

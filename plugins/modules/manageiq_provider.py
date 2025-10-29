@@ -596,7 +596,7 @@ def delete_nulls(h):
     return h
 
 
-class ManageIQProvider(object):
+class ManageIQProvider:
     """
         Object to execute provider management operations in manageiq.
     """

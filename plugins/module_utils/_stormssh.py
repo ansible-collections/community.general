@@ -92,7 +92,7 @@ class StormConfig(SSHConfig):
         self._config.append(host)
 
 
-class ConfigParser(object):
+class ConfigParser:
     """
     Config parser for ~/.ssh/config files.
     """

@@ -244,7 +244,7 @@ def fix_bool_str(value):
     return value
 
 
-class SSHConfig(object):
+class SSHConfig:
     def __init__(self, module):
         self.module = module
         if not HAS_PARAMIKO:

@@ -592,7 +592,7 @@ def create_script(command):
         os.remove(script_file)
 
 
-class LxcContainerManagement(object):
+class LxcContainerManagement:
     def __init__(self, module):
         """Management of LXC containers via Ansible.
 

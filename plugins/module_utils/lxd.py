@@ -38,7 +38,7 @@ class LXDClientException(Exception):
         self.kwargs = kwargs
 
 
-class LXDClient(object):
+class LXDClient:
     def __init__(self, url, key_file=None, cert_file=None, debug=False, server_cert_file=None, server_check_hostname=True):
         """LXD Client.
 

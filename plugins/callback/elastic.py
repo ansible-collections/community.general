@@ -138,7 +138,7 @@ class HostData:
         self.finish = time.time()
 
 
-class ElasticSource(object):
+class ElasticSource:
     def __init__(self, display):
         self.ansible_playbook = ""
         self.session = str(uuid.uuid4())

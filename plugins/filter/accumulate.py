@@ -54,7 +54,7 @@ def list_accumulate(sequence):
     return accumulate(sequence)
 
 
-class FilterModule(object):
+class FilterModule:
 
     def filters(self):
         return {

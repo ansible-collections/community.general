@@ -90,7 +90,7 @@ def to_ini(obj):
     return ''.join(config.getvalue().rsplit(config.getvalue()[-1], 1))
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Query filter '''
 
     def filters(self):

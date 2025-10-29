@@ -71,7 +71,7 @@ class SdkManagerException(Exception):
     pass
 
 
-class AndroidSdkManager(object):
+class AndroidSdkManager:
     _RE_INSTALLED_PACKAGES_HEADER = re.compile(r'^Installed packages:$')
     _RE_UPDATABLE_PACKAGES_HEADER = re.compile(r'^Available Updates:$')
 

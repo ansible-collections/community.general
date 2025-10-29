@@ -51,7 +51,7 @@ def ldap_required_together():
     return [['client_cert', 'client_key']]
 
 
-class LdapGeneric(object):
+class LdapGeneric:
     def __init__(self, module):
         # Shortcuts
         self.module = module

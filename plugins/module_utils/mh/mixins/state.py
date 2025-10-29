@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-class StateMixin(object):
+class StateMixin:
     state_param: str = 'state'
     default_state: str | None = None
 

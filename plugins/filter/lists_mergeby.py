@@ -268,7 +268,7 @@ def lists_mergeby(*terms, **kwargs):
     return result
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Ansible list filters '''
 
     def filters(self):

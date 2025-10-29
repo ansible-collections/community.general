@@ -453,7 +453,7 @@ def join_str(sep, *args):
     return sep.join([str(arg) for arg in args])
 
 
-class CloudflareAPI(object):
+class CloudflareAPI:
 
     cf_api_endpoint = 'https://api.cloudflare.com/client/v4'
     changed = False

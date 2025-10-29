@@ -210,7 +210,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 from datetime import datetime
 
 
-class GitlabMilestones(object):
+class GitlabMilestones:
 
     def __init__(self, module, gitlab_instance, group_id, project_id):
         self._gitlab = gitlab_instance

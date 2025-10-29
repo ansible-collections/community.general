@@ -98,7 +98,7 @@ from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible.module_utils.basic import AnsibleModule
 
 
-class AlertaInterface(object):
+class AlertaInterface:
 
     def __init__(self, module):
         self.module = module

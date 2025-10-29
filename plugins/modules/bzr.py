@@ -63,7 +63,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Bzr(object):
+class Bzr:
     def __init__(self, module, parent, dest, version, bzr_path):
         self.module = module
         self.parent = parent

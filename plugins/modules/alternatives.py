@@ -158,7 +158,7 @@ class AlternativeState:
         return [cls.PRESENT, cls.SELECTED, cls.ABSENT, cls.AUTO]
 
 
-class AlternativesModule(object):
+class AlternativesModule:
     _UPDATE_ALTERNATIVES = None
 
     def __init__(self, module):

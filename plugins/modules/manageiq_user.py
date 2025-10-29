@@ -133,7 +133,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
 
 
-class ManageIQUser(object):
+class ManageIQUser:
     """
         Object to execute user management operations in manageiq.
     """

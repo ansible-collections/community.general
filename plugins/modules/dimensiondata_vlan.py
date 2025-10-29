@@ -460,7 +460,7 @@ class InvalidVlanChangeError(Exception):
     pass
 
 
-class VlanDiff(object):
+class VlanDiff:
     """
     Represents differences between VLAN information (from CloudControl) and module parameters.
     """

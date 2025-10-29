@@ -189,7 +189,7 @@ from ansible_collections.community.general.plugins.module_utils.rundeck import (
 )
 
 
-class RundeckJobRun(object):
+class RundeckJobRun:
     def __init__(self, module):
         self.module = module
         self.url = self.module.params["url"]

@@ -126,7 +126,7 @@ from ansible.module_utils.basic import AnsibleModule
 # the stacktrace, which breaks the parsers.
 
 
-class Imgadm(object):
+class Imgadm:
     def __init__(self, module):
         self.module = module
         self.params = module.params

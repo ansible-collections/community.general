@@ -66,7 +66,7 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
 
 
-class IpifyFacts(object):
+class IpifyFacts:
 
     def __init__(self):
         self.api_url = module.params.get('api_url')

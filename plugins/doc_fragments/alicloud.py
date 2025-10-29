@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
 
     # Alicloud only documentation fragment
     DOCUMENTATION = r"""

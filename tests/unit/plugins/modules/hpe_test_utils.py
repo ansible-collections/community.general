@@ -14,7 +14,7 @@ from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
 from hpOneView.oneview_client import OneViewClient
 
 
-class OneViewBaseTest(object):
+class OneViewBaseTest:
     @pytest.fixture(autouse=True)
     def setUp(self, mock_ansible_module, mock_ov_client, request):
         marker = request.node.get_marker('resource')
@@ -88,7 +88,7 @@ class FactsParamsTest(OneViewBaseTest):
         self.resource.get_all.assert_called_once_with()
 
 
-class OneViewBaseTestCase(object):
+class OneViewBaseTestCase:
     mock_ov_client_from_json_file = None
     testing_class = None
     mock_ansible_module = None

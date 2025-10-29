@@ -175,7 +175,7 @@ def _create_regex_group_complement(s):
 # /utils ------------------------------------------------------------------ }}}
 
 
-class HomebrewCask(object):
+class HomebrewCask:
     '''A class to manage Homebrew casks.'''
 
     # class regexes ------------------------------------------------ {{{

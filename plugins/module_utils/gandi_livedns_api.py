@@ -10,7 +10,7 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
 
 
-class GandiLiveDNSAPI(object):
+class GandiLiveDNSAPI:
 
     api_endpoint = 'https://api.gandi.net/v5/livedns'
     changed = False

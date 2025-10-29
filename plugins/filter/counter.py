@@ -53,7 +53,7 @@ def counter(sequence):
     return result
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Ansible counter jinja2 filters '''
 
     def filters(self):

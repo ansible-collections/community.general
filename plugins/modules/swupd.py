@@ -99,7 +99,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Swupd(object):
+class Swupd:
     FILES_NOT_MATCH = "files did not match"
     FILES_REPLACED = "missing files were replaced"
     FILES_FIXED = "files were fixed"

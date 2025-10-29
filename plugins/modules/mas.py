@@ -110,7 +110,7 @@ import platform
 NOT_WORKING_MAC_VERSION_MAS_ACCOUNT = '12.0'
 
 
-class Mas(object):
+class Mas:
 
     def __init__(self, module):
         self.module = module

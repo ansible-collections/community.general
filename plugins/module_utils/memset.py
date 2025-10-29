@@ -17,7 +17,7 @@ from ansible.module_utils.basic import json
 import urllib.error as urllib_error
 
 
-class Response(object):
+class Response:
     '''
     Create a response object to mimic that of requests.
     '''

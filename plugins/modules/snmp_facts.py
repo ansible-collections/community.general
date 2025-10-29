@@ -195,7 +195,7 @@ with deps.declare("pysnmp"):
     from pysnmp.proto.rfc1905 import EndOfMibView
 
 
-class DefineOid(object):
+class DefineOid:
 
     def __init__(self, dotprefix=False):
         if dotprefix:

@@ -227,7 +227,7 @@ class TimeoutException(Exception):
     pass
 
 
-class HAProxy(object):
+class HAProxy:
     """
     Used for communicating with HAProxy through its local UNIX socket interface.
     Perform common tasks in Haproxy related to enable server and

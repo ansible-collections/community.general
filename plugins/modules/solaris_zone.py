@@ -153,7 +153,7 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Zone(object):
+class Zone:
     def __init__(self, module):
         self.changed = False
         self.msg = []

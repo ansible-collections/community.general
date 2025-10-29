@@ -154,7 +154,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitlabInstanceVariables(object):
+class GitlabInstanceVariables:
 
     def __init__(self, module, gitlab_instance):
         self.instance = gitlab_instance

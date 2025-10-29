@@ -128,7 +128,7 @@ def to_years(human_time, **kwargs):
     return to_time_unit(human_time, 'y', **kwargs)
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Ansible time jinja2 filters '''
 
     def filters(self):

@@ -1690,7 +1690,7 @@ class NmcliModuleError(Exception):
     pass
 
 
-class Nmcli(object):
+class Nmcli:
     """
     This is the generic nmcli manipulation class that is subclassed based on platform.
     A subclass may wish to override the following action methods:-

@@ -86,7 +86,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
 
 
-class ManageIQAlertProfiles(object):
+class ManageIQAlertProfiles:
     """ Object to execute alert profile management operations in manageiq.
     """
 

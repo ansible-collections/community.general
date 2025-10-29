@@ -16,7 +16,7 @@ class Failure(Exception):
         return str(self.details)
 
 
-class Session(object):
+class Session:
     def __init__(self, uri, transport=None, encoding=None, verbose=0,
                  allow_none=1, ignore_ssl=False):
 

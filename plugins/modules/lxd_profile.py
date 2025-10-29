@@ -240,7 +240,7 @@ CONFIG_PARAMS = [
 ]
 
 
-class LXDProfileManagement(object):
+class LXDProfileManagement:
     def __init__(self, module):
         """Management of LXC profiles via Ansible.
 

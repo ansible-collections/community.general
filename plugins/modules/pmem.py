@@ -220,7 +220,7 @@ else:
     XMLTODICT_LIBRARY_IMPORT_ERROR = None
 
 
-class PersistentMemory(object):
+class PersistentMemory:
     def __init__(self):
         module = AnsibleModule(
             argument_spec=dict(

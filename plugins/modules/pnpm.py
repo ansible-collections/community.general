@@ -159,7 +159,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Pnpm(object):
+class Pnpm:
     def __init__(self, module, **kwargs):
         self.module = module
         self.name = kwargs["name"]

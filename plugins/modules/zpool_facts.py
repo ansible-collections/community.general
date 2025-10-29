@@ -119,7 +119,7 @@ from collections import defaultdict
 from ansible.module_utils.basic import AnsibleModule
 
 
-class ZPoolFacts(object):
+class ZPoolFacts:
     def __init__(self, module):
 
         self.module = module

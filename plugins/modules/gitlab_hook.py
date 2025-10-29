@@ -175,7 +175,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitLabHook(object):
+class GitLabHook:
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance

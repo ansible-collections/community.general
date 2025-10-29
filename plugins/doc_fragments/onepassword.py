@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     DOCUMENTATION = r"""
 requirements:
   - See U(https://support.1password.com/command-line/)

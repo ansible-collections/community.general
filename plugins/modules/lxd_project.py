@@ -196,7 +196,7 @@ CONFIG_PARAMS = [
 ]
 
 
-class LXDProjectManagement(object):
+class LXDProjectManagement:
     def __init__(self, module):
         """Management of LXC projects via Ansible.
 

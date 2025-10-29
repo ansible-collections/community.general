@@ -93,7 +93,7 @@ MODULES_LOAD_LOCATION = '/etc/modules-load.d'
 PARAMETERS_FILES_LOCATION = '/etc/modprobe.d'
 
 
-class Modprobe(object):
+class Modprobe:
 
     def __init__(self, module):
         self.module = module
