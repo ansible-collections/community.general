@@ -8,6 +8,8 @@ minor_changes:
     https://github.com/ansible-collections/community.general/pull/10903,
     https://github.com/ansible-collections/community.general/pull/10904,
     https://github.com/ansible-collections/community.general/pull/10907,
+    https://github.com/ansible-collections/community.general/pull/10908,
+    https://github.com/ansible-collections/community.general/pull/10909,
     https://github.com/ansible-collections/community.general/pull/10939,
     https://github.com/ansible-collections/community.general/pull/10940,
     https://github.com/ansible-collections/community.general/pull/10941,
@@ -26,4 +28,6 @@ minor_changes:
     https://github.com/ansible-collections/community.general/pull/10976,
     https://github.com/ansible-collections/community.general/pull/10977,
     https://github.com/ansible-collections/community.general/pull/10978,
-    https://github.com/ansible-collections/community.general/pull/10979)
+    https://github.com/ansible-collections/community.general/pull/10979,
+    https://github.com/ansible-collections/community.general/pull/10980,
+    https://github.com/ansible-collections/community.general/pull/10981)

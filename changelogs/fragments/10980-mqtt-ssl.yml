@@ -1,2 +1,0 @@
-minor_changes:
-  - mqtt - remove provisions for unsupported Python versions (https://github.com/ansible-collections/community.general/pull/10980).
