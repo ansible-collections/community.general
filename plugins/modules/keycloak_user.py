@@ -360,7 +360,7 @@ def main():
     argument_spec['auth_username']['aliases'] = []
     credential_spec = dict(
         type=dict(type='str', required=True),
-        value=dict(type='str', required=True),
+        value=dict(type='str', required=True, no_log=True),
         temporary=dict(type='bool', default=False)
     )
     client_consents_spec = dict(
