@@ -302,7 +302,7 @@ def main():
         no_bin_links=dict(default=False, type='bool'),
         force=dict(default=False, type='bool'),
     )
-    arg_spec['global'] = dict(type='bool')
+    arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
         argument_spec=arg_spec,
         required_if=[
