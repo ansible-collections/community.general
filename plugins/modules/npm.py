@@ -28,6 +28,7 @@ options:
   path:
     description:
       - The base path where to install the node.js libraries.
+      - When O(global=true), then O(path) is not used to install the packages.
     type: path
     required: false
   version:
@@ -38,6 +39,7 @@ options:
   global:
     description:
       - Install the node.js library globally.
+      - When O(global=true), then O(path) is not used to install the packages.
     required: false
     default: false
     type: bool
@@ -303,7 +305,10 @@ def main():
     arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
         argument_spec=arg_spec,
-        required_if=[('state', 'absent', ['name'])],
+        required_if=[
+            ('state', 'absent', ['name']),
+            ("global", False, ["path"]),
+        ],
         supports_check_mode=True,
     )
 
@@ -312,9 +317,6 @@ def main():
     version = module.params['version']
     glbl = module.params['global']
     state = module.params['state']
-
-    if not path and not glbl:
-        module.fail_json(msg='path must be specified when not using global')
 
     npm = Npm(module,
               name=name,
