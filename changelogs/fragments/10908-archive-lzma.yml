@@ -1,2 +1,0 @@
-minor_changes:
-  - archive - remove conditional code for older Python versions (https://github.com/ansible-collections/community.general/pull/10908).
