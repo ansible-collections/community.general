@@ -1,0 +1,24 @@
+minor_changes:
+  - >-
+    Modernize code for Python 3.7+
+    (https://github.com/ansible-collections/community.general/pull/10285,
+    https://github.com/ansible-collections/community.general/pull/10899,
+    https://github.com/ansible-collections/community.general/pull/10939,
+    https://github.com/ansible-collections/community.general/pull/10940,
+    https://github.com/ansible-collections/community.general/pull/10941,
+    https://github.com/ansible-collections/community.general/pull/10942,
+    https://github.com/ansible-collections/community.general/pull/10945,
+    https://github.com/ansible-collections/community.general/pull/10947,
+    https://github.com/ansible-collections/community.general/pull/10958,
+    https://github.com/ansible-collections/community.general/pull/10959,
+    https://github.com/ansible-collections/community.general/pull/10968,
+    https://github.com/ansible-collections/community.general/pull/10969,
+    https://github.com/ansible-collections/community.general/pull/10970,
+    https://github.com/ansible-collections/community.general/pull/10971,
+    https://github.com/ansible-collections/community.general/pull/10973,
+    https://github.com/ansible-collections/community.general/pull/10974,
+    https://github.com/ansible-collections/community.general/pull/10975,
+    https://github.com/ansible-collections/community.general/pull/10976,
+    https://github.com/ansible-collections/community.general/pull/10977,
+    https://github.com/ansible-collections/community.general/pull/10978,
+    https://github.com/ansible-collections/community.general/pull/10979)
