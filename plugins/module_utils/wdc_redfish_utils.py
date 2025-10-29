@@ -49,11 +49,11 @@ class WdcRedfishUtils(RedfishUtils):
                  resource_id,
                  data_modification):
         super().__init__(creds=creds,
-                                              root_uri=root_uris[0],
-                                              timeout=timeout,
-                                              module=module,
-                                              resource_id=resource_id,
-                                              data_modification=data_modification)
+                         root_uri=root_uris[0],
+                         timeout=timeout,
+                         module=module,
+                         resource_id=resource_id,
+                         data_modification=data_modification)
         # Update the root URI if we cannot perform a Redfish GET to the first one
         self._set_root_uri(root_uris)
 

@@ -502,9 +502,7 @@ class CallbackModule(CallbackBase):
         self.opentelemetry = OpenTelemetrySource(display=self._display)
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super().set_options(task_keys=task_keys,
-                                                var_options=var_options,
-                                                direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         environment_variable = self.get_option('enable_from_environment')
         if environment_variable is not None and os.environ.get(environment_variable, 'false').lower() != 'true':

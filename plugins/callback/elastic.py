@@ -315,9 +315,7 @@ class CallbackModule(CallbackBase):
         self.elastic = ElasticSource(display=self._display)
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super().set_options(task_keys=task_keys,
-                                                var_options=var_options,
-                                                direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
 

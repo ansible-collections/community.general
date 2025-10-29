@@ -31,4 +31,4 @@ class PythonRunner(CmdRunner):
         python_cmd = [self.python] + _ensure_list(command)
 
         super().__init__(module, python_cmd, arg_formats, default_args_order,
-                                           check_rc, force_lang, path_prefix, environ_update)
+                         check_rc, force_lang, path_prefix, environ_update)

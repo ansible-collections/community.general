@@ -50,8 +50,8 @@ class UTMModule(AnsibleModule):
             state=dict(default='present', choices=['present', 'absent'])
         )
         super().__init__(self._merge_specs(default_specs, argument_spec), bypass_checks, no_log,
-                                        mutually_exclusive, required_together, required_one_of,
-                                        add_file_common_args, supports_check_mode, required_if)
+                         mutually_exclusive, required_together, required_one_of,
+                         add_file_common_args, supports_check_mode, required_if)
 
     def _merge_specs(self, default_specs, custom_specs):
         result = default_specs.copy()
