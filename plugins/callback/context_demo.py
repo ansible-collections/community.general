@@ -31,7 +31,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, *args, **kwargs):
-        super(CallbackModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.task = None
         self.play = None
 

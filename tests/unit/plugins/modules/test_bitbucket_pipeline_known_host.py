@@ -17,7 +17,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 class TestBucketPipelineKnownHostModule(ModuleTestCase):
     def setUp(self):
-        super(TestBucketPipelineKnownHostModule, self).setUp()
+        super().setUp()
         self.module = bitbucket_pipeline_known_host
 
     @pytest.mark.skipif(not HAS_PARAMIKO, reason='paramiko must be installed to test key creation')

@@ -217,7 +217,7 @@ class ConsulRoleModule(_ConsulModule):
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
             return [self.api_endpoint, "name", self.params["name"]]
-        return super(ConsulRoleModule, self).endpoint_url(operation, identifier)
+        return super().endpoint_url(operation, identifier)
 
 
 NAME_ID_SPEC = dict(

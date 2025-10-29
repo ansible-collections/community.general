@@ -234,10 +234,10 @@ class ConsulAgentServiceModule(_ConsulModule):
         if operation == OPERATION_DELETE:
             return f"{self.api_endpoint}/deregister/{identifier}"
 
-        return super(ConsulAgentServiceModule, self).endpoint_url(operation, identifier)
+        return super().endpoint_url(operation, identifier)
 
     def prepare_object(self, existing, obj):
-        existing = super(ConsulAgentServiceModule, self).prepare_object(existing, obj)
+        existing = super().prepare_object(existing, obj)
         if "ServicePort" in existing:
             existing["Port"] = existing.pop("ServicePort")
 
@@ -257,7 +257,7 @@ class ConsulAgentServiceModule(_ConsulModule):
         if "ServicePort" in module_obj:
             module_obj["Port"] = module_obj.pop("ServicePort")
 
-        return super(ConsulAgentServiceModule, self).needs_update(api_obj, module_obj)
+        return super().needs_update(api_obj, module_obj)
 
     def delete_object(self, obj):
         if not self._module.check_mode:

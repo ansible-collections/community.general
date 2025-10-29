@@ -79,7 +79,7 @@ def mock_good_connection():
 
 class TestKeycloakUserFederation(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakUserFederation, self).setUp()
+        super().setUp()
         self.module = keycloak_user_federation
 
     def test_create_when_absent(self):

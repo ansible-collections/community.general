@@ -61,7 +61,7 @@ class CallbackModule(Default):
         pass
 
     def set_options(self, *args, **kwargs):
-        result = super(CallbackModule, self).set_options(*args, **kwargs)
+        result = super().set_options(*args, **kwargs)
         self.number_of_columns = self.get_option("number_of_columns")
         if self.number_of_columns is not None:
             self._display.columns = self.number_of_columns

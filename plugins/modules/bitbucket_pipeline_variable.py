@@ -201,7 +201,7 @@ class BitBucketPipelineVariable(AnsibleModule):
         params = _load_params() or {}
         if params.get('secured'):
             kwargs['argument_spec']['value'].update({'no_log': True})
-        super(BitBucketPipelineVariable, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 def main():

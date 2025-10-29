@@ -146,7 +146,7 @@ class ConsulPolicyModule(_ConsulModule):
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
             return [self.api_endpoint, "name", self.params["name"]]
-        return super(ConsulPolicyModule, self).endpoint_url(operation, identifier)
+        return super().endpoint_url(operation, identifier)
 
 
 def main():

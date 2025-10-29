@@ -170,12 +170,12 @@ class ConsulAuthMethodModule(_ConsulModule):
     def map_param(self, k, v, is_update):
         if k == "config" and v:
             v = {camel_case_key(k2): v2 for k2, v2 in v.items()}
-        return super(ConsulAuthMethodModule, self).map_param(k, v, is_update)
+        return super().map_param(k, v, is_update)
 
     def needs_update(self, api_obj, module_obj):
         if "MaxTokenTTL" in module_obj:
             module_obj["MaxTokenTTL"] = normalize_ttl(module_obj["MaxTokenTTL"])
-        return super(ConsulAuthMethodModule, self).needs_update(api_obj, module_obj)
+        return super().needs_update(api_obj, module_obj)
 
 
 _ARGUMENT_SPEC = {

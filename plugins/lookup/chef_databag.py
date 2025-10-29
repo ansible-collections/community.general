@@ -58,7 +58,7 @@ class LookupModule(LookupBase):
     """
     def __init__(self, loader=None, templar=None, **kwargs):
 
-        super(LookupModule, self).__init__(loader, templar, **kwargs)
+        super().__init__(loader, templar, **kwargs)
 
         # setup vars for data bag name and data bag item
         self.name = None

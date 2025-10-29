@@ -14,7 +14,7 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
     module = ipa_getkeytab
 
     def setUp(self):
-        super(IPAKeytabModuleTestCase, self).setUp()
+        super().setUp()
         ansible_module_path = "ansible_collections.community.general.plugins.modules.ipa_getkeytab.AnsibleModule"
         self.mock_run_command = patch(f'{ansible_module_path}.run_command')
         self.module_main_command = self.mock_run_command.start()
@@ -25,7 +25,7 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
     def tearDown(self):
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
-        super(IPAKeytabModuleTestCase, self).tearDown()
+        super().tearDown()
 
     def module_main(self, exit_exc):
         with self.assertRaises(exit_exc) as exc:

@@ -91,7 +91,7 @@ def mock_good_connection():
 
 class TestKeycloakRealm(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealm, self).setUp()
+        super().setUp()
         self.module = keycloak_client
 
     def test_authentication_flow_binding_overrides_feature(self):

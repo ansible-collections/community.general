@@ -163,7 +163,7 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 
 class HBACRuleIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(HBACRuleIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def hbacrule_find(self, name):
         return self._post_json(method='hbacrule_find', name=None, item={'all': True, 'cn': name})

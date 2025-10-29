@@ -119,7 +119,7 @@ class LogicalInterconnectGroupModule(OneViewModuleBase):
             data=dict(required=True, type='dict')
         )
 
-        super(LogicalInterconnectGroupModule, self).__init__(additional_arg_spec=argument_spec,
+        super().__init__(additional_arg_spec=argument_spec,
                                                              validate_etag_support=True)
         self.resource_client = self.oneview_client.logical_interconnect_groups
 

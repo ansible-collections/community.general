@@ -53,11 +53,11 @@ class Response(object):
 
 class TestPagerDutyAlertModule(ModuleTestCase):
     def setUp(self):
-        super(TestPagerDutyAlertModule, self).setUp()
+        super().setUp()
         self.module = pagerduty_alert
 
     def tearDown(self):
-        super(TestPagerDutyAlertModule, self).tearDown()
+        super().tearDown()
 
     @pytest.fixture
     def fetch_url_mock(self, mocker):

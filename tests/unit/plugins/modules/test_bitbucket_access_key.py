@@ -14,7 +14,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 class TestBucketAccessKeyModule(ModuleTestCase):
     def setUp(self):
-        super(TestBucketAccessKeyModule, self).setUp()
+        super().setUp()
         self.module = bitbucket_access_key
 
     def test_missing_key_with_present_state(self):

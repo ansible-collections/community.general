@@ -85,10 +85,10 @@ _TELINIT_STATUS_RUNNING_NOT = """
 class TestSimpleinitMSB(ModuleTestCase):
 
     def setUp(self):
-        super(TestSimpleinitMSB, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(TestSimpleinitMSB, self).tearDown()
+        super().tearDown()
 
     @patch('os.path.exists', return_value=True)
     @patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', return_value="/sbin/telinit")

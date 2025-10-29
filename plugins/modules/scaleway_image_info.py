@@ -107,7 +107,7 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 class ScalewayImageInfo(Scaleway):
 
     def __init__(self, module):
-        super(ScalewayImageInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'images'
 
         region = module.params["region"]

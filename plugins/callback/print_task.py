@@ -44,7 +44,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self):
-        super(CallbackModule, self).__init__()
+        super().__init__()
         self._printed_message = False
 
     def _print_task(self, task):

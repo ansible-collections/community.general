@@ -54,7 +54,7 @@ except ImportError:
 
 class TestGitlabUser(GitlabModuleTestCase):
     def setUp(self):
-        super(TestGitlabUser, self).setUp()
+        super().setUp()
 
         self.moduleUtil = GitLabUser(module=self.mock_module, gitlab_instance=self.gitlab_instance)
 

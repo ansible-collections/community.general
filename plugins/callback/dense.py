@@ -161,7 +161,7 @@ class CallbackModule(CallbackModule_default):
         if HAS_OD:
 
             self.disabled = False
-            self.super_ref = super(CallbackModule, self)
+            self.super_ref = super()
             self.super_ref.__init__()
 
             # Attributes to remove from results for more density

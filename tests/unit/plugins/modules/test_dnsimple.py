@@ -25,12 +25,12 @@ class TestDNSimple(ModuleTestCase):
 
     def setUp(self):
         """Setup."""
-        super(TestDNSimple, self).setUp()
+        super().setUp()
         self.module = dnsimple_module
 
     def tearDown(self):
         """Teardown."""
-        super(TestDNSimple, self).tearDown()
+        super().tearDown()
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""

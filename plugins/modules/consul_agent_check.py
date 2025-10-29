@@ -206,7 +206,7 @@ class ConsulAgentCheckModule(_ConsulModule):
         if operation == OPERATION_DELETE:
             return f"{self.api_endpoint}/deregister/{identifier}"
 
-        return super(ConsulAgentCheckModule, self).endpoint_url(operation, identifier)
+        return super().endpoint_url(operation, identifier)
 
     def read_object(self):
         url = self.endpoint_url(OPERATION_READ)
@@ -217,7 +217,7 @@ class ConsulAgentCheckModule(_ConsulModule):
         return None
 
     def prepare_object(self, existing, obj):
-        existing = super(ConsulAgentCheckModule, self).prepare_object(existing, obj)
+        existing = super().prepare_object(existing, obj)
         validate_check(existing)
         return existing
 

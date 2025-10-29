@@ -37,7 +37,7 @@ def patch_ipa(**kwargs):
 
 class TestIPAPwPolicy(ModuleTestCase):
     def setUp(self):
-        super(TestIPAPwPolicy, self).setUp()
+        super().setUp()
         self.module = ipa_pwpolicy
 
     def _test_base(self, module_args, return_value, mock_calls, changed):

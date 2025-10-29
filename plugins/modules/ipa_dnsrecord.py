@@ -204,7 +204,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class DNSRecordIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(DNSRecordIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def dnsrecord_find(self, zone_name, record_name):
         if record_name == '@':

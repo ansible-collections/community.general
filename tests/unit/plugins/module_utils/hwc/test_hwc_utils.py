@@ -12,7 +12,7 @@ from ansible_collections.community.general.plugins.module_utils.hwc_utils import
 
 class HwcUtilsTestCase(unittest.TestCase):
     def setUp(self):
-        super(HwcUtilsTestCase, self).setUp()
+        super().setUp()
 
         # Add backward compatibility
         if sys.version_info < (3, 0):

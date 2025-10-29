@@ -94,7 +94,7 @@ def mock_good_connection():
 
 class TestKeycloakRealmRole(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealmRole, self).setUp()
+        super().setUp()
         self.module = keycloak_role
 
     def test_create_when_absent(self):
@@ -470,7 +470,7 @@ class TestKeycloakRealmRole(ModuleTestCase):
 
 class TestKeycloakClientRole(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakClientRole, self).setUp()
+        super().setUp()
         self.module = keycloak_role
 
     def test_create_client_role_with_composites_when_absent(self):

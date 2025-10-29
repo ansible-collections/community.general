@@ -14,7 +14,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 class TestBucketPipelineVariableModule(ModuleTestCase):
     def setUp(self):
-        super(TestBucketPipelineVariableModule, self).setUp()
+        super().setUp()
         self.module = bitbucket_pipeline_variable
 
     def test_without_required_parameters(self):

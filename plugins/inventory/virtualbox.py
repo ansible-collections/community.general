@@ -92,7 +92,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def __init__(self):
         self._vbox_path = None
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
     def _query_vbox_data(self, host, property_path):
         ret = None
@@ -302,7 +302,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def verify_file(self, path):
 
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(('virtualbox.yaml', 'virtualbox.yml', 'vbox.yaml', 'vbox.yml')):
                 valid = True
         return valid
@@ -314,7 +314,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         except ValueError as e:
             raise AnsibleParserError(e)
 
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         cache_key = self.get_cache_key(path)
 

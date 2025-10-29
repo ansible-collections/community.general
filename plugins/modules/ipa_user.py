@@ -188,7 +188,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class UserIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(UserIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def user_find(self, name):
         return self._post_json(method='user_find', name=None, item={'all': True, 'uid': name})

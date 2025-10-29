@@ -139,7 +139,7 @@ class PSAdapter(object, metaclass=abc.ABCMeta):
 
 class PSAdapter100(PSAdapter):
     def __init__(self, psutil):
-        super(PSAdapter100, self).__init__(psutil)
+        super().__init__(psutil)
 
     @staticmethod
     def _get_attribute_from_proc(proc, attribute):
@@ -148,7 +148,7 @@ class PSAdapter100(PSAdapter):
 
 class PSAdapter200(PSAdapter):
     def __init__(self, psutil):
-        super(PSAdapter200, self).__init__(psutil)
+        super().__init__(psutil)
 
     @staticmethod
     def _get_attribute_from_proc(proc, attribute):
@@ -158,7 +158,7 @@ class PSAdapter200(PSAdapter):
 
 class PSAdapter530(PSAdapter):
     def __init__(self, psutil):
-        super(PSAdapter530, self).__init__(psutil)
+        super().__init__(psutil)
 
     def _process_iter(self, *attrs):
         return self._psutil.process_iter(attrs=attrs)

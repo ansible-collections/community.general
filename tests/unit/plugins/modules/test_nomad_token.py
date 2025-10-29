@@ -90,11 +90,11 @@ def mock_acl_delete_token():
 class TestNomadTokenModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestNomadTokenModule, self).setUp()
+        super().setUp()
         self.module = nomad_token
 
     def tearDown(self):
-        super(TestNomadTokenModule, self).tearDown()
+        super().tearDown()
 
     def test_should_fail_without_parameters(self):
         with self.assertRaises(AnsibleFailJson):

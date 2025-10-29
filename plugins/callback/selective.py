@@ -83,14 +83,14 @@ class CallbackModule(CallbackBase):
 
     def __init__(self, display=None):
         """selective.py callback plugin."""
-        super(CallbackModule, self).__init__(display)
+        super().__init__(display)
         self.last_skipped = False
         self.last_task_name = None
         self.printed_last_task = False
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
 
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         global DONT_COLORIZE
         DONT_COLORIZE = self.get_option('nocolor')

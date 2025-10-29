@@ -147,7 +147,7 @@ class EthernetNetworkModule(OneViewModuleBase):
             data=dict(type='dict', required=True),
         )
 
-        super(EthernetNetworkModule, self).__init__(additional_arg_spec=argument_spec, validate_etag_support=True)
+        super().__init__(additional_arg_spec=argument_spec, validate_etag_support=True)
 
         self.resource_client = self.oneview_client.ethernet_networks
 

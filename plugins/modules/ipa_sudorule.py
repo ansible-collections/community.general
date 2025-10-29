@@ -205,7 +205,7 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 
 class SudoRuleIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(SudoRuleIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def sudorule_find(self, name):
         return self._post_json(method='sudorule_find', name=None, item={'all': True, 'cn': name})

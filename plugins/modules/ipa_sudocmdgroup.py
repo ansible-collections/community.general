@@ -81,7 +81,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class SudoCmdGroupIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(SudoCmdGroupIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def sudocmdgroup_find(self, name):
         return self._post_json(method='sudocmdgroup_find', name=None, item={'all': True, 'cn': name})

@@ -104,7 +104,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class HostGroupIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(HostGroupIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def hostgroup_find(self, name):
         return self._post_json(method='hostgroup_find', name=None, item={'all': True, 'cn': name})

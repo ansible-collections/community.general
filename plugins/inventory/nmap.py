@@ -145,7 +145,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def __init__(self):
         self._nmap = None
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
     def _populate(self, hosts):
         # Use constructed if applicable
@@ -170,7 +170,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def verify_file(self, path):
 
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             file_name, ext = os.path.splitext(path)
 
             if not ext or ext in C.YAML_FILENAME_EXTENSIONS:
@@ -185,7 +185,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         except ValueError as e:
             raise AnsibleParserError(f'nmap inventory plugin requires the nmap cli tool to work: {e}')
 
-        super(InventoryModule, self).parse(inventory, loader, path, cache=cache)
+        super().parse(inventory, loader, path, cache=cache)
 
         self._read_config_data(path)
 

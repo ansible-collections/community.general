@@ -45,7 +45,7 @@ except ImportError:
 
 class TestGitlabHook(GitlabModuleTestCase):
     def setUp(self):
-        super(TestGitlabHook, self).setUp()
+        super().setUp()
 
         self.moduleUtil = GitLabHook(module=self.mock_module, gitlab_instance=self.gitlab_instance)
 

@@ -101,7 +101,7 @@ def mock_good_connection():
 
 class TestKeycloakRealm(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealm, self).setUp()
+        super().setUp()
         self.module = keycloak_client_rolemapping
 
     def test_map_clientrole_to_group_with_name(self):

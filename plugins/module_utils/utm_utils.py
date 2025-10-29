@@ -21,7 +21,7 @@ from ansible.module_utils.urls import fetch_url
 class UTMModuleConfigurationError(Exception):
 
     def __init__(self, msg, **args):
-        super(UTMModuleConfigurationError, self).__init__(self, msg)
+        super().__init__(self, msg)
         self.msg = msg
         self.module_fail_args = args
 
@@ -49,7 +49,7 @@ class UTMModule(AnsibleModule):
             validate_certs=dict(type='bool', required=False, default=True),
             state=dict(default='present', choices=['present', 'absent'])
         )
-        super(UTMModule, self).__init__(self._merge_specs(default_specs, argument_spec), bypass_checks, no_log,
+        super().__init__(self._merge_specs(default_specs, argument_spec), bypass_checks, no_log,
                                         mutually_exclusive, required_together, required_one_of,
                                         add_file_common_args, supports_check_mode, required_if)
 

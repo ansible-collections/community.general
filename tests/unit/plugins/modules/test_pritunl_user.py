@@ -43,7 +43,7 @@ def mock_pritunl_api(func, **kwargs):
 
 class TestPritunlUser(ModuleTestCase):
     def setUp(self):
-        super(TestPritunlUser, self).setUp()
+        super().setUp()
         self.module = pritunl_user
 
         # Add backward compatibility
@@ -51,7 +51,7 @@ class TestPritunlUser(ModuleTestCase):
             self.assertRegex = self.assertRegexpMatches
 
     def tearDown(self):
-        super(TestPritunlUser, self).tearDown()
+        super().tearDown()
 
     def patch_get_pritunl_users(self, **kwds):
         return patch(

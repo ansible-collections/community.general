@@ -37,7 +37,7 @@ def patch_ipa(**kwargs):
 
 class TestIPAOTPToken(ModuleTestCase):
     def setUp(self):
-        super(TestIPAOTPToken, self).setUp()
+        super().setUp()
         self.module = ipa_otptoken
 
     def _test_base(self, module_args, return_value, mock_calls, changed):

@@ -109,7 +109,7 @@ class NetworkSetModule(OneViewModuleBase):
         data=dict(required=True, type='dict'))
 
     def __init__(self):
-        super(NetworkSetModule, self).__init__(additional_arg_spec=self.argument_spec,
+        super().__init__(additional_arg_spec=self.argument_spec,
                                                validate_etag_support=True)
         self.resource_client = self.oneview_client.network_sets
 

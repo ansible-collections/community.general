@@ -23,7 +23,7 @@ class TestIcinga2Feature(ModuleTestCase):
 
     def setUp(self):
         """Setup."""
-        super(TestIcinga2Feature, self).setUp()
+        super().setUp()
         self.module = icinga2_feature
         self.mock_get_bin_path = patch.object(basic.AnsibleModule, 'get_bin_path', get_bin_path)
         self.mock_get_bin_path.start()
@@ -31,7 +31,7 @@ class TestIcinga2Feature(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestIcinga2Feature, self).tearDown()
+        super().tearDown()
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing."""

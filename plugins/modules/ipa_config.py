@@ -236,7 +236,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class ConfigIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(ConfigIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def config_show(self):
         return self._post_json(method='config_show', name=None)

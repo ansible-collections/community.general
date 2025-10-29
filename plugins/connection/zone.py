@@ -49,7 +49,7 @@ class Connection(ConnectionBase):
     has_tty = False
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
         self.zone = self._play_context.remote_addr
 
@@ -96,7 +96,7 @@ class Connection(ConnectionBase):
 
     def _connect(self):
         """ connect to the zone; nothing to do here """
-        super(Connection, self)._connect()
+        super()._connect()
         if not self._connected:
             display.vvv("THIS IS A LOCAL ZONE DIR", host=self.zone)
             self._connected = True
@@ -123,7 +123,7 @@ class Connection(ConnectionBase):
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
         """ run a command on the zone """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         p = self._buffered_exec_command(cmd)
 
@@ -146,7 +146,7 @@ class Connection(ConnectionBase):
 
     def put_file(self, in_path, out_path):
         """ transfer a file from local to zone """
-        super(Connection, self).put_file(in_path, out_path)
+        super().put_file(in_path, out_path)
         display.vvv(f"PUT {in_path} TO {out_path}", host=self.zone)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
@@ -172,7 +172,7 @@ class Connection(ConnectionBase):
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from zone to local """
-        super(Connection, self).fetch_file(in_path, out_path)
+        super().fetch_file(in_path, out_path)
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self.zone)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
@@ -196,5 +196,5 @@ class Connection(ConnectionBase):
 
     def close(self):
         """ terminate the connection; nothing to do here """
-        super(Connection, self).close()
+        super().close()
         self._connected = False

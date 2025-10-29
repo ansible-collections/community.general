@@ -289,7 +289,7 @@ class Options(dict):
     """opts_string looks like: 'discard,foo=bar,baz=greeble' """
 
     def __init__(self, opts_string):
-        super(Options, self).__init__()
+        super().__init__()
         self.itemlist = []
         if opts_string is not None:
             for opt in opts_string.split(','):
@@ -334,11 +334,11 @@ class Options(dict):
     def __setitem__(self, key, value):
         if key not in self:
             self.itemlist.append(key)
-        super(Options, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def __delitem__(self, key):
         self.itemlist.remove(key)
-        super(Options, self).__delitem__(key)
+        super().__delitem__(key)
 
     def __ne__(self, obj):
         return not (isinstance(obj, Options) and sorted(self.items()) == sorted(obj.items()))

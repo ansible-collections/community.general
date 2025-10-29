@@ -102,7 +102,7 @@ def mock_good_connection():
 
 class TestKeycloakIdentityProvider(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakIdentityProvider, self).setUp()
+        super().setUp()
         self.module = keycloak_identity_provider
 
     def test_create_when_absent(self):

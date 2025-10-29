@@ -358,7 +358,7 @@ class TSSClient(object, metaclass=abc.ABCMeta):
 
 class TSSClientV0(TSSClient):
     def __init__(self, **server_parameters):
-        super(TSSClientV0, self).__init__()
+        super().__init__()
 
         if server_parameters.get("domain"):
             raise AnsibleError("The 'domain' option requires 'python-tss-sdk' version 1.0.0 or greater")
@@ -374,7 +374,7 @@ class TSSClientV0(TSSClient):
 
 class TSSClientV1(TSSClient):
     def __init__(self, **server_parameters):
-        super(TSSClientV1, self).__init__()
+        super().__init__()
 
         authorizer = self._get_authorizer(**server_parameters)
         self._client = SecretServer(

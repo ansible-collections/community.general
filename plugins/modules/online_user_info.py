@@ -54,7 +54,7 @@ from ansible_collections.community.general.plugins.module_utils.online import (
 class OnlineUserInfo(Online):
 
     def __init__(self, module):
-        super(OnlineUserInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'api/v1/user'
 
 

@@ -849,7 +849,7 @@ class CallbackModule(Default):
         return (spec['msg'] is not None) and (spec['msg'] != omit or omit is sentinel)
 
     def _parent_has_callback(self):
-        return hasattr(super(CallbackModule, self), sys._getframe(1).f_code.co_name)
+        return hasattr(super(), sys._getframe(1).f_code.co_name)
 
     def _template(self, loader, template, variables):
         _templar = Templar(loader=loader, variables=variables)
@@ -1027,7 +1027,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_on_any(*args, **kwargs)
+                super().v2_on_any(*args, **kwargs)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self._diy_spec = self._get_output_specification(
@@ -1045,7 +1045,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_failed(result, ignore_errors)
+                super().v2_runner_on_failed(result, ignore_errors)
 
     def v2_runner_on_ok(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1063,7 +1063,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_ok(result)
+                super().v2_runner_on_ok(result)
 
     def v2_runner_on_skipped(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1081,7 +1081,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_skipped(result)
+                super().v2_runner_on_skipped(result)
 
     def v2_runner_on_unreachable(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1099,7 +1099,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_unreachable(result)
+                super().v2_runner_on_unreachable(result)
 
     # not implemented as the call to this is not implemented yet
     def v2_runner_on_async_poll(self, result):
@@ -1130,7 +1130,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_item_on_ok(result)
+                super().v2_runner_item_on_ok(result)
 
     def v2_runner_item_on_failed(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1149,7 +1149,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_item_on_failed(result)
+                super().v2_runner_item_on_failed(result)
 
     def v2_runner_item_on_skipped(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1168,7 +1168,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_item_on_skipped(result)
+                super().v2_runner_item_on_skipped(result)
 
     def v2_runner_retry(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1186,7 +1186,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_retry(result)
+                super().v2_runner_retry(result)
 
     def v2_runner_on_start(self, host, task):
         self._diy_host = host
@@ -1207,7 +1207,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_start(host, task)
+                super().v2_runner_on_start(host, task)
 
     def v2_playbook_on_start(self, playbook):
         self._diy_playbook = playbook
@@ -1225,7 +1225,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_start(playbook)
+                super().v2_playbook_on_start(playbook)
 
     def v2_playbook_on_notify(self, handler, host):
         self._diy_handler = handler
@@ -1246,7 +1246,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_notify(handler, host)
+                super().v2_playbook_on_notify(handler, host)
 
     def v2_playbook_on_no_hosts_matched(self):
         self._diy_spec = self._get_output_specification(
@@ -1259,7 +1259,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_no_hosts_matched()
+                super().v2_playbook_on_no_hosts_matched()
 
     def v2_playbook_on_no_hosts_remaining(self):
         self._diy_spec = self._get_output_specification(
@@ -1272,7 +1272,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_no_hosts_remaining()
+                super().v2_playbook_on_no_hosts_remaining()
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._diy_task = task
@@ -1291,7 +1291,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_task_start(task, is_conditional)
+                super().v2_playbook_on_task_start(task, is_conditional)
 
     # not implemented as the call to this is not implemented yet
     def v2_playbook_on_cleanup_task_start(self, task):
@@ -1314,7 +1314,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_handler_task_start(task)
+                super().v2_playbook_on_handler_task_start(task)
 
     def v2_playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None,
                                    confirm=False, salt_size=None, salt=None, default=None,
@@ -1329,7 +1329,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_vars_prompt(
+                super().v2_playbook_on_vars_prompt(
                     varname, private, prompt, encrypt,
                     confirm, salt_size, salt, default,
                     unsafe
@@ -1359,7 +1359,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_play_start(play)
+                super().v2_playbook_on_play_start(play)
 
     def v2_playbook_on_stats(self, stats):
         self._diy_stats = stats
@@ -1378,7 +1378,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_stats(stats)
+                super().v2_playbook_on_stats(stats)
 
     def v2_playbook_on_include(self, included_file):
         self._diy_included_file = included_file
@@ -1398,7 +1398,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_include(included_file)
+                super().v2_playbook_on_include(included_file)
 
     def v2_on_file_diff(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1416,4 +1416,4 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_on_file_diff(result)
+                super().v2_on_file_diff(result)

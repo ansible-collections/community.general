@@ -16,11 +16,11 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 class TestDiscordModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestDiscordModule, self).setUp()
+        super().setUp()
         self.module = discord
 
     def tearDown(self):
-        super(TestDiscordModule, self).tearDown()
+        super().tearDown()
 
     @pytest.fixture
     def fetch_url_mock(self, mocker):

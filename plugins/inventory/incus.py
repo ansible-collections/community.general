@@ -97,12 +97,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
     NAME = "community.general.incus"
 
     def __init__(self):
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
     def verify_file(self, path):
         valid = False
 
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(("incus.yaml", "incus.yml")):
                 valid = True
             else:
@@ -113,7 +113,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         self._read_config_data(path)
 

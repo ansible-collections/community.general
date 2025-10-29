@@ -13,13 +13,13 @@ from ansible_collections.community.general.plugins.modules import sysupgrade
 class TestSysupgradeModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestSysupgradeModule, self).setUp()
+        super().setUp()
         self.module = sysupgrade
         self.mock_get_bin_path = (patch('ansible.module_utils.basic.AnsibleModule.get_bin_path'))
         self.get_bin_path = self.mock_get_bin_path.start()
 
     def tearDown(self):
-        super(TestSysupgradeModule, self).tearDown()
+        super().tearDown()
         self.mock_get_bin_path.stop()
 
     def test_upgrade_success(self):

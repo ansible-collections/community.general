@@ -81,7 +81,7 @@ def mock_good_connection():
 
 class TestKeycloakRealmRole(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealmRole, self).setUp()
+        super().setUp()
         self.module = keycloak_realm_info
 
     def test_get_public_info(self):

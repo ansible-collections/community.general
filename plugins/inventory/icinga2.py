@@ -110,7 +110,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def __init__(self):
 
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
         # from config
         self.icinga2_url = None
@@ -126,7 +126,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def verify_file(self, path):
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(('icinga2.yaml', 'icinga2.yml')):
                 valid = True
             else:
@@ -274,7 +274,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def parse(self, inventory, loader, path, cache=True):
 
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         # read config from file, this sets 'options'
         self._read_config_data(path)

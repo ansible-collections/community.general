@@ -24,7 +24,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 class TestPritunlUserInfo(ModuleTestCase):
     def setUp(self):
-        super(TestPritunlUserInfo, self).setUp()
+        super().setUp()
         self.module = pritunl_user_info
 
         # Add backward compatibility
@@ -32,7 +32,7 @@ class TestPritunlUserInfo(ModuleTestCase):
             self.assertRegex = self.assertRegexpMatches
 
     def tearDown(self):
-        super(TestPritunlUserInfo, self).tearDown()
+        super().tearDown()
 
     def patch_get_pritunl_users(self, **kwds):
         return patch(

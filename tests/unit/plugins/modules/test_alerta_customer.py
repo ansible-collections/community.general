@@ -69,11 +69,11 @@ def customer_response_page2():
 class TestAlertaCustomerModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestAlertaCustomerModule, self).setUp()
+        super().setUp()
         self.module = alerta_customer
 
     def tearDown(self):
-        super(TestAlertaCustomerModule, self).tearDown()
+        super().tearDown()
 
     @pytest.fixture
     def fetch_url_mock(self, mocker):

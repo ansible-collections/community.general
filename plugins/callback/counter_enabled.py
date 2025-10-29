@@ -47,7 +47,7 @@ class CallbackModule(CallbackBase):
     _previous_batch_total = 0
 
     def __init__(self):
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         self._playbook = ""
         self._play = ""

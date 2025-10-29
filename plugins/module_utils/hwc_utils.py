@@ -25,7 +25,7 @@ from ansible.module_utils.common.text.converters import to_text
 
 class HwcModuleException(Exception):
     def __init__(self, message):
-        super(HwcModuleException, self).__init__()
+        super().__init__()
 
         self._message = message
 
@@ -35,7 +35,7 @@ class HwcModuleException(Exception):
 
 class HwcClientException(Exception):
     def __init__(self, code, message):
-        super(HwcClientException, self).__init__()
+        super().__init__()
 
         self._code = code
         self._message = message
@@ -47,7 +47,7 @@ class HwcClientException(Exception):
 
 class HwcClientException404(HwcClientException):
     def __init__(self, message):
-        super(HwcClientException404, self).__init__(404, message)
+        super().__init__(404, message)
 
     def __str__(self):
         return f"[HwcClientException404] message={self._message}"
@@ -249,7 +249,7 @@ class HwcModule(AnsibleModule):
             )
         )
 
-        super(HwcModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class _DictComparison(object):

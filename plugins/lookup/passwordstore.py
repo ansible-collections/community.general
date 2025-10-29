@@ -302,7 +302,7 @@ def check_output2(*popenargs, **kwargs):
 class LookupModule(LookupBase):
     def __init__(self, loader=None, templar=None, **kwargs):
 
-        super(LookupModule, self).__init__(loader, templar, **kwargs)
+        super().__init__(loader, templar, **kwargs)
         self.realpass = None
 
     def is_real_pass(self):

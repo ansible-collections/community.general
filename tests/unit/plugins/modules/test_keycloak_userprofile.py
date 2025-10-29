@@ -75,7 +75,7 @@ def mock_good_connection():
 
 class TestKeycloakUserprofile(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakUserprofile, self).setUp()
+        super().setUp()
         self.module = keycloak_userprofile
 
     def test_create_when_absent(self):

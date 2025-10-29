@@ -109,7 +109,7 @@ class BecomeModule(BecomeBase):
 
     def build_become_command(self, cmd, shell):
 
-        super(BecomeModule, self).build_become_command(cmd, shell)
+        super().build_become_command(cmd, shell)
 
         # Prompt handling for ``ksu`` is more complicated, this
         # is used to satisfy the connection plugin

@@ -354,7 +354,7 @@ class LaunchCtlTask(metaclass=ABCMeta):
 
 class LaunchCtlStart(LaunchCtlTask):
     def __init__(self, module, service, plist):
-        super(LaunchCtlStart, self).__init__(module, service, plist)
+        super().__init__(module, service, plist)
 
     def runCommand(self):
         state, dummy, dummy, dummy = self.get_state()
@@ -381,7 +381,7 @@ class LaunchCtlStart(LaunchCtlTask):
 
 class LaunchCtlStop(LaunchCtlTask):
     def __init__(self, module, service, plist):
-        super(LaunchCtlStop, self).__init__(module, service, plist)
+        super().__init__(module, service, plist)
 
     def runCommand(self):
         state, dummy, dummy, dummy = self.get_state()
@@ -408,7 +408,7 @@ class LaunchCtlStop(LaunchCtlTask):
 
 class LaunchCtlReload(LaunchCtlTask):
     def __init__(self, module, service, plist):
-        super(LaunchCtlReload, self).__init__(module, service, plist)
+        super().__init__(module, service, plist)
 
     def runCommand(self):
         state, dummy, dummy, dummy = self.get_state()
@@ -423,7 +423,7 @@ class LaunchCtlReload(LaunchCtlTask):
 
 class LaunchCtlUnload(LaunchCtlTask):
     def __init__(self, module, service, plist):
-        super(LaunchCtlUnload, self).__init__(module, service, plist)
+        super().__init__(module, service, plist)
 
     def runCommand(self):
         state, dummy, dummy, dummy = self.get_state()
@@ -432,16 +432,16 @@ class LaunchCtlUnload(LaunchCtlTask):
 
 class LaunchCtlRestart(LaunchCtlReload):
     def __init__(self, module, service, plist):
-        super(LaunchCtlRestart, self).__init__(module, service, plist)
+        super().__init__(module, service, plist)
 
     def runCommand(self):
-        super(LaunchCtlRestart, self).runCommand()
+        super().runCommand()
         self.start()
 
 
 class LaunchCtlList(LaunchCtlTask):
     def __init__(self, module, service):
-        super(LaunchCtlList, self).__init__(module, service, None)
+        super().__init__(module, service, None)
 
     def runCommand(self):
         # Do nothing, the list functionality is done by the

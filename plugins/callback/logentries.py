@@ -218,7 +218,7 @@ class CallbackModule(CallbackBase):
     def __init__(self):
 
         # TODO: allow for alternate posting methods (REST/UDP/agent/etc)
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         # verify dependencies
         if not HAS_SSL:
@@ -235,7 +235,7 @@ class CallbackModule(CallbackBase):
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
 
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         # get options
         try:

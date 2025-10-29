@@ -264,7 +264,7 @@ ndctl_list_N_two_namespaces = """[
 
 class TestPmem(ModuleTestCase):
     def setUp(self):
-        super(TestPmem, self).setUp()
+        super().setUp()
         self.module = pmem_module
 
         self.mock_run_command = (patch('ansible.module_utils.basic.AnsibleModule.run_command'))
@@ -282,7 +282,7 @@ class TestPmem(ModuleTestCase):
         self.pmem_init_env = self.mock_pmem_init_env.start()
 
     def tearDown(self):
-        super(TestPmem, self).tearDown()
+        super().tearDown()
         self.mock_get_bin_path.stop()
         self.mock_run_command.stop()
         self.mock_pmem_is_dcpmm_installed.stop()

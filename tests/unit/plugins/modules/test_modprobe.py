@@ -12,7 +12,7 @@ from ansible_collections.community.general.plugins.modules.modprobe import Modpr
 
 class TestLoadModule(ModuleTestCase):
     def setUp(self):
-        super(TestLoadModule, self).setUp()
+        super().setUp()
 
         self.mock_module_loaded = patch(
             'ansible_collections.community.general.plugins.modules.modprobe.Modprobe.module_loaded'
@@ -26,7 +26,7 @@ class TestLoadModule(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestLoadModule, self).tearDown()
+        super().tearDown()
         self.mock_module_loaded.stop()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
@@ -73,7 +73,7 @@ class TestLoadModule(ModuleTestCase):
 
 class TestUnloadModule(ModuleTestCase):
     def setUp(self):
-        super(TestUnloadModule, self).setUp()
+        super().setUp()
 
         self.mock_module_loaded = patch(
             'ansible_collections.community.general.plugins.modules.modprobe.Modprobe.module_loaded'
@@ -87,7 +87,7 @@ class TestUnloadModule(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestUnloadModule, self).tearDown()
+        super().tearDown()
         self.mock_module_loaded.stop()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
@@ -146,7 +146,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
         if sys.version_info[0] == 3 and sys.version_info[1] < 7:
             self.skipTest("open_mock doesn't support readline in earlier python versions")
 
-        super(TestModuleIsLoadedPersistently, self).setUp()
+        super().setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
 
@@ -154,7 +154,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestModuleIsLoadedPersistently, self).tearDown()
+        super().tearDown()
 
         self.mock_get_bin_path.stop()
 
@@ -220,7 +220,7 @@ class TestPermanentParams(ModuleTestCase):
     def setUp(self):
         if sys.version_info[0] == 3 and sys.version_info[1] < 7:
             self.skipTest("open_mock doesn't support readline in earlier python versions")
-        super(TestPermanentParams, self).setUp()
+        super().setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
 
@@ -228,7 +228,7 @@ class TestPermanentParams(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestPermanentParams, self).tearDown()
+        super().tearDown()
 
         self.mock_get_bin_path.stop()
 
@@ -287,7 +287,7 @@ class TestPermanentParams(ModuleTestCase):
 
 class TestCreateModuleFIle(ModuleTestCase):
     def setUp(self):
-        super(TestCreateModuleFIle, self).setUp()
+        super().setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
 
@@ -295,7 +295,7 @@ class TestCreateModuleFIle(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestCreateModuleFIle, self).tearDown()
+        super().tearDown()
 
         self.mock_get_bin_path.stop()
 
@@ -320,7 +320,7 @@ class TestCreateModuleFIle(ModuleTestCase):
 
 class TestCreateModuleOptionsFIle(ModuleTestCase):
     def setUp(self):
-        super(TestCreateModuleOptionsFIle, self).setUp()
+        super().setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
 
@@ -328,7 +328,7 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestCreateModuleOptionsFIle, self).tearDown()
+        super().tearDown()
 
         self.mock_get_bin_path.stop()
 
@@ -354,7 +354,7 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
 
 class TestDisableOldParams(ModuleTestCase):
     def setUp(self):
-        super(TestDisableOldParams, self).setUp()
+        super().setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
 
@@ -362,7 +362,7 @@ class TestDisableOldParams(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestDisableOldParams, self).tearDown()
+        super().tearDown()
 
         self.mock_get_bin_path.stop()
 
@@ -412,7 +412,7 @@ class TestDisableOldParams(ModuleTestCase):
 
 class TestDisableModulePermanent(ModuleTestCase):
     def setUp(self):
-        super(TestDisableModulePermanent, self).setUp()
+        super().setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
 
@@ -420,7 +420,7 @@ class TestDisableModulePermanent(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestDisableModulePermanent, self).tearDown()
+        super().tearDown()
 
         self.mock_get_bin_path.stop()
 

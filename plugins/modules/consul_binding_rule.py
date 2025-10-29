@@ -141,12 +141,12 @@ class ConsulBindingRuleModule(_ConsulModule):
             raise
 
     def module_to_obj(self, is_update):
-        obj = super(ConsulBindingRuleModule, self).module_to_obj(is_update)
+        obj = super().module_to_obj(is_update)
         del obj["Name"]
         return obj
 
     def prepare_object(self, existing, obj):
-        final = super(ConsulBindingRuleModule, self).prepare_object(existing, obj)
+        final = super().prepare_object(existing, obj)
         name = self.params["name"]
         description = final.pop("Description", "").split(": ", 1)[-1]
         final["Description"] = f"{name}: {description}"

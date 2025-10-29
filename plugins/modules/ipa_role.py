@@ -140,7 +140,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class RoleIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(RoleIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def role_find(self, name):
         return self._post_json(method='role_find', name=None, item={'all': True, 'cn': name})

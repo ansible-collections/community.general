@@ -175,7 +175,7 @@ class CacheModule(BaseCacheModule):
     def __init__(self, *args, **kwargs):
         connection = ['127.0.0.1:11211']
 
-        super(CacheModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.get_option('_uri'):
             connection = self.get_option('_uri')
         self._timeout = self.get_option('_timeout')

@@ -23,7 +23,7 @@ class TestLvgRename(ModuleTestCase):
 
     def setUp(self):
         """Prepare mocks for module testing"""
-        super(TestLvgRename, self).setUp()
+        super().setUp()
 
         self.mock_run_responses = {}
 

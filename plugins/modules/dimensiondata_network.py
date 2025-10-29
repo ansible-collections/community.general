@@ -138,7 +138,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
         Create a new Dimension Data network module.
         """
 
-        super(DimensionDataNetworkModule, self).__init__(
+        super().__init__(
             module=AnsibleModule(
                 argument_spec=DimensionDataModule.argument_spec_with_wait(
                     name=dict(type='str', required=True),

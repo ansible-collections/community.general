@@ -51,7 +51,7 @@ except ImportError:
 
 class TestGitlabRunner(GitlabModuleTestCase):
     def setUp(self):
-        super(TestGitlabRunner, self).setUp()
+        super().setUp()
 
         self.module_util_all = GitLabRunner(module=FakeAnsibleModule({"owned": False}), gitlab_instance=self.gitlab_instance)
         self.module_util_owned = GitLabRunner(module=FakeAnsibleModule({"owned": True}), gitlab_instance=self.gitlab_instance)

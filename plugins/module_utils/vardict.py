@@ -120,11 +120,11 @@ class VarDict(object):
         try:
             return self.__vars__[item].value
         except KeyError:
-            return getattr(super(VarDict, self), item)
+            return getattr(super(), item)
 
     def __setattr__(self, key, value):
         if key == '__vars__':
-            super(VarDict, self).__setattr__(key, value)
+            super().__setattr__(key, value)
         else:
             self.set(key, value)
 

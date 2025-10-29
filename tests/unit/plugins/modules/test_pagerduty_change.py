@@ -15,11 +15,11 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 class TestPagerDutyChangeModule(ModuleTestCase):
     def setUp(self):
-        super(TestPagerDutyChangeModule, self).setUp()
+        super().setUp()
         self.module = pagerduty_change
 
     def tearDown(self):
-        super(TestPagerDutyChangeModule, self).tearDown()
+        super().tearDown()
 
     @pytest.fixture
     def fetch_url_mock(self, mocker):
