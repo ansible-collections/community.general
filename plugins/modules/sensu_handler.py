@@ -208,17 +208,17 @@ def main():
 
     state = module.params['state']
     name = module.params['name']
-    path = '/etc/sensu/conf.d/handlers/{0}.json'.format(name)
+    path = f'/etc/sensu/conf.d/handlers/{name}.json'
 
     if state == 'absent':
         if os.path.exists(path):
             if module.check_mode:
-                msg = '{path} would have been deleted'.format(path=path)
+                msg = f'{path} would have been deleted'
                 module.exit_json(msg=msg, changed=True)
             else:
                 try:
                     os.remove(path)
-                    msg = '{path} deleted successfully'.format(path=path)
+                    msg = f'{path} deleted successfully'
                     module.exit_json(msg=msg, changed=True)
                 except OSError as e:
                     msg = 'Exception when trying to delete {path}: {exception}'
@@ -226,7 +226,7 @@ def main():
                         msg=msg.format(path=path, exception=str(e)))
         else:
             # Idempotency: it is okay if the file doesn't exist
-            msg = '{path} already does not exist'.format(path=path)
+            msg = f'{path} already does not exist'
             module.exit_json(msg=msg)
 
     # Build handler configuration from module arguments
@@ -259,8 +259,7 @@ def main():
         try:
             os.makedirs(os.path.dirname(path))
         except OSError as e:
-            module.fail_json(msg='Unable to create {0}: {1}'.format(os.path.dirname(path),
-                                                                    str(e)))
+            module.fail_json(msg=f'Unable to create {os.path.dirname(path)}: {e}')
 
     if module.check_mode:
         module.exit_json(msg='Handler configuration would have been updated',
@@ -278,8 +277,7 @@ def main():
                              file=path,
                              name=name)
     except (OSError, IOError) as e:
-        module.fail_json(msg='Unable to write file {0}: {1}'.format(path,
-                                                                    str(e)))
+        module.fail_json(msg=f'Unable to write file {path}: {e}')
 
 
 if __name__ == '__main__':

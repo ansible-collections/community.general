@@ -93,7 +93,7 @@ def sensu_subscription(module, path, name, state='present', backup=False):
         else:
             module.fail_json(msg=to_native(e), exception=traceback.format_exc())
     except ValueError:
-        msg = '{path} contains invalid JSON'.format(path=path)
+        msg = f'{path} contains invalid JSON'
         module.fail_json(msg=msg)
 
     if 'client' not in config:

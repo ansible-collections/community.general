@@ -39,7 +39,6 @@ ignore = [
     "UP029",  # Unnecessary builtin import: `open`
     "UP030",  # Use implicit references for positional format fields
     "UP031",  # Use format specifiers instead of percent format
-    "UP032",  # Use f-string instead of `format` call
     "UP034",  # Avoid extraneous parentheses
     "UP035",  # Import from `collections.abc` instead: `Callable`
     "UP036",  # Version block is outdated for minimum Python version

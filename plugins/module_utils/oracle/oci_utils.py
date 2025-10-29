@@ -152,18 +152,16 @@ def get_oci_config(module, service_client_class=None):
     config = {}
 
     config_file = module.params.get("config_file_location")
-    _debug("Config file through module options - {0} ".format(config_file))
+    _debug(f"Config file through module options - {config_file} ")
     if not config_file:
         if "OCI_CONFIG_FILE" in os.environ:
             config_file = os.environ["OCI_CONFIG_FILE"]
             _debug(
-                "Config file through OCI_CONFIG_FILE environment variable - {0}".format(
-                    config_file
-                )
+                f"Config file through OCI_CONFIG_FILE environment variable - {config_file}"
             )
         else:
             config_file = "~/.oci/config"
-            _debug("Config file (fallback) - {0} ".format(config_file))
+            _debug(f"Config file (fallback) - {config_file} ")
 
     config_profile = module.params.get("config_profile_name")
     if not config_profile:
@@ -186,13 +184,11 @@ def get_oci_config(module, service_client_class=None):
             module.fail_json(msg=str(ex))
         else:
             _debug(
-                "Ignore {0} as the auth_type is set to instance_principal".format(
-                    str(ex)
-                )
+                f"Ignore {ex} as the auth_type is set to instance_principal"
             )
             # if instance_principal auth is used, an empty 'config' map is used below.
 
-    config["additional_user_agent"] = "Oracle-Ansible/{0}".format(__version__)
+    config["additional_user_agent"] = f"Oracle-Ansible/{__version__}"
     # Merge any overrides through other IAM options
     _merge_auth_option(
         config,
@@ -276,9 +272,7 @@ def create_service_client(module, service_client_class):
         except Exception as ex:
             message = (
                 "Failed retrieving certificates from localhost. Instance principal based authentication is only"
-                "possible from within OCI compute instances. Exception: {0}".format(
-                    str(ex)
-                )
+                f"possible from within OCI compute instances. Exception: {ex}"
             )
             module.fail_json(msg=message)
 
@@ -289,7 +283,7 @@ def create_service_client(module, service_client_class):
         oci.config.validate_config(config, **kwargs)
     except oci.exceptions.InvalidConfig as ic:
         module.fail_json(
-            msg="Invalid OCI configuration. Exception: {0}".format(str(ic))
+            msg=f"Invalid OCI configuration. Exception: {ic}"
         )
 
     # Create service client class with the signer
@@ -317,17 +311,17 @@ def _merge_auth_option(
 ):
     """Merge the values for an authentication attribute from ansible module options and
     environment variables with the values specified in a configuration file"""
-    _debug("Merging {0}".format(module_option_name))
+    _debug(f"Merging {module_option_name}")
 
     auth_attribute = module.params.get(module_option_name)
     _debug(
-        "\t Ansible module option {0} = {1}".format(module_option_name, auth_attribute)
+        f"\t Ansible module option {module_option_name} = {auth_attribute}"
     )
     if not auth_attribute:
         if env_var_name in os.environ:
             auth_attribute = os.environ[env_var_name]
             _debug(
-                "\t Environment variable {0} = {1}".format(env_var_name, auth_attribute)
+                f"\t Environment variable {env_var_name} = {auth_attribute}"
             )
 
     # An authentication attribute has been provided through an env-variable or an ansible
@@ -335,9 +329,7 @@ def _merge_auth_option(
     # config file [profile].
     if auth_attribute:
         _debug(
-            "Updating config attribute {0} -> {1} ".format(
-                config_attr_name, auth_attribute
-            )
+            f"Updating config attribute {config_attr_name} -> {auth_attribute} "
         )
         config.update({config_attr_name: auth_attribute})
 
@@ -657,14 +649,14 @@ def add_tags_to_model_class(model, freeform_tags, defined_tags):
     """
     try:
         if freeform_tags is not None:
-            _debug("Model {0} set freeform tags to {1}".format(model, freeform_tags))
+            _debug(f"Model {model} set freeform tags to {freeform_tags}")
             model.__setattr__("freeform_tags", freeform_tags)
 
         if defined_tags is not None:
-            _debug("Model {0} set defined tags to {1}".format(model, defined_tags))
+            _debug(f"Model {model} set defined tags to {defined_tags}")
             model.__setattr__("defined_tags", defined_tags)
     except AttributeError as ae:
-        _debug("Model {0} doesn't support tags. Error {1}".format(model, ae))
+        _debug(f"Model {model} doesn't support tags. Error {ae}")
 
     return model
 
@@ -703,7 +695,7 @@ def check_and_create_resource(
     """
 
     if module.params.get("force_create", None):
-        _debug("Force creating {0}".format(resource_type))
+        _debug(f"Force creating {resource_type}")
         result = call_with_backoff(create_fn, **kwargs_create)
         return result
 
@@ -738,16 +730,14 @@ def check_and_create_resource(
         default_attribute_values["defined_tags"] = {}
     resource_matched = None
     _debug(
-        "Trying to find a match within {0} existing resources".format(
-            len(existing_resources)
-        )
+        f"Trying to find a match within {len(existing_resources)} existing resources"
     )
 
     for resource in existing_resources:
         if _is_resource_active(resource, dead_states):
             _debug(
-                "Comparing user specified values {0} against an existing resource's "
-                "values {1}".format(module.params, to_dict(resource))
+                f"Comparing user specified values {module.params} against an existing resource's "
+                f"values {to_dict(resource)}"
             )
             if does_existing_resource_match_user_inputs(
                 to_dict(resource),
@@ -760,7 +750,7 @@ def check_and_create_resource(
                 break
 
     if resource_matched:
-        _debug("Resource with same attributes found: {0}.".format(resource_matched))
+        _debug(f"Resource with same attributes found: {resource_matched}.")
         result[resource_type] = resource_matched
         result["changed"] = False
     else:
@@ -791,7 +781,7 @@ def _get_attributes_to_consider(exclude_attributes, model, module):
         # Temporarily removing node_count as the existing resource does not reflect it
         if "node_count" in attributes_to_consider:
             attributes_to_consider.remove("node_count")
-    _debug("attributes to consider: {0}".format(attributes_to_consider))
+    _debug(f"attributes to consider: {attributes_to_consider}")
     return attributes_to_consider
 
 
@@ -842,7 +832,7 @@ def create_resource(resource_type, create_fn, kwargs_create, module):
     result = dict(changed=False)
     try:
         resource = to_dict(call_with_backoff(create_fn, **kwargs_create).data)
-        _debug("Created {0}, {1}".format(resource_type, resource))
+        _debug(f"Created {resource_type}, {resource}")
         result["changed"] = True
         result[resource_type] = resource
         return result
@@ -890,10 +880,8 @@ def does_existing_resource_match_user_inputs(
                 )
                 if not res[0]:
                     _debug(
-                        "Mismatch on attribute '{0}'. User provided value is {1} & existing resource's value"
-                        "is {2}.".format(
-                            attr, user_provided_value_for_attr, resources_value_for_attr
-                        )
+                        f"Mismatch on attribute '{attr}'. User provided value is {user_provided_value_for_attr} & existing resource's value"
+                        f"is {resources_value_for_attr}."
                     )
                     return False
             else:
@@ -922,10 +910,8 @@ def does_existing_resource_match_user_inputs(
 
         else:
             _debug(
-                "Attribute {0} is in the create model of resource {1}"
-                "but doesn't exist in the get model of the resource".format(
-                    attr, existing_resource.__class__
-                )
+                f"Attribute {attr} is in the create model of resource {existing_resource.__class__}"
+                "but doesn't exist in the get model of the resource"
             )
     return True
 
@@ -1151,13 +1137,8 @@ def are_dicts_equal(
         if sub_attr in user_provided_dict:
             if existing_resource_dict[sub_attr] != user_provided_dict[sub_attr]:
                 _debug(
-                    "Failed to match: Existing resource's attr {0} sub-attr {1} value is {2}, while user "
-                    "provided value is {3}".format(
-                        option_name,
-                        sub_attr,
-                        existing_resource_dict[sub_attr],
-                        user_provided_dict.get(sub_attr, None),
-                    )
+                    f"Failed to match: Existing resource's attr {option_name} sub-attr {sub_attr} value is {existing_resource_dict[sub_attr]}, while user "
+                    f"provided value is {user_provided_dict.get(sub_attr, None)}"
                 )
                 return False
 
@@ -1179,12 +1160,11 @@ def are_dicts_equal(
                 else:
                     # No default value specified by module author for sub_attr
                     _debug(
-                        "Consider as match: Existing resource's attr {0} sub-attr {1} value is {2}, while user did"
+                        f"Consider as match: Existing resource's attr {option_name} sub-attr {sub_attr} value is"
+                        f" {existing_resource_dict[sub_attr]}, while user did"
                         "not provide a value for it. The module author also has not provided a default value for it"
                         "or marked it for exclusion. So ignoring this attribute during matching and continuing with"
-                        "other checks".format(
-                            option_name, sub_attr, existing_resource_dict[sub_attr]
-                        )
+                        "other checks"
                     )
 
     return True
@@ -1382,9 +1362,7 @@ def wait_for_resource_lifecycle_state(
             time.sleep(15)
         if kwargs_get:
             _debug(
-                "Waiting for resource to reach READY state. get_args: {0}".format(
-                    kwargs_get
-                )
+                f"Waiting for resource to reach READY state. get_args: {kwargs_get}"
             )
             response_get = call_with_backoff(get_fn, **kwargs_get)
         else:
@@ -1413,9 +1391,7 @@ def wait_on_work_request(client, response, module):
     try:
         if module.params.get("wait", None):
             _debug(
-                "Waiting for work request with id {0} to reach SUCCEEDED state.".format(
-                    response.data.id
-                )
+                f"Waiting for work request with id {response.data.id} to reach SUCCEEDED state."
             )
             wait_response = oci.wait_until(
                 client,
@@ -1427,9 +1403,7 @@ def wait_on_work_request(client, response, module):
             )
         else:
             _debug(
-                "Waiting for work request with id {0} to reach ACCEPTED state.".format(
-                    response.data.id
-                )
+                f"Waiting for work request with id {response.data.id} to reach ACCEPTED state."
             )
             wait_response = oci.wait_until(
                 client,
@@ -1497,7 +1471,7 @@ def delete_and_wait(
                     result["changed"] = True
                     resource = to_dict(call_with_backoff(get_fn, **kwargs_get).data)
                 else:
-                    _debug("Deleted {0}, {1}".format(resource_type, resource))
+                    _debug(f"Deleted {resource_type}, {resource}")
                     result["changed"] = True
 
                     if wait_applicable and module.params.get("wait", None):
@@ -1540,9 +1514,7 @@ def delete_and_wait(
             result[resource_type] = resource
         else:
             _debug(
-                "Resource {0} with {1} already deleted. So returning changed=False".format(
-                    resource_type, kwargs_get
-                )
+                f"Resource {resource_type} with {kwargs_get} already deleted. So returning changed=False"
             )
     except ServiceError as ex:
         # DNS API throws a 400 InvalidParameter when a zone id is provided for zone_name_or_id and if the zone
@@ -1550,9 +1522,7 @@ def delete_and_wait(
         if isinstance(client, oci.dns.DnsClient):
             if ex.status == 400 and ex.code == "InvalidParameter":
                 _debug(
-                    "Resource {0} with {1} already deleted. So returning changed=False".format(
-                        resource_type, kwargs_get
-                    )
+                    f"Resource {resource_type} with {kwargs_get} already deleted. So returning changed=False"
                 )
         elif ex.status != 404:
             module.fail_json(msg=ex.message)
@@ -1623,10 +1593,8 @@ def update_model_with_user_options(curr_model, update_model, module):
             if user_provided_value is not None:
                 # Only update if a user has specified a value for an option
                 _debug(
-                    "User requested {0} for attribute {1}, whereas the current value is {2}. So adding it "
-                    "to the update model".format(
-                        user_provided_value, attr, curr_value_for_attr
-                    )
+                    f"User requested {user_provided_value} for attribute {attr}, whereas the current value is {curr_value_for_attr}. So adding it "
+                    "to the update model"
                 )
                 setattr(update_model, attr, user_provided_value)
             else:
