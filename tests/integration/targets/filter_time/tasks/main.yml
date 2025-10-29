@@ -113,3 +113,12 @@
     that:
       - res is failed
       - "'to_time_unit() got unknown keyword arguments' in res.msg"
+
+- name: test time_delta filter
+  assert:
+    that:
+      - "('2025-03-12 18:00:00' | community.general.time_delta(days=-1)) == '2025-03-11 18:00:00'"
+      - "('2025-03-12 18:00:00' | community.general.time_delta(minutes=-60)) == '2025-03-12 17:00:00'"
+      - "('2025-03-12 18:00:00' | community.general.time_delta(hours=-1)) == '2025-03-12 17:00:00'"
+      - "('2025-03-12 18:00:00' | community.general.time_delta(weeks=-1)) == '2025-03-05 18:00:00'"
+      - "('2025/03/12' | community.general.time_delta(days=-30, date_format='%Y/%m/%d')) == '2025-02-10 00:00:00'"

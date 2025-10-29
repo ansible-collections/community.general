@@ -1,0 +1,75 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: time_delta
+  short_description: Calculate datetime based upon the user given timedelta
+  version_added: 10.6.0
+  description:
+    - Calculate a new date/time by applying a time delta to a given datetime string.
+  options:
+    _input:
+      description:
+        - The time string to calculate timedelta from.
+        - The format should match the O(date_format) unless specified otherwise.
+      type: string
+      required: true
+    date_format:
+      description:
+        - The format to parse the given input.
+        - Defaults to "%Y-%m-%d %H:%M:%S".
+        - You can specify your own format if the datetime string is in a different format.
+        - See Python 3 datetime format codes for more information.
+      type: string
+    days:
+      type: integer
+      description:
+        - The number of days to add or subtract.
+        - Default is 0.
+    microseconds:
+      type: integer
+      description:
+        - The number of microseconds to add or subtract.
+        - Default is 0.
+    milliseconds:
+      type: integer
+      description:
+        - The number of milliseconds to add or subtract.
+        - Default is 0.
+    minutes:
+      type: integer
+      description:
+        - The number of minutes to add or subtract.
+        - Default is 0.
+    hours:
+      type: integer
+      description:
+        - The number of hours to add or subtract.
+        - Default is 0.
+    weeks:
+      type: integer
+      description:
+        - The number of weeks to add or subtract.
+        - Default is 0.
+  author:
+    - Abhijeet Kasurde (@Akasurde)
+
+EXAMPLES: |
+
+  tomorrow: "{{ '2025-03-12 18:00:00' | community.general.time_delta(days=1, date_format='%Y-%m-%d %H:%M:%S') }}"
+  # => "2025-03-13T18:00:00"
+
+  yesterday: "{{ '2025-03-12 18:00:00' | community.general.time_delta(days=-1) }}"
+  # => "2025-03-11T18:00:00"
+
+  a_month_ago: "{{ '2025/03/12' | community.general.time_delta(days=-30, date_format='%Y/%m/%d') }}"
+  # => "2025-02-10T00:00:00"
+
+RETURN:
+  _value:
+    description:
+      - Date string after applying the delta in ISO 8601 format.
+      - Raises AnsibleFilterError on failing to parse the datetime string.
+    type: string
