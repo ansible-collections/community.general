@@ -347,7 +347,7 @@ RHEV_UNAVAILABLE = 2
 RHEV_TYPE_OPTS = ['desktop', 'host', 'server']
 STATE_OPTS = ['absent', 'cd', 'down', 'info', 'ping', 'present', 'restart', 'up']
 
-msg = []
+msg: list[str] = []
 changed = False
 failed = False
 
@@ -1258,7 +1258,7 @@ def setChanged():
     changed = True
 
 
-def setMsg(message):
+def setMsg(message: str) -> None:
     msg.append(message)
 
 

@@ -114,14 +114,7 @@ EXAMPLES = r"""
     msg: Task completed ... with feeling.
 """
 
-try:
-    from html import escape as html_escape
-except ImportError:
-    # Python-3.2 or later
-    import cgi
-
-    def html_escape(text, quote=True):
-        return cgi.escape(text, quote)
+from html import escape as html_escape
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url

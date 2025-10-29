@@ -19,12 +19,11 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
     now,
 )
 
-SCALEWAY_SECRET_IMP_ERR = None
+SCALEWAY_SECRET_IMP_ERR: str | None = None
 try:
     from passlib.hash import argon2
     HAS_SCALEWAY_SECRET_PACKAGE = True
 except Exception:
-    argon2 = None
     SCALEWAY_SECRET_IMP_ERR = traceback.format_exc()
     HAS_SCALEWAY_SECRET_PACKAGE = False
 

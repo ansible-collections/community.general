@@ -36,7 +36,7 @@ try:
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing
-    GitlabModuleTestCase = object
+    GitlabModuleTestCase = object  # type: ignore
     resp_list_project_access_tokens = _dummy
     resp_create_project_access_tokens = _dummy
     resp_revoke_project_access_tokens = _dummy

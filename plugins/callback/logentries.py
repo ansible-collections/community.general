@@ -206,7 +206,7 @@ else:
             sock.connect((self.LE_API, self.LE_TLS_PORT))
             self._conn = sock
 
-    SocketAppender = TLSSocketAppender
+    SocketAppender = TLSSocketAppender  # type: ignore
 
 
 class CallbackModule(CallbackBase):

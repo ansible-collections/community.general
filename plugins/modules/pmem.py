@@ -209,6 +209,7 @@ import re
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, human_to_bytes
 
+XMLTODICT_LIBRARY_IMPORT_ERROR: str | None
 try:
     import xmltodict
 except ImportError:

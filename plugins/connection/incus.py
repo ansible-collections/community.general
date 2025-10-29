@@ -106,10 +106,10 @@ class Connection(ConnectionBase):
                               host=self._instance())
             self._connected = True
 
-    def _build_command(self, cmd) -> str:
+    def _build_command(self, cmd) -> list[str]:
         """build the command to execute on the incus host"""
 
-        exec_cmd = [
+        exec_cmd: list[str] = [
             self._incus_cmd,
             "--project", self.get_option("project"),
             "exec",

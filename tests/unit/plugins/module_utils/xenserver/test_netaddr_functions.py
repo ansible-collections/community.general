@@ -157,13 +157,13 @@ def test_is_valid_ip_prefix(xenserver, ip_prefix, result):
     assert xenserver.is_valid_ip_prefix(ip_prefix) is result
 
 
-@pytest.mark.parametrize('ip_prefix, ip_netmask', testcase_ip_prefix_to_netmask['params'], ids=testcase_ip_prefix_to_netmask['ids'])
+@pytest.mark.parametrize('ip_prefix, ip_netmask', testcase_ip_prefix_to_netmask['params'], ids=testcase_ip_prefix_to_netmask['ids'])  # type: ignore
 def test_ip_prefix_to_netmask(xenserver, ip_prefix, ip_netmask):
     """Tests ip prefix to netmask conversion."""
     assert xenserver.ip_prefix_to_netmask(ip_prefix) == ip_netmask
 
 
-@pytest.mark.parametrize('ip_netmask, ip_prefix', testcase_ip_netmask_to_prefix['params'], ids=testcase_ip_netmask_to_prefix['ids'])
+@pytest.mark.parametrize('ip_netmask, ip_prefix', testcase_ip_netmask_to_prefix['params'], ids=testcase_ip_netmask_to_prefix['ids'])  # type: ignore
 def test_ip_netmask_to_prefix(xenserver, ip_netmask, ip_prefix):
     """Tests ip netmask to prefix conversion."""
     assert xenserver.ip_netmask_to_prefix(ip_netmask) == ip_prefix

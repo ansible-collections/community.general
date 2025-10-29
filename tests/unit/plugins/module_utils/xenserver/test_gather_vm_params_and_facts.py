@@ -25,7 +25,7 @@ testcase_gather_vm_params_and_facts = {
 }
 
 
-@pytest.mark.parametrize('vm_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])
+@pytest.mark.parametrize('vm_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])  # type: ignore
 def test_gather_vm_params_bad_vm_ref(fake_ansible_module, xenserver, vm_ref):
     """Tests return of empty dict on bad vm_ref."""
     assert xenserver.gather_vm_params(fake_ansible_module, vm_ref) == {}
@@ -38,8 +38,8 @@ def test_gather_vm_facts_no_vm_params(fake_ansible_module, xenserver):
 
 
 @pytest.mark.parametrize('fixture_data_from_file',
-                         testcase_gather_vm_params_and_facts['params'],
-                         ids=testcase_gather_vm_params_and_facts['ids'],
+                         testcase_gather_vm_params_and_facts['params'],  # type: ignore
+                         ids=testcase_gather_vm_params_and_facts['ids'],  # type: ignore
                          indirect=True)
 def test_gather_vm_params_and_facts(mocker, fake_ansible_module, XenAPI, xenserver, fixture_data_from_file):
     """Tests proper parsing of VM parameters and facts."""

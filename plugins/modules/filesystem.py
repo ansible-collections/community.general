@@ -201,16 +201,16 @@ class Device(object):
 
 class Filesystem(object):
 
-    MKFS = None
-    MKFS_FORCE_FLAGS = []
-    MKFS_SET_UUID_OPTIONS = None
-    MKFS_SET_UUID_EXTRA_OPTIONS = []
-    INFO = None
-    GROW = None
-    GROW_MAX_SPACE_FLAGS = []
+    MKFS: str | None = None
+    MKFS_FORCE_FLAGS: list[str] | None = []
+    MKFS_SET_UUID_OPTIONS: list[str] | None = None
+    MKFS_SET_UUID_EXTRA_OPTIONS: list[str] | None = []
+    INFO: str | None = None
+    GROW: str | None = None
+    GROW_MAX_SPACE_FLAGS: list[str] | None = []
     GROW_MOUNTPOINT_ONLY = False
-    CHANGE_UUID = None
-    CHANGE_UUID_OPTION = None
+    CHANGE_UUID: str | None = None
+    CHANGE_UUID_OPTION: str | None = None
     CHANGE_UUID_OPTION_HAS_ARG = True
 
     LANG_ENV = {'LANG': 'C', 'LC_ALL': 'C', 'LC_MESSAGES': 'C'}

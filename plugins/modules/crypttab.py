@@ -166,10 +166,11 @@ def main():
 
 
 class Crypttab(object):
-    _lines = []
+    _lines: list[str]
 
     def __init__(self, path):
         self.path = path
+        self._lines = []
         if not os.path.exists(path):
             if not os.path.exists(os.path.dirname(path)):
                 os.makedirs(os.path.dirname(path))

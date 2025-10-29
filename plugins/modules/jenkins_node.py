@@ -164,7 +164,7 @@ IS_PYTHON_2 = sys.version_info[0] <= 2
 
 
 class JenkinsNode:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
 
         self.name = module.params['name']
@@ -174,7 +174,7 @@ class JenkinsNode:
         self.url = module.params['url']
         self.num_executors = module.params['num_executors']
         self.labels = module.params['labels']
-        self.offline_message = module.params['offline_message']  # type: str | None
+        self.offline_message: str | None = module.params['offline_message']
 
         if self.offline_message is not None:
             self.offline_message = self.offline_message.strip()

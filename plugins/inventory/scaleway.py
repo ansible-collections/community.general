@@ -118,6 +118,7 @@ variables:
 import os
 import json
 
+YAML_IMPORT_ERROR: ImportError | None
 try:
     import yaml
 except ImportError as exc:

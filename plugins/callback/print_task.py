@@ -28,7 +28,7 @@ try:
     from yaml import CSafeDumper as SafeDumper
     from yaml import CSafeLoader as SafeLoader
 except ImportError:
-    from yaml import SafeDumper, SafeLoader
+    from yaml import SafeDumper, SafeLoader  # type: ignore
 
 from ansible.plugins.callback import CallbackBase
 

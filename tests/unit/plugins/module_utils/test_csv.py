@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils import csv
@@ -112,7 +114,7 @@ INVALID_CSV = [
     ),
 ]
 
-INVALID_DIALECT = [
+INVALID_DIALECT: list[tuple[str, t.Any, t.Any, str]] = [
     (
         'invalid',
         {},
@@ -153,7 +155,7 @@ def test_invalid_csv(data, dialect, dialect_params, fieldnames):
 
 
 @pytest.mark.parametrize("dialect,dialect_params,fieldnames,data", INVALID_DIALECT)
-def test_invalid_dialect(data, dialect, dialect_params, fieldnames):
+def test_invalid_dialect(data: str, dialect: t.Any, dialect_params: t.Any, fieldnames: str) -> None:
     result = False
 
     try:

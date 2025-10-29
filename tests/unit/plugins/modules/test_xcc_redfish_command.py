@@ -436,7 +436,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                     with self.assertRaises(AnsibleFailJson) as result:
                         module.main()
 
-    def test_module_command_PostResource_fail_when_no_requestbody(self):
+    def test_module_command_PostResource_fail_when_no_requestbody_2(self):
         with set_module_args({
             'category': 'Raw',
             'command': 'PostResource',

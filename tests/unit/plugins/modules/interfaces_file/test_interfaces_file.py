@@ -373,7 +373,7 @@ class TestInterfacesFileModule(unittest.TestCase):
             iface_options = interfaces_file.get_interface_options(testcases[testname]["iface_lines"])
             self.assertEqual(testcases[testname]["iface_options"], iface_options)
 
-    def test_get_interface_options(self):
+    def test_get_interface_options_2(self):
         testcases = {
             "select address": {
                 "iface_options": [

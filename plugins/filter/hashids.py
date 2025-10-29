@@ -16,7 +16,7 @@ from ansible.module_utils.common.collections import is_sequence
 try:
     from ansible.errors import AnsibleTypeError
 except ImportError:
-    from ansible.errors import AnsibleFilterTypeError as AnsibleTypeError
+    from ansible.errors import AnsibleFilterTypeError as AnsibleTypeError  # type: ignore
 
 try:
     from hashids import Hashids

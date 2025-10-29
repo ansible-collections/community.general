@@ -145,6 +145,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.plugins.callback import CallbackBase
 
+OTEL_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from opentelemetry import trace
     from opentelemetry.trace import SpanKind

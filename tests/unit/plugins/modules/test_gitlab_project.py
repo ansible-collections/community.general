@@ -29,7 +29,7 @@ try:
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing
-    GitlabModuleTestCase = object
+    GitlabModuleTestCase = object  # type: ignore
     resp_get_group = _dummy
     resp_get_project_by_name = _dummy
     resp_create_project = _dummy

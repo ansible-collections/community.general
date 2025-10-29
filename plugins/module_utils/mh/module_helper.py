@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import typing as t
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
@@ -13,13 +14,16 @@ from ansible_collections.community.general.plugins.module_utils.mh.base import M
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
+if t.TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
-    facts_name = None
-    output_params = ()
-    diff_params = ()
-    change_params = ()
-    facts_params = ()
+    facts_name: str | None = None
+    output_params: Sequence[str] = ()
+    diff_params: Sequence[str] = ()
+    change_params: Sequence[str] = ()
+    facts_params: Sequence[str] = ()
 
     def __init__(self, module=None):
         super(ModuleHelper, self).__init__(module)

@@ -29,7 +29,7 @@ try:
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing
-    GitlabModuleTestCase = object
+    GitlabModuleTestCase = object  # type: ignore
     resp_get_group = _dummy
     resp_get_missing_group = _dummy
     resp_create_group = _dummy
@@ -58,7 +58,7 @@ class TestGitlabGroup(GitlabModuleTestCase):
         self.assertEqual(rvalue, True)
 
     @with_httmock(resp_get_missing_group)
-    def test_exist_group(self):
+    def test_exist_group_2(self):
         rvalue = self.moduleUtil.exists_group(1)
 
         self.assertEqual(rvalue, False)

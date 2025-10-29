@@ -7,8 +7,8 @@ from __future__ import annotations
 
 
 class StateMixin(object):
-    state_param = 'state'
-    default_state = None
+    state_param: str = 'state'
+    default_state: str | None = None
 
     def _state(self):
         state = self.module.params.get(self.state_param)

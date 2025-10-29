@@ -179,6 +179,7 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
+IPADDRESS_IMPORT_ERROR: ImportError | None
 try:
     import ipaddress
 except ImportError as exc:

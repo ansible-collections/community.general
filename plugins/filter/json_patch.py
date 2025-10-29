@@ -3,17 +3,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
+
+import typing as t
 from json import loads
-from typing import TYPE_CHECKING
 from ansible.errors import AnsibleFilterError
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from typing import Any, Callable, Union
 
+JSONPATCH_IMPORT_ERROR: ImportError | None
 try:
     import jsonpatch
-
 except ImportError as exc:
     HAS_LIB = False
     JSONPATCH_IMPORT_ERROR = exc
@@ -82,7 +83,7 @@ class FilterModule:
                 "You need to install 'jsonpatch' package prior to running 'json_patch' filter"
             ) from JSONPATCH_IMPORT_ERROR
 
-        args = {"op": op, "path": path}
+        args: dict[str, t.Any] = {"op": op, "path": path}
         from_arg = kwargs.pop("from", None)
         fail_test = kwargs.pop("fail_test", False)
 

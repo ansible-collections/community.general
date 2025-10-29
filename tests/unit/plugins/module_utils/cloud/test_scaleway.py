@@ -36,7 +36,7 @@ class SecretVariablesTestCase(unittest.TestCase):
 
         self.assertEqual(SecretVariables.list_to_dict(source, hashed=True), expect)
 
-    def test_list_to_dict(self):
+    def test_list_to_dict_2(self):
         source = [
             dict(key="secret1", value="value1"),
             dict(key="secret2", value="value2")

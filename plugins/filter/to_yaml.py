@@ -11,15 +11,16 @@ from yaml import dump
 try:
     from yaml.cyaml import CSafeDumper as SafeDumper
 except ImportError:
-    from yaml import SafeDumper
+    from yaml import SafeDumper  # type: ignore
 
 from ansible.module_utils.common.collections import is_sequence
 try:
     # This is ansible-core 2.19+
     from ansible.utils.vars import transform_to_native_types
     from ansible.parsing.vault import VaultHelper, VaultLib
+    HAS_TRANSFORM_TO_NATIVE_TYPES = True
 except ImportError:
-    transform_to_native_types = None
+    HAS_TRANSFORM_TO_NATIVE_TYPES = False
 
 from ansible.parsing.yaml.objects import AnsibleVaultEncryptedUnicode
 from ansible.utils.unsafe_proxy import AnsibleUnsafe
@@ -31,7 +32,7 @@ def _to_native_types_compat(value: t.Any, *, redact_value: str | None) -> t.Any:
         return value
     if isinstance(value, AnsibleUnsafe):
         # This only works up to ansible-core 2.18:
-        return _to_native_types_compat(value._strip_unsafe(), redact_value=redact_value)
+        return _to_native_types_compat(value._strip_unsafe(), redact_value=redact_value)  # type: ignore
         # But that's fine, since this code path isn't taken on ansible-core 2.19+ anyway.
     if isinstance(value, Mapping):
         return {
@@ -74,10 +75,10 @@ def remove_all_tags(value: t.Any, *, redact_sensitive_values: bool = False) -> t
 
     If ``redact_sensitive_values`` is ``True``, all sensitive values will be redacted.
     """
-    if transform_to_native_types is not None:
+    if HAS_TRANSFORM_TO_NATIVE_TYPES:
         return _to_native_types(value, redact=redact_sensitive_values)
 
-    return _to_native_types_compat(
+    return _to_native_types_compat(  # type: ignore[unreachable]
         value,
         redact_value="<redacted>" if redact_sensitive_values else None,  # same string as in ansible-core 2.19 by transform_to_native_types()
     )

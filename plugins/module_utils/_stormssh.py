@@ -11,10 +11,11 @@ import traceback
 from operator import itemgetter
 
 
+PARAMIKO_IMPORT_ERROR: str | None
 try:
     from paramiko.config import SSHConfig
 except ImportError:
-    SSHConfig = object
+    SSHConfig = object  # type: ignore
     HAS_PARAMIKO = False
     PARAMIKO_IMPORT_ERROR = traceback.format_exc()
 else:
