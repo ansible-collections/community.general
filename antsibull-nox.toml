@@ -22,6 +22,8 @@ stable_branches = [ "stable-*" ]
 [sessions.lint]
 run_isort = false
 run_black = false
+run_ruff_check = true
+ruff_check_config = "ruff.toml"
 run_flake8 = false
 run_pylint = false
 run_yamllint = true
