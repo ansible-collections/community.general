@@ -1,0 +1,4 @@
+security_fixes:
+  - "keycloak_user - the parameter ``credentials[].value`` is now marked as ``no_log=true``. Before it was logged by Ansible, unless the task was marked as ``no_log: true``.
+     Since this parameter can be used for passwords, this resulted in credential leaking
+     (https://github.com/ansible-collections/community.general/issues/11000, https://github.com/ansible-collections/community.general/pull/11005)."
