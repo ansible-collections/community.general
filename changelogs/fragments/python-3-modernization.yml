@@ -1,6 +1,8 @@
 minor_changes:
   - >-
-    Modernize code for Python 3.7+
+    Modernize code for Python 3.7+.
+    This includes code reformatting, and adding new checks to CI, including a type checker (mypy).
+    Most of the code does not have type hints yet, but now it is possible to add typing hints and have these validated
     (https://github.com/ansible-collections/community.general/pull/10285,
     https://github.com/ansible-collections/community.general/pull/10886,
     https://github.com/ansible-collections/community.general/pull/10891,
