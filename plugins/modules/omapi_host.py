@@ -144,7 +144,7 @@ except ImportError:
     pureomapi_found = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 
 
 class OmapiHostManager:
@@ -175,15 +175,18 @@ class OmapiHostManager:
 
     @staticmethod
     def unpack_facts(obj):
-        result = dict(obj)
+        result = {}
+        for k, v in dict(obj).items():
+            result[to_text(k)] = v
+
         if 'hardware-address' in result:
-            result['hardware-address'] = to_native(unpack_mac(result[to_bytes('hardware-address')]))
+            result['hardware-address'] = to_native(unpack_mac(result['hardware-address']))
 
         if 'ip-address' in result:
-            result['ip-address'] = to_native(unpack_ip(result[to_bytes('ip-address')]))
+            result['ip-address'] = to_native(unpack_ip(result['ip-address']))
 
         if 'hardware-type' in result:
-            result['hardware-type'] = struct.unpack("!I", result[to_bytes('hardware-type')])
+            result['hardware-type'] = struct.unpack("!I", result['hardware-type'])
 
         return result
 
@@ -231,8 +234,8 @@ class OmapiHostManager:
             response_obj = self.unpack_facts(host_response.obj)
             fields_to_update = {}
 
-            if to_bytes('ip-address', errors='surrogate_or_strict') not in response_obj or \
-                    unpack_ip(response_obj[to_bytes('ip-address', errors='surrogate_or_strict')]) != self.module.params['ip']:
+            if 'ip-address' not in response_obj or \
+                    response_obj['ip-address'] != self.module.params['ip']:
                 fields_to_update['ip-address'] = pack_ip(self.module.params['ip'])
 
             # Name cannot be changed
