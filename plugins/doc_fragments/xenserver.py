@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     # Common parameters for XenServer modules
     DOCUMENTATION = r"""
 options:

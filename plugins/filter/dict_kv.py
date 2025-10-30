@@ -93,7 +93,7 @@ def dict_kv(value, key):
     return {key: value}
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Query filter '''
 
     def filters(self):

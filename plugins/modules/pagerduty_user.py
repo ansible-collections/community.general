@@ -90,7 +90,7 @@ with deps.declare("pdpyras", url="https://github.com/PagerDuty/pdpyras"):
     from pdpyras import APISession, PDClientError
 
 
-class PagerDutyUser(object):
+class PagerDutyUser:
     def __init__(self, module, session):
         self._module = module
         self._apisession = session

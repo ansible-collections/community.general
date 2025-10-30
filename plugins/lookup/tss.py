@@ -286,7 +286,7 @@ except ImportError:
 display = Display()
 
 
-class TSSClient(object, metaclass=abc.ABCMeta):
+class TSSClient(metaclass=abc.ABCMeta):  # noqa: B024
     def __init__(self):
         self._client = None
 

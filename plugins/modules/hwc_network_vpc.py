@@ -454,7 +454,7 @@ def wait_for_delete(module, client, link):
         module.fail_json(msg=str(ex))
 
 
-class VpcRoutesArray(object):
+class VpcRoutesArray:
     def __init__(self, request, module):
         self.module = module
         if request:

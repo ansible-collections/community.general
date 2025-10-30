@@ -225,7 +225,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitlabGroupVariables(object):
+class GitlabGroupVariables:
 
     def __init__(self, module, gitlab_instance):
         self.repo = gitlab_instance

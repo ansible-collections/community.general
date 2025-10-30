@@ -244,7 +244,7 @@ RULE_ARG_REGEX = re.compile(r"(\[.*\]|\S*)")
 VALID_TYPES = ['account', '-account', 'auth', '-auth', 'password', '-password', 'session', '-session']
 
 
-class PamdLine(object):
+class PamdLine:
 
     def __init__(self, line):
         self.line = line
@@ -403,7 +403,7 @@ class PamdRule(PamdLine):
 
 # PamdService encapsulates an entire service and contains one or more rules.  It seems the best way is to do this
 # as a doubly linked list.
-class PamdService(object):
+class PamdService:
 
     def __init__(self, content):
         self._head = None

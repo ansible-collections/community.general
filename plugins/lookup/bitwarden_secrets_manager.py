@@ -82,7 +82,7 @@ class BitwardenSecretsManagerException(AnsibleLookupError):
     pass
 
 
-class BitwardenSecretsManager(object):
+class BitwardenSecretsManager:
     def __init__(self, path='bws'):
         self._cli_path = path
         self._max_retries = 3

@@ -130,7 +130,7 @@ class BitwardenException(AnsibleError):
     pass
 
 
-class Bitwarden(object):
+class Bitwarden:
 
     def __init__(self, path='bw'):
         self._cli_path = path

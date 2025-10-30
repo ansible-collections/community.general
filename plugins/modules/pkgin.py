@@ -128,7 +128,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-class PackageState(object):
+class PackageState:
     PRESENT = 1
     NOT_INSTALLED = 2
     OUTDATED = 4

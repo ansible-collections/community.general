@@ -174,7 +174,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
 
-class JenkinsJob(object):
+class JenkinsJob:
 
     def __init__(self, module):
         self.module = module

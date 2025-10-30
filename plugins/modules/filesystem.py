@@ -158,7 +158,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
-class Device(object):
+class Device:
     def __init__(self, module, path):
         self.module = module
         self.path = path
@@ -199,7 +199,7 @@ class Device(object):
         return self.path
 
 
-class Filesystem(object):
+class Filesystem:
 
     MKFS: str | None = None
     MKFS_FORCE_FLAGS: list[str] | None = []

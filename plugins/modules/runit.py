@@ -89,7 +89,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Sv(object):
+class Sv:
     """
     Main class that handles daemontools, can be subclassed and overridden in case
     we want to use a 'derivative' like encore, s6, etc

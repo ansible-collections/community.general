@@ -94,7 +94,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Zfs(object):
+class Zfs:
 
     def __init__(self, module, name, extra_zfs_properties):
         self.module = module

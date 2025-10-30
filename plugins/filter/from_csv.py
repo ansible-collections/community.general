@@ -111,7 +111,7 @@ def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitial
     return data_list
 
 
-class FilterModule(object):
+class FilterModule:
 
     def filters(self):
         return {

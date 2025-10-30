@@ -309,7 +309,7 @@ def adjust_recursive_directory_permissions(pre_existing_dir, new_directory_list,
     return changed
 
 
-class Artifact(object):
+class Artifact:
     def __init__(self, group_id, artifact_id, version, version_by_spec, classifier='', extension='jar'):
         if not group_id:
             raise ValueError("group_id must be set")

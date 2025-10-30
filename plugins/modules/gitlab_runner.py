@@ -268,7 +268,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
-class GitLabRunner(object):
+class GitLabRunner:
     def __init__(self, module, gitlab_instance, group=None, project=None):
         self._module = module
         self._gitlab = gitlab_instance

@@ -184,7 +184,7 @@ from ansible.module_utils.urls import fetch_url
 from re import findall
 
 
-class GithubDeployKey(object):
+class GithubDeployKey:
     def __init__(self, module):
         self.module = module
 

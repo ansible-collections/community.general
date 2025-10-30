@@ -72,7 +72,7 @@ from ansible.utils.cmd_functions import run_cmd
 from ansible.module_utils.common.text.converters import to_text
 
 
-class Hiera(object):
+class Hiera:
     def __init__(self, hiera_cfg, hiera_bin):
         self.hiera_cfg = hiera_cfg
         self.hiera_bin = hiera_bin

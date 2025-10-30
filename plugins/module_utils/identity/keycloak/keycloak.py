@@ -350,7 +350,7 @@ def is_struct_included(struct1, struct2, exclude=None):
         return to_text(struct1, 'utf-8') == to_text(struct2, 'utf-8')
 
 
-class KeycloakAPI(object):
+class KeycloakAPI:
     """ Keycloak API access; Keycloak uses OAuth 2.0 to protect its API, an access token for which
         is obtained through OpenID connect
     """

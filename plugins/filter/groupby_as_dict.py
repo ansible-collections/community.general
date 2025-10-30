@@ -80,7 +80,7 @@ def groupby_as_dict(sequence, attribute):
     return result
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Ansible list filters '''
 
     def filters(self):

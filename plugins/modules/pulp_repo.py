@@ -203,7 +203,7 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.urls import url_argument_spec
 
 
-class pulp_server(object):
+class pulp_server:
     """
     Class to interact with a Pulp server
     """

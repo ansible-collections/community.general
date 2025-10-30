@@ -367,7 +367,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-class DME2(object):
+class DME2:
 
     def __init__(self, apikey, secret, domain, sandbox, module):
         self.module = module

@@ -40,7 +40,7 @@ def _env_then_dns_fallback(*args, **kwargs):
             raise AnsibleFallbackNotFound
 
 
-class IPAClient(object):
+class IPAClient:
     def __init__(self, module, host, port, protocol):
         self.host = host
         self.port = port

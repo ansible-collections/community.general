@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
 
     # Use together with the community.general.redfish module utils' REDFISH_COMMON_ARGUMENT_SPEC
     DOCUMENTATION = r"""

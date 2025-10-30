@@ -200,7 +200,7 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
-class RecordManager(object):
+class RecordManager:
     def __init__(self, module):
         self.module = module
 

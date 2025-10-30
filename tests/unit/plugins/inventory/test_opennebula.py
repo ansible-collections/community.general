@@ -45,7 +45,7 @@ def access_mock(path, can_access=True):
     return access
 
 
-class HistoryEntry(object):
+class HistoryEntry:
     def __init__(self):
         self.SEQ = '384'
         self.HOSTNAME = 'sam-691-sam'
@@ -57,7 +57,7 @@ class HistoryEntry(object):
         self.ACTION = '0'
 
 
-class HistoryRecords(object):
+class HistoryRecords:
     def __init__(self):
         self.HISTORY = [HistoryEntry()]
 

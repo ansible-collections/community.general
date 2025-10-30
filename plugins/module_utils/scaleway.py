@@ -95,7 +95,7 @@ def filter_sensitive_attributes(container, attributes):
     return container
 
 
-class SecretVariables(object):
+class SecretVariables:
     @staticmethod
     def ensure_scaleway_secret_package(module):
         if not HAS_SCALEWAY_SECRET_PACKAGE:
@@ -139,7 +139,7 @@ def resource_attributes_should_be_changed(target, wished, verifiable_mutable_att
         return diff
 
 
-class Response(object):
+class Response:
 
     def __init__(self, resp, info):
         self.body = None
@@ -167,7 +167,7 @@ class Response(object):
         return self.status_code in (200, 201, 202, 204)
 
 
-class Scaleway(object):
+class Scaleway:
 
     def __init__(self, module):
         self.module = module

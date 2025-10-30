@@ -165,7 +165,7 @@ def main():
     module.exit_json(changed=changed, msg=reason, **module.params)
 
 
-class Crypttab(object):
+class Crypttab:
     _lines: list[str]
 
     def __init__(self, path):
@@ -207,7 +207,7 @@ class Crypttab(object):
         return crypttab
 
 
-class Line(object):
+class Line:
     def __init__(self, line=None, name=None, backing_device=None, password=None, opts=None):
         self.line = line
         self.name = name

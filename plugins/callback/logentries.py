@@ -120,7 +120,7 @@ from ansible.plugins.callback import CallbackBase
 #  * Better formatting of output before sending out to logentries data/api nodes.
 
 
-class PlainTextSocketAppender(object):
+class PlainTextSocketAppender:
     def __init__(self, display, LE_API='data.logentries.com', LE_PORT=80, LE_TLS_PORT=443):
 
         self.LE_API = LE_API

@@ -166,7 +166,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
 
 
-class ManageIQTenant(object):
+class ManageIQTenant:
     """
         Object to execute tenant management operations in manageiq.
     """

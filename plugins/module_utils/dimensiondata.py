@@ -52,7 +52,7 @@ except ImportError:
 MCP_2_LOCATION_NAME_PATTERN = re.compile(r".*MCP\s?2.*")
 
 
-class DimensionDataModule(object):
+class DimensionDataModule:
     """
     The base class containing common functionality used by Dimension Data modules for Ansible.
     """

@@ -88,7 +88,7 @@ def fqdn_valid(name, min_labels=1, allow_underscores=False):
     return (fobj.is_valid)
 
 
-class TestModule(object):
+class TestModule:
     ''' Ansible test hostname validity.
         https://pypi.org/project/fqdn/
     '''

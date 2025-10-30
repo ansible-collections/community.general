@@ -106,7 +106,7 @@ def to_nice_yaml(value: t.Any, *, redact_sensitive_values: bool = False, indent:
     )
 
 
-class FilterModule(object):
+class FilterModule:
     def filters(self):
         return {
             'to_yaml': to_yaml,

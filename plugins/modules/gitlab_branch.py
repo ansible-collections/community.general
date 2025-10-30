@@ -84,7 +84,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitlabBranch(object):
+class GitlabBranch:
 
     def __init__(self, module, project, gitlab_instance):
         self.repo = gitlab_instance

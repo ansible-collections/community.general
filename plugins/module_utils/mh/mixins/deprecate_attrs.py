@@ -9,7 +9,7 @@ from __future__ import annotations
 from ansible.module_utils.basic import AnsibleModule
 
 
-class DeprecateAttrsMixin(object):
+class DeprecateAttrsMixin:
 
     def _deprecate_setup(self, attr, target, module):
         if target is None:

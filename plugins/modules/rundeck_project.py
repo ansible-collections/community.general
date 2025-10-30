@@ -105,7 +105,7 @@ from ansible_collections.community.general.plugins.module_utils.rundeck import (
 )
 
 
-class RundeckProjectManager(object):
+class RundeckProjectManager:
     def __init__(self, module):
         self.module = module
 

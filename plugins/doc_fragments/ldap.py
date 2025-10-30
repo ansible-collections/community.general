@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     # Standard LDAP documentation fragment
     DOCUMENTATION = r"""
 notes:

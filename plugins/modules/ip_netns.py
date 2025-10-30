@@ -54,7 +54,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
 
 
-class Namespace(object):
+class Namespace:
     """Interface to network namespaces. """
 
     def __init__(self, module):

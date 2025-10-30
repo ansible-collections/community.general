@@ -79,7 +79,7 @@ class PSAdapterError(Exception):
     pass
 
 
-class PSAdapter(object, metaclass=abc.ABCMeta):
+class PSAdapter(metaclass=abc.ABCMeta):
     NAME_ATTRS = ('name', 'cmdline')
     PATTERN_ATTRS = ('name', 'exe', 'cmdline')
 
@@ -176,7 +176,7 @@ def compare_lower(a, b):
     return a.lower() == b.lower()
 
 
-class Pids(object):
+class Pids:
     def __init__(self, module):
 
         deps.validate(module)

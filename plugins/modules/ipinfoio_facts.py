@@ -87,7 +87,7 @@ from ansible.module_utils.urls import fetch_url
 USER_AGENT = 'ansible-ipinfoio-module/0.0.1'
 
 
-class IpinfoioFacts(object):
+class IpinfoioFacts:
 
     def __init__(self, module):
         self.url = 'https://ipinfo.io/json'

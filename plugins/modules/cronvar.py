@@ -112,7 +112,7 @@ class CronVarError(Exception):
     pass
 
 
-class CronVar(object):
+class CronVar:
     """
         CronVar object to write variables to crontabs.
 

@@ -47,7 +47,7 @@ REDFISH_COMMON_ARGUMENT_SPEC = {
 }
 
 
-class RedfishUtils(object):
+class RedfishUtils:
 
     def __init__(self, creds, root_uri, timeout, module, resource_id=None,
                  data_modification=False, strip_etag_quotes=False, ciphers=None):

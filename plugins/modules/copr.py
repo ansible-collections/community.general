@@ -134,7 +134,7 @@ def _respawn_dnf():
         respawn.respawn_module(interpreter)
 
 
-class CoprModule(object):
+class CoprModule:
     """The class represents a copr module.
 
     The class contains methods that take care of the repository state of a project,

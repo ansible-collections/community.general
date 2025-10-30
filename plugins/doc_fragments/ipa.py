@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     # Parameters for FreeIPA/IPA modules
     DOCUMENTATION = r"""
 options:

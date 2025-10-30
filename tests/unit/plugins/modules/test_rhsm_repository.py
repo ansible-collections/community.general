@@ -34,7 +34,7 @@ def patch_rhsm_repository(mocker):
                  return_value=0)
 
 
-class Repos(object):
+class Repos:
     """
     Helper class to represent a list of repositories
 

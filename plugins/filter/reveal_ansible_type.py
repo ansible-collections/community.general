@@ -139,7 +139,7 @@ def reveal_ansible_type(data, alias=None):
     return _ansible_type(data, alias)
 
 
-class FilterModule(object):
+class FilterModule:
 
     def filters(self):
         return {

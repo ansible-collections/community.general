@@ -27,7 +27,7 @@ class OnlineException(Exception):
         self.message = message
 
 
-class Response(object):
+class Response:
 
     def __init__(self, resp, info):
         self.body = None
@@ -55,7 +55,7 @@ class Response(object):
         return self.status_code in (200, 201, 202, 204)
 
 
-class Online(object):
+class Online:
 
     def __init__(self, module):
         self.module = module

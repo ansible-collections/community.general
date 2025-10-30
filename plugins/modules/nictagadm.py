@@ -106,7 +106,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.network import is_mac
 
 
-class NicTag(object):
+class NicTag:
 
     def __init__(self, module):
         self.module = module

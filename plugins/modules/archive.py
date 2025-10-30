@@ -246,7 +246,7 @@ def _to_native_ascii(s):
     return to_native(s, errors='surrogate_or_strict', encoding='ascii')
 
 
-class Archive(object, metaclass=abc.ABCMeta):
+class Archive(metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
 

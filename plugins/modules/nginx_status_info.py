@@ -98,7 +98,7 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
 
 
-class NginxStatusInfo(object):
+class NginxStatusInfo:
 
     def __init__(self):
         self.url = module.params.get('url')

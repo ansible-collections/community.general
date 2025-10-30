@@ -149,7 +149,7 @@ class OSXDefaultsException(Exception):
 # /exceptions -------------------------------------------------------------- }}}
 
 # class MacDefaults -------------------------------------------------------- {{{
-class OSXDefaults(object):
+class OSXDefaults:
     """ Class to manage Mac OS user defaults """
 
     # init ---------------------------------------------------------------- {{{

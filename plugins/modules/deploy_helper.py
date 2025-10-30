@@ -271,7 +271,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule
 
 
-class DeployHelper(object):
+class DeployHelper:
 
     def __init__(self, module):
         self.module = module

@@ -7,7 +7,7 @@ from __future__ import annotations
 import os
 
 
-class OnePasswordConfig(object):
+class OnePasswordConfig:
     _config_file_paths = (
         "~/.op/config",
         "~/.config/op/config",

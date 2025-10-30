@@ -79,7 +79,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.service import daemonize
 
 
-class SimpleinitMSB(object):
+class SimpleinitMSB:
     """
     Main simpleinit-msb service manipulation class
     """

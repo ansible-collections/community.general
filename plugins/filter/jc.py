@@ -149,7 +149,7 @@ def jc_filter(data, parser, quiet=True, raw=False):
         raise AnsibleFilterError(f'Error in jc filter plugin: {e}')
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Query filter '''
 
     def filters(self):

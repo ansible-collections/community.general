@@ -133,7 +133,7 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_native
 
 
-class GpgListResult(object):
+class GpgListResult:
     """Wraps gpg --list-* output."""
 
     def __init__(self, line):
@@ -176,7 +176,7 @@ def gpg_get_all_attrs_of_kind(lines, kind, attr):
     return result
 
 
-class PacmanKey(object):
+class PacmanKey:
     def __init__(self, module):
         self.module = module
         # obtain binary paths for gpg & pacman-key

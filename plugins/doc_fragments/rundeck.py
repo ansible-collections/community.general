@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
 
     # Standard files documentation fragment
     DOCUMENTATION = r"""

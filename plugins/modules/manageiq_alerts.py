@@ -131,7 +131,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
 
 
-class ManageIQAlert(object):
+class ManageIQAlert:
     """ Represent a ManageIQ alert. Can be initialized with both the format
     we receive from the server and the format we get from the user.
     """
@@ -159,7 +159,7 @@ class ManageIQAlert(object):
         return self.__dict__ == other.__dict__
 
 
-class ManageIQAlerts(object):
+class ManageIQAlerts:
     """ Object to execute alert management operations in manageiq.
     """
 

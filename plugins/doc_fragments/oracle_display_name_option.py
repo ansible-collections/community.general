@@ -11,7 +11,7 @@ from __future__ import annotations
 #
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     DOCUMENTATION = r"""
 options:
   display_name:

@@ -92,7 +92,7 @@ def session_method_wrapper(f):
     return _wrap
 
 
-class _ServiceClient(object):
+class _ServiceClient:
     def __init__(self, client, endpoint, product):
         self._client = client
         self._endpoint = endpoint
@@ -140,7 +140,7 @@ class _ServiceClient(object):
         return header
 
 
-class Config(object):
+class Config:
     def __init__(self, module, product):
         self._project_client = None
         self._domain_client = None
@@ -252,7 +252,7 @@ class HwcModule(AnsibleModule):
         super(HwcModule, self).__init__(*args, **kwargs)
 
 
-class _DictComparison(object):
+class _DictComparison:
     ''' This class takes in two dictionaries `a` and `b`.
         These are dictionaries of arbitrary depth, but made up of standard
         Python types only.

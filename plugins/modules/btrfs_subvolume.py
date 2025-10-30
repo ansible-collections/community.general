@@ -211,7 +211,7 @@ import os
 import tempfile
 
 
-class BtrfsSubvolumeModule(object):
+class BtrfsSubvolumeModule:
 
     __BTRFS_ROOT_SUBVOLUME = '/'
     __BTRFS_ROOT_SUBVOLUME_ID = 5

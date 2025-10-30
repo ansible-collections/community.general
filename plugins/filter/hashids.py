@@ -89,7 +89,7 @@ def hashids_decode(hashid, salt=None, alphabet=None, min_length=None):
     return list(nums)
 
 
-class FilterModule(object):
+class FilterModule:
 
     def filters(self):
         return {

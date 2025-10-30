@@ -225,7 +225,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitlabLabels(object):
+class GitlabLabels:
 
     def __init__(self, module, gitlab_instance, group_id, project_id):
         self._gitlab = gitlab_instance

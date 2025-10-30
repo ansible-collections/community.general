@@ -136,7 +136,7 @@ from ansible_collections.community.general.plugins.module_utils.rundeck import (
 )
 
 
-class RundeckJobExecutionsInfo(object):
+class RundeckJobExecutionsInfo:
     def __init__(self, module):
         self.module = module
         self.url = self.module.params["url"]

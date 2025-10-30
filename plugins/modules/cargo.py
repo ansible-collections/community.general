@@ -126,7 +126,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Cargo(object):
+class Cargo:
     def __init__(self, module, **kwargs):
         self.module = module
         self.executable = [kwargs["executable"] or module.get_bin_path("cargo", True)]

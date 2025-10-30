@@ -76,7 +76,7 @@ def unicode_normalize(data, form='NFC'):
     return normalize(form, data)
 
 
-class FilterModule(object):
+class FilterModule:
     def filters(self):
         return {
             'unicode_normalize': unicode_normalize,

@@ -143,7 +143,7 @@ def json_query(data, expr):
         raise AnsibleFilterError(f'Error in jmespath.search in json_query filter plugin:\n{e}')
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Query filter '''
 
     def filters(self):

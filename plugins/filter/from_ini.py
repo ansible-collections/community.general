@@ -85,7 +85,7 @@ def from_ini(obj):
     return parser.as_dict()
 
 
-class FilterModule(object):
+class FilterModule:
     ''' Query filter '''
 
     def filters(self):

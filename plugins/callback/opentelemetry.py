@@ -208,7 +208,7 @@ class HostData:
         self.finish = time_ns()
 
 
-class OpenTelemetrySource(object):
+class OpenTelemetrySource:
     def __init__(self, display):
         self.ansible_playbook = ""
         self.session = str(uuid.uuid4())

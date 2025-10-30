@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     # Parameters for influxdb modules
     DOCUMENTATION = r"""
 options:

@@ -106,7 +106,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 
-class TemporaryDirectory(object):
+class TemporaryDirectory:
     """Basic backport of tempfile.TemporaryDirectory"""
 
     def __init__(self, suffix="", prefix="tmp", dir=None):

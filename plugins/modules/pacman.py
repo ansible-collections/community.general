@@ -248,7 +248,7 @@ from ansible.module_utils.basic import AnsibleModule
 from collections import defaultdict, namedtuple
 
 
-class Package(object):
+class Package:
     def __init__(self, name, source, source_is_URL=False):
         self.name = name
         self.source = source
@@ -267,7 +267,7 @@ class Package(object):
 VersionTuple = namedtuple("VersionTuple", ["current", "latest"])
 
 
-class Pacman(object):
+class Pacman:
     def __init__(self, module):
         self.m = module
 

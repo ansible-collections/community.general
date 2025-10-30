@@ -50,7 +50,7 @@ class LPassException(AnsibleError):
     pass
 
 
-class LPass(object):
+class LPass:
 
     def __init__(self, path='lpass'):
         self._cli_path = path

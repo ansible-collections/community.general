@@ -352,7 +352,7 @@ class FailedInstallingWithPluginManager(Exception):
     pass
 
 
-class JenkinsPlugin(object):
+class JenkinsPlugin:
     def __init__(self, module):
         # To be able to call fail_json
         self.module = module

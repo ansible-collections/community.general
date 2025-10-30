@@ -296,7 +296,7 @@ else:
     LEGACYCRYPT_IMPORT_ERROR = None
 
 
-class Homectl(object):
+class Homectl:
     def __init__(self, module):
         self.module = module
         self.state = module.params['state']

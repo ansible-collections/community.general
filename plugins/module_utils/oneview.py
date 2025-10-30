@@ -177,7 +177,7 @@ class OneViewModuleResourceNotFound(OneViewModuleException):
     pass
 
 
-class OneViewModuleBase(object, metaclass=abc.ABCMeta):
+class OneViewModuleBase(metaclass=abc.ABCMeta):
     MSG_CREATED = 'Resource created successfully.'
     MSG_UPDATED = 'Resource updated successfully.'
     MSG_DELETED = 'Resource deleted successfully.'

@@ -66,7 +66,7 @@ except ImportError:
 display = Display()
 
 
-class ProxyClientPool(object):
+class ProxyClientPool:
     """
     Memcached connection pooling for thread/fork safety. Inspired by py-redis
     connection pool.

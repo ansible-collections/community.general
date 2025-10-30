@@ -16,7 +16,7 @@ from ansible.module_utils.basic import missing_required_lib
 _deps = dict()
 
 
-class _Dependency(object):
+class _Dependency:
     _states = ["pending", "failure", "success"]
 
     def __init__(self, name, reason=None, url=None, msg=None):

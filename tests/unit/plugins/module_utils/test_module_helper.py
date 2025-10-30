@@ -38,7 +38,7 @@ CAUSE_CHG_DECO_IDS = sorted(CAUSE_CHG_DECO.keys())
                          ids=CAUSE_CHG_DECO_IDS)
 def test_cause_changes_deco(deco_args, expect_exception, expect_changed):
 
-    class MockMH(object):
+    class MockMH:
         changed = None
 
         @cause_changes(**deco_args)

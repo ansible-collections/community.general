@@ -93,7 +93,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
-class Hg(object):
+class Hg:
     def __init__(self, module, dest, repo, revision, hg_path):
         self.module = module
         self.dest = dest

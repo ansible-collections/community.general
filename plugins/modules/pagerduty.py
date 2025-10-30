@@ -153,7 +153,7 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 )
 
 
-class PagerDutyRequest(object):
+class PagerDutyRequest:
     def __init__(self, module, name, user, token):
         self.module = module
         self.name = name

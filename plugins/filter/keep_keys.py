@@ -128,7 +128,7 @@ def keep_keys(data, target=None, matching_parameter='equal'):
     return [{k: v for k, v in d.items() if keep_key(k)} for d in data]
 
 
-class FilterModule(object):
+class FilterModule:
 
     def filters(self):
         return {

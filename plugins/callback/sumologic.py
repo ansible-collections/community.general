@@ -57,7 +57,7 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 )
 
 
-class SumologicHTTPCollectorSource(object):
+class SumologicHTTPCollectorSource:
     def __init__(self):
         self.ansible_check_mode = False
         self.ansible_playbook = ""

@@ -60,7 +60,7 @@ argument_spec = dict(
 )
 
 
-class LvgRename(object):
+class LvgRename:
     def __init__(self, module):
         '''
         Orchestrates the lvg_rename module logic.

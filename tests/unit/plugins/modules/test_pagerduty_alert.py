@@ -46,7 +46,7 @@ class PagerDutyAlertsTest(unittest.TestCase):
         )
 
 
-class Response(object):
+class Response:
     def read(self):
         return '{"incidents":[{"id": "incident_id", "status": "triggered"}]}'
 

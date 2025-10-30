@@ -140,7 +140,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
-class Zpool(object):
+class Zpool:
 
     def __init__(self, module, name, disable_new_features, force, pool_properties, filesystem_properties, mountpoint, altroot, temp_name, vdevs):
         self.module = module

@@ -97,7 +97,7 @@ RETURN = r"""
 from ansible.module_utils.basic import AnsibleModule
 
 
-class BackendProp(object):
+class BackendProp:
 
     def __init__(self, module):
         self._module = module

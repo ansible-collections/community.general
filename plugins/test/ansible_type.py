@@ -244,7 +244,7 @@ def ansible_type(data, dtype, alias=None):
     return _ansible_type(data, alias) in data_types
 
 
-class TestModule(object):
+class TestModule:
 
     def tests(self):
         return {

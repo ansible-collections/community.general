@@ -147,7 +147,7 @@ from ansible.module_utils.basic import AnsibleModule, json
 from ansible.module_utils.urls import open_url
 
 
-class Infinity(object):
+class Infinity:
     """
     Class for manage REST API calls with the Infinity.
     """

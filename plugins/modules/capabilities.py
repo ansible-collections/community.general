@@ -65,7 +65,7 @@ from ansible.module_utils.basic import AnsibleModule
 OPS = ('=', '-', '+')
 
 
-class CapabilitiesModule(object):
+class CapabilitiesModule:
     platform = 'Linux'
     distribution = None
 

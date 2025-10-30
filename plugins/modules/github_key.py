@@ -140,7 +140,7 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 )
 
 
-class GitHubResponse(object):
+class GitHubResponse:
     def __init__(self, response, info):
         self.content = response.read()
         self.info = info
@@ -158,7 +158,7 @@ class GitHubResponse(object):
         return links
 
 
-class GitHubSession(object):
+class GitHubSession:
     def __init__(self, module, token, api_url):
         self.module = module
         self.token = token

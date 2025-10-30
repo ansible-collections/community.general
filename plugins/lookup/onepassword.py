@@ -95,7 +95,7 @@ def _lower_if_possible(value):
         return value
 
 
-class OnePassCLIBase(object, metaclass=abc.ABCMeta):
+class OnePassCLIBase(metaclass=abc.ABCMeta):
     bin = "op"
 
     def __init__(
@@ -583,7 +583,7 @@ class OnePassCLIv2(OnePassCLIBase):
         return self._run(args, command_input=to_bytes(self.master_password))
 
 
-class OnePass(object):
+class OnePass:
     def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
                  service_account_token=None, account_id=None, connect_host=None, connect_token=None, cli_class=None):
         self.subdomain = subdomain

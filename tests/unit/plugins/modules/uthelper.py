@@ -13,7 +13,7 @@ import yaml
 import pytest
 
 
-class UTHelper(object):
+class UTHelper:
     TEST_SPEC_VALID_SECTIONS = ["anchors", "test_cases"]
 
     @staticmethod

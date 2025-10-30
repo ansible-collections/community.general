@@ -68,7 +68,7 @@ def dict_filter(sequence):
     return dict(sequence)
 
 
-class FilterModule(object):
+class FilterModule:
     '''Ansible jinja2 filters'''
 
     def filters(self):

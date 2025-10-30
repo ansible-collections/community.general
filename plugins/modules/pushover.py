@@ -92,7 +92,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-class Pushover(object):
+class Pushover:
     ''' Instantiates a pushover object, use it to send notifications '''
     base_uri = 'https://api.pushover.net'
 

@@ -139,7 +139,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Yarn(object):
+class Yarn:
 
     def __init__(self, module, **kwargs):
         self.module = module

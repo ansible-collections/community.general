@@ -87,7 +87,7 @@ from copy import deepcopy
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Rhsm(object):
+class Rhsm:
     def __init__(self, module):
         self.module = module
         self.rhsm_bin = self.module.get_bin_path('subscription-manager', required=True)

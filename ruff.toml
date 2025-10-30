@@ -25,7 +25,6 @@ ignore = [
     "E713",  # "not in" test
     "E714",  # "not is" test
     "F841",  # Unused variable
-    "UP004",  # Class `xxx` inherits from `object`
     "UP006",  # Use `dict` instead of `t.Dict` for type annotation
     "UP007",  # Use `X | Y` for type annotations
     "UP008",  # Use `super()` instead of `super(__class__, self)`
@@ -34,7 +33,6 @@ ignore = [
     "UP018",  # Unnecessary `str` call (rewrite as a literal)
     "UP020",  # Use builtin `open`
     "UP024",  # Replace aliased errors with `OSError`
-    "UP025",  # Remove unicode literals from strings
     "UP028",  # Replace `yield` over `for` loop with `yield from`
     "UP029",  # Unnecessary builtin import: `open`
     "UP030",  # Use implicit references for positional format fields
