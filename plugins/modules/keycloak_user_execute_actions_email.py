@@ -25,8 +25,6 @@ attributes:
     support: full
   diff_mode:
     support: none
-  action_group:
-    version_added: 12.0.0
 options:
   auth_username:
     aliases: []
