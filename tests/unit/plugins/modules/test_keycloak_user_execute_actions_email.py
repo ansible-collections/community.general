@@ -56,7 +56,7 @@ def patch_keycloak_api(get_user_by_username=None, send_execute_actions_email=Non
 
 class TestKeycloakUserExecuteActionsEmail(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakUserExecuteActionsEmail, self).setUp()
+        super().setUp()
         self.module = module_under_test
 
     def test_default_action_with_username(self):
