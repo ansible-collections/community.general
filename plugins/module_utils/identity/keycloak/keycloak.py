@@ -74,6 +74,7 @@ URL_USER_CLIENTS_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-map
 URL_USER_CLIENT_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client_id}"
 URL_USER_GROUPS = "{url}/admin/realms/{realm}/users/{id}/groups"
 URL_USER_GROUP = "{url}/admin/realms/{realm}/users/{id}/groups/{group_id}"
+URL_EXECUTE_ACTION = "{url}/admin/realms/{realm}/users/{user_id}/execute-actions-email"
 
 URL_CLIENT_SERVICE_ACCOUNT_USER = "{url}/admin/realms/{realm}/clients/{id}/service-account-user"
 URL_CLIENT_USER_ROLEMAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client}"
@@ -3118,3 +3119,39 @@ class KeycloakAPI:
         :return: None
         """
         return self.fail_request(e, msg, **kwargs)
+
+    def send_execute_actions_email(self, user_id, realm='master', client_id=None, data=None, redirect_uri=None, lifespan=None):
+        """
+        Send an email to the user with a link they can click to perform required actions (e.g. reset password).
+        Uses execute-actions-email endpoint with provided required actions (defaults handled by caller).
+
+        :param user_id: ID of the user
+        :param realm: Realm name (not the ID)
+        :param client_id: Optional client id for the redirect
+        :param redirect_uri: Optional redirect uri
+        :param data: List of required action names (list[str])
+        :param lifespan: Optional lifespan (seconds) for the action token
+        :return: HTTP response (204 No Content on success)
+        """
+        try:
+            execute_action_url = URL_EXECUTE_ACTION.format(url=self.baseurl, realm=realm, user_id=user_id)
+
+            params = {}
+            if client_id is not None:
+                params['client_id'] = client_id
+            if redirect_uri is not None:
+                params['redirect_uri'] = redirect_uri
+            if lifespan is not None:
+                params['lifespan'] = lifespan
+
+            if params:
+                execute_action_url = f"{execute_action_url}?{urlencode(params)}"
+
+            body = None
+            if data is not None:
+                # API expects JSON array of action names
+                body = json.dumps(data)
+
+            return self._request(execute_action_url, method='PUT', data=body)
+        except Exception as e:
+            self.fail_request(e, msg=f'Could not send execute actions email to user {user_id} in realm {realm}: {e}')
