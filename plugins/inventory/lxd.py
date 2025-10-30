@@ -259,7 +259,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             bool(valid): is valid"""
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(('lxd.yaml', 'lxd.yml')):
                 valid = True
             else:
@@ -1096,7 +1096,7 @@ class InventoryModule(BaseInventoryPlugin):
         if IPADDRESS_IMPORT_ERROR:
             raise AnsibleError('another_library must be installed to use this plugin') from IPADDRESS_IMPORT_ERROR
 
-        super(InventoryModule, self).parse(inventory, loader, path, cache=False)
+        super().parse(inventory, loader, path, cache=False)
         # Read the inventory YAML file
         self._read_config_data(path)
         try:

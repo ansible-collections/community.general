@@ -79,7 +79,7 @@ def mock_xenapi_failure(XenAPI, mocker):
     # same side_effect as its parent mock object.
     class MagicMockSideEffect(MagicMock):
         def _get_child_mock(self, **kw):
-            child_mock = super(MagicMockSideEffect, self)._get_child_mock(**kw)
+            child_mock = super()._get_child_mock(**kw)
             child_mock.side_effect = self.side_effect
             return child_mock
 

@@ -484,7 +484,7 @@ class Archive(metaclass=abc.ABCMeta):
 
 class ZipArchive(Archive):
     def __init__(self, module):
-        super(ZipArchive, self).__init__(module)
+        super().__init__(module)
 
     def close(self):
         self.file.close()
@@ -515,7 +515,7 @@ class ZipArchive(Archive):
 
 class TarArchive(Archive):
     def __init__(self, module):
-        super(TarArchive, self).__init__(module)
+        super().__init__(module)
         self.fileIO = None
 
     def close(self):

@@ -89,7 +89,7 @@ def mock_good_connection():
 
 class TestKeycloakUser(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakUser, self).setUp()
+        super().setUp()
         self.module = keycloak_user
 
     def test_add_new_user(self):

@@ -122,7 +122,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self):
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         if not HAS_LOGSTASH:
             self.disabled = True
@@ -163,7 +163,7 @@ class CallbackModule(CallbackBase):
                 self.base_data['inventory'] = context.CLIARGS.get('inventory')
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.ls_server = self.get_option('server')
         self.ls_port = int(self.get_option('port'))

@@ -87,7 +87,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class OTPConfigIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(OTPConfigIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def otpconfig_show(self):
         return self._post_json(method='otpconfig_show', name=None)

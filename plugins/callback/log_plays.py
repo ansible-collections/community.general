@@ -62,10 +62,10 @@ class CallbackModule(CallbackBase):
 
     def __init__(self):
 
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.log_folder = self.get_option("log_folder")
 

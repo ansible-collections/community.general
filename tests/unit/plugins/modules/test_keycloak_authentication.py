@@ -92,7 +92,7 @@ def mock_good_connection():
 
 class TestKeycloakAuthentication(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakAuthentication, self).setUp()
+        super().setUp()
         self.module = keycloak_authentication
 
     def test_create_auth_flow_from_copy(self):

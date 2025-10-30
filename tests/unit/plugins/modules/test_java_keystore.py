@@ -38,7 +38,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
 
     def setUp(self):
         """Setup."""
-        super(TestCreateJavaKeystore, self).setUp()
+        super().setUp()
 
         orig_exists = os.path.exists
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.java_keystore.create_file')
@@ -67,7 +67,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestCreateJavaKeystore, self).tearDown()
+        super().tearDown()
         self.mock_create_file.stop()
         self.mock_create_path.stop()
         self.mock_current_type.stop()
@@ -229,7 +229,7 @@ class TestCertChanged(ModuleTestCase):
 
     def setUp(self):
         """Setup."""
-        super(TestCertChanged, self).setUp()
+        super().setUp()
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.java_keystore.create_file')
         self.mock_current_type = patch('ansible_collections.community.general.plugins.modules.java_keystore.JavaKeystore.current_type')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
@@ -245,7 +245,7 @@ class TestCertChanged(ModuleTestCase):
 
     def tearDown(self):
         """Teardown."""
-        super(TestCertChanged, self).tearDown()
+        super().tearDown()
         self.mock_create_file.stop()
         self.mock_current_type.stop()
         self.mock_run_command.stop()

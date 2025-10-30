@@ -340,7 +340,7 @@ class PritunlDeleteUserMock(MagicMock):
 
 class ModuleFailException(Exception):
     def __init__(self, msg, **kwargs):
-        super(ModuleFailException, self).__init__(msg)
+        super().__init__(msg)
         self.fail_msg = msg
         self.fail_kwargs = kwargs
 

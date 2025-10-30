@@ -95,7 +95,7 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 class ScalewaySecurityGroupInfo(Scaleway):
 
     def __init__(self, module):
-        super(ScalewaySecurityGroupInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'security_groups'
 
         region = module.params["region"]

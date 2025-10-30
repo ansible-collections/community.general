@@ -91,7 +91,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class DNSZoneIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(DNSZoneIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def dnszone_find(self, zone_name, details=None):
         items = {'all': 'true',

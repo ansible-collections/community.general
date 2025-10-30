@@ -87,7 +87,7 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 
 class SubCAIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(SubCAIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def subca_find(self, subca_name):
         return self._post_json(method='ca_find', name=subca_name, item=None)

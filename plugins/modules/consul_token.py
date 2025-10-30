@@ -236,7 +236,7 @@ class ConsulTokenModule(_ConsulModule):
         # if `accessor_id` is not supplied we can only create objects and are not idempotent
         if not self.id_from_obj(self.params):
             return None
-        return super(ConsulTokenModule, self).read_object()
+        return super().read_object()
 
     def needs_update(self, api_obj, module_obj):
         # SecretID is usually not supplied
@@ -248,7 +248,7 @@ class ConsulTokenModule(_ConsulModule):
         # it writes to ExpirationTime, so we need to remove that as well
         if "ExpirationTTL" in module_obj:
             del module_obj["ExpirationTTL"]
-        return super(ConsulTokenModule, self).needs_update(api_obj, module_obj)
+        return super().needs_update(api_obj, module_obj)
 
 
 NAME_ID_SPEC = dict(

@@ -62,7 +62,7 @@ class CallbackModule(CallbackBase):
 
     def __init__(self, display=None):
 
-        super(CallbackModule, self).__init__(display=display)
+        super().__init__(display=display)
 
         if not HAS_XMPP:
             self._display.warning("The required python xmpp library (xmpppy) is not installed. "

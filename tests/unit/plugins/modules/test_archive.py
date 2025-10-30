@@ -14,7 +14,7 @@ from ansible_collections.community.general.plugins.modules.archive import get_ar
 
 class TestArchive(ModuleTestCase):
     def setUp(self):
-        super(TestArchive, self).setUp()
+        super().setUp()
 
         self.mock_os_path_isdir = patch('os.path.isdir')
         self.os_path_isdir = self.mock_os_path_isdir.start()

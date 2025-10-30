@@ -177,7 +177,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class GroupIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(GroupIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def group_find(self, name):
         return self._post_json(method='group_find', name=None, item={'all': True, 'cn': name})

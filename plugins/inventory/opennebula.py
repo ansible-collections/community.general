@@ -104,7 +104,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def verify_file(self, path):
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(('opennebula.yaml', 'opennebula.yml')):
                 valid = True
         return valid
@@ -248,7 +248,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         if not HAS_PYONE:
             raise AnsibleError('OpenNebula Inventory plugin requires pyone to work!')
 
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
         self._read_config_data(path=path)
 
         self._populate()

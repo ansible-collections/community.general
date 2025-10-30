@@ -48,7 +48,7 @@ except ImportError:
 class TestGitlabProject(GitlabModuleTestCase):
     @with_httmock(resp_get_user)
     def setUp(self):
-        super(TestGitlabProject, self).setUp()
+        super().setUp()
 
         self.gitlab_instance.user = self.gitlab_instance.users.get(1)
         self.moduleUtil = GitLabProject(module=self.mock_module, gitlab_instance=self.gitlab_instance)

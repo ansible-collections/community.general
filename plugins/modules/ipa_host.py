@@ -191,7 +191,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class HostIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(HostIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def host_show(self, name):
         return self._post_json(method='host_show', name=name)

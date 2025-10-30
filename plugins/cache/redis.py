@@ -100,7 +100,7 @@ class CacheModule(BaseCacheModule):
     def __init__(self, *args, **kwargs):
         uri = ''
 
-        super(CacheModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.get_option('_uri'):
             uri = self.get_option('_uri')
         self._timeout = float(self.get_option('_timeout'))

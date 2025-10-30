@@ -89,7 +89,7 @@ class Connection(ConnectionBase):
     has_pipelining = True
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
         try:
             self._lxc_cmd = get_bin_path("lxc")
@@ -102,7 +102,7 @@ class Connection(ConnectionBase):
 
     def _connect(self):
         """connect to lxd (nothing to do here) """
-        super(Connection, self)._connect()
+        super()._connect()
 
         if not self._connected:
             self._display.vvv(f"ESTABLISH LXD CONNECTION FOR USER: {self.get_option('remote_user')}", host=self._host())
@@ -134,7 +134,7 @@ class Connection(ConnectionBase):
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
         """ execute a command on the lxd host """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         self._display.vvv(f"EXEC {cmd}", host=self._host())
 
@@ -181,7 +181,7 @@ class Connection(ConnectionBase):
 
     def put_file(self, in_path, out_path):
         """ put a file from local to lxd """
-        super(Connection, self).put_file(in_path, out_path)
+        super().put_file(in_path, out_path)
 
         self._display.vvv(f"PUT {in_path} TO {out_path}", host=self._host())
 
@@ -225,7 +225,7 @@ class Connection(ConnectionBase):
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from lxd to local """
-        super(Connection, self).fetch_file(in_path, out_path)
+        super().fetch_file(in_path, out_path)
 
         self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self._host())
 
@@ -245,6 +245,6 @@ class Connection(ConnectionBase):
 
     def close(self):
         """ close the connection (nothing to do here) """
-        super(Connection, self).close()
+        super().close()
 
         self._connected = False

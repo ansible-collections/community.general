@@ -89,14 +89,14 @@ class CallbackModule(CallbackBase):
     UNKNOWN = 3
 
     def __init__(self):
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         self.printed_playbook = False
         self.playbook_name = None
         self.play = None
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.url = self.get_option('url')
         if not self.url.endswith('/'):

@@ -54,7 +54,7 @@ except ImportError:
 class TestGitlabGroupAccessToken(GitlabModuleTestCase):
     @with_httmock(resp_get_user)
     def setUp(self):
-        super(TestGitlabGroupAccessToken, self).setUp()
+        super().setUp()
         if not python_gitlab_version_match_requirement():
             self.skipTest(f"python-gitlab {'.'.join(map(str, PYTHON_GITLAB_MINIMAL_VERSION))}+ is needed for gitlab_group_access_token")
 

@@ -16,7 +16,7 @@ class RhsmRepositoryReleaseModuleTestCase(ModuleTestCase):
     SUBMAN_KWARGS = dict(check_rc=True, expand_user_and_vars=False)
 
     def setUp(self):
-        super(RhsmRepositoryReleaseModuleTestCase, self).setUp()
+        super().setUp()
 
         # Mainly interested that the subscription-manager calls are right
         # based on the module args, so patch out run_command in the module.
@@ -41,7 +41,7 @@ class RhsmRepositoryReleaseModuleTestCase(ModuleTestCase):
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
         self.mock_os_getuid.stop()
-        super(RhsmRepositoryReleaseModuleTestCase, self).tearDown()
+        super().tearDown()
 
     def module_main(self, exit_exc):
         with self.assertRaises(exit_exc) as exc:

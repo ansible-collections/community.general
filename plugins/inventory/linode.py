@@ -286,7 +286,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         Returns:
             bool(valid): is valid config file"""
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(("linode.yaml", "linode.yml")):
                 valid = True
             else:
@@ -295,7 +295,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def parse(self, inventory, loader, path, cache=True):
         """Dynamically parse Linode the cloud inventory."""
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
         self.instances = None
 
         if not HAS_LINODE:

@@ -55,7 +55,7 @@ class TestGitlabProtectedBranch(GitlabModuleTestCase):
     @with_httmock(resp_get_project_by_name)
     @with_httmock(resp_get_user)
     def setUp(self):
-        super(TestGitlabProtectedBranch, self).setUp()
+        super().setUp()
 
         self.gitlab_instance.user = self.gitlab_instance.users.get(1)
         self.moduleUtil = GitlabProtectedBranch(module=self.mock_module, project="foo-bar/diaspora-client", gitlab_instance=self.gitlab_instance)

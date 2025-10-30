@@ -14,7 +14,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def setUp(self):
-        super(TestBucketPipelineKeyPairModule, self).setUp()
+        super().setUp()
         self.module = bitbucket_pipeline_key_pair
 
     def test_missing_keys_with_present_state(self):

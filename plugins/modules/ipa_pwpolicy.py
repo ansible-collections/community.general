@@ -164,7 +164,7 @@ from ansible.module_utils.common.text.converters import to_native
 class PwPolicyIPAClient(IPAClient):
     '''The global policy will be selected when `name` is `None`'''
     def __init__(self, module, host, port, protocol):
-        super(PwPolicyIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def pwpolicy_find(self, name):
         if name is None:

@@ -137,7 +137,7 @@ from ansible_collections.community.general.plugins.module_utils.online import (
 class OnlineServerInfo(Online):
 
     def __init__(self, module):
-        super(OnlineServerInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'api/v1/server'
 
     def _get_server_detail(self, server_path):

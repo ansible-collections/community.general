@@ -12,11 +12,11 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 class TestBootcManageModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestBootcManageModule, self).setUp()
+        super().setUp()
         self.module = bootc_manage
 
     def tearDown(self):
-        super(TestBootcManageModule, self).tearDown()
+        super().tearDown()
 
     def test_switch_without_image(self):
         """Failure if state is 'switch' but no image provided"""

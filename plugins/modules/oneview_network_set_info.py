@@ -141,7 +141,7 @@ class NetworkSetInfoModule(OneViewModuleBase):
     )
 
     def __init__(self):
-        super(NetworkSetInfoModule, self).__init__(
+        super().__init__(
             additional_arg_spec=self.argument_spec,
             supports_check_mode=True,
         )

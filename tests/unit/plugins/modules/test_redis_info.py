@@ -31,12 +31,12 @@ class FakeRedisClientFail(MagicMock):
 class TestRedisInfoModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestRedisInfoModule, self).setUp()
+        super().setUp()
         redis_info.HAS_REDIS_PACKAGE = True
         self.module = redis_info
 
     def tearDown(self):
-        super(TestRedisInfoModule, self).tearDown()
+        super().tearDown()
 
     def patch_redis_client(self, **kwds):
         return patch('ansible_collections.community.general.plugins.modules.redis_info.redis_client', autospec=True, **kwds)

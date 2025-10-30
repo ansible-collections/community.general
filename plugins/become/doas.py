@@ -116,7 +116,7 @@ class BecomeModule(BecomeBase):
         return bool(re.match(b_prompt, b_output))
 
     def build_become_command(self, cmd, shell):
-        super(BecomeModule, self).build_become_command(cmd, shell)
+        super().build_become_command(cmd, shell)
 
         if not cmd:
             return cmd

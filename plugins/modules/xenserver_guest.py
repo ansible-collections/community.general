@@ -565,7 +565,7 @@ class XenServerVM(XenServerObject):
         Args:
             module: Reference to Ansible module object.
         """
-        super(XenServerVM, self).__init__(module)
+        super().__init__(module)
 
         self.vm_ref = get_object_ref(self.module, self.module.params['name'], self.module.params['uuid'], obj_type="VM", fail=False, msg_prefix="VM search: ")
         self.gather_params()

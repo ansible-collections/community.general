@@ -257,7 +257,7 @@ call_enable_crb = call(['/usr/bin/dnf', 'config-manager', '--assumeyes', '--set-
 
 class TestDNFConfigManager(ModuleTestCase):
     def setUp(self):
-        super(TestDNFConfigManager, self).setUp()
+        super().setUp()
         self.mock_run_command = (patch('ansible.module_utils.basic.AnsibleModule.run_command'))
         self.run_command = self.mock_run_command.start()
         self.mock_path_exists = (patch('os.path.exists'))
@@ -266,7 +266,7 @@ class TestDNFConfigManager(ModuleTestCase):
         self.module = dnf_config_manager_module
 
     def tearDown(self):
-        super(TestDNFConfigManager, self).tearDown()
+        super().tearDown()
         self.mock_run_command.stop()
         self.mock_path_exists.stop()
 

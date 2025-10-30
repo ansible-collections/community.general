@@ -157,7 +157,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
-        super(CallbackModule, self).__init__(display=display)
+        super().__init__(display=display)
         self.start_datetimes = {}  # Collect task start times
         self.workspace_id = None
         self.shared_key = None
@@ -170,7 +170,7 @@ class CallbackModule(CallbackBase):
         ).total_seconds()
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
         self.workspace_id = self.get_option('workspace_id')
         self.shared_key = self.get_option('shared_key')
 

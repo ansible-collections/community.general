@@ -37,7 +37,7 @@ def patch_ipa(**kwargs):
 
 class TestIPAOTPConfig(ModuleTestCase):
     def setUp(self):
-        super(TestIPAOTPConfig, self).setUp()
+        super().setUp()
         self.module = ipa_otpconfig
 
     def _test_base(self, module_args, return_value, mock_calls, changed):

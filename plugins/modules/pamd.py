@@ -277,7 +277,7 @@ class PamdEmptyLine(PamdLine):
 class PamdComment(PamdLine):
 
     def __init__(self, line):
-        super(PamdComment, self).__init__(line)
+        super().__init__(line)
 
     @property
     def is_valid(self):
@@ -288,7 +288,7 @@ class PamdComment(PamdLine):
 
 class PamdInclude(PamdLine):
     def __init__(self, line):
-        super(PamdInclude, self).__init__(line)
+        super().__init__(line)
 
     @property
     def is_valid(self):

@@ -25,12 +25,12 @@ class FakeStatsD(MagicMock):
 class TestStatsDModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestStatsDModule, self).setUp()
+        super().setUp()
         statsd.HAS_STATSD = True
         self.module = statsd
 
     def tearDown(self):
-        super(TestStatsDModule, self).tearDown()
+        super().tearDown()
 
     def patch_udp_statsd_client(self, **kwargs):
         return patch('ansible_collections.community.general.plugins.modules.statsd.udp_statsd_client', autospec=True, **kwargs)

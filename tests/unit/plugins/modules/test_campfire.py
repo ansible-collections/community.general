@@ -13,11 +13,11 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 class TestCampfireModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestCampfireModule, self).setUp()
+        super().setUp()
         self.module = campfire
 
     def tearDown(self):
-        super(TestCampfireModule, self).tearDown()
+        super().tearDown()
 
     @pytest.fixture
     def fetch_url_mock(self, mocker):

@@ -143,7 +143,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class VaultIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(VaultIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def vault_find(self, name):
         return self._post_json(method='vault_find', name=None, item={'all': True, 'cn': name})

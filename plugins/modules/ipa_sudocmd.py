@@ -72,7 +72,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 class SudoCmdIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(SudoCmdIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def sudocmd_find(self, name):
         return self._post_json(method='sudocmd_find', name=None, item={'all': True, 'sudocmd': name})

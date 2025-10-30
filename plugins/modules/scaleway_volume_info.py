@@ -90,7 +90,7 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 class ScalewayVolumeInfo(Scaleway):
 
     def __init__(self, module):
-        super(ScalewayVolumeInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'volumes'
 
         region = module.params["region"]

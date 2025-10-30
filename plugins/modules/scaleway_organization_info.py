@@ -82,7 +82,7 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 class ScalewayOrganizationInfo(Scaleway):
 
     def __init__(self, module):
-        super(ScalewayOrganizationInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'organizations'
 
 

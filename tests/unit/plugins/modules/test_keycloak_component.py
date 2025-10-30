@@ -80,7 +80,7 @@ def mock_good_connection():
 
 class TestKeycloakComponent(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakComponent, self).setUp()
+        super().setUp()
         self.module = keycloak_component
 
     def test_create_when_absent(self):

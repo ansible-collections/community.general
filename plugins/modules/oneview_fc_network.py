@@ -98,8 +98,7 @@ class FcNetworkModule(OneViewModuleBase):
                                        required=True,
                                        choices=['present', 'absent']))
 
-        super(FcNetworkModule, self).__init__(additional_arg_spec=additional_arg_spec,
-                                              validate_etag_support=True)
+        super().__init__(additional_arg_spec=additional_arg_spec, validate_etag_support=True)
 
         self.resource_client = self.oneview_client.fc_networks
 

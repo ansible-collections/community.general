@@ -57,7 +57,7 @@ class Connection(ConnectionBase):
     has_pipelining = True
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
         self._remote_vmname = self._play_context.remote_addr
         self._connected = False
@@ -103,13 +103,13 @@ class Connection(ConnectionBase):
 
     def _connect(self):
         """No persistent connection is being maintained."""
-        super(Connection, self)._connect()
+        super()._connect()
         self._connected = True
 
     @ensure_connect  # type: ignore  # TODO: for some reason, the type infos for ensure_connect suck...
     def exec_command(self, cmd, in_data=None, sudoable=False):
         """Run specified command in a running QubesVM """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         display.vvvv(f"CMD IS: {cmd}")
 
@@ -120,7 +120,7 @@ class Connection(ConnectionBase):
 
     def put_file(self, in_path, out_path):
         """ Place a local file located in 'in_path' inside VM at 'out_path' """
-        super(Connection, self).put_file(in_path, out_path)
+        super().put_file(in_path, out_path)
         display.vvv(f"PUT {in_path} TO {out_path}", host=self._remote_vmname)
 
         with open(in_path, "rb") as fobj:
@@ -137,7 +137,7 @@ class Connection(ConnectionBase):
 
     def fetch_file(self, in_path, out_path):
         """Obtain file specified via 'in_path' from the container and place it at 'out_path' """
-        super(Connection, self).fetch_file(in_path, out_path)
+        super().fetch_file(in_path, out_path)
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self._remote_vmname)
 
         # We are running in dom0
@@ -150,5 +150,5 @@ class Connection(ConnectionBase):
 
     def close(self):
         """ Closing the connection """
-        super(Connection, self).close()
+        super().close()
         self._connected = False

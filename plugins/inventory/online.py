@@ -220,7 +220,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_host(group=group, host=hostname)
 
     def parse(self, inventory, loader, path, cache=True):
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
         self._read_config_data(path=path)
 
         token = self.get_option("oauth_token")

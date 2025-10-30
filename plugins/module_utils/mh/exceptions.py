@@ -16,4 +16,4 @@ class ModuleHelperException(Exception):
         if update_output is None:
             update_output = {}
         self.update_output: dict[str, t.Any] = update_output
-        super(ModuleHelperException, self).__init__(*args)
+        super().__init__(*args)

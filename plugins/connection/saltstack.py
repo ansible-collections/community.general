@@ -39,7 +39,7 @@ class Connection(ConnectionBase):
     transport = 'community.general.saltstack'
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
         self.host = self._play_context.remote_addr
 
     def _connect(self):
@@ -52,7 +52,7 @@ class Connection(ConnectionBase):
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
         """ run a command on the remote minion """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         if in_data:
             raise errors.AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -76,7 +76,7 @@ class Connection(ConnectionBase):
     def put_file(self, in_path, out_path):
         """ transfer a file from local to remote """
 
-        super(Connection, self).put_file(in_path, out_path)
+        super().put_file(in_path, out_path)
 
         out_path = self._normalize_path(out_path, '/')
         self._display.vvv(f"PUT {in_path} TO {out_path}", host=self.host)
@@ -88,7 +88,7 @@ class Connection(ConnectionBase):
     def fetch_file(self, in_path, out_path):
         """ fetch a file from remote to local """
 
-        super(Connection, self).fetch_file(in_path, out_path)
+        super().fetch_file(in_path, out_path)
 
         in_path = self._normalize_path(in_path, '/')
         self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self.host)

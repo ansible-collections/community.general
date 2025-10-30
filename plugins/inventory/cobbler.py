@@ -147,7 +147,7 @@ except ImportError:
 
 class TimeoutTransport (xmlrpc_client.SafeTransport):
     def __init__(self, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
-        super(TimeoutTransport, self).__init__()
+        super().__init__()
         self._timeout = timeout
         self.context = None
 
@@ -163,7 +163,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     NAME = 'community.general.cobbler'
 
     def __init__(self):
-        super(InventoryModule, self).__init__()
+        super().__init__()
         self.cache_key = None
 
         if not HAS_XMLRPC_CLIENT:
@@ -171,7 +171,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
     def verify_file(self, path):
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(('cobbler.yaml', 'cobbler.yml')):
                 valid = True
             else:
@@ -242,7 +242,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
     def parse(self, inventory, loader, path, cache=True):
 
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         # read config from file, this sets 'options'
         self._read_config_data(path)

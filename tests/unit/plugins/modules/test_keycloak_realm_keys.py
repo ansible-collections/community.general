@@ -79,7 +79,7 @@ def mock_good_connection():
 
 class TestKeycloakRealmKeys(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealmKeys, self).setUp()
+        super().setUp()
         self.module = keycloak_realm_key
 
     def test_create_when_absent(self):

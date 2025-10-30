@@ -81,7 +81,7 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
     ]
 
     def __new__(cls, value, is_pending=False):
-        return super(StatusValue, cls).__new__(cls, value, is_pending)
+        return super().__new__(cls, value, is_pending)
 
     def pending(self):
         return StatusValue(self.value, True)

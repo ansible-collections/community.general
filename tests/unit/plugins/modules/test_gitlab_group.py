@@ -47,7 +47,7 @@ except ImportError:
 
 class TestGitlabGroup(GitlabModuleTestCase):
     def setUp(self):
-        super(TestGitlabGroup, self).setUp()
+        super().setUp()
 
         self.moduleUtil = GitLabGroup(module=self.mock_module, gitlab_instance=self.gitlab_instance)
 

@@ -132,7 +132,7 @@ class Timezone:
         Args:
             module: The AnsibleModule.
         """
-        super(Timezone, self).__init__()
+        super().__init__()
         self.msg = []
         # `self.value` holds the values for each params on each phases.
         # Initially there's only info of "planned" phase, but the
@@ -266,7 +266,7 @@ class SystemdTimezone(Timezone):
     )
 
     def __init__(self, module):
-        super(SystemdTimezone, self).__init__(module)
+        super().__init__(module)
         self.timedatectl = module.get_bin_path('timedatectl', required=True)
         self.status = dict()
         # Validate given timezone
@@ -339,7 +339,7 @@ class NosystemdTimezone(Timezone):
     )
 
     def __init__(self, module):
-        super(NosystemdTimezone, self).__init__(module)
+        super().__init__(module)
         # Validate given timezone
         planned_tz = ''
         if 'name' in self.value:
@@ -592,7 +592,7 @@ class SmartOSTimezone(Timezone):
     """
 
     def __init__(self, module):
-        super(SmartOSTimezone, self).__init__(module)
+        super().__init__(module)
         self.settimezone = self.module.get_bin_path('sm-set-timezone', required=False)
         if not self.settimezone:
             module.fail_json(msg='sm-set-timezone not found. Make sure the smtools package is installed.')
@@ -645,7 +645,7 @@ class DarwinTimezone(Timezone):
     )
 
     def __init__(self, module):
-        super(DarwinTimezone, self).__init__(module)
+        super().__init__(module)
         self.systemsetup = module.get_bin_path('systemsetup', required=True)
         self.status = dict()
         # Validate given timezone
@@ -690,7 +690,7 @@ class BSDTimezone(Timezone):
     """
 
     def __init__(self, module):
-        super(BSDTimezone, self).__init__(module)
+        super().__init__(module)
 
     def __get_timezone(self):
         zoneinfo_dir = '/usr/share/zoneinfo/'
@@ -780,7 +780,7 @@ class AIXTimezone(Timezone):
     """
 
     def __init__(self, module):
-        super(AIXTimezone, self).__init__(module)
+        super().__init__(module)
         self.settimezone = self.module.get_bin_path('chtz', required=True)
 
     def __get_timezone(self):

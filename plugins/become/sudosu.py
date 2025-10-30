@@ -87,7 +87,7 @@ class BecomeModule(BecomeBase):
     missing = ('Sorry, a password is required to run sudo', 'sudo: a password is required')
 
     def build_become_command(self, cmd, shell):
-        super(BecomeModule, self).build_become_command(cmd, shell)
+        super().build_become_command(cmd, shell)
 
         if not cmd:
             return cmd

@@ -145,7 +145,7 @@ class SanManagerModule(OneViewModuleBase):
     )
 
     def __init__(self):
-        super(SanManagerModule, self).__init__(additional_arg_spec=self.argument_spec, validate_etag_support=True)
+        super().__init__(additional_arg_spec=self.argument_spec, validate_etag_support=True)
         self.resource_client = self.oneview_client.san_managers
 
     def execute_module(self):

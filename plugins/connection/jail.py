@@ -60,7 +60,7 @@ class Connection(ConnectionBase):
     has_tty = False
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
         self.jail = self._play_context.remote_addr
         if self.modified_jailname_key in kwargs:
@@ -93,7 +93,7 @@ class Connection(ConnectionBase):
 
     def _connect(self):
         """ connect to the jail; nothing to do here """
-        super(Connection, self)._connect()
+        super()._connect()
         if not self._connected:
             display.vvv(f"ESTABLISH JAIL CONNECTION FOR USER: {self._play_context.remote_user}", host=self.jail)
             self._connected = True
@@ -126,7 +126,7 @@ class Connection(ConnectionBase):
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
         """ run a command on the jail """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         p = self._buffered_exec_command(cmd)
 
@@ -150,7 +150,7 @@ class Connection(ConnectionBase):
 
     def put_file(self, in_path, out_path):
         """ transfer a file from local to jail """
-        super(Connection, self).put_file(in_path, out_path)
+        super().put_file(in_path, out_path)
         display.vvv(f"PUT {in_path} TO {out_path}", host=self.jail)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
@@ -176,7 +176,7 @@ class Connection(ConnectionBase):
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from jail to local """
-        super(Connection, self).fetch_file(in_path, out_path)
+        super().fetch_file(in_path, out_path)
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self.jail)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
@@ -200,5 +200,5 @@ class Connection(ConnectionBase):
 
     def close(self):
         """ terminate the connection; nothing to do here """
-        super(Connection, self).close()
+        super().close()
         self._connected = False

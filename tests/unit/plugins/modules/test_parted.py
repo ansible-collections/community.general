@@ -130,7 +130,7 @@ parted_dict3 = {
 
 class TestParted(ModuleTestCase):
     def setUp(self):
-        super(TestParted, self).setUp()
+        super().setUp()
 
         self.module = parted_module
         self.mock_check_parted_label = (patch('ansible_collections.community.general.plugins.modules.parted.check_parted_label', return_value=False))
@@ -146,7 +146,7 @@ class TestParted(ModuleTestCase):
         self.get_bin_path = self.mock_get_bin_path.start()
 
     def tearDown(self):
-        super(TestParted, self).tearDown()
+        super().tearDown()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
         self.mock_parted.stop()

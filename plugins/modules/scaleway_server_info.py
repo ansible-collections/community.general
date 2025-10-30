@@ -177,7 +177,7 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 class ScalewayServerInfo(Scaleway):
 
     def __init__(self, module):
-        super(ScalewayServerInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'servers'
 
         region = module.params["region"]

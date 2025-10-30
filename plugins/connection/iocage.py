@@ -60,7 +60,7 @@ class Connection(Jail):
             host=kwargs[Jail.modified_jailname_key]
         )
 
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
     def get_jail_uuid(self):
         p = subprocess.Popen([self.iocage_cmd, 'get', 'host_hostuuid', self.ioc_jail],

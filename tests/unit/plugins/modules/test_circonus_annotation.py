@@ -19,11 +19,11 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 class TestCirconusAnnotation(ModuleTestCase):
 
     def setUp(self):
-        super(TestCirconusAnnotation, self).setUp()
+        super().setUp()
         self.module = circonus_annotation
 
     def tearDown(self):
-        super(TestCirconusAnnotation, self).tearDown()
+        super().tearDown()
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""

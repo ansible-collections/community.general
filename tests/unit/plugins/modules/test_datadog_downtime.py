@@ -22,11 +22,11 @@ DowntimeRecurrence = datadog_api_client.v1.model.downtime_recurrence.DowntimeRec
 class TestDatadogDowntime(ModuleTestCase):
 
     def setUp(self):
-        super(TestDatadogDowntime, self).setUp()
+        super().setUp()
         self.module = datadog_downtime
 
     def tearDown(self):
-        super(TestDatadogDowntime, self).tearDown()
+        super().tearDown()
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""

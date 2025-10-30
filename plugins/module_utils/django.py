@@ -85,16 +85,16 @@ class _DjangoRunner(PythonRunner):
         arg_fmts = dict(arg_formats) if arg_formats else {}
         arg_fmts.update(_django_std_arg_fmts)
 
-        super(_DjangoRunner, self).__init__(module, ["-m", "django"], arg_formats=arg_fmts, **kwargs)
+        super().__init__(module, ["-m", "django"], arg_formats=arg_fmts, **kwargs)
 
     def __call__(self, output_process=None, check_mode_skip=False, check_mode_return=None, **kwargs):
         args_order = (
             ("command", "no_color", "settings", "pythonpath", "traceback", "verbosity", "skip_checks") + self._prepare_args_order(self.default_args_order)
         )
-        return super(_DjangoRunner, self).__call__(args_order, output_process, check_mode_skip=check_mode_skip, check_mode_return=check_mode_return, **kwargs)
+        return super().__call__(args_order, output_process, check_mode_skip=check_mode_skip, check_mode_return=check_mode_return, **kwargs)
 
     def bare_context(self, *args, **kwargs):
-        return super(_DjangoRunner, self).__call__(*args, **kwargs)
+        return super().__call__(*args, **kwargs)
 
 
 class DjangoModuleHelper(ModuleHelper):
@@ -109,7 +109,7 @@ class DjangoModuleHelper(ModuleHelper):
         self.module["argument_spec"], self.arg_formats = self._build_args(self.module.get("argument_spec", {}),
                                                                           self.arg_formats,
                                                                           *(["std"] + self._django_args))
-        super(DjangoModuleHelper, self).__init__(self.module)
+        super().__init__(self.module)
         if self.django_admin_cmd is not None:
             self.vars.command = self.django_admin_cmd
 

@@ -37,7 +37,7 @@ class CallbackModule(CallbackBase):
 
     def __init__(self):
 
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         self.FAILED_VOICE = None
         self.REGULAR_VOICE = None

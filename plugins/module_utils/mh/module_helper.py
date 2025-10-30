@@ -26,7 +26,7 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
     facts_params: Sequence[str] = ()
 
     def __init__(self, module=None):
-        super(ModuleHelper, self).__init__(module)
+        super().__init__(module)
 
         self.vars = VarDict()
         for name, value in self.module.params.items():

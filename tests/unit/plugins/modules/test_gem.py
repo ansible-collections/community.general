@@ -20,7 +20,7 @@ def get_command(run_command):
 
 class TestGem(ModuleTestCase):
     def setUp(self):
-        super(TestGem, self).setUp()
+        super().setUp()
         self.rubygems_path = ['/usr/bin/gem']
         self.mocker.patch(
             'ansible_collections.community.general.plugins.modules.gem.get_rubygems_path',

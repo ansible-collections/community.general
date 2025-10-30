@@ -91,7 +91,7 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 class ScalewayIpInfo(Scaleway):
 
     def __init__(self, module):
-        super(ScalewayIpInfo, self).__init__(module)
+        super().__init__(module)
         self.name = 'ips'
 
         region = module.params["region"]

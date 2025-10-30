@@ -14,11 +14,11 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 class TestSlackModule(ModuleTestCase):
 
     def setUp(self):
-        super(TestSlackModule, self).setUp()
+        super().setUp()
         self.module = slack
 
     def tearDown(self):
-        super(TestSlackModule, self).tearDown()
+        super().tearDown()
 
     @pytest.fixture
     def fetch_url_mock(self, mocker):

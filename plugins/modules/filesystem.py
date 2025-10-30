@@ -444,7 +444,7 @@ class Btrfs(Filesystem):
     GROW_MOUNTPOINT_ONLY = True
 
     def __init__(self, module):
-        super(Btrfs, self).__init__(module)
+        super().__init__(module)
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
         dummy, stdout, stderr = self.module.run_command([mkfs, '--version'], check_rc=True)
         match = re.search(r" v([0-9.]+)", stdout)
@@ -485,7 +485,7 @@ class F2fs(Filesystem):
     GROW = 'resize.f2fs'
 
     def __init__(self, module):
-        super(F2fs, self).__init__(module)
+        super().__init__(module)
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
         dummy, out, dummy = self.module.run_command([mkfs, os.devnull], check_rc=False, environ_update=self.LANG_ENV)
         # Looking for "	F2FS-tools: mkfs.f2fs Ver: 1.10.0 (2018-01-30)"
@@ -523,7 +523,7 @@ class VFAT(Filesystem):
     GROW_MAX_SPACE_FLAGS = ['-s', 'max']
 
     def __init__(self, module):
-        super(VFAT, self).__init__(module)
+        super().__init__(module)
         if platform.system() == 'FreeBSD':
             self.MKFS = 'newfs_msdos'
         else:

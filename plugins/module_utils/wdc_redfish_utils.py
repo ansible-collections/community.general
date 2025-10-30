@@ -48,12 +48,12 @@ class WdcRedfishUtils(RedfishUtils):
                  module,
                  resource_id,
                  data_modification):
-        super(WdcRedfishUtils, self).__init__(creds=creds,
-                                              root_uri=root_uris[0],
-                                              timeout=timeout,
-                                              module=module,
-                                              resource_id=resource_id,
-                                              data_modification=data_modification)
+        super().__init__(creds=creds,
+                         root_uri=root_uris[0],
+                         timeout=timeout,
+                         module=module,
+                         resource_id=resource_id,
+                         data_modification=data_modification)
         # Update the root URI if we cannot perform a Redfish GET to the first one
         self._set_root_uri(root_uris)
 
@@ -72,7 +72,7 @@ class WdcRedfishUtils(RedfishUtils):
 
     def _find_updateservice_resource(self):
         """Find the update service resource as well as additional WDC-specific resources."""
-        response = super(WdcRedfishUtils, self)._find_updateservice_resource()
+        response = super()._find_updateservice_resource()
         if not response['ret']:
             return response
         return self._find_updateservice_additional_uris()

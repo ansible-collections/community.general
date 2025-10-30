@@ -113,7 +113,7 @@ def mock_good_connection():
 
 class TestKeycloakAuthentication(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakAuthentication, self).setUp()
+        super().setUp()
         self.module = keycloak_clientscope
 
     def test_create_clientscope(self):

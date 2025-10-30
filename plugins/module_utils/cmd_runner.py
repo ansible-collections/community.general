@@ -54,7 +54,7 @@ class FormatError(CmdRunnerException):
         self.value = value
         self.args_formats = args_formats
         self.exc = exc
-        super(FormatError, self).__init__()
+        super().__init__()
 
     def __repr__(self):
         return f"FormatError({self.name!r}, {self.value!r}, {self.args_formats!r}, {self.exc!r})"

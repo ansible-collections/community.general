@@ -27,7 +27,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 class TestPritunlOrg(ModuleTestCase):
     def setUp(self):
-        super(TestPritunlOrg, self).setUp()
+        super().setUp()
         self.module = pritunl_org
 
         # Add backward compatibility
@@ -35,7 +35,7 @@ class TestPritunlOrg(ModuleTestCase):
             self.assertRegex = self.assertRegexpMatches
 
     def tearDown(self):
-        super(TestPritunlOrg, self).tearDown()
+        super().tearDown()
 
     def patch_add_pritunl_organization(self, **kwds):
         return patch(

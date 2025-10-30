@@ -15,7 +15,7 @@ class NPMModuleTestCase(ModuleTestCase):
     module = npm
 
     def setUp(self):
-        super(NPMModuleTestCase, self).setUp()
+        super().setUp()
         ansible_module_path = "ansible_collections.community.general.plugins.modules.npm.AnsibleModule"
         self.mock_run_command = patch(f'{ansible_module_path}.run_command')
         self.module_main_command = self.mock_run_command.start()
@@ -26,7 +26,7 @@ class NPMModuleTestCase(ModuleTestCase):
     def tearDown(self):
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
-        super(NPMModuleTestCase, self).tearDown()
+        super().tearDown()
 
     def module_main(self, exit_exc):
         with self.assertRaises(exit_exc) as exc:

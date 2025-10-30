@@ -128,12 +128,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
     def verify_file(self, path):
         """Return the possibly of a file being consumable by this plugin."""
         return (
-            super(InventoryModule, self).verify_file(path) and
+            super().verify_file(path) and
             path.endswith(("gitlab_runners.yaml", "gitlab_runners.yml")))
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_GITLAB:
             raise AnsibleError('The GitLab runners dynamic inventory plugin requires python-gitlab: https://python-gitlab.readthedocs.io/en/stable/')
-        super(InventoryModule, self).parse(inventory, loader, path, cache)
+        super().parse(inventory, loader, path, cache)
         self._read_config_data(path)
         self._populate()

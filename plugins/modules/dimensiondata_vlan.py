@@ -180,7 +180,7 @@ class DimensionDataVlanModule(DimensionDataModule):
         Create a new Dimension Data VLAN module.
         """
 
-        super(DimensionDataVlanModule, self).__init__(
+        super().__init__(
             module=AnsibleModule(
                 argument_spec=DimensionDataModule.argument_spec_with_wait(
                     name=dict(required=True, type='str'),

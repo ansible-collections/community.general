@@ -45,7 +45,7 @@ except ImportError:
 
 class TestGitlabDeployKey(GitlabModuleTestCase):
     def setUp(self):
-        super(TestGitlabDeployKey, self).setUp()
+        super().setUp()
 
         self.moduleUtil = GitLabDeployKey(module=self.mock_module, gitlab_instance=self.gitlab_instance)
 

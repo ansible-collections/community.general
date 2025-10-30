@@ -58,14 +58,14 @@ class Connection(ConnectionBase):
     default_user = 'root'
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
         self.container_name = None
         self.container = None
 
     def _connect(self):
         """ connect to the lxc; nothing to do here """
-        super(Connection, self)._connect()
+        super()._connect()
 
         if not HAS_LIBLXC:
             msg = "lxc python bindings are not installed"
@@ -118,7 +118,7 @@ class Connection(ConnectionBase):
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
         """ run a command on the chroot """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         # python2-lxc needs bytes. python3-lxc needs text.
         executable = to_native(self.get_option('executable'), errors='surrogate_or_strict')
@@ -171,7 +171,7 @@ class Connection(ConnectionBase):
 
     def put_file(self, in_path, out_path):
         ''' transfer a file from local to lxc '''
-        super(Connection, self).put_file(in_path, out_path)
+        super().put_file(in_path, out_path)
         self._display.vvv(f"PUT {in_path} TO {out_path}", host=self.container_name)
         in_path = to_bytes(in_path, errors='surrogate_or_strict')
         out_path = to_bytes(out_path, errors='surrogate_or_strict')
@@ -199,7 +199,7 @@ class Connection(ConnectionBase):
 
     def fetch_file(self, in_path, out_path):
         ''' fetch a file from lxc to local '''
-        super(Connection, self).fetch_file(in_path, out_path)
+        super().fetch_file(in_path, out_path)
         self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self.container_name)
         in_path = to_bytes(in_path, errors='surrogate_or_strict')
         out_path = to_bytes(out_path, errors='surrogate_or_strict')
@@ -230,5 +230,5 @@ class Connection(ConnectionBase):
 
     def close(self):
         ''' terminate the connection; nothing to do here '''
-        super(Connection, self).close()
+        super().close()
         self._connected = False

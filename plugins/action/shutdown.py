@@ -58,7 +58,7 @@ class ActionModule(ActionBase):
     }
 
     def __init__(self, *args, **kwargs):
-        super(ActionModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def delay(self):
@@ -200,7 +200,7 @@ class ActionModule(ActionBase):
         if task_vars is None:
             task_vars = {}
 
-        result = super(ActionModule, self).run(tmp, task_vars)
+        result = super().run(tmp, task_vars)
 
         if result.get('skipped', False) or result.get('failed', False):
             return result

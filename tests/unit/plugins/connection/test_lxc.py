@@ -31,7 +31,7 @@ def lxc(request):
         _container_states = {}
 
         def __init__(self, name):
-            super(ContainerMock, self).__init__()
+            super().__init__()
             self.name = name
 
         @property
