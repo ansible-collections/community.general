@@ -338,7 +338,7 @@ def main():
                 kc.delete_localization_value(locale, override['key'], parent_id)
                 result['changed'] = True
 
-            result['msg'] = "Locale %s has no overrides." % (locale)
+            result['msg'] = f"Locale {locale} has no overrides."
 
         result['end_state'] = changeset
 
