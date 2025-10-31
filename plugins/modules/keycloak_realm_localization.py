@@ -328,9 +328,9 @@ def main():
 
             if old_overrides:
                 result['changed'] = True
-                result['msg'] = "All overrides for locale %s would be deleted." % (locale)
+                result['msg'] = f"All overrides for locale {locale} would be deleted."
             else:
-                result['msg'] = "No overrides for locale %s to be deleted." % (locale)
+                result['msg'] = f"No overrides for locale {locale} to be deleted."
 
         else:
 
