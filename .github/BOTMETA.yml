@@ -807,6 +807,8 @@ files:
     maintainers: Slezhuk pertoft
   $modules/kdeconfig.py:
     maintainers: smeso
+  $modules/kea_command.py:
+    maintainers: mirabilos
   $modules/kernel_blacklist.py:
     maintainers: matze
   $modules/keycloak_:
