@@ -294,7 +294,7 @@ def main():
 
             if module.check_mode:
                 # Dry-run: report intent without side effects
-                result['msg'] = "Locale %s overrides would be updated." % (locale)
+                result['msg'] = f"Locale {locale} overrides would be updated."
 
             else:
 
