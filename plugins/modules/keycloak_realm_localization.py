@@ -307,7 +307,7 @@ def main():
                 result['msg'] = f"Locale {locale} overrides have been updated."
 
         else:
-            result['msg'] = "Locale %s overrides are in sync." % (locale)
+            result['msg'] = f"Locale {locale} overrides are in sync."
 
         # For accurate end_state, read back from API unless we are in check_mode
         if not module.check_mode:
