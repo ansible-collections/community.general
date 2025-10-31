@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+import unittest
+from unittest.mock import patch
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
