@@ -594,7 +594,7 @@ class KeycloakAPI(object):
         try:
             return self._request_and_deserialize(realm_url, method='GET')
         except Exception as e:
-            self.fail_request(e, msg='Could not read localization overrides for realm %s, locale %s: %s' % (realm, locale, str(e)),
+            self.fail_request(e, msg=f'Could not read localization overrides for realm {realm}, locale {locale}: {e}',
                               exception=traceback.format_exc())
 
     def set_localization_value(self, locale, key, value, realm="master"):
