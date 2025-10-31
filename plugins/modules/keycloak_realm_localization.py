@@ -304,7 +304,7 @@ def main():
                 for override in to_update:
                     kc.set_localization_value(locale, override['key'], override['value'], parent_id)
 
-                result['msg'] = "Locale %s overrides have been updated." % (locale)
+                result['msg'] = f"Locale {locale} overrides have been updated."
 
         else:
             result['msg'] = "Locale %s overrides are in sync." % (locale)
