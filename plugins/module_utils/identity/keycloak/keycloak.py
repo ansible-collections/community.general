@@ -644,7 +644,7 @@ class KeycloakAPI(object):
         try:
             return self._request(realm_url, method='DELETE')
         except Exception as e:
-            self.fail_request(e, msg='Could not delete localization value in realm %s, locale %s, key %s: %s' % (realm, locale, key, str(e)),
+            self.fail_request(e, msg=f'Could not delete localization value in realm {realm}, locale {locale}, key {key}: {e}',
                               exception=traceback.format_exc())
 
     def get_clients(self, realm='master', filter=None):
