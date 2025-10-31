@@ -309,7 +309,7 @@ class Zpool(object):
         match = re.match(r'^(/dev/(?:sd|vd)[a-z])\d+$', device)
         if match:
             return match.group(1)
-        
+
         # disk/by-id drives
         match = re.match(r'^(/dev/disk/by-id/(.*))-part\d+$', device)
         if match:
