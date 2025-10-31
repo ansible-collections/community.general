@@ -81,7 +81,7 @@ def mock_good_connection():
 
 class TestKeycloakRealmLocalization(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealmLocalization, self).setUp()
+        super().setUp()
         self.module = keycloak_realm_localization
 
     def test_present_no_change_in_sync(self):
