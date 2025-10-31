@@ -621,7 +621,7 @@ class KeycloakAPI(object):
         try:
             return self._request(realm_url, method='PUT', data=to_native(value), headers=headers)
         except Exception as e:
-            self.fail_request(e, msg='Could not set localization value in realm %s, locale %s: %s=%s: %s' % (realm, locale, key, value, str(e)),
+            self.fail_request(e, msg=f'Could not set localization value in realm {realm}, locale {locale}: {key}={value}: {e}',
                               exception=traceback.format_exc())
 
     def delete_localization_value(self, locale, key, realm="master"):
