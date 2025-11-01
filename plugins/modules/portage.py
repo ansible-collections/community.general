@@ -551,6 +551,7 @@ def main():
             backtrack=dict(type="int"),
             deep=dict(default=False, type="bool"),
             newuse=dict(default=False, type="bool"),
+            changed_deps=dict(default=False, type="bool"),
             changed_use=dict(default=False, type="bool"),
             oneshot=dict(default=False, type="bool"),
             noreplace=dict(default=True, type="bool"),
