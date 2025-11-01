@@ -19,6 +19,9 @@ URL_REALMS = "{url}/admin/realms"
 URL_REALM = "{url}/admin/realms/{realm}"
 URL_REALM_KEYS_METADATA = "{url}/admin/realms/{realm}/keys"
 
+URL_LOCALIZATIONS = "{url}/admin/realms/{realm}/localization/{locale}"
+URL_LOCALIZATION = "{url}/admin/realms/{realm}/localization/{locale}/{key}"
+
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
 URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
@@ -364,7 +367,7 @@ class KeycloakAPI:
         self.restheaders = connection_header
         self.http_agent = self.module.params.get('http_agent')
 
-    def _request(self, url, method, data=None):
+    def _request(self, url, method, data=None, headers=None):
         """ Makes a request to Keycloak and returns the raw response.
         If a 401 is returned, attempts to re-authenticate
         using first the module's refresh_token (if provided)
@@ -375,12 +378,13 @@ class KeycloakAPI:
         :param url: request path
         :param method: request method (e.g., 'GET', 'POST', etc.)
         :param data: (optional) data for request
+        :param headers headers to be sent with request, defaults to self.restheaders
         :return: raw API response
         """
-        def make_request_catching_401():
+        def make_request_catching_401(headers):
             try:
                 return open_url(url, method=method, data=data,
-                                http_agent=self.http_agent, headers=self.restheaders,
+                                http_agent=self.http_agent, headers=headers,
                                 timeout=self.connection_timeout,
                                 validate_certs=self.validate_certs)
             except HTTPError as e:
@@ -388,7 +392,10 @@ class KeycloakAPI:
                     raise e
                 return e
 
-        r = make_request_catching_401()
+        if headers is None:
+            headers = self.restheaders
+
+        r = make_request_catching_401(headers)
 
         if isinstance(r, Exception):
             # Try to refresh token and retry, if available
@@ -563,6 +570,78 @@ class KeycloakAPI:
             return self._request(realm_url, method='DELETE')
         except Exception as e:
             self.fail_request(e, msg=f'Could not delete realm {realm}: {e}',
+                              exception=traceback.format_exc())
+
+    def get_localization_values(self, locale, realm="master"):
+        """
+        Get all localization overrides for a given realm and locale.
+
+        Parameters:
+            locale (str): Locale code (for example, 'en', 'fi', 'de').
+            realm (str): Realm name. Defaults to 'master'.
+
+        Returns:
+            dict[str, str]: Mapping of localization keys to override values.
+
+        Raises:
+            KeycloakError: Wrapped HTTP/JSON error with context
+        """
+        realm_url = URL_LOCALIZATIONS.format(url=self.baseurl, realm=realm, locale=locale)
+
+        try:
+            return self._request_and_deserialize(realm_url, method='GET')
+        except Exception as e:
+            self.fail_request(e, msg=f'Could not read localization overrides for realm {realm}, locale {locale}: {e}',
+                              exception=traceback.format_exc())
+
+    def set_localization_value(self, locale, key, value, realm="master"):
+        """
+        Create or update a single localization override for the given key.
+
+        Parameters:
+            locale (str): Locale code (for example, 'en').
+            key (str): Localization message key to set.
+            value (str): Override value to set.
+            realm (str): Realm name. Defaults to 'master'.
+
+        Returns:
+            HTTPResponse: Response object on success.
+
+        Raises:
+            KeycloakError: Wrapped HTTP error with context
+        """
+        realm_url = URL_LOCALIZATION.format(url=self.baseurl, realm=realm, locale=locale, key=key)
+
+        headers = self.restheaders.copy()
+        headers['Content-Type'] = 'text/plain; charset=utf-8'
+
+        try:
+            return self._request(realm_url, method='PUT', data=to_native(value), headers=headers)
+        except Exception as e:
+            self.fail_request(e, msg=f'Could not set localization value in realm {realm}, locale {locale}: {key}={value}: {e}',
+                              exception=traceback.format_exc())
+
+    def delete_localization_value(self, locale, key, realm="master"):
+        """
+        Delete a single localization override key for the given locale.
+
+        Parameters:
+            locale (str): Locale code (for example, 'en').
+            key (str): Localization message key to delete.
+            realm (str): Realm name. Defaults to 'master'.
+
+        Returns:
+            HTTPResponse: Response object on success.
+
+        Raises:
+            KeycloakError: Wrapped HTTP error with context
+        """
+        realm_url = URL_LOCALIZATION.format(url=self.baseurl, realm=realm, locale=locale, key=key)
+
+        try:
+            return self._request(realm_url, method='DELETE')
+        except Exception as e:
+            self.fail_request(e, msg=f'Could not delete localization value in realm {realm}, locale {locale}, key {key}: {e}',
                               exception=traceback.format_exc())
 
     def get_clients(self, realm='master', filter=None):
