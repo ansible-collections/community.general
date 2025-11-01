@@ -205,7 +205,7 @@ def sensu_check(module, path, name, state='present', backup=False):
             else:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
         except ValueError:
-            msg = '{path} contains invalid JSON'.format(path=path)
+            msg = f'{path} contains invalid JSON'
             module.fail_json(msg=msg)
     finally:
         if stream:
@@ -255,36 +255,36 @@ def sensu_check(module, path, name, state='present', backup=False):
                 if opt not in check or check[opt] != module.params[opt]:
                     check[opt] = module.params[opt]
                     changed = True
-                    reasons.append('`{opt}\' did not exist or was different'.format(opt=opt))
+                    reasons.append(f'`{opt}\' did not exist or was different')
             else:
                 if opt in check:
                     del check[opt]
                     changed = True
-                    reasons.append('`{opt}\' was removed'.format(opt=opt))
+                    reasons.append(f'`{opt}\' was removed')
 
         if module.params['custom']:
             # Convert to json
             custom_params = module.params['custom']
             overwrited_fields = set(custom_params.keys()) & set(simple_opts + ['type', 'subdue', 'subdue_begin', 'subdue_end'])
             if overwrited_fields:
-                msg = 'You can\'t overwriting standard module parameters via "custom". You are trying overwrite: {opt}'.format(opt=list(overwrited_fields))
+                msg = f'You can\'t overwriting standard module parameters via "custom". You are trying overwrite: {list(overwrited_fields)}'
                 module.fail_json(msg=msg)
 
             for k, v in custom_params.items():
                 if k in config['checks'][name]:
                     if not config['checks'][name][k] == v:
                         changed = True
-                        reasons.append('`custom param {opt}\' was changed'.format(opt=k))
+                        reasons.append(f'`custom param {k}\' was changed')
                 else:
                     changed = True
-                    reasons.append('`custom param {opt}\' was added'.format(opt=k))
+                    reasons.append(f'`custom param {k}\' was added')
                 check[k] = v
             simple_opts += custom_params.keys()
 
         # Remove obsolete custom params
         for opt in set(config['checks'][name].keys()) - set(simple_opts + ['type', 'subdue', 'subdue_begin', 'subdue_end']):
             changed = True
-            reasons.append('`custom param {opt}\' was deleted'.format(opt=opt))
+            reasons.append(f'`custom param {opt}\' was deleted')
             del check[opt]
 
         if module.params['metric']:
