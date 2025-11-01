@@ -1,0 +1,2 @@
+bugfixes:
+  - zpool - idempotency failed when canonical device IDs were used; the fix now ensures consistent device path normalization (https://github.com/ansible-collections/community.general/issues/10771, https://github.com/ansible-collections/community.general/issues/10744, https://github.com/ansible-collections/community.general/pull/11020).

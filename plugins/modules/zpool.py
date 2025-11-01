@@ -310,11 +310,16 @@ class Zpool:
         if match:
             return match.group(1)
 
+        # disk/by-id drives
+        match = re.match(r'^(/dev/disk/by-id/(.*))-part\d+$', device)
+        if match:
+            return match.group(1)
+
         return device
 
     def get_current_layout(self):
-        with self.zpool_runner('subcommand full_paths real_paths name', check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(subcommand='status', full_paths=True, real_paths=True)
+        with self.zpool_runner('subcommand full_paths name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(subcommand='status', full_paths=True)
 
         vdevs = []
         current = None
@@ -433,8 +438,8 @@ class Zpool:
             return {'prepared': stdout}
 
     def list_vdevs_with_names(self):
-        with self.zpool_runner('subcommand full_paths real_paths name', check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(subcommand='status', full_paths=True, real_paths=True)
+        with self.zpool_runner('subcommand full_paths name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(subcommand='status', full_paths=True)
         in_cfg = False
         saw_pool = False
         vdevs = []
