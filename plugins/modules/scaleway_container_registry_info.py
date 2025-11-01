@@ -82,7 +82,9 @@ container_registry:
 """
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
+    SCALEWAY_REGIONS,
+    scaleway_argument_spec,
+    Scaleway,
 )
 from ansible.module_utils.basic import AnsibleModule
 
@@ -108,10 +110,7 @@ def info_strategy(api, wished_cn):
 
 def core(module):
     region = module.params["region"]
-    wished_container_namespace = {
-        "project_id": module.params["project_id"],
-        "name": module.params["name"]
-    }
+    wished_container_namespace = {"project_id": module.params["project_id"], "name": module.params["name"]}
 
     api = Scaleway(module=module)
     api.api_path = f"registry/v1/regions/{region}/namespaces"
@@ -123,11 +122,13 @@ def core(module):
 
 def main():
     argument_spec = scaleway_argument_spec()
-    argument_spec.update(dict(
-        project_id=dict(type='str', required=True),
-        region=dict(type='str', required=True, choices=SCALEWAY_REGIONS),
-        name=dict(type='str', required=True)
-    ))
+    argument_spec.update(
+        dict(
+            project_id=dict(type="str", required=True),
+            region=dict(type="str", required=True, choices=SCALEWAY_REGIONS),
+            name=dict(type="str", required=True),
+        )
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -136,5 +137,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

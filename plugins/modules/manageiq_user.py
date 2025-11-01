@@ -135,7 +135,7 @@ from ansible_collections.community.general.plugins.module_utils.manageiq import 
 
 class ManageIQUser:
     """
-        Object to execute user management operations in manageiq.
+    Object to execute user management operations in manageiq.
     """
 
     def __init__(self, manageiq):
@@ -146,57 +146,56 @@ class ManageIQUser:
         self.client = self.manageiq.client
 
     def group_id(self, description):
-        """ Search for group id by group description.
+        """Search for group id by group description.
 
         Returns:
             the group id, or send a module Fail signal if group not found.
         """
-        group = self.manageiq.find_collection_resource_by('groups', description=description)
+        group = self.manageiq.find_collection_resource_by("groups", description=description)
         if not group:  # group doesn't exist
-            self.module.fail_json(
-                msg=f"group {description} does not exist in manageiq")
+            self.module.fail_json(msg=f"group {description} does not exist in manageiq")
 
-        return group['id']
+        return group["id"]
 
     def user(self, userid):
-        """ Search for user object by userid.
+        """Search for user object by userid.
 
         Returns:
             the user, or None if user not found.
         """
-        return self.manageiq.find_collection_resource_by('users', userid=userid)
+        return self.manageiq.find_collection_resource_by("users", userid=userid)
 
     def compare_user(self, user, name, group_id, password, email):
-        """ Compare user fields with new field values.
+        """Compare user fields with new field values.
 
         Returns:
             false if user fields have some difference from new fields, true o/w.
         """
         found_difference = (
-            (name and user['name'] != name) or
-            (password is not None) or
-            (email and user['email'] != email) or
-            (group_id and user['current_group_id'] != group_id)
+            (name and user["name"] != name)
+            or (password is not None)
+            or (email and user["email"] != email)
+            or (group_id and user["current_group_id"] != group_id)
         )
 
         return not found_difference
 
     def delete_user(self, user):
-        """ Deletes a user from manageiq.
+        """Deletes a user from manageiq.
 
         Returns:
             a short message describing the operation executed.
         """
         try:
             url = f"{self.api_url}/users/{user['id']}"
-            result = self.client.post(url, action='delete')
+            result = self.client.post(url, action="delete")
         except Exception as e:
             self.module.fail_json(msg=f"failed to delete user {user['userid']}: {e}")
 
-        return dict(changed=True, msg=result['message'])
+        return dict(changed=True, msg=result["message"])
 
     def edit_user(self, user, name, group, password, email):
-        """ Edit a user from manageiq.
+        """Edit a user from manageiq.
 
         Returns:
             a short message describing the operation executed.
@@ -204,40 +203,36 @@ class ManageIQUser:
         group_id = None
         url = f"{self.api_url}/users/{user['id']}"
 
-        resource = dict(userid=user['userid'])
+        resource = dict(userid=user["userid"])
         if group is not None:
             group_id = self.group_id(group)
-            resource['group'] = dict(id=group_id)
+            resource["group"] = dict(id=group_id)
         if name is not None:
-            resource['name'] = name
+            resource["name"] = name
         if email is not None:
-            resource['email'] = email
+            resource["email"] = email
 
         # if there is a password param, but 'update_password' is 'on_create'
         # then discard the password (since we're editing an existing user)
-        if self.module.params['update_password'] == 'on_create':
+        if self.module.params["update_password"] == "on_create":
             password = None
         if password is not None:
-            resource['password'] = password
+            resource["password"] = password
 
         # check if we need to update ( compare_user is true is no difference found )
         if self.compare_user(user, name, group_id, password, email):
-            return dict(
-                changed=False,
-                msg=f"user {user['userid']} is not changed.")
+            return dict(changed=False, msg=f"user {user['userid']} is not changed.")
 
         # try to update user
         try:
-            result = self.client.post(url, action='edit', resource=resource)
+            result = self.client.post(url, action="edit", resource=resource)
         except Exception as e:
             self.module.fail_json(msg=f"failed to update user {user['userid']}: {e}")
 
-        return dict(
-            changed=True,
-            msg=f"successfully updated the user {user['userid']}: {result}")
+        return dict(changed=True, msg=f"successfully updated the user {user['userid']}: {result}")
 
     def create_user(self, userid, name, group, password, email):
-        """ Creates the user in manageiq.
+        """Creates the user in manageiq.
 
         Returns:
             the created user id, name, created_on timestamp,
@@ -245,37 +240,34 @@ class ManageIQUser:
         """
         # check for required arguments
         for key, value in dict(name=name, group=group, password=password).items():
-            if value in (None, ''):
+            if value in (None, ""):
                 self.module.fail_json(msg=f"missing required argument: {key}")
 
         group_id = self.group_id(group)
-        url = f'{self.api_url}/users'
+        url = f"{self.api_url}/users"
 
-        resource = {'userid': userid, 'name': name, 'password': password, 'group': {'id': group_id}}
+        resource = {"userid": userid, "name": name, "password": password, "group": {"id": group_id}}
         if email is not None:
-            resource['email'] = email
+            resource["email"] = email
 
         # try to create a new user
         try:
-            result = self.client.post(url, action='create', resource=resource)
+            result = self.client.post(url, action="create", resource=resource)
         except Exception as e:
             self.module.fail_json(msg=f"failed to create user {userid}: {e}")
 
-        return dict(
-            changed=True,
-            msg=f"successfully created the user {userid}: {result['results']}")
+        return dict(changed=True, msg=f"successfully created the user {userid}: {result['results']}")
 
 
 def main():
     argument_spec = dict(
-        userid=dict(required=True, type='str'),
+        userid=dict(required=True, type="str"),
         name=dict(),
         password=dict(no_log=True),
         group=dict(),
         email=dict(),
-        state=dict(choices=['absent', 'present'], default='present'),
-        update_password=dict(choices=['always', 'on_create'],
-                             default='always'),
+        state=dict(choices=["absent", "present"], default="present"),
+        update_password=dict(choices=["always", "on_create"], default="always"),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
@@ -284,12 +276,12 @@ def main():
         argument_spec=argument_spec,
     )
 
-    userid = module.params['userid']
-    name = module.params['name']
-    password = module.params['password']
-    group = module.params['group']
-    email = module.params['email']
-    state = module.params['state']
+    userid = module.params["userid"]
+    name = module.params["name"]
+    password = module.params["password"]
+    group = module.params["group"]
+    email = module.params["email"]
+    state = module.params["state"]
 
     manageiq = ManageIQ(module)
     manageiq_user = ManageIQUser(manageiq)
@@ -303,9 +295,7 @@ def main():
             res_args = manageiq_user.delete_user(user)
         # if we do not have a user, nothing to do
         else:
-            res_args = dict(
-                changed=False,
-                msg=f"user {userid}: does not exist in manageiq")
+            res_args = dict(changed=False, msg=f"user {userid}: does not exist in manageiq")
 
     # user should exist
     if state == "present":

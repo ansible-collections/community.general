@@ -96,7 +96,6 @@ import json
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, no_log=True),
@@ -106,12 +105,12 @@ def main():
             description=dict(),
             revision=dict(required=True),
             user=dict(),
-            validate_certs=dict(default=True, type='bool'),
-            app_name_exact_match=dict(type='bool', default=False),
+            validate_certs=dict(default=True, type="bool"),
+            app_name_exact_match=dict(type="bool", default=False),
         ),
-        required_one_of=[['app_name', 'application_id']],
-        required_if=[('app_name_exact_match', True, ['app_name'])],
-        supports_check_mode=True
+        required_one_of=[["app_name", "application_id"]],
+        required_if=[("app_name_exact_match", True, ["app_name"])],
+        supports_check_mode=True,
     )
 
     # build list of params
@@ -139,15 +138,13 @@ def main():
 
     # Send the data to New Relic
     url = f"https://api.newrelic.com/v2/applications/{quote(str(app_id), safe='')}/deployments.json"
-    data = {
-        'deployment': params
-    }
+    data = {"deployment": params}
     headers = {
-        'Api-Key': module.params["token"],
-        'Content-Type': 'application/json',
+        "Api-Key": module.params["token"],
+        "Content-Type": "application/json",
     }
     response, info = fetch_url(module, url, data=module.jsonify(data), headers=headers, method="POST")
-    if info['status'] in (200, 201):
+    if info["status"] in (200, 201):
         module.exit_json(changed=True)
     else:
         module.fail_json(msg=f"Unable to insert deployment marker: {info['msg']}")
@@ -158,15 +155,15 @@ def get_application_id(module):
     data = f"filter[name]={module.params['app_name']}"
     application_id = None
     headers = {
-        'Api-Key': module.params["token"],
+        "Api-Key": module.params["token"],
     }
     response, info = fetch_url(module, url, data=data, headers=headers)
-    if info['status'] not in (200, 201):
+    if info["status"] not in (200, 201):
         module.fail_json(msg=f"Unable to get application: {info['msg']}")
 
     result = json.loads(response.read())
     if result is None or len(result.get("applications", "")) == 0:
-        module.fail_json(msg=f"No application found with name \"{module.params['app_name']}\"")
+        module.fail_json(msg=f'No application found with name "{module.params["app_name"]}"')
 
     if module.params["app_name_exact_match"]:
         for item in result["applications"]:
@@ -174,12 +171,12 @@ def get_application_id(module):
                 application_id = item["id"]
                 break
         if application_id is None:
-            module.fail_json(msg=f"No application found with exact name \"{module.params['app_name']}\"")
+            module.fail_json(msg=f'No application found with exact name "{module.params["app_name"]}"')
     else:
         application_id = result["applications"][0]["id"]
 
     return application_id
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

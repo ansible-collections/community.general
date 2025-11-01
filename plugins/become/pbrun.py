@@ -86,10 +86,9 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
+    name = "community.general.pbrun"
 
-    name = 'community.general.pbrun'
-
-    prompt = 'Password:'
+    prompt = "Password:"
 
     def build_become_command(self, cmd, shell):
         super().build_become_command(cmd, shell)
@@ -97,11 +96,11 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        become_exe = self.get_option('become_exe')
+        become_exe = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        become_user = self.get_option('become_user')
-        user = f'-u {become_user}' if become_user else ''
-        noexe = not self.get_option('wrap_exe')
+        flags = self.get_option("become_flags")
+        become_user = self.get_option("become_user")
+        user = f"-u {become_user}" if become_user else ""
+        noexe = not self.get_option("wrap_exe")
 
         return f"{become_exe} {flags} {user} {self._build_success_command(cmd, shell, noexe=noexe)}"

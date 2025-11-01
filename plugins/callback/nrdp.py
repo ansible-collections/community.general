@@ -73,13 +73,13 @@ from ansible.plugins.callback import CallbackBase
 
 
 class CallbackModule(CallbackBase):
-    '''
+    """
     send ansible-playbook to Nagios server using nrdp protocol
-    '''
+    """
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'community.general.nrdp'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "community.general.nrdp"
     CALLBACK_NEEDS_WHITELIST = True
 
     # Nagios states
@@ -98,25 +98,26 @@ class CallbackModule(CallbackBase):
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        self.url = self.get_option('url')
-        if not self.url.endswith('/'):
-            self.url += '/'
-        self.token = self.get_option('token')
-        self.hostname = self.get_option('hostname')
-        self.servicename = self.get_option('servicename')
-        self.validate_nrdp_certs = self.get_option('validate_certs')
+        self.url = self.get_option("url")
+        if not self.url.endswith("/"):
+            self.url += "/"
+        self.token = self.get_option("token")
+        self.hostname = self.get_option("hostname")
+        self.servicename = self.get_option("servicename")
+        self.validate_nrdp_certs = self.get_option("validate_certs")
 
-        if (self.url or self.token or self.hostname or
-                self.servicename) is None:
-            self._display.warning("NRDP callback wants the NRDP_URL,"
-                                  " NRDP_TOKEN, NRDP_HOSTNAME,"
-                                  " NRDP_SERVICENAME"
-                                  " environment variables'."
-                                  " The NRDP callback plugin is disabled.")
+        if (self.url or self.token or self.hostname or self.servicename) is None:
+            self._display.warning(
+                "NRDP callback wants the NRDP_URL,"
+                " NRDP_TOKEN, NRDP_HOSTNAME,"
+                " NRDP_SERVICENAME"
+                " environment variables'."
+                " The NRDP callback plugin is disabled."
+            )
             self.disabled = True
 
     def _send_nrdp(self, state, msg):
-        '''
+        """
         nrpd service check send XMLDATA like this:
         <?xml version='1.0'?>
             <checkresults>
@@ -127,7 +128,7 @@ class CallbackModule(CallbackBase):
                     <output>WARNING: Danger Will Robinson!|perfdata</output>
                 </checkresult>
             </checkresults>
-        '''
+        """
         xmldata = "<?xml version='1.0'?>\n"
         xmldata += "<checkresults>\n"
         xmldata += "<checkresult type='service'>\n"
@@ -138,31 +139,24 @@ class CallbackModule(CallbackBase):
         xmldata += "</checkresult>\n"
         xmldata += "</checkresults>\n"
 
-        body = {
-            'cmd': 'submitcheck',
-            'token': self.token,
-            'XMLDATA': to_bytes(xmldata)
-        }
+        body = {"cmd": "submitcheck", "token": self.token, "XMLDATA": to_bytes(xmldata)}
 
         try:
-            response = open_url(self.url,
-                                data=urlencode(body),
-                                method='POST',
-                                validate_certs=self.validate_nrdp_certs)
+            response = open_url(self.url, data=urlencode(body), method="POST", validate_certs=self.validate_nrdp_certs)
             return response.read()
         except Exception as ex:
             self._display.warning(f"NRDP callback cannot send result {ex}")
 
     def v2_playbook_on_play_start(self, play):
-        '''
+        """
         Display Playbook and play start messages
-        '''
+        """
         self.play = play
 
     def v2_playbook_on_stats(self, stats):
-        '''
+        """
         Display info about playbook statistics
-        '''
+        """
         name = self.play
         gstats = ""
         hosts = sorted(stats.processed.keys())
@@ -170,13 +164,14 @@ class CallbackModule(CallbackBase):
         for host in hosts:
             stat = stats.summarize(host)
             gstats += (
-                f"'{host}_ok'={stat['ok']} '{host}_changed'={stat['changed']} '{host}_unreachable'={stat['unreachable']} '{host}_failed'={stat['failures']} "
+                f"'{host}_ok'={stat['ok']} '{host}_changed'={stat['changed']}"
+                f" '{host}_unreachable'={stat['unreachable']} '{host}_failed'={stat['failures']} "
             )
             # Critical when failed tasks or unreachable host
-            critical += stat['failures']
-            critical += stat['unreachable']
+            critical += stat["failures"]
+            critical += stat["unreachable"]
             # Warning when changed tasks
-            warning += stat['changed']
+            warning += stat["changed"]
 
         msg = f"{name} | {gstats}"
         if critical:

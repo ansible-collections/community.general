@@ -121,25 +121,24 @@ from ansible.module_utils.basic import AnsibleModule
 
 class ZPoolFacts:
     def __init__(self, module):
-
         self.module = module
-        self.name = module.params['name']
-        self.parsable = module.params['parsable']
-        self.properties = module.params['properties']
+        self.name = module.params["name"]
+        self.parsable = module.params["parsable"]
+        self.properties = module.params["properties"]
         self._pools = defaultdict(dict)
         self.facts = []
 
     def pool_exists(self):
-        cmd = [self.module.get_bin_path('zpool'), 'list', self.name]
+        cmd = [self.module.get_bin_path("zpool"), "list", self.name]
         rc, dummy, dummy = self.module.run_command(cmd)
         return rc == 0
 
     def get_facts(self):
-        cmd = [self.module.get_bin_path('zpool'), 'get', '-H']
+        cmd = [self.module.get_bin_path("zpool"), "get", "-H"]
         if self.parsable:
-            cmd.append('-p')
-        cmd.append('-o')
-        cmd.append('name,property,value')
+            cmd.append("-p")
+        cmd.append("-o")
+        cmd.append("name,property,value")
         cmd.append(self.properties)
         if self.name:
             cmd.append(self.name)
@@ -147,46 +146,46 @@ class ZPoolFacts:
         rc, out, err = self.module.run_command(cmd, check_rc=True)
 
         for line in out.splitlines():
-            pool, prop, value = line.split('\t')
+            pool, prop, value = line.split("\t")
 
             self._pools[pool].update({prop: value})
 
         for k, v in self._pools.items():
-            v.update({'name': k})
+            v.update({"name": k})
             self.facts.append(v)
 
-        return {'ansible_zfs_pools': self.facts}
+        return {"ansible_zfs_pools": self.facts}
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(aliases=['pool', 'zpool'], type='str'),
-            parsable=dict(default=False, type='bool'),
-            properties=dict(default='all', type='str'),
+            name=dict(aliases=["pool", "zpool"], type="str"),
+            parsable=dict(default=False, type="bool"),
+            properties=dict(default="all", type="str"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     zpool_facts = ZPoolFacts(module)
 
     result = {
-        'changed': False,
-        'name': zpool_facts.name,
+        "changed": False,
+        "name": zpool_facts.name,
     }
     if zpool_facts.parsable:
-        result['parsable'] = zpool_facts.parsable
+        result["parsable"] = zpool_facts.parsable
 
     if zpool_facts.name is not None:
         if zpool_facts.pool_exists():
-            result['ansible_facts'] = zpool_facts.get_facts()
+            result["ansible_facts"] = zpool_facts.get_facts()
         else:
-            module.fail_json(msg=f'ZFS pool {zpool_facts.name} does not exist!')
+            module.fail_json(msg=f"ZFS pool {zpool_facts.name} does not exist!")
     else:
-        result['ansible_facts'] = zpool_facts.get_facts()
+        result["ansible_facts"] = zpool_facts.get_facts()
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

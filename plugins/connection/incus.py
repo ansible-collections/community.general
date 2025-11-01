@@ -84,7 +84,7 @@ from ansible.plugins.connection import ConnectionBase
 
 
 class Connection(ConnectionBase):
-    """ Incus based connections """
+    """Incus based connections"""
 
     transport = "incus"
     has_pipelining = True
@@ -98,12 +98,13 @@ class Connection(ConnectionBase):
             raise AnsibleError("incus command not found in PATH")
 
     def _connect(self):
-        """connect to Incus (nothing to do here) """
+        """connect to Incus (nothing to do here)"""
         super()._connect()
 
         if not self._connected:
-            self._display.vvv(f"ESTABLISH Incus CONNECTION FOR USER: {self.get_option('remote_user')}",
-                              host=self._instance())
+            self._display.vvv(
+                f"ESTABLISH Incus CONNECTION FOR USER: {self.get_option('remote_user')}", host=self._instance()
+            )
             self._connected = True
 
     def _build_command(self, cmd) -> list[str]:
@@ -111,10 +112,12 @@ class Connection(ConnectionBase):
 
         exec_cmd: list[str] = [
             self._incus_cmd,
-            "--project", self.get_option("project"),
+            "--project",
+            self.get_option("project"),
             "exec",
             f"{self.get_option('remote')}:{self._instance()}",
-            "--"]
+            "--",
+        ]
 
         if self.get_option("remote_user") != "root":
             self._display.vvv(
@@ -122,9 +125,7 @@ class Connection(ConnectionBase):
                 trying to run 'incus exec' with become method: {self.get_option('incus_become_method')}",
                 host=self._instance(),
             )
-            exec_cmd.extend(
-                [self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"]
-            )
+            exec_cmd.extend([self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"])
 
         exec_cmd.extend([self.get_option("executable"), "-c", cmd])
 
@@ -133,20 +134,19 @@ class Connection(ConnectionBase):
     def _instance(self):
         # Return only the leading part of the FQDN as the instance name
         # as Incus instance names cannot be a FQDN.
-        return self.get_option('remote_addr').split(".")[0]
+        return self.get_option("remote_addr").split(".")[0]
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
-        """ execute a command on the Incus host """
+        """execute a command on the Incus host"""
         super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        self._display.vvv(f"EXEC {cmd}",
-                          host=self._instance())
+        self._display.vvv(f"EXEC {cmd}", host=self._instance())
 
         local_cmd = self._build_command(cmd)
         self._display.vvvvv(f"EXEC {local_cmd}", host=self._instance())
 
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
-        in_data = to_bytes(in_data, errors='surrogate_or_strict', nonstring='passthru')
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
+        in_data = to_bytes(in_data, errors="surrogate_or_strict", nonstring="passthru")
 
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate(in_data)
@@ -154,32 +154,22 @@ class Connection(ConnectionBase):
         stdout = to_text(stdout)
         stderr = to_text(stderr)
 
-        if stderr.startswith("Error: ") and stderr.rstrip().endswith(
-            ": Instance is not running"
-        ):
+        if stderr.startswith("Error: ") and stderr.rstrip().endswith(": Instance is not running"):
             raise AnsibleConnectionFailure(
                 f"instance not running: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if stderr.startswith("Error: ") and stderr.rstrip().endswith(
-            ": Instance not found"
-        ):
+        if stderr.startswith("Error: ") and stderr.rstrip().endswith(": Instance not found"):
             raise AnsibleConnectionFailure(
                 f"instance not found: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if (
-            stderr.startswith("Error: ")
-            and ": User does not have permission " in stderr
-        ):
+        if stderr.startswith("Error: ") and ": User does not have permission " in stderr:
             raise AnsibleConnectionFailure(
                 f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if (
-            stderr.startswith("Error: ")
-            and ": User does not have entitlement " in stderr
-        ):
+        if stderr.startswith("Error: ") and ": User does not have entitlement " in stderr:
             raise AnsibleConnectionFailure(
                 f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
@@ -191,28 +181,23 @@ class Connection(ConnectionBase):
 
         rc, uid_out, err = self.exec_command("/bin/id -u")
         if rc != 0:
-            raise AnsibleError(
-                f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}"
-            )
+            raise AnsibleError(f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}")
         uid = uid_out.strip()
 
         rc, gid_out, err = self.exec_command("/bin/id -g")
         if rc != 0:
-            raise AnsibleError(
-                f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}"
-            )
+            raise AnsibleError(f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}")
         gid = gid_out.strip()
 
         return int(uid), int(gid)
 
     def put_file(self, in_path, out_path):
-        """ put a file from local to Incus """
+        """put a file from local to Incus"""
         super().put_file(in_path, out_path)
 
-        self._display.vvv(f"PUT {in_path} TO {out_path}",
-                          host=self._instance())
+        self._display.vvv(f"PUT {in_path} TO {out_path}", host=self._instance())
 
-        if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
+        if not os.path.isfile(to_bytes(in_path, errors="surrogate_or_strict")):
             raise AnsibleFileNotFound(f"input path is not a file: {in_path}")
 
         if self.get_option("remote_user") != "root":
@@ -245,30 +230,33 @@ class Connection(ConnectionBase):
 
         self._display.vvvvv(f"PUT {local_cmd}", host=self._instance())
 
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
         call(local_cmd)
 
     def fetch_file(self, in_path, out_path):
-        """ fetch a file from Incus to local """
+        """fetch a file from Incus to local"""
         super().fetch_file(in_path, out_path)
 
-        self._display.vvv(f"FETCH {in_path} TO {out_path}",
-                          host=self._instance())
+        self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self._instance())
 
         local_cmd = [
             self._incus_cmd,
-            "--project", self.get_option("project"),
-            "file", "pull", "--quiet",
+            "--project",
+            self.get_option("project"),
+            "file",
+            "pull",
+            "--quiet",
             f"{self.get_option('remote')}:{self._instance()}/{in_path}",
-            out_path]
+            out_path,
+        ]
 
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
         call(local_cmd)
 
     def close(self):
-        """ close the connection (nothing to do here) """
+        """close the connection (nothing to do here)"""
         super().close()
 
         self._connected = False

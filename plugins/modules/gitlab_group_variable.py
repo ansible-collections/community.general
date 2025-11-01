@@ -220,16 +220,18 @@ group_variable:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, filter_returned_variables, vars_to_variables,
-    list_all_kwargs
+    auth_argument_spec,
+    gitlab_authentication,
+    filter_returned_variables,
+    vars_to_variables,
+    list_all_kwargs,
 )
 
 
 class GitlabGroupVariables:
-
     def __init__(self, module, gitlab_instance):
         self.repo = gitlab_instance
-        self.group = self.get_group(module.params['group'])
+        self.group = self.get_group(module.params["group"])
         self._module = module
 
     def get_group(self, group_name):
@@ -242,17 +244,17 @@ class GitlabGroupVariables:
         if self._module.check_mode:
             return True
         var = {
-            "key": var_obj.get('key'),
-            "value": var_obj.get('value'),
-            "description": var_obj.get('description'),
-            "masked": var_obj.get('masked'),
-            "masked_and_hidden": var_obj.get('hidden'),
-            "protected": var_obj.get('protected'),
-            "raw": var_obj.get('raw'),
-            "variable_type": var_obj.get('variable_type'),
+            "key": var_obj.get("key"),
+            "value": var_obj.get("value"),
+            "description": var_obj.get("description"),
+            "masked": var_obj.get("masked"),
+            "masked_and_hidden": var_obj.get("hidden"),
+            "protected": var_obj.get("protected"),
+            "raw": var_obj.get("raw"),
+            "variable_type": var_obj.get("variable_type"),
         }
-        if var_obj.get('environment_scope') is not None:
-            var["environment_scope"] = var_obj.get('environment_scope')
+        if var_obj.get("environment_scope") is not None:
+            var["environment_scope"] = var_obj.get("environment_scope")
 
         self.group.variables.create(var)
         return True
@@ -267,7 +269,7 @@ class GitlabGroupVariables:
     def delete_variable(self, var_obj):
         if self._module.check_mode:
             return True
-        self.group.variables.delete(var_obj.get('key'), filter={'environment_scope': var_obj.get('environment_scope')})
+        self.group.variables.delete(var_obj.get("key"), filter={"environment_scope": var_obj.get("environment_scope")})
         return True
 
 
@@ -283,16 +285,16 @@ def compare(requested_variables, existing_variables, state):
     updated = list()
     added = list()
 
-    if state == 'present':
+    if state == "present":
         existing_key_scope_vars = list()
         for item in existing_variables:
-            existing_key_scope_vars.append({'key': item.get('key'), 'environment_scope': item.get('environment_scope')})
+            existing_key_scope_vars.append({"key": item.get("key"), "environment_scope": item.get("environment_scope")})
 
         for var in requested_variables:
             if var in existing_variables:
                 untouched.append(var)
             else:
-                compare_item = {'key': var.get('name'), 'environment_scope': var.get('environment_scope')}
+                compare_item = {"key": var.get("name"), "environment_scope": var.get("environment_scope")}
                 if compare_item in existing_key_scope_vars:
                     updated.append(var)
                 else:
@@ -302,7 +304,6 @@ def compare(requested_variables, existing_variables, state):
 
 
 def native_python_main(this_gitlab, purge, requested_variables, state, module):
-
     change = False
     return_value = dict(added=list(), updated=list(), removed=list(), untouched=list())
 
@@ -313,34 +314,34 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     existing_variables = filter_returned_variables(gitlab_keys)
 
     for item in requested_variables:
-        item['key'] = item.pop('name')
-        item['value'] = str(item.get('value'))
-        if item.get('protected') is None:
-            item['protected'] = False
-        if item.get('raw') is None:
-            item['raw'] = False
-        if item.get('masked') is None:
-            item['masked'] = False
-        if item.get('hidden') is None:
-            item['hidden'] = False
-        if item.get('environment_scope') is None:
-            item['environment_scope'] = '*'
-        if item.get('variable_type') is None:
-            item['variable_type'] = 'env_var'
+        item["key"] = item.pop("name")
+        item["value"] = str(item.get("value"))
+        if item.get("protected") is None:
+            item["protected"] = False
+        if item.get("raw") is None:
+            item["raw"] = False
+        if item.get("masked") is None:
+            item["masked"] = False
+        if item.get("hidden") is None:
+            item["hidden"] = False
+        if item.get("environment_scope") is None:
+            item["environment_scope"] = "*"
+        if item.get("variable_type") is None:
+            item["variable_type"] = "env_var"
 
     if module.check_mode:
         untouched, updated, added = compare(requested_variables, existing_variables, state)
 
-    if state == 'present':
+    if state == "present":
         add_or_update = [x for x in requested_variables if x not in existing_variables]
         for item in add_or_update:
             try:
                 if this_gitlab.create_variable(item):
-                    return_value['added'].append(item)
+                    return_value["added"].append(item)
 
             except Exception:
                 if this_gitlab.update_variable(item):
-                    return_value['updated'].append(item)
+                    return_value["updated"].append(item)
 
         if purge:
             # refetch and filter
@@ -350,11 +351,11 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
                 if this_gitlab.delete_variable(item):
-                    return_value['removed'].append(item)
+                    return_value["removed"].append(item)
 
-    elif state == 'absent':
+    elif state == "absent":
         # value, type, and description do not matter on removing variables.
-        keys_ignored_on_deletion = ['value', 'variable_type', 'description']
+        keys_ignored_on_deletion = ["value", "variable_type", "description"]
         for key in keys_ignored_on_deletion:
             for item in existing_variables:
                 item.pop(key)
@@ -365,17 +366,17 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             remove_requested = [x for x in requested_variables if x in existing_variables]
             for item in remove_requested:
                 if this_gitlab.delete_variable(item):
-                    return_value['removed'].append(item)
+                    return_value["removed"].append(item)
 
         else:
             for item in existing_variables:
                 if this_gitlab.delete_variable(item):
-                    return_value['removed'].append(item)
+                    return_value["removed"].append(item)
 
     if module.check_mode:
-        return_value = dict(added=added, updated=updated, removed=return_value['removed'], untouched=untouched)
+        return_value = dict(added=added, updated=updated, removed=return_value["removed"], untouched=untouched)
 
-    if len(return_value['added'] + return_value['removed'] + return_value['updated']) > 0:
+    if len(return_value["added"] + return_value["removed"] + return_value["updated"]) > 0:
         change = True
 
     gitlab_keys = this_gitlab.list_all_group_variables()
@@ -388,59 +389,62 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        group=dict(type='str', required=True),
-        purge=dict(type='bool', default=False),
-        vars=dict(type='dict', default=dict(), no_log=True),
+        group=dict(type="str", required=True),
+        purge=dict(type="bool", default=False),
+        vars=dict(type="dict", default=dict(), no_log=True),
         # please mind whenever changing the variables dict to also change module_utils/gitlab.py's
         # KNOWN dict in filter_returned_variables or bad evil will happen
-        variables=dict(type='list', elements='dict', default=list(), options=dict(
-            name=dict(type='str', required=True),
-            value=dict(type='str', no_log=True),
-            description=dict(type='str'),
-            masked=dict(type='bool', default=False),
-            hidden=dict(type='bool', default=False),
-            protected=dict(type='bool', default=False),
-            raw=dict(type='bool', default=False),
-            environment_scope=dict(type='str', default='*'),
-            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
-        )),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
+        variables=dict(
+            type="list",
+            elements="dict",
+            default=list(),
+            options=dict(
+                name=dict(type="str", required=True),
+                value=dict(type="str", no_log=True),
+                description=dict(type="str"),
+                masked=dict(type="bool", default=False),
+                hidden=dict(type="bool", default=False),
+                protected=dict(type="bool", default=False),
+                raw=dict(type="bool", default=False),
+                environment_scope=dict(type="str", default="*"),
+                variable_type=dict(type="str", default="env_var", choices=["env_var", "file"]),
+            ),
+        ),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
-            ['vars', 'variables'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
+            ["vars", "variables"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
-        supports_check_mode=True
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
+        supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    purge = module.params['purge']
-    var_list = module.params['vars']
-    state = module.params['state']
+    purge = module.params["purge"]
+    var_list = module.params["vars"]
+    state = module.params["state"]
 
     if var_list:
         variables = vars_to_variables(var_list, module)
     else:
-        variables = module.params['variables']
+        variables = module.params["variables"]
 
-    if state == 'present':
-        if any(x['value'] is None for x in variables):
-            module.fail_json(msg='value parameter is required in state present')
+    if state == "present":
+        if any(x["value"] is None for x in variables):
+            module.fail_json(msg="value parameter is required in state present")
 
     this_gitlab = GitlabGroupVariables(module=module, gitlab_instance=gitlab_instance)
 
@@ -448,25 +452,25 @@ def main():
 
     # postprocessing
     for item in after:
-        item.pop('group_id')
-        item['name'] = item.pop('key')
+        item.pop("group_id")
+        item["name"] = item.pop("key")
     for item in before:
-        item.pop('group_id')
-        item['name'] = item.pop('key')
+        item.pop("group_id")
+        item["name"] = item.pop("key")
 
-    untouched_key_name = 'key'
+    untouched_key_name = "key"
     if not module.check_mode:
-        untouched_key_name = 'name'
-        raw_return_value['untouched'] = [x for x in before if x in after]
+        untouched_key_name = "name"
+        raw_return_value["untouched"] = [x for x in before if x in after]
 
-    added = [x.get('key') for x in raw_return_value['added']]
-    updated = [x.get('key') for x in raw_return_value['updated']]
-    removed = [x.get('key') for x in raw_return_value['removed']]
-    untouched = [x.get(untouched_key_name) for x in raw_return_value['untouched']]
+    added = [x.get("key") for x in raw_return_value["added"]]
+    updated = [x.get("key") for x in raw_return_value["updated"]]
+    removed = [x.get("key") for x in raw_return_value["removed"]]
+    untouched = [x.get(untouched_key_name) for x in raw_return_value["untouched"]]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
     module.exit_json(changed=changed, group_variable=return_value)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 
 class StateMixin:
-    state_param: str = 'state'
+    state_param: str = "state"
     default_state: str | None = None
 
     def _state(self):
@@ -23,7 +23,7 @@ class StateMixin:
 
         # resolve aliases
         if state not in self.module.params:
-            aliased = [name for name, param in self.module.argument_spec.items() if state in param.get('aliases', [])]
+            aliased = [name for name, param in self.module.argument_spec.items() if state in param.get("aliases", [])]
             if aliased:
                 state = aliased[0]
                 self.vars.effective_state = state

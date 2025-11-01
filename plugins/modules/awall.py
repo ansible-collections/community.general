@@ -130,26 +130,26 @@ def disable_policy(module, names, act):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='enabled', choices=['disabled', 'enabled']),
-            name=dict(type='list', elements='str'),
-            activate=dict(type='bool', default=False),
+            state=dict(type="str", default="enabled", choices=["disabled", "enabled"]),
+            name=dict(type="list", elements="str"),
+            activate=dict(type="bool", default=False),
         ),
-        required_one_of=[['name', 'activate']],
+        required_one_of=[["name", "activate"]],
         supports_check_mode=True,
     )
 
     global AWALL_PATH
-    AWALL_PATH = module.get_bin_path('awall', required=True)
+    AWALL_PATH = module.get_bin_path("awall", required=True)
 
     p = module.params
 
-    if p['name']:
-        if p['state'] == 'enabled':
-            enable_policy(module, p['name'], p['activate'])
-        elif p['state'] == 'disabled':
-            disable_policy(module, p['name'], p['activate'])
+    if p["name"]:
+        if p["state"] == "enabled":
+            enable_policy(module, p["name"], p["activate"])
+        elif p["state"] == "disabled":
+            disable_policy(module, p["name"], p["activate"])
 
-    if p['activate']:
+    if p["activate"]:
         if not module.check_mode:
             activate(module)
         module.exit_json(changed=True, msg="activated awall rules")
@@ -157,5 +157,5 @@ def main():
     module.fail_json(msg="no action defined")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

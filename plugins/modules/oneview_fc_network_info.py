@@ -83,11 +83,7 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 
 class FcNetworkInfoModule(OneViewModuleBase):
     def __init__(self):
-
-        argument_spec = dict(
-            name=dict(type='str'),
-            params=dict(type='dict')
-        )
+        argument_spec = dict(name=dict(type="str"), params=dict(type="dict"))
 
         super().__init__(
             additional_arg_spec=argument_spec,
@@ -95,9 +91,8 @@ class FcNetworkInfoModule(OneViewModuleBase):
         )
 
     def execute_module(self):
-
-        if self.module.params['name']:
-            fc_networks = self.oneview_client.fc_networks.get_by('name', self.module.params['name'])
+        if self.module.params["name"]:
+            fc_networks = self.oneview_client.fc_networks.get_by("name", self.module.params["name"])
         else:
             fc_networks = self.oneview_client.fc_networks.get_all(**self.facts_params)
 
@@ -108,5 +103,5 @@ def main():
     FcNetworkInfoModule().run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -194,13 +194,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 # auto-filled at module init
-SORCERY = {
-    'sorcery': None,
-    'scribe': None,
-    'cast': None,
-    'dispel': None,
-    'gaze': None
-}
+SORCERY = {"sorcery": None, "scribe": None, "cast": None, "dispel": None, "gaze": None}
 
 SORCERY_LOG_DIR = "/var/log/sorcery"
 SORCERY_STATE_DIR = "/var/state/sorcery"
@@ -209,7 +203,7 @@ NA = "N/A"
 
 
 def get_sorcery_ver(module):
-    """ Get Sorcery version. """
+    """Get Sorcery version."""
 
     cmd_sorcery = f"{SORCERY['sorcery']} --version"
 
@@ -222,16 +216,15 @@ def get_sorcery_ver(module):
 
 
 def codex_fresh(codex, module):
-    """ Check if grimoire collection is fresh enough. """
+    """Check if grimoire collection is fresh enough."""
 
-    if not module.params['cache_valid_time']:
+    if not module.params["cache_valid_time"]:
         return False
 
-    timedelta = datetime.timedelta(seconds=module.params['cache_valid_time'])
+    timedelta = datetime.timedelta(seconds=module.params["cache_valid_time"])
 
     for grimoire in codex:
-        lastupdate_path = os.path.join(SORCERY_STATE_DIR,
-                                       f"{grimoire}.lastupdate")
+        lastupdate_path = os.path.join(SORCERY_STATE_DIR, f"{grimoire}.lastupdate")
 
         try:
             mtime = os.stat(lastupdate_path).st_mtime
@@ -248,7 +241,7 @@ def codex_fresh(codex, module):
 
 
 def codex_list(module, skip_new=False):
-    """ List valid grimoire collection. """
+    """List valid grimoire collection."""
 
     params = module.params
 
@@ -268,11 +261,11 @@ def codex_list(module, skip_new=False):
         match = rex.match(line)
 
         if match:
-            codex[match.group('grim')] = match.group('ver')
+            codex[match.group("grim")] = match.group("ver")
 
     # return only specified grimoires unless requested to skip new
-    if params['repository'] and not skip_new:
-        codex = {x: codex.get(x, NA) for x in params['name']}
+    if params["repository"] and not skip_new:
+        codex = {x: codex.get(x, NA) for x in params["name"]}
 
     if not codex:
         module.fail_json(msg="no grimoires to operate on; add at least one")
@@ -281,7 +274,7 @@ def codex_list(module, skip_new=False):
 
 
 def update_sorcery(module):
-    """ Update sorcery scripts.
+    """Update sorcery scripts.
 
     This runs 'sorcery update' ('sorcery -u'). Check mode always returns a
     positive change value.
@@ -309,7 +302,7 @@ def update_sorcery(module):
 
 
 def update_codex(module):
-    """ Update grimoire collections.
+    """Update grimoire collections.
 
     This runs 'scribe update'. Check mode always returns a positive change
     value when 'cache_valid_time' is used.
@@ -331,11 +324,11 @@ def update_codex(module):
     else:
         if not fresh:
             # SILENT is required as a workaround for query() in libgpg
-            module.run_command_environ_update.update(dict(SILENT='1'))
+            module.run_command_environ_update.update(dict(SILENT="1"))
 
             cmd_scribe = f"{SORCERY['scribe']} update"
 
-            if params['repository']:
+            if params["repository"]:
                 cmd_scribe += f" {' '.join(codex.keys())}"
 
             rc, stdout, stderr = module.run_command(cmd_scribe)
@@ -350,7 +343,7 @@ def update_codex(module):
 
 
 def match_depends(module):
-    """ Check for matching dependencies.
+    """Check for matching dependencies.
 
     This inspects spell's dependencies with the desired states and returns
     'False' if a recast is needed to match them. It also adds required lines
@@ -359,13 +352,13 @@ def match_depends(module):
     """
 
     params = module.params
-    spells = params['name']
+    spells = params["name"]
 
     depends = {}
 
     depends_ok = True
 
-    if len(spells) > 1 or not params['depends']:
+    if len(spells) > 1 or not params["depends"]:
         return depends_ok
 
     spell = spells[0]
@@ -383,22 +376,22 @@ def match_depends(module):
 
     rex = re.compile(r"^(?P<status>\+?|\-){1}(?P<depend>[a-z0-9]+[a-z0-9_\-\+\.]*(\([A-Z0-9_\-\+\.]+\))*)$")
 
-    for d in params['depends'].split(','):
+    for d in params["depends"].split(","):
         match = rex.match(d)
 
         if not match:
             module.fail_json(msg=f"wrong depends line for spell '{spell}'")
 
         # normalize status
-        if not match.group('status') or match.group('status') == '+':
-            status = 'on'
+        if not match.group("status") or match.group("status") == "+":
+            status = "on"
         else:
-            status = 'off'
+            status = "off"
 
-        depends[match.group('depend')] = status
+        depends[match.group("depend")] = status
 
     # drop providers spec
-    depends_list = [s.split('(')[0] for s in depends]
+    depends_list = [s.split("(")[0] for s in depends]
 
     cmd_gaze = f"{SORCERY['gaze']} -q version {' '.join(depends_list)}"
 
@@ -418,10 +411,10 @@ def match_depends(module):
                     for d in depends:
                         # when local status is 'off' and dependency is provider,
                         # use only provider value
-                        d_offset = d.find('(')
+                        d_offset = d.find("(")
 
                         if d_offset == -1:
-                            d_p = ''
+                            d_p = ""
                         else:
                             d_p = re.escape(d[d_offset:])
 
@@ -434,7 +427,7 @@ def match_depends(module):
                         if match:
                             # if we also matched the local status, mark dependency
                             # as empty and put it back into depends file
-                            if match.group('lstatus') == depends[d]:
+                            if match.group("lstatus") == depends[d]:
                                 depends[d] = None
 
                                 sys.stdout.write(line)
@@ -457,7 +450,7 @@ def match_depends(module):
 
     if depends_new:
         try:
-            with open(sorcery_depends, 'a') as fl:
+            with open(sorcery_depends, "a") as fl:
                 for k in depends_new:
                     fl.write(f"{spell}:{k}:{depends[k]}:optional::\n")
         except IOError:
@@ -475,17 +468,17 @@ def match_depends(module):
 
 
 def manage_grimoires(module):
-    """ Add or remove grimoires. """
+    """Add or remove grimoires."""
 
     params = module.params
-    grimoires = params['name']
-    url = params['repository']
+    grimoires = params["name"]
+    url = params["repository"]
 
     codex = codex_list(module, True)
 
-    if url == '*':
-        if params['state'] in ('present', 'latest', 'absent'):
-            if params['state'] == 'absent':
+    if url == "*":
+        if params["state"] in ("present", "latest", "absent"):
+            if params["state"] == "absent":
                 action = "remove"
                 todo = set(grimoires) & set(codex)
             else:
@@ -509,7 +502,7 @@ def manage_grimoires(module):
         else:
             module.fail_json(msg="unsupported operation on '*' repository value")
     else:
-        if params['state'] in ('present', 'latest'):
+        if params["state"] in ("present", "latest"):
             if len(grimoires) > 1:
                 module.fail_json(msg="using multiple items with repository is invalid")
 
@@ -534,7 +527,7 @@ def manage_grimoires(module):
 
 
 def manage_spells(module):
-    """ Cast or dispel spells.
+    """Cast or dispel spells.
 
     This manages the whole system ('*'), list or a single spell. Command 'cast'
     is used to install or rebuild spells, while 'dispel' takes care of theirs
@@ -543,12 +536,12 @@ def manage_spells(module):
     """
 
     params = module.params
-    spells = params['name']
+    spells = params["name"]
 
     sorcery_queue = os.path.join(SORCERY_LOG_DIR, "queue/install")
 
-    if spells == '*':
-        if params['state'] == 'latest':
+    if spells == "*":
+        if params["state"] == "latest":
             # back up original queue
             try:
                 os.rename(sorcery_queue, f"{sorcery_queue}.backup")
@@ -556,7 +549,7 @@ def manage_spells(module):
                 module.fail_json(msg="failed to backup the update queue")
 
             # see update_codex()
-            module.run_command_environ_update.update(dict(SILENT='1'))
+            module.run_command_environ_update.update(dict(SILENT="1"))
 
             cmd_sorcery = f"{SORCERY['sorcery']} queue"
 
@@ -589,7 +582,7 @@ def manage_spells(module):
                 return (True, "successfully updated the system")
             else:
                 return (False, "the system is already up to date")
-        elif params['state'] == 'rebuild':
+        elif params["state"] == "rebuild":
             if module.check_mode:
                 return (True, "would have rebuilt the system")
 
@@ -604,7 +597,7 @@ def manage_spells(module):
         else:
             module.fail_json(msg="unsupported operation on '*' name value")
     else:
-        if params['state'] in ('present', 'latest', 'rebuild', 'absent'):
+        if params["state"] in ("present", "latest", "rebuild", "absent"):
             # extract versions from the 'gaze' command
             cmd_gaze = f"{SORCERY['gaze']} -q version {' '.join(spells)}"
 
@@ -625,9 +618,9 @@ def manage_spells(module):
 
                 cast = False
 
-                if params['state'] == 'present':
+                if params["state"] == "present":
                     # spell is not installed..
-                    if match.group('inst_ver') == '-':
+                    if match.group("inst_ver") == "-":
                         # ..so set up depends reqs for it
                         match_depends(module)
 
@@ -637,9 +630,9 @@ def manage_spells(module):
                         # ..but does not conform depends reqs
                         if not match_depends(module):
                             cast = True
-                elif params['state'] == 'latest':
+                elif params["state"] == "latest":
                     # grimoire and installed versions do not match..
-                    if match.group('grim_ver') != match.group('inst_ver'):
+                    if match.group("grim_ver") != match.group("inst_ver"):
                         # ..so check for depends reqs first and set them up
                         match_depends(module)
 
@@ -649,15 +642,15 @@ def manage_spells(module):
                         # ..but the spell does not conform depends reqs
                         if not match_depends(module):
                             cast = True
-                elif params['state'] == 'rebuild':
+                elif params["state"] == "rebuild":
                     cast = True
                 # 'absent'
                 else:
-                    if match.group('inst_ver') != '-':
-                        dispel_queue.append(match.group('spell'))
+                    if match.group("inst_ver") != "-":
+                        dispel_queue.append(match.group("spell"))
 
                 if cast:
-                    cast_queue.append(match.group('spell'))
+                    cast_queue.append(match.group("spell"))
 
             if cast_queue:
                 if module.check_mode:
@@ -671,7 +664,7 @@ def manage_spells(module):
                     module.fail_json(msg=f"failed to cast spell(s): {stdout}")
 
                 return (True, "successfully cast spell(s)")
-            elif params['state'] != 'absent':
+            elif params["state"] != "absent":
                 return (False, "spell(s) are already cast")
 
             if dispel_queue:
@@ -693,17 +686,16 @@ def manage_spells(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(aliases=['spell', 'grimoire'], type='list', elements='str'),
-            repository=dict(type='str'),
-            state=dict(default='present', choices=['present', 'latest',
-                                                   'absent', 'cast', 'dispelled', 'rebuild']),
+            name=dict(aliases=["spell", "grimoire"], type="list", elements="str"),
+            repository=dict(type="str"),
+            state=dict(default="present", choices=["present", "latest", "absent", "cast", "dispelled", "rebuild"]),
             depends=dict(),
-            update=dict(default=False, type='bool'),
-            update_cache=dict(default=False, aliases=['update_codex'], type='bool'),
-            cache_valid_time=dict(default=0, type='int')
+            update=dict(default=False, type="bool"),
+            update_cache=dict(default=False, aliases=["update_codex"], type="bool"),
+            cache_valid_time=dict(default=0, type="int"),
         ),
-        required_one_of=[['name', 'update', 'update_cache']],
-        supports_check_mode=True
+        required_one_of=[["name", "update", "update_cache"]],
+        supports_check_mode=True,
     )
 
     if os.geteuid() != 0:
@@ -713,34 +705,29 @@ def main():
         SORCERY[c] = module.get_bin_path(c, True)
 
     # prepare environment: run sorcery commands without asking questions
-    module.run_command_environ_update = dict(PROMPT_DELAY='0', VOYEUR='0')
+    module.run_command_environ_update = dict(PROMPT_DELAY="0", VOYEUR="0")
 
     params = module.params
 
     # normalize 'state' parameter
-    if params['state'] in ('present', 'cast'):
-        params['state'] = 'present'
-    elif params['state'] in ('absent', 'dispelled'):
-        params['state'] = 'absent'
+    if params["state"] in ("present", "cast"):
+        params["state"] = "present"
+    elif params["state"] in ("absent", "dispelled"):
+        params["state"] = "absent"
 
-    changed = {
-        'sorcery': (False, NA),
-        'grimoires': (False, NA),
-        'codex': (False, NA),
-        'spells': (False, NA)
-    }
+    changed = {"sorcery": (False, NA), "grimoires": (False, NA), "codex": (False, NA), "spells": (False, NA)}
 
-    if params['update']:
-        changed['sorcery'] = update_sorcery(module)
+    if params["update"]:
+        changed["sorcery"] = update_sorcery(module)
 
-    if params['name'] and params['repository']:
-        changed['grimoires'] = manage_grimoires(module)
+    if params["name"] and params["repository"]:
+        changed["grimoires"] = manage_grimoires(module)
 
-    if params['update_cache']:
-        changed['codex'] = update_codex(module)
+    if params["update_cache"]:
+        changed["codex"] = update_codex(module)
 
-    if params['name'] and not params['repository']:
-        changed['spells'] = manage_spells(module)
+    if params["name"] and not params["repository"]:
+        changed["spells"] = manage_spells(module)
 
     if any(x[0] for x in changed.values()):
         state_msg = "state changed"
@@ -752,5 +739,5 @@ def main():
     module.exit_json(changed=state_changed, msg=f"{state_msg}: {'; '.join((x[1] for x in changed.values()))}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

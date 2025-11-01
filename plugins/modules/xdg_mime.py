@@ -91,12 +91,12 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 
 class XdgMime(ModuleHelper):
-    output_params = ['handler']
+    output_params = ["handler"]
 
     module = dict(
         argument_spec=dict(
-            mime_types=dict(type='list', elements='str', required=True),
-            handler=dict(type='str', required=True),
+            mime_types=dict(type="list", elements="str", required=True),
+            handler=dict(type="str", required=True),
         ),
         supports_check_mode=True,
     )
@@ -115,17 +115,19 @@ class XdgMime(ModuleHelper):
         for mime in self.vars.mime_types:
             handler_value = xdg_mime_get(self.runner, mime)
             if not handler_value:
-                handler_value = ''
+                handler_value = ""
             self.vars.current_handlers.append(handler_value)
 
     def __run__(self):
-        check_mode_return = (0, 'Module executed in check mode', '')
+        check_mode_return = (0, "Module executed in check mode", "")
 
         if any(h != self.vars.handler for h in self.vars.current_handlers):
             self.changed = True
 
         if self.has_changed():
-            with self.runner.context(args_order="default handler mime_types", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
+            with self.runner.context(
+                args_order="default handler mime_types", check_mode_skip=True, check_mode_return=check_mode_return
+            ) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
                 self.vars.stderr = err
@@ -136,5 +138,5 @@ def main():
     XdgMime.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

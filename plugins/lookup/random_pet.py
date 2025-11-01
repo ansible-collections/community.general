@@ -78,18 +78,15 @@ from ansible.plugins.lookup import LookupBase
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
-
         if not HAS_PETNAME:
-            raise AnsibleError('Python petname library is required. '
-                               'Please install using "pip install petname"')
+            raise AnsibleError('Python petname library is required. Please install using "pip install petname"')
 
         self.set_options(var_options=variables, direct=kwargs)
-        words = self.get_option('words')
-        length = self.get_option('length')
-        prefix = self.get_option('prefix')
-        separator = self.get_option('separator')
+        words = self.get_option("words")
+        length = self.get_option("length")
+        prefix = self.get_option("prefix")
+        separator = self.get_option("separator")
 
         values = petname.Generate(words=words, separator=separator, letters=length)
         if prefix:

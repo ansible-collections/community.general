@@ -9,6 +9,7 @@ from ansible.module_utils.common.collections import is_string
 
 try:
     from zlib import crc32
+
     HAS_ZLIB = True
 except ImportError:
     HAS_ZLIB = False
@@ -45,17 +46,17 @@ _value:
 
 def crc32s(value):
     if not is_string(value):
-        raise AnsibleFilterError(f'Invalid value type ({type(value)}) for crc32 ({value!r})')
+        raise AnsibleFilterError(f"Invalid value type ({type(value)}) for crc32 ({value!r})")
 
     if not HAS_ZLIB:
-        raise AnsibleFilterError('Failed to import zlib module')
+        raise AnsibleFilterError("Failed to import zlib module")
 
-    data = to_bytes(value, errors='surrogate_or_strict')
-    return f"{crc32(data) & 0xffffffff:x}"
+    data = to_bytes(value, errors="surrogate_or_strict")
+    return f"{crc32(data) & 0xFFFFFFFF:x}"
 
 
 class FilterModule:
     def filters(self):
         return {
-            'crc32': crc32s,
+            "crc32": crc32s,
         }

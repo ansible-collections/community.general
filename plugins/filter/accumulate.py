@@ -49,14 +49,13 @@ from ansible.errors import AnsibleFilterError
 
 def list_accumulate(sequence):
     if not isinstance(sequence, Sequence):
-        raise AnsibleFilterError(f'Invalid value type ({type(sequence)}) for accumulate ({sequence!r})')
+        raise AnsibleFilterError(f"Invalid value type ({type(sequence)}) for accumulate ({sequence!r})")
 
     return accumulate(sequence)
 
 
 class FilterModule:
-
     def filters(self):
         return {
-            'accumulate': list_accumulate,
+            "accumulate": list_accumulate,
         }

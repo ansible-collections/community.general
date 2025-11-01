@@ -18,5 +18,5 @@ def test_terraform_without_argument(capfd):
 
     out, err = capfd.readouterr()
     assert not err
-    assert json.loads(out)['failed']
-    assert 'project_path' in json.loads(out)['msg']
+    assert json.loads(out)["failed"]
+    assert "project_path" in json.loads(out)["msg"]

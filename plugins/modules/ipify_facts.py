@@ -67,22 +67,21 @@ from ansible.module_utils.common.text.converters import to_text
 
 
 class IpifyFacts:
-
     def __init__(self):
-        self.api_url = module.params.get('api_url')
-        self.timeout = module.params.get('timeout')
+        self.api_url = module.params.get("api_url")
+        self.timeout = module.params.get("timeout")
 
     def run(self):
-        result = {
-            'ipify_public_ip': None
-        }
+        result = {"ipify_public_ip": None}
         (response, info) = fetch_url(module=module, url=f"{self.api_url}?format=json", force=True, timeout=self.timeout)
 
         if not response:
-            module.fail_json(msg=f"No valid or no response from url {self.api_url} within {self.timeout} seconds (timeout)")
+            module.fail_json(
+                msg=f"No valid or no response from url {self.api_url} within {self.timeout} seconds (timeout)"
+            )
 
         data = json.loads(to_text(response.read()))
-        result['ipify_public_ip'] = data.get('ip')
+        result["ipify_public_ip"] = data.get("ip")
         return result
 
 
@@ -90,9 +89,9 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            api_url=dict(type='str', default='https://api.ipify.org/'),
-            timeout=dict(type='int', default=10),
-            validate_certs=dict(type='bool', default=True),
+            api_url=dict(type="str", default="https://api.ipify.org/"),
+            timeout=dict(type="int", default=10),
+            validate_certs=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
     )
@@ -102,5 +101,5 @@ def main():
     module.exit_json(**ipify_facts_result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

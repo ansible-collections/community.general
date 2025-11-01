@@ -71,7 +71,6 @@ from ansible_collections.community.general.plugins.module_utils.influxdb import 
 
 
 class AnsibleInfluxDBRead(InfluxDb):
-
     def read_by_query(self, query):
         client = self.connect_to_influxdb()
         try:
@@ -85,19 +84,16 @@ class AnsibleInfluxDBRead(InfluxDb):
 def main():
     argument_spec = InfluxDb.influxdb_argument_spec()
     argument_spec.update(
-        query=dict(type='str', required=True),
-        database_name=dict(required=True, type='str'),
+        query=dict(type="str", required=True),
+        database_name=dict(required=True, type="str"),
     )
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     influx = AnsibleInfluxDBRead(module)
-    query = module.params.get('query')
+    query = module.params.get("query")
     results = influx.read_by_query(query)
     module.exit_json(changed=True, query_results=results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

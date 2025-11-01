@@ -250,7 +250,9 @@ class Swupd:
         cmd = self._get_cmd(["verify", "--fix"])
         self._run_cmd(cmd)
 
-        if self.rc == 0 and (self.FILES_REPLACED in self.stdout or self.FILES_FIXED in self.stdout or self.FILES_DELETED in self.stdout):
+        if self.rc == 0 and (
+            self.FILES_REPLACED in self.stdout or self.FILES_FIXED in self.stdout or self.FILES_DELETED in self.stdout
+        ):
             self.changed = True
             self.msg = "Fix successful"
             return
@@ -275,7 +277,7 @@ def main():
         ),
         required_one_of=[["name", "update", "verify"]],
         mutually_exclusive=[["name", "update", "verify"]],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     swupd = Swupd(module)
@@ -302,5 +304,5 @@ def main():
         module.exit_json(changed=swupd.changed, msg=swupd.msg, stdout=swupd.stdout, stderr=swupd.stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

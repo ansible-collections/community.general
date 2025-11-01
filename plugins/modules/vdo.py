@@ -227,6 +227,7 @@ import traceback
 YAML_IMP_ERR = None
 try:
     import yaml
+
     HAS_YAML = True
 except ImportError:
     YAML_IMP_ERR = traceback.format_exc()
@@ -260,7 +261,7 @@ def inventory_vdos(module, vdocmd):
     if vdostatusyaml is None:
         return vdolist
 
-    vdoyamls = vdostatusyaml['VDOs']
+    vdoyamls = vdostatusyaml["VDOs"]
 
     if vdoyamls is not None:
         vdolist = list(vdoyamls.keys())
@@ -270,7 +271,7 @@ def inventory_vdos(module, vdocmd):
 
 def list_running_vdos(module, vdocmd):
     rc, vdolistout, err = module.run_command([vdocmd, "list"])
-    runningvdolist = [_f for _f in vdolistout.split('\n') if _f]
+    runningvdolist = [_f for _f in vdolistout.split("\n") if _f]
     return runningvdolist
 
 
@@ -313,31 +314,31 @@ def deactivate_vdo(module, vdoname, vdocmd):
 def add_vdooptions(params):
     options = []
 
-    if params.get('logicalsize') is not None:
+    if params.get("logicalsize") is not None:
         options.append(f"--vdoLogicalSize={params['logicalsize']}")
 
-    if params.get('blockmapcachesize') is not None:
+    if params.get("blockmapcachesize") is not None:
         options.append(f"--blockMapCacheSize={params['blockmapcachesize']}")
 
-    if params.get('readcache') == 'enabled':
+    if params.get("readcache") == "enabled":
         options.append("--readCache=enabled")
 
-    if params.get('readcachesize') is not None:
+    if params.get("readcachesize") is not None:
         options.append(f"--readCacheSize={params['readcachesize']}")
 
-    if params.get('slabsize') is not None:
+    if params.get("slabsize") is not None:
         options.append(f"--vdoSlabSize={params['slabsize']}")
 
-    if params.get('emulate512'):
+    if params.get("emulate512"):
         options.append("--emulate512=enabled")
 
-    if params.get('indexmem') is not None:
+    if params.get("indexmem") is not None:
         options.append(f"--indexMem={params['indexmem']}")
 
-    if params.get('indexmode') == 'sparse':
+    if params.get("indexmode") == "sparse":
         options.append("--sparseIndex=enabled")
 
-    if params.get('force'):
+    if params.get("force"):
         options.append("--force")
 
     # Entering an invalid thread config results in a cryptic
@@ -346,26 +347,25 @@ def add_vdooptions(params):
     # output a more helpful message, but one would have to log
     # onto that system to read the error.  For now, heed the thread
     # limit warnings in the DOCUMENTATION section above.
-    if params.get('ackthreads') is not None:
+    if params.get("ackthreads") is not None:
         options.append(f"--vdoAckThreads={params['ackthreads']}")
 
-    if params.get('biothreads') is not None:
+    if params.get("biothreads") is not None:
         options.append(f"--vdoBioThreads={params['biothreads']}")
 
-    if params.get('cputhreads') is not None:
+    if params.get("cputhreads") is not None:
         options.append(f"--vdoCpuThreads={params['cputhreads']}")
 
-    if params.get('logicalthreads') is not None:
+    if params.get("logicalthreads") is not None:
         options.append(f"--vdoLogicalThreads={params['logicalthreads']}")
 
-    if params.get('physicalthreads') is not None:
+    if params.get("physicalthreads") is not None:
         options.append(f"--vdoPhysicalThreads={params['physicalthreads']}")
 
     return options
 
 
 def run_module():
-
     # Define the available arguments/parameters that a user can pass to
     # the module.
     # Defaults for VDO parameters are None, in order to facilitate
@@ -373,29 +373,29 @@ def run_module():
     # Creation param defaults are determined by the creation section.
 
     module_args = dict(
-        name=dict(type='str', required=True),
-        state=dict(type='str', default='present', choices=['absent', 'present']),
-        activated=dict(type='bool'),
-        running=dict(type='bool'),
-        growphysical=dict(type='bool', default=False),
-        device=dict(type='str'),
-        logicalsize=dict(type='str'),
-        deduplication=dict(type='str', choices=['disabled', 'enabled']),
-        compression=dict(type='str', choices=['disabled', 'enabled']),
-        blockmapcachesize=dict(type='str'),
-        readcache=dict(type='str', choices=['disabled', 'enabled']),
-        readcachesize=dict(type='str'),
-        emulate512=dict(type='bool', default=False),
-        slabsize=dict(type='str'),
-        writepolicy=dict(type='str', choices=['async', 'auto', 'sync']),
-        indexmem=dict(type='str'),
-        indexmode=dict(type='str', choices=['dense', 'sparse']),
-        ackthreads=dict(type='str'),
-        biothreads=dict(type='str'),
-        cputhreads=dict(type='str'),
-        logicalthreads=dict(type='str'),
-        physicalthreads=dict(type='str'),
-        force=dict(type='bool', default=False),
+        name=dict(type="str", required=True),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
+        activated=dict(type="bool"),
+        running=dict(type="bool"),
+        growphysical=dict(type="bool", default=False),
+        device=dict(type="str"),
+        logicalsize=dict(type="str"),
+        deduplication=dict(type="str", choices=["disabled", "enabled"]),
+        compression=dict(type="str", choices=["disabled", "enabled"]),
+        blockmapcachesize=dict(type="str"),
+        readcache=dict(type="str", choices=["disabled", "enabled"]),
+        readcachesize=dict(type="str"),
+        emulate512=dict(type="bool", default=False),
+        slabsize=dict(type="str"),
+        writepolicy=dict(type="str", choices=["async", "auto", "sync"]),
+        indexmem=dict(type="str"),
+        indexmode=dict(type="str", choices=["dense", "sparse"]),
+        ackthreads=dict(type="str"),
+        biothreads=dict(type="str"),
+        cputhreads=dict(type="str"),
+        logicalthreads=dict(type="str"),
+        physicalthreads=dict(type="str"),
+        force=dict(type="bool", default=False),
     )
 
     # Seed the result dictionary in the object.  There will be an
@@ -415,11 +415,11 @@ def run_module():
     )
 
     if not HAS_YAML:
-        module.fail_json(msg=missing_required_lib('PyYAML'), exception=YAML_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("PyYAML"), exception=YAML_IMP_ERR)
 
     vdocmd = module.get_bin_path("vdo", required=True)
     if not vdocmd:
-        module.fail_json(msg='VDO is not installed.', **result)
+        module.fail_json(msg="VDO is not installed.", **result)
 
     # Print a pre-run list of VDO volumes in the result object.
     vdolist = inventory_vdos(module, vdocmd)
@@ -428,15 +428,14 @@ def run_module():
 
     # Collect the name of the desired VDO volume, and its state.  These will
     # determine what to do.
-    desiredvdo = module.params['name']
-    state = module.params['state']
+    desiredvdo = module.params["name"]
+    state = module.params["state"]
 
     # Create a desired VDO volume that doesn't exist yet.
-    if (desiredvdo not in vdolist) and (state == 'present'):
-        device = module.params['device']
+    if (desiredvdo not in vdolist) and (state == "present"):
+        device = module.params["device"]
         if device is None:
-            module.fail_json(msg="Creating a VDO volume requires specifying "
-                                 "a 'device' in the playbook.")
+            module.fail_json(msg="Creating a VDO volume requires specifying a 'device' in the playbook.")
 
         # Create a dictionary of the options from the AnsibleModule
         # parameters, compile the vdo command options, and run "vdo create"
@@ -446,22 +445,23 @@ def run_module():
         # assume default values.
         vdocmdoptions = add_vdooptions(module.params)
         rc, out, err = module.run_command(
-            [vdocmd, "create", f"--name={desiredvdo}", f"--device={device}"] + vdocmdoptions)
+            [vdocmd, "create", f"--name={desiredvdo}", f"--device={device}"] + vdocmdoptions
+        )
         if rc == 0:
-            result['changed'] = True
+            result["changed"] = True
         else:
             module.fail_json(msg=f"Creating VDO {desiredvdo} failed.", rc=rc, err=err)
 
-        if module.params['compression'] == 'disabled':
+        if module.params["compression"] == "disabled":
             rc, out, err = module.run_command([vdocmd, "disableCompression", f"--name={desiredvdo}"])
 
-        if module.params['deduplication'] == 'disabled':
+        if module.params["deduplication"] == "disabled":
             rc, out, err = module.run_command([vdocmd, "disableDeduplication", f"--name={desiredvdo}"])
 
-        if module.params['activated'] is False:
+        if module.params["activated"] is False:
             deactivate_vdo(module, desiredvdo, vdocmd)
 
-        if module.params['running'] is False:
+        if module.params["running"] is False:
             stop_vdo(module, desiredvdo, vdocmd)
 
         # Print a post-run list of VDO volumes in the result object.
@@ -470,47 +470,49 @@ def run_module():
         module.exit_json(**result)
 
     # Modify the current parameters of a VDO that exists.
-    if desiredvdo in vdolist and state == 'present':
+    if desiredvdo in vdolist and state == "present":
         rc, vdostatusoutput, err = module.run_command([vdocmd, "status"])
         vdostatusyaml = yaml.safe_load(vdostatusoutput)
 
         # An empty dictionary to contain dictionaries of VDO statistics
         processedvdos = {}
 
-        vdoyamls = vdostatusyaml['VDOs']
+        vdoyamls = vdostatusyaml["VDOs"]
         if vdoyamls is not None:
             processedvdos = vdoyamls
 
         # The 'vdo status' keys that are currently modifiable.
-        statusparamkeys = ['Acknowledgement threads',
-                           'Bio submission threads',
-                           'Block map cache size',
-                           'CPU-work threads',
-                           'Logical threads',
-                           'Physical threads',
-                           'Read cache',
-                           'Read cache size',
-                           'Configured write policy',
-                           'Compression',
-                           'Deduplication']
+        statusparamkeys = [
+            "Acknowledgement threads",
+            "Bio submission threads",
+            "Block map cache size",
+            "CPU-work threads",
+            "Logical threads",
+            "Physical threads",
+            "Read cache",
+            "Read cache size",
+            "Configured write policy",
+            "Compression",
+            "Deduplication",
+        ]
 
         # A key translation table from 'vdo status' output to Ansible
         # module parameters.  This covers all of the 'vdo status'
         # parameter keys that could be modified with the 'vdo'
         # command.
         vdokeytrans = {
-            'Logical size': 'logicalsize',
-            'Compression': 'compression',
-            'Deduplication': 'deduplication',
-            'Block map cache size': 'blockmapcachesize',
-            'Read cache': 'readcache',
-            'Read cache size': 'readcachesize',
-            'Configured write policy': 'writepolicy',
-            'Acknowledgement threads': 'ackthreads',
-            'Bio submission threads': 'biothreads',
-            'CPU-work threads': 'cputhreads',
-            'Logical threads': 'logicalthreads',
-            'Physical threads': 'physicalthreads'
+            "Logical size": "logicalsize",
+            "Compression": "compression",
+            "Deduplication": "deduplication",
+            "Block map cache size": "blockmapcachesize",
+            "Read cache": "readcache",
+            "Read cache size": "readcachesize",
+            "Configured write policy": "writepolicy",
+            "Acknowledgement threads": "ackthreads",
+            "Bio submission threads": "biothreads",
+            "CPU-work threads": "cputhreads",
+            "Logical threads": "logicalthreads",
+            "Physical threads": "physicalthreads",
         }
 
         # Build a dictionary of the current VDO status parameters, with
@@ -549,46 +551,50 @@ def run_module():
             if vdocmdoptions:
                 rc, out, err = module.run_command([vdocmd, "modify", f"--name={desiredvdo}"] + vdocmdoptions)
                 if rc == 0:
-                    result['changed'] = True
+                    result["changed"] = True
                 else:
                     module.fail_json(msg=f"Modifying VDO {desiredvdo} failed.", rc=rc, err=err)
 
-            if 'deduplication' in diffparams.keys():
-                dedupemod = diffparams['deduplication']
-                dedupeparam = "disableDeduplication" if dedupemod == 'disabled' else "enableDeduplication"
+            if "deduplication" in diffparams.keys():
+                dedupemod = diffparams["deduplication"]
+                dedupeparam = "disableDeduplication" if dedupemod == "disabled" else "enableDeduplication"
                 rc, out, err = module.run_command([vdocmd, dedupeparam, f"--name={desiredvdo}"])
 
                 if rc == 0:
-                    result['changed'] = True
+                    result["changed"] = True
                 else:
                     module.fail_json(msg=f"Changing deduplication on VDO volume {desiredvdo} failed.", rc=rc, err=err)
 
-            if 'compression' in diffparams.keys():
-                compressmod = diffparams['compression']
-                compressparam = "disableCompression" if compressmod == 'disabled' else "enableCompression"
+            if "compression" in diffparams.keys():
+                compressmod = diffparams["compression"]
+                compressparam = "disableCompression" if compressmod == "disabled" else "enableCompression"
                 rc, out, err = module.run_command([vdocmd, compressparam, f"--name={desiredvdo}"])
                 if rc == 0:
-                    result['changed'] = True
+                    result["changed"] = True
                 else:
                     module.fail_json(msg=f"Changing compression on VDO volume {desiredvdo} failed.", rc=rc, err=err)
 
-            if 'writepolicy' in diffparams.keys():
-                writepolmod = diffparams['writepolicy']
-                rc, out, err = module.run_command([
-                    vdocmd,
-                    "changeWritePolicy",
-                    f"--name={desiredvdo}",
-                    f"--writePolicy={writepolmod}",
-                ])
+            if "writepolicy" in diffparams.keys():
+                writepolmod = diffparams["writepolicy"]
+                rc, out, err = module.run_command(
+                    [
+                        vdocmd,
+                        "changeWritePolicy",
+                        f"--name={desiredvdo}",
+                        f"--writePolicy={writepolmod}",
+                    ]
+                )
 
                 if rc == 0:
-                    result['changed'] = True
+                    result["changed"] = True
                 else:
                     module.fail_json(msg=f"Changing write policy on VDO volume {desiredvdo} failed.", rc=rc, err=err)
 
         # Process the size parameters, to determine of a growPhysical or
         # growLogical operation needs to occur.
-        sizeparamkeys = ['Logical size', ]
+        sizeparamkeys = [
+            "Logical size",
+        ]
 
         currentsizeparams = {}
         sizetrans = {}
@@ -605,13 +611,13 @@ def run_module():
             if module.params[key] is not None and str(sizeparams[key]) != module.params[key]:
                 diffsizeparams[key] = module.params[key]
 
-        if module.params['growphysical']:
-            physdevice = module.params['device']
+        if module.params["growphysical"]:
+            physdevice = module.params["device"]
             rc, devsectors, err = module.run_command([module.get_bin_path("blockdev"), "--getsz", physdevice])
-            devblocks = (int(devsectors) / 8)
+            devblocks = int(devsectors) / 8
             dmvdoname = f"/dev/mapper/{desiredvdo}"
-            currentvdostats = processedvdos[desiredvdo]['VDO statistics'][dmvdoname]
-            currentphysblocks = currentvdostats['physical blocks']
+            currentvdostats = processedvdos[desiredvdo]["VDO statistics"][dmvdoname]
+            currentphysblocks = currentvdostats["physical blocks"]
 
             # Set a growPhysical threshold to grow only when there is
             # guaranteed to be more than 2 slabs worth of unallocated
@@ -621,29 +627,31 @@ def run_module():
             growthresh = devblocks + 16777216
 
             if currentphysblocks > growthresh:
-                result['changed'] = True
+                result["changed"] = True
                 rc, out, err = module.run_command([vdocmd, "growPhysical", f"--name={desiredvdo}"])
 
-        if 'logicalsize' in diffsizeparams.keys():
-            result['changed'] = True
-            rc, out, err = module.run_command([vdocmd, "growLogical", f"--name={desiredvdo}", f"--vdoLogicalSize={diffsizeparams['logicalsize']}"])
+        if "logicalsize" in diffsizeparams.keys():
+            result["changed"] = True
+            rc, out, err = module.run_command(
+                [vdocmd, "growLogical", f"--name={desiredvdo}", f"--vdoLogicalSize={diffsizeparams['logicalsize']}"]
+            )
 
-        vdoactivatestatus = processedvdos[desiredvdo]['Activate']
+        vdoactivatestatus = processedvdos[desiredvdo]["Activate"]
 
-        if module.params['activated'] is False and vdoactivatestatus == 'enabled':
+        if module.params["activated"] is False and vdoactivatestatus == "enabled":
             deactivate_vdo(module, desiredvdo, vdocmd)
-            if not result['changed']:
-                result['changed'] = True
+            if not result["changed"]:
+                result["changed"] = True
 
-        if module.params['activated'] and vdoactivatestatus == 'disabled':
+        if module.params["activated"] and vdoactivatestatus == "disabled":
             activate_vdo(module, desiredvdo, vdocmd)
-            if not result['changed']:
-                result['changed'] = True
+            if not result["changed"]:
+                result["changed"] = True
 
-        if module.params['running'] is False and desiredvdo in runningvdolist:
+        if module.params["running"] is False and desiredvdo in runningvdolist:
             stop_vdo(module, desiredvdo, vdocmd)
-            if not result['changed']:
-                result['changed'] = True
+            if not result["changed"]:
+                result["changed"] = True
 
         # Note that a disabled VDO volume cannot be started by the
         # 'vdo start' command, by design.  To accurately track changed
@@ -652,10 +660,14 @@ def run_module():
         # the activate_vdo() operation succeeded, as 'vdoactivatestatus'
         # will have the activated status prior to the activate_vdo()
         # call.
-        if (vdoactivatestatus == 'enabled' or module.params['activated']) and module.params['running'] and desiredvdo not in runningvdolist:
+        if (
+            (vdoactivatestatus == "enabled" or module.params["activated"])
+            and module.params["running"]
+            and desiredvdo not in runningvdolist
+        ):
             start_vdo(module, desiredvdo, vdocmd)
-            if not result['changed']:
-                result['changed'] = True
+            if not result["changed"]:
+                result["changed"] = True
 
         # Print a post-run list of VDO volumes in the result object.
         vdolist = inventory_vdos(module, vdocmd)
@@ -665,10 +677,10 @@ def run_module():
         module.exit_json(**result)
 
     # Remove a desired VDO that currently exists.
-    if desiredvdo in vdolist and state == 'absent':
+    if desiredvdo in vdolist and state == "absent":
         rc, out, err = module.run_command([vdocmd, "remove", f"--name={desiredvdo}"])
         if rc == 0:
-            result['changed'] = True
+            result["changed"] = True
         else:
             module.fail_json(msg=f"Removing VDO {desiredvdo} failed.", rc=rc, err=err)
 
@@ -691,5 +703,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -51,8 +51,7 @@ class LPassException(AnsibleError):
 
 
 class LPass:
-
-    def __init__(self, path='lpass'):
+    def __init__(self, path="lpass"):
         self._cli_path = path
 
     @property
@@ -70,7 +69,7 @@ class LPass:
         rc = p.wait()
         if rc != expected_rc:
             raise LPassException(err)
-        return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
+        return to_text(out, errors="surrogate_or_strict"), to_text(err, errors="surrogate_or_strict")
 
     def _build_args(self, command, args=None):
         if args is None:
@@ -80,7 +79,7 @@ class LPass:
         return args
 
     def get_field(self, key, field):
-        if field in ['username', 'password', 'url', 'notes', 'id', 'name']:
+        if field in ["username", "password", "url", "notes", "id", "name"]:
             out, err = self._run(self._build_args("show", [f"--{field}", key]))
         else:
             out, err = self._run(self._build_args("show", [f"--field={field}", key]))
@@ -88,10 +87,9 @@ class LPass:
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
-        field = self.get_option('field')
+        field = self.get_option("field")
 
         lp = LPass()
 

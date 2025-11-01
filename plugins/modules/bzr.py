@@ -76,7 +76,7 @@ class Bzr:
         return (rc, out, err)
 
     def get_version(self):
-        '''samples the version of the bzr branch'''
+        """samples the version of the bzr branch"""
 
         cmd = [self.bzr_path, "revno"]
         rc, stdout, stderr = self.module.run_command(cmd, cwd=self.dest)
@@ -84,41 +84,40 @@ class Bzr:
         return revno
 
     def clone(self):
-        '''makes a new bzr branch if it does not already exist'''
+        """makes a new bzr branch if it does not already exist"""
         dest_dirname = os.path.dirname(self.dest)
         try:
             os.makedirs(dest_dirname)
         except Exception:
             pass
-        if self.version.lower() != 'head':
+        if self.version.lower() != "head":
             args_list = ["branch", "-r", self.version, self.parent, self.dest]
         else:
             args_list = ["branch", self.parent, self.dest]
         return self._command(args_list, check_rc=True, cwd=dest_dirname)
 
     def has_local_mods(self):
-
         cmd = [self.bzr_path, "status", "-S"]
         rc, stdout, stderr = self.module.run_command(cmd, cwd=self.dest)
         lines = stdout.splitlines()
-        mods_re = re.compile('^\\?\\?.*$')
+        mods_re = re.compile("^\\?\\?.*$")
 
         lines = [c for c in lines if not mods_re.search(c)]
         return len(lines) > 0
 
     def reset(self, force):
-        '''
+        """
         Resets the index and working tree to head.
         Discards any changes to tracked files in the working
         tree since that commit.
-        '''
+        """
         if not force and self.has_local_mods():
             self.module.fail_json(msg="Local modifications exist in branch (force=false).")
         return self._command(["revert"], check_rc=True, cwd=self.dest)
 
     def fetch(self):
-        '''updates branch from remote sources'''
-        if self.version.lower() != 'head':
+        """updates branch from remote sources"""
+        if self.version.lower() != "head":
             (rc, out, err) = self._command(["pull", "-r", self.version], cwd=self.dest)
         else:
             (rc, out, err) = self._command(["pull"], cwd=self.dest)
@@ -127,8 +126,8 @@ class Bzr:
         return (rc, out, err)
 
     def switch_version(self):
-        '''once pulled, switch to a particular revno or revid'''
-        if self.version.lower() != 'head':
+        """once pulled, switch to a particular revno or revid"""
+        if self.version.lower() != "head":
             args_list = ["revert", "-r", self.version]
         else:
             args_list = ["revert"]
@@ -137,24 +136,25 @@ class Bzr:
 
 # ===========================================
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dest=dict(type='path', required=True),
-            name=dict(type='str', required=True, aliases=['parent']),
-            version=dict(type='str', default='head'),
-            force=dict(type='bool', default=False),
-            executable=dict(type='str'),
+            dest=dict(type="path", required=True),
+            name=dict(type="str", required=True, aliases=["parent"]),
+            version=dict(type="str", default="head"),
+            force=dict(type="bool", default=False),
+            executable=dict(type="str"),
         )
     )
 
-    dest = module.params['dest']
-    parent = module.params['name']
-    version = module.params['version']
-    force = module.params['force']
-    bzr_path = module.params['executable'] or module.get_bin_path('bzr', True)
+    dest = module.params["dest"]
+    parent = module.params["name"]
+    version = module.params["version"]
+    force = module.params["force"]
+    bzr_path = module.params["executable"] or module.get_bin_path("bzr", True)
 
-    bzrconfig = os.path.join(dest, '.bzr', 'branch', 'branch.conf')
+    bzrconfig = os.path.join(dest, ".bzr", "branch", "branch.conf")
 
     rc, out, err = (0, None, None)
 
@@ -192,5 +192,5 @@ def main():
     module.exit_json(changed=changed, before=before, after=after)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

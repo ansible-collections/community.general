@@ -72,7 +72,7 @@ class PacemakerInfo(ModuleHelper):
         "resource_info": "resource",
         "stonith_info": "stonith",
         "constraint_info": "constraint",
-        "property_info": "property"
+        "property_info": "property",
     }
     output_params = list(info_vars.keys())
 
@@ -85,13 +85,16 @@ class PacemakerInfo(ModuleHelper):
     def _process_command_output(self, cli_action=""):
         def process(rc, out, err):
             if rc != 0:
-                self.do_raise(f'pcs {cli_action} config failed with error (rc={rc}): {err}')
+                self.do_raise(f"pcs {cli_action} config failed with error (rc={rc}): {err}")
             out = json.loads(out)
             return None if out == "" else out
+
         return process
 
     def _get_info(self, cli_action):
-        with self.runner("cli_action config output_format", output_process=self._process_command_output(cli_action)) as ctx:
+        with self.runner(
+            "cli_action config output_format", output_process=self._process_command_output(cli_action)
+        ) as ctx:
             return ctx.run(cli_action=cli_action, output_format="json")
 
     def __run__(self):
@@ -103,5 +106,5 @@ def main():
     PacemakerInfo.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

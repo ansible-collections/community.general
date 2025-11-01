@@ -20,11 +20,10 @@ from ansible.plugins.callback import CallbackBase
 
 
 class CallbackModule(CallbackBase):
-
-    '''
+    """
     This callback won't print messages to stdout when new callback events are received.
-    '''
+    """
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'stdout'
-    CALLBACK_NAME = 'community.general.null'
+    CALLBACK_TYPE = "stdout"
+    CALLBACK_NAME = "community.general.null"

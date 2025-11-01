@@ -87,6 +87,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 HAS_PYODBC = None
 try:
     import pyodbc
+
     HAS_PYODBC = True
 except ImportError as e:
     HAS_PYODBC = False
@@ -95,27 +96,27 @@ except ImportError as e:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dsn=dict(type='str', required=True, no_log=True),
-            query=dict(type='str', required=True),
-            params=dict(type='list', elements='str'),
-            commit=dict(type='bool', default=True),
+            dsn=dict(type="str", required=True, no_log=True),
+            query=dict(type="str", required=True),
+            params=dict(type="list", elements="str"),
+            commit=dict(type="bool", default=True),
         ),
     )
 
-    dsn = module.params.get('dsn')
-    query = module.params.get('query')
-    params = module.params.get('params')
-    commit = module.params.get('commit')
+    dsn = module.params.get("dsn")
+    query = module.params.get("query")
+    params = module.params.get("params")
+    commit = module.params.get("commit")
 
     if not HAS_PYODBC:
-        module.fail_json(msg=missing_required_lib('pyodbc'))
+        module.fail_json(msg=missing_required_lib("pyodbc"))
 
     # Try to make a connection with the DSN
     connection = None
     try:
         connection = pyodbc.connect(dsn)
     except Exception as e:
-        module.fail_json(msg=f'Failed to connect to DSN: {e}')
+        module.fail_json(msg=f"Failed to connect to DSN: {e}")
 
     result = dict(
         changed=True,
@@ -137,21 +138,21 @@ def main():
             # Get the rows out into an 2d array
             for row in cursor.fetchall():
                 new_row = [f"{column}" for column in row]
-                result['results'].append(new_row)
+                result["results"].append(new_row)
 
             # Return additional information from the cursor
             for row_description in cursor.description:
                 description = {}
-                description['name'] = row_description[0]
-                description['type'] = row_description[1].__name__
-                description['display_size'] = row_description[2]
-                description['internal_size'] = row_description[3]
-                description['precision'] = row_description[4]
-                description['scale'] = row_description[5]
-                description['nullable'] = row_description[6]
-                result['description'].append(description)
+                description["name"] = row_description[0]
+                description["type"] = row_description[1].__name__
+                description["display_size"] = row_description[2]
+                description["internal_size"] = row_description[3]
+                description["precision"] = row_description[4]
+                description["scale"] = row_description[5]
+                description["nullable"] = row_description[6]
+                result["description"].append(description)
 
-            result['row_count'] = cursor.rowcount
+            result["row_count"] = cursor.rowcount
         except pyodbc.ProgrammingError as pe:
             pass
         except Exception as e:
@@ -166,5 +167,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

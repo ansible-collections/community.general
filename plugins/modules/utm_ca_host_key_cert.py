@@ -142,13 +142,13 @@ def main():
     key_to_check_for_changes = ["ca", "certificate", "comment", "encrypted", "key", "meta"]
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            ca=dict(type='str', required=True),
-            meta=dict(type='str', required=True),
-            certificate=dict(type='str', required=True),
-            comment=dict(type='str'),
-            encrypted=dict(type='bool', default=False),
-            key=dict(type='str', no_log=True),
+            name=dict(type="str", required=True),
+            ca=dict(type="str", required=True),
+            meta=dict(type="str", required=True),
+            certificate=dict(type="str", required=True),
+            comment=dict(type="str"),
+            encrypted=dict(type="bool", default=False),
+            key=dict(type="str", no_log=True),
         )
     )
     try:
@@ -158,5 +158,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

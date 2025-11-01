@@ -146,25 +146,25 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
 
 
-VALID_DURATION_REGEX = re.compile(r'^(INF|(\d+(ns|u|µ|ms|s|m|h|d|w)))+$')
+VALID_DURATION_REGEX = re.compile(r"^(INF|(\d+(ns|u|µ|ms|s|m|h|d|w)))+$")
 
-DURATION_REGEX = re.compile(r'(\d+)(ns|u|µ|ms|s|m|h|d|w)')
-EXTENDED_DURATION_REGEX = re.compile(r'(?:(\d+)(ns|u|µ|ms|m|h|d|w)|(\d+(?:\.\d+)?)(s))')
+DURATION_REGEX = re.compile(r"(\d+)(ns|u|µ|ms|s|m|h|d|w)")
+EXTENDED_DURATION_REGEX = re.compile(r"(?:(\d+)(ns|u|µ|ms|m|h|d|w)|(\d+(?:\.\d+)?)(s))")
 
 DURATION_UNIT_NANOSECS = {
-    'ns': 1,
-    'u': 1000,
-    'µ': 1000,
-    'ms': 1000 * 1000,
-    's': 1000 * 1000 * 1000,
-    'm': 1000 * 1000 * 1000 * 60,
-    'h': 1000 * 1000 * 1000 * 60 * 60,
-    'd': 1000 * 1000 * 1000 * 60 * 60 * 24,
-    'w': 1000 * 1000 * 1000 * 60 * 60 * 24 * 7,
+    "ns": 1,
+    "u": 1000,
+    "µ": 1000,
+    "ms": 1000 * 1000,
+    "s": 1000 * 1000 * 1000,
+    "m": 1000 * 1000 * 1000 * 60,
+    "h": 1000 * 1000 * 1000 * 60 * 60,
+    "d": 1000 * 1000 * 1000 * 60 * 60 * 24,
+    "w": 1000 * 1000 * 1000 * 60 * 60 * 24 * 7,
 }
 
-MINIMUM_VALID_DURATION = 1 * DURATION_UNIT_NANOSECS['h']
-MINIMUM_VALID_SHARD_GROUP_DURATION = 1 * DURATION_UNIT_NANOSECS['h']
+MINIMUM_VALID_DURATION = 1 * DURATION_UNIT_NANOSECS["h"]
+MINIMUM_VALID_SHARD_GROUP_DURATION = 1 * DURATION_UNIT_NANOSECS["h"]
 
 
 def check_duration_literal(value):
@@ -188,15 +188,15 @@ def parse_duration_literal(value, extended=False):
 
 
 def find_retention_policy(module, client):
-    database_name = module.params['database_name']
-    policy_name = module.params['policy_name']
-    hostname = module.params['hostname']
+    database_name = module.params["database_name"]
+    policy_name = module.params["policy_name"]
+    hostname = module.params["hostname"]
     retention_policy = None
 
     try:
         retention_policies = client.get_list_retention_policies(database=database_name)
         for policy in retention_policies:
-            if policy['name'] == policy_name:
+            if policy["name"] == policy_name:
                 retention_policy = policy
                 break
     except requests.exceptions.ConnectionError as e:
@@ -204,18 +204,20 @@ def find_retention_policy(module, client):
 
     if retention_policy is not None:
         retention_policy["duration"] = parse_duration_literal(retention_policy["duration"], extended=True)
-        retention_policy["shardGroupDuration"] = parse_duration_literal(retention_policy["shardGroupDuration"], extended=True)
+        retention_policy["shardGroupDuration"] = parse_duration_literal(
+            retention_policy["shardGroupDuration"], extended=True
+        )
 
     return retention_policy
 
 
 def create_retention_policy(module, client):
-    database_name = module.params['database_name']
-    policy_name = module.params['policy_name']
-    duration = module.params['duration']
-    replication = module.params['replication']
-    default = module.params['default']
-    shard_group_duration = module.params['shard_group_duration']
+    database_name = module.params["database_name"]
+    policy_name = module.params["policy_name"]
+    duration = module.params["duration"]
+    replication = module.params["replication"]
+    default = module.params["default"]
+    shard_group_duration = module.params["shard_group_duration"]
 
     if not check_duration_literal(duration):
         module.fail_json(msg="Failed to parse value of duration")
@@ -235,8 +237,9 @@ def create_retention_policy(module, client):
     if not module.check_mode:
         try:
             if shard_group_duration:
-                client.create_retention_policy(policy_name, duration, replication, database_name, default,
-                                               shard_group_duration)
+                client.create_retention_policy(
+                    policy_name, duration, replication, database_name, default, shard_group_duration
+                )
             else:
                 client.create_retention_policy(policy_name, duration, replication, database_name, default)
         except exceptions.InfluxDBClientError as e:
@@ -245,12 +248,12 @@ def create_retention_policy(module, client):
 
 
 def alter_retention_policy(module, client, retention_policy):
-    database_name = module.params['database_name']
-    policy_name = module.params['policy_name']
-    duration = module.params['duration']
-    replication = module.params['replication']
-    default = module.params['default']
-    shard_group_duration = module.params['shard_group_duration']
+    database_name = module.params["database_name"]
+    policy_name = module.params["policy_name"]
+    duration = module.params["duration"]
+    replication = module.params["replication"]
+    default = module.params["default"]
+    shard_group_duration = module.params["shard_group_duration"]
 
     changed = False
 
@@ -271,14 +274,17 @@ def alter_retention_policy(module, client, retention_policy):
         if influxdb_shard_group_duration_format < MINIMUM_VALID_SHARD_GROUP_DURATION:
             module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
-    if (retention_policy['duration'] != influxdb_duration_format or
-            retention_policy['shardGroupDuration'] != influxdb_shard_group_duration_format or
-            retention_policy['replicaN'] != int(replication) or
-            retention_policy['default'] != default):
+    if (
+        retention_policy["duration"] != influxdb_duration_format
+        or retention_policy["shardGroupDuration"] != influxdb_shard_group_duration_format
+        or retention_policy["replicaN"] != int(replication)
+        or retention_policy["default"] != default
+    ):
         if not module.check_mode:
             try:
-                client.alter_retention_policy(policy_name, database_name, duration, replication, default,
-                                              shard_group_duration)
+                client.alter_retention_policy(
+                    policy_name, database_name, duration, replication, default, shard_group_duration
+                )
             except exceptions.InfluxDBClientError as e:
                 module.fail_json(msg=e.content)
         changed = True
@@ -286,8 +292,8 @@ def alter_retention_policy(module, client, retention_policy):
 
 
 def drop_retention_policy(module, client):
-    database_name = module.params['database_name']
-    policy_name = module.params['policy_name']
+    database_name = module.params["database_name"]
+    policy_name = module.params["policy_name"]
 
     if not module.check_mode:
         try:
@@ -300,41 +306,39 @@ def drop_retention_policy(module, client):
 def main():
     argument_spec = InfluxDb.influxdb_argument_spec()
     argument_spec.update(
-        state=dict(default='present', type='str', choices=['present', 'absent']),
-        database_name=dict(required=True, type='str'),
-        policy_name=dict(required=True, type='str'),
-        duration=dict(type='str'),
-        replication=dict(type='int'),
-        default=dict(default=False, type='bool'),
-        shard_group_duration=dict(type='str'),
+        state=dict(default="present", type="str", choices=["present", "absent"]),
+        database_name=dict(required=True, type="str"),
+        policy_name=dict(required=True, type="str"),
+        duration=dict(type="str"),
+        replication=dict(type="int"),
+        default=dict(default=False, type="bool"),
+        shard_group_duration=dict(type="str"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        required_if=(
-            ('state', 'present', ['duration', 'replication']),
-        ),
+        required_if=(("state", "present", ["duration", "replication"]),),
     )
 
-    state = module.params['state']
+    state = module.params["state"]
 
     influxdb = InfluxDb(module)
     client = influxdb.connect_to_influxdb()
 
     retention_policy = find_retention_policy(module, client)
 
-    if state == 'present':
+    if state == "present":
         if retention_policy:
             alter_retention_policy(module, client, retention_policy)
         else:
             create_retention_policy(module, client)
 
-    if state == 'absent':
+    if state == "absent":
         if retention_policy:
             drop_retention_policy(module, client)
         else:
             module.exit_json(changed=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

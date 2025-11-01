@@ -9,7 +9,6 @@ from ansible_collections.community.general.plugins.module_utils.homebrew import 
 
 
 class TestHomebrewModule(unittest.TestCase):
-
     def setUp(self):
         self.brew_app_names = ["git-ssh", "awscli@1", "bash"]
 

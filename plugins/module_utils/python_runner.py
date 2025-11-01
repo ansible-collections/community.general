@@ -10,14 +10,24 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 
 
 class PythonRunner(CmdRunner):
-    def __init__(self, module, command, arg_formats=None, default_args_order=(),
-                 check_rc=False, force_lang="C", path_prefix=None, environ_update=None,
-                 python="python", venv=None):
+    def __init__(
+        self,
+        module,
+        command,
+        arg_formats=None,
+        default_args_order=(),
+        check_rc=False,
+        force_lang="C",
+        path_prefix=None,
+        environ_update=None,
+        python="python",
+        venv=None,
+    ):
         self.python = python
         self.venv = venv
         self.has_venv = venv is not None
 
-        if os.path.isabs(python) or '/' in python:
+        if os.path.isabs(python) or "/" in python:
             self.python = python
         elif self.has_venv:
             if path_prefix is None:
@@ -30,5 +40,6 @@ class PythonRunner(CmdRunner):
 
         python_cmd = [self.python] + _ensure_list(command)
 
-        super().__init__(module, python_cmd, arg_formats, default_args_order,
-                         check_rc, force_lang, path_prefix, environ_update)
+        super().__init__(
+            module, python_cmd, arg_formats, default_args_order, check_rc, force_lang, path_prefix, environ_update
+        )

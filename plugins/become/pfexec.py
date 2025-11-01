@@ -91,8 +91,7 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
-
-    name = 'community.general.pfexec'
+    name = "community.general.pfexec"
 
     def build_become_command(self, cmd, shell):
         super().build_become_command(cmd, shell)
@@ -100,8 +99,8 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        exe = self.get_option('become_exe')
+        exe = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        noexe = not self.get_option('wrap_exe')
-        return f'{exe} {flags} {self._build_success_command(cmd, shell, noexe=noexe)}'
+        flags = self.get_option("become_flags")
+        noexe = not self.get_option("wrap_exe")
+        return f"{exe} {flags} {self._build_success_command(cmd, shell, noexe=noexe)}"

@@ -75,8 +75,17 @@ class CmdRunner:
     def _prepare_args_order(order):
         return tuple(order) if is_sequence(order) else tuple(order.split())
 
-    def __init__(self, module, command, arg_formats=None, default_args_order=(),
-                 check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
+    def __init__(
+        self,
+        module,
+        command,
+        arg_formats=None,
+        default_args_order=(),
+        check_rc=False,
+        force_lang="C",
+        path_prefix=None,
+        environ_update=None,
+    ):
         self.module = module
         self.command = _ensure_list(command)
         self.default_args_order = self._prepare_args_order(default_args_order)
@@ -101,7 +110,11 @@ class CmdRunner:
         self.environ_update = environ_update
 
         _cmd = self.command[0]
-        self.command[0] = _cmd if (os.path.isabs(_cmd) or '/' in _cmd) else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
+        self.command[0] = (
+            _cmd
+            if (os.path.isabs(_cmd) or "/" in _cmd)
+            else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
+        )
 
     @property
     def binary(self):
@@ -116,11 +129,14 @@ class CmdRunner:
         for p in args_order:
             if p not in self.arg_formats:
                 raise MissingArgumentFormat(p, args_order, tuple(self.arg_formats.keys()))
-        return _CmdRunnerContext(runner=self,
-                                 args_order=args_order,
-                                 output_process=output_process,
-                                 check_mode_skip=check_mode_skip,
-                                 check_mode_return=check_mode_return, **kwargs)
+        return _CmdRunnerContext(
+            runner=self,
+            args_order=args_order,
+            output_process=output_process,
+            check_mode_skip=check_mode_skip,
+            check_mode_return=check_mode_return,
+            **kwargs,
+        )
 
     def has_arg_format(self, arg):
         return arg in self.arg_formats
@@ -139,17 +155,19 @@ class _CmdRunnerContext:
         self.run_command_args = dict(kwargs)
 
         self.environ_update = runner.environ_update
-        self.environ_update.update(self.run_command_args.get('environ_update', {}))
+        self.environ_update.update(self.run_command_args.get("environ_update", {}))
         if runner.force_lang:
-            self.environ_update.update({
-                'LANGUAGE': runner.force_lang,
-                'LC_ALL': runner.force_lang,
-            })
-        self.run_command_args['environ_update'] = self.environ_update
+            self.environ_update.update(
+                {
+                    "LANGUAGE": runner.force_lang,
+                    "LC_ALL": runner.force_lang,
+                }
+            )
+        self.run_command_args["environ_update"] = self.environ_update
 
-        if 'check_rc' not in self.run_command_args:
-            self.run_command_args['check_rc'] = runner.check_rc
-        self.check_rc = self.run_command_args['check_rc']
+        if "check_rc" not in self.run_command_args:
+            self.run_command_args["check_rc"] = runner.check_rc
+        self.check_rc = self.run_command_args["check_rc"]
 
         self.cmd = None
         self.results_rc = None

@@ -212,26 +212,40 @@ from ansible.module_utils.common.text.converters import to_native
 
 def main():
     endpoint = "reverse_proxy/exception"
-    key_to_check_for_changes = ["op", "path", "skip_custom_threats_filters", "skip_threats_filter_categories", "skipav",
-                                "comment", "skipbadclients", "skipcookie", "skipform", "status", "skipform_missingtoken",
-                                "skiphtmlrewrite", "skiptft", "skipurl", "source"]
+    key_to_check_for_changes = [
+        "op",
+        "path",
+        "skip_custom_threats_filters",
+        "skip_threats_filter_categories",
+        "skipav",
+        "comment",
+        "skipbadclients",
+        "skipcookie",
+        "skipform",
+        "status",
+        "skipform_missingtoken",
+        "skiphtmlrewrite",
+        "skiptft",
+        "skipurl",
+        "source",
+    ]
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            op=dict(type='str', default='AND', choices=['AND', 'OR']),
-            path=dict(type='list', elements='str', default=[]),
-            skip_custom_threats_filters=dict(type='list', elements='str', default=[]),
-            skip_threats_filter_categories=dict(type='list', elements='str', default=[]),
-            skipav=dict(type='bool', default=False),
-            skipbadclients=dict(type='bool', default=False),
-            skipcookie=dict(type='bool', default=False),
-            skipform=dict(type='bool', default=False),
-            skipform_missingtoken=dict(type='bool', default=False),
-            skiphtmlrewrite=dict(type='bool', default=False),
-            skiptft=dict(type='bool', default=False),
-            skipurl=dict(type='bool', default=False),
-            source=dict(type='list', elements='str', default=[]),
-            status=dict(type='bool', default=True),
+            name=dict(type="str", required=True),
+            op=dict(type="str", default="AND", choices=["AND", "OR"]),
+            path=dict(type="list", elements="str", default=[]),
+            skip_custom_threats_filters=dict(type="list", elements="str", default=[]),
+            skip_threats_filter_categories=dict(type="list", elements="str", default=[]),
+            skipav=dict(type="bool", default=False),
+            skipbadclients=dict(type="bool", default=False),
+            skipcookie=dict(type="bool", default=False),
+            skipform=dict(type="bool", default=False),
+            skipform_missingtoken=dict(type="bool", default=False),
+            skiphtmlrewrite=dict(type="bool", default=False),
+            skiptft=dict(type="bool", default=False),
+            skipurl=dict(type="bool", default=False),
+            source=dict(type="list", elements="str", default=[]),
+            status=dict(type="bool", default=True),
         )
     )
     try:
@@ -240,5 +254,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

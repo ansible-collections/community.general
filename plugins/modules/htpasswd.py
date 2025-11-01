@@ -128,16 +128,16 @@ def create_missing_directories(dest):
 
 
 def present(dest, username, password, hash_scheme, create, check_mode):
-    """ Ensures user is present
+    """Ensures user is present
 
-    Returns (msg, changed) """
+    Returns (msg, changed)"""
     if hash_scheme in apache_hashes:
         context = htpasswd_context
     else:
         context = CryptContext(schemes=[hash_scheme] + apache_hashes)
     if not os.path.exists(dest):
         if not create:
-            raise ValueError(f'Destination {dest} does not exist')
+            raise ValueError(f"Destination {dest} does not exist")
         if check_mode:
             return (f"Create {dest}", True)
         create_missing_directories(dest)
@@ -160,9 +160,9 @@ def present(dest, username, password, hash_scheme, create, check_mode):
 
 
 def absent(dest, username, check_mode):
-    """ Ensures user is absent
+    """Ensures user is absent
 
-    Returns (msg, changed) """
+    Returns (msg, changed)"""
     ht = HtpasswdFile(dest, new=False)
 
     if username not in ht.users():
@@ -175,10 +175,8 @@ def absent(dest, username, check_mode):
 
 
 def check_file_attrs(module, changed, message):
-
     file_args = module.load_file_common_arguments(module.params)
     if module.set_fs_attributes_if_different(file_args, False):
-
         if changed:
             message += " and "
         changed = True
@@ -189,24 +187,21 @@ def check_file_attrs(module, changed, message):
 
 def main():
     arg_spec = dict(
-        path=dict(type='path', required=True, aliases=["dest", "destfile"]),
-        name=dict(type='str', required=True, aliases=["username"]),
-        password=dict(type='str', no_log=True),
-        hash_scheme=dict(type='str', default="apr_md5_crypt", aliases=["crypt_scheme"]),
-        state=dict(type='str', default="present", choices=["present", "absent"]),
-        create=dict(type='bool', default=True),
-
+        path=dict(type="path", required=True, aliases=["dest", "destfile"]),
+        name=dict(type="str", required=True, aliases=["username"]),
+        password=dict(type="str", no_log=True),
+        hash_scheme=dict(type="str", default="apr_md5_crypt", aliases=["crypt_scheme"]),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        create=dict(type="bool", default=True),
     )
-    module = AnsibleModule(argument_spec=arg_spec,
-                           add_file_common_args=True,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=arg_spec, add_file_common_args=True, supports_check_mode=True)
 
-    path = module.params['path']
-    username = module.params['name']
-    password = module.params['password']
-    hash_scheme = module.params['hash_scheme']
-    state = module.params['state']
-    create = module.params['create']
+    path = module.params["path"]
+    username = module.params["name"]
+    password = module.params["password"]
+    hash_scheme = module.params["hash_scheme"]
+    state = module.params["state"]
+    create = module.params["create"]
     check_mode = module.check_mode
 
     deps.validate(module)
@@ -237,9 +232,9 @@ def main():
         pass
 
     try:
-        if state == 'present':
+        if state == "present":
             (msg, changed) = present(path, username, password, hash_scheme, create, check_mode)
-        elif state == 'absent':
+        elif state == "absent":
             if not os.path.exists(path):
                 module.warn(f"{path} does not exist")
                 module.exit_json(msg=f"{username} not present", changed=False)
@@ -254,5 +249,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -140,7 +140,5 @@ class LookupModule(LookupBase):
                 display.vvv(f"DevOps Secrets Vault GET /secrets/{path}")
                 result.append(vault.get_secret_json(path))
             except SecretsVaultError as error:
-                raise AnsibleError(
-                    f"DevOps Secrets Vault lookup failure: {error.message}"
-                )
+                raise AnsibleError(f"DevOps Secrets Vault lookup failure: {error.message}")
         return result

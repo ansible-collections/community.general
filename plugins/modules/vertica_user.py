@@ -124,12 +124,14 @@ class NotSupportedError(Exception):
 class CannotDropError(Exception):
     pass
 
+
 # module specific functions
 
 
-def get_user_facts(cursor, user=''):
+def get_user_facts(cursor, user=""):
     facts = {}
-    cursor.execute("""
+    cursor.execute(
+        """
         select u.user_name, u.is_locked, u.lock_time,
         p.password, p.acctexpired as is_expired,
         u.profile_name, u.resource_pool,
@@ -137,7 +139,10 @@ def get_user_facts(cursor, user=''):
         from users u join password_auditor p on p.user_id = u.user_id
         where not u.is_super_user
         and (? = '' or u.user_name ilike ?)
-    """, user, user)
+    """,
+        user,
+        user,
+    )
     while True:
         rows = cursor.fetchmany(100)
         if not rows:
@@ -145,25 +150,25 @@ def get_user_facts(cursor, user=''):
         for row in rows:
             user_key = row.user_name.lower()
             facts[user_key] = {
-                'name': row.user_name,
-                'locked': str(row.is_locked),
-                'password': row.password,
-                'expired': str(row.is_expired),
-                'profile': row.profile_name,
-                'resource_pool': row.resource_pool,
-                'roles': [],
-                'default_roles': []}
+                "name": row.user_name,
+                "locked": str(row.is_locked),
+                "password": row.password,
+                "expired": str(row.is_expired),
+                "profile": row.profile_name,
+                "resource_pool": row.resource_pool,
+                "roles": [],
+                "default_roles": [],
+            }
             if row.is_locked:
-                facts[user_key]['locked_time'] = str(row.lock_time)
+                facts[user_key]["locked_time"] = str(row.lock_time)
             if row.all_roles:
-                facts[user_key]['roles'] = row.all_roles.replace(' ', '').split(',')
+                facts[user_key]["roles"] = row.all_roles.replace(" ", "").split(",")
             if row.default_roles:
-                facts[user_key]['default_roles'] = row.default_roles.replace(' ', '').split(',')
+                facts[user_key]["default_roles"] = row.default_roles.replace(" ", "").split(",")
     return facts
 
 
-def update_roles(user_facts, cursor, user,
-                 existing_all, existing_default, required):
+def update_roles(user_facts, cursor, user, existing_all, existing_default, required):
     del_roles = list(set(existing_all) - set(required))
     if del_roles:
         cursor.execute(f"revoke {','.join(del_roles)} from {user}")
@@ -174,30 +179,34 @@ def update_roles(user_facts, cursor, user,
         cursor.execute(f"alter user {user} default role {','.join(required)}")
 
 
-def check(user_facts, user, profile, resource_pool,
-          locked, password, expired, ldap, roles):
+def check(user_facts, user, profile, resource_pool, locked, password, expired, ldap, roles):
     user_key = user.lower()
     if user_key not in user_facts:
         return False
-    if profile and profile != user_facts[user_key]['profile']:
+    if profile and profile != user_facts[user_key]["profile"]:
         return False
-    if resource_pool and resource_pool != user_facts[user_key]['resource_pool']:
+    if resource_pool and resource_pool != user_facts[user_key]["resource_pool"]:
         return False
-    if locked != (user_facts[user_key]['locked'] == 'True'):
+    if locked != (user_facts[user_key]["locked"] == "True"):
         return False
-    if password and password != user_facts[user_key]['password']:
+    if password and password != user_facts[user_key]["password"]:
         return False
-    if (expired is not None and expired != (user_facts[user_key]['expired'] == 'True') or
-            ldap is not None and ldap != (user_facts[user_key]['expired'] == 'True')):
+    if (
+        expired is not None
+        and expired != (user_facts[user_key]["expired"] == "True")
+        or ldap is not None
+        and ldap != (user_facts[user_key]["expired"] == "True")
+    ):
         return False
-    if roles and (sorted(roles) != sorted(user_facts[user_key]['roles']) or
-                  sorted(roles) != sorted(user_facts[user_key]['default_roles'])):
+    if roles and (
+        sorted(roles) != sorted(user_facts[user_key]["roles"])
+        or sorted(roles) != sorted(user_facts[user_key]["default_roles"])
+    ):
         return False
     return True
 
 
-def present(user_facts, cursor, user, profile, resource_pool,
-            locked, password, expired, ldap, roles):
+def present(user_facts, cursor, user, profile, resource_pool, locked, password, expired, ldap, roles):
     user_key = user.lower()
     if user_key not in user_facts:
         query_fragments = [f"create user {user}"]
@@ -214,8 +223,8 @@ def present(user_facts, cursor, user, profile, resource_pool,
             query_fragments.append(f"profile {profile}")
         if resource_pool:
             query_fragments.append(f"resource pool {resource_pool}")
-        cursor.execute(' '.join(query_fragments))
-        if resource_pool and resource_pool != 'general':
+        cursor.execute(" ".join(query_fragments))
+        if resource_pool and resource_pool != "general":
             cursor.execute(f"grant usage on resource pool {resource_pool} to {user}")
         update_roles(user_facts, cursor, user, [], [], roles)
         user_facts.update(get_user_facts(cursor, user))
@@ -223,42 +232,45 @@ def present(user_facts, cursor, user, profile, resource_pool,
     else:
         changed = False
         query_fragments = [f"alter user {user}"]
-        if locked is not None and locked != (user_facts[user_key]['locked'] == 'True'):
+        if locked is not None and locked != (user_facts[user_key]["locked"] == "True"):
             if locked:
-                state = 'lock'
+                state = "lock"
             else:
-                state = 'unlock'
+                state = "unlock"
             query_fragments.append(f"account {state}")
             changed = True
-        if password and password != user_facts[user_key]['password']:
+        if password and password != user_facts[user_key]["password"]:
             query_fragments.append(f"identified by '{password}'")
             changed = True
         if ldap:
-            if ldap != (user_facts[user_key]['expired'] == 'True'):
+            if ldap != (user_facts[user_key]["expired"] == "True"):
                 query_fragments.append("password expire")
                 changed = True
-        elif expired is not None and expired != (user_facts[user_key]['expired'] == 'True'):
+        elif expired is not None and expired != (user_facts[user_key]["expired"] == "True"):
             if expired:
                 query_fragments.append("password expire")
                 changed = True
             else:
                 raise NotSupportedError("Unexpiring user password is not supported.")
-        if profile and profile != user_facts[user_key]['profile']:
+        if profile and profile != user_facts[user_key]["profile"]:
             query_fragments.append(f"profile {profile}")
             changed = True
-        if resource_pool and resource_pool != user_facts[user_key]['resource_pool']:
+        if resource_pool and resource_pool != user_facts[user_key]["resource_pool"]:
             query_fragments.append(f"resource pool {resource_pool}")
-            if user_facts[user_key]['resource_pool'] != 'general':
+            if user_facts[user_key]["resource_pool"] != "general":
                 cursor.execute(f"revoke usage on resource pool {user_facts[user_key]['resource_pool']} from {user}")
-            if resource_pool != 'general':
+            if resource_pool != "general":
                 cursor.execute(f"grant usage on resource pool {resource_pool} to {user}")
             changed = True
         if changed:
-            cursor.execute(' '.join(query_fragments))
-        if roles and (sorted(roles) != sorted(user_facts[user_key]['roles']) or
-                      sorted(roles) != sorted(user_facts[user_key]['default_roles'])):
-            update_roles(user_facts, cursor, user,
-                         user_facts[user_key]['roles'], user_facts[user_key]['default_roles'], roles)
+            cursor.execute(" ".join(query_fragments))
+        if roles and (
+            sorted(roles) != sorted(user_facts[user_key]["roles"])
+            or sorted(roles) != sorted(user_facts[user_key]["default_roles"])
+        ):
+            update_roles(
+                user_facts, cursor, user, user_facts[user_key]["roles"], user_facts[user_key]["default_roles"], roles
+            )
             changed = True
         if changed:
             user_facts.update(get_user_facts(cursor, user))
@@ -268,8 +280,7 @@ def present(user_facts, cursor, user, profile, resource_pool,
 def absent(user_facts, cursor, user, roles):
     user_key = user.lower()
     if user_key in user_facts:
-        update_roles(user_facts, cursor, user,
-                     user_facts[user_key]['roles'], user_facts[user_key]['default_roles'], [])
+        update_roles(user_facts, cursor, user, user_facts[user_key]["roles"], user_facts[user_key]["default_roles"], [])
         try:
             cursor.execute(f"drop user {user_facts[user_key]['name']}")
         except pyodbc.Error:
@@ -279,53 +290,55 @@ def absent(user_facts, cursor, user, roles):
     else:
         return False
 
+
 # module logic
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            user=dict(required=True, aliases=['name']),
+            user=dict(required=True, aliases=["name"]),
             profile=dict(),
             resource_pool=dict(),
             password=dict(no_log=True),
-            expired=dict(type='bool'),
-            ldap=dict(type='bool'),
-            roles=dict(aliases=['role']),
-            state=dict(default='present', choices=['absent', 'present', 'locked']),
+            expired=dict(type="bool"),
+            ldap=dict(type="bool"),
+            roles=dict(aliases=["role"]),
+            state=dict(default="present", choices=["absent", "present", "locked"]),
             db=dict(),
-            cluster=dict(default='localhost'),
-            port=dict(default='5433'),
-            login_user=dict(default='dbadmin'),
+            cluster=dict(default="localhost"),
+            port=dict(default="5433"),
+            login_user=dict(default="dbadmin"),
             login_password=dict(no_log=True),
-        ), supports_check_mode=True)
+        ),
+        supports_check_mode=True,
+    )
 
     if not pyodbc_found:
-        module.fail_json(msg=missing_required_lib('pyodbc'), exception=PYODBC_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pyodbc"), exception=PYODBC_IMP_ERR)
 
-    user = module.params['user']
-    profile = module.params['profile']
+    user = module.params["user"]
+    profile = module.params["profile"]
     if profile:
         profile = profile.lower()
-    resource_pool = module.params['resource_pool']
+    resource_pool = module.params["resource_pool"]
     if resource_pool:
         resource_pool = resource_pool.lower()
-    password = module.params['password']
-    expired = module.params['expired']
-    ldap = module.params['ldap']
+    password = module.params["password"]
+    expired = module.params["expired"]
+    ldap = module.params["ldap"]
     roles = []
-    if module.params['roles']:
-        roles = module.params['roles'].split(',')
+    if module.params["roles"]:
+        roles = module.params["roles"].split(",")
         roles = [_f for _f in roles if _f]
-    state = module.params['state']
-    if state == 'locked':
+    state = module.params["state"]
+    if state == "locked":
         locked = True
     else:
         locked = False
-    db = ''
-    if module.params['db']:
-        db = module.params['db']
+    db = ""
+    if module.params["db"]:
+        db = module.params["db"]
 
     changed = False
 
@@ -347,31 +360,31 @@ def main():
     try:
         user_facts = get_user_facts(cursor)
         if module.check_mode:
-            changed = not check(user_facts, user, profile, resource_pool,
-                                locked, password, expired, ldap, roles)
-        elif state == 'absent':
+            changed = not check(user_facts, user, profile, resource_pool, locked, password, expired, ldap, roles)
+        elif state == "absent":
             try:
                 changed = absent(user_facts, cursor, user, roles)
             except pyodbc.Error as e:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
-        elif state in ['present', 'locked']:
+        elif state in ["present", "locked"]:
             try:
-                changed = present(user_facts, cursor, user, profile, resource_pool,
-                                  locked, password, expired, ldap, roles)
+                changed = present(
+                    user_facts, cursor, user, profile, resource_pool, locked, password, expired, ldap, roles
+                )
             except pyodbc.Error as e:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
     except NotSupportedError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={'vertica_users': user_facts})
+        module.fail_json(msg=to_native(e), ansible_facts={"vertica_users": user_facts})
     except CannotDropError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={'vertica_users': user_facts})
+        module.fail_json(msg=to_native(e), ansible_facts={"vertica_users": user_facts})
     except SystemExit:
         # avoid catching this on python 2.4
         raise
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
-    module.exit_json(changed=changed, user=user, ansible_facts={'vertica_users': user_facts})
+    module.exit_json(changed=changed, user=user, ansible_facts={"vertica_users": user_facts})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

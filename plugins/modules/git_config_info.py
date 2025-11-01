@@ -123,7 +123,7 @@ def main():
 
     # We check error message for a pattern, so we need to make sure the messages appear in the form we're expecting.
     # Set the locale to C to ensure consistent messages.
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     name = module.params["name"]
     path = module.params["path"]

@@ -80,7 +80,7 @@ except ImportError:
 def _alternate_retrieval_method(module):
     get_argument = (
         f'echo "{quote(module.params["keyring_password"])}" | gnome-keyring-daemon --unlock\n'
-        f'keyring get {quote(module.params["service"])} {quote(module.params["username"])}\n'
+        f"keyring get {quote(module.params['service'])} {quote(module.params['username'])}\n"
     )
     dummy, stdout, dummy = module.run_command(
         "dbus-run-session -- /bin/bash",
@@ -111,9 +111,7 @@ def run_module():
     if not HAS_KEYRING:
         module.fail_json(msg=missing_required_lib("keyring"), exception=KEYRING_IMP_ERR)
     try:
-        passphrase = keyring.get_password(
-            module.params["service"], module.params["username"]
-        )
+        passphrase = keyring.get_password(module.params["service"], module.params["username"])
     except keyring.errors.KeyringLocked:
         pass
     except keyring.errors.InitError:

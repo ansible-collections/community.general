@@ -106,9 +106,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             if path.endswith(("incus.yaml", "incus.yml")):
                 valid = True
             else:
-                self.display.vvv(
-                    'Skipping due to inventory source not ending in "incus.yaml" nor "incus.yml"'
-                )
+                self.display.vvv('Skipping due to inventory source not ending in "incus.yaml" nor "incus.yml"')
 
         return valid
 
@@ -148,10 +146,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             if project_name:
                 projects = [project_name]
             else:
-                projects = [
-                    entry["name"]
-                    for entry in self._run_incus("project", "list", f"{remote_name}:")
-                ]
+                projects = [entry["name"] for entry in self._run_incus("project", "list", f"{remote_name}:")]
 
             # Get a list of instances.
             for project in projects:
@@ -214,17 +209,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         strict = self.get_option("strict")
 
         # Add variables created by the user's Jinja2 expressions to the host
-        self._set_composite_vars(
-            self.get_option("compose"), host_vars, hostname, strict=True
-        )
+        self._set_composite_vars(self.get_option("compose"), host_vars, hostname, strict=True)
 
         # Create user-defined groups using variables and Jinja2 conditionals
-        self._add_host_to_composed_groups(
-            self.get_option("groups"), host_vars, hostname, strict=strict
-        )
-        self._add_host_to_keyed_groups(
-            self.get_option("keyed_groups"), host_vars, hostname, strict=strict
-        )
+        self._add_host_to_composed_groups(self.get_option("groups"), host_vars, hostname, strict=strict)
+        self._add_host_to_keyed_groups(self.get_option("keyed_groups"), host_vars, hostname, strict=strict)
 
     def _run_incus(self, *args):
         local_cmd = ["incus"] + list(args) + ["--format=json"]

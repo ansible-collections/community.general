@@ -131,10 +131,11 @@ _value:
 
 from ansible_collections.community.general.plugins.plugin_utils.keys_filter import (
     _keys_filter_params,
-    _keys_filter_target_dict)
+    _keys_filter_target_dict,
+)
 
 
-def replace_keys(data, target=None, matching_parameter='equal'):
+def replace_keys(data, target=None, matching_parameter="equal"):
     """replace specific keys in a list of dictionaries"""
 
     # test parameters
@@ -142,25 +143,29 @@ def replace_keys(data, target=None, matching_parameter='equal'):
     # test and transform target
     tz = _keys_filter_target_dict(target, matching_parameter)
 
-    if matching_parameter == 'equal':
+    if matching_parameter == "equal":
+
         def replace_key(key):
             for b, a in tz:
                 if key == b:
                     return a
             return key
-    elif matching_parameter == 'starts_with':
+    elif matching_parameter == "starts_with":
+
         def replace_key(key):
             for b, a in tz:
                 if key.startswith(b):
                     return a
             return key
-    elif matching_parameter == 'ends_with':
+    elif matching_parameter == "ends_with":
+
         def replace_key(key):
             for b, a in tz:
                 if key.endswith(b):
                     return a
             return key
-    elif matching_parameter == 'regex':
+    elif matching_parameter == "regex":
+
         def replace_key(key):
             for b, a in tz:
                 if b.match(key):
@@ -171,8 +176,7 @@ def replace_keys(data, target=None, matching_parameter='equal'):
 
 
 class FilterModule:
-
     def filters(self):
         return {
-            'replace_keys': replace_keys,
+            "replace_keys": replace_keys,
         }

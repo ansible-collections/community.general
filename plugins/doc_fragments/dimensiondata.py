@@ -16,7 +16,6 @@ from __future__ import annotations
 
 
 class ModuleDocFragment:
-
     # Dimension Data doc fragment
     DOCUMENTATION = r"""
 options:

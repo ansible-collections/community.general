@@ -37,7 +37,7 @@ class PackageRequirement:
             return name, None
 
         # Quick check for simple package names
-        if not any(c in name for c in '>=<!~[]'):
+        if not any(c in name for c in ">=<!~[]"):
             return name.strip(), None
 
         deps.validate(self.module, "packaging")

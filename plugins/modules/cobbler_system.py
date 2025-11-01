@@ -159,29 +159,29 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 IFPROPS_MAPPING = dict(
-    bondingopts='bonding_opts',
-    bridgeopts='bridge_opts',
-    connected_mode='connected_mode',
-    cnames='cnames',
-    dhcptag='dhcp_tag',
-    dnsname='dns_name',
-    ifgateway='if_gateway',
-    interfacetype='interface_type',
-    interfacemaster='interface_master',
-    ipaddress='ip_address',
-    ipv6address='ipv6_address',
-    ipv6defaultgateway='ipv6_default_gateway',
-    ipv6mtu='ipv6_mtu',
-    ipv6prefix='ipv6_prefix',
-    ipv6secondaries='ipv6_secondariesu',
-    ipv6staticroutes='ipv6_static_routes',
-    macaddress='mac_address',
-    management='management',
-    mtu='mtu',
-    netmask='netmask',
-    static='static',
-    staticroutes='static_routes',
-    virtbridge='virt_bridge',
+    bondingopts="bonding_opts",
+    bridgeopts="bridge_opts",
+    connected_mode="connected_mode",
+    cnames="cnames",
+    dhcptag="dhcp_tag",
+    dnsname="dns_name",
+    ifgateway="if_gateway",
+    interfacetype="interface_type",
+    interfacemaster="interface_master",
+    ipaddress="ip_address",
+    ipv6address="ipv6_address",
+    ipv6defaultgateway="ipv6_default_gateway",
+    ipv6mtu="ipv6_mtu",
+    ipv6prefix="ipv6_prefix",
+    ipv6secondaries="ipv6_secondariesu",
+    ipv6staticroutes="ipv6_static_routes",
+    macaddress="mac_address",
+    management="management",
+    mtu="mtu",
+    netmask="netmask",
+    static="static",
+    staticroutes="static_routes",
+    virtbridge="virt_bridge",
 )
 
 
@@ -198,33 +198,33 @@ def getsystem(conn, name, token):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(type='str', default='127.0.0.1'),
-            port=dict(type='int'),
-            username=dict(type='str', default='cobbler'),
-            password=dict(type='str', no_log=True),
-            use_ssl=dict(type='bool', default=True),
-            validate_certs=dict(type='bool', default=True),
-            name=dict(type='str'),
-            interfaces=dict(type='dict'),
-            properties=dict(type='dict'),
-            sync=dict(type='bool', default=False),
-            state=dict(type='str', default='present', choices=['absent', 'present', 'query']),
+            host=dict(type="str", default="127.0.0.1"),
+            port=dict(type="int"),
+            username=dict(type="str", default="cobbler"),
+            password=dict(type="str", no_log=True),
+            use_ssl=dict(type="bool", default=True),
+            validate_certs=dict(type="bool", default=True),
+            name=dict(type="str"),
+            interfaces=dict(type="dict"),
+            properties=dict(type="dict"),
+            sync=dict(type="bool", default=False),
+            state=dict(type="str", default="present", choices=["absent", "present", "query"]),
         ),
         supports_check_mode=True,
     )
 
-    username = module.params['username']
-    password = module.params['password']
-    port = module.params['port']
-    use_ssl = module.params['use_ssl']
-    validate_certs = module.params['validate_certs']
+    username = module.params["username"]
+    password = module.params["password"]
+    port = module.params["port"]
+    use_ssl = module.params["use_ssl"]
+    validate_certs = module.params["validate_certs"]
 
-    name = module.params['name']
-    state = module.params['state']
+    name = module.params["name"]
+    state = module.params["state"]
 
-    module.params['proto'] = 'https' if use_ssl else 'http'
+    module.params["proto"] = "https" if use_ssl else "http"
     if not port:
-        module.params['port'] = '443' if use_ssl else '80'
+        module.params["port"] = "443" if use_ssl else "80"
 
     result = dict(
         changed=False,
@@ -243,7 +243,7 @@ def main():
             # Handle target environment that doesn't support HTTPS verification
             ssl._create_default_https_context = ssl._create_unverified_context
 
-    url = '{proto}://{host}:{port}/cobbler_api'.format(**module.params)
+    url = "{proto}://{host}:{port}/cobbler_api".format(**module.params)
     if ssl_context:
         conn = xmlrpc_client.ServerProxy(url, context=ssl_context)
     else:
@@ -252,52 +252,55 @@ def main():
     try:
         token = conn.login(username, password)
     except xmlrpc_client.Fault as e:
-        module.fail_json(msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(url=url, error=to_text(e), **module.params))
+        module.fail_json(
+            msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(
+                url=url, error=to_text(e), **module.params
+            )
+        )
     except Exception as e:
         module.fail_json(msg=f"Connection to '{url}' failed. {e}")
 
     system = getsystem(conn, name, token)
     # result['system'] = system
 
-    if state == 'query':
+    if state == "query":
         if name:
-            result['system'] = system
+            result["system"] = system
         else:
             # Turn it into a dictionary of dictionaries
             # all_systems = conn.get_systems()
             # result['systems'] = { system['name']: system for system in all_systems }
 
             # Return a list of dictionaries
-            result['systems'] = conn.get_systems()
+            result["systems"] = conn.get_systems()
 
-    elif state == 'present':
-
+    elif state == "present":
         if system:
             # Update existing entry
-            system_id = ''
-            if LooseVersion(str(conn.version())) >= LooseVersion('3.4'):
+            system_id = ""
+            if LooseVersion(str(conn.version())) >= LooseVersion("3.4"):
                 system_id = conn.get_system_handle(name)
             else:
                 system_id = conn.get_system_handle(name, token)
 
-            for key, value in module.params['properties'].items():
+            for key, value in module.params["properties"].items():
                 if key not in system:
                     module.warn(f"Property '{key}' is not a valid system property.")
                 if system[key] != value:
                     try:
                         conn.modify_system(system_id, key, value, token)
-                        result['changed'] = True
+                        result["changed"] = True
                     except Exception as e:
                         module.fail_json(msg=f"Unable to change '{key}' to '{value}'. {e}")
 
         else:
             # Create a new entry
             system_id = conn.new_system(token)
-            conn.modify_system(system_id, 'name', name, token)
-            result['changed'] = True
+            conn.modify_system(system_id, "name", name, token)
+            result["changed"] = True
 
-            if module.params['properties']:
-                for key, value in module.params['properties'].items():
+            if module.params["properties"]:
+                for key, value in module.params["properties"].items():
                     try:
                         conn.modify_system(system_id, key, value, token)
                     except Exception as e:
@@ -305,46 +308,45 @@ def main():
 
         # Add interface properties
         interface_properties = dict()
-        if module.params['interfaces']:
-            for device, values in module.params['interfaces'].items():
+        if module.params["interfaces"]:
+            for device, values in module.params["interfaces"].items():
                 for key, value in values.items():
-                    if key == 'name':
+                    if key == "name":
                         continue
                     if key not in IFPROPS_MAPPING:
                         module.warn(f"Property '{key}' is not a valid system property.")
-                    if not system or system['interfaces'][device][IFPROPS_MAPPING[key]] != value:
-                        result['changed'] = True
-                    interface_properties[f'{key}-{device}'] = value
+                    if not system or system["interfaces"][device][IFPROPS_MAPPING[key]] != value:
+                        result["changed"] = True
+                    interface_properties[f"{key}-{device}"] = value
 
-            if result['changed'] is True:
+            if result["changed"] is True:
                 conn.modify_system(system_id, "modify_interface", interface_properties, token)
 
         # Only save when the entry was changed
-        if not module.check_mode and result['changed']:
+        if not module.check_mode and result["changed"]:
             conn.save_system(system_id, token)
 
-    elif state == 'absent':
-
+    elif state == "absent":
         if system:
             if not module.check_mode:
                 conn.remove_system(name, token)
-            result['changed'] = True
+            result["changed"] = True
 
-    if not module.check_mode and module.params['sync'] and result['changed']:
+    if not module.check_mode and module.params["sync"] and result["changed"]:
         try:
             conn.sync(token)
         except Exception as e:
             module.fail_json(msg=f"Failed to sync Cobbler. {e}")
 
-    if state in ('absent', 'present'):
-        result['system'] = getsystem(conn, name, token)
+    if state in ("absent", "present"):
+        result["system"] = getsystem(conn, name, token)
 
         if module._diff:
-            result['diff'] = dict(before=system, after=result['system'])
+            result["diff"] = dict(before=system, after=result["system"])
 
     elapsed = now() - start
     module.exit_json(elapsed=elapsed.seconds, **result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

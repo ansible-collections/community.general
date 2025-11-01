@@ -121,17 +121,17 @@ def decompress(b_src, b_dest, handler):
 
 class Decompress(ModuleHelper):
     destination_filename_template = "%s_decompressed"
-    output_params = 'dest'
+    output_params = "dest"
 
     module = dict(
         argument_spec=dict(
-            src=dict(type='path', required=True),
-            dest=dict(type='path'),
-            format=dict(type='str', default='gz', choices=['gz', 'bz2', 'xz']),
-            remove=dict(type='bool', default=False)
+            src=dict(type="path", required=True),
+            dest=dict(type="path"),
+            format=dict(type="str", default="gz", choices=["gz", "bz2", "xz"]),
+            remove=dict(type="bool", default=False),
         ),
         add_file_common_args=True,
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     def __init_module__(self):
@@ -142,8 +142,8 @@ class Decompress(ModuleHelper):
         self.configure()
 
     def configure(self):
-        b_dest = to_bytes(self.vars.dest, errors='surrogate_or_strict')
-        b_src = to_bytes(self.vars.src, errors='surrogate_or_strict')
+        b_dest = to_bytes(self.vars.dest, errors="surrogate_or_strict")
+        b_src = to_bytes(self.vars.src, errors="surrogate_or_strict")
         if not os.path.exists(b_src):
             if self.vars.remove and os.path.exists(b_dest):
                 self.module.exit_json(changed=False)
@@ -155,15 +155,15 @@ class Decompress(ModuleHelper):
             self.do_raise(msg=f"Destination is a directory, cannot decompress: '{b_dest}'")
 
     def __run__(self):
-        b_dest = to_bytes(self.vars.dest, errors='surrogate_or_strict')
-        b_src = to_bytes(self.vars.src, errors='surrogate_or_strict')
+        b_dest = to_bytes(self.vars.dest, errors="surrogate_or_strict")
+        b_src = to_bytes(self.vars.src, errors="surrogate_or_strict")
 
         file_args = self.module.load_file_common_arguments(self.module.params, path=self.vars.dest)
         handler = self.handlers[self.vars.format]
         try:
             tempfd, temppath = tempfile.mkstemp(dir=self.module.tmpdir)
             self.module.add_cleanup_file(temppath)
-            b_temppath = to_bytes(temppath, errors='surrogate_or_strict')
+            b_temppath = to_bytes(temppath, errors="surrogate_or_strict")
             decompress(b_src, b_temppath, handler)
         except OSError as e:
             self.do_raise(msg=f"Unable to create temporary file '{e}'")
@@ -187,7 +187,7 @@ class Decompress(ModuleHelper):
         src = self.vars.src
         fmt_extension = f".{self.vars.format}"
         if src.endswith(fmt_extension) and len(src) > len(fmt_extension):
-            filename = src[:-len(fmt_extension)]
+            filename = src[: -len(fmt_extension)]
         else:
             filename = Decompress.destination_filename_template % src
         return filename
@@ -197,5 +197,5 @@ def main():
     Decompress.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

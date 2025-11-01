@@ -140,8 +140,8 @@ def _check_device(module, device):
     Returns: bool, device state
 
     """
-    lsdev_cmd = module.get_bin_path('lsdev', True)
-    rc, lsdev_out, err = module.run_command([lsdev_cmd, '-C', '-l', device])
+    lsdev_cmd = module.get_bin_path("lsdev", True)
+    rc, lsdev_out, err = module.run_command([lsdev_cmd, "-C", "-l", device])
 
     if rc != 0:
         module.fail_json(msg="Failed to run lsdev", rc=rc, err=err)
@@ -165,15 +165,14 @@ def _check_device_attr(module, device, attr):
     Returns:
 
     """
-    lsattr_cmd = module.get_bin_path('lsattr', True)
-    rc, lsattr_out, err = module.run_command([lsattr_cmd, '-El', device, '-a', f"{attr}"])
+    lsattr_cmd = module.get_bin_path("lsattr", True)
+    rc, lsattr_out, err = module.run_command([lsattr_cmd, "-El", device, "-a", f"{attr}"])
 
-    hidden_attrs = ['delalias4', 'delalias6']
+    hidden_attrs = ["delalias4", "delalias6"]
 
     if rc == 255:
-
         if attr in hidden_attrs:
-            current_param = ''
+            current_param = ""
         else:
             current_param = None
 
@@ -187,17 +186,17 @@ def _check_device_attr(module, device, attr):
 
 
 def discover_device(module, device):
-    """ Discover AIX devices."""
-    cfgmgr_cmd = module.get_bin_path('cfgmgr', True)
+    """Discover AIX devices."""
+    cfgmgr_cmd = module.get_bin_path("cfgmgr", True)
 
     if device is not None:
         device = f"-l {device}"
 
     else:
-        device = ''
+        device = ""
 
     changed = True
-    msg = ''
+    msg = ""
     if not module.check_mode:
         rc, cfgmgr_out, err = module.run_command([cfgmgr_cmd, device])
         changed = True
@@ -207,12 +206,12 @@ def discover_device(module, device):
 
 
 def change_device_attr(module, attributes, device, force):
-    """ Change AIX device attribute. """
+    """Change AIX device attribute."""
 
     attr_changed = []
     attr_not_changed = []
     attr_invalid = []
-    chdev_cmd = module.get_bin_path('chdev', True)
+    chdev_cmd = module.get_bin_path("chdev", True)
 
     for attr in list(attributes.keys()):
         new_param = attributes[attr]
@@ -223,9 +222,9 @@ def change_device_attr(module, attributes, device, force):
 
         elif current_param != new_param:
             if force:
-                cmd = [chdev_cmd, '-l', device, '-a', f"{attr}={attributes[attr]}", f"{force}"]
+                cmd = [chdev_cmd, "-l", device, "-a", f"{attr}={attributes[attr]}", f"{force}"]
             else:
-                cmd = [chdev_cmd, '-l', device, '-a', f"{attr}={attributes[attr]}"]
+                cmd = [chdev_cmd, "-l", device, "-a", f"{attr}={attributes[attr]}"]
 
             if not module.check_mode:
                 rc, chdev_out, err = module.run_command(cmd)
@@ -241,17 +240,17 @@ def change_device_attr(module, attributes, device, force):
         attr_changed_msg = f"Attributes changed: {','.join(attr_changed)}. "
     else:
         changed = False
-        attr_changed_msg = ''
+        attr_changed_msg = ""
 
     if len(attr_not_changed) > 0:
         attr_not_changed_msg = f"Attributes already set: {','.join(attr_not_changed)}. "
     else:
-        attr_not_changed_msg = ''
+        attr_not_changed_msg = ""
 
     if len(attr_invalid) > 0:
         attr_invalid_msg = f"Invalid attributes: {', '.join(attr_invalid)} "
     else:
-        attr_invalid_msg = ''
+        attr_invalid_msg = ""
 
     msg = f"{attr_changed_msg}{attr_not_changed_msg}{attr_invalid_msg}"
 
@@ -259,25 +258,18 @@ def change_device_attr(module, attributes, device, force):
 
 
 def remove_device(module, device, force, recursive, state):
-    """ Puts device in defined state or removes device. """
+    """Puts device in defined state or removes device."""
 
-    state_opt = {
-        'removed': '-d',
-        'absent': '-d',
-        'defined': ''
-    }
+    state_opt = {"removed": "-d", "absent": "-d", "defined": ""}
 
-    recursive_opt = {
-        True: '-R',
-        False: ''
-    }
+    recursive_opt = {True: "-R", False: ""}
 
     recursive = recursive_opt[recursive]
     state = state_opt[state]
 
     changed = True
-    msg = ''
-    rmdev_cmd = module.get_bin_path('rmdev', True)
+    msg = ""
+    rmdev_cmd = module.get_bin_path("rmdev", True)
 
     if not module.check_mode:
         if state:
@@ -294,81 +286,80 @@ def remove_device(module, device, force, recursive, state):
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            attributes=dict(type='dict'),
-            device=dict(type='str'),
-            force=dict(type='bool', default=False),
-            recursive=dict(type='bool', default=False),
-            state=dict(type='str', default='available', choices=['available', 'defined', 'removed']),
+            attributes=dict(type="dict"),
+            device=dict(type="str"),
+            force=dict(type="bool", default=False),
+            recursive=dict(type="bool", default=False),
+            state=dict(type="str", default="available", choices=["available", "defined", "removed"]),
         ),
         supports_check_mode=True,
     )
 
     force_opt = {
-        True: '-f',
-        False: '',
+        True: "-f",
+        False: "",
     }
 
-    attributes = module.params['attributes']
-    device = module.params['device']
-    force = force_opt[module.params['force']]
-    recursive = module.params['recursive']
-    state = module.params['state']
+    attributes = module.params["attributes"]
+    device = module.params["device"]
+    force = force_opt[module.params["force"]]
+    recursive = module.params["recursive"]
+    state = module.params["state"]
 
     result = dict(
         changed=False,
-        msg='',
+        msg="",
     )
 
-    if state == 'available' or state == 'present':
+    if state == "available" or state == "present":
         if attributes:
             # change attributes on device
             device_status, device_state = _check_device(module, device)
             if device_status:
-                result['changed'], result['msg'] = change_device_attr(module, attributes, device, force)
+                result["changed"], result["msg"] = change_device_attr(module, attributes, device, force)
             else:
-                result['msg'] = f"Device {device} does not exist."
+                result["msg"] = f"Device {device} does not exist."
 
         else:
             # discovery devices (cfgmgr)
-            if device and device != 'all':
+            if device and device != "all":
                 device_status, device_state = _check_device(module, device)
                 if device_status:
                     # run cfgmgr on specific device
-                    result['changed'], result['msg'] = discover_device(module, device)
+                    result["changed"], result["msg"] = discover_device(module, device)
 
                 else:
-                    result['msg'] = f"Device {device} does not exist."
+                    result["msg"] = f"Device {device} does not exist."
 
             else:
-                result['changed'], result['msg'] = discover_device(module, device)
+                result["changed"], result["msg"] = discover_device(module, device)
 
-    elif state == 'removed' or state == 'absent' or state == 'defined':
+    elif state == "removed" or state == "absent" or state == "defined":
         if not device:
-            result['msg'] = "device is required to removed or defined state."
+            result["msg"] = "device is required to removed or defined state."
 
         else:
             # Remove device
             check_device, device_state = _check_device(module, device)
             if check_device:
-                if state == 'defined' and device_state == 'Defined':
-                    result['changed'] = False
-                    result['msg'] = f'Device {device} already in Defined'
+                if state == "defined" and device_state == "Defined":
+                    result["changed"] = False
+                    result["msg"] = f"Device {device} already in Defined"
 
                 else:
-                    result['changed'], result['msg'] = remove_device(module, device, force, recursive, state)
+                    result["changed"], result["msg"] = remove_device(module, device, force, recursive, state)
 
             else:
-                result['msg'] = f"Device {device} does not exist."
+                result["msg"] = f"Device {device} does not exist."
 
     else:
-        result['msg'] = f"Unexpected state {state}."
+        result["msg"] = f"Unexpected state {state}."
         module.fail_json(**result)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

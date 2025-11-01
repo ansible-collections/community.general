@@ -105,19 +105,19 @@ from ansible.module_utils.urls import fetch_url
 # Module execution.
 #
 
-def main():
 
+def main():
     module = AnsibleModule(
         argument_spec=dict(
-            project_id=dict(required=True, no_log=True, type='str'),
-            project_key=dict(required=True, no_log=True, type='str'),
-            environment=dict(required=True, type='str'),
-            user=dict(type='str'),
-            repo=dict(type='str'),
-            revision=dict(type='str'),
-            version=dict(type='str'),
-            url=dict(default='https://api.airbrake.io/api/v4/projects/', type='str'),
-            validate_certs=dict(default=True, type='bool'),
+            project_id=dict(required=True, no_log=True, type="str"),
+            project_key=dict(required=True, no_log=True, type="str"),
+            environment=dict(required=True, type="str"),
+            user=dict(type="str"),
+            repo=dict(type="str"),
+            revision=dict(type="str"),
+            version=dict(type="str"),
+            url=dict(default="https://api.airbrake.io/api/v4/projects/", type="str"),
+            validate_certs=dict(default=True, type="bool"),
         ),
         supports_check_mode=True,
     )
@@ -150,17 +150,16 @@ def main():
     json_body = module.jsonify(params)
 
     # Build header
-    headers = {'Content-Type': 'application/json'}
+    headers = {"Content-Type": "application/json"}
 
     # Notify Airbrake of deploy
-    response, info = fetch_url(module, url, data=json_body,
-                               headers=headers, method='POST')
+    response, info = fetch_url(module, url, data=json_body, headers=headers, method="POST")
 
-    if info['status'] == 200 or info['status'] == 201:
+    if info["status"] == 200 or info["status"] == 201:
         module.exit_json(changed=True)
     else:
         module.fail_json(msg=f"HTTP result code: {info['status']} connecting to {url}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

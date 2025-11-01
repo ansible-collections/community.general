@@ -78,10 +78,7 @@ EXAMPLES = r"""
 from ansible.module_utils.basic import AnsibleModule
 
 
-PACKAGE_STATE_MAP = dict(
-    present="install",
-    absent="remove"
-)
+PACKAGE_STATE_MAP = dict(present="install", absent="remove")
 
 
 def is_plugin_present(module, plugin_bin, plugin_name):
@@ -93,7 +90,7 @@ def is_plugin_present(module, plugin_bin, plugin_name):
 def parse_error(string):
     reason = "reason: "
     try:
-        return string[string.index(reason) + len(reason):].strip()
+        return string[string.index(reason) + len(reason) :].strip()
     except ValueError:
         return string
 
@@ -146,9 +143,9 @@ def main():
             plugin_bin=dict(default="/usr/share/logstash/bin/logstash-plugin", type="path"),
             proxy_host=dict(),
             proxy_port=dict(),
-            version=dict()
+            version=dict(),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     name = module.params["name"]
@@ -172,5 +169,5 @@ def main():
     module.exit_json(changed=changed, cmd=cmd, name=name, state=state, stdout=out, stderr=err)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

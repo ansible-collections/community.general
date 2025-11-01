@@ -49,6 +49,7 @@ from ansible.plugins.callback import CallbackBase
 
 class MemProf(threading.Thread):
     """Python thread for recording memory usage"""
+
     def __init__(self, path, obj=None):
         threading.Thread.__init__(self)
         self.obj = obj
@@ -66,8 +67,8 @@ class MemProf(threading.Thread):
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'community.general.cgroup_memory_recap'
+    CALLBACK_TYPE = "aggregate"
+    CALLBACK_NAME = "community.general.cgroup_memory_recap"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
@@ -80,11 +81,11 @@ class CallbackModule(CallbackBase):
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        self.cgroup_max_file = self.get_option('max_mem_file')
-        self.cgroup_current_file = self.get_option('cur_mem_file')
+        self.cgroup_max_file = self.get_option("max_mem_file")
+        self.cgroup_current_file = self.get_option("cur_mem_file")
 
-        with open(self.cgroup_max_file, 'w+') as f:
-            f.write('0')
+        with open(self.cgroup_max_file, "w+") as f:
+            f.write("0")
 
     def _profile_memory(self, obj=None):
         prev_task = None
@@ -112,8 +113,8 @@ class CallbackModule(CallbackBase):
         with open(self.cgroup_max_file) as f:
             max_results = int(f.read().strip()) / 1024 / 1024
 
-        self._display.banner('CGROUP MEMORY RECAP')
-        self._display.display(f'Execution Maximum: {max_results:0.2f}MB\n\n')
+        self._display.banner("CGROUP MEMORY RECAP")
+        self._display.display(f"Execution Maximum: {max_results:0.2f}MB\n\n")
 
         for task, memory in self.task_results:
-            self._display.display(f'{task.get_name()} ({task._uuid}): {memory:0.2f}MB')
+            self._display.display(f"{task.get_name()} ({task._uuid}): {memory:0.2f}MB")

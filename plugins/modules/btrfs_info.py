@@ -82,10 +82,7 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     module_args = dict()
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     provider = BtrfsFilesystemsProvider(module)
     filesystems = [x.get_summary() for x in provider.get_filesystems()]
@@ -99,5 +96,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

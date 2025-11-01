@@ -11,7 +11,9 @@ from collections.abc import MutableMapping
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils import deps
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args as _set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    set_module_args as _set_module_args,
+)
 
 
 def _fix_ansible_args(args):
@@ -22,7 +24,7 @@ def _fix_ansible_args(args):
     if isinstance(args, MutableMapping):
         return args
 
-    raise Exception('Malformed data to the patch_ansible_module pytest fixture')
+    raise Exception("Malformed data to the patch_ansible_module pytest fixture")
 
 
 @pytest.fixture
@@ -39,6 +41,7 @@ def patch_ansible_module_uthelper(request):
         args = _fix_ansible_args(args)
         with _set_module_args(args):
             yield
+
     return _patch
 
 

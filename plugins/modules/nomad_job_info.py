@@ -268,6 +268,7 @@ from ansible.module_utils.common.text.converters import to_native
 import_nomad = None
 try:
     import nomad
+
     import_nomad = True
 except ImportError:
     import_nomad = False
@@ -276,34 +277,34 @@ except ImportError:
 def run():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(required=True, type='str'),
-            port=dict(type='int', default=4646),
-            use_ssl=dict(type='bool', default=True),
-            timeout=dict(type='int', default=5),
-            validate_certs=dict(type='bool', default=True),
-            client_cert=dict(type='path'),
-            client_key=dict(type='path'),
-            namespace=dict(type='str'),
-            name=dict(type='str'),
-            token=dict(type='str', no_log=True)
+            host=dict(required=True, type="str"),
+            port=dict(type="int", default=4646),
+            use_ssl=dict(type="bool", default=True),
+            timeout=dict(type="int", default=5),
+            validate_certs=dict(type="bool", default=True),
+            client_cert=dict(type="path"),
+            client_key=dict(type="path"),
+            namespace=dict(type="str"),
+            name=dict(type="str"),
+            token=dict(type="str", no_log=True),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not import_nomad:
         module.fail_json(msg=missing_required_lib("python-nomad"))
 
-    certificate_ssl = (module.params.get('client_cert'), module.params.get('client_key'))
+    certificate_ssl = (module.params.get("client_cert"), module.params.get("client_key"))
 
     nomad_client = nomad.Nomad(
-        host=module.params.get('host'),
-        port=module.params.get('port'),
-        secure=module.params.get('use_ssl'),
-        timeout=module.params.get('timeout'),
-        verify=module.params.get('validate_certs'),
+        host=module.params.get("host"),
+        port=module.params.get("port"),
+        secure=module.params.get("use_ssl"),
+        timeout=module.params.get("timeout"),
+        verify=module.params.get("validate_certs"),
         cert=certificate_ssl,
-        namespace=module.params.get('namespace'),
-        token=module.params.get('token')
+        namespace=module.params.get("namespace"),
+        token=module.params.get("token"),
     )
 
     changed = False
@@ -311,15 +312,15 @@ def run():
     try:
         job_list = nomad_client.jobs.get_jobs()
         for job in job_list:
-            result.append(nomad_client.job.get_job(job.get('ID')))
+            result.append(nomad_client.job.get_job(job.get("ID")))
     except Exception as e:
         module.fail_json(msg=to_native(e))
 
-    if module.params.get('name'):
+    if module.params.get("name"):
         filter = list()
         try:
             for job in result:
-                if job.get('ID') == module.params.get('name'):
+                if job.get("ID") == module.params.get("name"):
                     filter.append(job)
                     result = filter
             if not filter:
@@ -331,7 +332,6 @@ def run():
 
 
 def main():
-
     run()
 
 

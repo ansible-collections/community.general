@@ -7,7 +7,6 @@ from __future__ import annotations
 
 
 class ModuleDocFragment:
-
     # OneView doc fragment
     DOCUMENTATION = r"""
 options:

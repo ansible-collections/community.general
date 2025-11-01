@@ -68,7 +68,6 @@ from ansible_collections.community.general.plugins.module_utils.influxdb import 
 
 
 class AnsibleInfluxDBWrite(InfluxDb):
-
     def write_data_point(self, data_points):
         client = self.connect_to_influxdb()
 
@@ -81,18 +80,18 @@ class AnsibleInfluxDBWrite(InfluxDb):
 def main():
     argument_spec = InfluxDb.influxdb_argument_spec()
     argument_spec.update(
-        data_points=dict(required=True, type='list', elements='dict'),
-        database_name=dict(required=True, type='str'),
+        data_points=dict(required=True, type="list", elements="dict"),
+        database_name=dict(required=True, type="str"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
     )
 
     influx = AnsibleInfluxDBWrite(module)
-    data_points = module.params.get('data_points')
+    data_points = module.params.get("data_points")
     influx.write_data_point(data_points)
     module.exit_json(changed=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

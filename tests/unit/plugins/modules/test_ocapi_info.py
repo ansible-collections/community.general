@@ -9,8 +9,15 @@ from unittest.mock import patch
 
 from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.ocapi_info as module
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
+)
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    set_module_args,
+    exit_json,
+    fail_json,
+)
 
 MOCK_BASE_URI = "mockBaseUri"
 MOCK_JOB_NAME_IN_PROGRESS = "MockJobInProgress"
@@ -19,15 +26,9 @@ MOCK_JOB_NAME_DOES_NOT_EXIST = "MockJobDoesNotExist"
 
 ACTION_WAS_SUCCESSFUL = "Action was successful."
 
-MOCK_SUCCESSFUL_HTTP_RESPONSE = {
-    "ret": True,
-    "data": {}
-}
+MOCK_SUCCESSFUL_HTTP_RESPONSE = {"ret": True, "data": {}}
 
-MOCK_404_RESPONSE = {
-    "ret": False,
-    "status": 404
-}
+MOCK_404_RESPONSE = {"ret": False, "status": 404}
 
 MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS = {
     "ret": True,
@@ -35,19 +36,8 @@ MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS = {
         "Self": "https://openflex-data24-usalp02120qo0012-iomb:443/Storage/Devices/openflex-data24-usalp02120qo0012/Jobs/FirmwareUpdate/",
         "ID": MOCK_JOB_NAME_IN_PROGRESS,
         "PercentComplete": 10,
-        "Status": {
-            "State": {
-                "ID": 16,
-                "Name": "In service"
-            },
-            "Health": [
-                {
-                    "ID": 5,
-                    "Name": "OK"
-                }
-            ]
-        }
-    }
+        "Status": {"State": {"ID": 16, "Name": "In service"}, "Health": [{"ID": 5, "Name": "OK"}]},
+    },
 }
 
 MOCK_HTTP_RESPONSE_JOB_COMPLETE = {
@@ -57,21 +47,11 @@ MOCK_HTTP_RESPONSE_JOB_COMPLETE = {
         "ID": MOCK_JOB_NAME_COMPLETE,
         "PercentComplete": 100,
         "Status": {
-            "State": {
-                "ID": 65540,
-                "Name": "Activate needed"
-            },
-            "Health": [
-                {
-                    "ID": 5,
-                    "Name": "OK"
-                }
-            ],
-            "Details": [
-                "Completed."
-            ]
-        }
-    }
+            "State": {"ID": 65540, "Name": "Activate needed"},
+            "Health": [{"ID": 5, "Name": "OK"}],
+            "Details": ["Completed."],
+        },
+    },
 }
 
 
@@ -117,10 +97,9 @@ def mock_post_request(*args, **kwargs):
 
 class TestOcapiInfo(unittest.TestCase):
     def setUp(self):
-        self.mock_module_helper = patch.multiple(basic.AnsibleModule,
-                                                 exit_json=exit_json,
-                                                 fail_json=fail_json,
-                                                 get_bin_path=get_bin_path)
+        self.mock_module_helper = patch.multiple(
+            basic.AnsibleModule, exit_json=exit_json, fail_json=fail_json, get_bin_path=get_bin_path
+        )
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
 
@@ -132,99 +111,137 @@ class TestOcapiInfo(unittest.TestCase):
 
     def test_module_fail_when_unknown_category(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            with set_module_args({
-                'category': 'unknown',
-                'command': 'JobStatus',
-                'username': 'USERID',
-                'password': 'PASSW0RD=21',
-                'baseuri': MOCK_BASE_URI
-            }):
+            with set_module_args(
+                {
+                    "category": "unknown",
+                    "command": "JobStatus",
+                    "username": "USERID",
+                    "password": "PASSW0RD=21",
+                    "baseuri": MOCK_BASE_URI,
+                }
+            ):
                 module.main()
         self.assertIn("Invalid Category 'unknown", get_exception_message(ansible_fail_json))
 
     def test_module_fail_when_unknown_command(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            with set_module_args({
-                'category': 'Jobs',
-                'command': 'unknown',
-                'username': 'USERID',
-                'password': 'PASSW0RD=21',
-                'baseuri': MOCK_BASE_URI
-            }):
+            with set_module_args(
+                {
+                    "category": "Jobs",
+                    "command": "unknown",
+                    "username": "USERID",
+                    "password": "PASSW0RD=21",
+                    "baseuri": MOCK_BASE_URI,
+                }
+            ):
                 module.main()
         self.assertIn("Invalid Command 'unknown", get_exception_message(ansible_fail_json))
 
     def test_job_status_in_progress(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request,
-                            delete_request=mock_delete_request,
-                            post_request=mock_post_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+            delete_request=mock_delete_request,
+            post_request=mock_post_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'JobStatus',
-                    'job_name': MOCK_JOB_NAME_IN_PROGRESS,
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "JobStatus",
+                        "job_name": MOCK_JOB_NAME_IN_PROGRESS,
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["PercentComplete"], response_data["percentComplete"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["State"]["ID"], response_data["operationStatusId"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["State"]["Name"], response_data["operationStatus"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["Health"][0]["Name"], response_data["operationHealth"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["Health"][0]["ID"], response_data["operationHealthId"])
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["PercentComplete"], response_data["percentComplete"]
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["State"]["ID"], response_data["operationStatusId"]
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["State"]["Name"], response_data["operationStatus"]
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["Health"][0]["Name"],
+                response_data["operationHealth"],
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["Status"]["Health"][0]["ID"],
+                response_data["operationHealthId"],
+            )
             self.assertTrue(response_data["jobExists"])
             self.assertFalse(response_data["changed"])
             self.assertEqual(ACTION_WAS_SUCCESSFUL, response_data["msg"])
             self.assertIsNone(response_data["details"])
 
     def test_job_status_complete(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request,
-                            delete_request=mock_delete_request,
-                            post_request=mock_post_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+            delete_request=mock_delete_request,
+            post_request=mock_post_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'JobStatus',
-                    'job_name': MOCK_JOB_NAME_COMPLETE,
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "JobStatus",
+                        "job_name": MOCK_JOB_NAME_COMPLETE,
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["PercentComplete"], response_data["percentComplete"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["State"]["ID"], response_data["operationStatusId"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["State"]["Name"], response_data["operationStatus"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["Health"][0]["Name"], response_data["operationHealth"])
-            self.assertEqual(MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["Health"][0]["ID"], response_data["operationHealthId"])
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["PercentComplete"], response_data["percentComplete"]
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["State"]["ID"], response_data["operationStatusId"]
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["State"]["Name"], response_data["operationStatus"]
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["Health"][0]["Name"], response_data["operationHealth"]
+            )
+            self.assertEqual(
+                MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["Status"]["Health"][0]["ID"], response_data["operationHealthId"]
+            )
             self.assertTrue(response_data["jobExists"])
             self.assertFalse(response_data["changed"])
             self.assertEqual(ACTION_WAS_SUCCESSFUL, response_data["msg"])
             self.assertEqual(["Completed."], response_data["details"])
 
     def test_job_status_not_found(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request,
-                            delete_request=mock_delete_request,
-                            post_request=mock_post_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+            delete_request=mock_delete_request,
+            post_request=mock_post_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'JobStatus',
-                    'job_name': MOCK_JOB_NAME_DOES_NOT_EXIST,
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "JobStatus",
+                        "job_name": MOCK_JOB_NAME_DOES_NOT_EXIST,
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]

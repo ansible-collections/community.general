@@ -97,81 +97,80 @@ class PagerDutyUser:
 
     # check if the user exists
     def does_user_exist(self, pd_email):
-        for user in self._apisession.iter_all('users'):
-            if user['email'] == pd_email:
-                return user['id']
+        for user in self._apisession.iter_all("users"):
+            if user["email"] == pd_email:
+                return user["id"]
 
     # create a user account on PD
     def add_pd_user(self, pd_name, pd_email, pd_role):
         try:
-            user = self._apisession.persist('users', 'email', {
-                "name": pd_name,
-                "email": pd_email,
-                "type": "user",
-                "role": pd_role,
-            })
+            user = self._apisession.persist(
+                "users",
+                "email",
+                {
+                    "name": pd_name,
+                    "email": pd_email,
+                    "type": "user",
+                    "role": pd_role,
+                },
+            )
             return user
 
         except PDClientError as e:
             if e.response.status_code == 400:
-                self._module.fail_json(
-                    msg=f"Failed to add {pd_name} due to invalid argument")
+                self._module.fail_json(msg=f"Failed to add {pd_name} due to invalid argument")
             if e.response.status_code == 401:
                 self._module.fail_json(msg=f"Failed to add {pd_name} due to invalid API key")
             if e.response.status_code == 402:
                 self._module.fail_json(
-                    msg=f"Failed to add {pd_name} due to inability to perform the action within the API token")
+                    msg=f"Failed to add {pd_name} due to inability to perform the action within the API token"
+                )
             if e.response.status_code == 403:
                 self._module.fail_json(
-                    msg=f"Failed to add {pd_name} due to inability to review the requested resource within the API token")
+                    msg=f"Failed to add {pd_name} due to inability to review the requested resource within the API token"
+                )
             if e.response.status_code == 429:
-                self._module.fail_json(
-                    msg=f"Failed to add {pd_name} due to reaching the limit of making requests")
+                self._module.fail_json(msg=f"Failed to add {pd_name} due to reaching the limit of making requests")
 
     # delete a user account from PD
     def delete_user(self, pd_user_id, pd_name):
         try:
-            user_path = path.join('/users/', pd_user_id)
+            user_path = path.join("/users/", pd_user_id)
             self._apisession.rdelete(user_path)
 
         except PDClientError as e:
             if e.response.status_code == 404:
-                self._module.fail_json(
-                    msg=f"Failed to remove {pd_name} as user was not found")
+                self._module.fail_json(msg=f"Failed to remove {pd_name} as user was not found")
             if e.response.status_code == 403:
                 self._module.fail_json(
-                    msg=f"Failed to remove {pd_name} due to inability to review the requested resource within the API token")
+                    msg=f"Failed to remove {pd_name} due to inability to review the requested resource within the API token"
+                )
             if e.response.status_code == 401:
                 # print out the list of incidents
                 pd_incidents = self.get_incidents_assigned_to_user(pd_user_id)
                 self._module.fail_json(msg=f"Failed to remove {pd_name} as user has assigned incidents {pd_incidents}")
             if e.response.status_code == 429:
-                self._module.fail_json(
-                    msg=f"Failed to remove {pd_name} due to reaching the limit of making requests")
+                self._module.fail_json(msg=f"Failed to remove {pd_name} due to reaching the limit of making requests")
 
     # get incidents assigned to a user
     def get_incidents_assigned_to_user(self, pd_user_id):
         incident_info = {}
-        incidents = self._apisession.list_all('incidents', params={'user_ids[]': [pd_user_id]})
+        incidents = self._apisession.list_all("incidents", params={"user_ids[]": [pd_user_id]})
 
         for incident in incidents:
-            incident_info = {
-                'title': incident['title'],
-                'key': incident['incident_key'],
-                'status': incident['status']
-            }
+            incident_info = {"title": incident["title"], "key": incident["incident_key"], "status": incident["status"]}
         return incident_info
 
     # add a user to a team/teams
     def add_user_to_teams(self, pd_user_id, pd_teams, pd_role):
         updated_team = None
         for team in pd_teams:
-            team_info = self._apisession.find('teams', team, attribute='name')
+            team_info = self._apisession.find("teams", team, attribute="name")
             if team_info is not None:
                 try:
-                    updated_team = self._apisession.rput(f"/teams/{team_info['id']}/users/{pd_user_id}", json={
-                        'role': pd_role
-                    })
+                    updated_team = self._apisession.rput(
+                        f"/teams/{team_info['id']}/users/{pd_user_id}", json={"role": pd_role}
+                    )
                 except PDClientError:
                     updated_team = None
         return updated_team
@@ -180,35 +179,49 @@ class PagerDutyUser:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            access_token=dict(type='str', required=True, no_log=True),
-            pd_user=dict(type='str', required=True),
-            pd_email=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            pd_role=dict(type='str', default='responder',
-                         choices=['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_stakeholder', 'restricted_access']),
-            pd_teams=dict(type='list', elements='str')),
-        required_if=[['state', 'present', ['pd_teams']], ],
+            access_token=dict(type="str", required=True, no_log=True),
+            pd_user=dict(type="str", required=True),
+            pd_email=dict(type="str", required=True),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            pd_role=dict(
+                type="str",
+                default="responder",
+                choices=[
+                    "global_admin",
+                    "manager",
+                    "responder",
+                    "observer",
+                    "stakeholder",
+                    "limited_stakeholder",
+                    "restricted_access",
+                ],
+            ),
+            pd_teams=dict(type="list", elements="str"),
+        ),
+        required_if=[
+            ["state", "present", ["pd_teams"]],
+        ],
         supports_check_mode=True,
     )
 
     deps.validate(module)
 
-    access_token = module.params['access_token']
-    pd_user = module.params['pd_user']
-    pd_email = module.params['pd_email']
-    state = module.params['state']
-    pd_role = module.params['pd_role']
-    pd_teams = module.params['pd_teams']
+    access_token = module.params["access_token"]
+    pd_user = module.params["pd_user"]
+    pd_email = module.params["pd_email"]
+    state = module.params["state"]
+    pd_role = module.params["pd_role"]
+    pd_teams = module.params["pd_teams"]
 
     if pd_role:
         pd_role_gui_value = {
-            'global_admin': 'admin',
-            'manager': 'user',
-            'responder': 'limited_user',
-            'observer': 'observer',
-            'stakeholder': 'read_only_user',
-            'limited_stakeholder': 'read_only_limited_user',
-            'restricted_access': 'restricted_access'
+            "global_admin": "admin",
+            "manager": "user",
+            "responder": "limited_user",
+            "observer": "observer",
+            "stakeholder": "read_only_user",
+            "limited_stakeholder": "read_only_limited_user",
+            "restricted_access": "restricted_access",
         }
         pd_role = pd_role_gui_value[pd_role]
 

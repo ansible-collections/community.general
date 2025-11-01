@@ -164,13 +164,13 @@ class Device:
         self.path = path
 
     def size(self):
-        """ Return size in bytes of device. Returns int """
+        """Return size in bytes of device. Returns int"""
         statinfo = os.stat(self.path)
         if stat.S_ISBLK(statinfo.st_mode):
             blockdev_cmd = self.module.get_bin_path("blockdev", required=True)
             dummy, out, dummy = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
             devsize_in_bytes = int(out)
-        elif stat.S_ISCHR(statinfo.st_mode) and platform.system() == 'FreeBSD':
+        elif stat.S_ISCHR(statinfo.st_mode) and platform.system() == "FreeBSD":
             diskinfo_cmd = self.module.get_bin_path("diskinfo", required=True)
             dummy, out, dummy = self.module.run_command([diskinfo_cmd, self.path], check_rc=True)
             devsize_in_bytes = int(out.split()[2])
@@ -186,12 +186,13 @@ class Device:
         cmd_findmnt = self.module.get_bin_path("findmnt", required=True)
 
         # find mountpoint
-        rc, mountpoint, dummy = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
-                                                        "TARGET", "--source", self.path], check_rc=False)
+        rc, mountpoint, dummy = self.module.run_command(
+            [cmd_findmnt, "--mtab", "--noheadings", "--output", "TARGET", "--source", self.path], check_rc=False
+        )
         if rc != 0:
             mountpoint = None
         else:
-            mountpoint = mountpoint.split('\n')[0]
+            mountpoint = mountpoint.split("\n")[0]
 
         return mountpoint
 
@@ -200,7 +201,6 @@ class Device:
 
 
 class Filesystem:
-
     MKFS: str | None = None
     MKFS_FORCE_FLAGS: list[str] | None = []
     MKFS_SET_UUID_OPTIONS: list[str] | None = None
@@ -213,7 +213,7 @@ class Filesystem:
     CHANGE_UUID_OPTION: str | None = None
     CHANGE_UUID_OPTION_HAS_ARG = True
 
-    LANG_ENV = {'LANG': 'C', 'LC_ALL': 'C', 'LC_MESSAGES': 'C'}
+    LANG_ENV = {"LANG": "C", "LC_ALL": "C", "LC_MESSAGES": "C"}
 
     def __init__(self, module):
         self.module = module
@@ -224,9 +224,9 @@ class Filesystem:
 
     def get_fs_size(self, dev):
         """Return size in bytes of filesystem on device (integer).
-           Should query the info with a per-fstype command that can access the
-           device whenever it is mounted or not, and parse the command output.
-           Parser must ensure to return an integer, or raise a ValueError.
+        Should query the info with a per-fstype command that can access the
+        device whenever it is mounted or not, and parse the command output.
+        Parser must ensure to return an integer, or raise a ValueError.
         """
         raise NotImplementedError()
 
@@ -253,7 +253,7 @@ class Filesystem:
         # not doable here if it needs get_mountpoint() (to prevent corruption of
         # a mounted filesystem), since 'findmnt' is not available on FreeBSD,
         # even in util-linux port for this OS.
-        wipefs = self.module.get_bin_path('wipefs', required=True)
+        wipefs = self.module.get_bin_path("wipefs", required=True)
         cmd = [wipefs, "--all", str(dev)]
         self.module.run_command(cmd, check_rc=True)
 
@@ -303,31 +303,33 @@ class Filesystem:
     def change_uuid(self, new_uuid, dev):
         """Change filesystem UUID. Returns stdout of used command"""
         if self.module.check_mode:
-            self.module.exit_json(change=True, msg=f'Changing {self.fstype} filesystem UUID on device {dev}')
+            self.module.exit_json(change=True, msg=f"Changing {self.fstype} filesystem UUID on device {dev}")
 
-        dummy, out, dummy = self.module.run_command(self.change_uuid_cmd(new_uuid=new_uuid, target=str(dev)), check_rc=True)
+        dummy, out, dummy = self.module.run_command(
+            self.change_uuid_cmd(new_uuid=new_uuid, target=str(dev)), check_rc=True
+        )
         return out
 
 
 class Ext(Filesystem):
-    MKFS_FORCE_FLAGS = ['-F']
-    MKFS_SET_UUID_OPTIONS = ['-U']
-    INFO = 'tune2fs'
-    GROW = 'resize2fs'
-    CHANGE_UUID = 'tune2fs'
+    MKFS_FORCE_FLAGS = ["-F"]
+    MKFS_SET_UUID_OPTIONS = ["-U"]
+    INFO = "tune2fs"
+    GROW = "resize2fs"
+    CHANGE_UUID = "tune2fs"
     CHANGE_UUID_OPTION = "-U"
 
     def get_fs_size(self, dev):
         """Get Block count and Block size and return their product."""
         cmd = self.module.get_bin_path(self.INFO, required=True)
-        dummy, out, dummy = self.module.run_command([cmd, '-l', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, out, dummy = self.module.run_command([cmd, "-l", str(dev)], check_rc=True, environ_update=self.LANG_ENV)
 
         block_count = block_size = None
         for line in out.splitlines():
-            if 'Block count:' in line:
-                block_count = int(line.split(':')[1].strip())
-            elif 'Block size:' in line:
-                block_size = int(line.split(':')[1].strip())
+            if "Block count:" in line:
+                block_count = int(line.split(":")[1].strip())
+            elif "Block size:" in line:
+                block_size = int(line.split(":")[1].strip())
             if None not in (block_size, block_count):
                 break
         else:
@@ -337,22 +339,22 @@ class Ext(Filesystem):
 
 
 class Ext2(Ext):
-    MKFS = 'mkfs.ext2'
+    MKFS = "mkfs.ext2"
 
 
 class Ext3(Ext):
-    MKFS = 'mkfs.ext3'
+    MKFS = "mkfs.ext3"
 
 
 class Ext4(Ext):
-    MKFS = 'mkfs.ext4'
+    MKFS = "mkfs.ext4"
 
 
 class XFS(Filesystem):
-    MKFS = 'mkfs.xfs'
-    MKFS_FORCE_FLAGS = ['-f']
-    INFO = 'xfs_info'
-    GROW = 'xfs_growfs'
+    MKFS = "mkfs.xfs"
+    MKFS_FORCE_FLAGS = ["-f"]
+    INFO = "xfs_info"
+    GROW = "xfs_growfs"
     GROW_MOUNTPOINT_ONLY = True
     CHANGE_UUID = "xfs_admin"
     CHANGE_UUID_OPTION = "-U"
@@ -375,12 +377,12 @@ class XFS(Filesystem):
 
         block_size = block_count = None
         for line in out.splitlines():
-            col = line.split('=')
-            if col[0].strip() == 'data':
-                if col[1].strip() == 'bsize':
+            col = line.split("=")
+            if col[0].strip() == "data":
+                if col[1].strip() == "bsize":
                     block_size = int(col[2].split()[0])
-                if col[2].split()[1] == 'blocks':
-                    block_count = int(col[3].split(',')[0])
+                if col[2].split()[1] == "blocks":
+                    block_count = int(col[3].split(",")[0])
             if None not in (block_size, block_count):
                 break
         else:
@@ -390,22 +392,23 @@ class XFS(Filesystem):
 
 
 class Reiserfs(Filesystem):
-    MKFS = 'mkfs.reiserfs'
-    MKFS_FORCE_FLAGS = ['-q']
+    MKFS = "mkfs.reiserfs"
+    MKFS_FORCE_FLAGS = ["-q"]
 
 
 class Bcachefs(Filesystem):
-    MKFS = 'mkfs.bcachefs'
-    MKFS_FORCE_FLAGS = ['--force']
-    MKFS_SET_UUID_OPTIONS = ['-U', '--uuid']
-    INFO = 'bcachefs'
-    GROW = 'bcachefs'
-    GROW_MAX_SPACE_FLAGS = ['device', 'resize']
+    MKFS = "mkfs.bcachefs"
+    MKFS_FORCE_FLAGS = ["--force"]
+    MKFS_SET_UUID_OPTIONS = ["-U", "--uuid"]
+    INFO = "bcachefs"
+    GROW = "bcachefs"
+    GROW_MAX_SPACE_FLAGS = ["device", "resize"]
 
     def get_fs_size(self, dev):
         """Return size in bytes of filesystem on device (integer)."""
-        dummy, stdout, dummy = self.module.run_command([self.module.get_bin_path(self.INFO),
-                                                        'show-super', str(dev)], check_rc=True)
+        dummy, stdout, dummy = self.module.run_command(
+            [self.module.get_bin_path(self.INFO), "show-super", str(dev)], check_rc=True
+        )
 
         for line in stdout.splitlines():
             if "Size: " in line:
@@ -437,28 +440,28 @@ class Bcachefs(Filesystem):
 
 
 class Btrfs(Filesystem):
-    MKFS = 'mkfs.btrfs'
-    INFO = 'btrfs'
-    GROW = 'btrfs'
-    GROW_MAX_SPACE_FLAGS = ['filesystem', 'resize', 'max']
+    MKFS = "mkfs.btrfs"
+    INFO = "btrfs"
+    GROW = "btrfs"
+    GROW_MAX_SPACE_FLAGS = ["filesystem", "resize", "max"]
     GROW_MOUNTPOINT_ONLY = True
 
     def __init__(self, module):
         super().__init__(module)
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
-        dummy, stdout, stderr = self.module.run_command([mkfs, '--version'], check_rc=True)
+        dummy, stdout, stderr = self.module.run_command([mkfs, "--version"], check_rc=True)
         match = re.search(r" v([0-9.]+)", stdout)
         if not match:
             # v0.20-rc1 use stderr
             match = re.search(r" v([0-9.]+)", stderr)
         if match:
             # v0.20-rc1 doesn't have --force parameter added in following version v3.12
-            if LooseVersion(match.group(1)) >= LooseVersion('3.12'):
-                self.MKFS_FORCE_FLAGS = ['-f']
+            if LooseVersion(match.group(1)) >= LooseVersion("3.12"):
+                self.MKFS_FORCE_FLAGS = ["-f"]
         else:
             # assume version is greater or equal to 3.12
-            self.MKFS_FORCE_FLAGS = ['-f']
-            self.module.warn(f'Unable to identify mkfs.btrfs version ({stdout!r}, {stderr!r})')
+            self.MKFS_FORCE_FLAGS = ["-f"]
+            self.module.warn(f"Unable to identify mkfs.btrfs version ({stdout!r}, {stderr!r})")
 
     def get_fs_size(self, dev):
         """Return size in bytes of filesystem on device (integer)."""
@@ -466,8 +469,9 @@ class Btrfs(Filesystem):
         if not mountpoint:
             self.module.fail_json(msg=f"{dev} needs to be mounted for {self.fstype} operations")
 
-        dummy, stdout, dummy = self.module.run_command([self.module.get_bin_path(self.INFO),
-                                                        'filesystem', 'usage', '-b', mountpoint], check_rc=True)
+        dummy, stdout, dummy = self.module.run_command(
+            [self.module.get_bin_path(self.INFO), "filesystem", "usage", "-b", mountpoint], check_rc=True
+        )
         for line in stdout.splitlines():
             if "Device size" in line:
                 return int(line.split()[-1])
@@ -475,14 +479,14 @@ class Btrfs(Filesystem):
 
 
 class Ocfs2(Filesystem):
-    MKFS = 'mkfs.ocfs2'
-    MKFS_FORCE_FLAGS = ['-Fx']
+    MKFS = "mkfs.ocfs2"
+    MKFS_FORCE_FLAGS = ["-Fx"]
 
 
 class F2fs(Filesystem):
-    MKFS = 'mkfs.f2fs'
-    INFO = 'dump.f2fs'
-    GROW = 'resize.f2fs'
+    MKFS = "mkfs.f2fs"
+    INFO = "dump.f2fs"
+    GROW = "resize.f2fs"
 
     def __init__(self, module):
         super().__init__(module)
@@ -494,8 +498,8 @@ class F2fs(Filesystem):
         if match is not None:
             # Since 1.9.0, mkfs.f2fs check overwrite before make filesystem
             # before that version -f switch wasn't used
-            if LooseVersion(match.group(1)) >= LooseVersion('1.9.0'):
-                self.MKFS_FORCE_FLAGS = ['-f']
+            if LooseVersion(match.group(1)) >= LooseVersion("1.9.0"):
+                self.MKFS_FORCE_FLAGS = ["-f"]
 
     def get_fs_size(self, dev):
         """Get sector size and total FS sectors and return their product."""
@@ -503,10 +507,10 @@ class F2fs(Filesystem):
         dummy, out, dummy = self.module.run_command([cmd, str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         sector_size = sector_count = None
         for line in out.splitlines():
-            if 'Info: sector size = ' in line:
+            if "Info: sector size = " in line:
                 # expected: 'Info: sector size = 512'
                 sector_size = int(line.split()[4])
-            elif 'Info: total FS sectors = ' in line:
+            elif "Info: total FS sectors = " in line:
                 # expected: 'Info: total FS sectors = 102400 (50 MB)'
                 sector_count = int(line.split()[5])
             if None not in (sector_size, sector_count):
@@ -518,28 +522,30 @@ class F2fs(Filesystem):
 
 
 class VFAT(Filesystem):
-    INFO = 'fatresize'
-    GROW = 'fatresize'
-    GROW_MAX_SPACE_FLAGS = ['-s', 'max']
+    INFO = "fatresize"
+    GROW = "fatresize"
+    GROW_MAX_SPACE_FLAGS = ["-s", "max"]
 
     def __init__(self, module):
         super().__init__(module)
-        if platform.system() == 'FreeBSD':
-            self.MKFS = 'newfs_msdos'
+        if platform.system() == "FreeBSD":
+            self.MKFS = "newfs_msdos"
         else:
-            self.MKFS = 'mkfs.vfat'
+            self.MKFS = "mkfs.vfat"
 
     def get_fs_size(self, dev):
         """Get and return size of filesystem, in bytes."""
         cmd = self.module.get_bin_path(self.INFO, required=True)
-        dummy, out, dummy = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, out, dummy = self.module.run_command(
+            [cmd, "--info", str(dev)], check_rc=True, environ_update=self.LANG_ENV
+        )
         fssize = None
         for line in out.splitlines()[1:]:
-            parts = line.split(':', 1)
+            parts = line.split(":", 1)
             if len(parts) < 2:
                 continue
             param, value = parts
-            if param.strip() in ('Size', 'Cur size'):
+            if param.strip() in ("Size", "Cur size"):
                 fssize = int(value.strip())
                 break
         else:
@@ -549,34 +555,36 @@ class VFAT(Filesystem):
 
 
 class LVM(Filesystem):
-    MKFS = 'pvcreate'
-    MKFS_FORCE_FLAGS = ['-f']
-    MKFS_SET_UUID_OPTIONS = ['-u', '--uuid']
-    MKFS_SET_UUID_EXTRA_OPTIONS = ['--norestorefile']
-    INFO = 'pvs'
-    GROW = 'pvresize'
-    CHANGE_UUID = 'pvchange'
-    CHANGE_UUID_OPTION = '-u'
+    MKFS = "pvcreate"
+    MKFS_FORCE_FLAGS = ["-f"]
+    MKFS_SET_UUID_OPTIONS = ["-u", "--uuid"]
+    MKFS_SET_UUID_EXTRA_OPTIONS = ["--norestorefile"]
+    INFO = "pvs"
+    GROW = "pvresize"
+    CHANGE_UUID = "pvchange"
+    CHANGE_UUID_OPTION = "-u"
     CHANGE_UUID_OPTION_HAS_ARG = False
 
     def get_fs_size(self, dev):
         """Get and return PV size, in bytes."""
         cmd = self.module.get_bin_path(self.INFO, required=True)
-        dummy, size, dummy = self.module.run_command([cmd, '--noheadings', '-o', 'pv_size', '--units', 'b', '--nosuffix', str(dev)], check_rc=True)
+        dummy, size, dummy = self.module.run_command(
+            [cmd, "--noheadings", "-o", "pv_size", "--units", "b", "--nosuffix", str(dev)], check_rc=True
+        )
         pv_size = int(size)
         return pv_size
 
 
 class Swap(Filesystem):
-    MKFS = 'mkswap'
-    MKFS_FORCE_FLAGS = ['-f']
+    MKFS = "mkswap"
+    MKFS_FORCE_FLAGS = ["-f"]
 
 
 class UFS(Filesystem):
-    MKFS = 'newfs'
-    INFO = 'dumpfs'
-    GROW = 'growfs'
-    GROW_MAX_SPACE_FLAGS = ['-y']
+    MKFS = "newfs"
+    INFO = "dumpfs"
+    GROW = "growfs"
+    GROW_MAX_SPACE_FLAGS = ["-y"]
 
     def get_fs_size(self, dev):
         """Get providersize and fragment size and return their product."""
@@ -585,9 +593,9 @@ class UFS(Filesystem):
 
         fragmentsize = providersize = None
         for line in out.splitlines():
-            if line.startswith('fsize'):
+            if line.startswith("fsize"):
                 fragmentsize = int(line.split()[1])
-            elif 'providersize' in line:
+            elif "providersize" in line:
                 providersize = int(line.split()[-1])
             if None not in (fragmentsize, providersize):
                 break
@@ -598,26 +606,26 @@ class UFS(Filesystem):
 
 
 FILESYSTEMS = {
-    'bcachefs': Bcachefs,
-    'ext2': Ext2,
-    'ext3': Ext3,
-    'ext4': Ext4,
-    'ext4dev': Ext4,
-    'f2fs': F2fs,
-    'reiserfs': Reiserfs,
-    'xfs': XFS,
-    'btrfs': Btrfs,
-    'vfat': VFAT,
-    'ocfs2': Ocfs2,
-    'LVM2_member': LVM,
-    'swap': Swap,
-    'ufs': UFS,
+    "bcachefs": Bcachefs,
+    "ext2": Ext2,
+    "ext3": Ext3,
+    "ext4": Ext4,
+    "ext4dev": Ext4,
+    "f2fs": F2fs,
+    "reiserfs": Reiserfs,
+    "xfs": XFS,
+    "btrfs": Btrfs,
+    "vfat": VFAT,
+    "ocfs2": Ocfs2,
+    "LVM2_member": LVM,
+    "swap": Swap,
+    "ufs": UFS,
 }
 
 
 def main():
     friendly_names = {
-        'lvm': 'LVM2_member',
+        "lvm": "LVM2_member",
     }
 
     fstypes = set(FILESYSTEMS.keys()) - set(friendly_names.values()) | set(friendly_names.keys())
@@ -625,30 +633,28 @@ def main():
     # There is no "single command" to manipulate filesystems, so we map them all out and their options
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            fstype=dict(type='str', aliases=['type'], choices=list(fstypes)),
-            dev=dict(type='path', required=True, aliases=['device']),
-            opts=dict(type='str'),
-            force=dict(type='bool', default=False),
-            resizefs=dict(type='bool', default=False),
-            uuid=dict(type='str'),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            fstype=dict(type="str", aliases=["type"], choices=list(fstypes)),
+            dev=dict(type="path", required=True, aliases=["device"]),
+            opts=dict(type="str"),
+            force=dict(type="bool", default=False),
+            resizefs=dict(type="bool", default=False),
+            uuid=dict(type="str"),
         ),
-        required_if=[
-            ('state', 'present', ['fstype'])
-        ],
+        required_if=[("state", "present", ["fstype"])],
         mutually_exclusive=[
-            ('resizefs', 'uuid'),
+            ("resizefs", "uuid"),
         ],
         supports_check_mode=True,
     )
 
-    state = module.params['state']
-    dev = module.params['dev']
-    fstype = module.params['fstype']
-    opts = module.params['opts']
-    force = module.params['force']
-    resizefs = module.params['resizefs']
-    uuid = module.params['uuid']
+    state = module.params["state"]
+    dev = module.params["dev"]
+    fstype = module.params["fstype"]
+    opts = module.params["opts"]
+    force = module.params["force"]
+    resizefs = module.params["resizefs"]
+    uuid = module.params["uuid"]
 
     mkfs_opts = []
     if opts is not None:
@@ -668,11 +674,11 @@ def main():
     # In case blkid/fstyp isn't able to identify an existing filesystem, device
     # is considered as empty, then this existing filesystem would be overwritten
     # even if force isn't enabled.
-    cmd = module.get_bin_path('blkid', required=True)
-    rc, raw_fs, err = module.run_command([cmd, '-c', os.devnull, '-o', 'value', '-s', 'TYPE', str(dev)])
+    cmd = module.get_bin_path("blkid", required=True)
+    rc, raw_fs, err = module.run_command([cmd, "-c", os.devnull, "-o", "value", "-s", "TYPE", str(dev)])
     fs = raw_fs.strip()
-    if not fs and platform.system() == 'FreeBSD':
-        cmd = module.get_bin_path('fstyp', required=True)
+    if not fs and platform.system() == "FreeBSD":
+        cmd = module.get_bin_path("fstyp", required=True)
         rc, raw_fs, err = module.run_command([cmd, str(dev)])
         fs = raw_fs.strip()
 
@@ -688,7 +694,9 @@ def main():
         filesystem = klass(module)
 
         if uuid and not (filesystem.CHANGE_UUID or filesystem.MKFS_SET_UUID_OPTIONS):
-            module.fail_json(changed=False, msg=f"module does not support UUID option for this filesystem ({fstype}) yet.")
+            module.fail_json(
+                changed=False, msg=f"module does not support UUID option for this filesystem ({fstype}) yet."
+            )
 
         same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
         if same_fs and not resizefs and not uuid and not force:
@@ -702,7 +710,6 @@ def main():
 
                 module.exit_json(changed=True, msg=out)
             elif uuid:
-
                 out = filesystem.change_uuid(new_uuid=uuid, dev=dev)
 
                 module.exit_json(changed=True, msg=out)
@@ -722,5 +729,5 @@ def main():
     module.exit_json(changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

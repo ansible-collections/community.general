@@ -744,16 +744,21 @@ end_state:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
 
-PROTOCOL_OPENID_CONNECT = 'openid-connect'
-PROTOCOL_SAML = 'saml'
-PROTOCOL_DOCKER_V2 = 'docker-v2'
-CLIENT_META_DATA = ['authorizationServicesEnabled']
+PROTOCOL_OPENID_CONNECT = "openid-connect"
+PROTOCOL_SAML = "saml"
+PROTOCOL_DOCKER_V2 = "docker-v2"
+CLIENT_META_DATA = ["authorizationServicesEnabled"]
 
 
 def normalise_scopes_for_behavior(desired_client, before_client, clientScopesBehavior):
@@ -785,16 +790,16 @@ def normalise_scopes_for_behavior(desired_client, before_client, clientScopesBeh
     """
     desired_client = copy.deepcopy(desired_client)
     before_client = copy.deepcopy(before_client)
-    if clientScopesBehavior == 'ignore':
-        desired_client['defaultClientScopes'] = copy.deepcopy(before_client['defaultClientScopes'])
-        desired_client['optionalClientScopes'] = copy.deepcopy(before_client['optionalClientScopes'])
-    elif clientScopesBehavior == 'patch':
-        for scope in before_client['defaultClientScopes']:
-            if scope not in desired_client['defaultClientScopes']:
-                desired_client['defaultClientScopes'].append(scope)
-        for scope in before_client['optionalClientScopes']:
-            if scope not in desired_client['optionalClientScopes']:
-                desired_client['optionalClientScopes'].append(scope)
+    if clientScopesBehavior == "ignore":
+        desired_client["defaultClientScopes"] = copy.deepcopy(before_client["defaultClientScopes"])
+        desired_client["optionalClientScopes"] = copy.deepcopy(before_client["optionalClientScopes"])
+    elif clientScopesBehavior == "patch":
+        for scope in before_client["defaultClientScopes"]:
+            if scope not in desired_client["defaultClientScopes"]:
+                desired_client["defaultClientScopes"].append(scope)
+        for scope in before_client["optionalClientScopes"]:
+            if scope not in desired_client["optionalClientScopes"]:
+                desired_client["optionalClientScopes"].append(scope)
 
     return desired_client, before_client
 
@@ -823,15 +828,15 @@ def check_optional_scopes_not_default(desired_client, clientScopesBehavior, modu
         type: None
         description: Returns None. Fails the module if a scope is both default and optional.
     """
-    if clientScopesBehavior == 'ignore':
+    if clientScopesBehavior == "ignore":
         return
-    for scope in desired_client['optionalClientScopes']:
-        if scope in desired_client['defaultClientScopes']:
-            module.fail_json(msg=f'Client scope {scope} cannot be both default and optional')
+    for scope in desired_client["optionalClientScopes"]:
+        if scope in desired_client["defaultClientScopes"]:
+            module.fail_json(msg=f"Client scope {scope} cannot be both default and optional")
 
 
 def normalise_cr(clientrep, remove_ids=False):
-    """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
+    """Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
     the change detection is more effective.
 
     :param clientrep: the clientrep dict to be sanitized
@@ -843,57 +848,59 @@ def normalise_cr(clientrep, remove_ids=False):
     clientrep = copy.deepcopy(clientrep)
 
     if remove_ids:
-        clientrep.pop('id', None)
+        clientrep.pop("id", None)
 
-    if 'defaultClientScopes' in clientrep:
-        clientrep['defaultClientScopes'] = list(sorted(clientrep['defaultClientScopes']))
+    if "defaultClientScopes" in clientrep:
+        clientrep["defaultClientScopes"] = list(sorted(clientrep["defaultClientScopes"]))
     else:
-        clientrep['defaultClientScopes'] = []
+        clientrep["defaultClientScopes"] = []
 
-    if 'optionalClientScopes' in clientrep:
-        clientrep['optionalClientScopes'] = list(sorted(clientrep['optionalClientScopes']))
+    if "optionalClientScopes" in clientrep:
+        clientrep["optionalClientScopes"] = list(sorted(clientrep["optionalClientScopes"]))
     else:
-        clientrep['optionalClientScopes'] = []
+        clientrep["optionalClientScopes"] = []
 
-    if 'redirectUris' in clientrep:
-        clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
+    if "redirectUris" in clientrep:
+        clientrep["redirectUris"] = list(sorted(clientrep["redirectUris"]))
     else:
-        clientrep['redirectUris'] = []
+        clientrep["redirectUris"] = []
 
-    if 'protocolMappers' in clientrep:
-        clientrep['protocolMappers'] = sorted(clientrep['protocolMappers'], key=lambda x: (x.get('name'), x.get('protocol'), x.get('protocolMapper')))
-        for mapper in clientrep['protocolMappers']:
+    if "protocolMappers" in clientrep:
+        clientrep["protocolMappers"] = sorted(
+            clientrep["protocolMappers"], key=lambda x: (x.get("name"), x.get("protocol"), x.get("protocolMapper"))
+        )
+        for mapper in clientrep["protocolMappers"]:
             if remove_ids:
-                mapper.pop('id', None)
+                mapper.pop("id", None)
 
             # Convert bool to string
-            if 'config' in mapper:
-                for key, value in mapper['config'].items():
+            if "config" in mapper:
+                for key, value in mapper["config"].items():
                     if isinstance(value, bool):
-                        mapper['config'][key] = str(value).lower()
+                        mapper["config"][key] = str(value).lower()
 
             # Set to a default value.
-            mapper['consentRequired'] = mapper.get('consentRequired', False)
+            mapper["consentRequired"] = mapper.get("consentRequired", False)
     else:
-        clientrep['protocolMappers'] = []
+        clientrep["protocolMappers"] = []
 
-    if 'attributes' in clientrep:
-        for key, value in clientrep['attributes'].items():
+    if "attributes" in clientrep:
+        for key, value in clientrep["attributes"].items():
             if isinstance(value, bool):
-                clientrep['attributes'][key] = str(value).lower()
-        clientrep['attributes'].pop('client.secret.creation.time', None)
+                clientrep["attributes"][key] = str(value).lower()
+        clientrep["attributes"].pop("client.secret.creation.time", None)
     else:
-        clientrep['attributes'] = []
+        clientrep["attributes"] = []
 
-    if 'webOrigins' in clientrep:
-        clientrep['webOrigins'] = sorted(clientrep['webOrigins'])
+    if "webOrigins" in clientrep:
+        clientrep["webOrigins"] = sorted(clientrep["webOrigins"])
     else:
-        clientrep['webOrigins'] = []
+        clientrep["webOrigins"] = []
 
-    if 'redirectUris' in clientrep:
-        clientrep['redirectUris'] = sorted(clientrep['redirectUris'])
+    if "redirectUris" in clientrep:
+        clientrep["redirectUris"] = sorted(clientrep["redirectUris"])
     else:
-        clientrep['redirectUris'] = []
+        clientrep["redirectUris"] = []
 
     return clientrep
 
@@ -901,31 +908,31 @@ def normalise_cr(clientrep, remove_ids=False):
 def normalize_kc_resp(clientrep):
     # kc drops the variable 'authorizationServicesEnabled' if set to false
     # to minimize diff/changes we set it to false if not set by kc
-    if clientrep and 'authorizationServicesEnabled' not in clientrep:
-        clientrep['authorizationServicesEnabled'] = False
+    if clientrep and "authorizationServicesEnabled" not in clientrep:
+        clientrep["authorizationServicesEnabled"] = False
 
 
 def sanitize_cr(clientrep):
-    """ Removes probably sensitive details from a client representation.
+    """Removes probably sensitive details from a client representation.
 
     :param clientrep: the clientrep dict to be sanitized
     :return: sanitized clientrep dict
     """
     result = copy.deepcopy(clientrep)
-    if 'secret' in result:
-        result['secret'] = 'no_log'
-    if 'attributes' in result:
-        attributes = result['attributes']
+    if "secret" in result:
+        result["secret"] = "no_log"
+    if "attributes" in result:
+        attributes = result["attributes"]
         if isinstance(attributes, dict):
-            if 'saml.signing.private.key' in attributes:
-                attributes['saml.signing.private.key'] = 'no_log'
-            if 'saml.encryption.private.key' in attributes:
-                attributes['saml.encryption.private.key'] = 'no_log'
+            if "saml.signing.private.key" in attributes:
+                attributes["saml.signing.private.key"] = "no_log"
+            if "saml.encryption.private.key" in attributes:
+                attributes["saml.encryption.private.key"] = "no_log"
     return normalise_cr(result)
 
 
 def get_authentication_flow_id(flow_name, realm, kc):
-    """ Get the authentication flow ID based on the flow name, realm, and Keycloak client.
+    """Get the authentication flow ID based on the flow name, realm, and Keycloak client.
 
     Args:
         flow_name (str): The name of the authentication flow.
@@ -941,11 +948,11 @@ def get_authentication_flow_id(flow_name, realm, kc):
     flow = kc.get_authentication_flow_by_alias(flow_name, realm)
     if flow:
         return flow["id"]
-    kc.module.fail_json(msg=f'Authentification flow {flow_name} not found in realm {realm}')
+    kc.module.fail_json(msg=f"Authentification flow {flow_name} not found in realm {realm}")
 
 
 def flow_binding_from_dict_to_model(newClientFlowBinding, realm, kc):
-    """ Convert a dictionary representing client flow bindings to a model representation.
+    """Convert a dictionary representing client flow bindings to a model representation.
 
     Args:
         newClientFlowBinding (dict): A dictionary containing client flow bindings.
@@ -962,10 +969,7 @@ def flow_binding_from_dict_to_model(newClientFlowBinding, realm, kc):
 
     """
 
-    modelFlow = {
-        "browser": None,
-        "direct_grant": None
-    }
+    modelFlow = {"browser": None, "direct_grant": None}
 
     for k, v in newClientFlowBinding.items():
         if not v:
@@ -1008,11 +1012,7 @@ def find_match(iterable, attribute, name):
     """
     name_lower = str(name).lower()
     return next(
-        (
-            value
-            for value in iterable
-            if attribute in value and str(value[attribute]).lower() == name_lower
-        ),
+        (value for value in iterable if attribute in value and str(value[attribute]).lower() == name_lower),
         None,
     )
 
@@ -1046,14 +1046,14 @@ def add_default_client_scopes(desired_client, before_client, realm, kc):
         None
     """
     desired_default_scope = desired_client["defaultClientScopes"]
-    missing_scopes = [item for item in desired_default_scope if item not in before_client['defaultClientScopes']]
+    missing_scopes = [item for item in desired_default_scope if item not in before_client["defaultClientScopes"]]
     if not missing_scopes:
         return
     client_scopes = kc.get_clientscopes(realm)
     for name in missing_scopes:
         scope = find_match(client_scopes, "name", name)
         if scope:
-            kc.add_default_clientscope(scope['id'], realm, desired_client['clientId'])
+            kc.add_default_clientscope(scope["id"], realm, desired_client["clientId"])
 
 
 def add_optional_client_scopes(desired_client, before_client, realm, kc):
@@ -1085,14 +1085,14 @@ def add_optional_client_scopes(desired_client, before_client, realm, kc):
         None
     """
     desired_optional_scope = desired_client["optionalClientScopes"]
-    missing_scopes = [item for item in desired_optional_scope if item not in before_client['optionalClientScopes']]
+    missing_scopes = [item for item in desired_optional_scope if item not in before_client["optionalClientScopes"]]
     if not missing_scopes:
         return
     client_scopes = kc.get_clientscopes(realm)
     for name in missing_scopes:
         scope = find_match(client_scopes, "name", name)
         if scope:
-            kc.add_optional_clientscope(scope['id'], realm, desired_client['clientId'])
+            kc.add_optional_clientscope(scope["id"], realm, desired_client["clientId"])
 
 
 def remove_default_client_scopes(desired_client, before_client, realm, kc):
@@ -1124,14 +1124,14 @@ def remove_default_client_scopes(desired_client, before_client, realm, kc):
         None
     """
     before_default_scope = before_client["defaultClientScopes"]
-    missing_scopes = [item for item in before_default_scope if item not in desired_client['defaultClientScopes']]
+    missing_scopes = [item for item in before_default_scope if item not in desired_client["defaultClientScopes"]]
     if not missing_scopes:
         return
-    client_scopes = kc.get_default_clientscopes(realm, desired_client['clientId'])
+    client_scopes = kc.get_default_clientscopes(realm, desired_client["clientId"])
     for name in missing_scopes:
         scope = find_match(client_scopes, "name", name)
         if scope:
-            kc.delete_default_clientscope(scope['id'], realm, desired_client['clientId'])
+            kc.delete_default_clientscope(scope["id"], realm, desired_client["clientId"])
 
 
 def remove_optional_client_scopes(desired_client, before_client, realm, kc):
@@ -1163,14 +1163,14 @@ def remove_optional_client_scopes(desired_client, before_client, realm, kc):
         None
     """
     before_optional_scope = before_client["optionalClientScopes"]
-    missing_scopes = [item for item in before_optional_scope if item not in desired_client['optionalClientScopes']]
+    missing_scopes = [item for item in before_optional_scope if item not in desired_client["optionalClientScopes"]]
     if not missing_scopes:
         return
-    client_scopes = kc.get_optional_clientscopes(realm, desired_client['clientId'])
+    client_scopes = kc.get_optional_clientscopes(realm, desired_client["clientId"])
     for name in missing_scopes:
         scope = find_match(client_scopes, "name", name)
         if scope:
-            kc.delete_optional_clientscope(scope['id'], realm, desired_client['clientId'])
+            kc.delete_optional_clientscope(scope["id"], realm, desired_client["clientId"])
 
 
 def main():
@@ -1182,86 +1182,94 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     protmapper_spec = dict(
-        consentRequired=dict(type='bool'),
-        consentText=dict(type='str'),
-        id=dict(type='str'),
-        name=dict(type='str'),
-        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
-        protocolMapper=dict(type='str'),
-        config=dict(type='dict'),
+        consentRequired=dict(type="bool"),
+        consentText=dict(type="str"),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        protocol=dict(type="str", choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
+        protocolMapper=dict(type="str"),
+        config=dict(type="dict"),
     )
 
     authentication_flow_spec = dict(
-        browser=dict(type='str'),
-        browser_name=dict(type='str', aliases=['browserName']),
-        direct_grant=dict(type='str', aliases=['directGrant']),
-        direct_grant_name=dict(type='str', aliases=['directGrantName']),
+        browser=dict(type="str"),
+        browser_name=dict(type="str", aliases=["browserName"]),
+        direct_grant=dict(type="str", aliases=["directGrant"]),
+        direct_grant_name=dict(type="str", aliases=["directGrantName"]),
     )
 
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-        realm=dict(type='str', default='master'),
-
-        id=dict(type='str'),
-        client_id=dict(type='str', aliases=['clientId']),
-        name=dict(type='str'),
-        description=dict(type='str'),
-        root_url=dict(type='str', aliases=['rootUrl']),
-        admin_url=dict(type='str', aliases=['adminUrl']),
-        base_url=dict(type='str', aliases=['baseUrl']),
-        surrogate_auth_required=dict(type='bool', aliases=['surrogateAuthRequired']),
-        enabled=dict(type='bool'),
-        client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt', 'client-x509'], aliases=['clientAuthenticatorType']),
-        secret=dict(type='str', no_log=True),
-        registration_access_token=dict(type='str', aliases=['registrationAccessToken'], no_log=True),
-        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
-        redirect_uris=dict(type='list', elements='str', aliases=['redirectUris']),
-        web_origins=dict(type='list', elements='str', aliases=['webOrigins']),
-        not_before=dict(type='int', aliases=['notBefore']),
-        bearer_only=dict(type='bool', aliases=['bearerOnly']),
-        consent_required=dict(type='bool', aliases=['consentRequired']),
-        standard_flow_enabled=dict(type='bool', aliases=['standardFlowEnabled']),
-        implicit_flow_enabled=dict(type='bool', aliases=['implicitFlowEnabled']),
-        direct_access_grants_enabled=dict(type='bool', aliases=['directAccessGrantsEnabled']),
-        service_accounts_enabled=dict(type='bool', aliases=['serviceAccountsEnabled']),
-        authorization_services_enabled=dict(type='bool', aliases=['authorizationServicesEnabled']),
-        public_client=dict(type='bool', aliases=['publicClient']),
-        frontchannel_logout=dict(type='bool', aliases=['frontchannelLogout']),
-        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
-        attributes=dict(type='dict'),
-        full_scope_allowed=dict(type='bool', aliases=['fullScopeAllowed']),
-        node_re_registration_timeout=dict(type='int', aliases=['nodeReRegistrationTimeout']),
-        registered_nodes=dict(type='dict', aliases=['registeredNodes']),
-        client_template=dict(type='str', aliases=['clientTemplate']),
-        use_template_config=dict(type='bool', aliases=['useTemplateConfig']),
-        use_template_scope=dict(type='bool', aliases=['useTemplateScope']),
-        use_template_mappers=dict(type='bool', aliases=['useTemplateMappers']),
-        always_display_in_console=dict(type='bool', aliases=['alwaysDisplayInConsole']),
-        authentication_flow_binding_overrides=dict(
-            type='dict',
-            aliases=['authenticationFlowBindingOverrides'],
-            options=authentication_flow_spec,
-            required_one_of=[['browser', 'direct_grant', 'browser_name', 'direct_grant_name']],
-            mutually_exclusive=[['browser', 'browser_name'], ['direct_grant', 'direct_grant_name']],
+        state=dict(default="present", choices=["present", "absent"]),
+        realm=dict(type="str", default="master"),
+        id=dict(type="str"),
+        client_id=dict(type="str", aliases=["clientId"]),
+        name=dict(type="str"),
+        description=dict(type="str"),
+        root_url=dict(type="str", aliases=["rootUrl"]),
+        admin_url=dict(type="str", aliases=["adminUrl"]),
+        base_url=dict(type="str", aliases=["baseUrl"]),
+        surrogate_auth_required=dict(type="bool", aliases=["surrogateAuthRequired"]),
+        enabled=dict(type="bool"),
+        client_authenticator_type=dict(
+            type="str", choices=["client-secret", "client-jwt", "client-x509"], aliases=["clientAuthenticatorType"]
         ),
-        protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
-        authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
-        client_scopes_behavior=dict(type='str', aliases=['clientScopesBehavior'], choices=['ignore', 'patch', 'idempotent'], default='ignore'),
-        default_client_scopes=dict(type='list', elements='str', aliases=['defaultClientScopes']),
-        optional_client_scopes=dict(type='list', elements='str', aliases=['optionalClientScopes']),
+        secret=dict(type="str", no_log=True),
+        registration_access_token=dict(type="str", aliases=["registrationAccessToken"], no_log=True),
+        default_roles=dict(type="list", elements="str", aliases=["defaultRoles"]),
+        redirect_uris=dict(type="list", elements="str", aliases=["redirectUris"]),
+        web_origins=dict(type="list", elements="str", aliases=["webOrigins"]),
+        not_before=dict(type="int", aliases=["notBefore"]),
+        bearer_only=dict(type="bool", aliases=["bearerOnly"]),
+        consent_required=dict(type="bool", aliases=["consentRequired"]),
+        standard_flow_enabled=dict(type="bool", aliases=["standardFlowEnabled"]),
+        implicit_flow_enabled=dict(type="bool", aliases=["implicitFlowEnabled"]),
+        direct_access_grants_enabled=dict(type="bool", aliases=["directAccessGrantsEnabled"]),
+        service_accounts_enabled=dict(type="bool", aliases=["serviceAccountsEnabled"]),
+        authorization_services_enabled=dict(type="bool", aliases=["authorizationServicesEnabled"]),
+        public_client=dict(type="bool", aliases=["publicClient"]),
+        frontchannel_logout=dict(type="bool", aliases=["frontchannelLogout"]),
+        protocol=dict(type="str", choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
+        attributes=dict(type="dict"),
+        full_scope_allowed=dict(type="bool", aliases=["fullScopeAllowed"]),
+        node_re_registration_timeout=dict(type="int", aliases=["nodeReRegistrationTimeout"]),
+        registered_nodes=dict(type="dict", aliases=["registeredNodes"]),
+        client_template=dict(type="str", aliases=["clientTemplate"]),
+        use_template_config=dict(type="bool", aliases=["useTemplateConfig"]),
+        use_template_scope=dict(type="bool", aliases=["useTemplateScope"]),
+        use_template_mappers=dict(type="bool", aliases=["useTemplateMappers"]),
+        always_display_in_console=dict(type="bool", aliases=["alwaysDisplayInConsole"]),
+        authentication_flow_binding_overrides=dict(
+            type="dict",
+            aliases=["authenticationFlowBindingOverrides"],
+            options=authentication_flow_spec,
+            required_one_of=[["browser", "direct_grant", "browser_name", "direct_grant_name"]],
+            mutually_exclusive=[["browser", "browser_name"], ["direct_grant", "direct_grant_name"]],
+        ),
+        protocol_mappers=dict(type="list", elements="dict", options=protmapper_spec, aliases=["protocolMappers"]),
+        authorization_settings=dict(type="dict", aliases=["authorizationSettings"]),
+        client_scopes_behavior=dict(
+            type="str", aliases=["clientScopesBehavior"], choices=["ignore", "patch", "idempotent"], default="ignore"
+        ),
+        default_client_scopes=dict(type="list", elements="str", aliases=["defaultClientScopes"]),
+        optional_client_scopes=dict(type="list", elements="str", aliases=["optionalClientScopes"]),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['client_id', 'id'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [
+                ["client_id", "id"],
+                ["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"],
+            ]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -1271,21 +1279,23 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    cid = module.params.get('id')
-    clientScopesBehavior = module.params.get('client_scopes_behavior')
-    state = module.params.get('state')
+    realm = module.params.get("realm")
+    cid = module.params.get("id")
+    clientScopesBehavior = module.params.get("client_scopes_behavior")
+    state = module.params.get("state")
 
     # Filter and map the parameters names that apply to the client
-    client_params = [x for x in module.params
-                     if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                     module.params.get(x) is not None]
+    client_params = [
+        x
+        for x in module.params
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm"] and module.params.get(x) is not None
+    ]
 
     # See if it already exists in Keycloak
     if cid is None:
-        before_client = kc.get_client_by_clientid(module.params.get('client_id'), realm=realm)
+        before_client = kc.get_client_by_clientid(module.params.get("client_id"), realm=realm)
         if before_client is not None:
-            cid = before_client['id']
+            cid = before_client["id"]
     else:
         before_client = kc.get_client_by_id(cid, realm=realm)
 
@@ -1302,15 +1312,15 @@ def main():
 
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
-        if client_param == 'protocol_mappers':
+        if client_param == "protocol_mappers":
             new_param_value = [{k: v for k, v in x.items() if v is not None} for x in new_param_value]
-        elif client_param == 'authentication_flow_binding_overrides':
+        elif client_param == "authentication_flow_binding_overrides":
             new_param_value = flow_binding_from_dict_to_model(new_param_value, realm, kc)
-        elif client_param == 'attributes' and 'attributes' in before_client:
-            attributes_copy = copy.deepcopy(before_client['attributes'])
+        elif client_param == "attributes" and "attributes" in before_client:
+            attributes_copy = copy.deepcopy(before_client["attributes"])
             attributes_copy.update(new_param_value)
             new_param_value = attributes_copy
-        elif client_param in ['clientScopesBehavior', 'client_scopes_behavior']:
+        elif client_param in ["clientScopesBehavior", "client_scopes_behavior"]:
             continue
 
         changeset[camel(client_param)] = new_param_value
@@ -1319,65 +1329,66 @@ def main():
     desired_client = copy.deepcopy(before_client)
     desired_client.update(changeset)
 
-    result['proposed'] = sanitize_cr(changeset)
-    result['existing'] = sanitize_cr(before_client)
+    result["proposed"] = sanitize_cr(changeset)
+    result["existing"] = sanitize_cr(before_client)
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_client:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Client does not exist; doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "Client does not exist; doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
+        result["changed"] = True
 
-        if 'clientId' not in desired_client:
-            module.fail_json(msg='client_id needs to be specified when creating a new client')
-        if 'protocol' not in desired_client:
-            desired_client['protocol'] = PROTOCOL_OPENID_CONNECT
+        if "clientId" not in desired_client:
+            module.fail_json(msg="client_id needs to be specified when creating a new client")
+        if "protocol" not in desired_client:
+            desired_client["protocol"] = PROTOCOL_OPENID_CONNECT
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(desired_client))
+            result["diff"] = dict(before="", after=sanitize_cr(desired_client))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # create it
         kc.create_client(desired_client, realm=realm)
-        after_client = kc.get_client_by_clientid(desired_client['clientId'], realm=realm)
+        after_client = kc.get_client_by_clientid(desired_client["clientId"], realm=realm)
 
-        result['end_state'] = sanitize_cr(after_client)
+        result["end_state"] = sanitize_cr(after_client)
 
-        result['msg'] = f"Client {desired_client['clientId']} has been created."
+        result["msg"] = f"Client {desired_client['clientId']} has been created."
         module.exit_json(**result)
 
     else:
-        if state == 'present':
+        if state == "present":
             # We can only compare the current client with the proposed updates we have
-            desired_client_with_scopes, before_client_with_scopes = normalise_scopes_for_behavior(desired_client, before_client, clientScopesBehavior)
+            desired_client_with_scopes, before_client_with_scopes = normalise_scopes_for_behavior(
+                desired_client, before_client, clientScopesBehavior
+            )
             check_optional_scopes_not_default(desired_client, clientScopesBehavior, module)
             before_norm = normalise_cr(before_client_with_scopes, remove_ids=True)
             desired_norm = normalise_cr(desired_client_with_scopes, remove_ids=True)
             # no changes
             if before_norm == desired_norm:
-                result['changed'] = False
-                result['end_state'] = sanitize_cr(before_client)
-                result['msg'] = f"No changes required for Client {desired_client['clientId']}."
+                result["changed"] = False
+                result["end_state"] = sanitize_cr(before_client)
+                result["msg"] = f"No changes required for Client {desired_client['clientId']}."
                 module.exit_json(**result)
 
             # Process an update
-            result['changed'] = True
+            result["changed"] = True
 
             if module.check_mode:
-                result['end_state'] = sanitize_cr(desired_client_with_scopes)
+                result["end_state"] = sanitize_cr(desired_client_with_scopes)
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_client),
-                                          after=sanitize_cr(desired_client))
+                    result["diff"] = dict(before=sanitize_cr(before_client), after=sanitize_cr(desired_client))
                 module.exit_json(**result)
 
             # do the update
@@ -1392,34 +1403,33 @@ def main():
             normalize_kc_resp(after_client)
 
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_client),
-                                      after=sanitize_cr(after_client))
+                result["diff"] = dict(before=sanitize_cr(before_client), after=sanitize_cr(after_client))
 
-            result['end_state'] = sanitize_cr(after_client)
+            result["end_state"] = sanitize_cr(after_client)
 
-            result['msg'] = f"Client {desired_client['clientId']} has been updated."
+            result["msg"] = f"Client {desired_client['clientId']} has been updated."
             module.exit_json(**result)
 
         else:
             # Process a deletion (because state was not 'present')
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_client), after='')
+                result["diff"] = dict(before=sanitize_cr(before_client), after="")
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # delete it
             kc.delete_client(cid, realm=realm)
-            result['proposed'] = {}
+            result["proposed"] = {}
 
-            result['end_state'] = {}
+            result["end_state"] = {}
 
-            result['msg'] = f"Client {before_client['clientId']} has been deleted."
+            result["msg"] = f"Client {before_client['clientId']} has been deleted."
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

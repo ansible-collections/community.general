@@ -81,7 +81,7 @@ def find_database(module, client, database_name):
     try:
         databases = client.get_list_database()
         for db in databases:
-            if db['name'] == database_name:
+            if db["name"] == database_name:
                 database = db
                 break
     except requests.exceptions.ConnectionError as e:
@@ -112,33 +112,30 @@ def drop_database(module, client, database_name):
 def main():
     argument_spec = InfluxDb.influxdb_argument_spec()
     argument_spec.update(
-        database_name=dict(required=True, type='str'),
-        state=dict(default='present', type='str', choices=['present', 'absent'])
+        database_name=dict(required=True, type="str"),
+        state=dict(default="present", type="str", choices=["present", "absent"]),
     )
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    state = module.params['state']
+    state = module.params["state"]
 
     influxdb = InfluxDb(module)
     client = influxdb.connect_to_influxdb()
     database_name = influxdb.database_name
     database = find_database(module, client, database_name)
 
-    if state == 'present':
+    if state == "present":
         if database:
             module.exit_json(changed=False)
         else:
             create_database(module, client, database_name)
 
-    if state == 'absent':
+    if state == "absent":
         if database:
             drop_database(module, client, database_name)
         else:
             module.exit_json(changed=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

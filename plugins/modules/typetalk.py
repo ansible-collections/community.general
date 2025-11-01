@@ -68,26 +68,29 @@ def do_request(module, url, params, headers=None):
     data = urlencode(params)
     if headers is None:
         headers = dict()
-    headers = dict(headers, **{
-        'User-Agent': 'Ansible/typetalk module',
-    })
+    headers = dict(
+        headers,
+        **{
+            "User-Agent": "Ansible/typetalk module",
+        },
+    )
     r, info = fetch_url(module, url, data=data, headers=headers)
-    if info['status'] != 200:
-        exc = ConnectionError(info['msg'])
-        exc.code = info['status']
+    if info["status"] != 200:
+        exc = ConnectionError(info["msg"])
+        exc.code = info["status"]
         raise exc
     return r
 
 
 def get_access_token(module, client_id, client_secret):
     params = {
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'grant_type': 'client_credentials',
-        'scope': 'topic.post'
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "grant_type": "client_credentials",
+        "scope": "topic.post",
     }
-    res = do_request(module, 'https://typetalk.com/oauth2/access_token', params)
-    return json.load(res)['access_token']
+    res = do_request(module, "https://typetalk.com/oauth2/access_token", params)
+    return json.load(res)["access_token"]
 
 
 def send_message(module, client_id, client_secret, topic, msg):
@@ -96,26 +99,25 @@ def send_message(module, client_id, client_secret, topic, msg):
     """
     try:
         access_token = get_access_token(module, client_id, client_secret)
-        url = f'https://typetalk.com/api/v1/topics/{topic}'
+        url = f"https://typetalk.com/api/v1/topics/{topic}"
         headers = {
-            'Authorization': f'Bearer {access_token}',
+            "Authorization": f"Bearer {access_token}",
         }
-        do_request(module, url, {'message': msg}, headers)
-        return True, {'access_token': access_token}
+        do_request(module, url, {"message": msg}, headers)
+        return True, {"access_token": access_token}
     except ConnectionError as e:
         return False, e
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             client_id=dict(required=True),
             client_secret=dict(required=True, no_log=True),
-            topic=dict(required=True, type='int'),
+            topic=dict(required=True, type="int"),
             msg=dict(required=True),
         ),
-        supports_check_mode=False
+        supports_check_mode=False,
     )
 
     if not json:
@@ -128,10 +130,10 @@ def main():
 
     res, error = send_message(module, client_id, client_secret, topic, msg)
     if not res:
-        module.fail_json(msg=f'fail to send message with response code {error.code}')
+        module.fail_json(msg=f"fail to send message with response code {error.code}")
 
     module.exit_json(changed=True, topic=topic, msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

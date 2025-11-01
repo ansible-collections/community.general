@@ -89,9 +89,7 @@ def main():
     endpoint = "ca/host_key_cert"
     key_to_check_for_changes = []
     module = UTMModule(
-        argument_spec=dict(
-            name=dict(type='str', required=True)
-        ),
+        argument_spec=dict(name=dict(type="str", required=True)),
         supports_check_mode=True,
     )
     try:
@@ -101,5 +99,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

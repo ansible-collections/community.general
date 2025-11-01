@@ -146,36 +146,40 @@ list:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.csv import (initialize_dialect, read_csv, CSVError,
-                                                                            DialectNotAvailableError,
-                                                                            CustomDialectFailureError)
+from ansible_collections.community.general.plugins.module_utils.csv import (
+    initialize_dialect,
+    read_csv,
+    CSVError,
+    DialectNotAvailableError,
+    CustomDialectFailureError,
+)
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path', required=True, aliases=['filename']),
-            dialect=dict(type='str', default='excel'),
-            key=dict(type='str', no_log=False),
-            fieldnames=dict(type='list', elements='str'),
-            unique=dict(type='bool', default=True),
-            delimiter=dict(type='str'),
-            skipinitialspace=dict(type='bool'),
-            strict=dict(type='bool'),
+            path=dict(type="path", required=True, aliases=["filename"]),
+            dialect=dict(type="str", default="excel"),
+            key=dict(type="str", no_log=False),
+            fieldnames=dict(type="list", elements="str"),
+            unique=dict(type="bool", default=True),
+            delimiter=dict(type="str"),
+            skipinitialspace=dict(type="bool"),
+            strict=dict(type="bool"),
         ),
         supports_check_mode=True,
     )
 
-    path = module.params['path']
-    dialect = module.params['dialect']
-    key = module.params['key']
-    fieldnames = module.params['fieldnames']
-    unique = module.params['unique']
+    path = module.params["path"]
+    dialect = module.params["dialect"]
+    key = module.params["key"]
+    fieldnames = module.params["fieldnames"]
+    unique = module.params["unique"]
 
     dialect_params = {
-        "delimiter": module.params['delimiter'],
-        "skipinitialspace": module.params['skipinitialspace'],
-        "strict": module.params['strict'],
+        "delimiter": module.params["delimiter"],
+        "skipinitialspace": module.params["skipinitialspace"],
+        "strict": module.params["strict"],
     }
 
     try:
@@ -184,7 +188,7 @@ def main():
         module.fail_json(msg=to_native(e))
 
     try:
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             data = f.read()
     except (IOError, OSError) as e:
         module.fail_json(msg=f"Unable to open file: {e}")
@@ -215,5 +219,5 @@ def main():
     module.exit_json(dict=data_dict, list=data_list)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

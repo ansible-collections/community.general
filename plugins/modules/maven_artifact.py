@@ -249,6 +249,7 @@ from urllib.parse import urlparse
 LXML_ETREE_IMP_ERR = None
 try:
     from lxml import etree
+
     HAS_LXML_ETREE = True
 except ImportError:
     LXML_ETREE_IMP_ERR = traceback.format_exc()
@@ -257,6 +258,7 @@ except ImportError:
 BOTO_IMP_ERR = None
 try:
     import boto3
+
     HAS_BOTO = True
 except ImportError:
     BOTO_IMP_ERR = traceback.format_exc()
@@ -265,6 +267,7 @@ except ImportError:
 SEMANTIC_VERSION_IMP_ERR = None
 try:
     from semantic_version import Version, Spec
+
     HAS_SEMANTIC_VERSION = True
 except ImportError:
     SEMANTIC_VERSION_IMP_ERR = traceback.format_exc()
@@ -277,11 +280,11 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native, to_
 
 
 def split_pre_existing_dir(dirname):
-    '''
+    """
     Return the first pre-existing directory and a list of the new directories that will be created.
-    '''
+    """
     head, tail = os.path.split(dirname)
-    b_head = to_bytes(head, errors='surrogate_or_strict')
+    b_head = to_bytes(head, errors="surrogate_or_strict")
     if not os.path.exists(b_head):
         if head == dirname:
             return None, [head]
@@ -294,23 +297,25 @@ def split_pre_existing_dir(dirname):
 
 
 def adjust_recursive_directory_permissions(pre_existing_dir, new_directory_list, module, directory_args, changed):
-    '''
+    """
     Walk the new directories list and make sure that permissions are as we would expect
-    '''
+    """
     if new_directory_list:
         first_sub_dir = new_directory_list.pop(0)
         if not pre_existing_dir:
             working_dir = first_sub_dir
         else:
             working_dir = os.path.join(pre_existing_dir, first_sub_dir)
-        directory_args['path'] = working_dir
+        directory_args["path"] = working_dir
         changed = module.set_fs_attributes_if_different(directory_args, changed)
-        changed = adjust_recursive_directory_permissions(working_dir, new_directory_list, module, directory_args, changed)
+        changed = adjust_recursive_directory_permissions(
+            working_dir, new_directory_list, module, directory_args, changed
+        )
     return changed
 
 
 class Artifact:
-    def __init__(self, group_id, artifact_id, version, version_by_spec, classifier='', extension='jar'):
+    def __init__(self, group_id, artifact_id, version, version_by_spec, classifier="", extension="jar"):
         if not group_id:
             raise ValueError("group_id must be set")
         if not artifact_id:
@@ -464,16 +469,18 @@ class MavenDownloader:
 
             for snapshotArtifact in xml.xpath("/metadata/versioning/snapshotVersions/snapshotVersion"):
                 classifier = snapshotArtifact.xpath("classifier/text()")
-                artifact_classifier = classifier[0] if classifier else ''
+                artifact_classifier = classifier[0] if classifier else ""
                 extension = snapshotArtifact.xpath("extension/text()")
-                artifact_extension = extension[0] if extension else ''
+                artifact_extension = extension[0] if extension else ""
                 if artifact_classifier == artifact.classifier and artifact_extension == artifact.extension:
                     return self._uri_for_artifact(artifact, snapshotArtifact.xpath("value/text()")[0])
             timestamp_xmlpath = xml.xpath("/metadata/versioning/snapshot/timestamp/text()")
             if timestamp_xmlpath:
                 timestamp = timestamp_xmlpath[0]
                 build_number = xml.xpath("/metadata/versioning/snapshot/buildNumber/text()")[0]
-                return self._uri_for_artifact(artifact, artifact.version.replace("SNAPSHOT", f"{timestamp}-{build_number}"))
+                return self._uri_for_artifact(
+                    artifact, artifact.version.replace("SNAPSHOT", f"{timestamp}-{build_number}")
+                )
 
         return self._uri_for_artifact(artifact, artifact.version)
 
@@ -483,7 +490,11 @@ class MavenDownloader:
         elif not artifact.is_snapshot():
             version = artifact.version
         if artifact.classifier:
-            return posixpath.join(self.base, artifact.path(), f"{artifact.artifact_id}-{version}-{artifact.classifier}.{artifact.extension}")
+            return posixpath.join(
+                self.base,
+                artifact.path(),
+                f"{artifact.artifact_id}-{version}-{artifact.classifier}.{artifact.extension}",
+            )
 
         return posixpath.join(self.base, artifact.path(), f"{artifact.artifact_id}-{version}.{artifact.extension}")
 
@@ -492,7 +503,7 @@ class MavenDownloader:
         if self.local:
             parsed_url = urlparse(url)
             if os.path.isfile(parsed_url.path):
-                with io.open(parsed_url.path, 'rb') as f:
+                with io.open(parsed_url.path, "rb") as f:
                     return f.read()
             if force:
                 raise ValueError(f"{failmsg} because can not find file: {url}")
@@ -507,42 +518,48 @@ class MavenDownloader:
         url_to_use = url
         parsed_url = urlparse(url)
 
-        if parsed_url.scheme == 's3':
+        if parsed_url.scheme == "s3":
             parsed_url = urlparse(url)
             bucket_name = parsed_url.netloc
             key_name = parsed_url.path[1:]
-            client = boto3.client('s3', aws_access_key_id=self.module.params.get('username', ''), aws_secret_access_key=self.module.params.get('password', ''))
-            url_to_use = client.generate_presigned_url('get_object', Params={'Bucket': bucket_name, 'Key': key_name}, ExpiresIn=10)
+            client = boto3.client(
+                "s3",
+                aws_access_key_id=self.module.params.get("username", ""),
+                aws_secret_access_key=self.module.params.get("password", ""),
+            )
+            url_to_use = client.generate_presigned_url(
+                "get_object", Params={"Bucket": bucket_name, "Key": key_name}, ExpiresIn=10
+            )
 
-        req_timeout = self.module.params.get('timeout')
+        req_timeout = self.module.params.get("timeout")
 
         # Hack to add parameters in the way that fetch_url expects
-        self.module.params['url_username'] = self.module.params.get('username', '')
-        self.module.params['url_password'] = self.module.params.get('password', '')
-        self.module.params['http_agent'] = self.user_agent
+        self.module.params["url_username"] = self.module.params.get("username", "")
+        self.module.params["url_password"] = self.module.params.get("password", "")
+        self.module.params["http_agent"] = self.user_agent
 
         kwargs = {}
-        if self.module.params['unredirected_headers']:
-            kwargs['unredirected_headers'] = self.module.params['unredirected_headers']
+        if self.module.params["unredirected_headers"]:
+            kwargs["unredirected_headers"] = self.module.params["unredirected_headers"]
 
-        response, info = fetch_url(
-            self.module,
-            url_to_use,
-            timeout=req_timeout,
-            headers=self.headers,
-            **kwargs
-        )
+        response, info = fetch_url(self.module, url_to_use, timeout=req_timeout, headers=self.headers, **kwargs)
 
-        if info['status'] == 200:
+        if info["status"] == 200:
             return response
         if force:
             raise ValueError(f"{failmsg} because of {info['msg']}for URL {url_to_use}")
         return None
 
-    def download(self, tmpdir, artifact, verify_download, filename=None, checksum_alg='md5'):
+    def download(self, tmpdir, artifact, verify_download, filename=None, checksum_alg="md5"):
         if (not artifact.version and not artifact.version_by_spec) or artifact.version == "latest":
-            artifact = Artifact(artifact.group_id, artifact.artifact_id, self.find_latest_version_available(artifact), None,
-                                artifact.classifier, artifact.extension)
+            artifact = Artifact(
+                artifact.group_id,
+                artifact.artifact_id,
+                self.find_latest_version_available(artifact),
+                None,
+                artifact.classifier,
+                artifact.extension,
+            )
         url = self.find_uri_for_artifact(artifact)
         tempfd, tempname = tempfile.mkstemp(dir=tmpdir)
 
@@ -556,7 +573,7 @@ class MavenDownloader:
                     return f"Can not find local file: {parsed_url.path}"
             else:
                 response = self._request(url, f"Failed to download artifact {artifact}")
-                with os.fdopen(tempfd, 'wb') as f:
+                with os.fdopen(tempfd, "wb") as f:
                     shutil.copyfileobj(response, f)
 
             if verify_download:
@@ -573,7 +590,7 @@ class MavenDownloader:
         shutil.move(tempname, artifact.get_filename(filename))
         return None
 
-    def is_invalid_checksum(self, file, remote_url, checksum_alg='md5'):
+    def is_invalid_checksum(self, file, remote_url, checksum_alg="md5"):
         if os.path.exists(file):
             local_checksum = self._local_checksum(checksum_alg, file)
             if self.local:
@@ -581,7 +598,10 @@ class MavenDownloader:
                 remote_checksum = self._local_checksum(checksum_alg, parsed_url.path)
             else:
                 try:
-                    remote_checksum = to_text(self._getContent(f"{remote_url}.{checksum_alg}", "Failed to retrieve checksum", False), errors='strict')
+                    remote_checksum = to_text(
+                        self._getContent(f"{remote_url}.{checksum_alg}", "Failed to retrieve checksum", False),
+                        errors="strict",
+                    )
                 except UnicodeError as e:
                     return f"Cannot retrieve a valid {checksum_alg} checksum from {remote_url}: {to_native(e)}"
                 if not remote_checksum:
@@ -597,19 +617,21 @@ class MavenDownloader:
             if local_checksum.lower() == remote_checksum.lower():
                 return None
             else:
-                return f"Checksum does not match: we computed {local_checksum} but the repository states {remote_checksum}"
+                return (
+                    f"Checksum does not match: we computed {local_checksum} but the repository states {remote_checksum}"
+                )
 
         return f"Path does not exist: {file}"
 
     def _local_checksum(self, checksum_alg, file):
-        if checksum_alg.lower() == 'md5':
+        if checksum_alg.lower() == "md5":
             hash = hashlib.md5()
-        elif checksum_alg.lower() == 'sha1':
+        elif checksum_alg.lower() == "sha1":
             hash = hashlib.sha1()
         else:
             raise ValueError(f"Unknown checksum_alg {checksum_alg}")
-        with io.open(file, 'rb') as f:
-            for chunk in iter(lambda: f.read(8192), b''):
+        with io.open(file, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
                 hash.update(chunk)
         return hash.hexdigest()
 
@@ -621,38 +643,38 @@ def main():
             artifact_id=dict(required=True),
             version=dict(),
             version_by_spec=dict(),
-            classifier=dict(default=''),
-            extension=dict(default='jar'),
-            repository_url=dict(default='https://repo1.maven.org/maven2'),
-            username=dict(aliases=['aws_secret_key']),
-            password=dict(no_log=True, aliases=['aws_secret_access_key']),
-            headers=dict(type='dict'),
-            force_basic_auth=dict(default=False, type='bool'),
+            classifier=dict(default=""),
+            extension=dict(default="jar"),
+            repository_url=dict(default="https://repo1.maven.org/maven2"),
+            username=dict(aliases=["aws_secret_key"]),
+            password=dict(no_log=True, aliases=["aws_secret_access_key"]),
+            headers=dict(type="dict"),
+            force_basic_auth=dict(default=False, type="bool"),
             state=dict(default="present", choices=["present", "absent"]),
-            timeout=dict(default=10, type='int'),
+            timeout=dict(default=10, type="int"),
             dest=dict(type="path", required=True),
-            validate_certs=dict(default=True, type='bool'),
+            validate_certs=dict(default=True, type="bool"),
             client_cert=dict(type="path"),
             client_key=dict(type="path"),
-            keep_name=dict(default=False, type='bool'),
-            verify_checksum=dict(default='download', choices=['never', 'download', 'change', 'always']),
-            checksum_alg=dict(default='md5', choices=['md5', 'sha1']),
-            unredirected_headers=dict(type='list', elements='str'),
-            directory_mode=dict(type='str'),
+            keep_name=dict(default=False, type="bool"),
+            verify_checksum=dict(default="download", choices=["never", "download", "change", "always"]),
+            checksum_alg=dict(default="md5", choices=["md5", "sha1"]),
+            unredirected_headers=dict(type="list", elements="str"),
+            directory_mode=dict(type="str"),
         ),
         add_file_common_args=True,
-        mutually_exclusive=([('version', 'version_by_spec')])
+        mutually_exclusive=([("version", "version_by_spec")]),
     )
 
-    if module.params['unredirected_headers'] is None:
+    if module.params["unredirected_headers"] is None:
         # if the user did not supply unredirected params, we use the default
-        module.params['unredirected_headers'] = ['Authorization', 'Cookie']
+        module.params["unredirected_headers"] = ["Authorization", "Cookie"]
 
     if not HAS_LXML_ETREE:
-        module.fail_json(msg=missing_required_lib('lxml'), exception=LXML_ETREE_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("lxml"), exception=LXML_ETREE_IMP_ERR)
 
-    if module.params['version_by_spec'] and not HAS_SEMANTIC_VERSION:
-        module.fail_json(msg=missing_required_lib('semantic_version'), exception=SEMANTIC_VERSION_IMP_ERR)
+    if module.params["version_by_spec"] and not HAS_SEMANTIC_VERSION:
+        module.fail_json(msg=missing_required_lib("semantic_version"), exception=SEMANTIC_VERSION_IMP_ERR)
 
     repository_url = module.params["repository_url"]
     if not repository_url:
@@ -660,13 +682,14 @@ def main():
     try:
         parsed_url = urlparse(repository_url)
     except AttributeError as e:
-        module.fail_json(msg=f'url parsing went wrong {e}')
+        module.fail_json(msg=f"url parsing went wrong {e}")
 
     local = parsed_url.scheme == "file"
 
-    if parsed_url.scheme == 's3' and not HAS_BOTO:
-        module.fail_json(msg=missing_required_lib('boto3', reason='when using s3:// repository URLs'),
-                         exception=BOTO_IMP_ERR)
+    if parsed_url.scheme == "s3" and not HAS_BOTO:
+        module.fail_json(
+            msg=missing_required_lib("boto3", reason="when using s3:// repository URLs"), exception=BOTO_IMP_ERR
+        )
 
     group_id = module.params["group_id"]
     artifact_id = module.params["artifact_id"]
@@ -674,14 +697,14 @@ def main():
     version_by_spec = module.params["version_by_spec"]
     classifier = module.params["classifier"]
     extension = module.params["extension"]
-    headers = module.params['headers']
+    headers = module.params["headers"]
     state = module.params["state"]
     dest = module.params["dest"]
-    b_dest = to_bytes(dest, errors='surrogate_or_strict')
+    b_dest = to_bytes(dest, errors="surrogate_or_strict")
     keep_name = module.params["keep_name"]
     verify_checksum = module.params["verify_checksum"]
-    verify_download = verify_checksum in ['download', 'always']
-    verify_change = verify_checksum in ['change', 'always']
+    verify_download = verify_checksum in ["download", "always"]
+    verify_change = verify_checksum in ["change", "always"]
     checksum_alg = module.params["checksum_alg"]
 
     downloader = MavenDownloader(module, repository_url, local, headers)
@@ -698,21 +721,23 @@ def main():
     prev_state = "absent"
 
     if dest.endswith(os.sep):
-        b_dest = to_bytes(dest, errors='surrogate_or_strict')
+        b_dest = to_bytes(dest, errors="surrogate_or_strict")
         if not os.path.exists(b_dest):
             (pre_existing_dir, new_directory_list) = split_pre_existing_dir(dest)
             os.makedirs(b_dest)
             directory_args = module.load_file_common_arguments(module.params)
             directory_mode = module.params["directory_mode"]
             if directory_mode is not None:
-                directory_args['mode'] = directory_mode
+                directory_args["mode"] = directory_mode
             else:
-                directory_args['mode'] = None
-            changed = adjust_recursive_directory_permissions(pre_existing_dir, new_directory_list, module, directory_args, changed)
+                directory_args["mode"] = None
+            changed = adjust_recursive_directory_permissions(
+                pre_existing_dir, new_directory_list, module, directory_args, changed
+            )
 
     if os.path.isdir(b_dest):
         version_part = version
-        if version == 'latest':
+        if version == "latest":
             version_part = downloader.find_latest_version_available(artifact)
         elif version_by_spec:
             version_part = downloader.find_version_by_spec(artifact)
@@ -720,9 +745,12 @@ def main():
         filename = f"{artifact_id}{(f'-{version_part}' if keep_name else '')}{(f'-{classifier}' if classifier else '')}.{extension}"
         dest = posixpath.join(dest, filename)
 
-        b_dest = to_bytes(dest, errors='surrogate_or_strict')
+        b_dest = to_bytes(dest, errors="surrogate_or_strict")
 
-    if os.path.lexists(b_dest) and ((not verify_change) or not downloader.is_invalid_checksum(dest, downloader.find_uri_for_artifact(artifact), checksum_alg)):
+    if os.path.lexists(b_dest) and (
+        (not verify_change)
+        or not downloader.is_invalid_checksum(dest, downloader.find_uri_for_artifact(artifact), checksum_alg)
+    ):
         prev_state = "present"
 
     if prev_state == "absent":
@@ -738,11 +766,20 @@ def main():
     file_args = module.load_file_common_arguments(module.params, path=dest)
     changed = module.set_fs_attributes_if_different(file_args, changed)
     if changed:
-        module.exit_json(state=state, dest=dest, group_id=group_id, artifact_id=artifact_id, version=version, classifier=classifier,
-                         extension=extension, repository_url=repository_url, changed=changed)
+        module.exit_json(
+            state=state,
+            dest=dest,
+            group_id=group_id,
+            artifact_id=artifact_id,
+            version=version,
+            classifier=classifier,
+            extension=extension,
+            repository_url=repository_url,
+            changed=changed,
+        )
     else:
         module.exit_json(state=state, dest=dest, changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

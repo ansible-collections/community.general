@@ -63,9 +63,8 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
-
-    name = 'community.general.pmrun'
-    prompt = 'Enter UPM user password:'
+    name = "community.general.pmrun"
+    prompt = "Enter UPM user password:"
 
     def build_become_command(self, cmd, shell):
         super().build_become_command(cmd, shell)
@@ -73,7 +72,7 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        become = self.get_option('become_exe')
+        become = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        return f'{become} {flags} {shlex_quote(self._build_success_command(cmd, shell))}'
+        flags = self.get_option("become_flags")
+        return f"{become} {flags} {shlex_quote(self._build_success_command(cmd, shell))}"

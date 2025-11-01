@@ -11,14 +11,13 @@ from ansible_collections.community.general.plugins.modules import pkgin
 
 
 class TestPkginQueryPackage(unittest.TestCase):
-
     def setUp(self):
         pkgin.PKGIN_PATH = ""
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_package_without_version_is_present(self, mock_module):
         # given
-        package = 'py37-conan'
+        package = "py37-conan"
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
@@ -31,10 +30,10 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEqual(command_result, pkgin.PackageState.PRESENT)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_package_with_version_is_present(self, mock_module):
         # given
-        package = 'py37-conan-1.21.0'
+        package = "py37-conan-1.21.0"
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
@@ -47,14 +46,18 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEqual(command_result, pkgin.PackageState.PRESENT)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_package_found_but_not_installed(self, mock_module):
         # given
-        package = 'cmake'
+        package = "cmake"
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
-            (0, "cmake316-3.16.0nb1 = Cross platform make\ncmake314-3.14.6nb1 = Cross platform make\ncmake-3.14.0  Cross platform make", None),
+            (
+                0,
+                "cmake316-3.16.0nb1 = Cross platform make\ncmake314-3.14.6nb1 = Cross platform make\ncmake-3.14.0  Cross platform make",
+                None,
+            ),
         ]
 
         # when
@@ -63,10 +66,10 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEqual(command_result, pkgin.PackageState.NOT_INSTALLED)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_package_found_outdated(self, mock_module):
         # given
-        package = 'cmake316'
+        package = "cmake316"
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
@@ -79,10 +82,10 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEqual(command_result, pkgin.PackageState.OUTDATED)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_package_with_version_found_outdated(self, mock_module):
         # given
-        package = 'cmake316-3.16.0nb1'
+        package = "cmake316-3.16.0nb1"
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
@@ -95,10 +98,10 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEqual(command_result, pkgin.PackageState.OUTDATED)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_package_not_found(self, mock_module):
         # given
-        package = 'cmake320-3.20.0nb1'
+        package = "cmake320-3.20.0nb1"
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
@@ -111,10 +114,10 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEqual(command_result, pkgin.PackageState.NOT_FOUND)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_with_parseable_flag_supported_package_is_present(self, mock_module):
         # given
-        package = 'py37-conan'
+        package = "py37-conan"
         parseable_flag_supported = 0
         mock_module.run_command.side_effect = [
             (parseable_flag_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),
@@ -127,10 +130,10 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEqual(command_result, pkgin.PackageState.PRESENT)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
+    @mock.patch("ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule")
     def test_with_parseable_flag_not_supported_package_is_present(self, mock_module):
         # given
-        package = 'py37-conan'
+        package = "py37-conan"
         parseable_flag_not_supported = 1
         mock_module.run_command.side_effect = [
             (parseable_flag_not_supported, "pkgin 0.11.7 for Darwin-18.6.0 x86_64 (using SQLite 3.27.2)", None),

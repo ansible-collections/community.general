@@ -121,11 +121,7 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 
 
 class DatacenterInfoModule(OneViewModuleBase):
-    argument_spec = dict(
-        name=dict(type='str'),
-        options=dict(type='list', elements='str'),
-        params=dict(type='dict')
-    )
+    argument_spec = dict(name=dict(type="str"), options=dict(type="list", elements="str"), params=dict(type="dict"))
 
     def __init__(self):
         super().__init__(
@@ -134,22 +130,21 @@ class DatacenterInfoModule(OneViewModuleBase):
         )
 
     def execute_module(self):
-
         client = self.oneview_client.datacenters
         info = {}
 
-        if self.module.params.get('name'):
-            datacenters = client.get_by('name', self.module.params['name'])
+        if self.module.params.get("name"):
+            datacenters = client.get_by("name", self.module.params["name"])
 
-            if self.options and 'visualContent' in self.options:
+            if self.options and "visualContent" in self.options:
                 if datacenters:
-                    info['datacenter_visual_content'] = client.get_visual_content(datacenters[0]['uri'])
+                    info["datacenter_visual_content"] = client.get_visual_content(datacenters[0]["uri"])
                 else:
-                    info['datacenter_visual_content'] = None
+                    info["datacenter_visual_content"] = None
 
-            info['datacenters'] = datacenters
+            info["datacenters"] = datacenters
         else:
-            info['datacenters'] = client.get_all(**self.facts_params)
+            info["datacenters"] = client.get_all(**self.facts_params)
 
         return dict(changed=False, **info)
 
@@ -158,5 +153,5 @@ def main():
     DatacenterInfoModule().run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

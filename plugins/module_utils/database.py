@@ -18,13 +18,13 @@ import re
 #
 # 1. '"' in string and '--' in string or
 # "'" in string and '--' in string
-PATTERN_1 = re.compile(r'(\'|\").*--')
+PATTERN_1 = re.compile(r"(\'|\").*--")
 
 # 2. union \ intersect \ except + select
-PATTERN_2 = re.compile(r'(UNION|INTERSECT|EXCEPT).*SELECT', re.IGNORECASE)
+PATTERN_2 = re.compile(r"(UNION|INTERSECT|EXCEPT).*SELECT", re.IGNORECASE)
 
 # 3. ';' and any KEY_WORDS
-PATTERN_3 = re.compile(r';.*(SELECT|UPDATE|INSERT|DELETE|DROP|TRUNCATE|ALTER)', re.IGNORECASE)
+PATTERN_3 = re.compile(r";.*(SELECT|UPDATE|INSERT|DELETE|DROP|TRUNCATE|ALTER)", re.IGNORECASE)
 
 
 class SQLParseError(Exception):
@@ -65,7 +65,7 @@ def _find_end_quote(identifier, quote_char):
             return accumulate
         if next_char == quote_char:
             try:
-                identifier = identifier[quote + 2:]
+                identifier = identifier[quote + 2 :]
                 accumulate = accumulate + 2
             except IndexError:
                 raise UnclosedQuoteError
@@ -75,7 +75,7 @@ def _find_end_quote(identifier, quote_char):
 
 def _identifier_parse(identifier, quote_char):
     if not identifier:
-        raise SQLParseError('Identifier name unspecified or unquoted trailing dot')
+        raise SQLParseError("Identifier name unspecified or unquoted trailing dot")
 
     already_quoted = False
     if identifier.startswith(quote_char):
@@ -86,20 +86,20 @@ def _identifier_parse(identifier, quote_char):
             already_quoted = False
         else:
             if end_quote < len(identifier) - 1:
-                if identifier[end_quote + 1] == '.':
+                if identifier[end_quote + 1] == ".":
                     dot = end_quote + 1
                     first_identifier = identifier[:dot]
-                    next_identifier = identifier[dot + 1:]
+                    next_identifier = identifier[dot + 1 :]
                     further_identifiers = _identifier_parse(next_identifier, quote_char)
                     further_identifiers.insert(0, first_identifier)
                 else:
-                    raise SQLParseError('User escaped identifiers must escape extra quotes')
+                    raise SQLParseError("User escaped identifiers must escape extra quotes")
             else:
                 further_identifiers = [identifier]
 
     if not already_quoted:
         try:
-            dot = identifier.index('.')
+            dot = identifier.index(".")
         except ValueError:
             identifier = identifier.replace(quote_char, quote_char * 2)
             identifier = f"{quote_char}{identifier}{quote_char}"
@@ -111,7 +111,7 @@ def _identifier_parse(identifier, quote_char):
                 further_identifiers = [identifier]
             else:
                 first_identifier = identifier[:dot]
-                next_identifier = identifier[dot + 1:]
+                next_identifier = identifier[dot + 1 :]
                 further_identifiers = _identifier_parse(next_identifier, quote_char)
                 first_identifier = first_identifier.replace(quote_char, quote_char * 2)
                 first_identifier = f"{quote_char}{first_identifier}{quote_char}"
@@ -123,23 +123,27 @@ def _identifier_parse(identifier, quote_char):
 def pg_quote_identifier(identifier, id_type):
     identifier_fragments = _identifier_parse(identifier, quote_char='"')
     if len(identifier_fragments) > _PG_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError(f'PostgreSQL does not support {id_type} with more than {_PG_IDENTIFIER_TO_DOT_LEVEL[id_type]} dots')
-    return '.'.join(identifier_fragments)
+        raise SQLParseError(
+            f"PostgreSQL does not support {id_type} with more than {_PG_IDENTIFIER_TO_DOT_LEVEL[id_type]} dots"
+        )
+    return ".".join(identifier_fragments)
 
 
 def mysql_quote_identifier(identifier, id_type):
-    identifier_fragments = _identifier_parse(identifier, quote_char='`')
+    identifier_fragments = _identifier_parse(identifier, quote_char="`")
     if (len(identifier_fragments) - 1) > _MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError(f'MySQL does not support {id_type} with more than {_MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]} dots')
+        raise SQLParseError(
+            f"MySQL does not support {id_type} with more than {_MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]} dots"
+        )
 
     special_cased_fragments = []
     for fragment in identifier_fragments:
-        if fragment == '`*`':
-            special_cased_fragments.append('*')
+        if fragment == "`*`":
+            special_cased_fragments.append("*")
         else:
             special_cased_fragments.append(fragment)
 
-    return '.'.join(special_cased_fragments)
+    return ".".join(special_cased_fragments)
 
 
 def is_input_dangerous(string):

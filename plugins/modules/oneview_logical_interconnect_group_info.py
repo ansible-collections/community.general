@@ -95,10 +95,9 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 
 class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
     def __init__(self):
-
         argument_spec = dict(
-            name=dict(type='str'),
-            params=dict(type='dict'),
+            name=dict(type="str"),
+            params=dict(type="dict"),
         )
 
         super().__init__(
@@ -107,8 +106,8 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
         )
 
     def execute_module(self):
-        if self.module.params.get('name'):
-            ligs = self.oneview_client.logical_interconnect_groups.get_by('name', self.module.params['name'])
+        if self.module.params.get("name"):
+            ligs = self.oneview_client.logical_interconnect_groups.get_by("name", self.module.params["name"])
         else:
             ligs = self.oneview_client.logical_interconnect_groups.get_all(**self.facts_params)
 
@@ -119,5 +118,5 @@ def main():
     LogicalInterconnectGroupInfoModule().run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -92,6 +92,7 @@ import traceback
 GITHUB_IMP_ERR = None
 try:
     import github
+
     HAS_GITHUB = True
 except ImportError:
     GITHUB_IMP_ERR = traceback.format_exc()
@@ -119,25 +120,26 @@ def _munge_hook(hook_obj):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            repository=dict(type='str', required=True, aliases=["repo"]),
-            user=dict(type='str', required=True),
-            password=dict(type='str', no_log=True),
-            token=dict(type='str', no_log=True),
-            github_url=dict(
-                type='str', default="https://api.github.com")),
-        mutually_exclusive=(('password', 'token'), ),
-        required_one_of=(("password", "token"), ),
-        supports_check_mode=True)
+            repository=dict(type="str", required=True, aliases=["repo"]),
+            user=dict(type="str", required=True),
+            password=dict(type="str", no_log=True),
+            token=dict(type="str", no_log=True),
+            github_url=dict(type="str", default="https://api.github.com"),
+        ),
+        mutually_exclusive=(("password", "token"),),
+        required_one_of=(("password", "token"),),
+        supports_check_mode=True,
+    )
 
     if not HAS_GITHUB:
-        module.fail_json(msg=missing_required_lib('PyGithub'),
-                         exception=GITHUB_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("PyGithub"), exception=GITHUB_IMP_ERR)
 
     try:
         github_conn = github.Github(
             module.params["user"],
             module.params.get("password") or module.params.get("token"),
-            base_url=module.params["github_url"])
+            base_url=module.params["github_url"],
+        )
     except github.GithubException as err:
         module.fail_json(msg=f"Could not connect to GitHub at {module.params['github_url']}: {err}")
 
@@ -147,21 +149,24 @@ def main():
         module.fail_json(msg=f"Could not authenticate to GitHub at {module.params['github_url']}: {err}")
     except github.UnknownObjectException as err:
         module.fail_json(
-            msg=f"Could not find repository {module.params['repository']} in GitHub at {module.params['github_url']}: {err}")
+            msg=f"Could not find repository {module.params['repository']} in GitHub at {module.params['github_url']}: {err}"
+        )
     except Exception as err:
         module.fail_json(
             msg=f"Could not fetch repository {module.params['repository']} from GitHub at {module.params['github_url']}: {err}",
-            exception=traceback.format_exc())
+            exception=traceback.format_exc(),
+        )
 
     try:
         hooks = [_munge_hook(h) for h in repo.get_hooks()]
     except github.GithubException as err:
         module.fail_json(
             msg=f"Unable to get hooks from repository {module.params['repository']}: {err}",
-            exception=traceback.format_exc())
+            exception=traceback.format_exc(),
+        )
 
     module.exit_json(changed=False, hooks=hooks)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

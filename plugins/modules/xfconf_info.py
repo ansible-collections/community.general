@@ -132,12 +132,10 @@ from ansible_collections.community.general.plugins.module_utils.xfconf import xf
 class XFConfInfo(ModuleHelper):
     module = dict(
         argument_spec=dict(
-            channel=dict(type='str'),
-            property=dict(type='str'),
+            channel=dict(type="str"),
+            property=dict(type="str"),
         ),
-        required_by=dict(
-            property=['channel']
-        ),
+        required_by=dict(property=["channel"]),
         supports_check_mode=True,
     )
 
@@ -168,16 +166,16 @@ class XFConfInfo(ModuleHelper):
 
     def __run__(self):
         self.vars.list_arg = not (bool(self.vars.channel) and bool(self.vars.property))
-        output = 'value'
+        output = "value"
         proc = self.process_command_output
         if self.vars.channel is None:
-            output = 'channels'
+            output = "channels"
             proc = self._process_list_channels
         elif self.vars.property is None:
-            output = 'properties'
+            output = "properties"
             proc = self._process_list_properties
 
-        with self.runner.context('list_arg channel property', output_process=proc) as ctx:
+        with self.runner.context("list_arg channel property", output_process=proc) as ctx:
             result = ctx.run(**self.vars.as_dict())
 
         if not self.vars.list_arg and self.vars.is_array:
@@ -189,5 +187,5 @@ def main():
     XFConfInfo.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

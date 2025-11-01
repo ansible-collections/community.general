@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, Andrew Pantuso (@ajpantuso) <ajpantuso@gmail.com>
 # Copyright (c) 2018, Dag Wieers (@dagwieers) <dag@wieers.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -80,13 +79,16 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 
-from ansible_collections.community.general.plugins.module_utils.csv import (initialize_dialect, read_csv, CSVError,
-                                                                            DialectNotAvailableError,
-                                                                            CustomDialectFailureError)
+from ansible_collections.community.general.plugins.module_utils.csv import (
+    initialize_dialect,
+    read_csv,
+    CSVError,
+    DialectNotAvailableError,
+    CustomDialectFailureError,
+)
 
 
-def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitialspace=None, strict=None):
-
+def from_csv(data, dialect="excel", fieldnames=None, delimiter=None, skipinitialspace=None, strict=None):
     dialect_params = {
         "delimiter": delimiter,
         "skipinitialspace": skipinitialspace,
@@ -112,8 +114,5 @@ def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitial
 
 
 class FilterModule:
-
     def filters(self):
-        return {
-            'from_csv': from_csv
-        }
+        return {"from_csv": from_csv}

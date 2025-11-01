@@ -38,24 +38,20 @@ class TestPritunlUserInfo(ModuleTestCase):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_users",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def patch_get_pritunl_organizations(self, **kwds):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_organizations",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def test_without_parameters(self):
         """Test without parameters"""
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
-            with self.patch_get_pritunl_users(
-                side_effect=PritunlListUserMock
-            ) as user_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
+            with self.patch_get_pritunl_users(side_effect=PritunlListUserMock) as user_mock:
                 with set_module_args({}):
                     with self.assertRaises(AnsibleFailJson):
                         self.module.main()
@@ -65,12 +61,8 @@ class TestPritunlUserInfo(ModuleTestCase):
 
     def test_missing_organization(self):
         """Failure must occur when the requested organization is not found."""
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
-            with self.patch_get_pritunl_users(
-                side_effect=PritunlListUserMock
-            ) as user_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
+            with self.patch_get_pritunl_users(side_effect=PritunlListUserMock) as user_mock:
                 with self.assertRaises(AnsibleFailJson) as result:
                     with set_module_args(
                         {
@@ -93,12 +85,8 @@ class TestPritunlUserInfo(ModuleTestCase):
         The list of all Pritunl client users from the organization must be returned when no user specified.
         """
         expected_user_type = "client"
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
-            with self.patch_get_pritunl_users(
-                side_effect=PritunlListUserMock
-            ) as user_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
+            with self.patch_get_pritunl_users(side_effect=PritunlListUserMock) as user_mock:
                 with self.assertRaises(AnsibleExitJson) as result:
                     with set_module_args(
                         {
@@ -127,12 +115,8 @@ class TestPritunlUserInfo(ModuleTestCase):
         """
         expected_user_type = "server"
         expected_user_name = "ops"
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
-            with self.patch_get_pritunl_users(
-                side_effect=PritunlListUserMock
-            ) as user_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
+            with self.patch_get_pritunl_users(side_effect=PritunlListUserMock) as user_mock:
                 with self.assertRaises(AnsibleExitJson) as result:
                     with set_module_args(
                         {

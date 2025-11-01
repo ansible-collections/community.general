@@ -71,7 +71,7 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 
 
 class EjabberdUser:
-    """ This object represents a user resource for an ejabberd server.   The
+    """This object represents a user resource for an ejabberd server.   The
     object manages user creation and deletion using ejabberdctl.  The following
     commands are currently supported:
         * ejabberdctl register
@@ -80,10 +80,10 @@ class EjabberdUser:
 
     def __init__(self, module):
         self.module = module
-        self.state = module.params.get('state')
-        self.host = module.params.get('host')
-        self.user = module.params.get('username')
-        self.pwd = module.params.get('password')
+        self.state = module.params.get("state")
+        self.host = module.params.get("host")
+        self.user = module.params.get("username")
+        self.pwd = module.params.get("password")
         self.runner = CmdRunner(
             module,
             command="ejabberdctl",
@@ -98,28 +98,29 @@ class EjabberdUser:
 
     @property
     def changed(self):
-        """ This method will check the current user and see if the password has
+        """This method will check the current user and see if the password has
         changed.   It will return True if the user does not match the supplied
         credentials and False if it does not
         """
-        return self.run_command('check_password', 'user host pwd', (lambda rc, out, err: bool(rc)))
+        return self.run_command("check_password", "user host pwd", (lambda rc, out, err: bool(rc)))
 
     @property
     def exists(self):
-        """ This method will check to see if the supplied username exists for
+        """This method will check to see if the supplied username exists for
         host specified.  If the user exists True is returned, otherwise False
         is returned
         """
-        return self.run_command('check_account', 'user host', (lambda rc, out, err: not bool(rc)))
+        return self.run_command("check_account", "user host", (lambda rc, out, err: not bool(rc)))
 
     def log(self, entry):
-        """ This method does nothing """
+        """This method does nothing"""
         pass
 
     def run_command(self, cmd, options, process=None):
-        """ This method will run the any command specified and return the
+        """This method will run the any command specified and return the
         returns using the Ansible common module
         """
+
         def _proc(*a):
             return a
 
@@ -132,32 +133,30 @@ class EjabberdUser:
         return res
 
     def update(self):
-        """ The update method will update the credentials for the user provided
-        """
-        return self.run_command('change_password', 'user host pwd')
+        """The update method will update the credentials for the user provided"""
+        return self.run_command("change_password", "user host pwd")
 
     def create(self):
-        """ The create method will create a new user on the host with the
+        """The create method will create a new user on the host with the
         password provided
         """
-        return self.run_command('register', 'user host pwd')
+        return self.run_command("register", "user host pwd")
 
     def delete(self):
-        """ The delete method will delete the user from the host
-        """
-        return self.run_command('unregister', 'user host')
+        """The delete method will delete the user from the host"""
+        return self.run_command("unregister", "user host")
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(required=True, type='str'),
-            username=dict(required=True, type='str'),
-            password=dict(type='str', no_log=True),
-            state=dict(default='present', choices=['present', 'absent']),
+            host=dict(required=True, type="str"),
+            username=dict(required=True, type="str"),
+            password=dict(type="str", no_log=True),
+            state=dict(default="present", choices=["present", "absent"]),
         ),
         required_if=[
-            ('state', 'present', ['password']),
+            ("state", "present", ["password"]),
         ],
         supports_check_mode=True,
     )
@@ -167,7 +166,7 @@ def main():
     rc = None
     result = dict(changed=False)
 
-    if obj.state == 'absent':
+    if obj.state == "absent":
         if obj.exists:
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -175,7 +174,7 @@ def main():
             if rc != 0:
                 module.fail_json(msg=err, rc=rc)
 
-    elif obj.state == 'present':
+    elif obj.state == "present":
         if not obj.exists:
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -188,12 +187,12 @@ def main():
             module.fail_json(msg=err, rc=rc)
 
     if rc is None:
-        result['changed'] = False
+        result["changed"] = False
     else:
-        result['changed'] = True
+        result["changed"] = True
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

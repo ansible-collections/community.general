@@ -179,7 +179,7 @@ def iso_check_file_exists(opened_iso, dest_file):
         else:
             parent_dir = f"{parent_dir}/{item}"
 
-    if '.' not in file_name:
+    if "." not in file_name:
         file_in_iso_path = f"{file_name.upper()}.;1"
     else:
         file_in_iso_path = f"{file_name.upper()};1"
@@ -200,7 +200,7 @@ def iso_add_file(module, opened_iso, iso_type, src_file, dest_file):
 
     file_dir = os.path.dirname(dest_file).strip()
     file_name = os.path.basename(dest_file)
-    if '.' not in file_name:
+    if "." not in file_name:
         file_in_iso_path = f"{dest_file.upper()}.;1"
     else:
         file_in_iso_path = f"{dest_file.upper()};1"
@@ -239,7 +239,7 @@ def iso_delete_file(module, opened_iso, iso_type, dest_file):
     if not iso_check_file_exists(opened_iso, dest_file):
         module.fail_json(msg=f"The file {dest_file} does not exist.")
 
-    if '.' not in file_name:
+    if "." not in file_name:
         file_in_iso_path = f"{dest_file.upper()}.;1"
     else:
         file_in_iso_path = f"{dest_file.upper()};1"
@@ -276,7 +276,7 @@ def iso_rebuild(module, src_iso, dest_iso, delete_files_list, add_files_list):
             iso_delete_file(module, iso, iso_type, item)
 
         for item in add_files_list:
-            iso_add_file(module, iso, iso_type, item['src_file'], item['dest_file'])
+            iso_add_file(module, iso, iso_type, item["src_file"], item["dest_file"])
 
         iso.write(dest_iso)
     except Exception as err:
@@ -289,38 +289,42 @@ def iso_rebuild(module, src_iso, dest_iso, delete_files_list, add_files_list):
 
 def main():
     argument_spec = dict(
-        src_iso=dict(type='path', required=True),
-        dest_iso=dict(type='path', required=True),
-        delete_files=dict(type='list', elements='str', default=[]),
+        src_iso=dict(type="path", required=True),
+        dest_iso=dict(type="path", required=True),
+        delete_files=dict(type="list", elements="str", default=[]),
         add_files=dict(
-            type='list', elements='dict', default=[],
+            type="list",
+            elements="dict",
+            default=[],
             options=dict(
-                src_file=dict(type='path', required=True),
-                dest_file=dict(type='str', required=True),
+                src_file=dict(type="path", required=True),
+                dest_file=dict(type="str", required=True),
             ),
         ),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_one_of=[('delete_files', 'add_files'), ],
+        required_one_of=[
+            ("delete_files", "add_files"),
+        ],
         supports_check_mode=True,
     )
     deps.validate(module)
 
-    src_iso = module.params['src_iso']
+    src_iso = module.params["src_iso"]
     if not os.path.exists(src_iso):
         module.fail_json(msg=f"ISO file {src_iso} does not exist.")
 
-    dest_iso = module.params['dest_iso']
+    dest_iso = module.params["dest_iso"]
     dest_iso_dir = os.path.dirname(dest_iso)
     if dest_iso_dir and not os.path.exists(dest_iso_dir):
         module.fail_json(msg=f"The dest directory {dest_iso_dir} does not exist")
 
-    delete_files_list = [s.strip() for s in module.params['delete_files']]
-    add_files_list = module.params['add_files']
+    delete_files_list = [s.strip() for s in module.params["delete_files"]]
+    add_files_list = module.params["add_files"]
     if add_files_list:
         for item in add_files_list:
-            if not os.path.exists(item['src_file']):
+            if not os.path.exists(item["src_file"]):
                 module.fail_json(msg=f"The file {item['src_file']} does not exist.")
 
     result = dict(
@@ -334,9 +338,9 @@ def main():
     if not module.check_mode:
         iso_rebuild(module, src_iso, dest_iso, delete_files_list, add_files_list)
 
-    result['changed'] = True
+    result["changed"] = True
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

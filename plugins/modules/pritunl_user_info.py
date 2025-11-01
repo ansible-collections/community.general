@@ -115,9 +115,7 @@ def get_pritunl_user(module):
     )
 
     if len(org_obj_list) == 0:
-        module.fail_json(
-            msg=f"Can not list users from the organization '{org_name}' which does not exist"
-        )
+        module.fail_json(msg=f"Can not list users from the organization '{org_name}' which does not exist")
 
     org_id = org_obj_list[0]["id"]
 
@@ -126,11 +124,7 @@ def get_pritunl_user(module):
             get_pritunl_settings(module),
             {
                 "organization_id": org_id,
-                "filters": (
-                    {"type": user_type}
-                    if user_name is None
-                    else {"name": user_name, "type": user_type}
-                ),
+                "filters": ({"type": user_type} if user_name is None else {"name": user_name, "type": user_type}),
             },
         )
     )

@@ -12,7 +12,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 from .linode_conftest import api_key, auth  # noqa: F401, pylint: disable=unused-import
 
 if not linode.HAS_LINODE:
-    pytestmark = pytest.mark.skip('test_linode.py requires the `linode-python` module')
+    pytestmark = pytest.mark.skip("test_linode.py requires the `linode-python` module")
 
 
 def test_name_is_a_required_parameter(api_key, auth):

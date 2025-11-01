@@ -128,16 +128,28 @@ TAIGA_IMP_ERR = None
 try:
     from taiga import TaigaAPI
     from taiga.exceptions import TaigaException
+
     TAIGA_MODULE_IMPORTED = True
 except ImportError:
     TAIGA_IMP_ERR = traceback.format_exc()
     TAIGA_MODULE_IMPORTED = False
 
 
-def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
-                 issue_status, issue_type, issue_severity, issue_description,
-                 issue_attachment, issue_attachment_description,
-                 issue_tags, state, check_mode=False):
+def manage_issue(
+    taiga_host,
+    project_name,
+    issue_subject,
+    issue_priority,
+    issue_status,
+    issue_type,
+    issue_severity,
+    issue_description,
+    issue_attachment,
+    issue_attachment_description,
+    issue_tags,
+    state,
+    check_mode=False,
+):
     """
     Method that creates/deletes issues depending whether they exist and the state desired
 
@@ -154,13 +166,13 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
     changed = False
 
     try:
-        token = getenv('TAIGA_TOKEN')
+        token = getenv("TAIGA_TOKEN")
         if token:
             api = TaigaAPI(host=taiga_host, token=token)
         else:
             api = TaigaAPI(host=taiga_host)
-            username = getenv('TAIGA_USERNAME')
-            password = getenv('TAIGA_PASSWORD')
+            username = getenv("TAIGA_USERNAME")
+            password = getenv("TAIGA_PASSWORD")
             if not any([username, password]):
                 return False, changed, "Missing credentials", {}
             api.auth(username=username, password=password)
@@ -214,8 +226,15 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
                 changed = True
                 if not check_mode:
                     # Create the issue
-                    new_issue = project.add_issue(issue_subject, priority_id, status_id, type_id, severity_id, tags=issue_tags,
-                                                  description=issue_description)
+                    new_issue = project.add_issue(
+                        issue_subject,
+                        priority_id,
+                        status_id,
+                        type_id,
+                        severity_id,
+                        tags=issue_tags,
+                        description=issue_description,
+                    )
                     if issue_attachment:
                         new_issue.attach(issue_attachment, description=issue_attachment_description)
                         issue["attachment"] = issue_attachment
@@ -252,41 +271,41 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            taiga_host=dict(type='str', default="https://api.taiga.io"),
-            project=dict(type='str', required=True),
-            subject=dict(type='str', required=True),
-            issue_type=dict(type='str', required=True),
-            priority=dict(type='str', default="Normal"),
-            status=dict(type='str', default="New"),
-            severity=dict(type='str', default="Normal"),
-            description=dict(type='str', default=""),
-            attachment=dict(type='path'),
-            attachment_description=dict(type='str', default=""),
-            tags=dict(default=[], type='list', elements='str'),
-            state=dict(type='str', choices=['present', 'absent'], default='present'),
+            taiga_host=dict(type="str", default="https://api.taiga.io"),
+            project=dict(type="str", required=True),
+            subject=dict(type="str", required=True),
+            issue_type=dict(type="str", required=True),
+            priority=dict(type="str", default="Normal"),
+            status=dict(type="str", default="New"),
+            severity=dict(type="str", default="Normal"),
+            description=dict(type="str", default=""),
+            attachment=dict(type="path"),
+            attachment_description=dict(type="str", default=""),
+            tags=dict(default=[], type="list", elements="str"),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not TAIGA_MODULE_IMPORTED:
         module.fail_json(msg=missing_required_lib("python-taiga"), exception=TAIGA_IMP_ERR)
 
-    taiga_host = module.params['taiga_host']
-    project_name = module.params['project']
-    issue_subject = module.params['subject']
-    issue_priority = module.params['priority']
-    issue_status = module.params['status']
-    issue_type = module.params['issue_type']
-    issue_severity = module.params['severity']
-    issue_description = module.params['description']
-    issue_attachment = module.params['attachment']
-    issue_attachment_description = module.params['attachment_description']
+    taiga_host = module.params["taiga_host"]
+    project_name = module.params["project"]
+    issue_subject = module.params["subject"]
+    issue_priority = module.params["priority"]
+    issue_status = module.params["status"]
+    issue_type = module.params["issue_type"]
+    issue_severity = module.params["severity"]
+    issue_description = module.params["description"]
+    issue_attachment = module.params["attachment"]
+    issue_attachment_description = module.params["attachment_description"]
     if issue_attachment:
         if not isfile(issue_attachment):
             msg = f"{issue_attachment} is not a file"
             module.fail_json(msg=msg)
-    issue_tags = module.params['tags']
-    state = module.params['state']
+    issue_tags = module.params["tags"]
+    state = module.params["state"]
 
     return_status, changed, msg, issue_attr_dict = manage_issue(
         taiga_host,
@@ -301,7 +320,7 @@ def main():
         issue_attachment_description,
         issue_tags,
         state,
-        check_mode=module.check_mode
+        check_mode=module.check_mode,
     )
     if return_status:
         if issue_attr_dict:
@@ -312,5 +331,5 @@ def main():
         module.fail_json(msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

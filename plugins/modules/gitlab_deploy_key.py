@@ -116,7 +116,11 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_project, gitlab_authentication, gitlab, list_all_kwargs
+    auth_argument_spec,
+    find_project,
+    gitlab_authentication,
+    gitlab,
+    list_all_kwargs,
 )
 
 
@@ -126,13 +130,14 @@ class GitLabDeployKey:
         self._gitlab = gitlab_instance
         self.deploy_key_object = None
 
-    '''
+    """
     @param project Project object
     @param key_title Title of the key
     @param key_key String of the key
     @param key_can_push Option of the deploy_key
     @param options Deploy key options
-    '''
+    """
+
     def create_or_update_deploy_key(self, project, key_title, key_key, options):
         changed = False
 
@@ -146,15 +151,14 @@ class GitLabDeployKey:
 
         # Because we have already call exists_deploy_key in main()
         if self.deploy_key_object is None:
-            deploy_key = self.create_deploy_key(project, {
-                'title': key_title,
-                'key': key_key,
-                'can_push': options['can_push']})
+            deploy_key = self.create_deploy_key(
+                project, {"title": key_title, "key": key_key, "can_push": options["can_push"]}
+            )
             changed = True
         else:
-            changed, deploy_key = self.update_deploy_key(self.deploy_key_object, {
-                'title': key_title,
-                'can_push': options['can_push']})
+            changed, deploy_key = self.update_deploy_key(
+                self.deploy_key_object, {"title": key_title, "can_push": options["can_push"]}
+            )
 
         self.deploy_key_object = deploy_key
         if changed:
@@ -169,25 +173,27 @@ class GitLabDeployKey:
         else:
             return False
 
-    '''
+    """
     @param project Project Object
     @param arguments Attributes of the deploy_key
-    '''
+    """
+
     def create_deploy_key(self, project, arguments):
         if self._module.check_mode:
             return True
 
         try:
             deploy_key = project.keys.create(arguments)
-        except (gitlab.exceptions.GitlabCreateError) as e:
+        except gitlab.exceptions.GitlabCreateError as e:
             self._module.fail_json(msg=f"Failed to create deploy key: {e} ")
 
         return deploy_key
 
-    '''
+    """
     @param deploy_key Deploy Key Object
     @param arguments Attributes of the deploy_key
-    '''
+    """
+
     def update_deploy_key(self, deploy_key, arguments):
         changed = False
 
@@ -199,19 +205,21 @@ class GitLabDeployKey:
 
         return (changed, deploy_key)
 
-    '''
+    """
     @param project Project object
     @param key_title Title of the key
-    '''
+    """
+
     def find_deploy_key(self, project, key_title):
         for deploy_key in project.keys.list(**list_all_kwargs):
             if deploy_key.title == key_title:
                 return deploy_key
 
-    '''
+    """
     @param project Project object
     @param key_title Title of the key
-    '''
+    """
+
     def exists_deploy_key(self, project, key_title):
         # When project exists, object will be stored in self.project_object.
         deploy_key = self.find_deploy_key(project, key_title)
@@ -230,40 +238,38 @@ class GitLabDeployKey:
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
-    argument_spec.update(dict(
-        state=dict(type='str', default="present", choices=["absent", "present"]),
-        project=dict(type='str', required=True),
-        key=dict(type='str', required=True, no_log=False),
-        can_push=dict(type='bool', default=False),
-        title=dict(type='str', required=True)
-    ))
+    argument_spec.update(
+        dict(
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            project=dict(type="str", required=True),
+            key=dict(type="str", required=True, no_log=False),
+            can_push=dict(type="bool", default=False),
+            title=dict(type="str", required=True),
+        )
+    )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
         ],
-        required_together=[
-            ['api_username', 'api_password']
-        ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
+        required_together=[["api_username", "api_password"]],
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
         supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    state = module.params['state']
-    project_identifier = module.params['project']
-    key_title = module.params['title']
-    key_keyfile = module.params['key']
-    key_can_push = module.params['can_push']
+    state = module.params["state"]
+    project_identifier = module.params["project"]
+    key_title = module.params["title"]
+    key_keyfile = module.params["key"]
+    key_can_push = module.params["can_push"]
 
     gitlab_deploy_key = GitLabDeployKey(module, gitlab_instance)
 
@@ -274,22 +280,27 @@ def main():
 
     deploy_key_exists = gitlab_deploy_key.exists_deploy_key(project, key_title)
 
-    if state == 'absent':
+    if state == "absent":
         if deploy_key_exists:
             gitlab_deploy_key.delete_deploy_key()
             module.exit_json(changed=True, msg=f"Successfully deleted deploy key {key_title}")
         else:
             module.exit_json(changed=False, msg="Deploy key deleted or does not exists")
 
-    if state == 'present':
-        if gitlab_deploy_key.create_or_update_deploy_key(project, key_title, key_keyfile, {'can_push': key_can_push}):
-
-            module.exit_json(changed=True, msg=f"Successfully created or updated the deploy key {key_title}",
-                             deploy_key=gitlab_deploy_key.deploy_key_object._attrs)
+    if state == "present":
+        if gitlab_deploy_key.create_or_update_deploy_key(project, key_title, key_keyfile, {"can_push": key_can_push}):
+            module.exit_json(
+                changed=True,
+                msg=f"Successfully created or updated the deploy key {key_title}",
+                deploy_key=gitlab_deploy_key.deploy_key_object._attrs,
+            )
         else:
-            module.exit_json(changed=False, msg=f"No need to update the deploy key {key_title}",
-                             deploy_key=gitlab_deploy_key.deploy_key_object._attrs)
+            module.exit_json(
+                changed=False,
+                msg=f"No need to update the deploy key {key_title}",
+                deploy_key=gitlab_deploy_key.deploy_key_object._attrs,
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

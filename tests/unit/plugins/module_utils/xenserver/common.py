@@ -13,12 +13,12 @@ def fake_xenapi_ref(xenapi_class):
 testcase_bad_xenapi_refs = {
     "params": [
         None,
-        '',
-        'OpaqueRef:NULL',
+        "",
+        "OpaqueRef:NULL",
     ],
     "ids": [
-        'none',
-        'empty',
-        'ref-null',
+        "none",
+        "empty",
+        "ref-null",
     ],
 }

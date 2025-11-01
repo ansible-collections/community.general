@@ -28,14 +28,10 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 def mock_pritunl_api(func, **kwargs):
     def wrapped(self=None):
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ):
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock):
             with self.patch_get_pritunl_users(side_effect=PritunlListUserMock):
                 with self.patch_add_pritunl_users(side_effect=PritunlPostUserMock):
-                    with self.patch_delete_pritunl_users(
-                        side_effect=PritunlDeleteUserMock
-                    ):
+                    with self.patch_delete_pritunl_users(side_effect=PritunlDeleteUserMock):
                         func(self, **kwargs)
 
     return wrapped
@@ -57,35 +53,35 @@ class TestPritunlUser(ModuleTestCase):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_users",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def patch_add_pritunl_users(self, **kwds):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._post_pritunl_user",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def patch_update_pritunl_users(self, **kwds):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._put_pritunl_user",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def patch_delete_pritunl_users(self, **kwds):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._delete_pritunl_user",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def patch_get_pritunl_organizations(self, **kwds):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_organizations",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def test_without_parameters(self):
@@ -112,9 +108,7 @@ class TestPritunlUser(ModuleTestCase):
                 user_params,
             )
         ):
-            with self.patch_update_pritunl_users(
-                side_effect=PritunlPostUserMock
-            ) as post_mock:
+            with self.patch_update_pritunl_users(side_effect=PritunlPostUserMock) as post_mock:
                 with self.assertRaises(AnsibleExitJson) as create_result:
                     self.module.main()
 
@@ -143,9 +137,7 @@ class TestPritunlUser(ModuleTestCase):
                 new_user_params,
             )
         ):
-            with self.patch_update_pritunl_users(
-                side_effect=PritunlPutUserMock
-            ) as put_mock:
+            with self.patch_update_pritunl_users(side_effect=PritunlPutUserMock) as put_mock:
                 with self.assertRaises(AnsibleExitJson) as update_result:
                     self.module.main()
 

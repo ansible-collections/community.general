@@ -130,10 +130,7 @@ executions:
 
 from urllib.parse import quote
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.rundeck import (
-    api_argument_spec,
-    api_request
-)
+from ansible_collections.community.general.plugins.module_utils.rundeck import api_argument_spec, api_request
 
 
 class RundeckJobExecutionsInfo:
@@ -150,34 +147,27 @@ class RundeckJobExecutionsInfo:
         response, info = api_request(
             module=self.module,
             endpoint=f"job/{quote(self.job_id)}/executions?offset={self.offset}&max={self.max}&status={self.status}",
-            method="GET"
+            method="GET",
         )
 
         if info["status"] != 200:
-            self.module.fail_json(
-                msg=info["msg"],
-                executions=response
-            )
+            self.module.fail_json(msg=info["msg"], executions=response)
 
         self.module.exit_json(msg="Executions info result", **response)
 
 
 def main():
     argument_spec = api_argument_spec()
-    argument_spec.update(dict(
-        job_id=dict(required=True, type="str"),
-        offset=dict(type="int", default=0),
-        max=dict(type="int", default=20),
-        status=dict(
-            type="str",
-            choices=["succeeded", "failed", "aborted", "running"]
+    argument_spec.update(
+        dict(
+            job_id=dict(required=True, type="str"),
+            offset=dict(type="int", default=0),
+            max=dict(type="int", default=20),
+            status=dict(type="str", choices=["succeeded", "failed", "aborted", "running"]),
         )
-    ))
-
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True
     )
+
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     if module.params["api_version"] < 14:
         module.fail_json(msg="API version should be at least 14")

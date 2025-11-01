@@ -22,7 +22,7 @@ def locale_gen_runner(module):
         command="locale-gen",
         arg_formats=dict(
             name=cmd_runner_fmt.as_list(),
-            purge=cmd_runner_fmt.as_fixed('--purge'),
+            purge=cmd_runner_fmt.as_fixed("--purge"),
         ),
         check_rc=True,
     )

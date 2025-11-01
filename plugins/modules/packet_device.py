@@ -287,25 +287,25 @@ except ImportError:
     HAS_PACKET_SDK = False
 
 
-NAME_RE = r'({0}|{0}{1}*{0})'.format(r'[a-zA-Z0-9]', r'[a-zA-Z0-9\-]')
-HOSTNAME_RE = rf'({NAME_RE}\.)*{NAME_RE}$'
+NAME_RE = r"({0}|{0}{1}*{0})".format(r"[a-zA-Z0-9]", r"[a-zA-Z0-9\-]")
+HOSTNAME_RE = rf"({NAME_RE}\.)*{NAME_RE}$"
 MAX_DEVICES = 100
 
 PACKET_DEVICE_STATES = (
-    'queued',
-    'provisioning',
-    'failed',
-    'powering_on',
-    'active',
-    'powering_off',
-    'inactive',
-    'rebooting',
+    "queued",
+    "provisioning",
+    "failed",
+    "powering_on",
+    "active",
+    "powering_off",
+    "inactive",
+    "rebooting",
 )
 
 PACKET_API_TOKEN_ENV_VAR = "PACKET_API_TOKEN"
 
 
-ALLOWED_STATES = ['absent', 'active', 'inactive', 'rebooted', 'present']
+ALLOWED_STATES = ["absent", "active", "inactive", "rebooted", "present"]
 
 
 def serialize_device(device):
@@ -342,16 +342,16 @@ def serialize_device(device):
 
     """
     device_data = {}
-    device_data['id'] = device.id
-    device_data['hostname'] = device.hostname
-    device_data['tags'] = device.tags
-    device_data['locked'] = device.locked
-    device_data['state'] = device.state
-    device_data['ip_addresses'] = [
+    device_data["id"] = device.id
+    device_data["hostname"] = device.hostname
+    device_data["tags"] = device.tags
+    device_data["locked"] = device.locked
+    device_data["state"] = device.state
+    device_data["ip_addresses"] = [
         {
-            'address': addr_data['address'],
-            'address_family': addr_data['address_family'],
-            'public': addr_data['public'],
+            "address": addr_data["address"],
+            "address_family": addr_data["address_family"],
+            "public": addr_data["public"],
         }
         for addr_data in device.ip_addresses
     ]
@@ -361,19 +361,19 @@ def serialize_device(device):
     # - public_ipv6
     # - private_ipv4
     # - private_ipv6 (if there is one)
-    for ipdata in device_data['ip_addresses']:
-        if ipdata['public']:
-            if ipdata['address_family'] == 6:
-                device_data['public_ipv6'] = ipdata['address']
-            elif ipdata['address_family'] == 4:
-                device_data['public_ipv4'] = ipdata['address']
-        elif not ipdata['public']:
-            if ipdata['address_family'] == 6:
+    for ipdata in device_data["ip_addresses"]:
+        if ipdata["public"]:
+            if ipdata["address_family"] == 6:
+                device_data["public_ipv6"] = ipdata["address"]
+            elif ipdata["address_family"] == 4:
+                device_data["public_ipv4"] = ipdata["address"]
+        elif not ipdata["public"]:
+            if ipdata["address_family"] == 6:
                 # Packet doesn't give public ipv6 yet, but maybe one
                 # day they will
-                device_data['private_ipv6'] = ipdata['address']
-            elif ipdata['address_family'] == 4:
-                device_data['private_ipv4'] = ipdata['address']
+                device_data["private_ipv6"] = ipdata["address"]
+            elif ipdata["address_family"] == 4:
+                device_data["private_ipv4"] = ipdata["address"]
     return device_data
 
 
@@ -390,8 +390,8 @@ def is_valid_uuid(myuuid):
 
 
 def listify_string_name_or_id(s):
-    if ',' in s:
-        return s.split(',')
+    if "," in s:
+        return s.split(",")
     else:
         return [s]
 
@@ -400,9 +400,9 @@ def get_hostname_list(module):
     # hostname is a list-typed param, so I guess it should return list
     # (and it does, in Ansible 2.2.1) but in order to be defensive,
     # I keep here the code to convert an eventual string to list
-    hostnames = module.params.get('hostnames')
-    count = module.params.get('count')
-    count_offset = module.params.get('count_offset')
+    hostnames = module.params.get("hostnames")
+    count = module.params.get("count")
+    count_offset = module.params.get("count_offset")
     if isinstance(hostnames, str):
         hostnames = listify_string_name_or_id(hostnames)
     if not isinstance(hostnames, list):
@@ -412,8 +412,9 @@ def get_hostname_list(module):
     hostnames = [h.strip() for h in hostnames]
 
     if len(hostnames) > 1 and count > 1:
-        _msg = ("If you set count>1, you should only specify one hostname "
-                "with the %d formatter, not a list of hostnames.")
+        _msg = (
+            "If you set count>1, you should only specify one hostname with the %d formatter, not a list of hostnames."
+        )
         raise Exception(_msg)
 
     if len(hostnames) == 1 and count > 0:
@@ -422,7 +423,7 @@ def get_hostname_list(module):
         if re.search(r"%\d{0,2}d", hostname_spec):
             hostnames = [hostname_spec % i for i in count_range]
         elif count > 1:
-            hostname_spec = '%s%%02d' % hostname_spec
+            hostname_spec = "%s%%02d" % hostname_spec
             hostnames = [hostname_spec % i for i in count_range]
 
     for hn in hostnames:
@@ -435,7 +436,7 @@ def get_hostname_list(module):
 
 
 def get_device_id_list(module):
-    device_ids = module.params.get('device_ids')
+    device_ids = module.params.get("device_ids")
 
     if isinstance(device_ids, str):
         device_ids = listify_string_name_or_id(device_ids)
@@ -452,23 +453,22 @@ def get_device_id_list(module):
 
 
 def create_single_device(module, packet_conn, hostname):
-
-    for param in ('hostnames', 'operating_system', 'plan'):
+    for param in ("hostnames", "operating_system", "plan"):
         if not module.params.get(param):
             raise Exception(f"{param} parameter is required for new device.")
-    project_id = module.params.get('project_id')
-    plan = module.params.get('plan')
-    tags = module.params.get('tags')
-    user_data = module.params.get('user_data')
-    facility = module.params.get('facility')
-    operating_system = module.params.get('operating_system')
-    locked = module.params.get('locked')
-    ipxe_script_url = module.params.get('ipxe_script_url')
-    always_pxe = module.params.get('always_pxe')
-    if operating_system != 'custom_ipxe':
-        for param in ('ipxe_script_url', 'always_pxe'):
+    project_id = module.params.get("project_id")
+    plan = module.params.get("plan")
+    tags = module.params.get("tags")
+    user_data = module.params.get("user_data")
+    facility = module.params.get("facility")
+    operating_system = module.params.get("operating_system")
+    locked = module.params.get("locked")
+    ipxe_script_url = module.params.get("ipxe_script_url")
+    always_pxe = module.params.get("always_pxe")
+    if operating_system != "custom_ipxe":
+        for param in ("ipxe_script_url", "always_pxe"):
             if module.params.get(param):
-                raise Exception(f'{param} parameter is not valid for non custom_ipxe operating_system.')
+                raise Exception(f"{param} parameter is not valid for non custom_ipxe operating_system.")
 
     device = packet_conn.create_device(
         project_id=project_id,
@@ -480,7 +480,8 @@ def create_single_device(module, packet_conn, hostname):
         userdata=user_data,
         locked=locked,
         ipxe_script_url=ipxe_script_url,
-        always_pxe=always_pxe)
+        always_pxe=always_pxe,
+    )
     return device
 
 
@@ -491,29 +492,29 @@ def refresh_device_list(module, packet_conn, devices):
 
 
 def wait_for_devices_active(module, packet_conn, watched_devices):
-    wait_timeout = module.params.get('wait_timeout')
+    wait_timeout = module.params.get("wait_timeout")
     wait_timeout = time.time() + wait_timeout
     refreshed = watched_devices
     while wait_timeout > time.time():
         refreshed = refresh_device_list(module, packet_conn, watched_devices)
-        if all(d.state == 'active' for d in refreshed):
+        if all(d.state == "active" for d in refreshed):
             return refreshed
         time.sleep(5)
-    raise Exception("Waiting for state \"active\" timed out for devices: %s"
-                    % [d.hostname for d in refreshed if d.state != "active"])
+    raise Exception(
+        'Waiting for state "active" timed out for devices: %s' % [d.hostname for d in refreshed if d.state != "active"]
+    )
 
 
 def wait_for_public_IPv(module, packet_conn, created_devices):
-
     def has_public_ip(addr_list, ip_v):
-        return any(a['public'] and a['address_family'] == ip_v and a['address'] for a in addr_list)
+        return any(a["public"] and a["address_family"] == ip_v and a["address"] for a in addr_list)
 
     def all_have_public_ip(ds, ip_v):
         return all(has_public_ip(d.ip_addresses, ip_v) for d in ds)
 
-    address_family = module.params.get('wait_for_public_IPv')
+    address_family = module.params.get("wait_for_public_IPv")
 
-    wait_timeout = module.params.get('wait_timeout')
+    wait_timeout = module.params.get("wait_timeout")
     wait_timeout = time.time() + wait_timeout
     while wait_timeout > time.time():
         refreshed = refresh_device_list(module, packet_conn, created_devices)
@@ -521,23 +522,23 @@ def wait_for_public_IPv(module, packet_conn, created_devices):
             return refreshed
         time.sleep(5)
 
-    raise Exception(f"Waiting for IPv{address_family} address timed out. Hostnames: {[d.hostname for d in created_devices]}")
+    raise Exception(
+        f"Waiting for IPv{address_family} address timed out. Hostnames: {[d.hostname for d in created_devices]}"
+    )
 
 
 def get_existing_devices(module, packet_conn):
-    project_id = module.params.get('project_id')
-    return packet_conn.list_devices(
-        project_id, params={
-            'per_page': MAX_DEVICES})
+    project_id = module.params.get("project_id")
+    return packet_conn.list_devices(project_id, params={"per_page": MAX_DEVICES})
 
 
 def get_specified_device_identifiers(module):
-    if module.params.get('device_ids'):
+    if module.params.get("device_ids"):
         device_id_list = get_device_id_list(module)
-        return {'ids': device_id_list, 'hostnames': []}
-    elif module.params.get('hostnames'):
+        return {"ids": device_id_list, "hostnames": []}
+    elif module.params.get("hostnames"):
         hostname_list = get_hostname_list(module)
-        return {'hostnames': hostname_list, 'ids': []}
+        return {"hostnames": hostname_list, "ids": []}
 
 
 def act_on_devices(module, packet_conn, target_state):
@@ -545,31 +546,32 @@ def act_on_devices(module, packet_conn, target_state):
     existing_devices = get_existing_devices(module, packet_conn)
     changed = False
     create_hostnames = []
-    if target_state in ['present', 'active', 'rebooted']:
+    if target_state in ["present", "active", "rebooted"]:
         # states where we might create non-existing specified devices
         existing_devices_names = [ed.hostname for ed in existing_devices]
-        create_hostnames = [hn for hn in specified_identifiers['hostnames']
-                            if hn not in existing_devices_names]
+        create_hostnames = [hn for hn in specified_identifiers["hostnames"] if hn not in existing_devices_names]
 
-    process_devices = [d for d in existing_devices
-                       if (d.id in specified_identifiers['ids']) or
-                       (d.hostname in specified_identifiers['hostnames'])]
+    process_devices = [
+        d
+        for d in existing_devices
+        if (d.id in specified_identifiers["ids"]) or (d.hostname in specified_identifiers["hostnames"])
+    ]
 
-    if target_state != 'present':
+    if target_state != "present":
         _absent_state_map = {}
         for s in PACKET_DEVICE_STATES:
             _absent_state_map[s] = packet.Device.delete
 
         state_map = {
-            'absent': _absent_state_map,
-            'active': {'inactive': packet.Device.power_on,
-                       'provisioning': None, 'rebooting': None
-                       },
-            'inactive': {'active': packet.Device.power_off},
-            'rebooted': {'active': packet.Device.reboot,
-                         'inactive': packet.Device.power_on,
-                         'provisioning': None, 'rebooting': None
-                         },
+            "absent": _absent_state_map,
+            "active": {"inactive": packet.Device.power_on, "provisioning": None, "rebooting": None},
+            "inactive": {"active": packet.Device.power_off},
+            "rebooted": {
+                "active": packet.Device.reboot,
+                "inactive": packet.Device.power_on,
+                "provisioning": None,
+                "rebooting": None,
+            },
         }
 
         # First do non-creation actions, it might be faster
@@ -582,80 +584,77 @@ def act_on_devices(module, packet_conn, target_state):
                     api_operation(d)
                     changed = True
             else:
-                _msg = (
-                    f"I don't know how to process existing device {d.hostname} from state {d.state} to state {target_state}")
+                _msg = f"I don't know how to process existing device {d.hostname} from state {d.state} to state {target_state}"
                 raise Exception(_msg)
 
     # At last create missing devices
     created_devices = []
     if create_hostnames:
-        created_devices = [create_single_device(module, packet_conn, n)
-                           for n in create_hostnames]
-        if module.params.get('wait_for_public_IPv'):
-            created_devices = wait_for_public_IPv(
-                module, packet_conn, created_devices)
+        created_devices = [create_single_device(module, packet_conn, n) for n in create_hostnames]
+        if module.params.get("wait_for_public_IPv"):
+            created_devices = wait_for_public_IPv(module, packet_conn, created_devices)
         changed = True
 
     processed_devices = created_devices + process_devices
-    if target_state == 'active':
-        processed_devices = wait_for_devices_active(
-            module, packet_conn, processed_devices)
+    if target_state == "active":
+        processed_devices = wait_for_devices_active(module, packet_conn, processed_devices)
 
-    return {
-        'changed': changed,
-        'devices': [serialize_device(d) for d in processed_devices]
-    }
+    return {"changed": changed, "devices": [serialize_device(d) for d in processed_devices]}
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(default=os.environ.get(PACKET_API_TOKEN_ENV_VAR),
-                            no_log=True),
-            count=dict(type='int', default=1),
-            count_offset=dict(type='int', default=1),
-            device_ids=dict(type='list', elements='str'),
+            auth_token=dict(default=os.environ.get(PACKET_API_TOKEN_ENV_VAR), no_log=True),
+            count=dict(type="int", default=1),
+            count_offset=dict(type="int", default=1),
+            device_ids=dict(type="list", elements="str"),
             facility=dict(),
-            features=dict(type='dict'),
-            hostnames=dict(type='list', elements='str', aliases=['name']),
-            tags=dict(type='list', elements='str'),
-            locked=dict(type='bool', default=False, aliases=['lock']),
+            features=dict(type="dict"),
+            hostnames=dict(type="list", elements="str", aliases=["name"]),
+            tags=dict(type="list", elements="str"),
+            locked=dict(type="bool", default=False, aliases=["lock"]),
             operating_system=dict(),
             plan=dict(),
             project_id=dict(required=True),
-            state=dict(choices=ALLOWED_STATES, default='present'),
+            state=dict(choices=ALLOWED_STATES, default="present"),
             user_data=dict(),
-            wait_for_public_IPv=dict(type='int', choices=[4, 6]),
-            wait_timeout=dict(type='int', default=900),
-            ipxe_script_url=dict(default=''),
-            always_pxe=dict(type='bool', default=False),
+            wait_for_public_IPv=dict(type="int", choices=[4, 6]),
+            wait_timeout=dict(type="int", default=900),
+            ipxe_script_url=dict(default=""),
+            always_pxe=dict(type="bool", default=False),
         ),
-        required_one_of=[('device_ids', 'hostnames',)],
+        required_one_of=[
+            (
+                "device_ids",
+                "hostnames",
+            )
+        ],
         mutually_exclusive=[
-            ('hostnames', 'device_ids'),
-            ('count', 'device_ids'),
-            ('count_offset', 'device_ids'),
-        ]
+            ("hostnames", "device_ids"),
+            ("count", "device_ids"),
+            ("count_offset", "device_ids"),
+        ],
     )
 
     if not HAS_PACKET_SDK:
-        module.fail_json(msg='packet required for this module')
+        module.fail_json(msg="packet required for this module")
 
-    if not module.params.get('auth_token'):
+    if not module.params.get("auth_token"):
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get('auth_token')
+    auth_token = module.params.get("auth_token")
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
     try:
         module.exit_json(**act_on_devices(module, packet_conn, state))
     except Exception as e:
-        module.fail_json(msg=f'failed to set device state {state}, error: {e}', exception=traceback.format_exc())
+        module.fail_json(msg=f"failed to set device state {state}, error: {e}", exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

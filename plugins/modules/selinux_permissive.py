@@ -63,6 +63,7 @@ HAVE_SEOBJECT = False
 SEOBJECT_IMP_ERR = None
 try:
     import seobject
+
     HAVE_SEOBJECT = True
 except ImportError:
     SEOBJECT_IMP_ERR = traceback.format_exc()
@@ -74,24 +75,23 @@ from ansible.module_utils.common.text.converters import to_native
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            domain=dict(type='str', required=True, aliases=['name']),
-            store=dict(type='str', default=''),
-            permissive=dict(type='bool', required=True),
-            no_reload=dict(type='bool', default=False),
+            domain=dict(type="str", required=True, aliases=["name"]),
+            store=dict(type="str", default=""),
+            permissive=dict(type="bool", required=True),
+            no_reload=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
     )
 
     # global vars
     changed = False
-    store = module.params['store']
-    permissive = module.params['permissive']
-    domain = module.params['domain']
-    no_reload = module.params['no_reload']
+    store = module.params["store"]
+    permissive = module.params["permissive"]
+    domain = module.params["domain"]
+    no_reload = module.params["no_reload"]
 
     if not HAVE_SEOBJECT:
-        module.fail_json(changed=False, msg=missing_required_lib("policycoreutils-python"),
-                         exception=SEOBJECT_IMP_ERR)
+        module.fail_json(changed=False, msg=missing_required_lib("policycoreutils-python"), exception=SEOBJECT_IMP_ERR)
 
     try:
         permissive_domains = seobject.permissiveRecords(store)
@@ -99,7 +99,7 @@ def main():
         module.fail_json(domain=domain, msg=to_native(e), exception=traceback.format_exc())
 
     # not supported on EL 6
-    if 'set_reload' in dir(permissive_domains):
+    if "set_reload" in dir(permissive_domains):
         permissive_domains.set_reload(not no_reload)
 
     try:
@@ -124,9 +124,8 @@ def main():
                     module.fail_json(domain=domain, msg=to_native(e), exception=traceback.format_exc())
             changed = True
 
-    module.exit_json(changed=changed, store=store,
-                     permissive=permissive, domain=domain)
+    module.exit_json(changed=changed, store=store, permissive=permissive, domain=domain)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

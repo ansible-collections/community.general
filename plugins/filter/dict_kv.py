@@ -38,7 +38,7 @@ _value:
 
 
 def dict_kv(value, key):
-    '''Return a dictionary with a single key-value pair
+    """Return a dictionary with a single key-value pair
 
     Example:
 
@@ -89,14 +89,12 @@ def dict_kv(value, key):
                 }
             ]
         }
-    '''
+    """
     return {key: value}
 
 
 class FilterModule:
-    ''' Query filter '''
+    """Query filter"""
 
     def filters(self):
-        return {
-            'dict_kv': dict_kv
-        }
+        return {"dict_kv": dict_kv}

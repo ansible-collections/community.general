@@ -57,33 +57,33 @@ from collections.abc import Mapping, Sequence
 
 
 def groupby_as_dict(sequence, attribute):
-    '''
+    """
     Given a sequence of dictionaries and an attribute name, returns a dictionary mapping
     the value of this attribute to the dictionary.
 
     If multiple dictionaries in the sequence have the same value for this attribute,
     the filter will fail.
-    '''
+    """
     if not isinstance(sequence, Sequence):
-        raise AnsibleFilterError('Input is not a sequence')
+        raise AnsibleFilterError("Input is not a sequence")
 
     result = dict()
     for list_index, element in enumerate(sequence):
         if not isinstance(element, Mapping):
-            raise AnsibleFilterError(f'Sequence element #{list_index} is not a mapping')
+            raise AnsibleFilterError(f"Sequence element #{list_index} is not a mapping")
         if attribute not in element:
-            raise AnsibleFilterError(f'Attribute not contained in element #{list_index} of sequence')
+            raise AnsibleFilterError(f"Attribute not contained in element #{list_index} of sequence")
         result_index = element[attribute]
         if result_index in result:
-            raise AnsibleFilterError(f'Multiple sequence entries have attribute value {result_index!r}')
+            raise AnsibleFilterError(f"Multiple sequence entries have attribute value {result_index!r}")
         result[result_index] = element
     return result
 
 
 class FilterModule:
-    ''' Ansible list filters '''
+    """Ansible list filters"""
 
     def filters(self):
         return {
-            'groupby_as_dict': groupby_as_dict,
+            "groupby_as_dict": groupby_as_dict,
         }

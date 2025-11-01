@@ -492,109 +492,145 @@ from ansible.module_utils.urls import fetch_url
 class JIRA(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            attachment=dict(type='dict', options=dict(
-                content=dict(type='str'),
-                filename=dict(type='path', required=True),
-                mimetype=dict(type='str')
-            )),
-            uri=dict(type='str', required=True),
-            operation=dict(
-                type='str',
-                choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search', 'worklog'],
-                aliases=['command'], required=True
+            attachment=dict(
+                type="dict",
+                options=dict(
+                    content=dict(type="str"), filename=dict(type="path", required=True), mimetype=dict(type="str")
+                ),
             ),
-            username=dict(type='str'),
-            password=dict(type='str', no_log=True),
-            token=dict(type='str', no_log=True),
-            client_cert=dict(type='path'),
-            client_key=dict(type='path'),
-            project=dict(type='str', ),
-            summary=dict(type='str', ),
-            description=dict(type='str', ),
-            issuetype=dict(type='str', ),
-            issue=dict(type='str', aliases=['ticket']),
-            comment=dict(type='str', ),
-            comment_visibility=dict(type='dict', options=dict(
-                type=dict(type='str', choices=['group', 'role'], required=True),
-                value=dict(type='str', required=True)
-            )),
-            status=dict(type='str', ),
-            status_id=dict(type='str', ),
-            assignee=dict(type='str', ),
-            fields=dict(default={}, type='dict'),
-            linktype=dict(type='str', ),
-            inwardissue=dict(type='str', ),
-            outwardissue=dict(type='str', ),
-            jql=dict(type='str', ),
-            maxresults=dict(type='int'),
-            timeout=dict(type='float', default=10),
-            validate_certs=dict(default=True, type='bool'),
-            account_id=dict(type='str'),
+            uri=dict(type="str", required=True),
+            operation=dict(
+                type="str",
+                choices=[
+                    "attach",
+                    "create",
+                    "comment",
+                    "edit",
+                    "update",
+                    "fetch",
+                    "transition",
+                    "link",
+                    "search",
+                    "worklog",
+                ],
+                aliases=["command"],
+                required=True,
+            ),
+            username=dict(type="str"),
+            password=dict(type="str", no_log=True),
+            token=dict(type="str", no_log=True),
+            client_cert=dict(type="path"),
+            client_key=dict(type="path"),
+            project=dict(
+                type="str",
+            ),
+            summary=dict(
+                type="str",
+            ),
+            description=dict(
+                type="str",
+            ),
+            issuetype=dict(
+                type="str",
+            ),
+            issue=dict(type="str", aliases=["ticket"]),
+            comment=dict(
+                type="str",
+            ),
+            comment_visibility=dict(
+                type="dict",
+                options=dict(
+                    type=dict(type="str", choices=["group", "role"], required=True),
+                    value=dict(type="str", required=True),
+                ),
+            ),
+            status=dict(
+                type="str",
+            ),
+            status_id=dict(
+                type="str",
+            ),
+            assignee=dict(
+                type="str",
+            ),
+            fields=dict(default={}, type="dict"),
+            linktype=dict(
+                type="str",
+            ),
+            inwardissue=dict(
+                type="str",
+            ),
+            outwardissue=dict(
+                type="str",
+            ),
+            jql=dict(
+                type="str",
+            ),
+            maxresults=dict(type="int"),
+            timeout=dict(type="float", default=10),
+            validate_certs=dict(default=True, type="bool"),
+            account_id=dict(type="str"),
         ),
         mutually_exclusive=[
-            ['username', 'token'],
-            ['password', 'token'],
-            ['assignee', 'account_id'],
-            ['status', 'status_id']
+            ["username", "token"],
+            ["password", "token"],
+            ["assignee", "account_id"],
+            ["status", "status_id"],
         ],
-        required_together=[
-            ['username', 'password'],
-            ['client_cert', 'client_key']
-        ],
+        required_together=[["username", "password"], ["client_cert", "client_key"]],
         required_one_of=[
-            ['username', 'token'],
+            ["username", "token"],
         ],
         required_if=(
-            ('operation', 'attach', ['issue', 'attachment']),
-            ('operation', 'create', ['project', 'issuetype', 'summary']),
-            ('operation', 'comment', ['issue', 'comment']),
-            ('operation', 'workflow', ['issue', 'comment']),
-            ('operation', 'fetch', ['issue']),
-            ('operation', 'transition', ['issue']),
-            ('operation', 'transition', ['status', 'status_id'], True),
-            ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
-            ('operation', 'search', ['jql']),
+            ("operation", "attach", ["issue", "attachment"]),
+            ("operation", "create", ["project", "issuetype", "summary"]),
+            ("operation", "comment", ["issue", "comment"]),
+            ("operation", "workflow", ["issue", "comment"]),
+            ("operation", "fetch", ["issue"]),
+            ("operation", "transition", ["issue"]),
+            ("operation", "transition", ["status", "status_id"], True),
+            ("operation", "link", ["linktype", "inwardissue", "outwardissue"]),
+            ("operation", "search", ["jql"]),
         ),
-        supports_check_mode=False
+        supports_check_mode=False,
     )
-    state_param = 'operation'
+    state_param = "operation"
 
     def __init_module__(self):
         if self.vars.fields is None:
             self.vars.fields = {}
         if self.vars.assignee:
-            self.vars.fields['assignee'] = {'name': self.vars.assignee}
+            self.vars.fields["assignee"] = {"name": self.vars.assignee}
         if self.vars.account_id:
-            self.vars.fields['assignee'] = {'accountId': self.vars.account_id}
-        self.vars.uri = self.vars.uri.strip('/')
-        self.vars.set('restbase', f"{self.vars.uri}/rest/api/2")
+            self.vars.fields["assignee"] = {"accountId": self.vars.account_id}
+        self.vars.uri = self.vars.uri.strip("/")
+        self.vars.set("restbase", f"{self.vars.uri}/rest/api/2")
 
     @cause_changes(when="success")
     def operation_create(self):
         createfields = {
-            'project': {'key': self.vars.project},
-            'summary': self.vars.summary,
-            'issuetype': {'name': self.vars.issuetype}}
+            "project": {"key": self.vars.project},
+            "summary": self.vars.summary,
+            "issuetype": {"name": self.vars.issuetype},
+        }
 
         if self.vars.description:
-            createfields['description'] = self.vars.description
+            createfields["description"] = self.vars.description
 
         # Merge in any additional or overridden fields
         if self.vars.fields:
             createfields.update(self.vars.fields)
 
-        data = {'fields': createfields}
+        data = {"fields": createfields}
         url = f"{self.vars.restbase}/issue/"
         self.vars.meta = self.post(url, data)
 
     @cause_changes(when="success")
     def operation_comment(self):
-        data = {
-            'body': self.vars.comment
-        }
+        data = {"body": self.vars.comment}
         # if comment_visibility is specified restrict visibility
         if self.vars.comment_visibility is not None:
-            data['visibility'] = self.vars.comment_visibility
+            data["visibility"] = self.vars.comment_visibility
 
         # Use 'fields' to merge in any additional data
         if self.vars.fields:
@@ -605,12 +641,10 @@ class JIRA(StateModuleHelper):
 
     @cause_changes(when="success")
     def operation_worklog(self):
-        data = {
-            'comment': self.vars.comment
-        }
+        data = {"comment": self.vars.comment}
         # if comment_visibility is specified restrict visibility
         if self.vars.comment_visibility is not None:
-            data['visibility'] = self.vars.comment_visibility
+            data["visibility"] = self.vars.comment_visibility
 
         # Use 'fields' to merge in any additional data
         if self.vars.fields:
@@ -621,9 +655,7 @@ class JIRA(StateModuleHelper):
 
     @cause_changes(when="success")
     def operation_edit(self):
-        data = {
-            'fields': self.vars.fields
-        }
+        data = {"fields": self.vars.fields}
         url = f"{self.vars.restbase}/issue/{self.vars.issue}"
         self.vars.meta = self.put(url, data)
 
@@ -663,13 +695,13 @@ class JIRA(StateModuleHelper):
         elif self.vars.status_id is not None:
             tid = self.vars.status_id.strip()
 
-        for t in tmeta['transitions']:
+        for t in tmeta["transitions"]:
             if target is not None:
-                if t['name'] == target:
-                    tid = t['id']
+                if t["name"] == target:
+                    tid = t["id"]
                     break
             else:
-                if tid == t['id']:
+                if tid == t["id"]:
                     break
         else:
             if target is not None:
@@ -679,28 +711,29 @@ class JIRA(StateModuleHelper):
 
         fields = dict(self.vars.fields)
         if self.vars.summary is not None:
-            fields.update({'summary': self.vars.summary})
+            fields.update({"summary": self.vars.summary})
         if self.vars.description is not None:
-            fields.update({'description': self.vars.description})
+            fields.update({"description": self.vars.description})
 
         # Perform it
-        data = {'transition': {"id": tid},
-                'fields': fields}
+        data = {"transition": {"id": tid}, "fields": fields}
         if self.vars.comment is not None:
-            data.update({"update": {
-                "comment": [{
-                    "add": {"body": self.vars.comment}
-                }],
-            }})
+            data.update(
+                {
+                    "update": {
+                        "comment": [{"add": {"body": self.vars.comment}}],
+                    }
+                }
+            )
         url = f"{self.vars.restbase}/issue/{self.vars.issue}/transitions"
         self.vars.meta = self.post(url, data)
 
     @cause_changes(when="success")
     def operation_link(self):
         data = {
-            'type': {'name': self.vars.linktype},
-            'inwardIssue': {'key': self.vars.inwardissue},
-            'outwardIssue': {'key': self.vars.outwardissue},
+            "type": {"name": self.vars.linktype},
+            "inwardIssue": {"key": self.vars.inwardissue},
+            "outwardIssue": {"key": self.vars.outwardissue},
         }
         url = f"{self.vars.restbase}/issueLink/"
         self.vars.meta = self.post(url, data)
@@ -708,15 +741,15 @@ class JIRA(StateModuleHelper):
     @cause_changes(when="success")
     def operation_attach(self):
         v = self.vars
-        filename = v.attachment.get('filename')
-        content = v.attachment.get('content')
+        filename = v.attachment.get("filename")
+        content = v.attachment.get("content")
 
         if not any((filename, content)):
-            raise ValueError('at least one of filename or content must be provided')
-        mime = v.attachment.get('mimetype')
+            raise ValueError("at least one of filename or content must be provided")
+        mime = v.attachment.get("mimetype")
 
         if not os.path.isfile(filename):
-            raise ValueError(f'The provided filename does not exist: {filename}')
+            raise ValueError(f"The provided filename does not exist: {filename}")
 
         content_type, data = self._prepare_attachment(filename, content, mime)
 
@@ -747,13 +780,13 @@ class JIRA(StateModuleHelper):
 
         if not mime_type:
             try:
-                mime_type = mimetypes.guess_type(filename or '', strict=False)[0] or 'application/octet-stream'
+                mime_type = mimetypes.guess_type(filename or "", strict=False)[0] or "application/octet-stream"
             except Exception:
-                mime_type = 'application/octet-stream'
-        main_type, sep, sub_type = mime_type.partition('/')
+                mime_type = "application/octet-stream"
+        main_type, sep, sub_type = mime_type.partition("/")
 
         if not content and filename:
-            with open(to_bytes(filename, errors='surrogate_or_strict'), 'rb') as f:
+            with open(to_bytes(filename, errors="surrogate_or_strict"), "rb") as f:
                 content = f.read()
         else:
             try:
@@ -765,26 +798,16 @@ class JIRA(StateModuleHelper):
             f"--{boundary}",
             f'Content-Disposition: form-data; name="file"; filename={escape_quotes(name)}',
             f"Content-Type: {main_type}/{sub_type}",
-            '',
+            "",
             to_text(content),
             f"--{boundary}--",
-            ""
+            "",
         ]
 
-        return (
-            f"multipart/form-data; boundary={boundary}",
-            "\r\n".join(lines)
-        )
+        return (f"multipart/form-data; boundary={boundary}", "\r\n".join(lines))
 
-    def request(
-            self,
-            url,
-            data=None,
-            method=None,
-            content_type='application/json',
-            additional_headers=None
-    ):
-        if data and content_type == 'application/json':
+    def request(self, url, data=None, method=None, content_type="application/json", additional_headers=None):
+        if data and content_type == "application/json":
             data = json.dumps(data)
 
         headers = {}
@@ -800,52 +823,58 @@ class JIRA(StateModuleHelper):
         # the requests as authorized for this user.
 
         if self.vars.token is not None:
-            headers.update({
-                "Content-Type": content_type,
-                "Authorization": f"Bearer {self.vars.token}",
-            })
+            headers.update(
+                {
+                    "Content-Type": content_type,
+                    "Authorization": f"Bearer {self.vars.token}",
+                }
+            )
         else:
-            auth = to_text(base64.b64encode(to_bytes(f'{self.vars.username}:{self.vars.password}',
-                                                     errors='surrogate_or_strict')))
-            headers.update({
-                "Content-Type": content_type,
-                "Authorization": f"Basic {auth}",
-            })
+            auth = to_text(
+                base64.b64encode(to_bytes(f"{self.vars.username}:{self.vars.password}", errors="surrogate_or_strict"))
+            )
+            headers.update(
+                {
+                    "Content-Type": content_type,
+                    "Authorization": f"Basic {auth}",
+                }
+            )
 
         response, info = fetch_url(
             self.module, url, data=data, method=method, timeout=self.vars.timeout, headers=headers
         )
 
-        if info['status'] not in (200, 201, 204):
+        if info["status"] not in (200, 201, 204):
             error = None
             try:
-                error = json.loads(info['body'])
+                error = json.loads(info["body"])
             except Exception:
                 msg = f'The request "{method} {url}" returned the unexpected status code {info["status"]} {info["msg"]}\n{info.get("body")}'
                 self.module.fail_json(msg=to_native(msg), exception=traceback.format_exc())
             if error:
                 msg = []
-                for key in ('errorMessages', 'errors'):
+                for key in ("errorMessages", "errors"):
                     if error.get(key):
                         msg.append(to_native(error[key]))
                 if msg:
-                    self.module.fail_json(msg=', '.join(msg))
+                    self.module.fail_json(msg=", ".join(msg))
                 self.module.fail_json(msg=to_native(error))
             # Fallback print body, if it can't be decoded
-            self.module.fail_json(msg=to_native(info['body']))
+            self.module.fail_json(msg=to_native(info["body"]))
 
         body = response.read()
 
         if body:
-            return json.loads(to_text(body, errors='surrogate_or_strict'))
+            return json.loads(to_text(body, errors="surrogate_or_strict"))
         return {}
 
-    def post(self, url, data, content_type='application/json', additional_headers=None):
-        return self.request(url, data=data, method='POST', content_type=content_type,
-                            additional_headers=additional_headers)
+    def post(self, url, data, content_type="application/json", additional_headers=None):
+        return self.request(
+            url, data=data, method="POST", content_type=content_type, additional_headers=additional_headers
+        )
 
     def put(self, url, data):
-        return self.request(url, data=data, method='PUT')
+        return self.request(url, data=data, method="PUT")
 
     def get(self, url):
         return self.request(url)
@@ -856,5 +885,5 @@ def main():
     jira.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

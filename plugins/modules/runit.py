@@ -97,21 +97,21 @@ class Sv:
 
     def __init__(self, module):
         self.extra_paths = []
-        self.report_vars = ['state', 'enabled', 'svc_full', 'src_full', 'pid', 'duration', 'full_state']
+        self.report_vars = ["state", "enabled", "svc_full", "src_full", "pid", "duration", "full_state"]
 
         self.module = module
 
-        self.name = module.params['name']
-        self.service_dir = module.params['service_dir']
-        self.service_src = module.params['service_src']
+        self.name = module.params["name"]
+        self.service_dir = module.params["service_dir"]
+        self.service_src = module.params["service_src"]
         self.enabled = None
         self.full_state = None
         self.state = None
         self.pid = None
         self.duration = None
 
-        self.svc_cmd = module.get_bin_path('sv', opt_dirs=self.extra_paths, required=True)
-        self.svstat_cmd = module.get_bin_path('sv', opt_dirs=self.extra_paths)
+        self.svc_cmd = module.get_bin_path("sv", opt_dirs=self.extra_paths, required=True)
+        self.svstat_cmd = module.get_bin_path("sv", opt_dirs=self.extra_paths)
         self.svc_full = f"{self.service_dir}/{self.name}"
         self.src_full = f"{self.service_src}/{self.name}"
 
@@ -119,26 +119,26 @@ class Sv:
         if self.enabled:
             self.get_status()
         else:
-            self.state = 'stopped'
+            self.state = "stopped"
 
     def enable(self):
         if os.path.exists(self.src_full):
             try:
                 os.symlink(self.src_full, self.svc_full)
             except OSError as e:
-                self.module.fail_json(path=self.src_full, msg=f'Error while linking: {e}')
+                self.module.fail_json(path=self.src_full, msg=f"Error while linking: {e}")
         else:
             self.module.fail_json(msg=f"Could not find source for service to enable ({self.src_full}).")
 
     def disable(self):
-        self.execute_command([self.svc_cmd, 'force-stop', self.src_full])
+        self.execute_command([self.svc_cmd, "force-stop", self.src_full])
         try:
             os.unlink(self.svc_full)
         except OSError as e:
-            self.module.fail_json(path=self.svc_full, msg=f'Error while unlinking: {e}')
+            self.module.fail_json(path=self.svc_full, msg=f"Error while unlinking: {e}")
 
     def get_status(self):
-        (rc, out, err) = self.execute_command([self.svstat_cmd, 'status', self.svc_full])
+        (rc, out, err) = self.execute_command([self.svstat_cmd, "status", self.svc_full])
 
         if err is not None and err:
             self.full_state = self.state = err
@@ -149,54 +149,54 @@ class Sv:
             # "down: /etc/service/updater: 127s, normally up; run: log: (pid 364) 263439s\n"
             full_state_no_logger = self.full_state.split("; ")[0]
 
-            m = re.search(r'\(pid (\d+)\)', full_state_no_logger)
+            m = re.search(r"\(pid (\d+)\)", full_state_no_logger)
             if m:
                 self.pid = m.group(1)
 
-            m = re.search(r' (\d+)s', full_state_no_logger)
+            m = re.search(r" (\d+)s", full_state_no_logger)
             if m:
                 self.duration = m.group(1)
 
-            if re.search(r'^run:', full_state_no_logger):
-                self.state = 'started'
-            elif re.search(r'^down:', full_state_no_logger):
-                self.state = 'stopped'
+            if re.search(r"^run:", full_state_no_logger):
+                self.state = "started"
+            elif re.search(r"^down:", full_state_no_logger):
+                self.state = "stopped"
             else:
-                self.state = 'unknown'
+                self.state = "unknown"
                 return
 
     def started(self):
         return self.start()
 
     def start(self):
-        return self.execute_command([self.svc_cmd, 'start', self.svc_full])
+        return self.execute_command([self.svc_cmd, "start", self.svc_full])
 
     def stopped(self):
         return self.stop()
 
     def stop(self):
-        return self.execute_command([self.svc_cmd, 'stop', self.svc_full])
+        return self.execute_command([self.svc_cmd, "stop", self.svc_full])
 
     def once(self):
-        return self.execute_command([self.svc_cmd, 'once', self.svc_full])
+        return self.execute_command([self.svc_cmd, "once", self.svc_full])
 
     def reloaded(self):
         return self.reload()
 
     def reload(self):
-        return self.execute_command([self.svc_cmd, 'reload', self.svc_full])
+        return self.execute_command([self.svc_cmd, "reload", self.svc_full])
 
     def restarted(self):
         return self.restart()
 
     def restart(self):
-        return self.execute_command([self.svc_cmd, 'restart', self.svc_full])
+        return self.execute_command([self.svc_cmd, "restart", self.svc_full])
 
     def killed(self):
         return self.kill()
 
     def kill(self):
-        return self.execute_command([self.svc_cmd, 'force-stop', self.svc_full])
+        return self.execute_command([self.svc_cmd, "force-stop", self.svc_full])
 
     def execute_command(self, cmd):
         try:
@@ -216,19 +216,19 @@ class Sv:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            state=dict(type='str', choices=['killed', 'once', 'reloaded', 'restarted', 'started', 'stopped']),
-            enabled=dict(type='bool'),
-            service_dir=dict(type='str', default='/var/service'),
-            service_src=dict(type='str', default='/etc/sv'),
+            name=dict(type="str", required=True),
+            state=dict(type="str", choices=["killed", "once", "reloaded", "restarted", "started", "stopped"]),
+            enabled=dict(type="bool"),
+            service_dir=dict(type="str", default="/var/service"),
+            service_src=dict(type="str", default="/etc/sv"),
         ),
         supports_check_mode=True,
     )
 
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
-    state = module.params['state']
-    enabled = module.params['enabled']
+    state = module.params["state"]
+    enabled = module.params["enabled"]
 
     sv = Sv(module)
     changed = False
@@ -252,5 +252,5 @@ def main():
     module.exit_json(changed=changed, sv=sv.report())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

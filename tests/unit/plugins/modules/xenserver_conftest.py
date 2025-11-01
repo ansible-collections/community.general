@@ -16,7 +16,7 @@ from .FakeAnsibleModule import FakeAnsibleModule
 @pytest.fixture
 def fake_ansible_module(request):
     """Returns fake AnsibleModule with fake module params."""
-    if hasattr(request, 'param'):
+    if hasattr(request, "param"):
         return FakeAnsibleModule(request.param)
     else:
         params = {
@@ -38,12 +38,12 @@ def XenAPI():
 
     # First we use importlib.import_module() to import the module and assign
     # it to a local symbol.
-    fake_xenapi = importlib.import_module('ansible_collections.community.general.tests.unit.plugins.modules.FakeXenAPI')
+    fake_xenapi = importlib.import_module("ansible_collections.community.general.tests.unit.plugins.modules.FakeXenAPI")
 
     # Now we populate Python module cache with imported fake module using the
     # original module name (XenAPI). That way, any 'import XenAPI' statement
     # will just load already imported fake module from the cache.
-    sys.modules['XenAPI'] = fake_xenapi
+    sys.modules["XenAPI"] = fake_xenapi
 
     return fake_xenapi
 

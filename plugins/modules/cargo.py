@@ -148,9 +148,7 @@ class Cargo:
             self.module.fail_json(msg=f"Path {path} is not a directory")
         self._path = path
 
-    def _exec(
-        self, args, run_in_check_mode=False, check_rc=True, add_package_name=True
-    ):
+    def _exec(self, args, run_in_check_mode=False, check_rc=True, add_package_name=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
             cmd = self.executable + args
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
@@ -195,9 +193,7 @@ class Cargo:
     def is_outdated(self, name):
         installed_version = self.get_installed().get(name)
         latest_version = (
-            self.get_latest_published_version(name)
-            if not self.directory
-            else self.get_source_directory_version(name)
+            self.get_latest_published_version(name) if not self.directory else self.get_source_directory_version(name)
         )
         return installed_version != latest_version
 
@@ -207,9 +203,7 @@ class Cargo:
 
         match = re.search(r'"(.+)"', data)
         if not match:
-            self.module.fail_json(
-                msg=f"No published version for package {name} found"
-            )
+            self.module.fail_json(msg=f"No published version for package {name} found")
         return match.group(1)
 
     def get_source_directory_version(self, name):
@@ -265,27 +259,20 @@ def main():
         module.fail_json(msg="Source directory does not exist")
 
     # Set LANG env since we parse stdout
-    module.run_command_environ_update = dict(
-        LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C"
-    )
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     cargo = Cargo(module, **module.params)
     changed, out, err = False, None, None
     installed_packages = cargo.get_installed()
     if state == "present":
         to_install = [
-            n
-            for n in name
-            if (n not in installed_packages)
-            or (version and version != installed_packages[n])
+            n for n in name if (n not in installed_packages) or (version and version != installed_packages[n])
         ]
         if to_install:
             changed = True
             out, err = cargo.install(to_install)
     elif state == "latest":
-        to_update = [
-            n for n in name if n not in installed_packages or cargo.is_outdated(n)
-        ]
+        to_update = [n for n in name if n not in installed_packages or cargo.is_outdated(n)]
         if to_update:
             changed = True
             out, err = cargo.install(to_update)

@@ -1,4 +1,3 @@
-
 # Copyright (c) 2023, Steffen Scheib <steffen@scheib.me>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -51,7 +50,7 @@ from ansible.errors import AnsibleFilterError
 
 
 class IniParser(ConfigParser):
-    ''' Implements a configparser which is able to return a dict '''
+    """Implements a configparser which is able to return a dict"""
 
     def __init__(self):
         super().__init__(interpolation=None)
@@ -61,35 +60,32 @@ class IniParser(ConfigParser):
         d = dict(self._sections)
         for k in d:
             d[k] = dict(self._defaults, **d[k])
-            d[k].pop('__name__', None)
+            d[k].pop("__name__", None)
 
         if self._defaults:
-            d['DEFAULT'] = dict(self._defaults)
+            d["DEFAULT"] = dict(self._defaults)
 
         return d
 
 
 def from_ini(obj):
-    ''' Read the given string as INI file and return a dict '''
+    """Read the given string as INI file and return a dict"""
 
     if not isinstance(obj, str):
-        raise AnsibleFilterError(f'from_ini requires a str, got {type(obj)}')
+        raise AnsibleFilterError(f"from_ini requires a str, got {type(obj)}")
 
     parser = IniParser()
 
     try:
         parser.read_file(StringIO(obj))
     except Exception as ex:
-        raise AnsibleFilterError(f'from_ini failed to parse given string: {ex}', orig_exc=ex)
+        raise AnsibleFilterError(f"from_ini failed to parse given string: {ex}", orig_exc=ex)
 
     return parser.as_dict()
 
 
 class FilterModule:
-    ''' Query filter '''
+    """Query filter"""
 
     def filters(self):
-
-        return {
-            'from_ini': from_ini
-        }
+        return {"from_ini": from_ini}

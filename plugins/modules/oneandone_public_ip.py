@@ -122,7 +122,7 @@ from ansible_collections.community.general.plugins.module_utils.oneandone import
     get_datacenter,
     get_public_ip,
     OneAndOneResources,
-    wait_for_resource_creation_completion
+    wait_for_resource_creation_completion,
 )
 
 HAS_ONEANDONE_SDK = True
@@ -132,16 +132,14 @@ try:
 except ImportError:
     HAS_ONEANDONE_SDK = False
 
-DATACENTERS = ['US', 'ES', 'DE', 'GB']
+DATACENTERS = ["US", "ES", "DE", "GB"]
 
-TYPES = ['IPV4', 'IPV6']
+TYPES = ["IPV4", "IPV6"]
 
 
 def _check_mode(module, result):
     if module.check_mode:
-        module.exit_json(
-            changed=result
-        )
+        module.exit_json(changed=result)
 
 
 def create_public_ip(module, oneandone_conn):
@@ -154,34 +152,30 @@ def create_public_ip(module, oneandone_conn):
     Returns a dictionary containing a 'changed' attribute indicating whether
     any public IP was added.
     """
-    reverse_dns = module.params.get('reverse_dns')
-    datacenter = module.params.get('datacenter')
-    ip_type = module.params.get('type')
-    wait = module.params.get('wait')
-    wait_timeout = module.params.get('wait_timeout')
-    wait_interval = module.params.get('wait_interval')
+    reverse_dns = module.params.get("reverse_dns")
+    datacenter = module.params.get("datacenter")
+    ip_type = module.params.get("type")
+    wait = module.params.get("wait")
+    wait_timeout = module.params.get("wait_timeout")
+    wait_interval = module.params.get("wait_interval")
 
     if datacenter is not None:
         datacenter_id = get_datacenter(oneandone_conn, datacenter)
         if datacenter_id is None:
             _check_mode(module, False)
-            module.fail_json(
-                msg=f'datacenter {datacenter} not found.')
+            module.fail_json(msg=f"datacenter {datacenter} not found.")
 
     try:
         _check_mode(module, True)
         public_ip = oneandone_conn.create_public_ip(
-            reverse_dns=reverse_dns,
-            ip_type=ip_type,
-            datacenter_id=datacenter_id)
+            reverse_dns=reverse_dns, ip_type=ip_type, datacenter_id=datacenter_id
+        )
 
         if wait:
-            wait_for_resource_creation_completion(oneandone_conn,
-                                                  OneAndOneResources.public_ip,
-                                                  public_ip['id'],
-                                                  wait_timeout,
-                                                  wait_interval)
-            public_ip = oneandone_conn.get_public_ip(public_ip['id'])
+            wait_for_resource_creation_completion(
+                oneandone_conn, OneAndOneResources.public_ip, public_ip["id"], wait_timeout, wait_interval
+            )
+            public_ip = oneandone_conn.get_public_ip(public_ip["id"])
 
         changed = True if public_ip else False
 
@@ -200,31 +194,26 @@ def update_public_ip(module, oneandone_conn):
     Returns a dictionary containing a 'changed' attribute indicating whether
     any public IP was changed.
     """
-    reverse_dns = module.params.get('reverse_dns')
-    public_ip_id = module.params.get('public_ip_id')
-    wait = module.params.get('wait')
-    wait_timeout = module.params.get('wait_timeout')
-    wait_interval = module.params.get('wait_interval')
+    reverse_dns = module.params.get("reverse_dns")
+    public_ip_id = module.params.get("public_ip_id")
+    wait = module.params.get("wait")
+    wait_timeout = module.params.get("wait_timeout")
+    wait_interval = module.params.get("wait_interval")
 
     public_ip = get_public_ip(oneandone_conn, public_ip_id, True)
     if public_ip is None:
         _check_mode(module, False)
-        module.fail_json(
-            msg=f'public IP {public_ip_id} not found.')
+        module.fail_json(msg=f"public IP {public_ip_id} not found.")
 
     try:
         _check_mode(module, True)
-        public_ip = oneandone_conn.modify_public_ip(
-            ip_id=public_ip['id'],
-            reverse_dns=reverse_dns)
+        public_ip = oneandone_conn.modify_public_ip(ip_id=public_ip["id"], reverse_dns=reverse_dns)
 
         if wait:
-            wait_for_resource_creation_completion(oneandone_conn,
-                                                  OneAndOneResources.public_ip,
-                                                  public_ip['id'],
-                                                  wait_timeout,
-                                                  wait_interval)
-            public_ip = oneandone_conn.get_public_ip(public_ip['id'])
+            wait_for_resource_creation_completion(
+                oneandone_conn, OneAndOneResources.public_ip, public_ip["id"], wait_timeout, wait_interval
+            )
+            public_ip = oneandone_conn.get_public_ip(public_ip["id"])
 
         changed = True if public_ip else False
 
@@ -243,24 +232,20 @@ def delete_public_ip(module, oneandone_conn):
     Returns a dictionary containing a 'changed' attribute indicating whether
     any public IP was deleted.
     """
-    public_ip_id = module.params.get('public_ip_id')
+    public_ip_id = module.params.get("public_ip_id")
 
     public_ip = get_public_ip(oneandone_conn, public_ip_id, True)
     if public_ip is None:
         _check_mode(module, False)
-        module.fail_json(
-            msg=f'public IP {public_ip_id} not found.')
+        module.fail_json(msg=f"public IP {public_ip_id} not found.")
 
     try:
         _check_mode(module, True)
-        deleted_public_ip = oneandone_conn.delete_public_ip(
-            ip_id=public_ip['id'])
+        deleted_public_ip = oneandone_conn.delete_public_ip(ip_id=public_ip["id"])
 
         changed = True if deleted_public_ip else False
 
-        return (changed, {
-            'id': public_ip['id']
-        })
+        return (changed, {"id": public_ip["id"]})
     except Exception as e:
         module.fail_json(msg=str(e))
 
@@ -268,62 +253,51 @@ def delete_public_ip(module, oneandone_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str', no_log=True,
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN')),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
-            public_ip_id=dict(type='str'),
-            reverse_dns=dict(type='str'),
-            datacenter=dict(
-                choices=DATACENTERS,
-                default='US'),
-            type=dict(
-                choices=TYPES,
-                default='IPV4'),
-            wait=dict(type='bool', default=True),
-            wait_timeout=dict(type='int', default=600),
-            wait_interval=dict(type='int', default=5),
-            state=dict(type='str', default='present', choices=['present', 'absent', 'update']),
+            auth_token=dict(type="str", no_log=True, default=os.environ.get("ONEANDONE_AUTH_TOKEN")),
+            api_url=dict(type="str", default=os.environ.get("ONEANDONE_API_URL")),
+            public_ip_id=dict(type="str"),
+            reverse_dns=dict(type="str"),
+            datacenter=dict(choices=DATACENTERS, default="US"),
+            type=dict(choices=TYPES, default="IPV4"),
+            wait=dict(type="bool", default=True),
+            wait_timeout=dict(type="int", default=600),
+            wait_interval=dict(type="int", default=5),
+            state=dict(type="str", default="present", choices=["present", "absent", "update"]),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not HAS_ONEANDONE_SDK:
-        module.fail_json(msg='1and1 required for this module')
+        module.fail_json(msg="1and1 required for this module")
 
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='auth_token parameter is required.')
+    if not module.params.get("auth_token"):
+        module.fail_json(msg="auth_token parameter is required.")
 
-    if not module.params.get('api_url'):
-        oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'))
+    if not module.params.get("api_url"):
+        oneandone_conn = oneandone.client.OneAndOneService(api_token=module.params.get("auth_token"))
     else:
         oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'), api_url=module.params.get('api_url'))
+            api_token=module.params.get("auth_token"), api_url=module.params.get("api_url")
+        )
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
-    if state == 'absent':
-        if not module.params.get('public_ip_id'):
-            module.fail_json(
-                msg="'public_ip_id' parameter is required to delete a public ip.")
+    if state == "absent":
+        if not module.params.get("public_ip_id"):
+            module.fail_json(msg="'public_ip_id' parameter is required to delete a public ip.")
         try:
             (changed, public_ip) = delete_public_ip(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
-    elif state == 'update':
-        if not module.params.get('public_ip_id'):
-            module.fail_json(
-                msg="'public_ip_id' parameter is required to update a public ip.")
+    elif state == "update":
+        if not module.params.get("public_ip_id"):
+            module.fail_json(msg="'public_ip_id' parameter is required to update a public ip.")
         try:
             (changed, public_ip) = update_public_ip(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
 
-    elif state == 'present':
+    elif state == "present":
         try:
             (changed, public_ip) = create_public_ip(module, oneandone_conn)
         except Exception as e:
@@ -332,5 +306,5 @@ def main():
     module.exit_json(changed=changed, public_ip=public_ip)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

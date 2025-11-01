@@ -80,12 +80,13 @@ from ansible.module_utils.api import basic_auth_argument_spec
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab
+    auth_argument_spec,
+    gitlab_authentication,
+    gitlab,
 )
 
 
 class GitlabBranch:
-
     def __init__(self, module, project, gitlab_instance):
         self.repo = gitlab_instance
         self._module = module
@@ -104,7 +105,7 @@ class GitlabBranch:
             return False
 
     def create_branch(self, branch, ref_branch):
-        return self.project.branches.create({'branch': branch, 'ref': ref_branch})
+        return self.project.branches.create({"branch": branch, "ref": ref_branch})
 
     def delete_branch(self, branch):
         return branch.delete()
@@ -114,46 +115,44 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        project=dict(type='str', required=True),
-        branch=dict(type='str', required=True),
-        ref_branch=dict(type='str'),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
+        project=dict(type="str", required=True),
+        branch=dict(type="str", required=True),
+        ref_branch=dict(type="str"),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
         required_if=[
-            ['state', 'present', ['ref_branch'], True],
+            ["state", "present", ["ref_branch"], True],
         ],
-        supports_check_mode=False
+        supports_check_mode=False,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    project = module.params['project']
-    branch = module.params['branch']
-    ref_branch = module.params['ref_branch']
-    state = module.params['state']
+    project = module.params["project"]
+    branch = module.params["branch"]
+    ref_branch = module.params["ref_branch"]
+    state = module.params["state"]
 
     gitlab_version = gitlab.__version__
-    if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
+    if LooseVersion(gitlab_version) < LooseVersion("2.3.0"):
         module.fail_json(
             msg=f"community.general.gitlab_branch requires python-gitlab Python module >= 2.3.0 (installed version: [{gitlab_version}])."
-                " Please upgrade python-gitlab to version 2.3.0 or above."
+            " Please upgrade python-gitlab to version 2.3.0 or above."
         )
 
     this_gitlab = GitlabBranch(module=module, project=project, gitlab_instance=gitlab_instance)
@@ -178,5 +177,5 @@ def main():
         module.exit_json(changed=False, msg="No changes are needed.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

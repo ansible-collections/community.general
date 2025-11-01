@@ -71,10 +71,10 @@ _django_std_arg_fmts: dict[str, ArgFormatType] = dict(
 # keys can be used in _django_args
 _args_menu = dict(
     std=(django_std_args, _django_std_arg_fmts),
-    database=(_database_dash, {"database": _django_std_arg_fmts["database_dash"]}),    # deprecate, remove in 13.0.0
+    database=(_database_dash, {"database": _django_std_arg_fmts["database_dash"]}),  # deprecate, remove in 13.0.0
     noinput=({}, {"noinput": cmd_runner_fmt.as_fixed("--noinput")}),  # deprecate, remove in 13.0.0
-    dry_run=({}, {"dry_run": cmd_runner_fmt.as_bool("--dry-run")}),   # deprecate, remove in 13.0.0
-    check=({}, {"check": cmd_runner_fmt.as_bool("--check")}),         # deprecate, remove in 13.0.0
+    dry_run=({}, {"dry_run": cmd_runner_fmt.as_bool("--dry-run")}),  # deprecate, remove in 13.0.0
+    check=({}, {"check": cmd_runner_fmt.as_bool("--check")}),  # deprecate, remove in 13.0.0
     database_dash=(_database_dash, {}),
     data=(_data, {}),
 )
@@ -89,9 +89,17 @@ class _DjangoRunner(PythonRunner):
 
     def __call__(self, output_process=None, check_mode_skip=False, check_mode_return=None, **kwargs):
         args_order = (
-            ("command", "no_color", "settings", "pythonpath", "traceback", "verbosity", "skip_checks") + self._prepare_args_order(self.default_args_order)
+            "command",
+            "no_color",
+            "settings",
+            "pythonpath",
+            "traceback",
+            "verbosity",
+            "skip_checks",
+        ) + self._prepare_args_order(self.default_args_order)
+        return super().__call__(
+            args_order, output_process, check_mode_skip=check_mode_skip, check_mode_return=check_mode_return, **kwargs
         )
-        return super().__call__(args_order, output_process, check_mode_skip=check_mode_skip, check_mode_return=check_mode_return, **kwargs)
 
     def bare_context(self, *args, **kwargs):
         return super().__call__(*args, **kwargs)
@@ -106,9 +114,9 @@ class DjangoModuleHelper(ModuleHelper):
     _check_mode_arg: str = ""
 
     def __init__(self):
-        self.module["argument_spec"], self.arg_formats = self._build_args(self.module.get("argument_spec", {}),
-                                                                          self.arg_formats,
-                                                                          *(["std"] + self._django_args))
+        self.module["argument_spec"], self.arg_formats = self._build_args(
+            self.module.get("argument_spec", {}), self.arg_formats, *(["std"] + self._django_args)
+        )
         super().__init__(self.module)
         if self.django_admin_cmd is not None:
             self.vars.command = self.django_admin_cmd
@@ -127,11 +135,13 @@ class DjangoModuleHelper(ModuleHelper):
         return res_arg_spec, res_arg_fmts
 
     def __run__(self):
-        runner = _DjangoRunner(self.module,
-                               default_args_order=self.django_admin_arg_order,
-                               arg_formats=self.arg_formats,
-                               venv=self.vars.venv,
-                               check_rc=True)
+        runner = _DjangoRunner(
+            self.module,
+            default_args_order=self.django_admin_arg_order,
+            arg_formats=self.arg_formats,
+            venv=self.vars.venv,
+            check_rc=True,
+        )
 
         run_params = self.vars.as_dict()
         if self._check_mode_arg:

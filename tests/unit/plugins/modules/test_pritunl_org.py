@@ -41,21 +41,21 @@ class TestPritunlOrg(ModuleTestCase):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._post_pritunl_organization",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def patch_delete_pritunl_organization(self, **kwds):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._delete_pritunl_organization",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def patch_get_pritunl_organizations(self, **kwds):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_organizations",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def test_without_parameters(self):
@@ -78,12 +78,8 @@ class TestPritunlOrg(ModuleTestCase):
             )
         ):
             # Test creation
-            with self.patch_get_pritunl_organizations(
-                side_effect=PritunlListOrganizationMock
-            ) as mock_get:
-                with self.patch_add_pritunl_organization(
-                    side_effect=PritunlPostOrganizationMock
-                ) as mock_add:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
+                with self.patch_add_pritunl_organization(side_effect=PritunlPostOrganizationMock) as mock_add:
                     with self.assertRaises(AnsibleExitJson) as create_result:
                         self.module.main()
 
@@ -94,12 +90,8 @@ class TestPritunlOrg(ModuleTestCase):
             self.assertEqual(create_exc["response"]["user_count"], 0)
 
             # Test module idempotency
-            with self.patch_get_pritunl_organizations(
-                side_effect=PritunlListOrganizationAfterPostMock
-            ) as mock_get:
-                with self.patch_add_pritunl_organization(
-                    side_effect=PritunlPostOrganizationMock
-                ) as mock_add:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationAfterPostMock) as mock_get:
+                with self.patch_add_pritunl_organization(side_effect=PritunlPostOrganizationMock) as mock_add:
                     with self.assertRaises(AnsibleExitJson) as idempotent_result:
                         self.module.main()
 
@@ -128,12 +120,8 @@ class TestPritunlOrg(ModuleTestCase):
             )
         ):
             # Test deletion
-            with self.patch_get_pritunl_organizations(
-                side_effect=PritunlListOrganizationAfterPostMock
-            ) as mock_get:
-                with self.patch_delete_pritunl_organization(
-                    side_effect=PritunlDeleteOrganizationMock
-                ) as mock_delete:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationAfterPostMock) as mock_get:
+                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock) as mock_delete:
                     with self.assertRaises(AnsibleExitJson) as delete_result:
                         self.module.main()
 
@@ -143,12 +131,8 @@ class TestPritunlOrg(ModuleTestCase):
             self.assertEqual(delete_exc["response"], {})
 
             # Test module idempotency
-            with self.patch_get_pritunl_organizations(
-                side_effect=PritunlListOrganizationMock
-            ) as mock_get:
-                with self.patch_delete_pritunl_organization(
-                    side_effect=PritunlDeleteOrganizationMock
-                ) as mock_add:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
+                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock) as mock_add:
                     with self.assertRaises(AnsibleExitJson) as idempotent_result:
                         self.module.main()
 
@@ -170,12 +154,8 @@ class TestPritunlOrg(ModuleTestCase):
         }
         with set_module_args(module_args):
             # Test deletion
-            with self.patch_get_pritunl_organizations(
-                side_effect=PritunlListOrganizationMock
-            ) as mock_get:
-                with self.patch_delete_pritunl_organization(
-                    side_effect=PritunlDeleteOrganizationMock
-                ) as mock_delete:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
+                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock) as mock_delete:
                     with self.assertRaises(AnsibleFailJson) as failure_result:
                         self.module.main()
 
@@ -185,9 +165,7 @@ class TestPritunlOrg(ModuleTestCase):
 
             # Switch force=True which should run successfully
             with set_module_args(dict_merge(module_args, {"force": True})):
-                with self.patch_get_pritunl_organizations(
-                    side_effect=PritunlListOrganizationMock
-                ) as mock_get:
+                with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
                     with self.patch_delete_pritunl_organization(
                         side_effect=PritunlDeleteOrganizationMock
                     ) as mock_delete:

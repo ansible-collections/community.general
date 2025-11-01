@@ -158,32 +158,30 @@ def is_valid_uuid(myuuid):
 
 def get_volume_selector(spec):
     if is_valid_uuid(spec):
-        return lambda v: v['id'] == spec
+        return lambda v: v["id"] == spec
     else:
-        return lambda v: v['name'] == spec or v['description'] == spec
+        return lambda v: v["name"] == spec or v["description"] == spec
 
 
 def get_device_selector(spec):
     if is_valid_uuid(spec):
-        return lambda v: v['id'] == spec
+        return lambda v: v["id"] == spec
     else:
-        return lambda v: v['hostname'] == spec
+        return lambda v: v["hostname"] == spec
 
 
 def do_attach(packet_conn, vol_id, dev_id):
     api_method = f"storage/{vol_id}/attachments"
-    packet_conn.call_api(
-        api_method,
-        params={"device_id": dev_id},
-        type="POST")
+    packet_conn.call_api(api_method, params={"device_id": dev_id}, type="POST")
 
 
 def do_detach(packet_conn, vol, dev_id=None):
     def dev_match(a):
-        return (dev_id is None) or (a['device']['id'] == dev_id)
-    for a in vol['attachments']:
+        return (dev_id is None) or (a["device"]["id"] == dev_id)
+
+    for a in vol["attachments"]:
         if dev_match(a):
-            packet_conn.call_api(a['href'], type="DELETE")
+            packet_conn.call_api(a["href"], type="DELETE")
 
 
 def validate_selected(l, resource_type, spec):
@@ -196,45 +194,44 @@ def validate_selected(l, resource_type, spec):
 
 
 def get_attached_dev_ids(volume_dict):
-    if len(volume_dict['attachments']) == 0:
+    if len(volume_dict["attachments"]) == 0:
         return []
     else:
-        return [a['device']['id'] for a in volume_dict['attachments']]
+        return [a["device"]["id"] for a in volume_dict["attachments"]]
 
 
 def act_on_volume_attachment(target_state, module, packet_conn):
-    return_dict = {'changed': False}
+    return_dict = {"changed": False}
     volspec = module.params.get("volume")
     devspec = module.params.get("device")
-    if devspec is None and target_state == 'present':
+    if devspec is None and target_state == "present":
         raise Exception("If you want to attach a volume, you must specify a device.")
     project_id = module.params.get("project_id")
     volumes_api_method = f"projects/{project_id}/storage"
-    volumes = packet_conn.call_api(volumes_api_method,
-                                   params={'include': 'facility,attachments.device'})['volumes']
+    volumes = packet_conn.call_api(volumes_api_method, params={"include": "facility,attachments.device"})["volumes"]
     v_match = get_volume_selector(volspec)
     matching_volumes = [v for v in volumes if v_match(v)]
     validate_selected(matching_volumes, "volume", volspec)
     volume = matching_volumes[0]
-    return_dict['volume_id'] = volume['id']
+    return_dict["volume_id"] = volume["id"]
 
     device = None
     if devspec is not None:
         devices_api_method = f"projects/{project_id}/devices"
-        devices = packet_conn.call_api(devices_api_method)['devices']
+        devices = packet_conn.call_api(devices_api_method)["devices"]
         d_match = get_device_selector(devspec)
         matching_devices = [d for d in devices if d_match(d)]
         validate_selected(matching_devices, "device", devspec)
         device = matching_devices[0]
-        return_dict['device_id'] = device['id']
+        return_dict["device_id"] = device["id"]
 
     attached_device_ids = get_attached_dev_ids(volume)
 
     if target_state == "present":
         if len(attached_device_ids) == 0:
-            do_attach(packet_conn, volume['id'], device['id'])
-            return_dict['changed'] = True
-        elif device['id'] not in attached_device_ids:
+            do_attach(packet_conn, volume["id"], device["id"])
+            return_dict["changed"] = True
+        elif device["id"] not in attached_device_ids:
             # Don't reattach volume which is attached to a different device.
             # Rather fail than force remove a device on state == 'present'.
             raise Exception(f"volume {volume} is already attached to device {attached_device_ids}")
@@ -242,10 +239,10 @@ def act_on_volume_attachment(target_state, module, packet_conn):
         if device is None:
             if len(attached_device_ids) > 0:
                 do_detach(packet_conn, volume)
-                return_dict['changed'] = True
-        elif device['id'] in attached_device_ids:
-            do_detach(packet_conn, volume, device['id'])
-            return_dict['changed'] = True
+                return_dict["changed"] = True
+        elif device["id"] in attached_device_ids:
+            do_detach(packet_conn, volume, device["id"])
+            return_dict["changed"] = True
 
     return return_dict
 
@@ -254,11 +251,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(choices=STATES, default="present"),
-            auth_token=dict(
-                type='str',
-                fallback=(env_fallback, [PACKET_API_TOKEN_ENV_VAR]),
-                no_log=True
-            ),
+            auth_token=dict(type="str", fallback=(env_fallback, [PACKET_API_TOKEN_ENV_VAR]), no_log=True),
             volume=dict(type="str", required=True),
             project_id=dict(type="str", required=True),
             device=dict(type="str"),
@@ -267,31 +260,29 @@ def main():
     )
 
     if not HAS_PACKET_SDK:
-        module.fail_json(msg='packet required for this module')
+        module.fail_json(msg="packet required for this module")
 
-    if not module.params.get('auth_token'):
+    if not module.params.get("auth_token"):
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get('auth_token')
+    auth_token = module.params.get("auth_token")
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
     if state in STATES:
         if module.check_mode:
             module.exit_json(changed=False)
 
         try:
-            module.exit_json(
-                **act_on_volume_attachment(state, module, packet_conn))
+            module.exit_json(**act_on_volume_attachment(state, module, packet_conn))
         except Exception as e:
-            module.fail_json(
-                msg=f"failed to set volume_attachment state {state}: {e}")
+            module.fail_json(msg=f"failed to set volume_attachment state {state}: {e}")
     else:
         module.fail_json(msg=f"{state} is not a valid state for this module")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -158,19 +158,18 @@ def do_versionlock(module, command, patterns=None, raw=False):
         outs = []
         for p in patterns:
             rc, out, err = module.run_command(
-                [DNF_BIN, "-q", "versionlock", command] + raw_parameter + [p],
-                check_rc=True)
+                [DNF_BIN, "-q", "versionlock", command] + raw_parameter + [p], check_rc=True
+            )
             outs.append(out)
         out = "\n".join(outs)
     else:
-        rc, out, err = module.run_command(
-            [DNF_BIN, "-q", "versionlock", command], check_rc=True)
+        rc, out, err = module.run_command([DNF_BIN, "-q", "versionlock", command], check_rc=True)
     return out
 
 
 # This is equivalent to the _match function of the versionlock plugin.
 def match(entry, pattern):
-    entry = entry.lstrip('!')
+    entry = entry.lstrip("!")
     if entry == pattern:
         return True
     m = NEVRA_RE.match(entry)
@@ -186,7 +185,7 @@ def match(entry, pattern):
         f"{m['name']}-{m['version']}-{m['release']}.{m['arch']}",
         f"{m['name']}-{m['epoch']}:{m['version']}-{m['release']}",
         f"{m['epoch']}:{m['name']}-{m['version']}-{m['release']}.{m['arch']}",
-        f"{m['name']}-{m['epoch']}:{m['version']}-{m['release']}.{m['arch']}"
+        f"{m['name']}-{m['epoch']}:{m['version']}-{m['release']}.{m['arch']}",
     ):
         if fnmatch.fnmatch(name, pattern):
             return True
@@ -196,18 +195,14 @@ def match(entry, pattern):
 def get_packages(module, patterns, only_installed=False):
     packages_available_map_name_evrs = {}
     rc, out, err = module.run_command(
-        [DNF_BIN, "-q", "repoquery"] +
-        (["--installed"] if only_installed else []) +
-        patterns,
-        check_rc=True)
+        [DNF_BIN, "-q", "repoquery"] + (["--installed"] if only_installed else []) + patterns, check_rc=True
+    )
 
     for p in out.split():
         # Extract the NEVRA pattern.
         m = NEVRA_RE.match(p)
         if not m:
-            module.fail_json(
-                msg=f"failed to parse nevra for {p}",
-                rc=rc, out=out, err=err)
+            module.fail_json(msg=f"failed to parse nevra for {p}", rc=rc, out=out, err=err)
 
         evr = f"{m['epoch']}:{m['version']}-{m['release']}"
 
@@ -258,8 +253,7 @@ def main():
         argument_spec=dict(
             name=dict(type="list", elements="str", default=[]),
             raw=dict(type="bool", default=False),
-            state=dict(type="str", default="present",
-                       choices=["present", "absent", "excluded", "clean"]),
+            state=dict(type="str", default="present", choices=["present", "absent", "excluded", "clean"]),
         ),
         supports_check_mode=True,
     )
@@ -272,7 +266,7 @@ def main():
 
     # Check module pre-requisites.
     global DNF_BIN
-    DNF_BIN = module.get_bin_path('dnf', True)
+    DNF_BIN = module.get_bin_path("dnf", True)
     package_mgr = get_package_mgr()
     if package_mgr == "dnf" and not os.path.exists(VERSIONLOCK_CONF):
         module.fail_json(msg="plugin versionlock is required")
@@ -289,7 +283,6 @@ def main():
     specs_todelete = []
 
     if state in ["present", "excluded"]:
-
         if raw:
             # Add raw patterns as specs to add.
             for p in patterns:
@@ -297,15 +290,10 @@ def main():
                     specs_toadd.append(p)
         else:
             # Get available packages that match the patterns.
-            packages_map_name_evrs = get_packages(
-                module,
-                patterns)
+            packages_map_name_evrs = get_packages(module, patterns)
 
             # Get installed packages that match the patterns.
-            packages_installed_map_name_evrs = get_packages(
-                module,
-                patterns,
-                only_installed=True)
+            packages_installed_map_name_evrs = get_packages(module, patterns, only_installed=True)
 
             # Obtain the list of package specs that require an entry in the
             # locklist. This list is composed by:
@@ -325,7 +313,6 @@ def main():
             msg = do_versionlock(module, cmd, patterns=specs_toadd, raw=raw)
 
     elif state == "absent":
-
         if raw:
             # Add raw patterns as specs to delete.
             for p in patterns:
@@ -340,8 +327,7 @@ def main():
                         specs_todelete.append(p)
 
         if specs_todelete and not module.check_mode:
-            msg = do_versionlock(
-                module, "delete", patterns=specs_todelete, raw=raw)
+            msg = do_versionlock(module, "delete", patterns=specs_todelete, raw=raw)
 
     elif state == "clean":
         specs_todelete = locklist_pre
@@ -357,7 +343,7 @@ def main():
         "msg": msg,
         "locklist_pre": locklist_pre,
         "specs_toadd": specs_toadd,
-        "specs_todelete": specs_todelete
+        "specs_todelete": specs_todelete,
     }
     if not module.check_mode:
         response["locklist_post"] = get_package_list(module, package_mgr=package_mgr)

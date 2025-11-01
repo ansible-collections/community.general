@@ -118,15 +118,9 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-PACKAGE_STATE_MAP = dict(
-    present="install",
-    absent="remove"
-)
+PACKAGE_STATE_MAP = dict(present="install", absent="remove")
 
-PLUGIN_BIN_PATHS = tuple([
-    '/usr/share/elasticsearch/bin/elasticsearch-plugin',
-    '/usr/share/elasticsearch/bin/plugin'
-])
+PLUGIN_BIN_PATHS = tuple(["/usr/share/elasticsearch/bin/elasticsearch-plugin", "/usr/share/elasticsearch/bin/plugin"])
 
 
 def parse_plugin_repo(string):
@@ -143,7 +137,7 @@ def parse_plugin_repo(string):
     # remove es- prefix
     for string in ("elasticsearch-", "es-"):
         if repo.startswith(string):
-            return repo[len(string):]
+            return repo[len(string) :]
 
     return repo
 
@@ -155,14 +149,14 @@ def is_plugin_present(plugin_name, plugin_dir):
 def parse_error(string):
     reason = "ERROR: "
     try:
-        return string[string.index(reason) + len(reason):].strip()
+        return string[string.index(reason) + len(reason) :].strip()
     except ValueError:
         return string
 
 
 def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_host, proxy_port, timeout, force):
     cmd = [plugin_bin, PACKAGE_STATE_MAP["present"]]
-    is_old_command = (os.path.basename(plugin_bin) == 'plugin')
+    is_old_command = os.path.basename(plugin_bin) == "plugin"
 
     # Timeout and version are only valid for plugin, not elasticsearch-plugin
     if is_old_command:
@@ -175,12 +169,16 @@ def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_hos
             cmd[2] = plugin_name
 
     if proxy_host and proxy_port:
-        java_opts = [f"-Dhttp.proxyHost={proxy_host}",
-                     f"-Dhttp.proxyPort={proxy_port}",
-                     f"-Dhttps.proxyHost={proxy_host}",
-                     f"-Dhttps.proxyPort={proxy_port}"]
-        module.run_command_environ_update = dict(CLI_JAVA_OPTS=" ".join(java_opts),  # Elasticsearch 8.x
-                                                 ES_JAVA_OPTS=" ".join(java_opts))  # Older Elasticsearch versions
+        java_opts = [
+            f"-Dhttp.proxyHost={proxy_host}",
+            f"-Dhttp.proxyPort={proxy_port}",
+            f"-Dhttps.proxyHost={proxy_host}",
+            f"-Dhttps.proxyPort={proxy_port}",
+        ]
+        module.run_command_environ_update = dict(
+            CLI_JAVA_OPTS=" ".join(java_opts),  # Elasticsearch 8.x
+            ES_JAVA_OPTS=" ".join(java_opts),
+        )  # Older Elasticsearch versions
 
     # Legacy ES 1.x
     if url:
@@ -247,7 +245,9 @@ def get_plugin_bin(module, plugin_bin=None):
                 break
 
     if not valid_plugin_bin:
-        module.fail_json(msg=f'{plugin_bin} does not exist and no other valid plugin installers were found. Make sure Elasticsearch is installed.')
+        module.fail_json(
+            msg=f"{plugin_bin} does not exist and no other valid plugin installers were found. Make sure Elasticsearch is installed."
+        )
 
     return valid_plugin_bin
 
@@ -260,15 +260,15 @@ def main():
             src=dict(),
             url=dict(),
             timeout=dict(default="1m"),
-            force=dict(type='bool', default=False),
+            force=dict(type="bool", default=False),
             plugin_bin=dict(type="path"),
             plugin_dir=dict(default="/usr/share/elasticsearch/plugins/", type="path"),
             proxy_host=dict(),
             proxy_port=dict(),
-            version=dict()
+            version=dict(),
         ),
         mutually_exclusive=[("src", "url")],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     name = module.params["name"]
@@ -294,7 +294,9 @@ def main():
         module.exit_json(changed=False, name=name, state=state)
 
     if state == "present":
-        changed, cmd, out, err = install_plugin(module, plugin_bin, name, version, src, url, proxy_host, proxy_port, timeout, force)
+        changed, cmd, out, err = install_plugin(
+            module, plugin_bin, name, version, src, url, proxy_host, proxy_port, timeout, force
+        )
 
     elif state == "absent":
         changed, cmd, out, err = remove_plugin(module, plugin_bin, name)
@@ -302,5 +304,5 @@ def main():
     module.exit_json(changed=changed, cmd=cmd, name=name, state=state, url=url, timeout=timeout, stdout=out, stderr=err)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

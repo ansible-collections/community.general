@@ -83,20 +83,24 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import execute_pyxcli_command, \
-    connect_ssl, spectrum_accelerate_spec, is_pyxcli_installed
+from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (
+    execute_pyxcli_command,
+    connect_ssl,
+    spectrum_accelerate_spec,
+    is_pyxcli_installed,
+)
 
 
 def main():
     argument_spec = spectrum_accelerate_spec()
     argument_spec.update(
         dict(
-            state=dict(default='present', choices=['present', 'absent']),
+            state=dict(default="present", choices=["present", "absent"]),
             pool=dict(required=True),
             size=dict(),
             snapshot_size=dict(),
             domain=dict(),
-            perf_class=dict()
+            perf_class=dict(),
         )
     )
 
@@ -105,20 +109,17 @@ def main():
     is_pyxcli_installed(module)
 
     xcli_client = connect_ssl(module)
-    pool = xcli_client.cmd.pool_list(
-        pool=module.params['pool']).as_single_element
-    state = module.params['state']
+    pool = xcli_client.cmd.pool_list(pool=module.params["pool"]).as_single_element
+    state = module.params["state"]
 
     state_changed = False
-    if state == 'present' and not pool:
-        state_changed = execute_pyxcli_command(
-            module, 'pool_create', xcli_client)
-    if state == 'absent' and pool:
-        state_changed = execute_pyxcli_command(
-            module, 'pool_delete', xcli_client)
+    if state == "present" and not pool:
+        state_changed = execute_pyxcli_command(module, "pool_create", xcli_client)
+    if state == "absent" and pool:
+        state_changed = execute_pyxcli_command(module, "pool_delete", xcli_client)
 
     module.exit_json(changed=state_changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

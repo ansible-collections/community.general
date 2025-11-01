@@ -121,7 +121,7 @@ def add_remote(module, binary, name, flatpakrepo_url, method):
     global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "remote-add", f"--{method}", name, flatpakrepo_url]
     _flatpak_command(module, module.check_mode, command)
-    result['changed'] = True
+    result["changed"] = True
 
 
 def remove_remote(module, binary, name, method):
@@ -129,7 +129,7 @@ def remove_remote(module, binary, name, method):
     global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "remote-delete", f"--{method}", "--force", name]
     _flatpak_command(module, module.check_mode, command)
-    result['changed'] = True
+    result["changed"] = True
 
 
 def remote_exists(module, binary, name, method):
@@ -151,7 +151,7 @@ def enable_remote(module, binary, name, method):
     global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "remote-modify", "--enable", f"--{method}", name]
     _flatpak_command(module, module.check_mode, command)
-    result['changed'] = True
+    result["changed"] = True
 
 
 def disable_remote(module, binary, name, method):
@@ -159,7 +159,7 @@ def disable_remote(module, binary, name, method):
     global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "remote-modify", "--disable", f"--{method}", name]
     _flatpak_command(module, module.check_mode, command)
-    result['changed'] = True
+    result["changed"] = True
 
 
 def remote_enabled(module, binary, name, method):
@@ -178,48 +178,42 @@ def remote_enabled(module, binary, name, method):
 
 def _flatpak_command(module, noop, command):
     global result  # pylint: disable=global-variable-not-assigned
-    result['command'] = ' '.join(command)
+    result["command"] = " ".join(command)
     if noop:
-        result['rc'] = 0
+        result["rc"] = 0
         return ""
 
-    result['rc'], result['stdout'], result['stderr'] = module.run_command(
-        command, check_rc=True
-    )
-    return result['stdout']
+    result["rc"], result["stdout"], result["stderr"] = module.run_command(command, check_rc=True)
+    return result["stdout"]
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            flatpakrepo_url=dict(type='str'),
-            method=dict(type='str', default='system',
-                        choices=['user', 'system']),
-            state=dict(type='str', default="present",
-                       choices=['absent', 'present']),
-            enabled=dict(type='bool', default=True),
-            executable=dict(type='str', default="flatpak")
+            name=dict(type="str", required=True),
+            flatpakrepo_url=dict(type="str"),
+            method=dict(type="str", default="system", choices=["user", "system"]),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            enabled=dict(type="bool", default=True),
+            executable=dict(type="str", default="flatpak"),
         ),
         # This module supports check mode
         supports_check_mode=True,
     )
 
-    name = module.params['name']
-    flatpakrepo_url = module.params['flatpakrepo_url']
-    method = module.params['method']
-    state = module.params['state']
-    enabled = module.params['enabled']
-    executable = module.params['executable']
+    name = module.params["name"]
+    flatpakrepo_url = module.params["flatpakrepo_url"]
+    method = module.params["method"]
+    state = module.params["state"]
+    enabled = module.params["enabled"]
+    executable = module.params["executable"]
     binary = module.get_bin_path(executable, None)
 
     if flatpakrepo_url is None:
-        flatpakrepo_url = ''
+        flatpakrepo_url = ""
 
     global result
-    result = dict(
-        changed=False
-    )
+    result = dict(changed=False)
 
     # If the binary was not found, fail the operation
     if not binary:
@@ -227,12 +221,12 @@ def main():
 
     remote_already_exists = remote_exists(module, binary, to_bytes(name), method)
 
-    if state == 'present' and not remote_already_exists:
+    if state == "present" and not remote_already_exists:
         add_remote(module, binary, name, flatpakrepo_url, method)
-    elif state == 'absent' and remote_already_exists:
+    elif state == "absent" and remote_already_exists:
         remove_remote(module, binary, name, method)
 
-    if state == 'present':
+    if state == "present":
         remote_already_enabled = remote_enabled(module, binary, to_bytes(name), method)
 
         if enabled and not remote_already_enabled:
@@ -243,5 +237,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

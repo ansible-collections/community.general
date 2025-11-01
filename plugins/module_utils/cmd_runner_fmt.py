@@ -46,7 +46,9 @@ def as_bool(args_true, args_false=None, ignore_none=None):
             ignore_none = False
     else:
         args_false = []
-    return _ArgFormat(lambda value: _ensure_list(args_true) if value else _ensure_list(args_false), ignore_none=ignore_none)
+    return _ArgFormat(
+        lambda value: _ensure_list(args_true) if value else _ensure_list(args_false), ignore_none=ignore_none
+    )
 
 
 def as_bool_not(args):
@@ -73,6 +75,7 @@ def as_list(ignore_none=None, min_len=0, max_len=None):
         if max_len is not None and len(value) > max_len:
             raise ValueError(f"Parameter must have at most {max_len} element(s)")
         return value
+
     return _ArgFormat(func, ignore_none=ignore_none)
 
 
@@ -96,6 +99,7 @@ def unpack_args(func):
     @wraps(func)
     def wrapper(v):
         return func(*v)
+
     return wrapper
 
 
@@ -103,6 +107,7 @@ def unpack_kwargs(func):
     @wraps(func)
     def wrapper(v):
         return func(**v)
+
     return wrapper
 
 
@@ -115,7 +120,9 @@ def stack(fmt):
             stack = [new_func(v) for v in value if v]
             stack = [x for args in stack for x in args]
             return stack
+
         return _ArgFormat(stacking, ignore_none=True)
+
     return wrapper
 
 

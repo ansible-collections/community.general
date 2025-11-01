@@ -51,6 +51,7 @@ EXAMPLES = r"""
 HAVE_XENAPI = False
 try:
     import XenAPI
+
     HAVE_XENAPI = True
 except ImportError:
     pass
@@ -62,11 +63,11 @@ from ansible.module_utils.basic import AnsibleModule
 class XenServerFacts:
     def __init__(self):
         self.codes = {
-            '5.5.0': 'george',
-            '5.6.100': 'oxford',
-            '6.0.0': 'boston',
-            '6.1.0': 'tampa',
-            '6.2.0': 'clearwater'
+            "5.5.0": "george",
+            "5.6.100": "oxford",
+            "6.0.0": "boston",
+            "6.1.0": "tampa",
+            "6.2.0": "clearwater",
         }
 
     @property
@@ -86,38 +87,38 @@ class XenServerFacts:
 
 def get_xenapi_session():
     session = XenAPI.xapi_local()
-    session.xenapi.login_with_password('', '')
+    session.xenapi.login_with_password("", "")
     return session
 
 
 def get_networks(session):
     recs = session.xenapi.network.get_all_records()
-    networks = change_keys(recs, key='name_label')
+    networks = change_keys(recs, key="name_label")
     return networks
 
 
 def get_pifs(session):
     recs = session.xenapi.PIF.get_all_records()
-    pifs = change_keys(recs, key='uuid')
+    pifs = change_keys(recs, key="uuid")
     xs_pifs = {}
     devicenums = range(0, 7)
     for pif in pifs.values():
         for eth in devicenums:
             interface_name = f"eth{eth}"
-            bond_name = interface_name.replace('eth', 'bond')
-            if pif['device'] == interface_name:
+            bond_name = interface_name.replace("eth", "bond")
+            if pif["device"] == interface_name:
                 xs_pifs[interface_name] = pif
-            elif pif['device'] == bond_name:
+            elif pif["device"] == bond_name:
                 xs_pifs[bond_name] = pif
     return xs_pifs
 
 
 def get_vlans(session):
     recs = session.xenapi.VLAN.get_all_records()
-    return change_keys(recs, key='tag')
+    return change_keys(recs, key="tag")
 
 
-def change_keys(recs, key='uuid', filter_func=None):
+def change_keys(recs, key="uuid", filter_func=None):
     """
     Take a xapi dict, and make the keys the value of recs[ref][key].
 
@@ -138,7 +139,7 @@ def change_keys(recs, key='uuid', filter_func=None):
             if hasattr(param_value, "value"):
                 rec[param_name] = param_value.value
         new_recs[rec[key]] = rec
-        new_recs[rec[key]]['ref'] = ref
+        new_recs[rec[key]]["ref"] = ref
 
     return new_recs
 
@@ -154,7 +155,7 @@ def get_vms(session):
     recs = session.xenapi.VM.get_all_records()
     if not recs:
         return None
-    vms = change_keys(recs, key='name_label')
+    vms = change_keys(recs, key="name_label")
     return vms
 
 
@@ -162,7 +163,7 @@ def get_srs(session):
     recs = session.xenapi.SR.get_all_records()
     if not recs:
         return None
-    srs = change_keys(recs, key='name_label')
+    srs = change_keys(recs, key="name_label")
     return srs
 
 
@@ -178,10 +179,7 @@ def main():
     except XenAPI.Failure as e:
         module.fail_json(msg=str(e))
 
-    data = {
-        'xenserver_version': obj.version,
-        'xenserver_codename': obj.codename
-    }
+    data = {"xenserver_version": obj.version, "xenserver_codename": obj.codename}
 
     xs_networks = get_networks(session)
     xs_pifs = get_pifs(session)
@@ -190,20 +188,20 @@ def main():
     xs_srs = get_srs(session)
 
     if xs_vlans:
-        data['xs_vlans'] = xs_vlans
+        data["xs_vlans"] = xs_vlans
     if xs_pifs:
-        data['xs_pifs'] = xs_pifs
+        data["xs_pifs"] = xs_pifs
     if xs_networks:
-        data['xs_networks'] = xs_networks
+        data["xs_networks"] = xs_networks
 
     if xs_vms:
-        data['xs_vms'] = xs_vms
+        data["xs_vms"] = xs_vms
 
     if xs_srs:
-        data['xs_srs'] = xs_srs
+        data["xs_srs"] = xs_srs
 
     module.exit_json(ansible_facts=data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

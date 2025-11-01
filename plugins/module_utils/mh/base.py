@@ -16,7 +16,11 @@ class ModuleHelperBase:
     module: dict[str, t.Any] | None = None  # TODO: better spec using t.TypedDict
     ModuleHelperException = _MHE
     _delegated_to_module: tuple[str, ...] = (
-        'check_mode', 'get_bin_path', 'warn', 'deprecate', 'debug',
+        "check_mode",
+        "get_bin_path",
+        "warn",
+        "deprecate",
+        "debug",
     )
 
     def __init__(self, module=None):
@@ -80,8 +84,8 @@ class ModuleHelperBase:
         self.__run__()
         self.__quit_module__()
         output = self.output
-        if 'failed' not in output:
-            output['failed'] = False
+        if "failed" not in output:
+            output["failed"] = False
         self.module.exit_json(changed=self.has_changed(), **output)
 
     @classmethod

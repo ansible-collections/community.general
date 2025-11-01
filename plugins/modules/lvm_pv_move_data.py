@@ -79,11 +79,11 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            source=dict(type='path', required=True),
-            destination=dict(type='path', required=True),
-            auto_answer=dict(type='bool', default=False),
-            atomic=dict(type='bool', default=True),
-            autobackup=dict(type='bool', default=True),
+            source=dict(type="path", required=True),
+            destination=dict(type="path", required=True),
+            auto_answer=dict(type="bool", default=False),
+            atomic=dict(type="bool", default=True),
+            autobackup=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
     )
@@ -98,14 +98,14 @@ def main():
             pv_pe_alloc_count=cmd_runner_fmt.as_fixed("-o", "pv_pe_alloc_count"),
             pv_pe_count=cmd_runner_fmt.as_fixed("-o", "pv_pe_count"),
             device=cmd_runner_fmt.as_list(),
-        )
+        ),
     )
 
-    source = module.params['source']
-    destination = module.params['destination']
+    source = module.params["source"]
+    destination = module.params["destination"]
     changed = False
     actions = []
-    result = {'changed': False}
+    result = {"changed": False}
 
     # Validate device existence
     if not os.path.exists(source):
@@ -155,7 +155,7 @@ def main():
 
     allocated = get_allocated_pe(source)
     if allocated == 0:
-        actions.append('no allocated extents to move')
+        actions.append("no allocated extents to move")
     else:
         # Check destination has enough free space
         def get_total_pe(device):
@@ -170,13 +170,15 @@ def main():
         free_pe_dest = get_free_pe(destination)
         if free_pe_dest < allocated:
             module.fail_json(
-                msg=(f"Destination device {destination} has only {int(free_pe_dest)} free physical extents, but "
-                     f"source device {source} has {int(allocated)} allocated extents. Not enough space.")
+                msg=(
+                    f"Destination device {destination} has only {int(free_pe_dest)} free physical extents, but "
+                    f"source device {source} has {int(allocated)} allocated extents. Not enough space."
+                )
             )
 
         if module.check_mode:
             changed = True
-            actions.append(f'would move data from {source} to {destination}')
+            actions.append(f"would move data from {source} to {destination}")
         else:
             pvmove_runner = CmdRunner(
                 module,
@@ -184,35 +186,31 @@ def main():
                 arg_formats=dict(
                     auto_answer=cmd_runner_fmt.as_bool("-y"),
                     atomic=cmd_runner_fmt.as_bool("--atomic"),
-                    autobackup=cmd_runner_fmt.as_fixed("--autobackup", "y" if module.params['autobackup'] else "n"),
+                    autobackup=cmd_runner_fmt.as_fixed("--autobackup", "y" if module.params["autobackup"] else "n"),
                     verbosity=cmd_runner_fmt.as_func(lambda v: [f"-{'v' * v}"] if v > 0 else []),
                     source=cmd_runner_fmt.as_list(),
                     destination=cmd_runner_fmt.as_list(),
-                )
+                ),
             )
 
             verbosity = module._verbosity
             with pvmove_runner("auto_answer atomic autobackup verbosity source destination") as ctx:
-                rc, out, err = ctx.run(
-                    verbosity=verbosity,
-                    source=source,
-                    destination=destination
-                )
-                result['stdout'] = out
-                result['stderr'] = err
+                rc, out, err = ctx.run(verbosity=verbosity, source=source, destination=destination)
+                result["stdout"] = out
+                result["stderr"] = err
 
             changed = True
-            actions.append(f'moved data from {source} to {destination}')
+            actions.append(f"moved data from {source} to {destination}")
 
-    result['changed'] = changed
-    result['actions'] = actions
+    result["changed"] = changed
+    result["actions"] = actions
     if actions:
-        result['msg'] = f"PV data move: {', '.join(actions)}"
+        result["msg"] = f"PV data move: {', '.join(actions)}"
     else:
-        result['msg'] = f"No data to move from {source}"
+        result["msg"] = f"No data to move from {source}"
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -472,51 +472,64 @@ status:
 """
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
-    Config, HwcClientException, HwcModule, are_different_dicts, build_path,
-    get_region, is_empty_value, navigate_value, wait_to_finish)
+    Config,
+    HwcClientException,
+    HwcModule,
+    are_different_dicts,
+    build_path,
+    get_region,
+    is_empty_value,
+    navigate_value,
+    wait_to_finish,
+)
 
 
 def build_module():
     return HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            timeouts=dict(type='dict', options=dict(
-                create=dict(default='30m', type='str'),
-                update=dict(default='30m', type='str'),
-                delete=dict(default='30m', type='str'),
-            ), default=dict()),
-            availability_zone=dict(type='str', required=True),
-            flavor_name=dict(type='str', required=True),
-            image_id=dict(type='str', required=True),
-            name=dict(type='str', required=True),
-            nics=dict(
-                type='list', required=True, elements='dict',
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            timeouts=dict(
+                type="dict",
                 options=dict(
-                    ip_address=dict(type='str', required=True),
-                    subnet_id=dict(type='str', required=True)
+                    create=dict(default="30m", type="str"),
+                    update=dict(default="30m", type="str"),
+                    delete=dict(default="30m", type="str"),
+                ),
+                default=dict(),
+            ),
+            availability_zone=dict(type="str", required=True),
+            flavor_name=dict(type="str", required=True),
+            image_id=dict(type="str", required=True),
+            name=dict(type="str", required=True),
+            nics=dict(
+                type="list",
+                required=True,
+                elements="dict",
+                options=dict(ip_address=dict(type="str", required=True), subnet_id=dict(type="str", required=True)),
+            ),
+            root_volume=dict(
+                type="dict",
+                required=True,
+                options=dict(
+                    volume_type=dict(type="str", required=True), size=dict(type="int"), snapshot_id=dict(type="str")
                 ),
             ),
-            root_volume=dict(type='dict', required=True, options=dict(
-                volume_type=dict(type='str', required=True),
-                size=dict(type='int'),
-                snapshot_id=dict(type='str')
-            )),
-            vpc_id=dict(type='str', required=True),
-            admin_pass=dict(type='str', no_log=True),
-            data_volumes=dict(type='list', elements='dict', options=dict(
-                volume_id=dict(type='str', required=True),
-                device=dict(type='str')
-            )),
-            description=dict(type='str'),
-            eip_id=dict(type='str'),
-            enable_auto_recovery=dict(type='bool'),
-            enterprise_project_id=dict(type='str'),
-            security_groups=dict(type='list', elements='str'),
-            server_metadata=dict(type='dict'),
-            server_tags=dict(type='dict'),
-            ssh_key_name=dict(type='str'),
-            user_data=dict(type='str')
+            vpc_id=dict(type="str", required=True),
+            admin_pass=dict(type="str", no_log=True),
+            data_volumes=dict(
+                type="list",
+                elements="dict",
+                options=dict(volume_id=dict(type="str", required=True), device=dict(type="str")),
+            ),
+            description=dict(type="str"),
+            eip_id=dict(type="str"),
+            enable_auto_recovery=dict(type="bool"),
+            enterprise_project_id=dict(type="str"),
+            security_groups=dict(type="list", elements="str"),
+            server_metadata=dict(type="dict"),
+            server_tags=dict(type="dict"),
+            ssh_key_name=dict(type="str"),
+            user_data=dict(type="str"),
         ),
         supports_check_mode=True,
     )
@@ -530,11 +543,11 @@ def main():
 
     try:
         _init(config)
-        is_exist = module.params['id']
+        is_exist = module.params["id"]
 
         result = None
         changed = False
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if not is_exist:
                 if not module.check_mode:
                     create(config)
@@ -553,12 +566,11 @@ def main():
                     result = build_state(inputv, resp, array_index)
                     set_readonly_options(inputv, result)
                     if are_different_dicts(inputv, result):
-                        raise Exception("Update resource failed, "
-                                        "some attributes are not updated")
+                        raise Exception("Update resource failed, some attributes are not updated")
 
                 changed = True
 
-            result['id'] = module.params.get('id')
+            result["id"] = module.params.get("id")
         else:
             result = dict()
             if is_exist:
@@ -570,13 +582,13 @@ def main():
         module.fail_json(msg=str(ex))
 
     else:
-        result['changed'] = changed
+        result["changed"] = changed
         module.exit_json(**result)
 
 
 def _init(config):
     module = config.module
-    if module.params['id']:
+    if module.params["id"]:
         return
 
     v = search_resource(config)
@@ -585,7 +597,7 @@ def _init(config):
         raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
     if n == 1:
-        module.params['id'] = navigate_value(v[0], ["id"])
+        module.params["id"] = navigate_value(v[0], ["id"])
 
 
 def user_input_parameters(module):
@@ -614,7 +626,7 @@ def user_input_parameters(module):
 def create(config):
     module = config.module
     client = config.client(get_region(module), "ecs", "project")
-    timeout = 60 * int(module.params['timeouts']['create'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["create"].rstrip("m"))
     opts = user_input_parameters(module)
     opts["ansible_module"] = module
 
@@ -634,14 +646,14 @@ def create(config):
             break
     else:
         raise Exception("Can't find the sub job")
-    module.params['id'] = navigate_value(obj, ["entities", "server_id"])
+    module.params["id"] = navigate_value(obj, ["entities", "server_id"])
 
 
 def update(config, expect_state, current_state):
     module = config.module
     expect_state["current_state"] = current_state
     current_state["current_state"] = current_state
-    timeout = 60 * int(module.params['timeouts']['update'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["update"].rstrip("m"))
     client = config.client(get_region(module), "ecs", "project")
 
     params = build_delete_nics_parameters(expect_state)
@@ -669,7 +681,7 @@ def update(config, expect_state, current_state):
 def delete(config):
     module = config.module
     client = config.client(get_region(module), "ecs", "project")
-    timeout = 60 * int(module.params['timeouts']['delete'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["delete"].rstrip("m"))
 
     opts = user_input_parameters(module)
     opts["ansible_module"] = module
@@ -746,13 +758,11 @@ def _build_query_link(opts):
 
     v = navigate_value(opts, ["enterprise_project_id"])
     if v or v in [False, 0]:
-        query_params.append(
-            f"enterprise_project_id={str(v) if v else str(v).lower()}")
+        query_params.append(f"enterprise_project_id={str(v) if v else str(v).lower()}")
 
     v = navigate_value(opts, ["name"])
     if v or v in [False, 0]:
-        query_params.append(
-            f"name={str(v) if v else str(v).lower()}")
+        query_params.append(f"name={str(v) if v else str(v).lower()}")
 
     query_link = "?limit=10&offset={offset}"
     if query_params:
@@ -770,7 +780,7 @@ def search_resource(config):
     link = f"cloudservers/detail{query_link}"
 
     result = []
-    p = {'offset': 1}
+    p = {"offset": 1}
     while True:
         url = link.format(**p)
         r = send_list_request(module, client, url)
@@ -786,7 +796,7 @@ def search_resource(config):
         if len(result) > 1:
             break
 
-        p['offset'] += 1
+        p["offset"] += 1
 
     return result
 
@@ -964,8 +974,7 @@ def expand_create_nics(d, array_index):
 
     req = []
 
-    v = navigate_value(
-        d, ["nics"], new_ai)
+    v = navigate_value(d, ["nics"], new_ai)
 
     if not v:
         return req
@@ -1227,10 +1236,7 @@ def async_wait(config, result, client, timeout):
             return None, ""
 
     try:
-        return wait_to_finish(
-            ["SUCCESS"],
-            ["RUNNING", "INIT"],
-            _query_status, timeout)
+        return wait_to_finish(["SUCCESS"], ["RUNNING", "INIT"], _query_status, timeout)
     except Exception as ex:
         module.fail_json(msg=f"module(hwc_ecs_instance): error waiting to be done, error= {ex}")
 
@@ -1243,11 +1249,7 @@ def multi_invoke_delete_volume(config, opts, client, timeout):
     current = opts["current_state"]["data_volumes"]
     if expect and current:
         v = [i["volume_id"] for i in expect]
-        opts1 = {
-            "data_volumes": [
-                i for i in current if i["volume_id"] not in v
-            ]
-        }
+        opts1 = {"data_volumes": [i for i in current if i["volume_id"] not in v]}
 
     loop_val = navigate_value(opts1, ["data_volumes"])
     if not loop_val:
@@ -1266,11 +1268,7 @@ def multi_invoke_attach_data_disk(config, opts, client, timeout):
     current = opts["current_state"]["data_volumes"]
     if expect and current:
         v = [i["volume_id"] for i in current]
-        opts1 = {
-            "data_volumes": [
-                i for i in expect if i["volume_id"] not in v
-            ]
-        }
+        opts1 = {"data_volumes": [i for i in expect if i["volume_id"] not in v]}
 
     loop_val = navigate_value(opts1, ["data_volumes"])
     if not loop_val:
@@ -1300,13 +1298,11 @@ def fill_read_resp_body(body):
 
     result["OS-DCF:diskConfig"] = body.get("OS-DCF:diskConfig")
 
-    result["OS-EXT-AZ:availability_zone"] = body.get(
-        "OS-EXT-AZ:availability_zone")
+    result["OS-EXT-AZ:availability_zone"] = body.get("OS-EXT-AZ:availability_zone")
 
     result["OS-EXT-SRV-ATTR:hostname"] = body.get("OS-EXT-SRV-ATTR:hostname")
 
-    result["OS-EXT-SRV-ATTR:instance_name"] = body.get(
-        "OS-EXT-SRV-ATTR:instance_name")
+    result["OS-EXT-SRV-ATTR:instance_name"] = body.get("OS-EXT-SRV-ATTR:instance_name")
 
     result["OS-EXT-SRV-ATTR:user_data"] = body.get("OS-EXT-SRV-ATTR:user_data")
 
@@ -1338,8 +1334,7 @@ def fill_read_resp_body(body):
 
     result["name"] = body.get("name")
 
-    v = fill_read_resp_os_extended_volumes_volumes_attached(
-        body.get("os-extended-volumes:volumes_attached"))
+    v = fill_read_resp_os_extended_volumes_volumes_attached(body.get("os-extended-volumes:volumes_attached"))
     result["os-extended-volumes:volumes_attached"] = v
 
     v = fill_read_resp_root_volume(body.get("root_volume"))
@@ -1462,8 +1457,7 @@ def fill_read_auto_recovery_resp_body(body):
 def flatten_options(response, array_index):
     r = dict()
 
-    v = navigate_value(
-        response, ["read", "OS-EXT-AZ:availability_zone"], array_index)
+    v = navigate_value(response, ["read", "OS-EXT-AZ:availability_zone"], array_index)
     r["availability_zone"] = v
 
     v = navigate_value(response, ["read", "config_drive"], array_index)
@@ -1484,22 +1478,19 @@ def flatten_options(response, array_index):
     v = flatten_enable_auto_recovery(response, array_index)
     r["enable_auto_recovery"] = v
 
-    v = navigate_value(
-        response, ["read", "enterprise_project_id"], array_index)
+    v = navigate_value(response, ["read", "enterprise_project_id"], array_index)
     r["enterprise_project_id"] = v
 
     v = navigate_value(response, ["read", "flavor", "id"], array_index)
     r["flavor_name"] = v
 
-    v = navigate_value(
-        response, ["read", "OS-EXT-SRV-ATTR:hostname"], array_index)
+    v = navigate_value(response, ["read", "OS-EXT-SRV-ATTR:hostname"], array_index)
     r["host_name"] = v
 
     v = navigate_value(response, ["read", "image", "id"], array_index)
     r["image_id"] = v
 
-    v = navigate_value(
-        response, ["read", "metadata", "image_name"], array_index)
+    v = navigate_value(response, ["read", "metadata", "image_name"], array_index)
     r["image_name"] = v
 
     v = navigate_value(response, ["read", "name"], array_index)
@@ -1508,15 +1499,13 @@ def flatten_options(response, array_index):
     v = flatten_nics(response, array_index)
     r["nics"] = v
 
-    v = navigate_value(
-        response, ["read", "OS-EXT-STS:power_state"], array_index)
+    v = navigate_value(response, ["read", "OS-EXT-STS:power_state"], array_index)
     r["power_state"] = v
 
     v = flatten_root_volume(response, array_index)
     r["root_volume"] = v
 
-    v = navigate_value(
-        response, ["read", "OS-EXT-SRV-ATTR:instance_name"], array_index)
+    v = navigate_value(response, ["read", "OS-EXT-SRV-ATTR:instance_name"], array_index)
     r["server_alias"] = v
 
     v = flatten_server_tags(response, array_index)
@@ -1528,8 +1517,7 @@ def flatten_options(response, array_index):
     v = navigate_value(response, ["read", "status"], array_index)
     r["status"] = v
 
-    v = navigate_value(
-        response, ["read", "OS-EXT-SRV-ATTR:user_data"], array_index)
+    v = navigate_value(response, ["read", "OS-EXT-SRV-ATTR:user_data"], array_index)
     r["user_data"] = v
 
     v = navigate_value(response, ["read", "metadata", "vpc_id"], array_index)
@@ -1539,8 +1527,7 @@ def flatten_options(response, array_index):
 
 
 def flatten_data_volumes(d, array_index):
-    v = navigate_value(d, ["read", "os-extended-volumes:volumes_attached"],
-                       array_index)
+    v = navigate_value(d, ["read", "os-extended-volumes:volumes_attached"], array_index)
     if not v:
         return None
     n = len(v)
@@ -1555,12 +1542,10 @@ def flatten_data_volumes(d, array_index):
 
         val = dict()
 
-        v = navigate_value(
-            d, ["read", "os-extended-volumes:volumes_attached", "device"], new_ai)
+        v = navigate_value(d, ["read", "os-extended-volumes:volumes_attached", "device"], new_ai)
         val["device"] = v
 
-        v = navigate_value(
-            d, ["read", "os-extended-volumes:volumes_attached", "id"], new_ai)
+        v = navigate_value(d, ["read", "os-extended-volumes:volumes_attached", "id"], new_ai)
         val["volume_id"] = v
 
         for v in val.values():
@@ -1572,14 +1557,12 @@ def flatten_data_volumes(d, array_index):
 
 
 def flatten_enable_auto_recovery(d, array_index):
-    v = navigate_value(d, ["read_auto_recovery", "support_auto_recovery"],
-                       array_index)
+    v = navigate_value(d, ["read_auto_recovery", "support_auto_recovery"], array_index)
     return v == "true"
 
 
 def flatten_nics(d, array_index):
-    v = navigate_value(d, ["read", "address"],
-                       array_index)
+    v = navigate_value(d, ["read", "address"], array_index)
     if not v:
         return None
     n = len(v)
@@ -1597,8 +1580,7 @@ def flatten_nics(d, array_index):
         v = navigate_value(d, ["read", "address", "addr"], new_ai)
         val["ip_address"] = v
 
-        v = navigate_value(
-            d, ["read", "address", "OS-EXT-IPS:port_id"], new_ai)
+        v = navigate_value(d, ["read", "address", "OS-EXT-IPS:port_id"], new_ai)
         val["port_id"] = v
 
         for v in val.values():
@@ -1681,8 +1663,7 @@ def adjust_data_volumes(parent_input, parent_cur):
                 result.append(cv[i])
 
     if len(result) != lcv:
-        raise Exception("adjust property(data_volumes) failed, "
-                        "the array number is not equal")
+        raise Exception("adjust property(data_volumes) failed, the array number is not equal")
 
     parent_cur["data_volumes"] = result
 
@@ -1725,8 +1706,7 @@ def adjust_nics(parent_input, parent_cur):
                 result.append(cv[i])
 
     if len(result) != lcv:
-        raise Exception("adjust property(nics) failed, "
-                        "the array number is not equal")
+        raise Exception("adjust property(nics) failed, the array number is not equal")
 
     parent_cur["nics"] = result
 
@@ -1736,11 +1716,9 @@ def set_unreadable_options(opts, states):
 
     states["eip_id"] = opts.get("eip_id")
 
-    set_unread_nics(
-        opts.get("nics"), states.get("nics"))
+    set_unread_nics(opts.get("nics"), states.get("nics"))
 
-    set_unread_root_volume(
-        opts.get("root_volume"), states.get("root_volume"))
+    set_unread_root_volume(opts.get("root_volume"), states.get("root_volume"))
 
     states["security_groups"] = opts.get("security_groups")
 
@@ -1803,13 +1781,11 @@ def set_readonly_options(opts, states):
 
     opts["image_name"] = states.get("image_name")
 
-    set_readonly_nics(
-        opts.get("nics"), states.get("nics"))
+    set_readonly_nics(opts.get("nics"), states.get("nics"))
 
     opts["power_state"] = states.get("power_state")
 
-    set_readonly_root_volume(
-        opts.get("root_volume"), states.get("root_volume"))
+    set_readonly_root_volume(opts.get("root_volume"), states.get("root_volume"))
 
     opts["server_alias"] = states.get("server_alias")
 
@@ -1860,7 +1836,6 @@ def set_readonly_root_volume(inputv, curv):
 
 
 def send_list_request(module, client, url):
-
     r = None
     try:
         r = client.get(url)
@@ -1972,13 +1947,11 @@ def fill_list_resp_body(body):
 
     result["OS-DCF:diskConfig"] = body.get("OS-DCF:diskConfig")
 
-    result["OS-EXT-AZ:availability_zone"] = body.get(
-        "OS-EXT-AZ:availability_zone")
+    result["OS-EXT-AZ:availability_zone"] = body.get("OS-EXT-AZ:availability_zone")
 
     result["OS-EXT-SRV-ATTR:hostname"] = body.get("OS-EXT-SRV-ATTR:hostname")
 
-    result["OS-EXT-SRV-ATTR:instance_name"] = body.get(
-        "OS-EXT-SRV-ATTR:instance_name")
+    result["OS-EXT-SRV-ATTR:instance_name"] = body.get("OS-EXT-SRV-ATTR:instance_name")
 
     result["OS-EXT-SRV-ATTR:user_data"] = body.get("OS-EXT-SRV-ATTR:user_data")
 
@@ -2076,5 +2049,5 @@ def adjust_list_api_tags(parent_input, parent_cur):
     parent_cur["tags"] = result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

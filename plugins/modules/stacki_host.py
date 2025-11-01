@@ -126,25 +126,23 @@ from ansible.module_utils.urls import fetch_url
 
 
 class StackiHost:
-
     def __init__(self, module):
         self.module = module
-        self.hostname = module.params['name']
-        self.rack = module.params['rack']
-        self.rank = module.params['rank']
-        self.appliance = module.params['appliance']
-        self.prim_intf = module.params['prim_intf']
-        self.prim_intf_ip = module.params['prim_intf_ip']
-        self.network = module.params['network']
-        self.prim_intf_mac = module.params['prim_intf_mac']
-        self.endpoint = module.params['stacki_endpoint']
+        self.hostname = module.params["name"]
+        self.rack = module.params["rack"]
+        self.rank = module.params["rank"]
+        self.appliance = module.params["appliance"]
+        self.prim_intf = module.params["prim_intf"]
+        self.prim_intf_ip = module.params["prim_intf_ip"]
+        self.network = module.params["network"]
+        self.prim_intf_mac = module.params["prim_intf_mac"]
+        self.endpoint = module.params["stacki_endpoint"]
 
-        auth_creds = {'USERNAME': module.params['stacki_user'],
-                      'PASSWORD': module.params['stacki_password']}
+        auth_creds = {"USERNAME": module.params["stacki_user"], "PASSWORD": module.params["stacki_password"]}
 
         # Get Initial CSRF
         cred_a = self.do_request(self.endpoint, method="GET")
-        cookie_a = cred_a.headers.get('Set-Cookie').split(';')
+        cookie_a = cred_a.headers.get("Set-Cookie").split(";")
         init_csrftoken = None
         for c in cookie_a:
             if "csrftoken" in c:
@@ -153,16 +151,20 @@ class StackiHost:
                 break
 
         # Make Header Dictionary with initial CSRF
-        header = {'csrftoken': init_csrftoken, 'X-CSRFToken': init_csrftoken,
-                  'Content-type': 'application/x-www-form-urlencoded', 'Cookie': cred_a.headers.get('Set-Cookie')}
+        header = {
+            "csrftoken": init_csrftoken,
+            "X-CSRFToken": init_csrftoken,
+            "Content-type": "application/x-www-form-urlencoded",
+            "Cookie": cred_a.headers.get("Set-Cookie"),
+        }
 
         # Endpoint to get final authentication header
         login_endpoint = f"{self.endpoint}/login"
 
         # Get Final CSRF and Session ID
-        login_req = self.do_request(login_endpoint, headers=header, payload=urlencode(auth_creds), method='POST')
+        login_req = self.do_request(login_endpoint, headers=header, payload=urlencode(auth_creds), method="POST")
 
-        cookie_f = login_req.headers.get('Set-Cookie').split(';')
+        cookie_f = login_req.headers.get("Set-Cookie").split(";")
         csrftoken = None
         for f in cookie_f:
             if "csrftoken" in f:
@@ -171,97 +173,103 @@ class StackiHost:
                 sessionid = c.split("sessionid=", 1)[-1]
                 sessionid = sessionid.rstrip("\r\n")
 
-        self.header = {'csrftoken': csrftoken,
-                       'X-CSRFToken': csrftoken,
-                       'sessionid': sessionid,
-                       'Content-type': 'application/json',
-                       'Cookie': login_req.headers.get('Set-Cookie')}
+        self.header = {
+            "csrftoken": csrftoken,
+            "X-CSRFToken": csrftoken,
+            "sessionid": sessionid,
+            "Content-type": "application/json",
+            "Cookie": login_req.headers.get("Set-Cookie"),
+        }
 
     def do_request(self, url, payload=None, headers=None, method=None):
         res, info = fetch_url(self.module, url, data=payload, headers=headers, method=method)
 
-        if info['status'] != 200:
-            self.module.fail_json(changed=False, msg=info['msg'])
+        if info["status"] != 200:
+            self.module.fail_json(changed=False, msg=info["msg"])
 
         return res
 
     def stack_check_host(self):
-        res = self.do_request(self.endpoint, payload=json.dumps({"cmd": "list host"}), headers=self.header, method="POST")
+        res = self.do_request(
+            self.endpoint, payload=json.dumps({"cmd": "list host"}), headers=self.header, method="POST"
+        )
         return self.hostname in res.read()
 
     def stack_sync(self):
         self.do_request(self.endpoint, payload=json.dumps({"cmd": "sync config"}), headers=self.header, method="POST")
-        self.do_request(self.endpoint, payload=json.dumps({"cmd": "sync host config"}), headers=self.header, method="POST")
+        self.do_request(
+            self.endpoint, payload=json.dumps({"cmd": "sync host config"}), headers=self.header, method="POST"
+        )
 
     def stack_force_install(self, result):
-        data = {'cmd': f"set host boot {self.hostname} action=install"}
+        data = {"cmd": f"set host boot {self.hostname} action=install"}
         self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
         changed = True
 
         self.stack_sync()
 
-        result['changed'] = changed
-        result['stdout'] = "api call successful".rstrip("\r\n")
+        result["changed"] = changed
+        result["stdout"] = "api call successful".rstrip("\r\n")
 
     def stack_add(self, result):
         data = dict()
         changed = False
 
-        data['cmd'] = f"add host {self.hostname} rack={self.rack} rank={self.rank} appliance={self.appliance}"
+        data["cmd"] = f"add host {self.hostname} rack={self.rack} rank={self.rank} appliance={self.appliance}"
         self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
 
         self.stack_sync()
 
-        result['changed'] = changed
-        result['stdout'] = "api call successful".rstrip("\r\n")
+        result["changed"] = changed
+        result["stdout"] = "api call successful".rstrip("\r\n")
 
     def stack_remove(self, result):
         data = dict()
 
-        data['cmd'] = f"remove host {self.hostname}"
+        data["cmd"] = f"remove host {self.hostname}"
         self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
 
         self.stack_sync()
 
-        result['changed'] = True
-        result['stdout'] = "api call successful".rstrip("\r\n")
+        result["changed"] = True
+        result["stdout"] = "api call successful".rstrip("\r\n")
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['absent', 'present']),
-            name=dict(type='str', required=True),
-            rack=dict(type='int', default=0),
-            rank=dict(type='int', default=0),
-            appliance=dict(type='str', default='backend'),
-            prim_intf=dict(type='str'),
-            prim_intf_ip=dict(type='str'),
-            network=dict(type='str', default='private'),
-            prim_intf_mac=dict(type='str'),
-            stacki_user=dict(type='str', required=True, fallback=(env_fallback, ['stacki_user'])),
-            stacki_password=dict(type='str', required=True, fallback=(env_fallback, ['stacki_password']), no_log=True),
-            stacki_endpoint=dict(type='str', required=True, fallback=(env_fallback, ['stacki_endpoint'])),
-            force_install=dict(type='bool', default=False),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            name=dict(type="str", required=True),
+            rack=dict(type="int", default=0),
+            rank=dict(type="int", default=0),
+            appliance=dict(type="str", default="backend"),
+            prim_intf=dict(type="str"),
+            prim_intf_ip=dict(type="str"),
+            network=dict(type="str", default="private"),
+            prim_intf_mac=dict(type="str"),
+            stacki_user=dict(type="str", required=True, fallback=(env_fallback, ["stacki_user"])),
+            stacki_password=dict(type="str", required=True, fallback=(env_fallback, ["stacki_password"]), no_log=True),
+            stacki_endpoint=dict(type="str", required=True, fallback=(env_fallback, ["stacki_endpoint"])),
+            force_install=dict(type="bool", default=False),
         ),
         supports_check_mode=False,
     )
 
-    result = {'changed': False}
+    result = {"changed": False}
     missing_params = list()
 
     stacki = StackiHost(module)
     host_exists = stacki.stack_check_host()
 
     # If state is present, but host exists, need force_install flag to put host back into install state
-    if module.params['state'] == 'present' and host_exists and module.params['force_install']:
+    if module.params["state"] == "present" and host_exists and module.params["force_install"]:
         stacki.stack_force_install(result)
     # If state is present, but host exists, and force_install and false, do nothing
-    elif module.params['state'] == 'present' and host_exists and not module.params['force_install']:
-        result['stdout'] = f"{module.params['name']} already exists. Set 'force_install' to true to bootstrap"
+    elif module.params["state"] == "present" and host_exists and not module.params["force_install"]:
+        result["stdout"] = f"{module.params['name']} already exists. Set 'force_install' to true to bootstrap"
     # Otherwise, state is present, but host doesn't exists, require more params to add host
-    elif module.params['state'] == 'present' and not host_exists:
-        for param in ['appliance', 'rack', 'rank', 'prim_intf', 'prim_intf_ip', 'network', 'prim_intf_mac']:
+    elif module.params["state"] == "present" and not host_exists:
+        for param in ["appliance", "rack", "rank", "prim_intf", "prim_intf_ip", "network", "prim_intf_mac"]:
             if not module.params[param]:
                 missing_params.append(param)
         if len(missing_params) > 0:
@@ -269,11 +277,11 @@ def main():
 
         stacki.stack_add(result)
     # If state is absent, and host exists, lets remove it.
-    elif module.params['state'] == 'absent' and host_exists:
+    elif module.params["state"] == "absent" and host_exists:
         stacki.stack_remove(result)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

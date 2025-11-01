@@ -142,6 +142,7 @@ from ansible.module_utils.common.text.converters import to_text
 try:
     import consul
     from requests.exceptions import ConnectionError
+
     python_consul_installed = True
 except ImportError:
     python_consul_installed = False
@@ -168,7 +169,7 @@ def _has_value_changed(consul_client, key, target_value):
     if not existing:
         return index, True
     try:
-        changed = to_text(existing['Value'], errors='surrogate_or_strict') != target_value
+        changed = to_text(existing["Value"], errors="surrogate_or_strict") != target_value
         return index, changed
     except UnicodeError:
         # Existing value was not decodable but all values we set are valid utf-8
@@ -176,57 +177,51 @@ def _has_value_changed(consul_client, key, target_value):
 
 
 def execute(module):
-    state = module.params.get('state')
+    state = module.params.get("state")
 
-    if state == 'acquire' or state == 'release':
+    if state == "acquire" or state == "release":
         lock(module, state)
-    elif state == 'present':
-        if module.params.get('value') is NOT_SET:
+    elif state == "present":
+        if module.params.get("value") is NOT_SET:
             get_value(module)
         else:
             set_value(module)
-    elif state == 'absent':
+    elif state == "absent":
         remove_value(module)
     else:
         module.exit_json(msg=f"Unsupported state: {state}")
 
 
 def lock(module, state):
-
     consul_api = get_consul_api(module)
 
-    session = module.params.get('session')
-    key = module.params.get('key')
-    value = module.params.get('value')
+    session = module.params.get("session")
+    key = module.params.get("key")
+    value = module.params.get("value")
 
     if not session:
-        module.fail(
-            msg=f'{state} of lock for {key} requested but no session supplied')
+        module.fail(msg=f"{state} of lock for {key} requested but no session supplied")
 
     index, changed = _has_value_changed(consul_api, key, value)
 
     if changed and not module.check_mode:
-        if state == 'acquire':
-            changed = consul_api.kv.put(key, value,
-                                        cas=module.params.get('cas'),
-                                        acquire=session,
-                                        flags=module.params.get('flags'))
+        if state == "acquire":
+            changed = consul_api.kv.put(
+                key, value, cas=module.params.get("cas"), acquire=session, flags=module.params.get("flags")
+            )
         else:
-            changed = consul_api.kv.put(key, value,
-                                        cas=module.params.get('cas'),
-                                        release=session,
-                                        flags=module.params.get('flags'))
+            changed = consul_api.kv.put(
+                key, value, cas=module.params.get("cas"), release=session, flags=module.params.get("flags")
+            )
 
-    module.exit_json(changed=changed,
-                     index=index,
-                     key=key)
+    module.exit_json(changed=changed, index=index, key=key)
 
 
 def get_value(module):
     consul_api = get_consul_api(module)
-    key = module.params.get('key')
+    key = module.params.get("key")
 
-    index, existing_value = consul_api.kv.get(key, recurse=module.params.get('recurse'))
+    index, existing_value = consul_api.kv.get(key, recurse=module.params.get("recurse"))
 
     module.exit_json(changed=False, index=index, data=existing_value)
 
@@ -234,8 +229,8 @@ def get_value(module):
 def set_value(module):
     consul_api = get_consul_api(module)
 
-    key = module.params.get('key')
-    value = module.params.get('value')
+    key = module.params.get("key")
+    value = module.params.get("value")
 
     if value is NOT_SET:
         raise AssertionError(f'Cannot set value of "{key}" to `NOT_SET`')
@@ -243,75 +238,69 @@ def set_value(module):
     index, changed = _has_value_changed(consul_api, key, value)
 
     if changed and not module.check_mode:
-        changed = consul_api.kv.put(key, value,
-                                    cas=module.params.get('cas'),
-                                    flags=module.params.get('flags'))
+        changed = consul_api.kv.put(key, value, cas=module.params.get("cas"), flags=module.params.get("flags"))
 
     stored = None
-    if module.params.get('retrieve'):
+    if module.params.get("retrieve"):
         index, stored = consul_api.kv.get(key)
 
-    module.exit_json(changed=changed,
-                     index=index,
-                     key=key,
-                     data=stored)
+    module.exit_json(changed=changed, index=index, key=key, data=stored)
 
 
 def remove_value(module):
-    ''' remove the value associated with the given key. if the recurse parameter
-     is set then any key prefixed with the given key will be removed. '''
+    """remove the value associated with the given key. if the recurse parameter
+    is set then any key prefixed with the given key will be removed."""
     consul_api = get_consul_api(module)
 
-    key = module.params.get('key')
+    key = module.params.get("key")
 
-    index, existing = consul_api.kv.get(
-        key, recurse=module.params.get('recurse'))
+    index, existing = consul_api.kv.get(key, recurse=module.params.get("recurse"))
 
     changed = existing is not None
     if changed and not module.check_mode:
-        consul_api.kv.delete(key, module.params.get('recurse'))
+        consul_api.kv.delete(key, module.params.get("recurse"))
 
-    module.exit_json(changed=changed,
-                     index=index,
-                     key=key,
-                     data=existing)
+    module.exit_json(changed=changed, index=index, key=key, data=existing)
 
 
 def get_consul_api(module):
-    return consul.Consul(host=module.params.get('host'),
-                         port=module.params.get('port'),
-                         scheme=module.params.get('scheme'),
-                         verify=module.params.get('validate_certs'),
-                         token=module.params.get('token'),
-                         dc=module.params.get('datacenter'))
+    return consul.Consul(
+        host=module.params.get("host"),
+        port=module.params.get("port"),
+        scheme=module.params.get("scheme"),
+        verify=module.params.get("validate_certs"),
+        token=module.params.get("token"),
+        dc=module.params.get("datacenter"),
+    )
 
 
 def test_dependencies(module):
     if not python_consul_installed:
-        module.fail_json(msg="python-consul required for this module. "
-                             "see https://python-consul.readthedocs.io/en/latest/#installation")
+        module.fail_json(
+            msg="python-consul required for this module. "
+            "see https://python-consul.readthedocs.io/en/latest/#installation"
+        )
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            cas=dict(type='str'),
-            datacenter=dict(type='str'),
-            flags=dict(type='str'),
-            key=dict(type='str', required=True, no_log=False),
-            host=dict(type='str', default='localhost'),
-            scheme=dict(type='str', default='http'),
-            validate_certs=dict(type='bool', default=True),
-            port=dict(type='int', default=8500),
-            recurse=dict(type='bool'),
-            retrieve=dict(type='bool', default=True),
-            state=dict(type='str', default='present', choices=['absent', 'acquire', 'present', 'release']),
-            token=dict(type='str', no_log=True),
-            value=dict(type='str', default=NOT_SET),
-            session=dict(type='str'),
+            cas=dict(type="str"),
+            datacenter=dict(type="str"),
+            flags=dict(type="str"),
+            key=dict(type="str", required=True, no_log=False),
+            host=dict(type="str", default="localhost"),
+            scheme=dict(type="str", default="http"),
+            validate_certs=dict(type="bool", default=True),
+            port=dict(type="int", default=8500),
+            recurse=dict(type="bool"),
+            retrieve=dict(type="bool", default=True),
+            state=dict(type="str", default="present", choices=["absent", "acquire", "present", "release"]),
+            token=dict(type="str", no_log=True),
+            value=dict(type="str", default=NOT_SET),
+            session=dict(type="str"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     test_dependencies(module)
@@ -319,10 +308,12 @@ def main():
     try:
         execute(module)
     except ConnectionError as e:
-        module.fail_json(msg=f"Could not connect to consul agent at {module.params.get('host')}:{module.params.get('port')}, error was {e}")
+        module.fail_json(
+            msg=f"Could not connect to consul agent at {module.params.get('host')}:{module.params.get('port')}, error was {e}"
+        )
     except Exception as e:
         module.fail_json(msg=str(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

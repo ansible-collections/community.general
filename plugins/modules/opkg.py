@@ -123,9 +123,21 @@ class Opkg(StateModuleHelper):
         argument_spec=dict(
             name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
-            force=dict(choices=["depends", "maintainer", "reinstall", "overwrite", "downgrade", "space",
-                                "postinstall", "remove", "checksum", "removal-of-dependent-packages"]),
-            update_cache=dict(default=False, type='bool'),
+            force=dict(
+                choices=[
+                    "depends",
+                    "maintainer",
+                    "reinstall",
+                    "overwrite",
+                    "downgrade",
+                    "space",
+                    "postinstall",
+                    "remove",
+                    "checksum",
+                    "removal-of-dependent-packages",
+                ]
+            ),
+            update_cache=dict(default=False, type="bool"),
             executable=dict(type="path"),
         ),
     )
@@ -168,8 +180,8 @@ class Opkg(StateModuleHelper):
 
     @staticmethod
     def split_name_and_version(package):
-        """ Split the name and the version when using the NAME=VERSION syntax """
-        splitted = package.split('=', 1)
+        """Split the name and the version when using the NAME=VERSION syntax"""
+        splitted = package.split("=", 1)
         if len(splitted) == 1:
             return splitted[0], None
         else:
@@ -185,7 +197,10 @@ class Opkg(StateModuleHelper):
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 pkg_name, pkg_version = self.split_name_and_version(package)
-                if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version) or self.vars.force == "reinstall":
+                if (
+                    not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version)
+                    or self.vars.force == "reinstall"
+                ):
                     ctx.run(package=package)
                     self.vars.set("run_info", ctx.run_info, verbosity=4)
                     if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version):
@@ -219,5 +234,5 @@ def main():
     Opkg.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

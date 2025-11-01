@@ -13,7 +13,19 @@ from os import environ
 from ansible.module_utils.basic import AnsibleModule
 
 
-IMAGE_STATES = ['INIT', 'READY', 'USED', 'DISABLED', 'LOCKED', 'ERROR', 'CLONE', 'DELETE', 'USED_PERS', 'LOCKED_USED', 'LOCKED_USED_PERS']
+IMAGE_STATES = [
+    "INIT",
+    "READY",
+    "USED",
+    "DISABLED",
+    "LOCKED",
+    "ERROR",
+    "CLONE",
+    "DELETE",
+    "USED_PERS",
+    "LOCKED_USED",
+    "LOCKED_USED_PERS",
+]
 HAS_PYONE = True
 
 try:
@@ -29,8 +41,10 @@ except ImportError:
 # There are either lists of dictionaries (length > 1) or just dictionaries.
 def flatten(to_flatten, extract=False):
     """Flattens nested lists (with optional value extraction)."""
+
     def recurse(to_flatten):
         return sum(map(recurse, to_flatten), []) if isinstance(to_flatten, list) else [to_flatten]
+
     value = recurse(to_flatten)
     if extract and len(value) == 1:
         return value[0]
@@ -41,6 +55,7 @@ def flatten(to_flatten, extract=False):
 # It renders JSON-like template representation into OpenNebula's template syntax (string).
 def render(to_render):
     """Converts dictionary to OpenNebula template."""
+
     def recurse(to_render):
         for key, value in sorted(to_render.items()):
             if value is None:
@@ -53,11 +68,12 @@ def render(to_render):
                     yield f"{key}=[{','.join(recurse(item))}]"
                 continue
             if isinstance(value, str):
-                _value = value.replace('\\', '\\\\').replace('"', '\\"')
+                _value = value.replace("\\", "\\\\").replace('"', '\\"')
                 yield f'{key}="{_value}"'
                 continue
             yield f'{key}="{value}"'
-    return '\n'.join(recurse(to_render))
+
+    return "\n".join(recurse(to_render))
 
 
 class OpenNebulaModule:
@@ -68,26 +84,27 @@ class OpenNebulaModule:
     """
 
     common_args = dict(
-        api_url=dict(type='str', aliases=['api_endpoint'], default=environ.get("ONE_URL")),
-        api_username=dict(type='str', default=environ.get("ONE_USERNAME")),
-        api_password=dict(type='str', no_log=True, aliases=['api_token'], default=environ.get("ONE_PASSWORD")),
-        validate_certs=dict(default=True, type='bool'),
-        wait_timeout=dict(type='int', default=300),
+        api_url=dict(type="str", aliases=["api_endpoint"], default=environ.get("ONE_URL")),
+        api_username=dict(type="str", default=environ.get("ONE_USERNAME")),
+        api_password=dict(type="str", no_log=True, aliases=["api_token"], default=environ.get("ONE_PASSWORD")),
+        validate_certs=dict(default=True, type="bool"),
+        wait_timeout=dict(type="int", default=300),
     )
 
-    def __init__(self, argument_spec, supports_check_mode=False, mutually_exclusive=None, required_one_of=None, required_if=None):
-
+    def __init__(
+        self, argument_spec, supports_check_mode=False, mutually_exclusive=None, required_one_of=None, required_if=None
+    ):
         module_args = OpenNebulaModule.common_args.copy()
         module_args.update(argument_spec)
 
-        self.module = AnsibleModule(argument_spec=module_args,
-                                    supports_check_mode=supports_check_mode,
-                                    mutually_exclusive=mutually_exclusive,
-                                    required_one_of=required_one_of,
-                                    required_if=required_if)
-        self.result = dict(changed=False,
-                           original_message='',
-                           message='')
+        self.module = AnsibleModule(
+            argument_spec=module_args,
+            supports_check_mode=supports_check_mode,
+            mutually_exclusive=mutually_exclusive,
+            required_one_of=required_one_of,
+            required_if=required_if,
+        )
+        self.result = dict(changed=False, original_message="", message="")
         self.one = self.create_one_client()
 
         self.resolved_parameters = self.resolve_parameters()
@@ -101,7 +118,7 @@ class OpenNebulaModule:
         """
 
         # context required for not validating SSL, old python versions won't validate anyway.
-        if hasattr(ssl, '_create_unverified_context'):
+        if hasattr(ssl, "_create_unverified_context"):
             no_ssl_validation_context = ssl._create_unverified_context()
         else:
             no_ssl_validation_context = None
@@ -144,7 +161,7 @@ class OpenNebulaModule:
         Args:
             msg: human readable failure reason.
         """
-        if hasattr(self, 'one'):
+        if hasattr(self, "one"):
             self.close_one_client()
         self.module.fail_json(msg=msg)
 
@@ -153,7 +170,7 @@ class OpenNebulaModule:
         Utility exit method, will ensure pyone is properly closed before exiting.
 
         """
-        if hasattr(self, 'one'):
+        if hasattr(self, "one"):
             self.close_one_client()
         self.module.exit_json(**self.result)
 
@@ -169,11 +186,11 @@ class OpenNebulaModule:
 
         resolved_params = dict(self.module.params)
 
-        if 'cluster_name' in self.module.params:
+        if "cluster_name" in self.module.params:
             clusters = self.one.clusterpool.info()
             for cluster in clusters.CLUSTER:
-                if cluster.NAME == self.module.params.get('cluster_name'):
-                    resolved_params['cluster_id'] = cluster.ID
+                if cluster.NAME == self.module.params.get("cluster_name"):
+                    resolved_params["cluster_id"] = cluster.ID
 
         return resolved_params
 
@@ -196,14 +213,14 @@ class OpenNebulaModule:
         return self.resolved_parameters.get(name)
 
     def get_host_by_name(self, name):
-        '''
+        """
         Returns a host given its name.
         Args:
             name: the name of the host
 
         Returns: the host object or None if the host is absent.
 
-        '''
+        """
         hosts = self.one.hostpool.info()
         for h in hosts.HOST:
             if h.NAME == name:
@@ -226,14 +243,14 @@ class OpenNebulaModule:
         return None
 
     def get_template_by_name(self, name):
-        '''
+        """
         Returns a template given its name.
         Args:
             name: the name of the template
 
         Returns: the template object or None if the host is absent.
 
-        '''
+        """
         templates = self.one.templatepool.info()
         for t in templates.TEMPLATE:
             if t.NAME == name:
@@ -262,7 +279,7 @@ class OpenNebulaModule:
             if isinstance(value, dict):
                 self.cast_template(template[key])
             elif isinstance(value, list):
-                template[key] = ', '.join(value)
+                template[key] = ", ".join(value)
             elif not isinstance(value, str):
                 template[key] = str(value)
 
@@ -290,9 +307,16 @@ class OpenNebulaModule:
                 return True
         return not (desired == intersection)
 
-    def wait_for_state(self, element_name, state, state_name, target_states,
-                       invalid_states=None, transition_states=None,
-                       wait_timeout=None):
+    def wait_for_state(
+        self,
+        element_name,
+        state,
+        state_name,
+        target_states,
+        invalid_states=None,
+        transition_states=None,
+        wait_timeout=None,
+    ):
         """
         Args:
             element_name: the name of the object we are waiting for: HOST, VM, etc.
@@ -313,11 +337,11 @@ class OpenNebulaModule:
             current_state = state()
 
             if current_state in invalid_states:
-                self.fail(f'invalid {element_name} state {state_name(current_state)}')
+                self.fail(f"invalid {element_name} state {state_name(current_state)}")
 
             if transition_states:
                 if current_state not in transition_states:
-                    self.fail(f'invalid {element_name} transition state {state_name(current_state)}')
+                    self.fail(f"invalid {element_name} transition state {state_name(current_state)}")
 
             if current_state in target_states:
                 return True
@@ -353,17 +377,17 @@ class OpenNebulaModule:
         """
         list_of_id = []
 
-        if element == 'VMS':
+        if element == "VMS":
             image_list = image.VMS
-        if element == 'CLONES':
+        if element == "CLONES":
             image_list = image.CLONES
-        if element == 'APP_CLONES':
+        if element == "APP_CLONES":
             image_list = image.APP_CLONES
 
         for iter in image_list.ID:
             list_of_id.append(
                 # These are optional so firstly check for presence
-                getattr(iter, 'ID', 'Null'),
+                getattr(iter, "ID", "Null"),
             )
         return list_of_id
 
@@ -374,16 +398,18 @@ class OpenNebulaModule:
         list_of_snapshots = []
 
         for iter in image.SNAPSHOTS.SNAPSHOT:
-            list_of_snapshots.append({
-                'date': iter['DATE'],
-                'parent': iter['PARENT'],
-                'size': iter['SIZE'],
-                # These are optional so firstly check for presence
-                'allow_orhans': getattr(image.SNAPSHOTS, 'ALLOW_ORPHANS', 'Null'),
-                'children': getattr(iter, 'CHILDREN', 'Null'),
-                'active': getattr(iter, 'ACTIVE', 'Null'),
-                'name': getattr(iter, 'NAME', 'Null'),
-            })
+            list_of_snapshots.append(
+                {
+                    "date": iter["DATE"],
+                    "parent": iter["PARENT"],
+                    "size": iter["SIZE"],
+                    # These are optional so firstly check for presence
+                    "allow_orhans": getattr(image.SNAPSHOTS, "ALLOW_ORPHANS", "Null"),
+                    "children": getattr(iter, "CHILDREN", "Null"),
+                    "active": getattr(iter, "ACTIVE", "Null"),
+                    "name": getattr(iter, "NAME", "Null"),
+                }
+            )
         return list_of_snapshots
 
     def get_image_info(self, image):
@@ -393,43 +419,43 @@ class OpenNebulaModule:
         Returns: a copy of the parameters that includes the resolved parameters.
         """
         info = {
-            'id': image.ID,
-            'name': image.NAME,
-            'state': IMAGE_STATES[image.STATE],
-            'running_vms': image.RUNNING_VMS,
-            'used': bool(image.RUNNING_VMS),
-            'user_name': image.UNAME,
-            'user_id': image.UID,
-            'group_name': image.GNAME,
-            'group_id': image.GID,
-            'permissions': {
-                'owner_u': image.PERMISSIONS.OWNER_U,
-                'owner_m': image.PERMISSIONS.OWNER_M,
-                'owner_a': image.PERMISSIONS.OWNER_A,
-                'group_u': image.PERMISSIONS.GROUP_U,
-                'group_m': image.PERMISSIONS.GROUP_M,
-                'group_a': image.PERMISSIONS.GROUP_A,
-                'other_u': image.PERMISSIONS.OTHER_U,
-                'other_m': image.PERMISSIONS.OTHER_M,
-                'other_a': image.PERMISSIONS.OTHER_A
+            "id": image.ID,
+            "name": image.NAME,
+            "state": IMAGE_STATES[image.STATE],
+            "running_vms": image.RUNNING_VMS,
+            "used": bool(image.RUNNING_VMS),
+            "user_name": image.UNAME,
+            "user_id": image.UID,
+            "group_name": image.GNAME,
+            "group_id": image.GID,
+            "permissions": {
+                "owner_u": image.PERMISSIONS.OWNER_U,
+                "owner_m": image.PERMISSIONS.OWNER_M,
+                "owner_a": image.PERMISSIONS.OWNER_A,
+                "group_u": image.PERMISSIONS.GROUP_U,
+                "group_m": image.PERMISSIONS.GROUP_M,
+                "group_a": image.PERMISSIONS.GROUP_A,
+                "other_u": image.PERMISSIONS.OTHER_U,
+                "other_m": image.PERMISSIONS.OTHER_M,
+                "other_a": image.PERMISSIONS.OTHER_A,
             },
-            'type': image.TYPE,
-            'disk_type': image.DISK_TYPE,
-            'persistent': image.PERSISTENT,
-            'regtime': image.REGTIME,
-            'source': image.SOURCE,
-            'path': image.PATH,
-            'fstype': getattr(image, 'FSTYPE', 'Null'),
-            'size': image.SIZE,
-            'cloning_ops': image.CLONING_OPS,
-            'cloning_id': image.CLONING_ID,
-            'target_snapshot': image.TARGET_SNAPSHOT,
-            'datastore_id': image.DATASTORE_ID,
-            'datastore': image.DATASTORE,
-            'vms': self.get_image_list_id(image, 'VMS'),
-            'clones': self.get_image_list_id(image, 'CLONES'),
-            'app_clones': self.get_image_list_id(image, 'APP_CLONES'),
-            'snapshots': self.get_image_snapshots_list(image),
-            'template': image.TEMPLATE,
+            "type": image.TYPE,
+            "disk_type": image.DISK_TYPE,
+            "persistent": image.PERSISTENT,
+            "regtime": image.REGTIME,
+            "source": image.SOURCE,
+            "path": image.PATH,
+            "fstype": getattr(image, "FSTYPE", "Null"),
+            "size": image.SIZE,
+            "cloning_ops": image.CLONING_OPS,
+            "cloning_id": image.CLONING_ID,
+            "target_snapshot": image.TARGET_SNAPSHOT,
+            "datastore_id": image.DATASTORE_ID,
+            "datastore": image.DATASTORE,
+            "vms": self.get_image_list_id(image, "VMS"),
+            "clones": self.get_image_list_id(image, "CLONES"),
+            "app_clones": self.get_image_list_id(image, "APP_CLONES"),
+            "snapshots": self.get_image_snapshots_list(image),
+            "template": image.TEMPLATE,
         }
         return info

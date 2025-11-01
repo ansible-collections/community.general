@@ -92,6 +92,7 @@ import traceback
 SELINUX_IMP_ERR = None
 try:
     import selinux
+
     HAVE_SELINUX = True
 except ImportError:
     SELINUX_IMP_ERR = traceback.format_exc()
@@ -100,6 +101,7 @@ except ImportError:
 SEOBJECT_IMP_ERR = None
 try:
     import seobject
+
     HAVE_SEOBJECT = True
 except ImportError:
     SEOBJECT_IMP_ERR = traceback.format_exc()
@@ -109,8 +111,8 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
-def semanage_login_add(module, login, seuser, do_reload, serange='s0', sestore=''):
-    """ Add linux user to SELinux user mapping
+def semanage_login_add(module, login, seuser, do_reload, serange="s0", sestore=""):
+    """Add linux user to SELinux user mapping
 
     :type module: AnsibleModule
     :param module: Ansible module
@@ -156,8 +158,8 @@ def semanage_login_add(module, login, seuser, do_reload, serange='s0', sestore='
     return change
 
 
-def semanage_login_del(module, login, seuser, do_reload, sestore=''):
-    """ Delete linux user to SELinux user mapping
+def semanage_login_del(module, login, seuser, do_reload, sestore=""):
+    """Delete linux user to SELinux user mapping
 
     :type module: AnsibleModule
     :param module: Ansible module
@@ -201,17 +203,15 @@ def get_runtime_status(ignore_selinux_state=False):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            ignore_selinux_state=dict(type='bool', default=False),
-            login=dict(type='str', required=True),
-            seuser=dict(type='str'),
-            selevel=dict(type='str', aliases=['serange'], default='s0'),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
-            reload=dict(type='bool', default=True),
+            ignore_selinux_state=dict(type="bool", default=False),
+            login=dict(type="str", required=True),
+            seuser=dict(type="str"),
+            selevel=dict(type="str", aliases=["serange"], default="s0"),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            reload=dict(type="bool", default=True),
         ),
-        required_if=[
-            ["state", "present", ["seuser"]]
-        ],
-        supports_check_mode=True
+        required_if=[["state", "present", ["seuser"]]],
+        supports_check_mode=True,
     )
     if not HAVE_SELINUX:
         module.fail_json(msg=missing_required_lib("libselinux"), exception=SELINUX_IMP_ERR)
@@ -219,33 +219,33 @@ def main():
     if not HAVE_SEOBJECT:
         module.fail_json(msg=missing_required_lib("seobject from policycoreutils"), exception=SEOBJECT_IMP_ERR)
 
-    ignore_selinux_state = module.params['ignore_selinux_state']
+    ignore_selinux_state = module.params["ignore_selinux_state"]
 
     if not get_runtime_status(ignore_selinux_state):
         module.fail_json(msg="SELinux is disabled on this host.")
 
-    login = module.params['login']
-    seuser = module.params['seuser']
-    serange = module.params['selevel']
-    state = module.params['state']
-    do_reload = module.params['reload']
+    login = module.params["login"]
+    seuser = module.params["seuser"]
+    serange = module.params["selevel"]
+    state = module.params["state"]
+    do_reload = module.params["reload"]
 
     result = {
-        'login': login,
-        'seuser': seuser,
-        'serange': serange,
-        'state': state,
+        "login": login,
+        "seuser": seuser,
+        "serange": serange,
+        "state": state,
     }
 
-    if state == 'present':
-        result['changed'] = semanage_login_add(module, login, seuser, do_reload, serange)
-    elif state == 'absent':
-        result['changed'] = semanage_login_del(module, login, seuser, do_reload)
+    if state == "present":
+        result["changed"] = semanage_login_add(module, login, seuser, do_reload, serange)
+    elif state == "absent":
+        result["changed"] = semanage_login_del(module, login, seuser, do_reload)
     else:
         module.fail_json(msg=f'Invalid value of argument "state": {state}')
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 name: ansible_type
 short_description: Validate input type
 version_added: "9.2.0"
@@ -23,9 +23,9 @@ options:
     description: Data type aliases.
     default: {}
     type: dictionary
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # Substitution converts str to AnsibleUnicode or _AnsibleTaggedStr
 # ----------------------------------------------------------------
 
@@ -214,13 +214,13 @@ dtype: number
 data: 123.45
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 # result => true
-'''
+"""
 
-RETURN = '''
+RETURN = """
 _value:
   description: Whether the data type is valid.
   type: bool
-'''
+"""
 
 from collections.abc import Sequence
 
@@ -245,8 +245,5 @@ def ansible_type(data, dtype, alias=None):
 
 
 class TestModule:
-
     def tests(self):
-        return {
-            'ansible_type': ansible_type
-        }
+        return {"ansible_type": ansible_type}

@@ -179,18 +179,12 @@ class LookupModule(LookupBase):
     @staticmethod
     def get_random(random_generator, chars, length):
         if not chars:
-            raise AnsibleLookupError(
-                "Available characters cannot be None, please change constraints"
-            )
+            raise AnsibleLookupError("Available characters cannot be None, please change constraints")
         return "".join(random_generator.choice(chars) for dummy in range(length))
 
     @staticmethod
     def b64encode(string_value, encoding="utf-8"):
-        return to_text(
-            base64.b64encode(
-                to_bytes(string_value, encoding=encoding, errors="surrogate_or_strict")
-            )
-        )
+        return to_text(base64.b64encode(to_bytes(string_value, encoding=encoding, errors="surrogate_or_strict")))
 
     def run(self, terms, variables=None, **kwargs):
         number_chars = string.digits

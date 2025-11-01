@@ -40,7 +40,6 @@ from ansible.utils.listify import listify_lookup_plugin_terms
 
 
 class LookupModule(LookupBase):
-
     def _check_list_of_one_list(self, term):
         # make sure term is not a list of one (list of one..) item
         # return the final non list item if so
@@ -53,12 +52,11 @@ class LookupModule(LookupBase):
         return term
 
     def _do_flatten(self, terms, variables):
-
         ret = []
         for term in terms:
             term = self._check_list_of_one_list(term)
 
-            if term == 'None' or term == 'null':
+            if term == "None" or term == "null":
                 # ignore undefined items
                 break
 

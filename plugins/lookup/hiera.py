@@ -79,7 +79,7 @@ class Hiera:
 
     def get(self, hiera_key):
         pargs = [self.hiera_bin]
-        pargs.extend(['-c', self.hiera_cfg])
+        pargs.extend(["-c", self.hiera_cfg])
 
         pargs.extend(hiera_key)
 
@@ -92,6 +92,6 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
-        hiera = Hiera(self.get_option('config_file'), self.get_option('executable'))
+        hiera = Hiera(self.get_option("config_file"), self.get_option("executable"))
         ret = [hiera.get(terms)]
         return ret

@@ -159,9 +159,7 @@ def create_vcn(virtual_network_client, module):
 
 
 def main():
-    module_args = oci_utils.get_taggable_arg_spec(
-        supports_create=True, supports_wait=True
-    )
+    module_args = oci_utils.get_taggable_arg_spec(supports_create=True, supports_wait=True)
     module_args.update(
         dict(
             cidr_block=dict(type="str"),
@@ -182,9 +180,7 @@ def main():
     if not HAS_OCI_PY_SDK:
         module.fail_json(msg=missing_required_lib("oci"))
 
-    virtual_network_client = oci_utils.create_service_client(
-        module, VirtualNetworkClient
-    )
+    virtual_network_client = oci_utils.create_service_client(module, VirtualNetworkClient)
 
     exclude_attributes = {"display_name": True, "dns_label": True}
     state = module.params["state"]
@@ -194,9 +190,7 @@ def main():
         if vcn_id is not None:
             result = delete_vcn(virtual_network_client, module)
         else:
-            module.fail_json(
-                msg="Specify vcn_id with state as 'absent' to delete a VCN."
-            )
+            module.fail_json(msg="Specify vcn_id with state as 'absent' to delete a VCN.")
 
     else:
         if vcn_id is not None:

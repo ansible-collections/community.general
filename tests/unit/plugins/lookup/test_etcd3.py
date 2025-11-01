@@ -13,42 +13,39 @@ from ansible.plugins.loader import lookup_loader
 
 
 class FakeKVMetadata:
-
     def __init__(self, keyvalue, header):
         self.key = keyvalue
-        self.create_revision = ''
-        self.mod_revision = ''
-        self.version = ''
-        self.lease_id = ''
+        self.create_revision = ""
+        self.mod_revision = ""
+        self.version = ""
+        self.lease_id = ""
         self.response_header = header
 
 
 class FakeEtcd3Client(MagicMock):
-
     def get_prefix(self, key):
         for i in range(1, 4):
-            yield self.get(f'{key}_{i}')
+            yield self.get(f"{key}_{i}")
 
     def get(self, key):
         return (f"{key} value", FakeKVMetadata(key, None))
 
 
 class TestLookupModule(unittest.TestCase):
-
     def setUp(self):
         etcd3.HAS_ETCD = True
-        self.lookup = lookup_loader.get('community.general.etcd3')
+        self.lookup = lookup_loader.get("community.general.etcd3")
 
-    @patch('ansible_collections.community.general.plugins.lookup.etcd3.etcd3_client', FakeEtcd3Client())
+    @patch("ansible_collections.community.general.plugins.lookup.etcd3.etcd3_client", FakeEtcd3Client())
     def test_key(self):
-        expected_result = [{'key': 'a_key', 'value': 'a_key value'}]
-        self.assertListEqual(expected_result, self.lookup.run(['a_key'], []))
+        expected_result = [{"key": "a_key", "value": "a_key value"}]
+        self.assertListEqual(expected_result, self.lookup.run(["a_key"], []))
 
-    @patch('ansible_collections.community.general.plugins.lookup.etcd3.etcd3_client', FakeEtcd3Client())
+    @patch("ansible_collections.community.general.plugins.lookup.etcd3.etcd3_client", FakeEtcd3Client())
     def test_key_prefix(self):
         expected_result = [
-            {'key': 'a_key_1', 'value': 'a_key_1 value'},
-            {'key': 'a_key_2', 'value': 'a_key_2 value'},
-            {'key': 'a_key_3', 'value': 'a_key_3 value'},
+            {"key": "a_key_1", "value": "a_key_1 value"},
+            {"key": "a_key_2", "value": "a_key_2 value"},
+            {"key": "a_key_3", "value": "a_key_3 value"},
         ]
-        self.assertListEqual(expected_result, self.lookup.run(['a_key'], [], **{'prefix': True}))
+        self.assertListEqual(expected_result, self.lookup.run(["a_key"], [], **{"prefix": True}))

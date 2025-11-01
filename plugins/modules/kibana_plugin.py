@@ -119,10 +119,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
-PACKAGE_STATE_MAP = dict(
-    present="--install",
-    absent="--remove"
-)
+PACKAGE_STATE_MAP = dict(present="--install", absent="--remove")
 
 
 def parse_plugin_repo(string):
@@ -139,7 +136,7 @@ def parse_plugin_repo(string):
     # remove es- prefix
     for string in ("elasticsearch-", "es-"):
         if repo.startswith(string):
-            return repo[len(string):]
+            return repo[len(string) :]
 
     return repo
 
@@ -151,14 +148,14 @@ def is_plugin_present(plugin_dir, working_dir):
 def parse_error(string):
     reason = "reason: "
     try:
-        return string[string.index(reason) + len(reason):].strip()
+        return string[string.index(reason) + len(reason) :].strip()
     except ValueError:
         return string
 
 
-def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, kibana_version='4.6'):
-    if LooseVersion(kibana_version) > LooseVersion('4.6'):
-        kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
+def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, kibana_version="4.6"):
+    if LooseVersion(kibana_version) > LooseVersion("4.6"):
+        kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), "kibana-plugin")
         cmd_args = [kibana_plugin_bin, "install"]
         if url:
             cmd_args.append(url)
@@ -174,7 +171,7 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, ki
         cmd_args.extend(["--timeout", timeout])
 
     if allow_root:
-        cmd_args.append('--allow-root')
+        cmd_args.append("--allow-root")
 
     if module.check_mode:
         return True, " ".join(cmd_args), "check mode", ""
@@ -187,15 +184,15 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, ki
     return True, " ".join(cmd_args), out, err
 
 
-def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version='4.6'):
-    if LooseVersion(kibana_version) > LooseVersion('4.6'):
-        kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
+def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version="4.6"):
+    if LooseVersion(kibana_version) > LooseVersion("4.6"):
+        kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), "kibana-plugin")
         cmd_args = [kibana_plugin_bin, "remove", plugin_name]
     else:
         cmd_args = [plugin_bin, "plugin", PACKAGE_STATE_MAP["absent"], plugin_name]
 
     if allow_root:
-        cmd_args.append('--allow-root')
+        cmd_args.append("--allow-root")
 
     if module.check_mode:
         return True, " ".join(cmd_args), "check mode", ""
@@ -209,10 +206,10 @@ def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version='4
 
 
 def get_kibana_version(module, plugin_bin, allow_root):
-    cmd_args = [plugin_bin, '--version']
+    cmd_args = [plugin_bin, "--version"]
 
     if allow_root:
-        cmd_args.append('--allow-root')
+        cmd_args.append("--allow-root")
 
     rc, out, err = module.run_command(cmd_args)
     if rc != 0:
@@ -247,7 +244,7 @@ def main():
     force = module.params["force"]
     allow_root = module.params["allow_root"]
 
-    changed, cmd, out, err = False, '', '', ''
+    changed, cmd, out, err = False, "", "", ""
 
     kibana_version = get_kibana_version(module, plugin_bin, allow_root)
 
@@ -271,5 +268,5 @@ def main():
     module.exit_json(changed=changed, cmd=cmd, name=name, state=state, url=url, timeout=timeout, stdout=out, stderr=err)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

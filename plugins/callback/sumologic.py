@@ -67,7 +67,7 @@ class SumologicHTTPCollectorSource:
         self.user = getpass.getuser()
 
     def send_event(self, url, state, result, runtime):
-        if result._task_fields['args'].get('_ansible_check_mode') is True:
+        if result._task_fields["args"].get("_ansible_check_mode") is True:
             self.ansible_check_mode = True
 
         if result._task._role:
@@ -75,41 +75,38 @@ class SumologicHTTPCollectorSource:
         else:
             ansible_role = None
 
-        if 'args' in result._task_fields:
-            del result._task_fields['args']
+        if "args" in result._task_fields:
+            del result._task_fields["args"]
 
         data = {}
-        data['uuid'] = result._task._uuid
-        data['session'] = self.session
-        data['status'] = state
-        data['timestamp'] = now().strftime('%Y-%m-%d %H:%M:%S +0000')
-        data['host'] = self.host
-        data['ip_address'] = self.ip_address
-        data['user'] = self.user
-        data['runtime'] = runtime
-        data['ansible_version'] = ansible_version
-        data['ansible_check_mode'] = self.ansible_check_mode
-        data['ansible_host'] = result._host.name
-        data['ansible_playbook'] = self.ansible_playbook
-        data['ansible_role'] = ansible_role
-        data['ansible_task'] = result._task_fields
-        data['ansible_result'] = result._result
+        data["uuid"] = result._task._uuid
+        data["session"] = self.session
+        data["status"] = state
+        data["timestamp"] = now().strftime("%Y-%m-%d %H:%M:%S +0000")
+        data["host"] = self.host
+        data["ip_address"] = self.ip_address
+        data["user"] = self.user
+        data["runtime"] = runtime
+        data["ansible_version"] = ansible_version
+        data["ansible_check_mode"] = self.ansible_check_mode
+        data["ansible_host"] = result._host.name
+        data["ansible_playbook"] = self.ansible_playbook
+        data["ansible_role"] = ansible_role
+        data["ansible_task"] = result._task_fields
+        data["ansible_result"] = result._result
 
         open_url(
             url,
             data=json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True),
-            headers={
-                'Content-type': 'application/json',
-                'X-Sumo-Host': data['ansible_host']
-            },
-            method='POST'
+            headers={"Content-type": "application/json", "X-Sumo-Host": data["ansible_host"]},
+            method="POST",
         )
 
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'community.general.sumologic'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "community.general.sumologic"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
@@ -119,23 +116,22 @@ class CallbackModule(CallbackBase):
         self.sumologic = SumologicHTTPCollectorSource()
 
     def _runtime(self, result):
-        return (
-            now() -
-            self.start_datetimes[result._task._uuid]
-        ).total_seconds()
+        return (now() - self.start_datetimes[result._task._uuid]).total_seconds()
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        self.url = self.get_option('url')
+        self.url = self.get_option("url")
 
         if self.url is None:
             self.disabled = True
-            self._display.warning('Sumologic HTTP collector source URL was '
-                                  'not provided. The Sumologic HTTP collector '
-                                  'source URL can be provided using the '
-                                  '`SUMOLOGIC_URL` environment variable or '
-                                  'in the ansible.cfg file.')
+            self._display.warning(
+                "Sumologic HTTP collector source URL was "
+                "not provided. The Sumologic HTTP collector "
+                "source URL can be provided using the "
+                "`SUMOLOGIC_URL` environment variable or "
+                "in the ansible.cfg file."
+            )
 
     def v2_playbook_on_start(self, playbook):
         self.sumologic.ansible_playbook = basename(playbook._file_name)
@@ -147,41 +143,16 @@ class CallbackModule(CallbackBase):
         self.start_datetimes[task._uuid] = now()
 
     def v2_runner_on_ok(self, result, **kwargs):
-        self.sumologic.send_event(
-            self.url,
-            'OK',
-            result,
-            self._runtime(result)
-        )
+        self.sumologic.send_event(self.url, "OK", result, self._runtime(result))
 
     def v2_runner_on_skipped(self, result, **kwargs):
-        self.sumologic.send_event(
-            self.url,
-            'SKIPPED',
-            result,
-            self._runtime(result)
-        )
+        self.sumologic.send_event(self.url, "SKIPPED", result, self._runtime(result))
 
     def v2_runner_on_failed(self, result, **kwargs):
-        self.sumologic.send_event(
-            self.url,
-            'FAILED',
-            result,
-            self._runtime(result)
-        )
+        self.sumologic.send_event(self.url, "FAILED", result, self._runtime(result))
 
     def runner_on_async_failed(self, result, **kwargs):
-        self.sumologic.send_event(
-            self.url,
-            'FAILED',
-            result,
-            self._runtime(result)
-        )
+        self.sumologic.send_event(self.url, "FAILED", result, self._runtime(result))
 
     def v2_runner_on_unreachable(self, result, **kwargs):
-        self.sumologic.send_event(
-            self.url,
-            'UNREACHABLE',
-            result,
-            self._runtime(result)
-        )
+        self.sumologic.send_event(self.url, "UNREACHABLE", result, self._runtime(result))

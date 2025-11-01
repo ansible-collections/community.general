@@ -17,7 +17,7 @@ PARSE_UPDATECONF_VALID = [
         },
         {
             "OS": {"ARCH": 2},
-        }
+        },
     ),
     (
         {
@@ -25,14 +25,13 @@ PARSE_UPDATECONF_VALID = [
         },
         {
             "OS": {"ARCH": 1},
-        }
+        },
     ),
     (
         {
             "OS": {"ASD": 1},  # "ASD" is an invalid attribute, we ignore it
         },
-        {
-        }
+        {},
     ),
     (
         {
@@ -47,12 +46,12 @@ PARSE_UPDATECONF_VALID = [
                 "PASSWORD": 2,
                 "SSH_PUBLIC_KEY": 3,
             },
-        }
+        },
     ),
 ]
 
 
-@pytest.mark.parametrize('vm_template,expected_result', PARSE_UPDATECONF_VALID)
+@pytest.mark.parametrize("vm_template,expected_result", PARSE_UPDATECONF_VALID)
 def test_parse_updateconf(vm_template, expected_result):
     result = parse_updateconf(vm_template)
     assert result == expected_result, repr(result)

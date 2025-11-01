@@ -110,6 +110,7 @@ try:
     import ovh
     import ovh.exceptions
     from ovh.exceptions import APIError
+
     HAS_OVH = True
 except ImportError:
     HAS_OVH = False
@@ -118,22 +119,22 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def getOvhClient(ansibleModule):
-    endpoint = ansibleModule.params.get('endpoint')
-    application_key = ansibleModule.params.get('application_key')
-    application_secret = ansibleModule.params.get('application_secret')
-    consumer_key = ansibleModule.params.get('consumer_key')
+    endpoint = ansibleModule.params.get("endpoint")
+    application_key = ansibleModule.params.get("application_key")
+    application_secret = ansibleModule.params.get("application_secret")
+    consumer_key = ansibleModule.params.get("consumer_key")
 
     return ovh.Client(
         endpoint=endpoint,
         application_key=application_key,
         application_secret=application_secret,
-        consumer_key=consumer_key
+        consumer_key=consumer_key,
     )
 
 
 def waitForNoTask(client, name, timeout):
     currentTimeout = timeout
-    while len(client.get(f'/ip/loadBalancing/{name}/task')) > 0:
+    while len(client.get(f"/ip/loadBalancing/{name}/task")) > 0:
         time.sleep(1)  # Delay for 1 sec
         currentTimeout -= 1
         if currentTimeout < 0:
@@ -146,60 +147,65 @@ def main():
         argument_spec=dict(
             name=dict(required=True),
             backend=dict(required=True),
-            weight=dict(default=8, type='int'),
-            probe=dict(default='none',
-                       choices=['none', 'http', 'icmp', 'oco']),
-            state=dict(default='present', choices=['present', 'absent']),
+            weight=dict(default=8, type="int"),
+            probe=dict(default="none", choices=["none", "http", "icmp", "oco"]),
+            state=dict(default="present", choices=["present", "absent"]),
             endpoint=dict(required=True),
             application_key=dict(required=True, no_log=True),
             application_secret=dict(required=True, no_log=True),
             consumer_key=dict(required=True, no_log=True),
-            timeout=dict(default=120, type='int')
+            timeout=dict(default=120, type="int"),
         )
     )
 
     if not HAS_OVH:
-        module.fail_json(msg='ovh-api python module is required to run this module')
+        module.fail_json(msg="ovh-api python module is required to run this module")
 
     # Get parameters
-    name = module.params.get('name')
-    state = module.params.get('state')
-    backend = module.params.get('backend')
-    weight = module.params.get('weight')
-    probe = module.params.get('probe')
-    timeout = module.params.get('timeout')
+    name = module.params.get("name")
+    state = module.params.get("state")
+    backend = module.params.get("backend")
+    weight = module.params.get("weight")
+    probe = module.params.get("probe")
+    timeout = module.params.get("timeout")
 
     # Connect to OVH API
     client = getOvhClient(module)
 
     # Check that the load balancing exists
     try:
-        loadBalancings = client.get('/ip/loadBalancing')
+        loadBalancings = client.get("/ip/loadBalancing")
     except APIError as apiError:
         module.fail_json(
-            msg=f'Unable to call OVH API for getting the list of loadBalancing, check application key, secret, consumerkey and parameters. '
-                f'Error returned by OVH API was : {apiError}')
+            msg=f"Unable to call OVH API for getting the list of loadBalancing, check application key, secret, consumerkey and parameters. "
+            f"Error returned by OVH API was : {apiError}"
+        )
 
     if name not in loadBalancings:
-        module.fail_json(msg=f'IP LoadBalancing {name} does not exist')
+        module.fail_json(msg=f"IP LoadBalancing {name} does not exist")
 
     # Check that no task is pending before going on
     try:
         if not waitForNoTask(client, name, timeout):
             module.fail_json(
-                msg=f'Timeout of {timeout} seconds while waiting for no pending tasks before executing the module ')
+                msg=f"Timeout of {timeout} seconds while waiting for no pending tasks before executing the module "
+            )
     except APIError as apiError:
         module.fail_json(
-            msg=f'Unable to call OVH API for getting the list of pending tasks of the loadBalancing, check application key, secret, consumerkey and '
-                f'parameters. Error returned by OVH API was : {apiError}')
+            msg=f"Unable to call OVH API for getting the list of pending tasks of the loadBalancing, check application key, secret, consumerkey and "
+            f"parameters. Error returned by OVH API was : {apiError}"
+        )
 
     try:
-        backends = client.get(f'/ip/loadBalancing/{name}/backend')
+        backends = client.get(f"/ip/loadBalancing/{name}/backend")
     except APIError as apiError:
         module.fail_json(
-            msg=('Unable to call OVH API for getting the list of backends '
-                 'of the loadBalancing, check application key, secret, consumerkey '
-                 f'and parameters. Error returned by OVH API was : {apiError}'))
+            msg=(
+                "Unable to call OVH API for getting the list of backends "
+                "of the loadBalancing, check application key, secret, consumerkey "
+                f"and parameters. Error returned by OVH API was : {apiError}"
+            )
+        )
 
     backendExists = backend in backends
     moduleChanged = False
@@ -207,78 +213,83 @@ def main():
         if backendExists:
             # Remove backend
             try:
-                client.delete(
-                    f'/ip/loadBalancing/{name}/backend/{backend}')
+                client.delete(f"/ip/loadBalancing/{name}/backend/{backend}")
                 if not waitForNoTask(client, name, timeout):
                     module.fail_json(
-                        msg=f'Timeout of {timeout} seconds while waiting for completion of removing backend task')
+                        msg=f"Timeout of {timeout} seconds while waiting for completion of removing backend task"
+                    )
             except APIError as apiError:
                 module.fail_json(
-                    msg=f'Unable to call OVH API for deleting the backend, check application key, secret, consumerkey and parameters. '
-                        f'Error returned by OVH API was : {apiError}')
+                    msg=f"Unable to call OVH API for deleting the backend, check application key, secret, consumerkey and parameters. "
+                    f"Error returned by OVH API was : {apiError}"
+                )
             moduleChanged = True
     else:
         if backendExists:
             # Get properties
             try:
-                backendProperties = client.get(
-                    f'/ip/loadBalancing/{name}/backend/{backend}')
+                backendProperties = client.get(f"/ip/loadBalancing/{name}/backend/{backend}")
             except APIError as apiError:
                 module.fail_json(
-                    msg=f'Unable to call OVH API for getting the backend properties, check application key, secret, consumerkey and parameters. '
-                        f'Error returned by OVH API was : {apiError}')
+                    msg=f"Unable to call OVH API for getting the backend properties, check application key, secret, consumerkey and parameters. "
+                    f"Error returned by OVH API was : {apiError}"
+                )
 
-            if backendProperties['weight'] != weight:
+            if backendProperties["weight"] != weight:
                 # Change weight
                 try:
-                    client.post(
-                        f'/ip/loadBalancing/{name}/backend/{backend}/setWeight', weight=weight)
+                    client.post(f"/ip/loadBalancing/{name}/backend/{backend}/setWeight", weight=weight)
                     if not waitForNoTask(client, name, timeout):
                         module.fail_json(
-                            msg=f'Timeout of {timeout} seconds while waiting for completion of setWeight to backend task')
+                            msg=f"Timeout of {timeout} seconds while waiting for completion of setWeight to backend task"
+                        )
                 except APIError as apiError:
                     module.fail_json(
-                        msg=f'Unable to call OVH API for updating the weight of the backend, check application key, secret, consumerkey and parameters. '
-                            f'Error returned by OVH API was : {apiError}')
+                        msg=f"Unable to call OVH API for updating the weight of the backend, check application key, secret, consumerkey and parameters. "
+                        f"Error returned by OVH API was : {apiError}"
+                    )
                 moduleChanged = True
 
-            if backendProperties['probe'] != probe:
+            if backendProperties["probe"] != probe:
                 # Change probe
-                backendProperties['probe'] = probe
+                backendProperties["probe"] = probe
                 try:
-                    client.put(
-                        f'/ip/loadBalancing/{name}/backend/{backend}', probe=probe)
+                    client.put(f"/ip/loadBalancing/{name}/backend/{backend}", probe=probe)
                     if not waitForNoTask(client, name, timeout):
                         module.fail_json(
-                            msg=f'Timeout of {timeout} seconds while waiting for completion of setProbe to backend task')
+                            msg=f"Timeout of {timeout} seconds while waiting for completion of setProbe to backend task"
+                        )
                 except APIError as apiError:
                     module.fail_json(
-                        msg=f'Unable to call OVH API for updating the probe of the backend, check application key, secret, consumerkey and parameters. '
-                            f'Error returned by OVH API was : {apiError}')
+                        msg=f"Unable to call OVH API for updating the probe of the backend, check application key, secret, consumerkey and parameters. "
+                        f"Error returned by OVH API was : {apiError}"
+                    )
                 moduleChanged = True
 
         else:
             # Creates backend
             try:
                 try:
-                    client.post(f'/ip/loadBalancing/{name}/backend',
-                                ipBackend=backend, probe=probe, weight=weight)
+                    client.post(f"/ip/loadBalancing/{name}/backend", ipBackend=backend, probe=probe, weight=weight)
                 except APIError as apiError:
                     module.fail_json(
-                        msg=f'Unable to call OVH API for creating the backend, check application key, secret, consumerkey and parameters. '
-                            f'Error returned by OVH API was : {apiError}')
+                        msg=f"Unable to call OVH API for creating the backend, check application key, secret, consumerkey and parameters. "
+                        f"Error returned by OVH API was : {apiError}"
+                    )
 
                 if not waitForNoTask(client, name, timeout):
                     module.fail_json(
-                        msg=f'Timeout of {timeout} seconds while waiting for completion of backend creation task')
+                        msg=f"Timeout of {timeout} seconds while waiting for completion of backend creation task"
+                    )
             except APIError as apiError:
                 module.fail_json(
-                    msg=f'Unable to call OVH API for creating the backend, check application key, secret, consumerkey and parameters. '
-                        f'Error returned by OVH API was : {apiError}')
+                    msg=f"Unable to call OVH API for creating the backend, check application key, secret, consumerkey and parameters. "
+                    f"Error returned by OVH API was : {apiError}"
+                )
             moduleChanged = True
 
     module.exit_json(changed=moduleChanged)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

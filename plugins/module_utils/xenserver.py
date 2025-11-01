@@ -13,6 +13,7 @@ import traceback
 XENAPI_IMP_ERR = None
 try:
     import XenAPI
+
     HAS_XENAPI = True
 except ImportError:
     HAS_XENAPI = False
@@ -24,22 +25,19 @@ from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 
 def xenserver_common_argument_spec():
     return dict(
-        hostname=dict(type='str',
-                      aliases=['host', 'pool'],
-                      default='localhost',
-                      fallback=(env_fallback, ['XENSERVER_HOST']),
-                      ),
-        username=dict(type='str',
-                      aliases=['user', 'admin'],
-                      default='root',
-                      fallback=(env_fallback, ['XENSERVER_USER'])),
-        password=dict(type='str',
-                      aliases=['pass', 'pwd'],
-                      no_log=True,
-                      fallback=(env_fallback, ['XENSERVER_PASSWORD'])),
-        validate_certs=dict(type='bool',
-                            default=True,
-                            fallback=(env_fallback, ['XENSERVER_VALIDATE_CERTS'])),
+        hostname=dict(
+            type="str",
+            aliases=["host", "pool"],
+            default="localhost",
+            fallback=(env_fallback, ["XENSERVER_HOST"]),
+        ),
+        username=dict(
+            type="str", aliases=["user", "admin"], default="root", fallback=(env_fallback, ["XENSERVER_USER"])
+        ),
+        password=dict(
+            type="str", aliases=["pass", "pwd"], no_log=True, fallback=(env_fallback, ["XENSERVER_PASSWORD"])
+        ),
+        validate_certs=dict(type="bool", default=True, fallback=(env_fallback, ["XENSERVER_VALIDATE_CERTS"])),
     )
 
 
@@ -49,7 +47,7 @@ def xapi_to_module_vm_power_state(power_state):
         "running": "poweredon",
         "halted": "poweredoff",
         "suspended": "suspended",
-        "paused": "paused"
+        "paused": "paused",
     }
 
     return module_power_state_map.get(power_state)
@@ -78,7 +76,7 @@ def is_valid_ip_addr(ip_addr):
     Returns:
         bool: True if string is valid IPv4 address, else False.
     """
-    ip_addr_split = ip_addr.split('.')
+    ip_addr_split = ip_addr.split(".")
 
     if len(ip_addr_split) != 4:
         return False
@@ -104,22 +102,24 @@ def is_valid_ip_netmask(ip_netmask):
     Returns:
         bool: True if string is valid IPv4 netmask, else False.
     """
-    ip_netmask_split = ip_netmask.split('.')
+    ip_netmask_split = ip_netmask.split(".")
 
     if len(ip_netmask_split) != 4:
         return False
 
-    valid_octet_values = ['0', '128', '192', '224', '240', '248', '252', '254', '255']
+    valid_octet_values = ["0", "128", "192", "224", "240", "248", "252", "254", "255"]
 
     for ip_netmask_octet in ip_netmask_split:
         if ip_netmask_octet not in valid_octet_values:
             return False
 
-    if ip_netmask_split[0] != '255' and (ip_netmask_split[1] != '0' or ip_netmask_split[2] != '0' or ip_netmask_split[3] != '0'):
+    if ip_netmask_split[0] != "255" and (
+        ip_netmask_split[1] != "0" or ip_netmask_split[2] != "0" or ip_netmask_split[3] != "0"
+    ):
         return False
-    elif ip_netmask_split[1] != '255' and (ip_netmask_split[2] != '0' or ip_netmask_split[3] != '0'):
+    elif ip_netmask_split[1] != "255" and (ip_netmask_split[2] != "0" or ip_netmask_split[3] != "0"):
         return False
-    elif ip_netmask_split[2] != '255' and ip_netmask_split[3] != '0':
+    elif ip_netmask_split[2] != "255" and ip_netmask_split[3] != "0":
         return False
 
     return True
@@ -163,7 +163,7 @@ def ip_prefix_to_netmask(ip_prefix, skip_check=False):
         ip_prefix_valid = is_valid_ip_prefix(ip_prefix)
 
     if ip_prefix_valid:
-        return '.'.join([str((0xffffffff << (32 - int(ip_prefix)) >> i) & 0xff) for i in [24, 16, 8, 0]])
+        return ".".join([str((0xFFFFFFFF << (32 - int(ip_prefix)) >> i) & 0xFF) for i in [24, 16, 8, 0]])
     else:
         return ""
 
@@ -201,7 +201,7 @@ def is_valid_ip6_addr(ip6_addr):
         bool: True if string is valid IPv6 address, else False.
     """
     ip6_addr = ip6_addr.lower()
-    ip6_addr_split = ip6_addr.split(':')
+    ip6_addr_split = ip6_addr.split(":")
 
     if ip6_addr_split[0] == "":
         ip6_addr_split.pop(0)
@@ -220,7 +220,7 @@ def is_valid_ip6_addr(ip6_addr):
         if len(ip6_addr_split) != 8:
             return False
 
-    ip6_addr_hextet_regex = re.compile('^[0-9a-f]{1,4}$')
+    ip6_addr_hextet_regex = re.compile("^[0-9a-f]{1,4}$")
 
     for ip6_addr_hextet in ip6_addr_split:
         if not bool(ip6_addr_hextet_regex.match(ip6_addr_hextet)):
@@ -337,63 +337,67 @@ def gather_vm_params(module, vm_ref):
         # We need some params like affinity, VBDs, VIFs, VDIs etc. dereferenced.
 
         # Affinity.
-        if vm_params['affinity'] != "OpaqueRef:NULL":
-            vm_affinity = xapi_session.xenapi.host.get_record(vm_params['affinity'])
-            vm_params['affinity'] = vm_affinity
+        if vm_params["affinity"] != "OpaqueRef:NULL":
+            vm_affinity = xapi_session.xenapi.host.get_record(vm_params["affinity"])
+            vm_params["affinity"] = vm_affinity
         else:
-            vm_params['affinity'] = {}
+            vm_params["affinity"] = {}
 
         # VBDs.
-        vm_vbd_params_list = [xapi_session.xenapi.VBD.get_record(vm_vbd_ref) for vm_vbd_ref in vm_params['VBDs']]
+        vm_vbd_params_list = [xapi_session.xenapi.VBD.get_record(vm_vbd_ref) for vm_vbd_ref in vm_params["VBDs"]]
 
         # List of VBDs is usually sorted by userdevice but we sort just
         # in case. We need this list sorted by userdevice so that we can
         # make positional pairing with module.params['disks'].
-        vm_vbd_params_list = sorted(vm_vbd_params_list, key=lambda vm_vbd_params: int(vm_vbd_params['userdevice']))
-        vm_params['VBDs'] = vm_vbd_params_list
+        vm_vbd_params_list = sorted(vm_vbd_params_list, key=lambda vm_vbd_params: int(vm_vbd_params["userdevice"]))
+        vm_params["VBDs"] = vm_vbd_params_list
 
         # VDIs.
-        for vm_vbd_params in vm_params['VBDs']:
-            if vm_vbd_params['VDI'] != "OpaqueRef:NULL":
-                vm_vdi_params = xapi_session.xenapi.VDI.get_record(vm_vbd_params['VDI'])
+        for vm_vbd_params in vm_params["VBDs"]:
+            if vm_vbd_params["VDI"] != "OpaqueRef:NULL":
+                vm_vdi_params = xapi_session.xenapi.VDI.get_record(vm_vbd_params["VDI"])
             else:
                 vm_vdi_params = {}
 
-            vm_vbd_params['VDI'] = vm_vdi_params
+            vm_vbd_params["VDI"] = vm_vdi_params
 
         # VIFs.
-        vm_vif_params_list = [xapi_session.xenapi.VIF.get_record(vm_vif_ref) for vm_vif_ref in vm_params['VIFs']]
+        vm_vif_params_list = [xapi_session.xenapi.VIF.get_record(vm_vif_ref) for vm_vif_ref in vm_params["VIFs"]]
 
         # List of VIFs is usually sorted by device but we sort just
         # in case. We need this list sorted by device so that we can
         # make positional pairing with module.params['networks'].
-        vm_vif_params_list = sorted(vm_vif_params_list, key=lambda vm_vif_params: int(vm_vif_params['device']))
-        vm_params['VIFs'] = vm_vif_params_list
+        vm_vif_params_list = sorted(vm_vif_params_list, key=lambda vm_vif_params: int(vm_vif_params["device"]))
+        vm_params["VIFs"] = vm_vif_params_list
 
         # Networks.
-        for vm_vif_params in vm_params['VIFs']:
-            if vm_vif_params['network'] != "OpaqueRef:NULL":
-                vm_network_params = xapi_session.xenapi.network.get_record(vm_vif_params['network'])
+        for vm_vif_params in vm_params["VIFs"]:
+            if vm_vif_params["network"] != "OpaqueRef:NULL":
+                vm_network_params = xapi_session.xenapi.network.get_record(vm_vif_params["network"])
             else:
                 vm_network_params = {}
 
-            vm_vif_params['network'] = vm_network_params
+            vm_vif_params["network"] = vm_network_params
 
         # Guest metrics.
-        if vm_params['guest_metrics'] != "OpaqueRef:NULL":
-            vm_guest_metrics = xapi_session.xenapi.VM_guest_metrics.get_record(vm_params['guest_metrics'])
-            vm_params['guest_metrics'] = vm_guest_metrics
+        if vm_params["guest_metrics"] != "OpaqueRef:NULL":
+            vm_guest_metrics = xapi_session.xenapi.VM_guest_metrics.get_record(vm_params["guest_metrics"])
+            vm_params["guest_metrics"] = vm_guest_metrics
         else:
-            vm_params['guest_metrics'] = {}
+            vm_params["guest_metrics"] = {}
 
         # Detect customization agent.
         xenserver_version = get_xenserver_version(module)
 
-        if (xenserver_version[0] >= 7 and xenserver_version[1] >= 0 and vm_params.get('guest_metrics') and
-                "feature-static-ip-setting" in vm_params['guest_metrics']['other']):
-            vm_params['customization_agent'] = "native"
+        if (
+            xenserver_version[0] >= 7
+            and xenserver_version[1] >= 0
+            and vm_params.get("guest_metrics")
+            and "feature-static-ip-setting" in vm_params["guest_metrics"]["other"]
+        ):
+            vm_params["customization_agent"] = "native"
         else:
-            vm_params['customization_agent'] = "custom"
+            vm_params["customization_agent"] = "custom"
 
     except XenAPI.Failure as f:
         module.fail_json(msg=f"XAPI ERROR: {f.details}")
@@ -420,88 +424,90 @@ def gather_vm_facts(module, vm_params):
 
     # Gather facts.
     vm_facts = {
-        "state": xapi_to_module_vm_power_state(vm_params['power_state'].lower()),
-        "name": vm_params['name_label'],
-        "name_desc": vm_params['name_description'],
-        "uuid": vm_params['uuid'],
-        "is_template": vm_params['is_a_template'],
-        "folder": vm_params['other_config'].get('folder', ''),
+        "state": xapi_to_module_vm_power_state(vm_params["power_state"].lower()),
+        "name": vm_params["name_label"],
+        "name_desc": vm_params["name_description"],
+        "uuid": vm_params["uuid"],
+        "is_template": vm_params["is_a_template"],
+        "folder": vm_params["other_config"].get("folder", ""),
         "hardware": {
-            "num_cpus": int(vm_params['VCPUs_max']),
-            "num_cpu_cores_per_socket": int(vm_params['platform'].get('cores-per-socket', '1')),
-            "memory_mb": int(int(vm_params['memory_dynamic_max']) / 1048576),
+            "num_cpus": int(vm_params["VCPUs_max"]),
+            "num_cpu_cores_per_socket": int(vm_params["platform"].get("cores-per-socket", "1")),
+            "memory_mb": int(int(vm_params["memory_dynamic_max"]) / 1048576),
         },
         "disks": [],
         "cdrom": {},
         "networks": [],
-        "home_server": vm_params['affinity'].get('name_label', ''),
-        "domid": vm_params['domid'],
-        "platform": vm_params['platform'],
-        "other_config": vm_params['other_config'],
-        "xenstore_data": vm_params['xenstore_data'],
-        "customization_agent": vm_params['customization_agent'],
+        "home_server": vm_params["affinity"].get("name_label", ""),
+        "domid": vm_params["domid"],
+        "platform": vm_params["platform"],
+        "other_config": vm_params["other_config"],
+        "xenstore_data": vm_params["xenstore_data"],
+        "customization_agent": vm_params["customization_agent"],
     }
 
-    for vm_vbd_params in vm_params['VBDs']:
-        if vm_vbd_params['type'] == "Disk":
-            vm_disk_sr_params = xapi_session.xenapi.SR.get_record(vm_vbd_params['VDI']['SR'])
+    for vm_vbd_params in vm_params["VBDs"]:
+        if vm_vbd_params["type"] == "Disk":
+            vm_disk_sr_params = xapi_session.xenapi.SR.get_record(vm_vbd_params["VDI"]["SR"])
 
             vm_disk_params = {
-                "size": int(vm_vbd_params['VDI']['virtual_size']),
-                "name": vm_vbd_params['VDI']['name_label'],
-                "name_desc": vm_vbd_params['VDI']['name_description'],
-                "sr": vm_disk_sr_params['name_label'],
-                "sr_uuid": vm_disk_sr_params['uuid'],
-                "os_device": vm_vbd_params['device'],
-                "vbd_userdevice": vm_vbd_params['userdevice'],
+                "size": int(vm_vbd_params["VDI"]["virtual_size"]),
+                "name": vm_vbd_params["VDI"]["name_label"],
+                "name_desc": vm_vbd_params["VDI"]["name_description"],
+                "sr": vm_disk_sr_params["name_label"],
+                "sr_uuid": vm_disk_sr_params["uuid"],
+                "os_device": vm_vbd_params["device"],
+                "vbd_userdevice": vm_vbd_params["userdevice"],
             }
 
-            vm_facts['disks'].append(vm_disk_params)
-        elif vm_vbd_params['type'] == "CD":
-            if vm_vbd_params['empty']:
-                vm_facts['cdrom'].update(type="none")
+            vm_facts["disks"].append(vm_disk_params)
+        elif vm_vbd_params["type"] == "CD":
+            if vm_vbd_params["empty"]:
+                vm_facts["cdrom"].update(type="none")
             else:
-                vm_facts['cdrom'].update(type="iso")
-                vm_facts['cdrom'].update(iso_name=vm_vbd_params['VDI']['name_label'])
+                vm_facts["cdrom"].update(type="iso")
+                vm_facts["cdrom"].update(iso_name=vm_vbd_params["VDI"]["name_label"])
 
-    for vm_vif_params in vm_params['VIFs']:
-        vm_guest_metrics_networks = vm_params['guest_metrics'].get('networks', {})
+    for vm_vif_params in vm_params["VIFs"]:
+        vm_guest_metrics_networks = vm_params["guest_metrics"].get("networks", {})
 
         vm_network_params = {
-            "name": vm_vif_params['network']['name_label'],
-            "mac": vm_vif_params['MAC'],
-            "vif_device": vm_vif_params['device'],
-            "mtu": vm_vif_params['MTU'],
-            "ip": vm_guest_metrics_networks.get(f"{vm_vif_params['device']}/ip", ''),
+            "name": vm_vif_params["network"]["name_label"],
+            "mac": vm_vif_params["MAC"],
+            "vif_device": vm_vif_params["device"],
+            "mtu": vm_vif_params["MTU"],
+            "ip": vm_guest_metrics_networks.get(f"{vm_vif_params['device']}/ip", ""),
             "prefix": "",
             "netmask": "",
             "gateway": "",
-            "ip6": [vm_guest_metrics_networks[ipv6]
-                    for ipv6 in sorted(vm_guest_metrics_networks.keys())
-                    if ipv6.startswith(f"{vm_vif_params['device']}/ipv6/")],
+            "ip6": [
+                vm_guest_metrics_networks[ipv6]
+                for ipv6 in sorted(vm_guest_metrics_networks.keys())
+                if ipv6.startswith(f"{vm_vif_params['device']}/ipv6/")
+            ],
             "prefix6": "",
             "gateway6": "",
         }
 
-        if vm_params['customization_agent'] == "native":
-            if vm_vif_params['ipv4_addresses'] and vm_vif_params['ipv4_addresses'][0]:
-                vm_network_params['prefix'] = vm_vif_params['ipv4_addresses'][0].split('/')[1]
-                vm_network_params['netmask'] = ip_prefix_to_netmask(vm_network_params['prefix'])
+        if vm_params["customization_agent"] == "native":
+            if vm_vif_params["ipv4_addresses"] and vm_vif_params["ipv4_addresses"][0]:
+                vm_network_params["prefix"] = vm_vif_params["ipv4_addresses"][0].split("/")[1]
+                vm_network_params["netmask"] = ip_prefix_to_netmask(vm_network_params["prefix"])
 
-            vm_network_params['gateway'] = vm_vif_params['ipv4_gateway']
+            vm_network_params["gateway"] = vm_vif_params["ipv4_gateway"]
 
-            if vm_vif_params['ipv6_addresses'] and vm_vif_params['ipv6_addresses'][0]:
-                vm_network_params['prefix6'] = vm_vif_params['ipv6_addresses'][0].split('/')[1]
+            if vm_vif_params["ipv6_addresses"] and vm_vif_params["ipv6_addresses"][0]:
+                vm_network_params["prefix6"] = vm_vif_params["ipv6_addresses"][0].split("/")[1]
 
-            vm_network_params['gateway6'] = vm_vif_params['ipv6_gateway']
+            vm_network_params["gateway6"] = vm_vif_params["ipv6_gateway"]
 
-        elif vm_params['customization_agent'] == "custom":
-            vm_xenstore_data = vm_params['xenstore_data']
+        elif vm_params["customization_agent"] == "custom":
+            vm_xenstore_data = vm_params["xenstore_data"]
 
-            for f in ['prefix', 'netmask', 'gateway', 'prefix6', 'gateway6']:
+            for f in ["prefix", "netmask", "gateway", "prefix6", "gateway6"]:
                 vm_network_params[f] = vm_xenstore_data.get(f"vm-data/networks/{vm_vif_params['device']}/{f}", "")
 
-        vm_facts['networks'].append(vm_network_params)
+        vm_facts["networks"].append(vm_network_params)
 
     return vm_facts
 
@@ -535,7 +541,7 @@ def set_vm_power_state(module, vm_ref, power_state, timeout=300):
 
     xapi_session = XAPI.connect(module)
 
-    power_state = power_state.replace('_', '').replace('-', '').lower()
+    power_state = power_state.replace("_", "").replace("-", "").lower()
     vm_power_state_resulting = module_to_xapi_vm_power_state(power_state)
 
     state_changed = False
@@ -697,7 +703,7 @@ def wait_for_vm_ip_address(module, vm_ref, timeout=300):
         # consistent with module VM power states.
         vm_power_state = xapi_to_module_vm_power_state(xapi_session.xenapi.VM.get_power_state(vm_ref).lower())
 
-        if vm_power_state != 'poweredon':
+        if vm_power_state != "poweredon":
             module.fail_json(msg=f"Cannot wait for VM IP address when VM is in state '{vm_power_state}'!")
 
         interval = 2
@@ -714,7 +720,7 @@ def wait_for_vm_ip_address(module, vm_ref, timeout=300):
 
             if vm_guest_metrics_ref != "OpaqueRef:NULL":
                 vm_guest_metrics = xapi_session.xenapi.VM_guest_metrics.get_record(vm_guest_metrics_ref)
-                vm_ips = vm_guest_metrics['networks']
+                vm_ips = vm_guest_metrics["networks"]
 
                 if "0/ip" in vm_ips:
                     break
@@ -749,7 +755,10 @@ def get_xenserver_version(module):
     host_ref = xapi_session.xenapi.session.get_this_host(xapi_session._session)
 
     try:
-        xenserver_version = [int(version_number) for version_number in xapi_session.xenapi.host.get_software_version(host_ref)['product_version'].split('.')]
+        xenserver_version = [
+            int(version_number)
+            for version_number in xapi_session.xenapi.host.get_software_version(host_ref)["product_version"].split(".")
+        ]
     except ValueError:
         xenserver_version = [0, 0, 0]
 
@@ -758,6 +767,7 @@ def get_xenserver_version(module):
 
 class XAPI:
     """Class for XAPI session management."""
+
     _xapi_session = None
 
     @classmethod
@@ -779,15 +789,15 @@ class XAPI:
         if cls._xapi_session is not None:
             return cls._xapi_session
 
-        hostname = module.params['hostname']
-        username = module.params['username']
-        password = module.params['password']
-        ignore_ssl = not module.params['validate_certs']
+        hostname = module.params["hostname"]
+        username = module.params["username"]
+        password = module.params["password"]
+        ignore_ssl = not module.params["validate_certs"]
 
-        if hostname == 'localhost':
+        if hostname == "localhost":
             cls._xapi_session = XenAPI.xapi_local()
-            username = ''
-            password = ''
+            username = ""
+            password = ""
         else:
             # If scheme is not specified we default to http:// because https://
             # is problematic in most setups.
@@ -806,10 +816,10 @@ class XAPI:
                 cls._xapi_session = XenAPI.Session(hostname)
 
             if not password:
-                password = ''
+                password = ""
 
         try:
-            cls._xapi_session.login_with_password(username, password, ANSIBLE_VERSION, 'Ansible')
+            cls._xapi_session.login_with_password(username, password, ANSIBLE_VERSION, "Ansible")
         except XenAPI.Failure as f:
             module.fail_json(msg=f"Unable to log on to XenServer at {hostname} as {username}: {f.details}")
 

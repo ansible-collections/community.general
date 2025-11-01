@@ -126,9 +126,7 @@ class RundeckProjectManager:
                 self.module.exit_json(
                     changed=True,
                     before={},
-                    after={
-                        "name": self.module.params["name"]
-                    },
+                    after={"name": self.module.params["name"]},
                 )
 
             resp, info = api_request(
@@ -138,14 +136,17 @@ class RundeckProjectManager:
                 data={
                     "name": self.module.params["name"],
                     "config": {},
-                }
+                },
             )
 
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_project_facts())
             else:
-                self.module.fail_json(msg=f"Unhandled HTTP status {info['status']}, please report the bug",
-                                      before={}, after=self.get_project_facts())
+                self.module.fail_json(
+                    msg=f"Unhandled HTTP status {info['status']}, please report the bug",
+                    before={},
+                    after=self.get_project_facts(),
+                )
         else:
             self.module.exit_json(changed=False, before=facts, after=facts)
 
@@ -168,27 +169,26 @@ class RundeckProjectManager:
 def main():
     # Also allow the user to set values for fetch_url
     argument_spec = api_argument_spec()
-    argument_spec.update(dict(
-        state=dict(type='str', choices=['present', 'absent'], default='present'),
-        name=dict(required=True, type='str'),
-    ))
-
-    argument_spec['api_token']['aliases'] = ['token']
-
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True
+    argument_spec.update(
+        dict(
+            state=dict(type="str", choices=["present", "absent"], default="present"),
+            name=dict(required=True, type="str"),
+        )
     )
+
+    argument_spec["api_token"]["aliases"] = ["token"]
+
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     if module.params["api_version"] < 14:
         module.fail_json(msg="API version should be at least 14")
 
     rundeck = RundeckProjectManager(module)
-    if module.params['state'] == 'present':
+    if module.params["state"] == "present":
         rundeck.create_or_update_project()
-    elif module.params['state'] == 'absent':
+    elif module.params["state"] == "absent":
         rundeck.remove_project()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

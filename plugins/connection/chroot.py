@@ -87,16 +87,16 @@ display = Display()
 
 
 class Connection(ConnectionBase):
-    """ Local chroot based connections """
+    """Local chroot based connections"""
 
-    transport = 'community.general.chroot'
+    transport = "community.general.chroot"
     has_pipelining = True
     # su currently has an undiagnosed issue with calculating the file
     # checksums (so copy, for instance, doesn't work right)
     # Have to look into that before re-enabling this
     has_tty = False
 
-    default_user = 'root'
+    default_user = "root"
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
         super().__init__(play_context, new_stdin, *args, **kwargs)
@@ -107,7 +107,7 @@ class Connection(ConnectionBase):
         if not os.path.isdir(self.chroot):
             raise AnsibleError(f"{self.chroot} is not a directory")
 
-        chrootsh = os.path.join(self.chroot, 'bin/sh')
+        chrootsh = os.path.join(self.chroot, "bin/sh")
         # Want to check for a usable bourne shell inside the chroot.
         # is_executable() == True is sufficient.  For symlinks it
         # gets really complicated really fast.  So we punt on finding that
@@ -116,17 +116,18 @@ class Connection(ConnectionBase):
             raise AnsibleError(f"{self.chroot} does not look like a chrootable dir (/bin/sh missing)")
 
     def _connect(self):
-        """ connect to the chroot """
-        if not self.get_option('disable_root_check') and os.geteuid() != 0:
+        """connect to the chroot"""
+        if not self.get_option("disable_root_check") and os.geteuid() != 0:
             raise AnsibleError(
                 "chroot connection requires running as root. "
-                "You can override this check with the `disable_root_check` option.")
+                "You can override this check with the `disable_root_check` option."
+            )
 
-        if os.path.isabs(self.get_option('chroot_exe')):
-            self.chroot_cmd = self.get_option('chroot_exe')
+        if os.path.isabs(self.get_option("chroot_exe")):
+            self.chroot_cmd = self.get_option("chroot_exe")
         else:
             try:
-                self.chroot_cmd = get_bin_path(self.get_option('chroot_exe'))
+                self.chroot_cmd = get_bin_path(self.get_option("chroot_exe"))
             except ValueError as e:
                 raise AnsibleError(str(e))
 
@@ -136,25 +137,24 @@ class Connection(ConnectionBase):
             self._connected = True
 
     def _buffered_exec_command(self, cmd, stdin=subprocess.PIPE):
-        """ run a command on the chroot.  This is only needed for implementing
+        """run a command on the chroot.  This is only needed for implementing
         put_file() get_file() so that we don't have to read the whole file
         into memory.
 
         compared to exec_command() it looses some niceties like being able to
         return the process's exit code immediately.
         """
-        executable = self.get_option('executable')
-        local_cmd = [self.chroot_cmd, self.chroot, executable, '-c', cmd]
+        executable = self.get_option("executable")
+        local_cmd = [self.chroot_cmd, self.chroot, executable, "-c", cmd]
 
         display.vvv(f"EXEC {local_cmd}", host=self.chroot)
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
-        p = subprocess.Popen(local_cmd, shell=False, stdin=stdin,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
+        p = subprocess.Popen(local_cmd, shell=False, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         return p
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        """ run a command on the chroot """
+        """run a command on the chroot"""
         super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         p = self._buffered_exec_command(cmd)
@@ -164,33 +164,33 @@ class Connection(ConnectionBase):
 
     @staticmethod
     def _prefix_login_path(remote_path):
-        """ Make sure that we put files into a standard path
+        """Make sure that we put files into a standard path
 
-            If a path is relative, then we need to choose where to put it.
-            ssh chooses $HOME but we aren't guaranteed that a home dir will
-            exist in any given chroot.  So for now we're choosing "/" instead.
-            This also happens to be the former default.
+        If a path is relative, then we need to choose where to put it.
+        ssh chooses $HOME but we aren't guaranteed that a home dir will
+        exist in any given chroot.  So for now we're choosing "/" instead.
+        This also happens to be the former default.
 
-            Can revisit using $HOME instead if it is a problem
+        Can revisit using $HOME instead if it is a problem
         """
         if not remote_path.startswith(os.path.sep):
             remote_path = os.path.join(os.path.sep, remote_path)
         return os.path.normpath(remote_path)
 
     def put_file(self, in_path, out_path):
-        """ transfer a file from local to chroot """
+        """transfer a file from local to chroot"""
         super().put_file(in_path, out_path)
         display.vvv(f"PUT {in_path} TO {out_path}", host=self.chroot)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
         try:
-            with open(to_bytes(in_path, errors='surrogate_or_strict'), 'rb') as in_file:
+            with open(to_bytes(in_path, errors="surrogate_or_strict"), "rb") as in_file:
                 if not os.fstat(in_file.fileno()).st_size:
-                    count = ' count=0'
+                    count = " count=0"
                 else:
-                    count = ''
+                    count = ""
                 try:
-                    p = self._buffered_exec_command(f'dd of={out_path} bs={BUFSIZE}{count}', stdin=in_file)
+                    p = self._buffered_exec_command(f"dd of={out_path} bs={BUFSIZE}{count}", stdin=in_file)
                 except OSError:
                     raise AnsibleError("chroot connection requires dd command in the chroot")
                 try:
@@ -204,17 +204,17 @@ class Connection(ConnectionBase):
             raise AnsibleError(f"file or module does not exist at: {in_path}")
 
     def fetch_file(self, in_path, out_path):
-        """ fetch a file from chroot to local """
+        """fetch a file from chroot to local"""
         super().fetch_file(in_path, out_path)
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self.chroot)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
         try:
-            p = self._buffered_exec_command(f'dd if={in_path} bs={BUFSIZE}')
+            p = self._buffered_exec_command(f"dd if={in_path} bs={BUFSIZE}")
         except OSError:
             raise AnsibleError("chroot connection requires dd command in the chroot")
 
-        with open(to_bytes(out_path, errors='surrogate_or_strict'), 'wb+') as out_file:
+        with open(to_bytes(out_path, errors="surrogate_or_strict"), "wb+") as out_file:
             try:
                 chunk = p.stdout.read(BUFSIZE)
                 while chunk:
@@ -228,6 +228,6 @@ class Connection(ConnectionBase):
                 raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{stdout}\n{stderr}")
 
     def close(self):
-        """ terminate the connection; nothing to do here """
+        """terminate the connection; nothing to do here"""
         super().close()
         self._connected = False

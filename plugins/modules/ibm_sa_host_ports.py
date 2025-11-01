@@ -79,19 +79,23 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (execute_pyxcli_command, connect_ssl,
-                                                                                     spectrum_accelerate_spec, is_pyxcli_installed)
+from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (
+    execute_pyxcli_command,
+    connect_ssl,
+    spectrum_accelerate_spec,
+    is_pyxcli_installed,
+)
 
 
 def main():
     argument_spec = spectrum_accelerate_spec()
     argument_spec.update(
         dict(
-            state=dict(default='present', choices=['present', 'absent']),
+            state=dict(default="present", choices=["present", "absent"]),
             host=dict(required=True),
             iscsi_name=dict(),
             fcaddress=dict(),
-            num_of_visible_targets=dict()
+            num_of_visible_targets=dict(),
         )
     )
 
@@ -102,32 +106,27 @@ def main():
     # required args
     ports = []
     try:
-        ports = xcli_client.cmd.host_list_ports(
-            host=module.params.get('host')).as_list
+        ports = xcli_client.cmd.host_list_ports(host=module.params.get("host")).as_list
     except Exception:
         pass
-    state = module.params['state']
+    state = module.params["state"]
     port_exists = False
-    ports = [port.get('port_name') for port in ports]
+    ports = [port.get("port_name") for port in ports]
 
-    fc_ports = (module.params.get('fcaddress')
-                if module.params.get('fcaddress') else [])
-    iscsi_ports = (module.params.get('iscsi_name')
-                   if module.params.get('iscsi_name') else [])
+    fc_ports = module.params.get("fcaddress") if module.params.get("fcaddress") else []
+    iscsi_ports = module.params.get("iscsi_name") if module.params.get("iscsi_name") else []
     for port in ports:
         if port in iscsi_ports or port in fc_ports:
             port_exists = True
             break
     state_changed = False
-    if state == 'present' and not port_exists:
-        state_changed = execute_pyxcli_command(
-            module, 'host_add_port', xcli_client)
-    if state == 'absent' and port_exists:
-        state_changed = execute_pyxcli_command(
-            module, 'host_remove_port', xcli_client)
+    if state == "present" and not port_exists:
+        state_changed = execute_pyxcli_command(module, "host_add_port", xcli_client)
+    if state == "absent" and port_exists:
+        state_changed = execute_pyxcli_command(module, "host_remove_port", xcli_client)
 
     module.exit_json(changed=state_changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

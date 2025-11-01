@@ -101,10 +101,11 @@ _value:
 
 from ansible_collections.community.general.plugins.plugin_utils.keys_filter import (
     _keys_filter_params,
-    _keys_filter_target_str)
+    _keys_filter_target_str,
+)
 
 
-def keep_keys(data, target=None, matching_parameter='equal'):
+def keep_keys(data, target=None, matching_parameter="equal"):
     """keep specific keys from dictionaries in a list"""
 
     # test parameters
@@ -112,16 +113,20 @@ def keep_keys(data, target=None, matching_parameter='equal'):
     # test and transform target
     tt = _keys_filter_target_str(target, matching_parameter)
 
-    if matching_parameter == 'equal':
+    if matching_parameter == "equal":
+
         def keep_key(key):
             return key in tt
-    elif matching_parameter == 'starts_with':
+    elif matching_parameter == "starts_with":
+
         def keep_key(key):
             return key.startswith(tt)
-    elif matching_parameter == 'ends_with':
+    elif matching_parameter == "ends_with":
+
         def keep_key(key):
             return key.endswith(tt)
-    elif matching_parameter == 'regex':
+    elif matching_parameter == "regex":
+
         def keep_key(key):
             return tt.match(key) is not None
 
@@ -129,8 +134,7 @@ def keep_keys(data, target=None, matching_parameter='equal'):
 
 
 class FilterModule:
-
     def filters(self):
         return {
-            'keep_keys': keep_keys,
+            "keep_keys": keep_keys,
         }

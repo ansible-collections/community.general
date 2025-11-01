@@ -37,6 +37,10 @@ class TestLookupModule(TestCase):
             self.lookup.run(
                 ["/dummy"],
                 [],
-                **{"tenant": "dummy", "client_id": "dummy", "client_secret": "dummy", }
+                **{
+                    "tenant": "dummy",
+                    "client_id": "dummy",
+                    "client_secret": "dummy",
+                },
             ),
         )

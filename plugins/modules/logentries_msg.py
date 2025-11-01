@@ -58,7 +58,6 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def send_msg(module, token, msg, api, port):
-
     message = f"{token} {msg}\n"
 
     api_ip = socket.gethostbyname(api)
@@ -76,11 +75,12 @@ def send_msg(module, token, msg, api, port):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            token=dict(type='str', required=True, no_log=True),
-            msg=dict(type='str', required=True),
-            api=dict(type='str', default="data.logentries.com"),
-            port=dict(type='int', default=80)),
-        supports_check_mode=True
+            token=dict(type="str", required=True, no_log=True),
+            msg=dict(type="str", required=True),
+            api=dict(type="str", default="data.logentries.com"),
+            port=dict(type="int", default=80),
+        ),
+        supports_check_mode=True,
     )
 
     token = module.params["token"]
@@ -98,5 +98,5 @@ def main():
     module.exit_json(changed=changed, msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

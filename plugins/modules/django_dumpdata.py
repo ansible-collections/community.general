@@ -109,7 +109,9 @@ class DjangoDumpData(DjangoModuleHelper):
         supports_check_mode=False,
     )
     django_admin_cmd = "dumpdata"
-    django_admin_arg_order = "all format indent excludes database_dash natural_foreign natural_primary primary_keys fixture apps_models"
+    django_admin_arg_order = (
+        "all format indent excludes database_dash natural_foreign natural_primary primary_keys fixture apps_models"
+    )
     _django_args = ["data", "database_dash"]
 
     def __init_module__(self):
@@ -120,5 +122,5 @@ def main():
     DjangoDumpData.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

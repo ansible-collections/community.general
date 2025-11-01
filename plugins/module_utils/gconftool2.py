@@ -17,7 +17,7 @@ _state_map = {
 def gconftool2_runner(module, **kwargs):
     return CmdRunner(
         module,
-        command='gconftool-2',
+        command="gconftool-2",
         arg_formats=dict(
             state=cmd_runner_fmt.as_map(_state_map),
             key=cmd_runner_fmt.as_list(),
@@ -27,5 +27,5 @@ def gconftool2_runner(module, **kwargs):
             config_source=cmd_runner_fmt.as_opt_val("--config-source"),
             version=cmd_runner_fmt.as_fixed("--version"),
         ),
-        **kwargs
+        **kwargs,
     )

@@ -165,50 +165,50 @@ from ansible_collections.community.general.plugins.module_utils.gandi_livedns_ap
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            api_key=dict(type='str', no_log=True),
-            personal_access_token=dict(type='str', no_log=True),
-            record=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
-            ttl=dict(type='int'),
-            type=dict(type='str', required=True),
-            values=dict(type='list', elements='str'),
-            domain=dict(type='str', required=True),
+            api_key=dict(type="str", no_log=True),
+            personal_access_token=dict(type="str", no_log=True),
+            record=dict(type="str", required=True),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            ttl=dict(type="int"),
+            type=dict(type="str", required=True),
+            values=dict(type="list", elements="str"),
+            domain=dict(type="str", required=True),
         ),
         supports_check_mode=True,
         required_if=[
-            ('state', 'present', ['values', 'ttl']),
+            ("state", "present", ["values", "ttl"]),
         ],
         mutually_exclusive=[
-            ('api_key', 'personal_access_token'),
+            ("api_key", "personal_access_token"),
         ],
         required_one_of=[
-            ('api_key', 'personal_access_token'),
+            ("api_key", "personal_access_token"),
         ],
     )
 
     gandi_api = GandiLiveDNSAPI(module)
 
-    if module.params['state'] == 'present':
-        ret, changed = gandi_api.ensure_dns_record(module.params['record'],
-                                                   module.params['type'],
-                                                   module.params['ttl'],
-                                                   module.params['values'],
-                                                   module.params['domain'])
+    if module.params["state"] == "present":
+        ret, changed = gandi_api.ensure_dns_record(
+            module.params["record"],
+            module.params["type"],
+            module.params["ttl"],
+            module.params["values"],
+            module.params["domain"],
+        )
     else:
-        ret, changed = gandi_api.delete_dns_record(module.params['record'],
-                                                   module.params['type'],
-                                                   module.params['values'],
-                                                   module.params['domain'])
+        ret, changed = gandi_api.delete_dns_record(
+            module.params["record"], module.params["type"], module.params["values"], module.params["domain"]
+        )
 
     result = dict(
         changed=changed,
     )
     if ret:
-        result['record'] = gandi_api.build_result(ret,
-                                                  module.params['domain'])
+        result["record"] = gandi_api.build_result(ret, module.params["domain"])
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

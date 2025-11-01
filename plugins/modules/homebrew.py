@@ -186,29 +186,33 @@ from ansible.module_utils.basic import AnsibleModule
 # exceptions -------------------------------------------------------------- {{{
 class HomebrewException(Exception):
     pass
+
+
 # /exceptions ------------------------------------------------------------- }}}
 
 
 # utils ------------------------------------------------------------------- {{{
 def _create_regex_group_complement(s):
-    lines = (line.strip() for line in s.split('\n') if line.strip())
-    chars = [_f for _f in (line.split('#')[0].strip() for line in lines) if _f]
+    lines = (line.strip() for line in s.split("\n") if line.strip())
+    chars = [_f for _f in (line.split("#")[0].strip() for line in lines) if _f]
     group = rf"[^{''.join(chars)}]"
     return re.compile(group)
 
 
 def _check_package_in_json(json_output, package_type):
     return bool(json_output.get(package_type, []) and json_output[package_type][0].get("installed"))
+
+
 # /utils ------------------------------------------------------------------ }}}
 
 
 class Homebrew:
-    '''A class to manage Homebrew packages.'''
+    """A class to manage Homebrew packages."""
 
     # class validations -------------------------------------------- {{{
     @classmethod
     def valid_state(cls, state):
-        '''
+        """
         A valid state is one of:
             - None
             - installed
@@ -217,26 +221,23 @@ class Homebrew:
             - linked
             - unlinked
             - absent
-        '''
+        """
 
         if state is None:
             return True
         else:
-            return (
-                isinstance(state, str)
-                and state.lower() in (
-                    'installed',
-                    'upgraded',
-                    'head',
-                    'linked',
-                    'unlinked',
-                    'absent',
-                )
+            return isinstance(state, str) and state.lower() in (
+                "installed",
+                "upgraded",
+                "head",
+                "linked",
+                "unlinked",
+                "absent",
             )
 
     @classmethod
     def valid_module(cls, module):
-        '''A valid module is an instance of AnsibleModule.'''
+        """A valid module is an instance of AnsibleModule."""
 
         return isinstance(module, AnsibleModule)
 
@@ -252,7 +253,7 @@ class Homebrew:
         if not self.valid_module(module):
             self._module = None
             self.failed = True
-            self.message = f'Invalid module: {module}.'
+            self.message = f"Invalid module: {module}."
             raise HomebrewException(self.message)
 
         else:
@@ -268,12 +269,12 @@ class Homebrew:
         if not HomebrewValidate.valid_path(path):
             self._path = []
             self.failed = True
-            self.message = f'Invalid path: {path}.'
+            self.message = f"Invalid path: {path}."
             raise HomebrewException(self.message)
 
         else:
             if isinstance(path, str):
-                self._path = path.split(':')
+                self._path = path.split(":")
             else:
                 self._path = path
 
@@ -288,7 +289,7 @@ class Homebrew:
         if not HomebrewValidate.valid_brew_path(brew_path):
             self._brew_path = None
             self.failed = True
-            self.message = f'Invalid brew_path: {brew_path}.'
+            self.message = f"Invalid brew_path: {brew_path}."
             raise HomebrewException(self.message)
 
         else:
@@ -306,21 +307,34 @@ class Homebrew:
 
     # /class properties -------------------------------------------- }}}
 
-    def __init__(self, module, path, packages=None, state=None,
-                 update_homebrew=False, upgrade_all=False,
-                 install_options=None, upgrade_options=None,
-                 force_formula=False):
+    def __init__(
+        self,
+        module,
+        path,
+        packages=None,
+        state=None,
+        update_homebrew=False,
+        upgrade_all=False,
+        install_options=None,
+        upgrade_options=None,
+        force_formula=False,
+    ):
         if not install_options:
             install_options = list()
         if not upgrade_options:
             upgrade_options = list()
         self._setup_status_vars()
-        self._setup_instance_vars(module=module, path=path, packages=packages,
-                                  state=state, update_homebrew=update_homebrew,
-                                  upgrade_all=upgrade_all,
-                                  install_options=install_options,
-                                  upgrade_options=upgrade_options,
-                                  force_formula=force_formula)
+        self._setup_instance_vars(
+            module=module,
+            path=path,
+            packages=packages,
+            state=state,
+            update_homebrew=update_homebrew,
+            upgrade_all=upgrade_all,
+            install_options=install_options,
+            upgrade_options=upgrade_options,
+            force_formula=force_formula,
+        )
 
         self._prep()
 
@@ -330,7 +344,7 @@ class Homebrew:
         self.changed = False
         self.changed_pkgs = []
         self.unchanged_pkgs = []
-        self.message = ''
+        self.message = ""
 
     def _setup_instance_vars(self, **kwargs):
         self.installed_packages = set()
@@ -345,19 +359,19 @@ class Homebrew:
         if not self.module:
             self.brew_path = None
             self.failed = True
-            self.message = 'AnsibleModule not set.'
+            self.message = "AnsibleModule not set."
             raise HomebrewException(self.message)
 
         self.brew_path = self.module.get_bin_path(
-            'brew',
+            "brew",
             required=True,
             opt_dirs=self.path,
         )
         if not self.brew_path:
             self.brew_path = None
             self.failed = True
-            self.message = 'Unable to locate homebrew executable.'
-            raise HomebrewException('Unable to locate homebrew executable.')
+            self.message = "Unable to locate homebrew executable."
+            raise HomebrewException("Unable to locate homebrew executable.")
 
         return self.brew_path
 
@@ -407,7 +421,7 @@ class Homebrew:
         package_names.update(package_detail.get("aliases", []))
         package_names.update(package_detail.get("oldnames", []))
         package_names.update(package_detail.get("old_tokens", []))
-        if package_detail['tap']:
+        if package_detail["tap"]:
             # names so far, with tap prefix added to each
             tapped_names = {f"{package_detail['tap']}/{x}" for x in package_names}
             package_names.update(tapped_names)
@@ -416,7 +430,9 @@ class Homebrew:
         package_names = package_names & set(self.packages)
         if len(package_names) != 1:
             self.failed = True
-            self.message = f"Package names for {name} are missing or ambiguous: {', '.join((str(p) for p in package_names))}"
+            self.message = (
+                f"Package names for {name} are missing or ambiguous: {', '.join((str(p) for p in package_names))}"
+            )
             raise HomebrewException(self.message)
 
         # Then make sure the user provided name resurface.
@@ -472,72 +488,74 @@ class Homebrew:
         if self.packages:
             self._validate_packages_names()
             self._get_packages_info()
-            if self.state == 'installed':
+            if self.state == "installed":
                 return self._install_packages()
-            elif self.state == 'upgraded':
+            elif self.state == "upgraded":
                 return self._upgrade_packages()
-            elif self.state == 'head':
+            elif self.state == "head":
                 return self._install_packages()
-            elif self.state == 'linked':
+            elif self.state == "linked":
                 return self._link_packages()
-            elif self.state == 'unlinked':
+            elif self.state == "unlinked":
                 return self._unlink_packages()
-            elif self.state == 'absent':
+            elif self.state == "absent":
                 return self._uninstall_packages()
 
     # updated -------------------------------- {{{
     def _update_homebrew(self):
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Homebrew would be updated.'
+            self.message = "Homebrew would be updated."
             raise HomebrewException(self.message)
 
-        rc, out, err = self.module.run_command([
-            self.brew_path,
-            'update',
-        ])
+        rc, out, err = self.module.run_command(
+            [
+                self.brew_path,
+                "update",
+            ]
+        )
         if rc == 0:
             if out and isinstance(out, str):
                 already_updated = any(
-                    re.search(r'Already up-to-date.', s.strip(), re.IGNORECASE)
-                    for s in out.split('\n')
-                    if s
+                    re.search(r"Already up-to-date.", s.strip(), re.IGNORECASE) for s in out.split("\n") if s
                 )
                 if not already_updated:
                     self.changed = True
-                    self.message = 'Homebrew updated successfully.'
+                    self.message = "Homebrew updated successfully."
                 else:
-                    self.message = 'Homebrew already up-to-date.'
+                    self.message = "Homebrew already up-to-date."
 
             return True
         else:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
+
     # /updated ------------------------------- }}}
 
     # _upgrade_all --------------------------- {{{
     def _upgrade_all(self):
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Homebrew packages would be upgraded.'
+            self.message = "Homebrew packages would be upgraded."
             raise HomebrewException(self.message)
-        cmd = [self.brew_path, 'upgrade'] + self.upgrade_options
+        cmd = [self.brew_path, "upgrade"] + self.upgrade_options
 
         rc, out, err = self.module.run_command(cmd)
         if rc == 0:
             if not out:
-                self.message = 'Homebrew packages already upgraded.'
+                self.message = "Homebrew packages already upgraded."
 
             else:
                 self.changed = True
-                self.message = 'Homebrew upgraded.'
+                self.message = "Homebrew upgraded."
 
             return True
         else:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
+
     # /_upgrade_all -------------------------- }}}
 
     # installed ------------------------------ {{{
@@ -546,7 +564,9 @@ class Homebrew:
 
         if len(packages_to_install) == 0:
             self.unchanged_pkgs.extend(self.packages)
-            self.message = f"Package{'s' if len(self.packages) > 1 else ''} already installed: {', '.join(self.packages)}"
+            self.message = (
+                f"Package{'s' if len(self.packages) > 1 else ''} already installed: {', '.join(self.packages)}"
+            )
             return True
 
         if self.module.check_mode:
@@ -554,22 +574,17 @@ class Homebrew:
             self.message = f"Package{'s' if len(packages_to_install) > 1 else ''} would be installed: {', '.join(packages_to_install)}"
             raise HomebrewException(self.message)
 
-        if self.state == 'head':
-            head = '--HEAD'
+        if self.state == "head":
+            head = "--HEAD"
         else:
             head = None
 
         if self.force_formula:
-            formula = '--formula'
+            formula = "--formula"
         else:
             formula = None
 
-        opts = (
-            [self.brew_path, 'install']
-            + self.install_options
-            + list(packages_to_install)
-            + [head, formula]
-        )
+        opts = [self.brew_path, "install"] + self.install_options + list(packages_to_install) + [head, formula]
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
@@ -577,26 +592,26 @@ class Homebrew:
             self.changed_pkgs.extend(packages_to_install)
             self.unchanged_pkgs.extend(self.installed_packages)
             self.changed = True
-            self.message = f"Package{'s' if len(packages_to_install) > 1 else ''} installed: {', '.join(packages_to_install)}"
+            self.message = (
+                f"Package{'s' if len(packages_to_install) > 1 else ''} installed: {', '.join(packages_to_install)}"
+            )
             return True
         else:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
+
     # /installed ----------------------------- }}}
 
     # upgraded ------------------------------- {{{
     def _upgrade_all_packages(self):
-        opts = (
-            [self.brew_path, 'upgrade']
-            + self.install_options
-        )
+        opts = [self.brew_path, "upgrade"] + self.install_options
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
             self.changed = True
-            self.message = 'All packages upgraded.'
+            self.message = "All packages upgraded."
             return True
         else:
             self.failed = True
@@ -617,7 +632,9 @@ class Homebrew:
 
             if len(packages_to_install_or_upgrade) == 0:
                 self.unchanged_pkgs.extend(self.packages)
-                self.message = f"Package{'s' if len(self.packages) > 1 else ''} already upgraded: {', '.join(self.packages)}"
+                self.message = (
+                    f"Package{'s' if len(self.packages) > 1 else ''} already upgraded: {', '.join(self.packages)}"
+                )
                 return True
 
             if self.module.check_mode:
@@ -625,18 +642,11 @@ class Homebrew:
                 self.message = f"Package{'s' if len(packages_to_install_or_upgrade) > 1 else ''} would be upgraded: {', '.join(packages_to_install_or_upgrade)}"
                 raise HomebrewException(self.message)
 
-            for command, packages in [
-                ("install", packages_to_install),
-                ("upgrade", packages_to_upgrade)
-            ]:
+            for command, packages in [("install", packages_to_install), ("upgrade", packages_to_upgrade)]:
                 if not packages:
                     continue
 
-                opts = (
-                    [self.brew_path, command]
-                    + self.install_options
-                    + list(packages)
-                )
+                opts = [self.brew_path, command] + self.install_options + list(packages)
                 cmd = [opt for opt in opts if opt]
                 rc, out, err = self.module.run_command(cmd)
 
@@ -649,6 +659,7 @@ class Homebrew:
             self.unchanged_pkgs.extend(set(self.packages) - packages_to_install_or_upgrade)
             self.changed = True
             self.message = f"Package{'s' if len(packages_to_install_or_upgrade) > 1 else ''} upgraded: {', '.join(packages_to_install_or_upgrade)}"
+
     # /upgraded ------------------------------ }}}
 
     # uninstalled ---------------------------- {{{
@@ -657,7 +668,9 @@ class Homebrew:
 
         if len(packages_to_uninstall) == 0:
             self.unchanged_pkgs.extend(self.packages)
-            self.message = f"Package{'s' if len(self.packages) > 1 else ''} already uninstalled: {', '.join(self.packages)}"
+            self.message = (
+                f"Package{'s' if len(self.packages) > 1 else ''} already uninstalled: {', '.join(self.packages)}"
+            )
             return True
 
         if self.module.check_mode:
@@ -665,11 +678,7 @@ class Homebrew:
             self.message = f"Package{'s' if len(packages_to_uninstall) > 1 else ''} would be uninstalled: {', '.join(packages_to_uninstall)}"
             raise HomebrewException(self.message)
 
-        opts = (
-            [self.brew_path, 'uninstall', '--force']
-            + self.install_options
-            + list(packages_to_uninstall)
-        )
+        opts = [self.brew_path, "uninstall", "--force"] + self.install_options + list(packages_to_uninstall)
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
@@ -683,6 +692,7 @@ class Homebrew:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
+
     # /uninstalled ----------------------------- }}}
 
     # linked --------------------------------- {{{
@@ -690,7 +700,9 @@ class Homebrew:
         missing_packages = set(self.packages) - self.installed_packages
         if missing_packages:
             self.failed = True
-            self.message = f"Package{'s' if len(missing_packages) > 1 else ''} not installed: {', '.join(missing_packages)}."
+            self.message = (
+                f"Package{'s' if len(missing_packages) > 1 else ''} not installed: {', '.join(missing_packages)}."
+            )
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
@@ -698,11 +710,7 @@ class Homebrew:
             self.message = f"Package{'s' if len(self.packages) > 1 else ''} would be linked: {', '.join(self.packages)}"
             raise HomebrewException(self.message)
 
-        opts = (
-            [self.brew_path, 'link']
-            + self.install_options
-            + self.packages
-        )
+        opts = [self.brew_path, "link"] + self.install_options + self.packages
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
@@ -713,8 +721,11 @@ class Homebrew:
             return True
         else:
             self.failed = True
-            self.message = f"Package{'s' if len(self.packages) > 1 else ''} could not be linked: {', '.join(self.packages)}."
+            self.message = (
+                f"Package{'s' if len(self.packages) > 1 else ''} could not be linked: {', '.join(self.packages)}."
+            )
             raise HomebrewException(self.message)
+
     # /linked -------------------------------- }}}
 
     # unlinked ------------------------------- {{{
@@ -722,19 +733,19 @@ class Homebrew:
         missing_packages = set(self.packages) - self.installed_packages
         if missing_packages:
             self.failed = True
-            self.message = f"Package{'s' if len(missing_packages) > 1 else ''} not installed: {', '.join(missing_packages)}."
+            self.message = (
+                f"Package{'s' if len(missing_packages) > 1 else ''} not installed: {', '.join(missing_packages)}."
+            )
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
             self.changed = True
-            self.message = f"Package{'s' if len(self.packages) > 1 else ''} would be unlinked: {', '.join(self.packages)}"
+            self.message = (
+                f"Package{'s' if len(self.packages) > 1 else ''} would be unlinked: {', '.join(self.packages)}"
+            )
             raise HomebrewException(self.message)
 
-        opts = (
-            [self.brew_path, 'unlink']
-            + self.install_options
-            + self.packages
-        )
+        opts = [self.brew_path, "unlink"] + self.install_options + self.packages
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
@@ -745,8 +756,11 @@ class Homebrew:
             return True
         else:
             self.failed = True
-            self.message = f"Package{'s' if len(self.packages) > 1 else ''} could not be unlinked: {', '.join(self.packages)}."
+            self.message = (
+                f"Package{'s' if len(self.packages) > 1 else ''} could not be unlinked: {', '.join(self.packages)}."
+            )
             raise HomebrewException(self.message)
+
     # /unlinked ------------------------------ }}}
     # /commands ---------------------------------------------------- }}}
 
@@ -756,106 +770,110 @@ def main():
         argument_spec=dict(
             name=dict(
                 aliases=["pkg", "package", "formula"],
-                type='list',
-                elements='str',
+                type="list",
+                elements="str",
             ),
             path=dict(
                 default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
-                type='path',
+                type="path",
             ),
             state=dict(
                 default="present",
                 choices=[
-                    "present", "installed",
-                    "latest", "upgraded", "head",
-                    "linked", "unlinked",
-                    "absent", "removed", "uninstalled",
+                    "present",
+                    "installed",
+                    "latest",
+                    "upgraded",
+                    "head",
+                    "linked",
+                    "unlinked",
+                    "absent",
+                    "removed",
+                    "uninstalled",
                 ],
             ),
             update_homebrew=dict(
                 default=False,
-                type='bool',
+                type="bool",
             ),
             upgrade_all=dict(
                 default=False,
                 aliases=["upgrade"],
-                type='bool',
+                type="bool",
             ),
             install_options=dict(
-                aliases=['options'],
-                type='list',
-                elements='str',
+                aliases=["options"],
+                type="list",
+                elements="str",
             ),
             upgrade_options=dict(
-                type='list',
-                elements='str',
+                type="list",
+                elements="str",
             ),
             force_formula=dict(
                 default=False,
-                type='bool',
+                type="bool",
             ),
         ),
         supports_check_mode=True,
     )
 
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     p = module.params
 
-    if p['name']:
-        packages = [package_name.lower() for package_name in p['name']]
+    if p["name"]:
+        packages = [package_name.lower() for package_name in p["name"]]
     else:
         packages = None
 
-    path = p['path']
+    path = p["path"]
     if path:
-        path = path.split(':')
+        path = path.split(":")
 
-    state = p['state']
-    if state in ('present', 'installed'):
-        state = 'installed'
-    if state in ('head', ):
-        state = 'head'
-    if state in ('latest', 'upgraded'):
-        state = 'upgraded'
-    if state == 'linked':
-        state = 'linked'
-    if state == 'unlinked':
-        state = 'unlinked'
-    if state in ('absent', 'removed', 'uninstalled'):
-        state = 'absent'
+    state = p["state"]
+    if state in ("present", "installed"):
+        state = "installed"
+    if state in ("head",):
+        state = "head"
+    if state in ("latest", "upgraded"):
+        state = "upgraded"
+    if state == "linked":
+        state = "linked"
+    if state == "unlinked":
+        state = "unlinked"
+    if state in ("absent", "removed", "uninstalled"):
+        state = "absent"
 
-    force_formula = p['force_formula']
-    update_homebrew = p['update_homebrew']
+    force_formula = p["force_formula"]
+    update_homebrew = p["update_homebrew"]
     if not update_homebrew:
-        module.run_command_environ_update.update(
-            dict(HOMEBREW_NO_AUTO_UPDATE="True")
-        )
-    upgrade_all = p['upgrade_all']
-    p['install_options'] = p['install_options'] or []
-    install_options = [f'--{install_option}'
-                       for install_option in p['install_options']]
+        module.run_command_environ_update.update(dict(HOMEBREW_NO_AUTO_UPDATE="True"))
+    upgrade_all = p["upgrade_all"]
+    p["install_options"] = p["install_options"] or []
+    install_options = [f"--{install_option}" for install_option in p["install_options"]]
 
-    p['upgrade_options'] = p['upgrade_options'] or []
-    upgrade_options = [f'--{upgrade_option}'
-                       for upgrade_option in p['upgrade_options']]
-    brew = Homebrew(module=module, path=path, packages=packages,
-                    state=state, update_homebrew=update_homebrew,
-                    upgrade_all=upgrade_all, install_options=install_options,
-                    upgrade_options=upgrade_options, force_formula=force_formula)
+    p["upgrade_options"] = p["upgrade_options"] or []
+    upgrade_options = [f"--{upgrade_option}" for upgrade_option in p["upgrade_options"]]
+    brew = Homebrew(
+        module=module,
+        path=path,
+        packages=packages,
+        state=state,
+        update_homebrew=update_homebrew,
+        upgrade_all=upgrade_all,
+        install_options=install_options,
+        upgrade_options=upgrade_options,
+        force_formula=force_formula,
+    )
     (failed, changed, message) = brew.run()
     changed_pkgs = brew.changed_pkgs
     unchanged_pkgs = brew.unchanged_pkgs
 
     if failed:
         module.fail_json(msg=message)
-    module.exit_json(
-        changed=changed,
-        msg=message,
-        unchanged_pkgs=unchanged_pkgs,
-        changed_pkgs=changed_pkgs
-    )
+    module.exit_json(changed=changed, msg=message, unchanged_pkgs=unchanged_pkgs, changed_pkgs=changed_pkgs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -140,8 +140,5 @@ def reveal_ansible_type(data, alias=None):
 
 
 class FilterModule:
-
     def filters(self):
-        return {
-            'reveal_ansible_type': reveal_ansible_type
-        }
+        return {"reveal_ansible_type": reveal_ansible_type}

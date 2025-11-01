@@ -13,8 +13,15 @@ from urllib.parse import urljoin
 
 from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.ocapi_command as module
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
+)
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    set_module_args,
+    exit_json,
+    fail_json,
+)
 
 
 MOCK_BASE_URI = "mockBaseUri/"
@@ -27,60 +34,21 @@ NO_ACTION_PERFORMED_IN_CHECK_MODE = "No action performed in check mode."
 
 MOCK_SUCCESSFUL_HTTP_RESPONSE_LED_INDICATOR_OFF_WITH_ETAG = {
     "ret": True,
-    "data": {
-        "IndicatorLED": {
-            "ID": 4,
-            "Name": "Off"
-        },
-        "PowerState": {
-            "ID": 2,
-            "Name": "On"
-        }
-    },
-    "headers": {"etag": "MockETag"}
+    "data": {"IndicatorLED": {"ID": 4, "Name": "Off"}, "PowerState": {"ID": 2, "Name": "On"}},
+    "headers": {"etag": "MockETag"},
 }
 
-MOCK_SUCCESSFUL_HTTP_RESPONSE = {
-    "ret": True,
-    "data": {}
-}
+MOCK_SUCCESSFUL_HTTP_RESPONSE = {"ret": True, "data": {}}
 
-MOCK_404_RESPONSE = {
-    "ret": False,
-    "status": 404
-}
+MOCK_404_RESPONSE = {"ret": False, "status": 404}
 
-MOCK_SUCCESSFUL_HTTP_RESPONSE_WITH_LOCATION_HEADER = {
-    "ret": True,
-    "data": {},
-    "headers": {"location": "mock_location"}
-}
+MOCK_SUCCESSFUL_HTTP_RESPONSE_WITH_LOCATION_HEADER = {"ret": True, "data": {}, "headers": {"location": "mock_location"}}
 
-MOCK_HTTP_RESPONSE_CONFLICT = {
-    "ret": False,
-    "msg": "Conflict",
-    "status": 409
-}
+MOCK_HTTP_RESPONSE_CONFLICT = {"ret": False, "msg": "Conflict", "status": 409}
 
-MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS = {
-    "ret": True,
-    "data": {
-        "PercentComplete": 99
-    },
-    "headers": {
-        "etag": "12345"
-    }
-}
+MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS = {"ret": True, "data": {"PercentComplete": 99}, "headers": {"etag": "12345"}}
 
-MOCK_HTTP_RESPONSE_JOB_COMPLETE = {
-    "ret": True,
-    "data": {
-        "PercentComplete": 100
-    },
-    "headers": {
-        "etag": "12345"
-    }
-}
+MOCK_HTTP_RESPONSE_JOB_COMPLETE = {"ret": True, "data": {"PercentComplete": 100}, "headers": {"etag": "12345"}}
 
 
 def get_bin_path(self, arg, required=False):
@@ -171,12 +139,10 @@ def mock_invalid_http_request(*args, **kwargs):
 
 
 class TestOcapiCommand(unittest.TestCase):
-
     def setUp(self):
-        self.mock_module_helper = patch.multiple(basic.AnsibleModule,
-                                                 exit_json=exit_json,
-                                                 fail_json=fail_json,
-                                                 get_bin_path=get_bin_path)
+        self.mock_module_helper = patch.multiple(
+            basic.AnsibleModule, exit_json=exit_json, fail_json=fail_json, get_bin_path=get_bin_path
+        )
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
         self.tempdir = tempfile.mkdtemp()
@@ -192,237 +158,291 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_module_fail_when_unknown_category(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            with set_module_args({
-                'category': 'unknown',
-                'command': 'IndicatorLedOn',
-                'username': 'USERID',
-                'password': 'PASSW0RD=21',
-                'baseuri': MOCK_BASE_URI
-            }):
+            with set_module_args(
+                {
+                    "category": "unknown",
+                    "command": "IndicatorLedOn",
+                    "username": "USERID",
+                    "password": "PASSW0RD=21",
+                    "baseuri": MOCK_BASE_URI,
+                }
+            ):
                 module.main()
         self.assertIn("Invalid Category 'unknown", get_exception_message(ansible_fail_json))
 
     def test_set_power_mode(self):
         """Test that we can set chassis power mode"""
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'PowerModeLow',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "PowerModeLow",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_set_chassis_led_indicator(self):
         """Test that we can set chassis LED indicator."""
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'IndicatorLedOn',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "IndicatorLedOn",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_set_power_mode_already_set(self):
         """Test that if we set Power Mode to normal when it's already normal, we get changed=False."""
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'PowerModeNormal',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "PowerModeNormal",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
     def test_set_power_mode_check_mode(self):
         """Test check mode when setting chassis Power Mode."""
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'IndicatorLedOn',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    '_ansible_check_mode': True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "IndicatorLedOn",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_set_chassis_led_indicator_check_mode(self):
         """Test check mode when setting chassis LED indicator"""
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'IndicatorLedOn',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    '_ansible_check_mode': True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "IndicatorLedOn",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_set_chassis_led_indicator_already_set(self):
         """Test that if we set LED Indicator to off when it's already off, we get changed=False."""
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'IndicatorLedOff',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "IndicatorLedOff",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
     def test_set_chassis_led_indicator_already_set_check_mode(self):
         """Test that if we set LED Indicator to off when it's already off, we get changed=False even in check mode."""
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'IndicatorLedOff',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    "_ansible_check_mode": True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "IndicatorLedOff",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(NO_ACTION_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
     def test_set_chassis_invalid_indicator_command(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+        ):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                with set_module_args({
-                    'category': 'Chassis',
-                    'command': 'IndicatorLedBright',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Chassis",
+                        "command": "IndicatorLedBright",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertIn("Invalid Command", get_exception_message(ansible_fail_json))
 
     def test_reset_enclosure(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Systems',
-                    'command': 'PowerGracefulRestart',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Systems",
+                        "command": "PowerGracefulRestart",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_reset_enclosure_check_mode(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Systems',
-                    'command': 'PowerGracefulRestart',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    "_ansible_check_mode": True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Systems",
+                        "command": "PowerGracefulRestart",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_firmware_upload_missing_update_image_path(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+        ):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWUpload',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWUpload",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual("Missing update_image_path.", get_exception_message(ansible_fail_json))
 
     def test_firmware_upload_file_not_found(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWUpload',
-                    'update_image_path': 'nonexistentfile.bin',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWUpload",
+                        "update_image_path": "nonexistentfile.bin",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual("File does not exist.", get_exception_message(ansible_fail_json))
 
     def test_firmware_upload(self):
         filename = "fake_firmware.bin"
         filepath = os.path.join(self.tempdir, filename)
-        file_contents = b'\x00\x01\x02\x03\x04'
-        with open(filepath, 'wb+') as f:
+        file_contents = b"\x00\x01\x02\x03\x04"
+        with open(filepath, "wb+") as f:
             f.write(file_contents)
 
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request,
-                            post_request=mock_post_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+            post_request=mock_post_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWUpload',
-                    'update_image_path': filepath,
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWUpload",
+                        "update_image_path": filepath,
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
@@ -430,208 +450,252 @@ class TestOcapiCommand(unittest.TestCase):
     def test_firmware_upload_check_mode(self):
         filename = "fake_firmware.bin"
         filepath = os.path.join(self.tempdir, filename)
-        file_contents = b'\x00\x01\x02\x03\x04'
-        with open(filepath, 'wb+') as f:
+        file_contents = b"\x00\x01\x02\x03\x04"
+        with open(filepath, "wb+") as f:
             f.write(file_contents)
 
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWUpload',
-                    'update_image_path': filepath,
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    "_ansible_check_mode": True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWUpload",
+                        "update_image_path": filepath,
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_firmware_update(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWUpdate',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWUpdate",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_firmware_update_check_mode(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWUpdate',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    "_ansible_check_mode": True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWUpdate",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_firmware_activate(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_put_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_put_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWActivate',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWActivate",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_firmware_activate_check_mode(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Update',
-                    'command': 'FWActivate',
-                    'baseuri': MOCK_BASE_URI,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    "_ansible_check_mode": True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Update",
+                        "command": "FWActivate",
+                        "baseuri": MOCK_BASE_URI,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_delete_job(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request_job_complete,
-                            delete_request=mock_delete_request,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request_job_complete,
+            delete_request=mock_delete_request,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'DeleteJob',
-                    'baseuri': MOCK_BASE_URI,
-                    'job_name': MOCK_JOB_NAME,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "DeleteJob",
+                        "baseuri": MOCK_BASE_URI,
+                        "job_name": MOCK_JOB_NAME,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_delete_job_in_progress(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request_job_in_progress,
-                            delete_request=mock_invalid_http_request,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request_job_in_progress,
+            delete_request=mock_invalid_http_request,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'DeleteJob',
-                    'baseuri': MOCK_BASE_URI,
-                    'job_name': MOCK_JOB_NAME,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "DeleteJob",
+                        "baseuri": MOCK_BASE_URI,
+                        "job_name": MOCK_JOB_NAME,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual("Cannot delete job because it is in progress.", get_exception_message(ansible_fail_json))
 
     def test_delete_job_in_progress_only_on_delete(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request_job_complete,
-                            delete_request=mock_http_request_conflict,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request_job_complete,
+            delete_request=mock_http_request_conflict,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'DeleteJob',
-                    'baseuri': MOCK_BASE_URI,
-                    'job_name': MOCK_JOB_NAME,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21'
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "DeleteJob",
+                        "baseuri": MOCK_BASE_URI,
+                        "job_name": MOCK_JOB_NAME,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                    }
+                ):
                     module.main()
             self.assertEqual("Cannot delete job because it is in progress.", get_exception_message(ansible_fail_json))
 
     def test_delete_job_check_mode(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request_job_complete,
-                            delete_request=mock_delete_request,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request_job_complete,
+            delete_request=mock_delete_request,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'DeleteJob',
-                    'baseuri': MOCK_BASE_URI,
-                    'job_name': MOCK_JOB_NAME,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    '_ansible_check_mode': True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "DeleteJob",
+                        "baseuri": MOCK_BASE_URI,
+                        "job_name": MOCK_JOB_NAME,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
     def test_delete_job_check_mode_job_not_found(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request_job_does_not_exist,
-                            delete_request=mock_delete_request,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request_job_does_not_exist,
+            delete_request=mock_delete_request,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'DeleteJob',
-                    'baseuri': MOCK_BASE_URI,
-                    'job_name': MOCK_JOB_NAME,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    '_ansible_check_mode': True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "DeleteJob",
+                        "baseuri": MOCK_BASE_URI,
+                        "job_name": MOCK_JOB_NAME,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual("Job already deleted.", get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
     def test_delete_job_check_mode_job_in_progress(self):
-        with patch.multiple("ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
-                            get_request=mock_get_request_job_in_progress,
-                            delete_request=mock_delete_request,
-                            put_request=mock_invalid_http_request,
-                            post_request=mock_invalid_http_request):
+        with patch.multiple(
+            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            get_request=mock_get_request_job_in_progress,
+            delete_request=mock_delete_request,
+            put_request=mock_invalid_http_request,
+            post_request=mock_invalid_http_request,
+        ):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                with set_module_args({
-                    'category': 'Jobs',
-                    'command': 'DeleteJob',
-                    'baseuri': MOCK_BASE_URI,
-                    'job_name': MOCK_JOB_NAME,
-                    'username': 'USERID',
-                    'password': 'PASSWORD=21',
-                    '_ansible_check_mode': True
-                }):
+                with set_module_args(
+                    {
+                        "category": "Jobs",
+                        "command": "DeleteJob",
+                        "baseuri": MOCK_BASE_URI,
+                        "job_name": MOCK_JOB_NAME,
+                        "username": "USERID",
+                        "password": "PASSWORD=21",
+                        "_ansible_check_mode": True,
+                    }
+                ):
                     module.main()
             self.assertEqual("Cannot delete job because it is in progress.", get_exception_message(ansible_fail_json))

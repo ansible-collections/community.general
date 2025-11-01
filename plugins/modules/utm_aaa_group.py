@@ -202,26 +202,39 @@ from ansible.module_utils.common.text.converters import to_native
 
 def main():
     endpoint = "aaa/group"
-    key_to_check_for_changes = ["comment", "adirectory_groups", "adirectory_groups_sids", "backend_match", "dynamic",
-                                "edirectory_groups", "ipsec_dn", "ldap_attribute", "ldap_attribute_value", "members",
-                                "network", "radius_groups", "tacacs_groups"]
+    key_to_check_for_changes = [
+        "comment",
+        "adirectory_groups",
+        "adirectory_groups_sids",
+        "backend_match",
+        "dynamic",
+        "edirectory_groups",
+        "ipsec_dn",
+        "ldap_attribute",
+        "ldap_attribute_value",
+        "members",
+        "network",
+        "radius_groups",
+        "tacacs_groups",
+    ]
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            adirectory_groups=dict(type='list', elements='str', default=[]),
-            adirectory_groups_sids=dict(type='dict', default={}),
-            backend_match=dict(type='str', default="none",
-                               choices=["none", "adirectory", "edirectory", "radius", "tacacs", "ldap"]),
-            comment=dict(type='str', default=""),
-            dynamic=dict(type='str', default="none", choices=["none", "ipsec_dn", "directory_groups"]),
-            edirectory_groups=dict(type='list', elements='str', default=[]),
-            ipsec_dn=dict(type='str', default=""),
-            ldap_attribute=dict(type='str', default=""),
-            ldap_attribute_value=dict(type='str', default=""),
-            members=dict(type='list', elements='str', default=[]),
-            network=dict(type='str', default=""),
-            radius_groups=dict(type='list', elements='str', default=[]),
-            tacacs_groups=dict(type='list', elements='str', default=[]),
+            name=dict(type="str", required=True),
+            adirectory_groups=dict(type="list", elements="str", default=[]),
+            adirectory_groups_sids=dict(type="dict", default={}),
+            backend_match=dict(
+                type="str", default="none", choices=["none", "adirectory", "edirectory", "radius", "tacacs", "ldap"]
+            ),
+            comment=dict(type="str", default=""),
+            dynamic=dict(type="str", default="none", choices=["none", "ipsec_dn", "directory_groups"]),
+            edirectory_groups=dict(type="list", elements="str", default=[]),
+            ipsec_dn=dict(type="str", default=""),
+            ldap_attribute=dict(type="str", default=""),
+            ldap_attribute_value=dict(type="str", default=""),
+            members=dict(type="list", elements="str", default=[]),
+            network=dict(type="str", default=""),
+            radius_groups=dict(type="list", elements="str", default=[]),
+            tacacs_groups=dict(type="list", elements="str", default=[]),
         )
     )
     try:
@@ -230,5 +243,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

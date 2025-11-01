@@ -141,15 +141,15 @@ def main():
     key_to_check_for_changes = ["comment", "hostname", "interface"]
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            address=dict(type='str', default='0.0.0.0'),
-            address6=dict(type='str', default='::'),
-            comment=dict(type='str', default=""),
-            hostname=dict(type='str'),
-            interface=dict(type='str', default=""),
-            resolved=dict(type='bool', default=False),
-            resolved6=dict(type='bool', default=False),
-            timeout=dict(type='int', default=0),
+            name=dict(type="str", required=True),
+            address=dict(type="str", default="0.0.0.0"),
+            address6=dict(type="str", default="::"),
+            comment=dict(type="str", default=""),
+            hostname=dict(type="str"),
+            interface=dict(type="str", default=""),
+            resolved=dict(type="bool", default=False),
+            resolved6=dict(type="bool", default=False),
+            timeout=dict(type="int", default=0),
         )
     )
     try:
@@ -158,5 +158,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

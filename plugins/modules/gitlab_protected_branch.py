@@ -89,20 +89,21 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab
+    auth_argument_spec,
+    gitlab_authentication,
+    gitlab,
 )
 
 
 class GitlabProtectedBranch:
-
     def __init__(self, module, project, gitlab_instance):
         self.repo = gitlab_instance
         self._module = module
         self.project = self.get_project(project)
         self.ACCESS_LEVEL = {
-            'nobody': gitlab.const.NO_ACCESS,
-            'developer': gitlab.const.DEVELOPER_ACCESS,
-            'maintainer': gitlab.const.MAINTAINER_ACCESS
+            "nobody": gitlab.const.NO_ACCESS,
+            "developer": gitlab.const.DEVELOPER_ACCESS,
+            "maintainer": gitlab.const.MAINTAINER_ACCESS,
         }
 
     def get_project(self, project_name):
@@ -116,9 +117,9 @@ class GitlabProtectedBranch:
 
     def create_or_update_protected_branch(self, name, options):
         protected_branch_options = {
-            'name': name,
-            'allow_force_push': options['allow_force_push'],
-            'code_owner_approval_required': options['code_owner_approval_required'],
+            "name": name,
+            "allow_force_push": options["allow_force_push"],
+            "code_owner_approval_required": options["code_owner_approval_required"],
         }
         protected_branch = self.protected_branch_exist(name=name)
         changed = False
@@ -132,8 +133,8 @@ class GitlabProtectedBranch:
                 protected_branch.save()
         else:
             # Set immutable options only on (re)creation
-            protected_branch_options['merge_access_level'] = options['merge_access_levels']
-            protected_branch_options['push_access_level'] = options['push_access_level']
+            protected_branch_options["merge_access_level"] = options["merge_access_levels"]
+            protected_branch_options["push_access_level"] = options["push_access_level"]
             if protected_branch:
                 # Exists, but couldn't update. So, delete first
                 self.delete_protected_branch(name)
@@ -145,12 +146,13 @@ class GitlabProtectedBranch:
 
     def can_update(self, protected_branch, options):
         # these keys are not set on update the same way they are on creation
-        configured_merge = options['merge_access_levels']
-        configured_push = options['push_access_level']
-        current_merge = protected_branch.merge_access_levels[0]['access_level']
-        current_push = protected_branch.push_access_levels[0]['access_level']
-        return ((configured_merge is None or current_merge == configured_merge) and
-                (configured_push is None or current_push == configured_push))
+        configured_merge = options["merge_access_levels"]
+        configured_push = options["push_access_level"]
+        current_merge = protected_branch.merge_access_levels[0]["access_level"]
+        current_push = protected_branch.push_access_levels[0]["access_level"]
+        return (configured_merge is None or current_merge == configured_merge) and (
+            configured_push is None or current_push == configured_push
+        )
 
     def delete_protected_branch(self, name):
         if self._module.check_mode:
@@ -162,47 +164,45 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        project=dict(type='str', required=True),
-        name=dict(type='str', required=True),
-        merge_access_levels=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
-        push_access_level=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
-        allow_force_push=dict(type='bool'),
-        code_owner_approval_required=dict(type='bool'),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
+        project=dict(type="str", required=True),
+        name=dict(type="str", required=True),
+        merge_access_levels=dict(type="str", default="maintainer", choices=["maintainer", "developer", "nobody"]),
+        push_access_level=dict(type="str", default="maintainer", choices=["maintainer", "developer", "nobody"]),
+        allow_force_push=dict(type="bool"),
+        code_owner_approval_required=dict(type="bool"),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
-        supports_check_mode=True
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
+        supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    project = module.params['project']
-    name = module.params['name']
-    merge_access_levels = module.params['merge_access_levels']
-    push_access_level = module.params['push_access_level']
-    state = module.params['state']
+    project = module.params["project"]
+    name = module.params["name"]
+    merge_access_levels = module.params["merge_access_levels"]
+    push_access_level = module.params["push_access_level"]
+    state = module.params["state"]
 
     gitlab_version = gitlab.__version__
-    if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
+    if LooseVersion(gitlab_version) < LooseVersion("2.3.0"):
         module.fail_json(
             msg=f"community.general.gitlab_protected_branch requires python-gitlab Python module >= 2.3.0 (installed version: [{gitlab_version}])."
-                " Please upgrade python-gitlab to version 2.3.0 or above."
+            " Please upgrade python-gitlab to version 2.3.0 or above."
         )
 
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
@@ -223,5 +223,5 @@ def main():
     module.exit_json(changed=False, msg="No changes are needed.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

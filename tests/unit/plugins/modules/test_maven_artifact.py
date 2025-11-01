@@ -9,7 +9,7 @@ from ansible_collections.community.general.plugins.modules import maven_artifact
 from ansible.module_utils import basic
 
 
-pytestmark = pytest.mark.usefixtures('patch_ansible_module')
+pytestmark = pytest.mark.usefixtures("patch_ansible_module")
 
 maven_metadata_example = b"""<?xml version="1.0" encoding="UTF-8"?>
 <metadata>
@@ -52,16 +52,21 @@ maven_metadata_example = b"""<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-@pytest.mark.parametrize('patch_ansible_module, version_by_spec, version_choosed', [
-    (None, "(,3.9]", "3.8.2"),
-    (None, "3.0", "3.8.2"),
-    (None, "[3.7]", "3.7"),
-    (None, "[4.10, 4.12]", "4.12"),
-    (None, "[4.10, 4.12)", "4.11"),
-    (None, "[2.0,)", "4.13-beta-2"),
-])
+@pytest.mark.parametrize(
+    "patch_ansible_module, version_by_spec, version_choosed",
+    [
+        (None, "(,3.9]", "3.8.2"),
+        (None, "3.0", "3.8.2"),
+        (None, "[3.7]", "3.7"),
+        (None, "[4.10, 4.12]", "4.12"),
+        (None, "[4.10, 4.12)", "4.11"),
+        (None, "[2.0,)", "4.13-beta-2"),
+    ],
+)
 def test_find_version_by_spec(mocker, version_by_spec, version_choosed):
-    _getContent = mocker.patch('ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent')
+    _getContent = mocker.patch(
+        "ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent"
+    )
     _getContent.return_value = maven_metadata_example
 
     artifact = maven_artifact.Artifact("junit", "junit", None, version_by_spec, "jar")

@@ -21,14 +21,14 @@ from ansible_collections.community.general.plugins.plugin_utils.unsafe import (
 
 TEST_MAKE_UNSAFE = [
     (
-        _make_trusted('text'),
+        _make_trusted("text"),
         [],
         [
             (),
         ],
     ),
     (
-        _make_trusted('{{text}}'),
+        _make_trusted("{{text}}"),
         [
             (),
         ],
@@ -36,56 +36,58 @@ TEST_MAKE_UNSAFE = [
     ),
     (
         {
-            _make_trusted('skey'): _make_trusted('value'),
-            _make_trusted('ukey'): _make_trusted('{{value}}'),
+            _make_trusted("skey"): _make_trusted("value"),
+            _make_trusted("ukey"): _make_trusted("{{value}}"),
             1: [
-                _make_trusted('value'),
-                _make_trusted('{{value}}'),
+                _make_trusted("value"),
+                _make_trusted("{{value}}"),
                 {
-                    1.0: _make_trusted('{{value}}'),
-                    2.0: _make_trusted('value'),
+                    1.0: _make_trusted("{{value}}"),
+                    2.0: _make_trusted("value"),
                 },
             ],
         },
         [
-            ('ukey', ),
+            ("ukey",),
             (1, 1),
             (1, 2, 1.0),
         ],
         [
-            ('skey', ),
+            ("skey",),
             (1, 0),
             (1, 2, 2.0),
         ],
     ),
     (
-        [_make_trusted('value'), _make_trusted('{{value}}')],
+        [_make_trusted("value"), _make_trusted("{{value}}")],
         [
-            (1, ),
+            (1,),
         ],
         [
-            (0, ),
+            (0,),
         ],
     ),
 ]
 
 if not SUPPORTS_DATA_TAGGING:
-    TEST_MAKE_UNSAFE.extend([
-        (
-            _make_trusted(b"text"),
-            [],
-            [
-                (),
-            ],
-        ),
-        (
-            _make_trusted(b"{{text}}"),
-            [
-                (),
-            ],
-            [],
-        ),
-    ])
+    TEST_MAKE_UNSAFE.extend(
+        [
+            (
+                _make_trusted(b"text"),
+                [],
+                [
+                    (),
+                ],
+            ),
+            (
+                _make_trusted(b"{{text}}"),
+                [
+                    (),
+                ],
+                [],
+            ),
+        ]
+    )
 
 
 @pytest.mark.parametrize("value, check_unsafe_paths, check_safe_paths", TEST_MAKE_UNSAFE)
@@ -107,16 +109,16 @@ def test_make_unsafe(value, check_unsafe_paths, check_safe_paths):
 def test_make_unsafe_idempotence():
     assert make_unsafe(None) is None
 
-    unsafe_str = _make_untrusted('{{test}}')
+    unsafe_str = _make_untrusted("{{test}}")
     assert id(make_unsafe(unsafe_str)) == id(unsafe_str)
 
-    safe_str = _make_trusted('{{test}}')
+    safe_str = _make_trusted("{{test}}")
     assert id(make_unsafe(safe_str)) != id(safe_str)
 
 
 def test_make_unsafe_dict_key():
     value = {
-        _make_trusted('test'): 2,
+        _make_trusted("test"): 2,
     }
     if not SUPPORTS_DATA_TAGGING:
         value[_make_trusted(b"test")] = 1
@@ -126,7 +128,7 @@ def test_make_unsafe_dict_key():
         assert _is_trusted(obj)
 
     value = {
-        _make_trusted('{{test}}'): 2,
+        _make_trusted("{{test}}"): 2,
     }
     if not SUPPORTS_DATA_TAGGING:
         value[_make_trusted(b"{{test}}")] = 1
@@ -137,7 +139,7 @@ def test_make_unsafe_dict_key():
 
 
 def test_make_unsafe_set():
-    value = set([_make_trusted('test')])
+    value = set([_make_trusted("test")])
     if not SUPPORTS_DATA_TAGGING:
         value.add(_make_trusted(b"test"))
     unsafe_value = make_unsafe(value)
@@ -145,7 +147,7 @@ def test_make_unsafe_set():
     for obj in unsafe_value:
         assert _is_trusted(obj)
 
-    value = set([_make_trusted('{{test}}')])
+    value = set([_make_trusted("{{test}}")])
     if not SUPPORTS_DATA_TAGGING:
         value.add(_make_trusted(b"{{test}}"))
     unsafe_value = make_unsafe(value)

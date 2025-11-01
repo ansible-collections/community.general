@@ -72,11 +72,11 @@ from ansible_collections.community.general.plugins.module_utils.gio_mime import 
 
 
 class GioMime(ModuleHelper):
-    output_params = ['handler']
+    output_params = ["handler"]
     module = dict(
         argument_spec=dict(
-            mime_type=dict(type='str', required=True),
-            handler=dict(type='str', required=True),
+            mime_type=dict(type="str", required=True),
+            handler=dict(type="str", required=True),
         ),
         supports_check_mode=True,
     )
@@ -86,12 +86,16 @@ class GioMime(ModuleHelper):
         with self.runner("version") as ctx:
             rc, out, err = ctx.run()
             self.vars.version = out.strip()
-        self.vars.set_meta("handler", initial_value=gio_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
+        self.vars.set_meta(
+            "handler", initial_value=gio_mime_get(self.runner, self.vars.mime_type), diff=True, change=True
+        )
 
     def __run__(self):
-        check_mode_return = (0, 'Module executed in check mode', '')
+        check_mode_return = (0, "Module executed in check mode", "")
         if self.vars.has_changed:
-            with self.runner.context(args_order="mime mime_type handler", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
+            with self.runner.context(
+                args_order="mime mime_type handler", check_mode_skip=True, check_mode_return=check_mode_return
+            ) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
                 self.vars.stderr = err
@@ -102,5 +106,5 @@ def main():
     GioMime.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

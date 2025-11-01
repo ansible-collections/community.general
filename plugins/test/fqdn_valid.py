@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 name: fqdn_valid
 short_description: Validates fully-qualified domain names against RFC 1123
 version_added: 8.1.0
@@ -41,9 +41,9 @@ options:
     default: false
     type: bool
     required: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 - name: Make sure that hostname is valid
   ansible.builtin.assert:
     that: hostname is community.general.fqdn_valid
@@ -55,13 +55,13 @@ EXAMPLES = '''
 - name: Make sure that hostname is at least 2 labels long (a.b). Allow '_'
   ansible.builtin.assert:
     that: hostname is community.general.fqdn_valid(min_labels=2, allow_underscores=True)
-'''
+"""
 
-RETURN = '''
+RETURN = """
 _value:
   description: Whether the name is valid.
   type: bool
-'''
+"""
 
 from ansible.errors import AnsibleError
 
@@ -82,18 +82,18 @@ def fqdn_valid(name, min_labels=1, allow_underscores=False):
     """
 
     if ANOTHER_LIBRARY_IMPORT_ERROR:
-        raise AnsibleError('Python package fqdn must be installed to use this test.') from ANOTHER_LIBRARY_IMPORT_ERROR
+        raise AnsibleError("Python package fqdn must be installed to use this test.") from ANOTHER_LIBRARY_IMPORT_ERROR
 
     fobj = FQDN(name, min_labels=min_labels, allow_underscores=allow_underscores)
-    return (fobj.is_valid)
+    return fobj.is_valid
 
 
 class TestModule:
-    ''' Ansible test hostname validity.
-        https://pypi.org/project/fqdn/
-    '''
+    """Ansible test hostname validity.
+    https://pypi.org/project/fqdn/
+    """
 
     def tests(self):
         return {
-            'fqdn_valid': fqdn_valid,
+            "fqdn_valid": fqdn_valid,
         }

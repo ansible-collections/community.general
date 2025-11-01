@@ -260,14 +260,26 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
-    from delinea.secrets.server import SecretServer, SecretServerError, PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
+    from delinea.secrets.server import (
+        SecretServer,
+        SecretServerError,
+        PasswordGrantAuthorizer,
+        DomainPasswordGrantAuthorizer,
+        AccessTokenAuthorizer,
+    )
 
     HAS_TSS_SDK = True
     HAS_DELINEA_SS_SDK = True
     HAS_TSS_AUTHORIZER = True
 except ImportError:
     try:
-        from thycotic.secrets.server import SecretServer, SecretServerError, PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
+        from thycotic.secrets.server import (
+            SecretServer,
+            SecretServerError,
+            PasswordGrantAuthorizer,
+            DomainPasswordGrantAuthorizer,
+            AccessTokenAuthorizer,
+        )
 
         HAS_TSS_SDK = True
         HAS_DELINEA_SS_SDK = False
@@ -312,11 +324,11 @@ class TSSClient(metaclass=abc.ABCMeta):  # noqa: B024
                 obj = self._client.get_secret_by_path(secret_path, fetch_file_attachments)
             else:
                 obj = self._client.get_secret(secret_id, fetch_file_attachments)
-            for i in obj['items']:
+            for i in obj["items"]:
                 if file_download_path and os.path.isdir(file_download_path):
-                    if i['isFile']:
+                    if i["isFile"]:
                         try:
-                            file_content = i['itemValue'].content
+                            file_content = i["itemValue"].content
                             with open(os.path.join(file_download_path, f"{obj['id']}_{i['slug']}"), "wb") as f:
                                 f.write(file_content)
                         except ValueError:
@@ -324,7 +336,7 @@ class TSSClient(metaclass=abc.ABCMeta):  # noqa: B024
                         except AttributeError:
                             display.warning(f"Could not read file content for {i['slug']}")
                         finally:
-                            i['itemValue'] = "*** Not Valid For Display ***"
+                            i["itemValue"] = "*** Not Valid For Display ***"
                 else:
                     raise AnsibleOptionsError("File download path does not exist")
             return obj
@@ -377,9 +389,7 @@ class TSSClientV1(TSSClient):
         super().__init__()
 
         authorizer = self._get_authorizer(**server_parameters)
-        self._client = SecretServer(
-            server_parameters["base_url"], authorizer, server_parameters["api_path_uri"]
-        )
+        self._client = SecretServer(server_parameters["base_url"], authorizer, server_parameters["api_path_uri"])
 
     @staticmethod
     def _get_authorizer(**server_parameters):

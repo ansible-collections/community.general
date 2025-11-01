@@ -226,8 +226,14 @@ end_state:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+    is_struct_included,
+)
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
@@ -241,32 +247,35 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     composites_spec = dict(
-        name=dict(type='str', required=True),
-        client_id=dict(type='str', aliases=['clientId']),
-        state=dict(type='str', default='present', choices=['present', 'absent'])
+        name=dict(type="str", required=True),
+        client_id=dict(type="str", aliases=["clientId"]),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
     )
 
     meta_args = dict(
-        state=dict(type='str', default='present', choices=['present', 'absent']),
-        name=dict(type='str', required=True),
-        description=dict(type='str'),
-        realm=dict(type='str', default='master'),
-        client_id=dict(type='str'),
-        attributes=dict(type='dict'),
-        composites=dict(type='list', default=[], options=composites_spec, elements='dict'),
-        composite=dict(type='bool', default=False),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        name=dict(type="str", required=True),
+        description=dict(type="str"),
+        realm=dict(type="str", default="master"),
+        client_id=dict(type="str"),
+        attributes=dict(type="dict"),
+        composites=dict(type="list", default=[], options=composites_spec, elements="dict"),
+        composite=dict(type="bool", default=False),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -276,22 +285,25 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    clientid = module.params.get('client_id')
-    name = module.params.get('name')
-    state = module.params.get('state')
+    realm = module.params.get("realm")
+    clientid = module.params.get("client_id")
+    name = module.params.get("name")
+    state = module.params.get("state")
 
     # attributes in Keycloak have their values returned as lists
     # using the API. attributes is a dict, so we'll transparently convert
     # the values to lists.
-    if module.params.get('attributes') is not None:
-        for key, val in module.params['attributes'].items():
-            module.params['attributes'][key] = [val] if not isinstance(val, list) else val
+    if module.params.get("attributes") is not None:
+        for key, val in module.params["attributes"].items():
+            module.params["attributes"][key] = [val] if not isinstance(val, list) else val
 
     # Filter and map the parameters names that apply to the role
-    role_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id'] and
-                   module.params.get(x) is not None]
+    role_params = [
+        x
+        for x in module.params
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "client_id"]
+        and module.params.get(x) is not None
+    ]
 
     # See if it already exists in Keycloak
     if clientid is None:
@@ -315,28 +327,28 @@ def main():
     desired_role = copy.deepcopy(before_role)
     desired_role.update(changeset)
 
-    result['proposed'] = changeset
-    result['existing'] = before_role
+    result["proposed"] = changeset
+    result["existing"] = before_role
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_role:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Role does not exist, doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "Role does not exist, doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
+        result["changed"] = True
 
         if name is None:
-            module.fail_json(msg='name must be specified when creating a new role')
+            module.fail_json(msg="name must be specified when creating a new role")
 
         if module._diff:
-            result['diff'] = dict(before='', after=desired_role)
+            result["diff"] = dict(before="", after=desired_role)
 
         if module.check_mode:
             module.exit_json(**result)
@@ -349,45 +361,49 @@ def main():
             kc.create_client_role(desired_role, clientid, realm)
             after_role = kc.get_client_role(name, clientid, realm)
 
-        if after_role['composite']:
-            after_role['composites'] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
+        if after_role["composite"]:
+            after_role["composites"] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
 
-        result['end_state'] = after_role
+        result["end_state"] = after_role
 
-        result['msg'] = f'Role {name} has been created'
+        result["msg"] = f"Role {name} has been created"
         module.exit_json(**result)
 
     else:
-        if state == 'present':
-            compare_exclude = ['clientId']
-            if 'composites' in desired_role and isinstance(desired_role['composites'], list) and len(desired_role['composites']) > 0:
+        if state == "present":
+            compare_exclude = ["clientId"]
+            if (
+                "composites" in desired_role
+                and isinstance(desired_role["composites"], list)
+                and len(desired_role["composites"]) > 0
+            ):
                 composites = kc.get_role_composites(rolerep=before_role, clientid=clientid, realm=realm)
-                before_role['composites'] = []
+                before_role["composites"] = []
                 for composite in composites:
                     before_composite = {}
-                    if composite['clientRole']:
-                        composite_client = kc.get_client_by_id(id=composite['containerId'], realm=realm)
-                        before_composite['client_id'] = composite_client['clientId']
+                    if composite["clientRole"]:
+                        composite_client = kc.get_client_by_id(id=composite["containerId"], realm=realm)
+                        before_composite["client_id"] = composite_client["clientId"]
                     else:
-                        before_composite['client_id'] = None
-                    before_composite['name'] = composite['name']
-                    before_composite['state'] = 'present'
-                    before_role['composites'].append(before_composite)
+                        before_composite["client_id"] = None
+                    before_composite["name"] = composite["name"]
+                    before_composite["state"] = "present"
+                    before_role["composites"].append(before_composite)
             else:
-                compare_exclude.append('composites')
+                compare_exclude.append("composites")
             # Process an update
             # no changes
             if is_struct_included(desired_role, before_role, exclude=compare_exclude):
-                result['changed'] = False
-                result['end_state'] = desired_role
-                result['msg'] = f"No changes required to role {name}."
+                result["changed"] = False
+                result["end_state"] = desired_role
+                result["msg"] = f"No changes required to role {name}."
                 module.exit_json(**result)
 
             # doing an update
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_role, after=desired_role)
+                result["diff"] = dict(before=before_role, after=desired_role)
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -399,20 +415,20 @@ def main():
             else:
                 kc.update_client_role(desired_role, clientid, realm)
                 after_role = kc.get_client_role(name, clientid, realm)
-            if after_role['composite']:
-                after_role['composites'] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
+            if after_role["composite"]:
+                after_role["composites"] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
 
-            result['end_state'] = after_role
+            result["end_state"] = after_role
 
-            result['msg'] = f"Role {name} has been updated"
+            result["msg"] = f"Role {name} has been updated"
             module.exit_json(**result)
 
         else:
             # Process a deletion (because state was not 'present')
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_role, after='')
+                result["diff"] = dict(before=before_role, after="")
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -423,12 +439,12 @@ def main():
             else:
                 kc.delete_client_role(name, clientid, realm)
 
-            result['end_state'] = {}
+            result["end_state"] = {}
 
-            result['msg'] = f"Role {name} has been deleted"
+            result["msg"] = f"Role {name} has been deleted"
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

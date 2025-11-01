@@ -10,6 +10,5 @@ from ansible_collections.community.general.plugins.filter.crc32 import crc32s
 
 
 class TestFilterCrc32(unittest.TestCase):
-
     def test_checksum(self):
-        self.assertEqual(crc32s('test'), 'd87f7e0c')
+        self.assertEqual(crc32s("test"), "d87f7e0c")

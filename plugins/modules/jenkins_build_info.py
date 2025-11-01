@@ -105,6 +105,7 @@ import traceback
 JENKINS_IMP_ERR = None
 try:
     import jenkins
+
     python_jenkins_installed = True
 except ImportError:
     JENKINS_IMP_ERR = traceback.format_exc()
@@ -114,23 +115,22 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 class JenkinsBuildInfo:
-
     def __init__(self, module):
         self.module = module
 
-        self.name = module.params.get('name')
-        self.password = module.params.get('password')
-        self.token = module.params.get('token')
-        self.user = module.params.get('user')
-        self.jenkins_url = module.params.get('url')
-        self.build_number = module.params.get('build_number')
+        self.name = module.params.get("name")
+        self.password = module.params.get("password")
+        self.token = module.params.get("token")
+        self.user = module.params.get("user")
+        self.jenkins_url = module.params.get("url")
+        self.build_number = module.params.get("build_number")
         self.server = self.get_jenkins_connection()
 
         self.result = {
-            'changed': False,
-            'url': self.jenkins_url,
-            'name': self.name,
-            'user': self.user,
+            "changed": False,
+            "url": self.jenkins_url,
+            "name": self.name,
+            "user": self.user,
         }
 
     def get_jenkins_connection(self):
@@ -144,13 +144,13 @@ class JenkinsBuildInfo:
             else:
                 return jenkins.Jenkins(self.jenkins_url)
         except Exception as e:
-            self.module.fail_json(msg=f'Unable to connect to Jenkins server, {e}')
+            self.module.fail_json(msg=f"Unable to connect to Jenkins server, {e}")
 
     def get_build_status(self):
         try:
             if self.build_number is None:
                 job_info = self.server.get_job_info(self.name)
-                self.build_number = job_info['lastBuild']['number']
+                self.build_number = job_info["lastBuild"]["number"]
 
             return self.server.get_build_info(self.name, self.build_number)
         except jenkins.JenkinsException as e:
@@ -158,16 +158,15 @@ class JenkinsBuildInfo:
             response["result"] = "ABSENT"
             return response
         except Exception as e:
-            self.module.fail_json(msg=f'Unable to fetch build information, {e}',
-                                  exception=traceback.format_exc())
+            self.module.fail_json(msg=f"Unable to fetch build information, {e}", exception=traceback.format_exc())
 
     def get_result(self):
         result = self.result
         build_status = self.get_build_status()
 
-        if build_status['result'] == "ABSENT":
-            result['failed'] = True
-        result['build_info'] = build_status
+        if build_status["result"] == "ABSENT":
+            result["failed"] = True
+        result["build_info"] = build_status
 
         return result
 
@@ -175,22 +174,24 @@ class JenkinsBuildInfo:
 def test_dependencies(module):
     if not python_jenkins_installed:
         module.fail_json(
-            msg=missing_required_lib("python-jenkins",
-                                     url="https://python-jenkins.readthedocs.io/en/latest/install.html"),
-            exception=JENKINS_IMP_ERR)
+            msg=missing_required_lib(
+                "python-jenkins", url="https://python-jenkins.readthedocs.io/en/latest/install.html"
+            ),
+            exception=JENKINS_IMP_ERR,
+        )
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            build_number=dict(type='int'),
+            build_number=dict(type="int"),
             name=dict(required=True),
             password=dict(no_log=True),
             token=dict(no_log=True),
             url=dict(default="http://localhost:8080"),
             user=dict(),
         ),
-        mutually_exclusive=[['password', 'token']],
+        mutually_exclusive=[["password", "token"]],
         supports_check_mode=True,
     )
 
@@ -201,5 +202,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

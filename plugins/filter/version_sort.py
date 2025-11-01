@@ -37,14 +37,12 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 
 
 def version_sort(value, reverse=False):
-    '''Sort a list according to loose versions so that e.g. 2.9 is smaller than 2.10'''
+    """Sort a list according to loose versions so that e.g. 2.9 is smaller than 2.10"""
     return sorted(value, key=LooseVersion, reverse=reverse)
 
 
 class FilterModule:
-    ''' Version sort filter '''
+    """Version sort filter"""
 
     def filters(self):
-        return {
-            'version_sort': version_sort
-        }
+        return {"version_sort": version_sort}

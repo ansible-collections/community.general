@@ -87,8 +87,7 @@ from ansible_collections.community.general.plugins.module_utils.manageiq import 
 
 
 class ManageIQAlertProfiles:
-    """ Object to execute alert profile management operations in manageiq.
-    """
+    """Object to execute alert profile management operations in manageiq."""
 
     def __init__(self, manageiq):
         self.manageiq = manageiq
@@ -96,41 +95,36 @@ class ManageIQAlertProfiles:
         self.module = self.manageiq.module
         self.api_url = self.manageiq.api_url
         self.client = self.manageiq.client
-        self.url = f'{self.api_url}/alert_definition_profiles'
+        self.url = f"{self.api_url}/alert_definition_profiles"
 
     def get_profiles(self):
-        """ Get all alert profiles from ManageIQ
-        """
+        """Get all alert profiles from ManageIQ"""
         try:
             response = self.client.get(f"{self.url}?expand=alert_definitions,resources")
         except Exception as e:
             self.module.fail_json(msg=f"Failed to query alert profiles: {e}")
-        return response.get('resources') or []
+        return response.get("resources") or []
 
     def get_alerts(self, alert_descriptions):
-        """ Get a list of alert hrefs from a list of alert descriptions
-        """
+        """Get a list of alert hrefs from a list of alert descriptions"""
         alerts = []
         for alert_description in alert_descriptions:
             alert = self.manageiq.find_collection_resource_or_fail("alert_definitions", description=alert_description)
-            alerts.append(alert['href'])
+            alerts.append(alert["href"])
 
         return alerts
 
     def add_profile(self, profile):
-        """ Add a new alert profile to ManageIQ
-        """
+        """Add a new alert profile to ManageIQ"""
         # find all alerts to add to the profile
         # we do this first to fail early if one is missing.
-        alerts = self.get_alerts(profile['alerts'])
+        alerts = self.get_alerts(profile["alerts"])
 
         # build the profile dict to send to the server
 
-        profile_dict = dict(name=profile['name'],
-                            description=profile['name'],
-                            mode=profile['resource_type'])
-        if profile['notes']:
-            profile_dict['set_data'] = dict(notes=profile['notes'])
+        profile_dict = dict(name=profile["name"], description=profile["name"], mode=profile["resource_type"])
+        if profile["notes"]:
+            profile_dict["set_data"] = dict(notes=profile["notes"])
 
         # send it to the server
         try:
@@ -139,17 +133,16 @@ class ManageIQAlertProfiles:
             self.module.fail_json(msg=f"Creating profile failed {e}")
 
         # now that it has been created, we can assign the alerts
-        self.assign_or_unassign(result['results'][0], alerts, "assign")
+        self.assign_or_unassign(result["results"][0], alerts, "assign")
 
         msg = "Profile {name} created successfully"
-        msg = msg.format(name=profile['name'])
+        msg = msg.format(name=profile["name"])
         return dict(changed=True, msg=msg)
 
     def delete_profile(self, profile):
-        """ Delete an alert profile from ManageIQ
-        """
+        """Delete an alert profile from ManageIQ"""
         try:
-            self.client.post(profile['href'], action="delete")
+            self.client.post(profile["href"], action="delete")
         except Exception as e:
             self.module.fail_json(msg=f"Deleting profile failed: {e}")
 
@@ -157,47 +150,41 @@ class ManageIQAlertProfiles:
         return dict(changed=True, msg=msg)
 
     def get_alert_href(self, alert):
-        """ Get an absolute href for an alert
-        """
+        """Get an absolute href for an alert"""
         return f"{self.api_url}/alert_definitions/{alert['id']}"
 
     def assign_or_unassign(self, profile, resources, action):
-        """ Assign or unassign alerts to profile, and validate the result.
-        """
+        """Assign or unassign alerts to profile, and validate the result."""
         alerts = [dict(href=href) for href in resources]
 
         subcollection_url = f"{profile['href']}/alert_definitions"
         try:
             result = self.client.post(subcollection_url, resources=alerts, action=action)
-            if len(result['results']) != len(alerts):
+            if len(result["results"]) != len(alerts):
                 msg = "Failed to {action} alerts to profile '{name}',expected {expected} alerts to be {action}ed,but only {changed} were {action}ed"
-                msg = msg.format(action=action,
-                                 name=profile['name'],
-                                 expected=len(alerts),
-                                 changed=result['results'])
+                msg = msg.format(action=action, name=profile["name"], expected=len(alerts), changed=result["results"])
                 self.module.fail_json(msg=msg)
         except Exception as e:
             msg = "Failed to {action} alerts to profile '{name}': {error}"
-            msg = msg.format(action=action, name=profile['name'], error=e)
+            msg = msg.format(action=action, name=profile["name"], error=e)
             self.module.fail_json(msg=msg)
 
-        return result['results']
+        return result["results"]
 
     def update_profile(self, old_profile, desired_profile):
-        """ Update alert profile in ManageIQ
-        """
+        """Update alert profile in ManageIQ"""
         changed = False
         # we need to use client.get to query the alert definitions
         old_profile = self.client.get(f"{old_profile['href']}?expand=alert_definitions")
 
         # figure out which alerts we need to assign / unassign
         # alerts listed by the user:
-        desired_alerts = set(self.get_alerts(desired_profile['alerts']))
+        desired_alerts = set(self.get_alerts(desired_profile["alerts"]))
 
         # alert which currently exist in the profile
-        if 'alert_definitions' in old_profile:
+        if "alert_definitions" in old_profile:
             # we use get_alert_href to have a direct href to the alert
-            existing_alerts = set(self.get_alert_href(alert) for alert in old_profile['alert_definitions'])
+            existing_alerts = set(self.get_alert_href(alert) for alert in old_profile["alert_definitions"])
         else:
             # no alerts in this profile
             existing_alerts = set()
@@ -217,26 +204,24 @@ class ManageIQAlertProfiles:
         # update other properties
         profile_dict = dict()
 
-        if old_profile['mode'] != desired_profile['resource_type']:
+        if old_profile["mode"] != desired_profile["resource_type"]:
             # mode needs to be updated
-            profile_dict['mode'] = desired_profile['resource_type']
+            profile_dict["mode"] = desired_profile["resource_type"]
 
         # check if notes need to be updated
-        old_notes = old_profile.get('set_data', {}).get('notes')
+        old_notes = old_profile.get("set_data", {}).get("notes")
 
-        if desired_profile['notes'] != old_notes:
-            profile_dict['set_data'] = dict(notes=desired_profile['notes'])
+        if desired_profile["notes"] != old_notes:
+            profile_dict["set_data"] = dict(notes=desired_profile["notes"])
 
         if profile_dict:
             # if we have any updated values
             changed = True
             try:
-                result = self.client.post(old_profile['href'],
-                                          resource=profile_dict,
-                                          action="edit")
+                result = self.client.post(old_profile["href"], resource=profile_dict, action="edit")
             except Exception as e:
                 msg = "Updating profile '{name}' failed: {error}"
-                msg = msg.format(name=old_profile['name'], error=e)
+                msg = msg.format(name=old_profile["name"], error=e)
                 self.module.fail_json(msg=msg)
 
         if changed:
@@ -248,27 +233,31 @@ class ManageIQAlertProfiles:
 
 def main():
     argument_spec = dict(
-        name=dict(type='str', required=True),
-        resource_type=dict(type='str', choices=['Vm',
-                                                'ContainerNode',
-                                                'MiqServer',
-                                                'Host',
-                                                'Storage',
-                                                'EmsCluster',
-                                                'ExtManagementSystem',
-                                                'MiddlewareServer']),
-        alerts=dict(type='list', elements='str'),
-        notes=dict(type='str'),
-        state=dict(default='present', choices=['present', 'absent']),
+        name=dict(type="str", required=True),
+        resource_type=dict(
+            type="str",
+            choices=[
+                "Vm",
+                "ContainerNode",
+                "MiqServer",
+                "Host",
+                "Storage",
+                "EmsCluster",
+                "ExtManagementSystem",
+                "MiddlewareServer",
+            ],
+        ),
+        alerts=dict(type="list", elements="str"),
+        notes=dict(type="str"),
+        state=dict(default="present", choices=["present", "absent"]),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           required_if=[('state', 'present', ['resource_type', 'alerts'])])
+    module = AnsibleModule(argument_spec=argument_spec, required_if=[("state", "present", ["resource_type", "alerts"])])
 
-    state = module.params['state']
-    name = module.params['name']
+    state = module.params["state"]
+    name = module.params["name"]
 
     manageiq = ManageIQ(module)
     manageiq_alert_profiles = ManageIQAlertProfiles(manageiq)

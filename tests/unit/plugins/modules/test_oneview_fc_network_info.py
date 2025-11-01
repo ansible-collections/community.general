@@ -8,26 +8,16 @@ import unittest
 from .oneview_module_loader import FcNetworkInfoModule
 from .hpe_test_utils import FactsParamsTestCase
 
-ERROR_MSG = 'Fake message error'
+ERROR_MSG = "Fake message error"
 
-PARAMS_GET_ALL = dict(
-    config='config.json',
-    name=None
-)
+PARAMS_GET_ALL = dict(config="config.json", name=None)
 
-PARAMS_GET_BY_NAME = dict(
-    config='config.json',
-    name="Test FC Network"
-)
+PARAMS_GET_BY_NAME = dict(config="config.json", name="Test FC Network")
 
-PRESENT_NETWORKS = [{
-    "name": "Test FC Network",
-    "uri": "/rest/fc-networks/c6bf9af9-48e7-4236-b08a-77684dc258a5"
-}]
+PRESENT_NETWORKS = [{"name": "Test FC Network", "uri": "/rest/fc-networks/c6bf9af9-48e7-4236-b08a-77684dc258a5"}]
 
 
-class FcNetworkInfoSpec(unittest.TestCase,
-                        FactsParamsTestCase):
+class FcNetworkInfoSpec(unittest.TestCase, FactsParamsTestCase):
     def setUp(self):
         self.configure_mocks(self, FcNetworkInfoModule)
         self.fc_networks = self.mock_ov_client.fc_networks
@@ -39,10 +29,7 @@ class FcNetworkInfoSpec(unittest.TestCase,
 
         FcNetworkInfoModule().run()
 
-        self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            fc_networks=PRESENT_NETWORKS
-        )
+        self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, fc_networks=PRESENT_NETWORKS)
 
     def test_should_get_fc_network_by_name(self):
         self.fc_networks.get_by.return_value = PRESENT_NETWORKS
@@ -50,11 +37,8 @@ class FcNetworkInfoSpec(unittest.TestCase,
 
         FcNetworkInfoModule().run()
 
-        self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            fc_networks=PRESENT_NETWORKS
-        )
+        self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, fc_networks=PRESENT_NETWORKS)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

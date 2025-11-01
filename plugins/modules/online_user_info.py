@@ -47,15 +47,16 @@ online_user_info:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.online import (
-    Online, OnlineException, online_argument_spec
+    Online,
+    OnlineException,
+    online_argument_spec,
 )
 
 
 class OnlineUserInfo(Online):
-
     def __init__(self, module):
         super().__init__(module)
-        self.name = 'api/v1/user'
+        self.name = "api/v1/user"
 
 
 def main():
@@ -65,12 +66,10 @@ def main():
     )
 
     try:
-        module.exit_json(
-            online_user_info=OnlineUserInfo(module).get_resources()
-        )
+        module.exit_json(online_user_info=OnlineUserInfo(module).get_resources())
     except OnlineException as exc:
         module.fail_json(msg=exc.message)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

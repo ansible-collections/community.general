@@ -216,17 +216,16 @@ container:
 from copy import deepcopy
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    scaleway_waitable_resource_argument_spec, resource_attributes_should_be_changed,
-    SecretVariables
+    SCALEWAY_REGIONS,
+    scaleway_argument_spec,
+    Scaleway,
+    scaleway_waitable_resource_argument_spec,
+    resource_attributes_should_be_changed,
+    SecretVariables,
 )
 from ansible.module_utils.basic import AnsibleModule
 
-STABLE_STATES = (
-    "ready",
-    "created",
-    "absent"
-)
+STABLE_STATES = ("ready", "created", "absent")
 
 MUTABLE_ATTRIBUTES = (
     "description",
@@ -241,7 +240,7 @@ MUTABLE_ATTRIBUTES = (
     "max_concurrency",
     "protocol",
     "port",
-    "secret_environment_variables"
+    "secret_environment_variables",
 )
 
 
@@ -262,7 +261,7 @@ def payload_from_wished_cn(wished_cn):
         "max_concurrency": wished_cn["max_concurrency"],
         "protocol": wished_cn["protocol"],
         "port": wished_cn["port"],
-        "redeploy": wished_cn["redeploy"]
+        "redeploy": wished_cn["redeploy"],
     }
 
     return payload
@@ -285,7 +284,7 @@ def absent_strategy(api, wished_cn):
     api.wait_to_complete_state_transition(resource=target_cn, stable_states=STABLE_STATES, force_wait=True)
     response = api.delete(path=f"{api.api_path}/{target_cn['id']}")
     if not response.ok:
-        api.module.fail_json(msg=f'Error deleting container [{response.status_code}: {response.json}]')
+        api.module.fail_json(msg=f"Error deleting container [{response.status_code}: {response.json}]")
 
     api.wait_to_complete_state_transition(resource=target_cn, stable_states=STABLE_STATES)
     return changed, response.json
@@ -309,8 +308,7 @@ def present_strategy(api, wished_cn):
 
         # Create container
         api.warn(payload_cn)
-        creation_response = api.post(path=api.api_path,
-                                     data=payload_cn)
+        creation_response = api.post(path=api.api_path, data=payload_cn)
 
         if not creation_response.ok:
             msg = f"Error during container creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
@@ -322,12 +320,15 @@ def present_strategy(api, wished_cn):
 
     target_cn = cn_lookup[wished_cn["name"]]
     decoded_target_cn = deepcopy(target_cn)
-    decoded_target_cn["secret_environment_variables"] = SecretVariables.decode(decoded_target_cn["secret_environment_variables"],
-                                                                               payload_cn["secret_environment_variables"])
-    patch_payload = resource_attributes_should_be_changed(target=decoded_target_cn,
-                                                          wished=payload_cn,
-                                                          verifiable_mutable_attributes=MUTABLE_ATTRIBUTES,
-                                                          mutable_attributes=MUTABLE_ATTRIBUTES)
+    decoded_target_cn["secret_environment_variables"] = SecretVariables.decode(
+        decoded_target_cn["secret_environment_variables"], payload_cn["secret_environment_variables"]
+    )
+    patch_payload = resource_attributes_should_be_changed(
+        target=decoded_target_cn,
+        wished=payload_cn,
+        verifiable_mutable_attributes=MUTABLE_ATTRIBUTES,
+        mutable_attributes=MUTABLE_ATTRIBUTES,
+    )
 
     if not patch_payload:
         return changed, target_cn
@@ -336,21 +337,19 @@ def present_strategy(api, wished_cn):
     if api.module.check_mode:
         return changed, {"status": "Container attributes would be changed."}
 
-    cn_patch_response = api.patch(path=f"{api.api_path}/{target_cn['id']}",
-                                  data=patch_payload)
+    cn_patch_response = api.patch(path=f"{api.api_path}/{target_cn['id']}", data=patch_payload)
 
     if not cn_patch_response.ok:
-        api.module.fail_json(msg=f"Error during container attributes update: [{cn_patch_response.status_code}: {cn_patch_response.json['message']}]")
+        api.module.fail_json(
+            msg=f"Error during container attributes update: [{cn_patch_response.status_code}: {cn_patch_response.json['message']}]"
+        )
 
     api.wait_to_complete_state_transition(resource=target_cn, stable_states=STABLE_STATES)
     response = api.get(path=f"{api.api_path}/{target_cn['id']}")
     return changed, response.json
 
 
-state_strategy = {
-    "present": present_strategy,
-    "absent": absent_strategy
-}
+state_strategy = {"present": present_strategy, "absent": absent_strategy}
 
 
 def core(module):
@@ -361,11 +360,11 @@ def core(module):
         "state": module.params["state"],
         "namespace_id": module.params["namespace_id"],
         "name": module.params["name"],
-        "description": module.params['description'],
+        "description": module.params["description"],
         "min_scale": module.params["min_scale"],
         "max_scale": module.params["max_scale"],
-        "environment_variables": module.params['environment_variables'],
-        "secret_environment_variables": module.params['secret_environment_variables'],
+        "environment_variables": module.params["environment_variables"],
+        "secret_environment_variables": module.params["secret_environment_variables"],
         "cpu_limit": module.params["cpu_limit"],
         "memory_limit": module.params["memory_limit"],
         "timeout": module.params["container_timeout"],
@@ -374,7 +373,7 @@ def core(module):
         "max_concurrency": module.params["max_concurrency"],
         "protocol": module.params["protocol"],
         "port": module.params["port"],
-        "redeploy": module.params["redeploy"]
+        "redeploy": module.params["redeploy"],
     }
 
     api = Scaleway(module=module)
@@ -388,26 +387,28 @@ def core(module):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(scaleway_waitable_resource_argument_spec())
-    argument_spec.update(dict(
-        state=dict(type='str', default='present', choices=['absent', 'present']),
-        namespace_id=dict(type='str', required=True),
-        region=dict(type='str', required=True, choices=SCALEWAY_REGIONS),
-        name=dict(type='str', required=True),
-        description=dict(type='str', default=''),
-        min_scale=dict(type='int'),
-        max_scale=dict(type='int'),
-        cpu_limit=dict(type='int'),
-        memory_limit=dict(type='int'),
-        container_timeout=dict(type='str'),
-        privacy=dict(type='str', default='public', choices=['public', 'private']),
-        registry_image=dict(type='str', required=True),
-        max_concurrency=dict(type='int'),
-        protocol=dict(type='str', default='http1', choices=['http1', 'h2c']),
-        port=dict(type='int'),
-        redeploy=dict(type='bool', default=False),
-        environment_variables=dict(type='dict', default={}),
-        secret_environment_variables=dict(type='dict', default={}, no_log=True)
-    ))
+    argument_spec.update(
+        dict(
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            namespace_id=dict(type="str", required=True),
+            region=dict(type="str", required=True, choices=SCALEWAY_REGIONS),
+            name=dict(type="str", required=True),
+            description=dict(type="str", default=""),
+            min_scale=dict(type="int"),
+            max_scale=dict(type="int"),
+            cpu_limit=dict(type="int"),
+            memory_limit=dict(type="int"),
+            container_timeout=dict(type="str"),
+            privacy=dict(type="str", default="public", choices=["public", "private"]),
+            registry_image=dict(type="str", required=True),
+            max_concurrency=dict(type="int"),
+            protocol=dict(type="str", default="http1", choices=["http1", "h2c"]),
+            port=dict(type="int"),
+            redeploy=dict(type="bool", default=False),
+            environment_variables=dict(type="dict", default={}),
+            secret_environment_variables=dict(type="dict", default={}, no_log=True),
+        )
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -416,5 +417,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

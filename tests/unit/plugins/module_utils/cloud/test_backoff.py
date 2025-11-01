@@ -7,15 +7,14 @@ from __future__ import annotations
 import random
 import unittest
 
-from ansible_collections.community.general.plugins.module_utils.cloud import _exponential_backoff, \
-    _full_jitter_backoff
+from ansible_collections.community.general.plugins.module_utils.cloud import _exponential_backoff, _full_jitter_backoff
 
 
 class ExponentialBackoffStrategyTestCase(unittest.TestCase):
     def test_no_retries(self):
         strategy = _exponential_backoff(retries=0)
         result = list(strategy())
-        self.assertEqual(result, [], 'list should be empty')
+        self.assertEqual(result, [], "list should be empty")
 
     def test_exponential_backoff(self):
         strategy = _exponential_backoff(retries=5, delay=1, backoff=2)
@@ -37,7 +36,7 @@ class FullJitterBackoffStrategyTestCase(unittest.TestCase):
     def test_no_retries(self):
         strategy = _full_jitter_backoff(retries=0)
         result = list(strategy())
-        self.assertEqual(result, [], 'list should be empty')
+        self.assertEqual(result, [], "list should be empty")
 
     def test_full_jitter(self):
         retries = 5
@@ -46,8 +45,7 @@ class FullJitterBackoffStrategyTestCase(unittest.TestCase):
         r = random.Random(seed)
         expected = [r.randint(0, 2**i) for i in range(0, retries)]
 
-        strategy = _full_jitter_backoff(
-            retries=retries, delay=1, _random=random.Random(seed))
+        strategy = _full_jitter_backoff(retries=retries, delay=1, _random=random.Random(seed))
         result = list(strategy())
 
         self.assertEqual(result, expected)

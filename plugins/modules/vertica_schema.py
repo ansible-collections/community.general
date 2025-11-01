@@ -116,29 +116,36 @@ class NotSupportedError(Exception):
 class CannotDropError(Exception):
     pass
 
+
 # module specific functions
 
 
-def get_schema_facts(cursor, schema=''):
+def get_schema_facts(cursor, schema=""):
     facts = {}
-    cursor.execute("""
+    cursor.execute(
+        """
         select schema_name, schema_owner, create_time
         from schemata
         where not is_system_schema and schema_name not in ('public', 'TxtIndex')
         and (? = '' or schema_name ilike ?)
-    """, schema, schema)
+    """,
+        schema,
+        schema,
+    )
     while True:
         rows = cursor.fetchmany(100)
         if not rows:
             break
         for row in rows:
             facts[row.schema_name.lower()] = {
-                'name': row.schema_name,
-                'owner': row.schema_owner,
-                'create_time': str(row.create_time),
-                'usage_roles': [],
-                'create_roles': []}
-    cursor.execute("""
+                "name": row.schema_name,
+                "owner": row.schema_owner,
+                "create_time": str(row.create_time),
+                "usage_roles": [],
+                "create_roles": [],
+            }
+    cursor.execute(
+        """
         select g.object_name as schema_name, r.name as role_name,
         lower(g.privileges_description) privileges_description
         from roles r join grants g
@@ -146,23 +153,24 @@ def get_schema_facts(cursor, schema=''):
         and g.privileges_description like '%USAGE%'
         and g.grantee not in ('public', 'dbadmin')
         and (? = '' or g.object_name ilike ?)
-    """, schema, schema)
+    """,
+        schema,
+        schema,
+    )
     while True:
         rows = cursor.fetchmany(100)
         if not rows:
             break
         for row in rows:
             schema_key = row.schema_name.lower()
-            if 'create' in row.privileges_description:
-                facts[schema_key]['create_roles'].append(row.role_name)
+            if "create" in row.privileges_description:
+                facts[schema_key]["create_roles"].append(row.role_name)
             else:
-                facts[schema_key]['usage_roles'].append(row.role_name)
+                facts[schema_key]["usage_roles"].append(row.role_name)
     return facts
 
 
-def update_roles(schema_facts, cursor, schema,
-                 existing, required,
-                 create_existing, create_required):
+def update_roles(schema_facts, cursor, schema, existing, required, create_existing, create_required):
     for role in set(existing + create_existing) - set(required + create_required):
         cursor.execute(f"drop role {role} cascade")
     for role in set(create_existing) - set(create_required):
@@ -178,11 +186,11 @@ def check(schema_facts, schema, usage_roles, create_roles, owner):
     schema_key = schema.lower()
     if schema_key not in schema_facts:
         return False
-    if owner and owner.lower() == schema_facts[schema_key]['owner'].lower():
+    if owner and owner.lower() == schema_facts[schema_key]["owner"].lower():
         return False
-    if sorted(usage_roles) != sorted(schema_facts[schema_key]['usage_roles']):
+    if sorted(usage_roles) != sorted(schema_facts[schema_key]["usage_roles"]):
         return False
-    if sorted(create_roles) != sorted(schema_facts[schema_key]['create_roles']):
+    if sorted(create_roles) != sorted(schema_facts[schema_key]["create_roles"]):
         return False
     return True
 
@@ -193,20 +201,28 @@ def present(schema_facts, cursor, schema, usage_roles, create_roles, owner):
         query_fragments = [f"create schema {schema}"]
         if owner:
             query_fragments.append(f"authorization {owner}")
-        cursor.execute(' '.join(query_fragments))
+        cursor.execute(" ".join(query_fragments))
         update_roles(schema_facts, cursor, schema, [], usage_roles, [], create_roles)
         schema_facts.update(get_schema_facts(cursor, schema))
         return True
     else:
         changed = False
-        if owner and owner.lower() != schema_facts[schema_key]['owner'].lower():
-            raise NotSupportedError(f"Changing schema owner is not supported. Current owner: {schema_facts[schema_key]['owner']}.")
-        if sorted(usage_roles) != sorted(schema_facts[schema_key]['usage_roles']) or \
-           sorted(create_roles) != sorted(schema_facts[schema_key]['create_roles']):
-
-            update_roles(schema_facts, cursor, schema,
-                         schema_facts[schema_key]['usage_roles'], usage_roles,
-                         schema_facts[schema_key]['create_roles'], create_roles)
+        if owner and owner.lower() != schema_facts[schema_key]["owner"].lower():
+            raise NotSupportedError(
+                f"Changing schema owner is not supported. Current owner: {schema_facts[schema_key]['owner']}."
+            )
+        if sorted(usage_roles) != sorted(schema_facts[schema_key]["usage_roles"]) or sorted(create_roles) != sorted(
+            schema_facts[schema_key]["create_roles"]
+        ):
+            update_roles(
+                schema_facts,
+                cursor,
+                schema,
+                schema_facts[schema_key]["usage_roles"],
+                usage_roles,
+                schema_facts[schema_key]["create_roles"],
+                create_roles,
+            )
             changed = True
         if changed:
             schema_facts.update(get_schema_facts(cursor, schema))
@@ -216,8 +232,15 @@ def present(schema_facts, cursor, schema, usage_roles, create_roles, owner):
 def absent(schema_facts, cursor, schema, usage_roles, create_roles):
     schema_key = schema.lower()
     if schema_key in schema_facts:
-        update_roles(schema_facts, cursor, schema,
-                     schema_facts[schema_key]['usage_roles'], [], schema_facts[schema_key]['create_roles'], [])
+        update_roles(
+            schema_facts,
+            cursor,
+            schema,
+            schema_facts[schema_key]["usage_roles"],
+            [],
+            schema_facts[schema_key]["create_roles"],
+            [],
+        )
         try:
             cursor.execute(f"drop schema {schema_facts[schema_key]['name']} restrict")
         except pyodbc.Error:
@@ -227,42 +250,44 @@ def absent(schema_facts, cursor, schema, usage_roles, create_roles):
     else:
         return False
 
+
 # module logic
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            schema=dict(required=True, aliases=['name']),
-            usage_roles=dict(aliases=['usage_role']),
-            create_roles=dict(aliases=['create_role']),
+            schema=dict(required=True, aliases=["name"]),
+            usage_roles=dict(aliases=["usage_role"]),
+            create_roles=dict(aliases=["create_role"]),
             owner=dict(),
-            state=dict(default='present', choices=['absent', 'present']),
+            state=dict(default="present", choices=["absent", "present"]),
             db=dict(),
-            cluster=dict(default='localhost'),
-            port=dict(default='5433'),
-            login_user=dict(default='dbadmin'),
+            cluster=dict(default="localhost"),
+            port=dict(default="5433"),
+            login_user=dict(default="dbadmin"),
             login_password=dict(no_log=True),
-        ), supports_check_mode=True)
+        ),
+        supports_check_mode=True,
+    )
 
     if not pyodbc_found:
-        module.fail_json(msg=missing_required_lib('pyodbc'), exception=PYODBC_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pyodbc"), exception=PYODBC_IMP_ERR)
 
-    schema = module.params['schema']
+    schema = module.params["schema"]
     usage_roles = []
-    if module.params['usage_roles']:
-        usage_roles = module.params['usage_roles'].split(',')
+    if module.params["usage_roles"]:
+        usage_roles = module.params["usage_roles"].split(",")
         usage_roles = [_f for _f in usage_roles if _f]
     create_roles = []
-    if module.params['create_roles']:
-        create_roles = module.params['create_roles'].split(',')
+    if module.params["create_roles"]:
+        create_roles = module.params["create_roles"].split(",")
         create_roles = [_f for _f in create_roles if _f]
-    owner = module.params['owner']
-    state = module.params['state']
-    db = ''
-    if module.params['db']:
-        db = module.params['db']
+    owner = module.params["owner"]
+    state = module.params["state"]
+    db = ""
+    if module.params["db"]:
+        db = module.params["db"]
 
     changed = False
 
@@ -285,28 +310,28 @@ def main():
         schema_facts = get_schema_facts(cursor)
         if module.check_mode:
             changed = not check(schema_facts, schema, usage_roles, create_roles, owner)
-        elif state == 'absent':
+        elif state == "absent":
             try:
                 changed = absent(schema_facts, cursor, schema, usage_roles, create_roles)
             except pyodbc.Error as e:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
-        elif state == 'present':
+        elif state == "present":
             try:
                 changed = present(schema_facts, cursor, schema, usage_roles, create_roles, owner)
             except pyodbc.Error as e:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
     except NotSupportedError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={'vertica_schemas': schema_facts})
+        module.fail_json(msg=to_native(e), ansible_facts={"vertica_schemas": schema_facts})
     except CannotDropError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={'vertica_schemas': schema_facts})
+        module.fail_json(msg=to_native(e), ansible_facts={"vertica_schemas": schema_facts})
     except SystemExit:
         # avoid catching this on python 2.4
         raise
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
-    module.exit_json(changed=changed, schema=schema, ansible_facts={'vertica_schemas': schema_facts})
+    module.exit_json(changed=changed, schema=schema, ansible_facts={"vertica_schemas": schema_facts})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -11,45 +11,45 @@ from ansible_collections.community.general.plugins.module_utils.saslprep import 
 
 
 VALID = [
-    ('', ''),
-    ('\u00A0', ' '),
-    ('a', 'a'),
-    ('й', 'й'),
-    ('\u30DE\u30C8\u30EA\u30C3\u30AF\u30B9', '\u30DE\u30C8\u30EA\u30C3\u30AF\u30B9'),
-    ('The\u00ADM\u00AAtr\u2168', 'TheMatrIX'),
-    ('I\u00ADX', 'IX'),
-    ('user', 'user'),
-    ('USER', 'USER'),
-    ('\u00AA', 'a'),
-    ('\u2168', 'IX'),
-    ('\u05BE\u00A0\u05BE', '\u05BE\u0020\u05BE'),
+    ("", ""),
+    ("\u00a0", " "),
+    ("a", "a"),
+    ("й", "й"),
+    ("\u30de\u30c8\u30ea\u30c3\u30af\u30b9", "\u30de\u30c8\u30ea\u30c3\u30af\u30b9"),
+    ("The\u00adM\u00aatr\u2168", "TheMatrIX"),
+    ("I\u00adX", "IX"),
+    ("user", "user"),
+    ("USER", "USER"),
+    ("\u00aa", "a"),
+    ("\u2168", "IX"),
+    ("\u05be\u00a0\u05be", "\u05be\u0020\u05be"),
 ]
 
 INVALID = [
     (None, TypeError),
-    (b'', TypeError),
-    ('\u0221', ValueError),
-    ('\u0007', ValueError),
-    ('\u0627\u0031', ValueError),
-    ('\uE0001', ValueError),
-    ('\uE0020', ValueError),
-    ('\uFFF9', ValueError),
-    ('\uFDD0', ValueError),
-    ('\u0000', ValueError),
-    ('\u06DD', ValueError),
-    ('\uFFFFD', ValueError),
-    ('\uD800', ValueError),
-    ('\u200E', ValueError),
-    ('\u05BE\u00AA\u05BE', ValueError),
+    (b"", TypeError),
+    ("\u0221", ValueError),
+    ("\u0007", ValueError),
+    ("\u0627\u0031", ValueError),
+    ("\ue0001", ValueError),
+    ("\ue0020", ValueError),
+    ("\ufff9", ValueError),
+    ("\ufdd0", ValueError),
+    ("\u0000", ValueError),
+    ("\u06dd", ValueError),
+    ("\uffffD", ValueError),
+    ("\ud800", ValueError),
+    ("\u200e", ValueError),
+    ("\u05be\u00aa\u05be", ValueError),
 ]
 
 
-@pytest.mark.parametrize('source,target', VALID)
+@pytest.mark.parametrize("source,target", VALID)
 def test_saslprep_conversions(source, target):
     assert saslprep(source) == target
 
 
-@pytest.mark.parametrize('source,exception', INVALID)
+@pytest.mark.parametrize("source,exception", INVALID)
 def test_saslprep_exceptions(source, exception):
     with pytest.raises(exception) as ex:
         saslprep(source)

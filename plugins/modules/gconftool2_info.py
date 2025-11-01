@@ -58,10 +58,10 @@ from ansible_collections.community.general.plugins.module_utils.gconftool2 impor
 
 
 class GConftoolInfo(ModuleHelper):
-    output_params = ['key']
+    output_params = ["key"]
     module = dict(
         argument_spec=dict(
-            key=dict(type='str', required=True, no_log=False),
+            key=dict(type="str", required=True, no_log=False),
         ),
         supports_check_mode=True,
     )
@@ -82,5 +82,5 @@ def main():
     GConftoolInfo.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

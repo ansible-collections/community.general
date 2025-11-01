@@ -6,8 +6,7 @@ from __future__ import annotations
 
 
 emc_vnx_argument_spec = {
-    'sp_address': dict(type='str', required=True),
-    'sp_user': dict(type='str', required=False, default='sysadmin'),
-    'sp_password': dict(type='str', required=False, default='sysadmin',
-                        no_log=True),
+    "sp_address": dict(type="str", required=True),
+    "sp_user": dict(type="str", required=False, default="sysadmin"),
+    "sp_password": dict(type="str", required=False, default="sysadmin", no_log=True),
 }

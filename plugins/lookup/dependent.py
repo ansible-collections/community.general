@@ -125,6 +125,7 @@ from ansible.template import Templar
 
 try:
     from ansible.template import trust_as_template as _trust_as_template
+
     HAS_DATATAGGING = True
 except ImportError:
     HAS_DATATAGGING = False
@@ -145,7 +146,7 @@ class LookupModule(LookupBase):
         """
         templar.available_variables = variables or {}
         quoted_expression = "{0}{1}{2}".format("{{", expression, "}}")
-        if hasattr(templar, 'evaluate_expression'):
+        if hasattr(templar, "evaluate_expression"):
             # This is available since the Data Tagging PR has been merged
             return templar.evaluate_expression(_make_safe(expression))
         return templar.template(quoted_expression)
@@ -169,12 +170,11 @@ class LookupModule(LookupBase):
         if expression is not None:
             # Evaluate expression in current context
             vars = variables.copy()
-            vars['item'] = current.copy()
+            vars["item"] = current.copy()
             try:
                 values = self.__evaluate(expression, templar, variables=vars)
             except Exception as e:
-                raise AnsibleLookupError(
-                    f'Caught "{e}" while evaluating {key!r} with item == {current!r}')
+                raise AnsibleLookupError(f'Caught "{e}" while evaluating {key!r} with item == {current!r}')
 
         if isinstance(values, Mapping):
             for idx, val in sorted(values.items()):
@@ -186,7 +186,8 @@ class LookupModule(LookupBase):
                 self.__process(result, terms, index + 1, current, templar, variables)
         else:
             raise AnsibleLookupError(
-                f'Did not obtain dictionary or list while evaluating {key!r} with item == {current!r}, but {type(values)}')
+                f"Did not obtain dictionary or list while evaluating {key!r} with item == {current!r}, but {type(values)}"
+            )
 
     def run(self, terms, variables=None, **kwargs):
         """Generate list."""
@@ -202,15 +203,14 @@ class LookupModule(LookupBase):
             vars_so_far = set()
             for index, term in enumerate(terms):
                 if not isinstance(term, Mapping):
-                    raise AnsibleLookupError(
-                        f'Parameter {index} must be a dictionary, got {type(term)}')
+                    raise AnsibleLookupError(f"Parameter {index} must be a dictionary, got {type(term)}")
                 if len(term) != 1:
                     raise AnsibleLookupError(
-                        f'Parameter {index} must be a one-element dictionary, got {len(term)} elements')
+                        f"Parameter {index} must be a one-element dictionary, got {len(term)} elements"
+                    )
                 k, v = list(term.items())[0]
                 if k in vars_so_far:
-                    raise AnsibleLookupError(
-                        f'The variable {k!r} appears more than once')
+                    raise AnsibleLookupError(f"The variable {k!r} appears more than once")
                 vars_so_far.add(k)
                 if isinstance(v, str):
                     data.append((k, v, None))
@@ -218,6 +218,7 @@ class LookupModule(LookupBase):
                     data.append((k, None, v))
                 else:
                     raise AnsibleLookupError(
-                        f'Parameter {k!r} (index {index}) must have a value of type string, dictionary or list, got type {type(v)}')
+                        f"Parameter {k!r} (index {index}) must have a value of type string, dictionary or list, got type {type(v)}"
+                    )
             self.__process(result, data, 0, {}, templar, variables)
         return result

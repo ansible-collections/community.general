@@ -38,14 +38,12 @@ class TestPritunlOrgInfo(ModuleTestCase):
         return patch(
             "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_organizations",
             autospec=True,
-            **kwds
+            **kwds,
         )
 
     def test_without_parameters(self):
         """Test without parameters"""
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
             with set_module_args({}):
                 with self.assertRaises(AnsibleFailJson):
                     self.module.main()
@@ -54,9 +52,7 @@ class TestPritunlOrgInfo(ModuleTestCase):
 
     def test_list_empty_organizations(self):
         """Listing all organizations even when no org exists should be valid."""
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlEmptyOrganizationMock
-        ) as org_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlEmptyOrganizationMock) as org_mock:
             with self.assertRaises(AnsibleExitJson) as result:
                 with set_module_args(
                     {
@@ -74,9 +70,7 @@ class TestPritunlOrgInfo(ModuleTestCase):
 
     def test_list_specific_organization(self):
         """Listing a specific organization should be valid."""
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
             with self.assertRaises(AnsibleExitJson) as result:
                 with set_module_args(
                     {
@@ -95,9 +89,7 @@ class TestPritunlOrgInfo(ModuleTestCase):
 
     def test_list_unknown_organization(self):
         """Listing an unknown organization should result in a failure."""
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
             with self.assertRaises(AnsibleFailJson) as result:
                 with set_module_args(
                     {
@@ -116,9 +108,7 @@ class TestPritunlOrgInfo(ModuleTestCase):
 
     def test_list_all_organizations(self):
         """Listing all organizations should be valid."""
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as org_mock:
+        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
             with self.assertRaises(AnsibleExitJson) as result:
                 with set_module_args(
                     {
