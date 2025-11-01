@@ -142,10 +142,10 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def get_rubygems_path(module):
-    if module.params['executable']:
-        result = module.params['executable'].split(' ')
+    if module.params["executable"]:
+        result = module.params["executable"].split(" ")
     else:
-        result = [module.get_bin_path('gem', True)]
+        result = [module.get_bin_path("gem", True)]
     return result
 
 
@@ -153,10 +153,10 @@ def get_rubygems_version(module):
     if hasattr(get_rubygems_version, "ver"):
         return get_rubygems_version.ver
 
-    cmd = get_rubygems_path(module) + ['--version']
+    cmd = get_rubygems_path(module) + ["--version"]
     (rc, out, err) = module.run_command(cmd, check_rc=True)
 
-    match = re.match(r'^(\d+)\.(\d+)\.(\d+)', out)
+    match = re.match(r"^(\d+)\.(\d+)\.(\d+)", out)
     if not match:
         return None
 
@@ -167,21 +167,20 @@ def get_rubygems_version(module):
 
 
 def get_rubygems_environ(module):
-    if module.params['install_dir']:
-        return {'GEM_HOME': module.params['install_dir']}
+    if module.params["install_dir"]:
+        return {"GEM_HOME": module.params["install_dir"]}
     return None
 
 
 def get_installed_versions(module, remote=False):
-
     cmd = get_rubygems_path(module)
-    cmd.append('query')
+    cmd.append("query")
     cmd.extend(common_opts(module))
     if remote:
-        cmd.append('--remote')
-        if module.params['repository']:
-            cmd.extend(['--source', module.params['repository']])
-    cmd.append('-n')
+        cmd.append("--remote")
+        if module.params["repository"]:
+            cmd.extend(["--source", module.params["repository"]])
+    cmd.append("-n")
     cmd.append(f"^{module.params['name']}$")
 
     environ = get_rubygems_environ(module)
@@ -191,19 +190,19 @@ def get_installed_versions(module, remote=False):
         match = re.match(r"\S+\s+\((?:default: )?(.+)\)", line)
         if match:
             versions = match.group(1)
-            for version in versions.split(', '):
+            for version in versions.split(", "):
                 installed_versions.append(version.split()[0])
     return installed_versions
 
 
 def exists(module):
-    if module.params['state'] == 'latest':
+    if module.params["state"] == "latest":
         remoteversions = get_installed_versions(module, remote=True)
         if remoteversions:
-            module.params['version'] = remoteversions[0]
+            module.params["version"] = remoteversions[0]
     installed_versions = get_installed_versions(module)
-    if module.params['version']:
-        if module.params['version'] in installed_versions:
+    if module.params["version"]:
+        if module.params["version"] in installed_versions:
             return True
     else:
         if installed_versions:
@@ -214,123 +213,120 @@ def exists(module):
 def common_opts(module):
     opts = []
     ver = get_rubygems_version(module)
-    if module.params['norc'] and ver and ver >= (2, 5, 2):
-        opts.append('--norc')
+    if module.params["norc"] and ver and ver >= (2, 5, 2):
+        opts.append("--norc")
     return opts
 
 
 def uninstall(module):
-
     if module.check_mode:
         return
     cmd = get_rubygems_path(module)
     environ = get_rubygems_environ(module)
-    cmd.append('uninstall')
+    cmd.append("uninstall")
     cmd.extend(common_opts(module))
-    if module.params['install_dir']:
-        cmd.extend(['--install-dir', module.params['install_dir']])
+    if module.params["install_dir"]:
+        cmd.extend(["--install-dir", module.params["install_dir"]])
 
-    if module.params['bindir']:
-        cmd.extend(['--bindir', module.params['bindir']])
+    if module.params["bindir"]:
+        cmd.extend(["--bindir", module.params["bindir"]])
 
-    if module.params['version']:
-        cmd.extend(['--version', module.params['version']])
+    if module.params["version"]:
+        cmd.extend(["--version", module.params["version"]])
     else:
-        cmd.append('--all')
-    cmd.append('--executable')
-    if module.params['force']:
-        cmd.append('--force')
-    cmd.append(module.params['name'])
+        cmd.append("--all")
+    cmd.append("--executable")
+    if module.params["force"]:
+        cmd.append("--force")
+    cmd.append(module.params["name"])
     return module.run_command(cmd, environ_update=environ, check_rc=True)
 
 
 def install(module):
-
     if module.check_mode:
         return
 
     ver = get_rubygems_version(module)
 
     cmd = get_rubygems_path(module)
-    cmd.append('install')
+    cmd.append("install")
     cmd.extend(common_opts(module))
-    if module.params['version']:
-        cmd.extend(['--version', module.params['version']])
-    if module.params['repository']:
-        cmd.extend(['--source', module.params['repository']])
-    if not module.params['include_dependencies']:
-        cmd.append('--ignore-dependencies')
+    if module.params["version"]:
+        cmd.extend(["--version", module.params["version"]])
+    if module.params["repository"]:
+        cmd.extend(["--source", module.params["repository"]])
+    if not module.params["include_dependencies"]:
+        cmd.append("--ignore-dependencies")
     else:
         if ver and ver < (2, 0, 0):
-            cmd.append('--include-dependencies')
-    if module.params['user_install']:
-        cmd.append('--user-install')
+            cmd.append("--include-dependencies")
+    if module.params["user_install"]:
+        cmd.append("--user-install")
     else:
-        cmd.append('--no-user-install')
-    if module.params['install_dir']:
-        cmd.extend(['--install-dir', module.params['install_dir']])
-    if module.params['bindir']:
-        cmd.extend(['--bindir', module.params['bindir']])
-    if module.params['pre_release']:
-        cmd.append('--pre')
-    if not module.params['include_doc']:
+        cmd.append("--no-user-install")
+    if module.params["install_dir"]:
+        cmd.extend(["--install-dir", module.params["install_dir"]])
+    if module.params["bindir"]:
+        cmd.extend(["--bindir", module.params["bindir"]])
+    if module.params["pre_release"]:
+        cmd.append("--pre")
+    if not module.params["include_doc"]:
         if ver and ver < (2, 0, 0):
-            cmd.append('--no-rdoc')
-            cmd.append('--no-ri')
+            cmd.append("--no-rdoc")
+            cmd.append("--no-ri")
         else:
-            cmd.append('--no-document')
-    if module.params['env_shebang']:
-        cmd.append('--env-shebang')
-    cmd.append(module.params['gem_source'])
-    if module.params['build_flags']:
-        cmd.extend(['--', module.params['build_flags']])
-    if module.params['force']:
-        cmd.append('--force')
+            cmd.append("--no-document")
+    if module.params["env_shebang"]:
+        cmd.append("--env-shebang")
+    cmd.append(module.params["gem_source"])
+    if module.params["build_flags"]:
+        cmd.extend(["--", module.params["build_flags"]])
+    if module.params["force"]:
+        cmd.append("--force")
     module.run_command(cmd, check_rc=True)
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            executable=dict(type='path'),
-            gem_source=dict(type='path'),
-            include_dependencies=dict(default=True, type='bool'),
-            name=dict(required=True, type='str'),
-            repository=dict(aliases=['source'], type='str'),
-            state=dict(default='present', choices=['present', 'absent', 'latest'], type='str'),
-            user_install=dict(default=True, type='bool'),
-            install_dir=dict(type='path'),
-            bindir=dict(type='path'),
-            norc=dict(type='bool', default=True),
-            pre_release=dict(default=False, type='bool'),
-            include_doc=dict(default=False, type='bool'),
-            env_shebang=dict(default=False, type='bool'),
-            version=dict(type='str'),
-            build_flags=dict(type='str'),
-            force=dict(default=False, type='bool'),
+            executable=dict(type="path"),
+            gem_source=dict(type="path"),
+            include_dependencies=dict(default=True, type="bool"),
+            name=dict(required=True, type="str"),
+            repository=dict(aliases=["source"], type="str"),
+            state=dict(default="present", choices=["present", "absent", "latest"], type="str"),
+            user_install=dict(default=True, type="bool"),
+            install_dir=dict(type="path"),
+            bindir=dict(type="path"),
+            norc=dict(type="bool", default=True),
+            pre_release=dict(default=False, type="bool"),
+            include_doc=dict(default=False, type="bool"),
+            env_shebang=dict(default=False, type="bool"),
+            version=dict(type="str"),
+            build_flags=dict(type="str"),
+            force=dict(default=False, type="bool"),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[['gem_source', 'repository'], ['gem_source', 'version']],
+        mutually_exclusive=[["gem_source", "repository"], ["gem_source", "version"]],
     )
 
-    if module.params['version'] and module.params['state'] == 'latest':
+    if module.params["version"] and module.params["state"] == "latest":
         module.fail_json(msg="Cannot specify version when state=latest")
-    if module.params['gem_source'] and module.params['state'] == 'latest':
+    if module.params["gem_source"] and module.params["state"] == "latest":
         module.fail_json(msg="Cannot maintain state=latest when installing from local source")
-    if module.params['user_install'] and module.params['install_dir']:
+    if module.params["user_install"] and module.params["install_dir"]:
         module.fail_json(msg="install_dir requires user_install=false")
 
-    if not module.params['gem_source']:
-        module.params['gem_source'] = module.params['name']
+    if not module.params["gem_source"]:
+        module.params["gem_source"] = module.params["name"]
 
     changed = False
 
-    if module.params['state'] in ['present', 'latest']:
+    if module.params["state"] in ["present", "latest"]:
         if not exists(module):
             install(module)
             changed = True
-    elif module.params['state'] == 'absent':
+    elif module.params["state"] == "absent":
         if exists(module):
             command_output = uninstall(module)
             if command_output is not None and exists(module):
@@ -343,19 +339,19 @@ def main():
                     ),
                     rc=rc,
                     stdout=out,
-                    stderr=err
+                    stderr=err,
                 )
             else:
                 changed = True
     result = {}
-    result['name'] = module.params['name']
-    result['state'] = module.params['state']
-    if module.params['version']:
-        result['version'] = module.params['version']
-    result['changed'] = changed
+    result["name"] = module.params["name"]
+    result["state"] = module.params["state"]
+    if module.params["version"]:
+        result["version"] = module.params["version"]
+    result["changed"] = changed
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

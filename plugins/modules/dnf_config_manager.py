@@ -126,40 +126,40 @@ import os
 import re
 
 DNF_BIN = "/usr/bin/dnf"
-REPO_ID_RE = re.compile(r'^Repo-id\s*:\s*(\S+)$')
-REPO_STATUS_RE = re.compile(r'^Repo-status\s*:\s*(disabled|enabled)$')
+REPO_ID_RE = re.compile(r"^Repo-id\s*:\s*(\S+)$")
+REPO_STATUS_RE = re.compile(r"^Repo-status\s*:\s*(disabled|enabled)$")
 
 
 def get_repo_states(module):
-    rc, out, err = module.run_command([DNF_BIN, 'repolist', '--all', '--verbose'], check_rc=True)
+    rc, out, err = module.run_command([DNF_BIN, "repolist", "--all", "--verbose"], check_rc=True)
 
     repos = dict()
-    last_repo = ''
-    for i, line in enumerate(out.split('\n')):
+    last_repo = ""
+    for i, line in enumerate(out.split("\n")):
         m = REPO_ID_RE.match(line)
         if m:
             if len(last_repo) > 0:
-                module.fail_json(msg='dnf repolist parse failure: parsed another repo id before next status')
+                module.fail_json(msg="dnf repolist parse failure: parsed another repo id before next status")
             last_repo = m.group(1)
             continue
         m = REPO_STATUS_RE.match(line)
         if m:
             if len(last_repo) == 0:
-                module.fail_json(msg='dnf repolist parse failure: parsed status before repo id')
+                module.fail_json(msg="dnf repolist parse failure: parsed status before repo id")
             repos[last_repo] = m.group(1)
-            last_repo = ''
+            last_repo = ""
     return repos
 
 
 def set_repo_states(module, repo_ids, state):
-    module.run_command([DNF_BIN, 'config-manager', '--assumeyes', f'--set-{state}'] + repo_ids, check_rc=True)
+    module.run_command([DNF_BIN, "config-manager", "--assumeyes", f"--set-{state}"] + repo_ids, check_rc=True)
 
 
 def pack_repo_states_for_return(states):
     enabled = []
     disabled = []
     for repo_id in states:
-        if states[repo_id] == 'enabled':
+        if states[repo_id] == "enabled":
             enabled.append(repo_id)
         else:
             disabled.append(repo_id)
@@ -168,33 +168,28 @@ def pack_repo_states_for_return(states):
     enabled.sort()
     disabled.sort()
 
-    return {'enabled': enabled, 'disabled': disabled}
+    return {"enabled": enabled, "disabled": disabled}
 
 
 def main():
     module_args = dict(
-        name=dict(type='list', elements='str', default=[]),
-        state=dict(type='str', choices=['enabled', 'disabled'], default='enabled')
+        name=dict(type="list", elements="str", default=[]),
+        state=dict(type="str", choices=["enabled", "disabled"], default="enabled"),
     )
 
-    result = dict(
-        changed=False
-    )
+    result = dict(changed=False)
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
-    module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     if not os.path.exists(DNF_BIN):
         module.fail_json(msg=f"{DNF_BIN} was not found")
 
     repo_states = get_repo_states(module)
-    result['repo_states_pre'] = pack_repo_states_for_return(repo_states)
+    result["repo_states_pre"] = pack_repo_states_for_return(repo_states)
 
-    desired_repo_state = module.params['state']
-    names = module.params['name']
+    desired_repo_state = module.params["state"]
+    names = module.params["name"]
 
     to_change = []
     for repo_id in names:
@@ -202,8 +197,8 @@ def main():
             module.fail_json(msg=f"did not find repo with ID '{repo_id}' in dnf repolist --all --verbose")
         if repo_states[repo_id] != desired_repo_state:
             to_change.append(repo_id)
-    result['changed'] = len(to_change) > 0
-    result['changed_repos'] = to_change
+    result["changed"] = len(to_change) > 0
+    result["changed_repos"] = to_change
 
     if module.check_mode:
         module.exit_json(**result)
@@ -212,7 +207,7 @@ def main():
         set_repo_states(module, to_change, desired_repo_state)
 
     repo_states_post = get_repo_states(module)
-    result['repo_states_post'] = pack_repo_states_for_return(repo_states_post)
+    result["repo_states_post"] = pack_repo_states_for_return(repo_states_post)
 
     for repo_id in to_change:
         if repo_states_post[repo_id] != desired_repo_state:

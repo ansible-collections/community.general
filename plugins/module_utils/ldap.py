@@ -1,4 +1,3 @@
-
 # Copyright (c) 2016, Peter Sagerson <psagers@ignorare.net>
 # Copyright (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
 # Copyright (c) 2017-2018 Keller Fuchs (@KellerFuchs) <kellerfuchs@hashbang.sh>
@@ -21,51 +20,53 @@ try:
     HAS_LDAP = True
 
     SASCL_CLASS = {
-        'gssapi': ldap.sasl.gssapi,
-        'external': ldap.sasl.external,
+        "gssapi": ldap.sasl.gssapi,
+        "external": ldap.sasl.external,
     }
 except ImportError:
     HAS_LDAP = False
 
 
 def gen_specs(**specs):
-    specs.update({
-        'bind_dn': dict(),
-        'bind_pw': dict(default='', no_log=True),
-        'ca_path': dict(type='path'),
-        'dn': dict(required=True),
-        'referrals_chasing': dict(type='str', default='anonymous', choices=['disabled', 'anonymous']),
-        'server_uri': dict(default='ldapi:///'),
-        'start_tls': dict(default=False, type='bool'),
-        'validate_certs': dict(default=True, type='bool'),
-        'sasl_class': dict(choices=['external', 'gssapi'], default='external', type='str'),
-        'xorder_discovery': dict(choices=['enable', 'auto', 'disable'], default='auto', type='str'),
-        'client_cert': dict(default=None, type='path'),
-        'client_key': dict(default=None, type='path'),
-    })
+    specs.update(
+        {
+            "bind_dn": dict(),
+            "bind_pw": dict(default="", no_log=True),
+            "ca_path": dict(type="path"),
+            "dn": dict(required=True),
+            "referrals_chasing": dict(type="str", default="anonymous", choices=["disabled", "anonymous"]),
+            "server_uri": dict(default="ldapi:///"),
+            "start_tls": dict(default=False, type="bool"),
+            "validate_certs": dict(default=True, type="bool"),
+            "sasl_class": dict(choices=["external", "gssapi"], default="external", type="str"),
+            "xorder_discovery": dict(choices=["enable", "auto", "disable"], default="auto", type="str"),
+            "client_cert": dict(default=None, type="path"),
+            "client_key": dict(default=None, type="path"),
+        }
+    )
 
     return specs
 
 
 def ldap_required_together():
-    return [['client_cert', 'client_key']]
+    return [["client_cert", "client_key"]]
 
 
 class LdapGeneric:
     def __init__(self, module):
         # Shortcuts
         self.module = module
-        self.bind_dn = self.module.params['bind_dn']
-        self.bind_pw = self.module.params['bind_pw']
-        self.ca_path = self.module.params['ca_path']
-        self.referrals_chasing = self.module.params['referrals_chasing']
-        self.server_uri = self.module.params['server_uri']
-        self.start_tls = self.module.params['start_tls']
-        self.verify_cert = self.module.params['validate_certs']
-        self.sasl_class = self.module.params['sasl_class']
-        self.xorder_discovery = self.module.params['xorder_discovery']
-        self.client_cert = self.module.params['client_cert']
-        self.client_key = self.module.params['client_key']
+        self.bind_dn = self.module.params["bind_dn"]
+        self.bind_pw = self.module.params["bind_pw"]
+        self.ca_path = self.module.params["ca_path"]
+        self.referrals_chasing = self.module.params["referrals_chasing"]
+        self.server_uri = self.module.params["server_uri"]
+        self.start_tls = self.module.params["start_tls"]
+        self.verify_cert = self.module.params["validate_certs"]
+        self.sasl_class = self.module.params["sasl_class"]
+        self.xorder_discovery = self.module.params["xorder_discovery"]
+        self.client_cert = self.module.params["client_cert"]
+        self.client_key = self.module.params["client_key"]
 
         # Establish connection
         self.connection = self._connect_to_ldap()
@@ -74,17 +75,13 @@ class LdapGeneric:
             # Try to find the X_ORDERed version of the DN
             self.dn = self._find_dn()
         else:
-            self.dn = self.module.params['dn']
+            self.dn = self.module.params["dn"]
 
     def fail(self, msg, exn):
-        self.module.fail_json(
-            msg=msg,
-            details=to_native(exn),
-            exception=traceback.format_exc()
-        )
+        self.module.fail_json(msg=msg, details=to_native(exn), exception=traceback.format_exc())
 
     def _find_dn(self):
-        dn = self.module.params['dn']
+        dn = self.module.params["dn"]
 
         explode_dn = ldap.dn.explode_dn(dn)
 
@@ -92,8 +89,7 @@ class LdapGeneric:
             try:
                 escaped_value = ldap.filter.escape_filter_chars(explode_dn[0])
                 filterstr = f"({escaped_value})"
-                dns = self.connection.search_s(','.join(explode_dn[1:]),
-                                               ldap.SCOPE_ONELEVEL, filterstr)
+                dns = self.connection.search_s(",".join(explode_dn[1:]), ldap.SCOPE_ONELEVEL, filterstr)
                 if len(dns) == 1:
                     dn, dummy = dns[0]
             except Exception:
@@ -114,7 +110,7 @@ class LdapGeneric:
 
         connection = ldap.initialize(self.server_uri)
 
-        if self.referrals_chasing == 'disabled':
+        if self.referrals_chasing == "disabled":
             # Switch off chasing of referrals (https://github.com/ansible-collections/community.general/issues/1067)
             connection.set_option(ldap.OPT_REFERRALS, 0)
 
@@ -129,7 +125,7 @@ class LdapGeneric:
                 connection.simple_bind_s(self.bind_dn, self.bind_pw)
             else:
                 klass = SASCL_CLASS.get(self.sasl_class, ldap.sasl.external)
-                connection.sasl_interactive_bind_s('', klass())
+                connection.sasl_interactive_bind_s("", klass())
         except ldap.LDAPError as e:
             self.fail("Cannot bind to the server.", e)
 
@@ -138,6 +134,6 @@ class LdapGeneric:
     def _xorder_dn(self):
         # match X_ORDERed DNs
         regex = r".+\{\d+\}.+"
-        explode_dn = ldap.dn.explode_dn(self.module.params['dn'])
+        explode_dn = ldap.dn.explode_dn(self.module.params["dn"])
 
         return re.match(regex, explode_dn[0]) is not None

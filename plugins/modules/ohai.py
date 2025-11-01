@@ -38,13 +38,11 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict()
-    )
+    module = AnsibleModule(argument_spec=dict())
     cmd = ["/usr/bin/env", "ohai"]
     rc, out, err = module.run_command(cmd, check_rc=True)
     module.exit_json(**json.loads(out))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

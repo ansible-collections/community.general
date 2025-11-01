@@ -132,19 +132,23 @@ version:
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_dict
+from ansible_collections.community.general.plugins.module_utils.pipx import (
+    pipx_runner,
+    pipx_common_argspec,
+    make_process_dict,
+)
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible.module_utils.facts.compat import ansible_facts
 
 
 class PipXInfo(ModuleHelper):
-    output_params = ['name']
+    output_params = ["name"]
     argument_spec = dict(
-        name=dict(type='str'),
-        include_deps=dict(type='bool', default=False),
-        include_injected=dict(type='bool', default=False),
-        include_raw=dict(type='bool', default=False),
+        name=dict(type="str"),
+        include_deps=dict(type="bool", default=False),
+        include_injected=dict(type="bool", default=False),
+        include_raw=dict(type="bool", default=False),
     )
     argument_spec.update(pipx_common_argspec)
     module = dict(
@@ -156,8 +160,8 @@ class PipXInfo(ModuleHelper):
         if self.vars.executable:
             self.command = [self.vars.executable]
         else:
-            facts = ansible_facts(self.module, gather_subset=['python'])
-            self.command = [facts['python']['executable'], '-m', 'pipx']
+            facts = ansible_facts(self.module, gather_subset=["python"])
+            self.command = [facts["python"]["executable"], "-m", "pipx"]
         self.runner = pipx_runner(self.module, self.command)
         with self.runner("version") as ctx:
             rc, out, err = ctx.run()
@@ -168,17 +172,13 @@ class PipXInfo(ModuleHelper):
 
     def __run__(self):
         output_process = make_process_dict(self.vars.include_injected, self.vars.include_deps)
-        with self.runner('_list global', output_process=output_process) as ctx:
+        with self.runner("_list global", output_process=output_process) as ctx:
             applications, raw_data = ctx.run()
             if self.vars.include_raw:
                 self.vars.raw_output = raw_data
 
             if self.vars.name:
-                self.vars.application = [
-                    v
-                    for k, v in applications.items()
-                    if k == self.vars.name
-                ]
+                self.vars.application = [v for k, v in applications.items() if k == self.vars.name]
             else:
                 self.vars.application = list(applications.values())
             self._capture_results(ctx)
@@ -193,5 +193,5 @@ def main():
     PipXInfo.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

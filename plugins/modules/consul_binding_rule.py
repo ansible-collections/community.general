@@ -129,9 +129,7 @@ class ConsulBindingRuleModule(_ConsulModule):
         try:
             results = self.get(url)
             for result in results:
-                if result.get("Description").startswith(
-                    f"{self.params['name']}: "
-                ):
+                if result.get("Description").startswith(f"{self.params['name']}: "):
                     return result
         except RequestError as e:
             if e.status == 404:
@@ -158,9 +156,7 @@ _ARGUMENT_SPEC = {
     "description": dict(type="str"),
     "auth_method": dict(type="str", required=True),
     "selector": dict(type="str"),
-    "bind_type": dict(
-        type="str", choices=["service", "node", "role", "templated-policy"]
-    ),
+    "bind_type": dict(type="str", choices=["service", "node", "role", "templated-policy"]),
     "bind_name": dict(type="str"),
     "bind_vars": dict(type="dict"),
     "state": dict(default="present", choices=["present", "absent"]),

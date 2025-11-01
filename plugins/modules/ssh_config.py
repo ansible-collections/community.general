@@ -224,23 +224,27 @@ import os
 from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser, HAS_PARAMIKO, PARAMIKO_IMPORT_ERROR
+from ansible_collections.community.general.plugins.module_utils._stormssh import (
+    ConfigParser,
+    HAS_PARAMIKO,
+    PARAMIKO_IMPORT_ERROR,
+)
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
 def convert_bool(value):
     if value is True:
-        return 'yes'
+        return "yes"
     if value is False:
-        return 'no'
+        return "no"
     return None
 
 
 def fix_bool_str(value):
-    if value == 'True':
-        return 'yes'
-    if value == 'False':
-        return 'no'
+    if value == "True":
+        return "yes"
+    if value == "False":
+        return "no"
     return value
 
 
@@ -248,13 +252,13 @@ class SSHConfig:
     def __init__(self, module):
         self.module = module
         if not HAS_PARAMIKO:
-            module.fail_json(msg=missing_required_lib('PARAMIKO'), exception=PARAMIKO_IMPORT_ERROR)
+            module.fail_json(msg=missing_required_lib("PARAMIKO"), exception=PARAMIKO_IMPORT_ERROR)
         self.params = module.params
-        self.user = self.params.get('user')
-        self.group = self.params.get('group') or self.user
-        self.host = self.params.get('host')
-        self.config_file = self.params.get('ssh_config_file')
-        self.identity_file = self.params['identity_file']
+        self.user = self.params.get("user")
+        self.group = self.params.get("group") or self.user
+        self.host = self.params.get("host")
+        self.config_file = self.params.get("ssh_config_file")
+        self.identity_file = self.params["identity_file"]
         self.check_ssh_config_path()
         try:
             self.config = ConfigParser(self.config_file)
@@ -275,32 +279,34 @@ class SSHConfig:
 
     def ensure_state(self):
         hosts_result = self.config.search_host(self.host)
-        state = self.params['state']
+        state = self.params["state"]
         args = dict(
-            hostname=self.params.get('hostname'),
-            port=self.params.get('port'),
-            identity_file=self.params.get('identity_file'),
-            identities_only=convert_bool(self.params.get('identities_only')),
-            user=self.params.get('remote_user'),
-            strict_host_key_checking=self.params.get('strict_host_key_checking'),
-            user_known_hosts_file=self.params.get('user_known_hosts_file'),
-            proxycommand=self.params.get('proxycommand'),
-            proxyjump=self.params.get('proxyjump'),
-            host_key_algorithms=self.params.get('host_key_algorithms'),
-            forward_agent=convert_bool(self.params.get('forward_agent')),
-            add_keys_to_agent=convert_bool(self.params.get('add_keys_to_agent')),
-            controlmaster=self.params.get('controlmaster'),
-            controlpath=self.params.get('controlpath'),
-            controlpersist=fix_bool_str(self.params.get('controlpersist')),
-            dynamicforward=self.params.get('dynamicforward'),
+            hostname=self.params.get("hostname"),
+            port=self.params.get("port"),
+            identity_file=self.params.get("identity_file"),
+            identities_only=convert_bool(self.params.get("identities_only")),
+            user=self.params.get("remote_user"),
+            strict_host_key_checking=self.params.get("strict_host_key_checking"),
+            user_known_hosts_file=self.params.get("user_known_hosts_file"),
+            proxycommand=self.params.get("proxycommand"),
+            proxyjump=self.params.get("proxyjump"),
+            host_key_algorithms=self.params.get("host_key_algorithms"),
+            forward_agent=convert_bool(self.params.get("forward_agent")),
+            add_keys_to_agent=convert_bool(self.params.get("add_keys_to_agent")),
+            controlmaster=self.params.get("controlmaster"),
+            controlpath=self.params.get("controlpath"),
+            controlpersist=fix_bool_str(self.params.get("controlpersist")),
+            dynamicforward=self.params.get("dynamicforward"),
         )
-        if self.params.get('other_options'):
-            for key, value in self.params.get('other_options').items():
+        if self.params.get("other_options"):
+            for key, value in self.params.get("other_options").items():
                 if key.lower() != key:
                     self.module.fail_json(msg=f"The other_options key {key} must be lower case")
                 if key not in args:
                     if not isinstance(value, str):
-                        self.module.fail_json(msg=f"The other_options value provided for key {key} must be a string, got {type(value)}")
+                        self.module.fail_json(
+                            msg=f"The other_options value provided for key {key} must be a string, got {type(value)}"
+                        )
                     args[key] = value
                 else:
                     self.module.fail_json(msg=f"Multiple values provided for key {key}")
@@ -311,30 +317,32 @@ class SSHConfig:
         hosts_removed = []
         hosts_added = []
 
-        hosts_result = [host for host in hosts_result if host['host'] == self.host]
+        hosts_result = [host for host in hosts_result if host["host"] == self.host]
 
         if hosts_result:
             for host in hosts_result:
-                if state == 'absent':
+                if state == "absent":
                     # Delete host from the configuration
                     config_changed = True
-                    hosts_removed.append(host['host'])
-                    self.config.delete_host(host['host'])
+                    hosts_removed.append(host["host"])
+                    self.config.delete_host(host["host"])
                 else:
                     # Update host in the configuration
-                    changed, options = self.change_host(host['options'], **args)
+                    changed, options = self.change_host(host["options"], **args)
 
                     if changed:
                         config_changed = True
-                        self.config.update_host(host['host'], options)
-                        hosts_changed.append(host['host'])
-                        hosts_change_diff.append({
-                            host['host']: {
-                                'old': host['options'],
-                                'new': options,
+                        self.config.update_host(host["host"], options)
+                        hosts_changed.append(host["host"])
+                        hosts_change_diff.append(
+                            {
+                                host["host"]: {
+                                    "old": host["options"],
+                                    "new": options,
+                                }
                             }
-                        })
-        elif state == 'present':
+                        )
+        elif state == "present":
             changed, options = self.change_host(dict(), **args)
 
             if changed:
@@ -346,30 +354,31 @@ class SSHConfig:
             try:
                 self.config.write_to_ssh_config()
             except PermissionError as perm_exec:
-                self.module.fail_json(
-                    msg=f"Failed to write to {self.config_file} due to permission issue: {perm_exec}")
+                self.module.fail_json(msg=f"Failed to write to {self.config_file} due to permission issue: {perm_exec}")
             # Make sure we set the permission
-            perm_mode = '0600'
-            if self.config_file == '/etc/ssh/ssh_config':
-                perm_mode = '0644'
+            perm_mode = "0600"
+            if self.config_file == "/etc/ssh/ssh_config":
+                perm_mode = "0644"
             self.module.set_mode_if_different(self.config_file, perm_mode, False)
             # Make sure the file is owned by the right user and group
             self.module.set_owner_if_different(self.config_file, self.user, False)
             self.module.set_group_if_different(self.config_file, self.group, False)
 
-        self.module.exit_json(changed=config_changed,
-                              hosts_changed=hosts_changed,
-                              hosts_removed=hosts_removed,
-                              hosts_change_diff=hosts_change_diff,
-                              hosts_added=hosts_added)
+        self.module.exit_json(
+            changed=config_changed,
+            hosts_changed=hosts_changed,
+            hosts_removed=hosts_removed,
+            hosts_change_diff=hosts_change_diff,
+            hosts_added=hosts_added,
+        )
 
     @staticmethod
     def change_host(options, **kwargs):
         options = deepcopy(options)
         changed = False
         for k, v in kwargs.items():
-            if '_' in k:
-                k = k.replace('_', '')
+            if "_" in k:
+                k = k.replace("_", "")
 
             if not v:
                 if options.get(k):
@@ -385,33 +394,33 @@ class SSHConfig:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            group=dict(type='str'),
-            host=dict(type='str', required=True),
-            hostname=dict(type='str'),
-            host_key_algorithms=dict(type='str', no_log=False),
-            identity_file=dict(type='path'),
-            identities_only=dict(type='bool'),
-            other_options=dict(type='dict'),
-            port=dict(type='str'),
-            proxycommand=dict(type='str'),
-            proxyjump=dict(type='str'),
-            forward_agent=dict(type='bool'),
-            add_keys_to_agent=dict(type='bool'),
-            remote_user=dict(type='str'),
-            ssh_config_file=dict(type='path'),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            strict_host_key_checking=dict(type='str', choices=['yes', 'no', 'ask', 'accept-new']),
-            controlmaster=dict(type='str', choices=['yes', 'no', 'ask', 'auto', 'autoask']),
-            controlpath=dict(type='str'),
-            controlpersist=dict(type='str'),
-            dynamicforward=dict(type='str'),
-            user=dict(type='str'),
-            user_known_hosts_file=dict(type='str'),
+            group=dict(type="str"),
+            host=dict(type="str", required=True),
+            hostname=dict(type="str"),
+            host_key_algorithms=dict(type="str", no_log=False),
+            identity_file=dict(type="path"),
+            identities_only=dict(type="bool"),
+            other_options=dict(type="dict"),
+            port=dict(type="str"),
+            proxycommand=dict(type="str"),
+            proxyjump=dict(type="str"),
+            forward_agent=dict(type="bool"),
+            add_keys_to_agent=dict(type="bool"),
+            remote_user=dict(type="str"),
+            ssh_config_file=dict(type="path"),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            strict_host_key_checking=dict(type="str", choices=["yes", "no", "ask", "accept-new"]),
+            controlmaster=dict(type="str", choices=["yes", "no", "ask", "auto", "autoask"]),
+            controlpath=dict(type="str"),
+            controlpersist=dict(type="str"),
+            dynamicforward=dict(type="str"),
+            user=dict(type="str"),
+            user_known_hosts_file=dict(type="str"),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
-            ['user', 'ssh_config_file'],
-            ['proxycommand', 'proxyjump'],
+            ["user", "ssh_config_file"],
+            ["proxycommand", "proxyjump"],
         ],
     )
 
@@ -419,5 +428,5 @@ def main():
     ssh_config_obj.ensure_state()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

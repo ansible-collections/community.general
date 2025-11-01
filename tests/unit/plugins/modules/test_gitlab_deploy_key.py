@@ -1,4 +1,3 @@
-
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -18,10 +17,14 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from .gitlab import (GitlabModuleTestCase,
-                         python_version_match_requirement,
-                         resp_get_project, resp_find_project_deploy_key,
-                         resp_create_project_deploy_key, resp_delete_project_deploy_key)
+    from .gitlab import (
+        GitlabModuleTestCase,
+        python_version_match_requirement,
+        resp_get_project,
+        resp_find_project_deploy_key,
+        resp_create_project_deploy_key,
+        resp_delete_project_deploy_key,
+    )
 
     # GitLab module requirements
     if python_version_match_requirement():
@@ -67,11 +70,16 @@ class TestGitlabDeployKey(GitlabModuleTestCase):
     def test_create_deploy_key(self):
         project = self.gitlab_instance.projects.get(1)
 
-        deploy_key = self.moduleUtil.create_deploy_key(project, {"title": "Public key",
-                                                                 "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM"
-                                                                 "4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxc"
-                                                                 "KDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfD"
-                                                                 "zpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="})
+        deploy_key = self.moduleUtil.create_deploy_key(
+            project,
+            {
+                "title": "Public key",
+                "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM"
+                "4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxc"
+                "KDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfD"
+                "zpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0=",
+            },
+        )
 
         self.assertEqual(type(deploy_key), ProjectKey)
         self.assertEqual(deploy_key.title, "Public key")

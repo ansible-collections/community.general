@@ -98,7 +98,6 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             user=dict(required=True),
@@ -106,52 +105,52 @@ def main():
             to=dict(required=True),
             msg=dict(required=True),
             host=dict(),
-            port=dict(default=5222, type='int'),
+            port=dict(default=5222, type="int"),
             encoding=dict(),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not HAS_XMPP:
-        module.fail_json(msg=missing_required_lib('xmpppy'), exception=XMPP_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("xmpppy"), exception=XMPP_IMP_ERR)
 
-    jid = xmpp.JID(module.params['user'])
+    jid = xmpp.JID(module.params["user"])
     user = jid.getNode()
     server = jid.getDomain()
-    port = module.params['port']
-    password = module.params['password']
+    port = module.params["port"]
+    password = module.params["password"]
     try:
-        to, nick = module.params['to'].split('/', 1)
+        to, nick = module.params["to"].split("/", 1)
     except ValueError:
-        to, nick = module.params['to'], None
+        to, nick = module.params["to"], None
 
-    if module.params['host']:
-        host = module.params['host']
+    if module.params["host"]:
+        host = module.params["host"]
     else:
         host = server
-    if module.params['encoding']:
-        xmpp.simplexml.ENCODING = module.params['encoding']
+    if module.params["encoding"]:
+        xmpp.simplexml.ENCODING = module.params["encoding"]
 
-    msg = xmpp.protocol.Message(body=module.params['msg'])
+    msg = xmpp.protocol.Message(body=module.params["msg"])
 
     try:
         conn = xmpp.Client(server, debug=[])
         if not conn.connect(server=(host, port)):
-            module.fail_json(rc=1, msg=f'Failed to connect to server: {server}')
-        if not conn.auth(user, password, 'Ansible'):
-            module.fail_json(rc=1, msg=f'Failed to authorize {user} on: {server}')
+            module.fail_json(rc=1, msg=f"Failed to connect to server: {server}")
+        if not conn.auth(user, password, "Ansible"):
+            module.fail_json(rc=1, msg=f"Failed to authorize {user} on: {server}")
         # some old servers require this, also the sleep following send
         conn.sendInitPresence(requestRoster=0)
 
         if nick:  # sending to room instead of user, need to join
-            msg.setType('groupchat')
-            msg.setTag('x', namespace='http://jabber.org/protocol/muc#user')
-            join = xmpp.Presence(to=module.params['to'])
-            join.setTag('x', namespace='http://jabber.org/protocol/muc')
+            msg.setType("groupchat")
+            msg.setTag("x", namespace="http://jabber.org/protocol/muc#user")
+            join = xmpp.Presence(to=module.params["to"])
+            join.setTag("x", namespace="http://jabber.org/protocol/muc")
             conn.send(join)
             time.sleep(1)
         else:
-            msg.setType('chat')
+            msg.setType("chat")
 
         msg.setTo(to)
         if not module.check_mode:
@@ -164,5 +163,5 @@ def main():
     module.exit_json(changed=False, to=to, user=user, msg=msg.getBody())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

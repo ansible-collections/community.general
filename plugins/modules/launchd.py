@@ -139,11 +139,11 @@ class ServiceState:
     @staticmethod
     def to_string(state):
         strings = {
-            ServiceState.UNKNOWN: 'unknown',
-            ServiceState.LOADED: 'loaded',
-            ServiceState.STOPPED: 'stopped',
-            ServiceState.STARTED: 'started',
-            ServiceState.UNLOADED: 'unloaded'
+            ServiceState.UNKNOWN: "unknown",
+            ServiceState.LOADED: "loaded",
+            ServiceState.STOPPED: "stopped",
+            ServiceState.STARTED: "started",
+            ServiceState.UNLOADED: "unloaded",
         }
         return strings[state]
 
@@ -155,15 +155,15 @@ class Plist:
         if filename is not None:
             self.__filename = filename
         else:
-            self.__filename = f'{service}.plist'
+            self.__filename = f"{service}.plist"
 
         state, pid, dummy, dummy = LaunchCtlList(module, self.__service).run()
 
         self.__file = self.__find_service_plist(self.__filename)
         if self.__file is None:
-            msg = f'Unable to find the plist file {self.__filename} for service {self.__service}'
+            msg = f"Unable to find the plist file {self.__filename} for service {self.__service}"
             if pid is None and state == ServiceState.UNLOADED:
-                msg += ' and it was not found among active services'
+                msg += " and it was not found among active services"
             module.fail_json(msg=msg)
         self.__update(module)
 
@@ -172,11 +172,11 @@ class Plist:
         """Finds the plist file associated with a service"""
 
         launchd_paths = [
-            os.path.join(os.getenv('HOME'), 'Library/LaunchAgents'),
-            '/Library/LaunchAgents',
-            '/Library/LaunchDaemons',
-            '/System/Library/LaunchAgents',
-            '/System/Library/LaunchDaemons'
+            os.path.join(os.getenv("HOME"), "Library/LaunchAgents"),
+            "/Library/LaunchAgents",
+            "/Library/LaunchDaemons",
+            "/System/Library/LaunchAgents",
+            "/System/Library/LaunchDaemons",
         ]
 
         for path in launchd_paths:
@@ -196,7 +196,7 @@ class Plist:
     def __read_plist_file(self, module):
         service_plist = {}
         try:
-            with open(self.__file, 'rb') as plist_fp:
+            with open(self.__file, "rb") as plist_fp:
                 service_plist = plistlib.load(plist_fp)
         except Exception as e:
             module.fail_json(msg=f"Failed to read plist file {self.__file} due to {e}")
@@ -207,23 +207,23 @@ class Plist:
             service_plist = {}
 
         try:
-            with open(self.__file, 'wb') as plist_fp:
+            with open(self.__file, "wb") as plist_fp:
                 plistlib.dump(service_plist, plist_fp)
         except Exception as e:
             module.fail_json(msg=f"Failed to write to plist file  {self.__file} due to {e}")
 
     def __handle_param_enabled(self, module):
-        if module.params['enabled'] is not None:
+        if module.params["enabled"] is not None:
             service_plist = self.__read_plist_file(module)
 
             # Enable/disable service startup at boot if requested
             # Launchctl does not expose functionality to set the RunAtLoad
             # attribute of a job definition. So we parse and modify the job
             # definition plist file directly for this purpose.
-            if module.params['enabled'] is not None:
-                enabled = service_plist.get('RunAtLoad', False)
-                if module.params['enabled'] != enabled:
-                    service_plist['RunAtLoad'] = module.params['enabled']
+            if module.params["enabled"] is not None:
+                enabled = service_plist.get("RunAtLoad", False)
+                if module.params["enabled"] != enabled:
+                    service_plist["RunAtLoad"] = module.params["enabled"]
 
                     # Update the plist with one of the changes done.
                     if not module.check_mode:
@@ -231,15 +231,15 @@ class Plist:
                         self.__changed = True
 
     def __handle_param_force_stop(self, module):
-        if module.params['force_stop'] is not None:
+        if module.params["force_stop"] is not None:
             service_plist = self.__read_plist_file(module)
 
             # Set KeepAlive to false in case force_stop is defined to avoid
             # that the service gets restarted when stopping was requested.
-            if module.params['force_stop'] is not None:
-                keep_alive = service_plist.get('KeepAlive', False)
-                if module.params['force_stop'] and keep_alive:
-                    service_plist['KeepAlive'] = not module.params['force_stop']
+            if module.params["force_stop"] is not None:
+                keep_alive = service_plist.get("KeepAlive", False)
+                if module.params["force_stop"] and keep_alive:
+                    service_plist["KeepAlive"] = not module.params["force_stop"]
 
                     # Update the plist with one of the changes done.
                     if not module.check_mode:
@@ -260,7 +260,7 @@ class LaunchCtlTask(metaclass=ABCMeta):
         self._module = module
         self._service = service
         self._plist = plist
-        self._launch = self._module.get_bin_path('launchctl', True)
+        self._launch = self._module.get_bin_path("launchctl", True)
 
     def run(self):
         """Runs a launchd command like 'load', 'unload', 'start', 'stop', etc.
@@ -276,15 +276,14 @@ class LaunchCtlTask(metaclass=ABCMeta):
     def get_state(self):
         rc, out, err = self._launchctl("list")
         if rc != 0:
-            self._module.fail_json(
-                msg=f'Failed to get status of {self._launch}')
+            self._module.fail_json(msg=f"Failed to get status of {self._launch}")
 
         state = ServiceState.UNLOADED
         service_pid = "-"
         status_code = None
         for line in out.splitlines():
             if line.strip():
-                pid, last_exit_code, label = line.split('\t')
+                pid, last_exit_code, label = line.split("\t")
                 if label.strip() == self._service:
                     service_pid = pid
                     status_code = last_exit_code
@@ -294,12 +293,12 @@ class LaunchCtlTask(metaclass=ABCMeta):
                     # negative of the signal which killed the job.  Thus,
                     # "-15" would indicate that the job was terminated with
                     # SIGTERM.
-                    if last_exit_code not in ['0', '-2', '-3', '-9', '-15']:
+                    if last_exit_code not in ["0", "-2", "-3", "-9", "-15"]:
                         # Something strange happened and we have no clue in
                         # which state the service is now. Therefore we mark
                         # the service state as UNKNOWN.
                         state = ServiceState.UNKNOWN
-                    elif pid != '-':
+                    elif pid != "-":
                         # PID seems to be an integer so we assume the service
                         # is started.
                         state = ServiceState.STARTED
@@ -339,11 +338,15 @@ class LaunchCtlTask(metaclass=ABCMeta):
         return self._launchctl("unload")
 
     def _launchctl(self, command):
-        service_or_plist = self._plist.get_file() if command in [
-            'load', 'unload'] else self._service if command in ['start', 'stop'] else ""
+        service_or_plist = (
+            self._plist.get_file()
+            if command in ["load", "unload"]
+            else self._service
+            if command in ["start", "stop"]
+            else ""
+        )
 
-        rc, out, err = self._module.run_command(
-            f'{self._launch} {command} {service_or_plist}')
+        rc, out, err = self._module.run_command(f"{self._launch} {command} {service_or_plist}")
 
         if rc != 0:
             msg = f"Unable to {command} '{self._service}' ({self._plist.get_file()}): '{err}'"
@@ -452,66 +455,68 @@ class LaunchCtlList(LaunchCtlTask):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            plist=dict(type='str'),
-            state=dict(type='str', choices=['reloaded', 'restarted', 'started', 'stopped', 'unloaded']),
-            enabled=dict(type='bool'),
-            force_stop=dict(type='bool', default=False),
+            name=dict(type="str", required=True),
+            plist=dict(type="str"),
+            state=dict(type="str", choices=["reloaded", "restarted", "started", "stopped", "unloaded"]),
+            enabled=dict(type="bool"),
+            force_stop=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
         required_one_of=[
-            ['state', 'enabled'],
+            ["state", "enabled"],
         ],
     )
 
-    service = module.params['name']
-    plist_filename = module.params['plist']
-    action = module.params['state']
+    service = module.params["name"]
+    plist_filename = module.params["plist"]
+    action = module.params["state"]
     rc = 0
-    out = err = ''
+    out = err = ""
     result = {
-        'name': service,
-        'changed': False,
-        'status': {},
+        "name": service,
+        "changed": False,
+        "status": {},
     }
 
     # We will tailor the plist file in case one of the options
     # (enabled, force_stop) was specified.
     plist = Plist(module, service, plist_filename)
-    result['changed'] = plist.is_changed()
+    result["changed"] = plist.is_changed()
 
     # Gather information about the service to be controlled.
     state, pid, dummy, dummy = LaunchCtlList(module, service).run()
-    result['status']['previous_state'] = ServiceState.to_string(state)
-    result['status']['previous_pid'] = pid
+    result["status"]["previous_state"] = ServiceState.to_string(state)
+    result["status"]["previous_pid"] = pid
 
     # Map the actions to specific tasks
     tasks = {
-        'started': LaunchCtlStart(module, service, plist),
-        'stopped': LaunchCtlStop(module, service, plist),
-        'restarted': LaunchCtlRestart(module, service, plist),
-        'reloaded': LaunchCtlReload(module, service, plist),
-        'unloaded': LaunchCtlUnload(module, service, plist)
+        "started": LaunchCtlStart(module, service, plist),
+        "stopped": LaunchCtlStop(module, service, plist),
+        "restarted": LaunchCtlRestart(module, service, plist),
+        "reloaded": LaunchCtlReload(module, service, plist),
+        "unloaded": LaunchCtlUnload(module, service, plist),
     }
 
-    status_code = '0'
+    status_code = "0"
     # Run the requested task
     if not module.check_mode:
         state, pid, status_code, err = tasks[action].run()
 
-    result['status']['current_state'] = ServiceState.to_string(state)
-    result['status']['current_pid'] = pid
-    result['status']['status_code'] = status_code
-    result['status']['error'] = err
+    result["status"]["current_state"] = ServiceState.to_string(state)
+    result["status"]["current_pid"] = pid
+    result["status"]["status_code"] = status_code
+    result["status"]["error"] = err
 
-    if (result['status']['current_state'] != result['status']['previous_state'] or
-            result['status']['current_pid'] != result['status']['previous_pid']):
-        result['changed'] = True
+    if (
+        result["status"]["current_state"] != result["status"]["previous_state"]
+        or result["status"]["current_pid"] != result["status"]["previous_pid"]
+    ):
+        result["changed"] = True
     if module.check_mode:
-        if result['status']['current_state'] != action:
-            result['changed'] = True
+        if result["status"]["current_state"] != action:
+            result["changed"] = True
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

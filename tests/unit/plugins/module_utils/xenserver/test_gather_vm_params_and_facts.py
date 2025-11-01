@@ -25,7 +25,7 @@ testcase_gather_vm_params_and_facts = {
 }
 
 
-@pytest.mark.parametrize('vm_ref', testcase_bad_xenapi_refs['params'], ids=testcase_bad_xenapi_refs['ids'])  # type: ignore
+@pytest.mark.parametrize("vm_ref", testcase_bad_xenapi_refs["params"], ids=testcase_bad_xenapi_refs["ids"])  # type: ignore
 def test_gather_vm_params_bad_vm_ref(fake_ansible_module, xenserver, vm_ref):
     """Tests return of empty dict on bad vm_ref."""
     assert xenserver.gather_vm_params(fake_ansible_module, vm_ref) == {}
@@ -37,13 +37,15 @@ def test_gather_vm_facts_no_vm_params(fake_ansible_module, xenserver):
     assert xenserver.gather_vm_facts(fake_ansible_module, {}) == {}
 
 
-@pytest.mark.parametrize('fixture_data_from_file',
-                         testcase_gather_vm_params_and_facts['params'],  # type: ignore
-                         ids=testcase_gather_vm_params_and_facts['ids'],  # type: ignore
-                         indirect=True)
+@pytest.mark.parametrize(
+    "fixture_data_from_file",
+    testcase_gather_vm_params_and_facts["params"],  # type: ignore
+    ids=testcase_gather_vm_params_and_facts["ids"],  # type: ignore
+    indirect=True,
+)
 def test_gather_vm_params_and_facts(mocker, fake_ansible_module, XenAPI, xenserver, fixture_data_from_file):
     """Tests proper parsing of VM parameters and facts."""
-    mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
+    mocked_xenapi = mocker.patch.object(XenAPI.Session, "xenapi", create=True)
 
     if "params" in list(fixture_data_from_file.keys())[0]:
         params_file = list(fixture_data_from_file.keys())[0]
@@ -53,21 +55,29 @@ def test_gather_vm_params_and_facts(mocker, fake_ansible_module, XenAPI, xenserv
         facts_file = list(fixture_data_from_file.keys())[0]
 
     mocked_returns = {
-        "VM.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['VM'][obj_ref],
-        "VM_metrics.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['VM_metrics'][obj_ref],
-        "VM_guest_metrics.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['VM_guest_metrics'][obj_ref],
-        "VBD.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['VBD'][obj_ref],
-        "VDI.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['VDI'][obj_ref],
-        "SR.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['SR'][obj_ref],
-        "VIF.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['VIF'][obj_ref],
-        "network.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['network'][obj_ref],
-        "host.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]['host'][obj_ref],
+        "VM.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["VM"][obj_ref],
+        "VM_metrics.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["VM_metrics"][obj_ref],
+        "VM_guest_metrics.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file][
+            "VM_guest_metrics"
+        ][obj_ref],
+        "VBD.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["VBD"][obj_ref],
+        "VDI.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["VDI"][obj_ref],
+        "SR.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["SR"][obj_ref],
+        "VIF.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["VIF"][obj_ref],
+        "network.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["network"][obj_ref],
+        "host.get_record.side_effect": lambda obj_ref: fixture_data_from_file[params_file]["host"][obj_ref],
     }
 
     mocked_xenapi.configure_mock(**mocked_returns)
 
-    mocker.patch('ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version', return_value=[7, 2, 0])
+    mocker.patch(
+        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        return_value=[7, 2, 0],
+    )
 
-    vm_ref = list(fixture_data_from_file[params_file]['VM'].keys())[0]
+    vm_ref = list(fixture_data_from_file[params_file]["VM"].keys())[0]
 
-    assert xenserver.gather_vm_facts(fake_ansible_module, xenserver.gather_vm_params(fake_ansible_module, vm_ref)) == fixture_data_from_file[facts_file]
+    assert (
+        xenserver.gather_vm_facts(fake_ansible_module, xenserver.gather_vm_params(fake_ansible_module, vm_ref))
+        == fixture_data_from_file[facts_file]
+    )

@@ -86,9 +86,9 @@ class SimpleinitMSB:
 
     def __init__(self, module):
         self.module = module
-        self.name = module.params['name']
-        self.state = module.params['state']
-        self.enable = module.params['enabled']
+        self.name = module.params["name"]
+        self.state = module.params["state"]
+        self.enable = module.params["enabled"]
         self.changed = False
         self.running = None
         self.action = None
@@ -112,54 +112,54 @@ class SimpleinitMSB:
         elif self.state == "restarted":
             self.svc_change = True
         if self.module.check_mode and self.svc_change:
-            self.module.exit_json(changed=True, msg='service state changed')
+            self.module.exit_json(changed=True, msg="service state changed")
 
     def modify_service_state(self):
         # Only do something if state will change
         if self.svc_change:
             # Control service
-            if self.state in ['started', 'running']:
+            if self.state in ["started", "running"]:
                 self.action = "start"
-            elif not self.running and self.state == 'reloaded':
+            elif not self.running and self.state == "reloaded":
                 self.action = "start"
-            elif self.state == 'stopped':
+            elif self.state == "stopped":
                 self.action = "stop"
-            elif self.state == 'reloaded':
+            elif self.state == "reloaded":
                 self.action = "reload"
-            elif self.state == 'restarted':
+            elif self.state == "restarted":
                 self.action = "restart"
 
             if self.module.check_mode:
-                self.module.exit_json(changed=True, msg='changing service state')
+                self.module.exit_json(changed=True, msg="changing service state")
 
             return self.service_control()
         else:
             # If nothing needs to change just say all is well
             rc = 0
-            err = ''
-            out = ''
+            err = ""
+            out = ""
             return rc, out, err
 
     def get_service_tools(self):
-        paths = ['/sbin', '/usr/sbin', '/bin', '/usr/bin']
-        binaries = ['telinit']
+        paths = ["/sbin", "/usr/sbin", "/bin", "/usr/bin"]
+        binaries = ["telinit"]
         location = dict()
 
         for binary in binaries:
             location[binary] = self.module.get_bin_path(binary, opt_dirs=paths)
 
-        if location.get('telinit', False) and os.path.exists("/etc/init.d/smgl_init"):
-            self.telinit_cmd = location['telinit']
+        if location.get("telinit", False) and os.path.exists("/etc/init.d/smgl_init"):
+            self.telinit_cmd = location["telinit"]
 
         if self.telinit_cmd is None:
-            self.module.fail_json(msg='cannot find telinit script for simpleinit-msb, aborting...')
+            self.module.fail_json(msg="cannot find telinit script for simpleinit-msb, aborting...")
 
     def get_service_status(self):
         self.action = "status"
         rc, status_stdout, status_stderr = self.service_control()
 
-        if self.running is None and status_stdout.count('\n') <= 1:
-            cleanout = status_stdout.lower().replace(self.name.lower(), '')
+        if self.running is None and status_stdout.count("\n") <= 1:
+            cleanout = status_stdout.lower().replace(self.name.lower(), "")
 
             if "is not running" in cleanout:
                 self.running = False
@@ -180,10 +180,10 @@ class SimpleinitMSB:
         self.changed = True
 
         for line in err.splitlines():
-            if self.enable and line.find('already enabled') != -1:
+            if self.enable and line.find("already enabled") != -1:
                 self.changed = False
                 break
-            if not self.enable and line.find('already disabled') != -1:
+            if not self.enable and line.find("already disabled") != -1:
                 self.changed = False
                 break
 
@@ -199,7 +199,7 @@ class SimpleinitMSB:
 
         service_enabled = False if self.enable else True
 
-        rex = re.compile(rf'^{self.name}$')
+        rex = re.compile(rf"^{self.name}$")
 
         for line in out.splitlines():
             if rex.match(line):
@@ -213,7 +213,7 @@ class SimpleinitMSB:
 
         service_exists = False
 
-        rex = re.compile(rf'^\w+\s+{self.name}$')
+        rex = re.compile(rf"^\w+\s+{self.name}$")
 
         for line in out.splitlines():
             if rex.match(line):
@@ -221,7 +221,7 @@ class SimpleinitMSB:
                 break
 
         if not service_exists:
-            self.module.fail_json(msg=f'telinit could not find the requested service: {self.name}')
+            self.module.fail_json(msg=f"telinit could not find the requested service: {self.name}")
 
     def service_control(self):
         self.service_exists()
@@ -236,12 +236,12 @@ class SimpleinitMSB:
 def build_module():
     return AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=['service']),
-            state=dict(choices=['running', 'started', 'stopped', 'restarted', 'reloaded']),
-            enabled=dict(type='bool'),
+            name=dict(required=True, aliases=["service"]),
+            state=dict(choices=["running", "started", "stopped", "restarted", "reloaded"]),
+            enabled=dict(type="bool"),
         ),
         supports_check_mode=True,
-        required_one_of=[['state', 'enabled']],
+        required_one_of=[["state", "enabled"]],
     )
 
 
@@ -251,25 +251,25 @@ def main():
     service = SimpleinitMSB(module)
 
     rc = 0
-    out = ''
-    err = ''
+    out = ""
+    err = ""
     result = {}
-    result['name'] = service.name
+    result["name"] = service.name
 
     # Find service management tools
     service.get_service_tools()
 
     # Enable/disable service startup at boot if requested
-    if service.module.params['enabled'] is not None:
+    if service.module.params["enabled"] is not None:
         service.service_enable()
-        result['enabled'] = service.enable
+        result["enabled"] = service.enable
 
-    if module.params['state'] is None:
+    if module.params["state"] is None:
         # Not changing the running state, so bail out now.
-        result['changed'] = service.changed
+        result["changed"] = service.changed
         module.exit_json(**result)
 
-    result['state'] = service.state
+    result["state"] = service.state
 
     service.get_service_status()
 
@@ -285,28 +285,28 @@ def main():
         else:
             module.fail_json(msg=out)
 
-    result['changed'] = service.changed | service.svc_change
-    if service.module.params['enabled'] is not None:
-        result['enabled'] = service.module.params['enabled']
+    result["changed"] = service.changed | service.svc_change
+    if service.module.params["enabled"] is not None:
+        result["enabled"] = service.module.params["enabled"]
 
-    if not service.module.params['state']:
+    if not service.module.params["state"]:
         status = service.get_service_status()
         if status is None:
-            result['state'] = 'absent'
+            result["state"] = "absent"
         elif status is False:
-            result['state'] = 'started'
+            result["state"] = "started"
         else:
-            result['state'] = 'stopped'
+            result["state"] = "stopped"
     else:
         # as we may have just bounced the service the service command may not
         # report accurate state at this moment so just show what we ran
-        if service.module.params['state'] in ['started', 'restarted', 'running', 'reloaded']:
-            result['state'] = 'started'
+        if service.module.params["state"] in ["started", "restarted", "running", "reloaded"]:
+            result["state"] = "started"
         else:
-            result['state'] = 'stopped'
+            result["state"] = "stopped"
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

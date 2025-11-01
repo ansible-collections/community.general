@@ -68,13 +68,16 @@ msg:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.redis import (
-    fail_imports, redis_auth_argument_spec, RedisAnsible)
+    fail_imports,
+    redis_auth_argument_spec,
+    RedisAnsible,
+)
 
 
 def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
-        key=dict(type='str', required=True, no_log=False),
+        key=dict(type="str", required=True, no_log=False),
     )
     module_args.update(redis_auth_args)
 
@@ -86,27 +89,27 @@ def main():
 
     redis = RedisAnsible(module)
 
-    key = module.params['key']
-    result = {'changed': False}
+    key = module.params["key"]
+    result = {"changed": False}
 
     value = None
     try:
         value = redis.connection.get(key)
     except Exception as e:
         msg = f'Failed to get value of key "{key}" with exception: {e}'
-        result['msg'] = msg
+        result["msg"] = msg
         module.fail_json(**result)
 
     if value is None:
         msg = f'Key "{key}" does not exist in database'
-        result['exists'] = False
+        result["exists"] = False
     else:
         msg = f'Got key "{key}"'
-        result['value'] = value
-        result['exists'] = True
-    result['msg'] = msg
+        result["value"] = value
+        result["exists"] = True
+    result["msg"] = msg
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

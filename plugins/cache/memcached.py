@@ -59,6 +59,7 @@ from ansible.utils.display import Display
 
 try:
     import memcache
+
     HAS_MEMCACHE = True
 except ImportError:
     HAS_MEMCACHE = False
@@ -75,7 +76,7 @@ class ProxyClientPool:
     """
 
     def __init__(self, *args, **kwargs):
-        self.max_connections = kwargs.pop('max_connections', 1024)
+        self.max_connections = kwargs.pop("max_connections", 1024)
         self.connection_args = args
         self.connection_kwargs = kwargs
         self.reset()
@@ -123,6 +124,7 @@ class ProxyClientPool:
     def __getattr__(self, name):
         def wrapped(*args, **kwargs):
             return self._proxy_client(name, *args, **kwargs)
+
         return wrapped
 
     def _proxy_client(self, name, *args, **kwargs):
@@ -139,7 +141,8 @@ class CacheModuleKeys(MutableSet):
     A set subclass that keeps track of insertion time and persists
     the set in memcached.
     """
-    PREFIX = 'ansible_cache_keys'
+
+    PREFIX = "ansible_cache_keys"
 
     def __init__(self, cache, *args, **kwargs):
         self._cache = cache
@@ -171,15 +174,14 @@ class CacheModuleKeys(MutableSet):
 
 
 class CacheModule(BaseCacheModule):
-
     def __init__(self, *args, **kwargs):
-        connection = ['127.0.0.1:11211']
+        connection = ["127.0.0.1:11211"]
 
         super().__init__(*args, **kwargs)
-        if self.get_option('_uri'):
-            connection = self.get_option('_uri')
-        self._timeout = self.get_option('_timeout')
-        self._prefix = self.get_option('_prefix')
+        if self.get_option("_uri"):
+            connection = self.get_option("_uri")
+        self._timeout = self.get_option("_timeout")
+        self._prefix = self.get_option("_prefix")
 
         if not HAS_MEMCACHE:
             raise AnsibleError("python-memcached is required for the memcached fact cache")

@@ -97,13 +97,13 @@ class SnapAlias(StateModuleHelper):
 
     module = dict(
         argument_spec={
-            'state': dict(type='str', choices=['absent', 'present'], default='present'),
-            'name': dict(type='str'),
-            'alias': dict(type='list', elements='str', aliases=['aliases']),
+            "state": dict(type="str", choices=["absent", "present"], default="present"),
+            "name": dict(type="str"),
+            "alias": dict(type="list", elements="str", aliases=["aliases"]),
         },
         required_if=[
-            ('state', 'present', ['name', 'alias']),
-            ('state', 'absent', ['name', 'alias'], True),
+            ("state", "present", ["name", "alias"]),
+            ("state", "absent", ["name", "alias"], True),
         ],
         supports_check_mode=True,
     )
@@ -181,5 +181,5 @@ def main():
     SnapAlias.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

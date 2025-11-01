@@ -83,6 +83,7 @@ try:
     import ovh
     import ovh.exceptions
     from ovh.exceptions import APIError
+
     HAS_OVH = True
 except ImportError:
     HAS_OVH = False
@@ -101,59 +102,59 @@ def main():
             application_secret=dict(no_log=True),
             consumer_key=dict(no_log=True),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     # Get parameters
-    project_id = module.params.get('project_id')
-    instance_id = module.params.get('instance_id')
-    endpoint = module.params.get('endpoint')
-    application_key = module.params.get('application_key')
-    application_secret = module.params.get('application_secret')
-    consumer_key = module.params.get('consumer_key')
+    project_id = module.params.get("project_id")
+    instance_id = module.params.get("instance_id")
+    endpoint = module.params.get("endpoint")
+    application_key = module.params.get("application_key")
+    application_secret = module.params.get("application_secret")
+    consumer_key = module.params.get("consumer_key")
     project = ""
     instance = ""
     ovh_billing_status = ""
 
     if not HAS_OVH:
-        module.fail_json(msg='python-ovh is required to run this module, see https://github.com/ovh/python-ovh')
+        module.fail_json(msg="python-ovh is required to run this module, see https://github.com/ovh/python-ovh")
 
     # Connect to OVH API
     client = ovh.Client(
         endpoint=endpoint,
         application_key=application_key,
         application_secret=application_secret,
-        consumer_key=consumer_key
+        consumer_key=consumer_key,
     )
 
     # Check that the instance exists
     try:
-        project = client.get(f'/cloud/project/{project_id}')
+        project = client.get(f"/cloud/project/{project_id}")
     except ovh.exceptions.ResourceNotFoundError:
-        module.fail_json(msg=f'project {project_id} does not exist')
+        module.fail_json(msg=f"project {project_id} does not exist")
 
     # Check that the instance exists
     try:
-        instance = client.get(f'/cloud/project/{project_id}/instance/{instance_id}')
+        instance = client.get(f"/cloud/project/{project_id}/instance/{instance_id}")
     except ovh.exceptions.ResourceNotFoundError:
-        module.fail_json(msg=f'instance {instance_id} does not exist in project {project_id}')
+        module.fail_json(msg=f"instance {instance_id} does not exist in project {project_id}")
 
     # Is monthlyBilling already enabled or pending ?
-    if instance['monthlyBilling'] is not None:
-        if instance['monthlyBilling']['status'] in ['ok', 'activationPending']:
-            module.exit_json(changed=False, ovh_billing_status=instance['monthlyBilling'])
+    if instance["monthlyBilling"] is not None:
+        if instance["monthlyBilling"]["status"] in ["ok", "activationPending"]:
+            module.exit_json(changed=False, ovh_billing_status=instance["monthlyBilling"])
 
     if module.check_mode:
         module.exit_json(changed=True, msg="Dry Run!")
 
     try:
-        ovh_billing_status = client.post(f'/cloud/project/{project_id}/instance/{instance_id}/activeMonthlyBilling')
-        module.exit_json(changed=True, ovh_billing_status=ovh_billing_status['monthlyBilling'])
+        ovh_billing_status = client.post(f"/cloud/project/{project_id}/instance/{instance_id}/activeMonthlyBilling")
+        module.exit_json(changed=True, ovh_billing_status=ovh_billing_status["monthlyBilling"])
     except APIError as apiError:
         module.fail_json(changed=False, msg=f"Failed to call OVH API: {apiError}")
 
     # We should never reach here
-    module.fail_json(msg='Internal ovh_monthly_billing module error')
+    module.fail_json(msg="Internal ovh_monthly_billing module error")
 
 
 if __name__ == "__main__":

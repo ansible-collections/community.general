@@ -108,6 +108,7 @@ try:
     import dnf.cli
     import dnf.repodict
     from dnf.conf import Conf
+
     HAS_DNF_PACKAGES = True
     DNF_IMP_ERR = None
 except ImportError:
@@ -159,7 +160,7 @@ class CoprModule:
     @property
     def short_chroot(self):
         """str: Chroot (distribution-version-architecture) shorten to distribution-version."""
-        return self.chroot.rsplit('-', 1)[0]
+        return self.chroot.rsplit("-", 1)[0]
 
     @property
     def arch(self):
@@ -229,7 +230,7 @@ class CoprModule:
         Returns:
             Information about the repository.
         """
-        distribution, version = self.short_chroot.split('-', 1)
+        distribution, version = self.short_chroot.split("-", 1)
         chroot = self.short_chroot
         while True:
             repo_info, status_code = self._get(chroot)
@@ -247,13 +248,9 @@ class CoprModule:
                 distribution = "epel"
             else:
                 if str(status_code) != "404":
-                    self.raise_exception(
-                        "This repository does not have any builds yet so you cannot enable it now."
-                    )
+                    self.raise_exception("This repository does not have any builds yet so you cannot enable it now.")
                 else:
-                    self.raise_exception(
-                        f"Chroot {self.chroot} does not exist in {self.name}"
-                    )
+                    self.raise_exception(f"Chroot {self.chroot} does not exist in {self.name}")
 
     def _enable_repo(self, repo_filename_path, repo_content=None):
         """Write information to a repo file.
@@ -269,12 +266,16 @@ class CoprModule:
         if not repo_content:
             repo_content = self._download_repo_info()
         if self.ansible_module.params["includepkgs"]:
-            includepkgs_value = ','.join(self.ansible_module.params['includepkgs'])
-            repo_content_strip = repo_content.rstrip('\n')  # Python 3.11 does not allow backslash chars within f-string expressions
+            includepkgs_value = ",".join(self.ansible_module.params["includepkgs"])
+            repo_content_strip = repo_content.rstrip(
+                "\n"
+            )  # Python 3.11 does not allow backslash chars within f-string expressions
             repo_content = f"{repo_content_strip}\nincludepkgs={includepkgs_value}\n"
         if self.ansible_module.params["excludepkgs"]:
-            excludepkgs_value = ','.join(self.ansible_module.params['excludepkgs'])
-            repo_content_strip = repo_content.rstrip('\n')  # Python 3.11 does not allow backslash chars within f-string expressions
+            excludepkgs_value = ",".join(self.ansible_module.params["excludepkgs"])
+            repo_content_strip = repo_content.rstrip(
+                "\n"
+            )  # Python 3.11 does not allow backslash chars within f-string expressions
             repo_content = f"{repo_content_strip}\nexcludepkgs={excludepkgs_value}\n"
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
@@ -352,13 +353,14 @@ class CoprModule:
             with open(repo_filename_path, "r") as file:
                 repo_content_file = file.read()
             if repo_content_file != repo_content_api:
-                if not self.resolve_differences(
-                    repo_content_file, repo_content_api, repo_filename_path
-                ):
+                if not self.resolve_differences(repo_content_file, repo_content_api, repo_filename_path):
                     return False
             if not self.check_mode:
                 self.base.conf.write_raw_configfile(
-                    repo.repofile, repo_id, self.base.conf.substitutions, {"enabled": "0"},
+                    repo.repofile,
+                    repo_id,
+                    self.base.conf.substitutions,
+                    {"enabled": "0"},
                 )
         return True
 
@@ -487,8 +489,8 @@ def run_module():
         name=dict(type="str", required=True),
         state=dict(type="str", choices=["enabled", "disabled", "absent"], default="enabled"),
         chroot=dict(type="str"),
-        includepkgs=dict(type='list', elements="str"),
-        excludepkgs=dict(type='list', elements="str"),
+        includepkgs=dict(type="list", elements="str"),
+        excludepkgs=dict(type="list", elements="str"),
     )
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     params = module.params

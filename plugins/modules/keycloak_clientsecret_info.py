@@ -128,9 +128,14 @@ clientsecret_info:
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    KeycloakAPI, KeycloakError, get_token)
+    KeycloakAPI,
+    KeycloakError,
+    get_token,
+)
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak_clientsecret import (
-    keycloak_clientsecret_module, keycloak_clientsecret_module_resolve_params)
+    keycloak_clientsecret_module,
+    keycloak_clientsecret_module_resolve_params,
+)
 
 
 def main():
@@ -154,13 +159,10 @@ def main():
 
     clientsecret = kc.get_clientsecret(id=id, realm=realm)
 
-    result = {
-        'clientsecret_info': clientsecret,
-        'msg': f'Get client secret successful for ID {id}'
-    }
+    result = {"clientsecret_info": clientsecret, "msg": f"Get client secret successful for ID {id}"}
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

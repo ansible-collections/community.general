@@ -131,12 +131,12 @@ def db_delete(conn, cursor, db):
 
 def db_import(conn, cursor, module, db, target):
     if os.path.isfile(target):
-        with open(target, 'r') as backup:
+        with open(target, "r") as backup:
             sqlQuery = f"USE [{db}]\n"
             for line in backup:
                 if line is None:
                     break
-                elif line.startswith('GO'):
+                elif line.startswith("GO"):
                     cursor.execute(sqlQuery)
                     sqlQuery = f"USE [{db}]\n"
                 else:
@@ -151,30 +151,29 @@ def db_import(conn, cursor, module, db, target):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=['db']),
-            login_user=dict(default=''),
-            login_password=dict(default='', no_log=True),
+            name=dict(required=True, aliases=["db"]),
+            login_user=dict(default=""),
+            login_password=dict(default="", no_log=True),
             login_host=dict(required=True),
-            login_port=dict(default='1433'),
+            login_port=dict(default="1433"),
             target=dict(),
-            autocommit=dict(type='bool', default=False),
-            state=dict(
-                default='present', choices=['present', 'absent', 'import'])
+            autocommit=dict(type="bool", default=False),
+            state=dict(default="present", choices=["present", "absent", "import"]),
         )
     )
 
     if not mssql_found:
-        module.fail_json(msg=missing_required_lib('pymssql'), exception=PYMSSQL_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pymssql"), exception=PYMSSQL_IMP_ERR)
 
-    db = module.params['name']
-    state = module.params['state']
-    autocommit = module.params['autocommit']
+    db = module.params["name"]
+    state = module.params["state"]
+    autocommit = module.params["autocommit"]
     target = module.params["target"]
 
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    login_host = module.params['login_host']
-    login_port = module.params['login_port']
+    login_user = module.params["login_user"]
+    login_password = module.params["login_password"]
+    login_host = module.params["login_host"]
+    login_port = module.params["login_port"]
 
     login_querystring = login_host
     if login_port != "1433":
@@ -184,15 +183,17 @@ def main():
         module.fail_json(msg="when supplying login_user arguments login_password must be provided")
 
     try:
-        conn = pymssql.connect(user=login_user, password=login_password, host=login_querystring, database='master')
+        conn = pymssql.connect(user=login_user, password=login_password, host=login_querystring, database="master")
         cursor = conn.cursor()
     except Exception as e:
         if "Unknown database" in str(e):
             errno, errstr = e.args
             module.fail_json(msg=f"ERROR: {errno} {errstr}")
         else:
-            module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
-                                 "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+            module.fail_json(
+                msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
+                "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf"
+            )
 
     conn.autocommit(True)
     changed = False
@@ -234,5 +235,5 @@ def main():
     module.exit_json(changed=changed, db=db)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

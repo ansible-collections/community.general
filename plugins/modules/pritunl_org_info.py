@@ -109,11 +109,7 @@ def get_pritunl_organizations(module):
 def main():
     argument_spec = pritunl_argument_spec()
 
-    argument_spec.update(
-        dict(
-            organization=dict(type="str", aliases=["org"])
-        )
-    )
+    argument_spec.update(dict(organization=dict(type="str", aliases=["org"])))
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 

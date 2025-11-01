@@ -17,11 +17,16 @@ from ansible.plugins.loader import lookup_loader
     (
         (item["vault_name"], item["queries"], item.get("kwargs", {}), item["output"], item["expected"])
         for item in SSH_KEY_MOCK_ENTRIES
-    )
+    ),
 )
 def test_ssh_key(mocker, vault, queries, kwargs, output, expected):
-    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True)
-    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run", return_value=(0, json.dumps(output), ""))
+    mocker.patch(
+        "ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run",
+        return_value=(0, json.dumps(output), ""),
+    )
 
     op_lookup = lookup_loader.get("community.general.onepassword_ssh_key")
     result = op_lookup.run(queries, vault=vault, **kwargs)

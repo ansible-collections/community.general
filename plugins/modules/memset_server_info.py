@@ -241,37 +241,37 @@ from ansible_collections.community.general.plugins.module_utils.memset import me
 
 
 def get_facts(args=None):
-    '''
+    """
     Performs a simple API call and returns a JSON blob.
-    '''
+    """
     retvals, payload = dict(), dict()
     has_changed, has_failed = False, False
     msg, stderr, memset_api = None, None, None
 
-    payload['name'] = args['name']
+    payload["name"] = args["name"]
 
-    api_method = 'server.info'
-    has_failed, msg, response = memset_api_call(api_key=args['api_key'], api_method=api_method, payload=payload)
+    api_method = "server.info"
+    has_failed, msg, response = memset_api_call(api_key=args["api_key"], api_method=api_method, payload=payload)
 
     if has_failed:
         # this is the first time the API is called; incorrect credentials will
         # manifest themselves at this point so we need to ensure the user is
         # informed of the reason.
-        retvals['failed'] = has_failed
-        retvals['msg'] = msg
+        retvals["failed"] = has_failed
+        retvals["msg"] = msg
         if response.status_code is not None:
-            retvals['stderr'] = f"API returned an error: {response.status_code}"
+            retvals["stderr"] = f"API returned an error: {response.status_code}"
         else:
-            retvals['stderr'] = f"{response.stderr}"
+            retvals["stderr"] = f"{response.stderr}"
         return retvals
 
     # we don't want to return the same thing twice
     msg = None
     memset_api = response.json()
 
-    retvals['changed'] = has_changed
-    retvals['failed'] = has_failed
-    for val in ['msg', 'memset_api']:
+    retvals["changed"] = has_changed
+    retvals["failed"] = has_failed
+    for val in ["msg", "memset_api"]:
         if val is not None:
             retvals[val] = eval(val)
 
@@ -281,10 +281,7 @@ def get_facts(args=None):
 def main():
     global module
     module = AnsibleModule(
-        argument_spec=dict(
-            api_key=dict(required=True, type='str', no_log=True),
-            name=dict(required=True, type='str')
-        ),
+        argument_spec=dict(api_key=dict(required=True, type="str", no_log=True), name=dict(required=True, type="str")),
         supports_check_mode=True,
     )
 
@@ -293,11 +290,11 @@ def main():
 
     retvals = get_facts(args)
 
-    if retvals['failed']:
+    if retvals["failed"]:
         module.fail_json(**retvals)
     else:
         module.exit_json(**retvals)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

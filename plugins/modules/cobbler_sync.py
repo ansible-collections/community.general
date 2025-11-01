@@ -84,25 +84,25 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(type='str', default='127.0.0.1'),
-            port=dict(type='int'),
-            username=dict(type='str', default='cobbler'),
-            password=dict(type='str', no_log=True),
-            use_ssl=dict(type='bool', default=True),
-            validate_certs=dict(type='bool', default=True),
+            host=dict(type="str", default="127.0.0.1"),
+            port=dict(type="int"),
+            username=dict(type="str", default="cobbler"),
+            password=dict(type="str", no_log=True),
+            use_ssl=dict(type="bool", default=True),
+            validate_certs=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
     )
 
-    username = module.params['username']
-    password = module.params['password']
-    port = module.params['port']
-    use_ssl = module.params['use_ssl']
-    validate_certs = module.params['validate_certs']
+    username = module.params["username"]
+    password = module.params["password"]
+    port = module.params["port"]
+    use_ssl = module.params["use_ssl"]
+    validate_certs = module.params["validate_certs"]
 
-    module.params['proto'] = 'https' if use_ssl else 'http'
+    module.params["proto"] = "https" if use_ssl else "http"
     if not port:
-        module.params['port'] = '443' if use_ssl else '80'
+        module.params["port"] = "443" if use_ssl else "80"
 
     result = dict(
         changed=True,
@@ -121,7 +121,7 @@ def main():
             # Handle target environment that doesn't support HTTPS verification
             ssl._create_default_https_context = ssl._create_unverified_context
 
-    url = '{proto}://{host}:{port}/cobbler_api'.format(**module.params)
+    url = "{proto}://{host}:{port}/cobbler_api".format(**module.params)
     if ssl_context:
         conn = xmlrpc_client.ServerProxy(url, context=ssl_context)
     else:
@@ -130,7 +130,11 @@ def main():
     try:
         token = conn.login(username, password)
     except xmlrpc_client.Fault as e:
-        module.fail_json(msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(url=url, error=to_text(e), **module.params))
+        module.fail_json(
+            msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(
+                url=url, error=to_text(e), **module.params
+            )
+        )
     except Exception as e:
         module.fail_json(msg=f"Connection to '{url}' failed. {e}")
 
@@ -144,5 +148,5 @@ def main():
     module.exit_json(elapsed=elapsed.seconds, **result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

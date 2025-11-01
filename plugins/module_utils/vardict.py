@@ -94,7 +94,7 @@ class _Variable:
     @property
     def diff_result(self):
         if self.diff and self.has_changed:
-            return {'before': self.initial_value, 'after': self.value}
+            return {"before": self.initial_value, "after": self.value}
         return
 
     def __str__(self):
@@ -105,7 +105,19 @@ class _Variable:
 
 
 class VarDict:
-    reserved_names = ('__vars__', '_var', 'var', 'set_meta', 'get_meta', 'set', 'output', 'diff', 'facts', 'has_changed', 'as_dict')
+    reserved_names = (
+        "__vars__",
+        "_var",
+        "var",
+        "set_meta",
+        "get_meta",
+        "set",
+        "output",
+        "diff",
+        "facts",
+        "has_changed",
+        "as_dict",
+    )
 
     def __init__(self):
         self.__vars__ = dict()
@@ -123,7 +135,7 @@ class VarDict:
             return getattr(super(), item)
 
     def __setattr__(self, key, value):
-        if key == '__vars__':
+        if key == "__vars__":
             super().__setattr__(key, value)
         else:
             self.set(key, value)
@@ -177,11 +189,13 @@ class VarDict:
         return {n: v.value for n, v in self.__vars__.items() if v.output and v.is_visible(verbosity)}
 
     def diff(self, verbosity=0):
-        diff_results = [(n, v.diff_result) for n, v in self.__vars__.items() if v.diff_result and v.is_visible(verbosity)]
+        diff_results = [
+            (n, v.diff_result) for n, v in self.__vars__.items() if v.diff_result and v.is_visible(verbosity)
+        ]
         if diff_results:
-            before = {n: dr['before'] for n, dr in diff_results}
-            after = {n: dr['after'] for n, dr in diff_results}
-            return {'before': before, 'after': after}
+            before = {n: dr["before"] for n, dr in diff_results}
+            after = {n: dr["after"] for n, dr in diff_results}
+            return {"before": before, "after": after}
         return None
 
     def facts(self, verbosity=0):

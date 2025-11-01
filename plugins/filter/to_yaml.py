@@ -8,16 +8,19 @@ import typing as t
 from collections.abc import Mapping, Set
 
 from yaml import dump
+
 try:
     from yaml.cyaml import CSafeDumper as SafeDumper
 except ImportError:
     from yaml import SafeDumper  # type: ignore
 
 from ansible.module_utils.common.collections import is_sequence
+
 try:
     # This is ansible-core 2.19+
     from ansible.utils.vars import transform_to_native_types
     from ansible.parsing.vault import VaultHelper, VaultLib
+
     HAS_TRANSFORM_TO_NATIVE_TYPES = True
 except ImportError:
     HAS_TRANSFORM_TO_NATIVE_TYPES = False
@@ -36,7 +39,9 @@ def _to_native_types_compat(value: t.Any, *, redact_value: str | None) -> t.Any:
         # But that's fine, since this code path isn't taken on ansible-core 2.19+ anyway.
     if isinstance(value, Mapping):
         return {
-            _to_native_types_compat(key, redact_value=redact_value): _to_native_types_compat(val, redact_value=redact_value)
+            _to_native_types_compat(key, redact_value=redact_value): _to_native_types_compat(
+                val, redact_value=redact_value
+            )
             for key, val in value.items()
         }
     if isinstance(value, Set):
@@ -80,11 +85,15 @@ def remove_all_tags(value: t.Any, *, redact_sensitive_values: bool = False) -> t
 
     return _to_native_types_compat(  # type: ignore[unreachable]
         value,
-        redact_value="<redacted>" if redact_sensitive_values else None,  # same string as in ansible-core 2.19 by transform_to_native_types()
+        redact_value="<redacted>"
+        if redact_sensitive_values
+        else None,  # same string as in ansible-core 2.19 by transform_to_native_types()
     )
 
 
-def to_yaml(value: t.Any, *, redact_sensitive_values: bool = False, default_flow_style: bool | None = None, **kwargs) -> str:
+def to_yaml(
+    value: t.Any, *, redact_sensitive_values: bool = False, default_flow_style: bool | None = None, **kwargs
+) -> str:
     """Serialize input as terse flow-style YAML."""
     return dump(
         remove_all_tags(value, redact_sensitive_values=redact_sensitive_values),
@@ -95,7 +104,9 @@ def to_yaml(value: t.Any, *, redact_sensitive_values: bool = False, default_flow
     )
 
 
-def to_nice_yaml(value: t.Any, *, redact_sensitive_values: bool = False, indent: int = 2, default_flow_style: bool = False, **kwargs) -> str:
+def to_nice_yaml(
+    value: t.Any, *, redact_sensitive_values: bool = False, indent: int = 2, default_flow_style: bool = False, **kwargs
+) -> str:
     """Serialize input as verbose multi-line YAML."""
     return to_yaml(
         value,
@@ -109,6 +120,6 @@ def to_nice_yaml(value: t.Any, *, redact_sensitive_values: bool = False, indent:
 class FilterModule:
     def filters(self):
         return {
-            'to_yaml': to_yaml,
-            'to_nice_yaml': to_nice_yaml,
+            "to_yaml": to_yaml,
+            "to_nice_yaml": to_nice_yaml,
         }

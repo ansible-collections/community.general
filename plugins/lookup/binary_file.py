@@ -84,7 +84,6 @@ display = Display()
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
         not_exist = self.get_option("not_exist")

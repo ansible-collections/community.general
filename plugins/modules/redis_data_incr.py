@@ -89,36 +89,39 @@ msg:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.redis import (
-    fail_imports, redis_auth_argument_spec, RedisAnsible)
+    fail_imports,
+    redis_auth_argument_spec,
+    RedisAnsible,
+)
 
 
 def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
-        key=dict(type='str', required=True, no_log=False),
-        increment_int=dict(type='int'),
-        increment_float=dict(type='float'),
+        key=dict(type="str", required=True, no_log=False),
+        increment_int=dict(type="int"),
+        increment_float=dict(type="float"),
     )
     module_args.update(redis_auth_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        mutually_exclusive=[['increment_int', 'increment_float']],
+        mutually_exclusive=[["increment_int", "increment_float"]],
     )
     fail_imports(module)
 
     redis = RedisAnsible(module)
-    key = module.params['key']
-    increment_float = module.params['increment_float']
-    increment_int = module.params['increment_int']
+    key = module.params["key"]
+    increment_float = module.params["increment_float"]
+    increment_int = module.params["increment_int"]
     increment = 1
     if increment_float is not None:
         increment = increment_float
     elif increment_int is not None:
         increment = increment_int
 
-    result = {'changed': False}
+    result = {"changed": False}
     if module.check_mode:
         value = 0.0
         try:
@@ -126,55 +129,55 @@ def main():
             if res is not None:
                 value = float(res)
         except ValueError as e:
-            msg = f'Value: {res} of key: {key} is not incrementable(int or float)'
-            result['msg'] = msg
+            msg = f"Value: {res} of key: {key} is not incrementable(int or float)"
+            result["msg"] = msg
             module.fail_json(**result)
         except Exception as e:
-            msg = f'Failed to get value of key: {key} with exception: {e}'
-            result['msg'] = msg
+            msg = f"Failed to get value of key: {key} with exception: {e}"
+            result["msg"] = msg
             module.fail_json(**result)
-        msg = f'Incremented key: {key} by {increment} to {value + increment}'
-        result['msg'] = msg
-        result['value'] = float(value + increment)
+        msg = f"Incremented key: {key} by {increment} to {value + increment}"
+        result["msg"] = msg
+        result["value"] = float(value + increment)
         module.exit_json(**result)
 
     if increment_float is not None:
         try:
             value = redis.connection.incrbyfloat(key, increment)
-            msg = f'Incremented key: {key} by {increment} to {value}'
-            result['msg'] = msg
-            result['value'] = float(value)
-            result['changed'] = True
+            msg = f"Incremented key: {key} by {increment} to {value}"
+            result["msg"] = msg
+            result["value"] = float(value)
+            result["changed"] = True
             module.exit_json(**result)
         except Exception as e:
-            msg = f'Failed to increment key: {key} by {increment} with exception: {e}'
-            result['msg'] = msg
+            msg = f"Failed to increment key: {key} by {increment} with exception: {e}"
+            result["msg"] = msg
             module.fail_json(**result)
     elif increment_int is not None:
         try:
             value = redis.connection.incrby(key, increment)
-            msg = f'Incremented key: {key} by {increment} to {value}'
-            result['msg'] = msg
-            result['value'] = float(value)
-            result['changed'] = True
+            msg = f"Incremented key: {key} by {increment} to {value}"
+            result["msg"] = msg
+            result["value"] = float(value)
+            result["changed"] = True
             module.exit_json(**result)
         except Exception as e:
-            msg = f'Failed to increment key: {key} by {increment} with exception: {e}'
-            result['msg'] = msg
+            msg = f"Failed to increment key: {key} by {increment} with exception: {e}"
+            result["msg"] = msg
             module.fail_json(**result)
     else:
         try:
             value = redis.connection.incr(key)
-            msg = f'Incremented key: {key} to {value}'
-            result['msg'] = msg
-            result['value'] = float(value)
-            result['changed'] = True
+            msg = f"Incremented key: {key} to {value}"
+            result["msg"] = msg
+            result["value"] = float(value)
+            result["changed"] = True
             module.exit_json(**result)
         except Exception as e:
-            msg = f'Failed to increment key: {key} with exception: {e}'
-            result['msg'] = msg
+            msg = f"Failed to increment key: {key} with exception: {e}"
+            result["msg"] = msg
             module.fail_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

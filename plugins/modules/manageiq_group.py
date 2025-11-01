@@ -211,7 +211,7 @@ from ansible_collections.community.general.plugins.module_utils.manageiq import 
 
 class ManageIQgroup:
     """
-        Object to execute group management operations in manageiq.
+    Object to execute group management operations in manageiq.
     """
 
     def __init__(self, manageiq):
@@ -222,7 +222,7 @@ class ManageIQgroup:
         self.client = self.manageiq.client
 
     def group(self, description):
-        """ Search for group object by description.
+        """Search for group object by description.
         Returns:
             the group, or None if group was not found.
         """
@@ -233,13 +233,13 @@ class ManageIQgroup:
             return groups[0]
 
     def tenant(self, tenant_id, tenant_name):
-        """ Search for tenant entity by name or id
+        """Search for tenant entity by name or id
         Returns:
             the tenant entity, None if no id or name was supplied
         """
 
         if tenant_id:
-            tenant = self.client.get_entity('tenants', tenant_id)
+            tenant = self.client.get_entity("tenants", tenant_id)
             if not tenant:
                 self.module.fail_json(msg=f"Tenant with id '{tenant_id}' not found in manageiq")
             return tenant
@@ -257,14 +257,14 @@ class ManageIQgroup:
                 return None
 
     def role(self, role_id, role_name):
-        """ Search for a role object by name or id.
+        """Search for a role object by name or id.
         Returns:
             the role entity, None no id or name was supplied
 
             the role, or send a module Fail signal if role not found.
         """
         if role_id:
-            role = self.client.get_entity('roles', role_id)
+            role = self.client.get_entity("roles", role_id)
             if not role:
                 self.module.fail_json(msg=f"Role with id '{role_id}' not found in manageiq")
             return role
@@ -282,7 +282,7 @@ class ManageIQgroup:
 
     @staticmethod
     def merge_dict_values(norm_current_values, norm_updated_values):
-        """ Create an merged update object for manageiq group filters.
+        """Create an merged update object for manageiq group filters.
 
             The input dict contain the tag values per category.
             If the new values contain the category, all tags for that category are replaced
@@ -308,7 +308,7 @@ class ManageIQgroup:
         return res
 
     def delete_group(self, group):
-        """ Deletes a group from manageiq.
+        """Deletes a group from manageiq.
 
         Returns:
             a dict of:
@@ -317,20 +317,27 @@ class ManageIQgroup:
         """
         try:
             url = f"{self.api_url}/groups/{group['id']}"
-            result = self.client.post(url, action='delete')
+            result = self.client.post(url, action="delete")
         except Exception as e:
             self.module.fail_json(msg=f"failed to delete group {group['description']}: {e}")
 
-        if result['success'] is False:
-            self.module.fail_json(msg=result['message'])
+        if result["success"] is False:
+            self.module.fail_json(msg=result["message"])
 
-        return dict(
-            changed=True,
-            msg=f"deleted group {group['description']} with id {group['id']}")
+        return dict(changed=True, msg=f"deleted group {group['description']} with id {group['id']}")
 
-    def edit_group(self, group, description, role, tenant, norm_managed_filters, managed_filters_merge_mode,
-                   belongsto_filters, belongsto_filters_merge_mode):
-        """ Edit a manageiq group.
+    def edit_group(
+        self,
+        group,
+        description,
+        role,
+        tenant,
+        norm_managed_filters,
+        managed_filters_merge_mode,
+        belongsto_filters,
+        belongsto_filters_merge_mode,
+    ):
+        """Edit a manageiq group.
 
         Returns:
             a dict of:
@@ -339,66 +346,71 @@ class ManageIQgroup:
         """
 
         if role or norm_managed_filters or belongsto_filters:
-            group.reload(attributes=['miq_user_role_name', 'entitlement'])
+            group.reload(attributes=["miq_user_role_name", "entitlement"])
 
         try:
-            current_role = group['miq_user_role_name']
+            current_role = group["miq_user_role_name"]
         except AttributeError:
             current_role = None
 
         changed = False
         resource = {}
 
-        if description and group['description'] != description:
-            resource['description'] = description
+        if description and group["description"] != description:
+            resource["description"] = description
             changed = True
 
-        if tenant and group['tenant_id'] != tenant['id']:
-            resource['tenant'] = dict(id=tenant['id'])
+        if tenant and group["tenant_id"] != tenant["id"]:
+            resource["tenant"] = dict(id=tenant["id"])
             changed = True
 
-        if role and current_role != role['name']:
-            resource['role'] = dict(id=role['id'])
+        if role and current_role != role["name"]:
+            resource["role"] = dict(id=role["id"])
             changed = True
 
         if norm_managed_filters or belongsto_filters:
-
             # Only compare if filters are supplied
-            entitlement = group['entitlement']
+            entitlement = group["entitlement"]
 
-            if 'filters' not in entitlement:
+            if "filters" not in entitlement:
                 # No existing filters exist, use supplied filters
                 managed_tag_filters_post_body = self.normalized_managed_tag_filters_to_miq(norm_managed_filters)
-                resource['filters'] = {'managed': managed_tag_filters_post_body, "belongsto": belongsto_filters}
+                resource["filters"] = {"managed": managed_tag_filters_post_body, "belongsto": belongsto_filters}
                 changed = True
             else:
-                current_filters = entitlement['filters']
-                new_filters = self.edit_group_edit_filters(current_filters,
-                                                           norm_managed_filters, managed_filters_merge_mode,
-                                                           belongsto_filters, belongsto_filters_merge_mode)
+                current_filters = entitlement["filters"]
+                new_filters = self.edit_group_edit_filters(
+                    current_filters,
+                    norm_managed_filters,
+                    managed_filters_merge_mode,
+                    belongsto_filters,
+                    belongsto_filters_merge_mode,
+                )
                 if new_filters:
-                    resource['filters'] = new_filters
+                    resource["filters"] = new_filters
                     changed = True
 
         if not changed:
-            return dict(
-                changed=False,
-                msg=f"group {group['description']} is not changed.")
+            return dict(changed=False, msg=f"group {group['description']} is not changed.")
 
         # try to update group
         try:
-            self.client.post(group['href'], action='edit', resource=resource)
+            self.client.post(group["href"], action="edit", resource=resource)
             changed = True
         except Exception as e:
             self.module.fail_json(msg=f"failed to update group {group['name']}: {e!s}")
 
-        return dict(
-            changed=changed,
-            msg=f"successfully updated the group {group['description']} with id {group['id']}")
+        return dict(changed=changed, msg=f"successfully updated the group {group['description']} with id {group['id']}")
 
-    def edit_group_edit_filters(self, current_filters, norm_managed_filters, managed_filters_merge_mode,
-                                belongsto_filters, belongsto_filters_merge_mode):
-        """ Edit a manageiq group filters.
+    def edit_group_edit_filters(
+        self,
+        current_filters,
+        norm_managed_filters,
+        managed_filters_merge_mode,
+        belongsto_filters,
+        belongsto_filters_merge_mode,
+    ):
+        """Edit a manageiq group filters.
 
         Returns:
             None if no the group was not updated
@@ -407,7 +419,7 @@ class ManageIQgroup:
         filters_updated = False
         new_filters_resource = {}
 
-        current_belongsto_set = current_filters.get('belongsto', set())
+        current_belongsto_set = current_filters.get("belongsto", set())
 
         if belongsto_filters:
             new_belongsto_set = set(belongsto_filters)
@@ -415,13 +427,13 @@ class ManageIQgroup:
             new_belongsto_set = set()
 
         if current_belongsto_set == new_belongsto_set:
-            new_filters_resource['belongsto'] = current_filters['belongsto']
+            new_filters_resource["belongsto"] = current_filters["belongsto"]
         else:
-            if belongsto_filters_merge_mode == 'merge':
+            if belongsto_filters_merge_mode == "merge":
                 current_belongsto_set.update(new_belongsto_set)
-                new_filters_resource['belongsto'] = list(current_belongsto_set)
+                new_filters_resource["belongsto"] = list(current_belongsto_set)
             else:
-                new_filters_resource['belongsto'] = list(new_belongsto_set)
+                new_filters_resource["belongsto"] = list(new_belongsto_set)
             filters_updated = True
 
         # Process belongsto managed filter tags
@@ -432,14 +444,14 @@ class ManageIQgroup:
         norm_current_filters = self.manageiq_filters_to_sorted_dict(current_filters)
 
         if norm_current_filters == norm_managed_filters:
-            if 'managed' in current_filters:
-                new_filters_resource['managed'] = current_filters['managed']
+            if "managed" in current_filters:
+                new_filters_resource["managed"] = current_filters["managed"]
         else:
-            if managed_filters_merge_mode == 'merge':
+            if managed_filters_merge_mode == "merge":
                 merged_dict = self.merge_dict_values(norm_current_filters, norm_managed_filters)
-                new_filters_resource['managed'] = self.normalized_managed_tag_filters_to_miq(merged_dict)
+                new_filters_resource["managed"] = self.normalized_managed_tag_filters_to_miq(merged_dict)
             else:
-                new_filters_resource['managed'] = self.normalized_managed_tag_filters_to_miq(norm_managed_filters)
+                new_filters_resource["managed"] = self.normalized_managed_tag_filters_to_miq(norm_managed_filters)
             filters_updated = True
 
         if not filters_updated:
@@ -448,7 +460,7 @@ class ManageIQgroup:
         return new_filters_resource
 
     def create_group(self, description, role, tenant, norm_managed_filters, belongsto_filters):
-        """ Creates the group in manageiq.
+        """Creates the group in manageiq.
 
         Returns:
             the created group id, name, created_on timestamp,
@@ -456,33 +468,29 @@ class ManageIQgroup:
         """
         # check for required arguments
         for key, value in dict(description=description).items():
-            if value in (None, ''):
+            if value in (None, ""):
                 self.module.fail_json(msg=f"missing required argument: {key}")
 
-        url = f'{self.api_url}/groups'
+        url = f"{self.api_url}/groups"
 
-        resource = {'description': description}
+        resource = {"description": description}
 
         if role is not None:
-            resource['role'] = dict(id=role['id'])
+            resource["role"] = dict(id=role["id"])
 
         if tenant is not None:
-            resource['tenant'] = dict(id=tenant['id'])
+            resource["tenant"] = dict(id=tenant["id"])
 
         if norm_managed_filters or belongsto_filters:
             managed_tag_filters_post_body = self.normalized_managed_tag_filters_to_miq(norm_managed_filters)
-            resource['filters'] = {'managed': managed_tag_filters_post_body, "belongsto": belongsto_filters}
+            resource["filters"] = {"managed": managed_tag_filters_post_body, "belongsto": belongsto_filters}
 
         try:
-            result = self.client.post(url, action='create', resource=resource)
+            result = self.client.post(url, action="create", resource=resource)
         except Exception as e:
             self.module.fail_json(msg=f"failed to create group {description}: {e}")
 
-        return dict(
-            changed=True,
-            msg=f"successfully created group {description}",
-            group_id=result['results'][0]['id']
-        )
+        return dict(changed=True, msg=f"successfully created group {description}", group_id=result["results"][0]["id"])
 
     @staticmethod
     def normalized_managed_tag_filters_to_miq(norm_managed_filters):
@@ -493,14 +501,14 @@ class ManageIQgroup:
 
     @staticmethod
     def manageiq_filters_to_sorted_dict(current_filters):
-        current_managed_filters = current_filters.get('managed')
+        current_managed_filters = current_filters.get("managed")
         if not current_managed_filters:
             return None
 
         res = {}
         for tag_list in current_managed_filters:
             tag_list.sort()
-            key = tag_list[0].split('/')[2]
+            key = tag_list[0].split("/")[2]
             res[key] = tag_list
 
         return res
@@ -526,74 +534,72 @@ class ManageIQgroup:
 
     @staticmethod
     def create_result_group(group):
-        """ Creates the ansible result object from a manageiq group entity
+        """Creates the ansible result object from a manageiq group entity
 
         Returns:
             a dict with the group id, description, role, tenant, filters, group_type, created_on, updated_on
         """
         try:
-            role_name = group['miq_user_role_name']
+            role_name = group["miq_user_role_name"]
         except AttributeError:
             role_name = None
 
         managed_filters = None
         belongsto_filters = None
-        if 'filters' in group['entitlement']:
-            filters = group['entitlement']['filters']
-            belongsto_filters = filters.get('belongsto')
-            group_managed_filters = filters.get('managed')
+        if "filters" in group["entitlement"]:
+            filters = group["entitlement"]["filters"]
+            belongsto_filters = filters.get("belongsto")
+            group_managed_filters = filters.get("managed")
             if group_managed_filters:
                 managed_filters = {}
                 for tag_list in group_managed_filters:
-                    key = tag_list[0].split('/')[2]
+                    key = tag_list[0].split("/")[2]
                     tags = []
                     for t in tag_list:
-                        tags.append(t.split('/')[3])
+                        tags.append(t.split("/")[3])
                     managed_filters[key] = tags
 
         return dict(
-            id=group['id'],
-            description=group['description'],
+            id=group["id"],
+            description=group["description"],
             role=role_name,
-            tenant=group['tenant']['name'],
+            tenant=group["tenant"]["name"],
             managed_filters=managed_filters,
             belongsto_filters=belongsto_filters,
-            group_type=group['group_type'],
-            created_on=group['created_on'],
-            updated_on=group['updated_on'],
+            group_type=group["group_type"],
+            created_on=group["created_on"],
+            updated_on=group["updated_on"],
         )
 
 
 def main():
     argument_spec = dict(
-        description=dict(required=True, type='str'),
-        state=dict(choices=['absent', 'present'], default='present'),
-        role_id=dict(type='int'),
-        role=dict(type='str'),
-        tenant_id=dict(type='int'),
-        tenant=dict(type='str'),
-        managed_filters=dict(type='dict'),
-        managed_filters_merge_mode=dict(choices=['merge', 'replace'], default='replace'),
-        belongsto_filters=dict(type='list', elements='str'),
-        belongsto_filters_merge_mode=dict(choices=['merge', 'replace'], default='replace'),
+        description=dict(required=True, type="str"),
+        state=dict(choices=["absent", "present"], default="present"),
+        role_id=dict(type="int"),
+        role=dict(type="str"),
+        tenant_id=dict(type="int"),
+        tenant=dict(type="str"),
+        managed_filters=dict(type="dict"),
+        managed_filters_merge_mode=dict(choices=["merge", "replace"], default="replace"),
+        belongsto_filters=dict(type="list", elements="str"),
+        belongsto_filters_merge_mode=dict(choices=["merge", "replace"], default="replace"),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
 
-    module = AnsibleModule(
-        argument_spec=argument_spec
-    )
+    module = AnsibleModule(argument_spec=argument_spec)
 
-    description = module.params['description']
-    state = module.params['state']
-    role_id = module.params['role_id']
-    role_name = module.params['role']
-    tenant_id = module.params['tenant_id']
-    tenant_name = module.params['tenant']
-    managed_filters = module.params['managed_filters']
-    managed_filters_merge_mode = module.params['managed_filters_merge_mode']
-    belongsto_filters = module.params['belongsto_filters']
-    belongsto_filters_merge_mode = module.params['belongsto_filters_merge_mode']
+    description = module.params["description"]
+    state = module.params["state"]
+    role_id = module.params["role_id"]
+    role_name = module.params["role"]
+    tenant_id = module.params["tenant_id"]
+    tenant_name = module.params["tenant"]
+    managed_filters = module.params["managed_filters"]
+    managed_filters_merge_mode = module.params["managed_filters_merge_mode"]
+    belongsto_filters = module.params["belongsto_filters"]
+    belongsto_filters_merge_mode = module.params["belongsto_filters_merge_mode"]
 
     manageiq = ManageIQ(module)
     manageiq_group = ManageIQgroup(manageiq)
@@ -607,29 +613,33 @@ def main():
             res_args = manageiq_group.delete_group(group)
         # if we do not have a group, nothing to do
         else:
-            res_args = dict(
-                changed=False,
-                msg=f"group '{description}' does not exist in manageiq")
+            res_args = dict(changed=False, msg=f"group '{description}' does not exist in manageiq")
 
     # group should exist
     if state == "present":
-
         tenant = manageiq_group.tenant(tenant_id, tenant_name)
         role = manageiq_group.role(role_id, role_name)
         norm_managed_filters = manageiq_group.normalize_user_managed_filters_to_sorted_dict(managed_filters, module)
         # if we have a group, edit it
         if group:
-            res_args = manageiq_group.edit_group(group, description, role, tenant,
-                                                 norm_managed_filters, managed_filters_merge_mode,
-                                                 belongsto_filters, belongsto_filters_merge_mode)
+            res_args = manageiq_group.edit_group(
+                group,
+                description,
+                role,
+                tenant,
+                norm_managed_filters,
+                managed_filters_merge_mode,
+                belongsto_filters,
+                belongsto_filters_merge_mode,
+            )
 
         # if we do not have a group, create it
         else:
             res_args = manageiq_group.create_group(description, role, tenant, norm_managed_filters, belongsto_filters)
-            group = manageiq.client.get_entity('groups', res_args['group_id'])
+            group = manageiq.client.get_entity("groups", res_args["group_id"])
 
-        group.reload(expand='resources', attributes=['miq_user_role_name', 'tenant', 'entitlement'])
-        res_args['group'] = manageiq_group.create_result_group(group)
+        group.reload(expand="resources", attributes=["miq_user_role_name", "tenant", "entitlement"])
+        res_args["group"] = manageiq_group.create_result_group(group)
 
     module.exit_json(**res_args)
 

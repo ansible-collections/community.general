@@ -130,15 +130,16 @@ online_server_info:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.online import (
-    Online, OnlineException, online_argument_spec
+    Online,
+    OnlineException,
+    online_argument_spec,
 )
 
 
 class OnlineServerInfo(Online):
-
     def __init__(self, module):
         super().__init__(module)
-        self.name = 'api/v1/server'
+        self.name = "api/v1/server"
 
     def _get_server_detail(self, server_path):
         try:
@@ -149,10 +150,7 @@ class OnlineServerInfo(Online):
     def all_detailed_servers(self):
         servers_api_path = self.get_resources()
 
-        server_data = (
-            self._get_server_detail(server_api_path)
-            for server_api_path in servers_api_path
-        )
+        server_data = (self._get_server_detail(server_api_path) for server_api_path in servers_api_path)
 
         return [s for s in server_data if s is not None]
 
@@ -165,12 +163,10 @@ def main():
 
     try:
         servers_info = OnlineServerInfo(module).all_detailed_servers()
-        module.exit_json(
-            online_server_info=servers_info
-        )
+        module.exit_json(online_server_info=servers_info)
     except OnlineException as exc:
         module.fail_json(msg=exc.message)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

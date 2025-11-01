@@ -65,22 +65,20 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            arguments=dict(type='list', elements='str'),
+            arguments=dict(type="list", elements="str"),
         ),
         supports_check_mode=True,
     )
 
-    facter_path = module.get_bin_path(
-        'facter',
-        opt_dirs=['/opt/puppetlabs/bin'])
+    facter_path = module.get_bin_path("facter", opt_dirs=["/opt/puppetlabs/bin"])
 
     cmd = [facter_path, "--json"]
-    if module.params['arguments']:
-        cmd += module.params['arguments']
+    if module.params["arguments"]:
+        cmd += module.params["arguments"]
 
     rc, out, err = module.run_command(cmd, check_rc=True)
     module.exit_json(ansible_facts=dict(facter=json.loads(out)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

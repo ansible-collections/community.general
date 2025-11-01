@@ -31,7 +31,8 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
         self.vars = VarDict()
         for name, value in self.module.params.items():
             self.vars.set(
-                name, value,
+                name,
+                value,
                 diff=name in self.diff_params,
                 output=name in self.output_params,
                 change=None if not self.change_params else name in self.change_params,
@@ -62,11 +63,11 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
         if self.facts_name:
             facts = self.vars.facts()
             if facts is not None:
-                result['ansible_facts'] = {self.facts_name: facts}
+                result["ansible_facts"] = {self.facts_name: facts}
         if self.diff_mode:
-            diff = result.get('diff', {})
+            diff = result.get("diff", {})
             vars_diff = self.vars.diff() or {}
-            result['diff'] = dict_merge(dict(diff), vars_diff)
+            result["diff"] = dict_merge(dict(diff), vars_diff)
 
         return result
 

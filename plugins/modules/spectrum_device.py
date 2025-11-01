@@ -133,35 +133,32 @@ from ansible.module_utils.urls import fetch_url
 
 
 def request(resource, xml=None, method=None):
-    headers = {
-        "Content-Type": "application/xml",
-        "Accept": "application/xml"
-    }
+    headers = {"Content-Type": "application/xml", "Accept": "application/xml"}
 
     url = f"{module.params['oneclick_url']}/spectrum/restful/{resource}"
 
     response, info = fetch_url(module, url, data=xml, method=method, headers=headers, timeout=45)
 
-    if info['status'] == 401:
+    if info["status"] == 401:
         module.fail_json(msg="failed to authenticate to Oneclick server")
 
-    if info['status'] not in (200, 201, 204):
-        module.fail_json(msg=info['msg'])
+    if info["status"] not in (200, 201, 204):
+        module.fail_json(msg=info["msg"])
 
     return response.read()
 
 
 def post(resource, xml=None):
-    return request(resource, xml=xml, method='POST')
+    return request(resource, xml=xml, method="POST")
 
 
 def delete(resource):
-    return request(resource, xml=None, method='DELETE')
+    return request(resource, xml=None, method="DELETE")
 
 
 def get_ip():
     try:
-        device_ip = gethostbyname(module.params.get('device'))
+        device_ip = gethostbyname(module.params.get("device"))
     except gaierror:
         module.fail_json(msg=f"failed to resolve device ip address for '{module.params.get('device')}'")
 
@@ -170,7 +167,7 @@ def get_ip():
 
 def get_device(device_ip):
     """Query OneClick for the device using the IP Address"""
-    resource = '/models'
+    resource = "/models"
     landscape_min = f"0x{int(module.params.get('landscape'), 16):x}"
     landscape_max = f"0x{int(module.params.get('landscape'), 16) + 0x100000:x}"
 
@@ -216,29 +213,26 @@ def get_device(device_ip):
 
     root = ET.fromstring(result)
 
-    if root.get('total-models') == '0':
+    if root.get("total-models") == "0":
         return None
 
-    namespace = dict(ca='http://www.ca.com/spectrum/restful/schema/response')
+    namespace = dict(ca="http://www.ca.com/spectrum/restful/schema/response")
 
     # get the first device
-    model = root.find('ca:model-responses', namespace).find('ca:model', namespace)
+    model = root.find("ca:model-responses", namespace).find("ca:model", namespace)
 
-    if model.get('error'):
+    if model.get("error"):
         module.fail_json(msg=f"error checking device: {model.get('error')}")
 
     # get the attributes
-    model_handle = model.get('mh')
+    model_handle = model.get("mh")
 
     model_address = model.find('./*[@id="0x12d7f"]').text
 
     # derive the landscape handler from the model handler of the device
     model_landscape = f"0x{int(model_handle, 16) // 0x100000 * 0x100000:x}"
 
-    device = dict(
-        model_handle=model_handle,
-        address=model_address,
-        landscape=model_landscape)
+    device = dict(model_handle=model_handle, address=model_address, landscape=model_landscape)
 
     return device
 
@@ -251,28 +245,25 @@ def add_device():
         module.exit_json(changed=False, device=device)
 
     if module.check_mode:
-        device = dict(
-            model_handle=None,
-            address=device_ip,
-            landscape=f"0x{int(module.params.get('landscape'), 16):x}")
+        device = dict(model_handle=None, address=device_ip, landscape=f"0x{int(module.params.get('landscape'), 16):x}")
         module.exit_json(changed=True, device=device)
 
     resource = f"model?ipaddress={device_ip}&commstring={module.params.get('community')}"
     resource += f"&landscapeid={module.params.get('landscape')}"
 
-    if module.params.get('agentport', None):
+    if module.params.get("agentport", None):
         resource += f"&agentport={module.params.get('agentport', 161)}"
 
     result = post(resource)
     root = ET.fromstring(result)
 
-    if root.get('error') != 'Success':
-        module.fail_json(msg=root.get('error-message'))
+    if root.get("error") != "Success":
+        module.fail_json(msg=root.get("error-message"))
 
-    namespace = dict(ca='http://www.ca.com/spectrum/restful/schema/response')
-    model = root.find('ca:model', namespace)
+    namespace = dict(ca="http://www.ca.com/spectrum/restful/schema/response")
+    model = root.find("ca:model", namespace)
 
-    model_handle = model.get('mh')
+    model_handle = model.get("mh")
     model_landscape = f"0x{int(model_handle, 16) // 0x100000 * 0x100000:x}"
 
     device = dict(
@@ -299,11 +290,11 @@ def remove_device():
 
     root = ET.fromstring(result)
 
-    namespace = dict(ca='http://www.ca.com/spectrum/restful/schema/response')
-    error = root.find('ca:error', namespace).text
+    namespace = dict(ca="http://www.ca.com/spectrum/restful/schema/response")
+    error = root.find("ca:error", namespace).text
 
-    if error != 'Success':
-        error_message = root.find('ca:error-message', namespace).text
+    if error != "Success":
+        error_message = root.find("ca:error-message", namespace).text
         module.fail_json(msg=f"{error} {error_message}")
 
     module.exit_json(changed=True)
@@ -313,26 +304,26 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            device=dict(required=True, aliases=['host', 'name']),
+            device=dict(required=True, aliases=["host", "name"]),
             landscape=dict(required=True),
-            state=dict(choices=['present', 'absent'], default='present'),
-            community=dict(required=True, no_log=True),   # @TODO remove the 'required', given the required_if ?
-            agentport=dict(type='int', default=161),
-            url=dict(required=True, aliases=['oneclick_url']),
-            url_username=dict(required=True, aliases=['oneclick_user']),
-            url_password=dict(required=True, no_log=True, aliases=['oneclick_password']),
-            use_proxy=dict(type='bool', default=True),
-            validate_certs=dict(type='bool', default=True),
+            state=dict(choices=["present", "absent"], default="present"),
+            community=dict(required=True, no_log=True),  # @TODO remove the 'required', given the required_if ?
+            agentport=dict(type="int", default=161),
+            url=dict(required=True, aliases=["oneclick_url"]),
+            url_username=dict(required=True, aliases=["oneclick_user"]),
+            url_password=dict(required=True, no_log=True, aliases=["oneclick_password"]),
+            use_proxy=dict(type="bool", default=True),
+            validate_certs=dict(type="bool", default=True),
         ),
-        required_if=[('state', 'present', ['community'])],
-        supports_check_mode=True
+        required_if=[("state", "present", ["community"])],
+        supports_check_mode=True,
     )
 
-    if module.params.get('state') == 'present':
+    if module.params.get("state") == "present":
         add_device()
     else:
         remove_device()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

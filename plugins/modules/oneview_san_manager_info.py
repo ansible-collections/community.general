@@ -89,10 +89,7 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 
 
 class SanManagerInfoModule(OneViewModuleBase):
-    argument_spec = dict(
-        provider_display_name=dict(type='str'),
-        params=dict(type='dict')
-    )
+    argument_spec = dict(provider_display_name=dict(type="str"), params=dict(type="dict"))
 
     def __init__(self):
         super().__init__(
@@ -102,8 +99,8 @@ class SanManagerInfoModule(OneViewModuleBase):
         self.resource_client = self.oneview_client.san_managers
 
     def execute_module(self):
-        if self.module.params.get('provider_display_name'):
-            provider_display_name = self.module.params['provider_display_name']
+        if self.module.params.get("provider_display_name"):
+            provider_display_name = self.module.params["provider_display_name"]
             san_manager = self.oneview_client.san_managers.get_by_provider_display_name(provider_display_name)
             if san_manager:
                 resources = [san_manager]
@@ -119,5 +116,5 @@ def main():
     SanManagerInfoModule().run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

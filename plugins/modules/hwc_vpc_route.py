@@ -119,20 +119,26 @@ type:
 """
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
-    Config, HwcClientException, HwcModule, are_different_dicts, build_path,
-    get_region, is_empty_value, navigate_value)
+    Config,
+    HwcClientException,
+    HwcModule,
+    are_different_dicts,
+    build_path,
+    get_region,
+    is_empty_value,
+    navigate_value,
+)
 
 
 def build_module():
     return HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            destination=dict(type='str', required=True),
-            next_hop=dict(type='str', required=True),
-            vpc_id=dict(type='str', required=True),
-            type=dict(type='str', default='peering'),
-            id=dict(type='str')
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            destination=dict(type="str", required=True),
+            next_hop=dict(type="str", required=True),
+            vpc_id=dict(type="str", required=True),
+            type=dict(type="str", default="peering"),
+            id=dict(type="str"),
         ),
         supports_check_mode=True,
     )
@@ -148,11 +154,12 @@ def main():
         resource = None
         if module.params.get("id"):
             resource = get_resource_by_id(config)
-            if module.params['state'] == 'present':
+            if module.params["state"] == "present":
                 opts = user_input_parameters(module)
                 if are_different_dicts(resource, opts):
                     raise Exception(
-                        f"Cannot change option from ({resource}) to ({opts}) for an existing route.({config.module.params['id']})")
+                        f"Cannot change option from ({resource}) to ({opts}) for an existing route.({config.module.params['id']})"
+                    )
         else:
             v = search_resource(config)
             if len(v) > 1:
@@ -160,11 +167,11 @@ def main():
 
             if len(v) == 1:
                 resource = update_properties(module, {"read": v[0]}, None)
-                module.params['id'] = navigate_value(resource, ["id"])
+                module.params["id"] = navigate_value(resource, ["id"])
 
         result = {}
         changed = False
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if resource is None:
                 if not module.check_mode:
                     resource = create(config)
@@ -181,7 +188,7 @@ def main():
         module.fail_json(msg=str(ex))
 
     else:
-        result['changed'] = changed
+        result["changed"] = changed
         module.exit_json(**result)
 
 
@@ -202,7 +209,7 @@ def create(config):
 
     params = build_create_parameters(opts)
     r = send_create_request(module, params, client)
-    module.params['id'] = navigate_value(r, ["route", "id"])
+    module.params["id"] = navigate_value(r, ["route", "id"])
 
     result = update_properties(module, {"read": fill_resp_body(r)}, None)
     return result
@@ -259,7 +266,7 @@ def search_resource(config):
     link = f"v2.0/vpc/routes{query_link}"
 
     result = []
-    p = {'marker': ''}
+    p = {"marker": ""}
     while True:
         url = link.format(**p)
         r = send_list_request(module, client, url)
@@ -274,7 +281,7 @@ def search_resource(config):
         if len(result) > 1:
             break
 
-        p['marker'] = r[-1].get('id')
+        p["marker"] = r[-1].get("id")
 
     return result
 
@@ -380,7 +387,6 @@ def update_properties(module, response, array_index, exclude_output=False):
 
 
 def send_list_request(module, client, url):
-
     r = None
     try:
         r = client.get(url)
@@ -428,5 +434,5 @@ def fill_list_resp_body(body):
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

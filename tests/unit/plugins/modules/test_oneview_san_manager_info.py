@@ -10,22 +10,18 @@ from .hpe_test_utils import FactsParamsTestCase
 
 
 class SanManagerInfoSpec(unittest.TestCase, FactsParamsTestCase):
-    ERROR_MSG = 'Fake message error'
+    ERROR_MSG = "Fake message error"
 
-    PARAMS_GET_ALL = dict(
-        config='config.json',
-        provider_display_name=None
-    )
+    PARAMS_GET_ALL = dict(config="config.json", provider_display_name=None)
 
-    PARAMS_GET_BY_PROVIDER_DISPLAY_NAME = dict(
-        config='config.json',
-        provider_display_name="Brocade Network Advisor"
-    )
+    PARAMS_GET_BY_PROVIDER_DISPLAY_NAME = dict(config="config.json", provider_display_name="Brocade Network Advisor")
 
-    PRESENT_SAN_MANAGERS = [{
-        "providerDisplayName": "Brocade Network Advisor",
-        "uri": "/rest/fc-sans/device-managers//d60efc8a-15b8-470c-8470-738d16d6b319"
-    }]
+    PRESENT_SAN_MANAGERS = [
+        {
+            "providerDisplayName": "Brocade Network Advisor",
+            "uri": "/rest/fc-sans/device-managers//d60efc8a-15b8-470c-8470-738d16d6b319",
+        }
+    ]
 
     def setUp(self):
         self.configure_mocks(self, SanManagerInfoModule)
@@ -40,8 +36,7 @@ class SanManagerInfoSpec(unittest.TestCase, FactsParamsTestCase):
         SanManagerInfoModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            san_managers=self.PRESENT_SAN_MANAGERS
+            changed=False, san_managers=self.PRESENT_SAN_MANAGERS
         )
 
     def test_should_get_by_display_name(self):
@@ -51,8 +46,7 @@ class SanManagerInfoSpec(unittest.TestCase, FactsParamsTestCase):
         SanManagerInfoModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            san_managers=self.PRESENT_SAN_MANAGERS
+            changed=False, san_managers=self.PRESENT_SAN_MANAGERS
         )
 
     def test_should_return_empty_list_when_get_by_display_name_is_null(self):
@@ -61,11 +55,8 @@ class SanManagerInfoSpec(unittest.TestCase, FactsParamsTestCase):
 
         SanManagerInfoModule().run()
 
-        self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            san_managers=[]
-        )
+        self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, san_managers=[])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

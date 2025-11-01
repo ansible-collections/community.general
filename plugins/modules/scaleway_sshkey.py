@@ -100,16 +100,15 @@ def extract_user_id(raw_organization_dict):
 
 
 def sshkey_user_patch(ssh_lookup):
-    ssh_list = {"ssh_public_keys": [{"key": key}
-                                    for key in ssh_lookup]}
+    ssh_list = {"ssh_public_keys": [{"key": key} for key in ssh_lookup]}
     return ssh_list
 
 
 def core(module):
-    ssh_pub_key = module.params['ssh_pub_key']
+    ssh_pub_key = module.params["ssh_pub_key"]
     state = module.params["state"]
     account_api = Scaleway(module)
-    response = account_api.get('organizations')
+    response = account_api.get("organizations")
 
     status_code = response.status_code
     organization_json = response.json
@@ -124,7 +123,7 @@ def core(module):
     except (KeyError, IndexError) as e:
         module.fail_json(changed=False, data="Error while extracting present SSH keys from API")
 
-    if state in ('present',):
+    if state in ("present",):
         if ssh_pub_key in present_sshkeys:
             module.exit_json(changed=False)
 
@@ -135,14 +134,14 @@ def core(module):
         present_sshkeys.append(ssh_pub_key)
         payload = sshkey_user_patch(present_sshkeys)
 
-        response = account_api.patch(f'/users/{user_id}', data=payload)
+        response = account_api.patch(f"/users/{user_id}", data=payload)
 
         if response.ok:
             module.exit_json(changed=True, data=response.json)
 
-        module.fail_json(msg=f'Error creating ssh key [{response.status_code}: {response.json}]')
+        module.fail_json(msg=f"Error creating ssh key [{response.status_code}: {response.json}]")
 
-    elif state in ('absent',):
+    elif state in ("absent",):
         if ssh_pub_key not in present_sshkeys:
             module.exit_json(changed=False)
 
@@ -152,21 +151,25 @@ def core(module):
         present_sshkeys.remove(ssh_pub_key)
         payload = sshkey_user_patch(present_sshkeys)
 
-        response = account_api.patch(f'/users/{user_id}', data=payload)
+        response = account_api.patch(f"/users/{user_id}", data=payload)
 
         if response.ok:
             module.exit_json(changed=True, data=response.json)
 
-        module.fail_json(msg=f'Error deleting ssh key [{response.status_code}: {response.json}]')
+        module.fail_json(msg=f"Error deleting ssh key [{response.status_code}: {response.json}]")
 
 
 def main():
     argument_spec = scaleway_argument_spec()
-    argument_spec.update(dict(
-        state=dict(default='present', choices=['absent', 'present']),
-        ssh_pub_key=dict(required=True),
-        api_url=dict(fallback=(env_fallback, ['SCW_API_URL']), default='https://account.scaleway.com', aliases=['base_url']),
-    ))
+    argument_spec.update(
+        dict(
+            state=dict(default="present", choices=["absent", "present"]),
+            ssh_pub_key=dict(required=True),
+            api_url=dict(
+                fallback=(env_fallback, ["SCW_API_URL"]), default="https://account.scaleway.com", aliases=["base_url"]
+            ),
+        )
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -175,5 +178,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

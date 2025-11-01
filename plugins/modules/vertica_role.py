@@ -100,32 +100,34 @@ class NotSupportedError(Exception):
 class CannotDropError(Exception):
     pass
 
+
 # module specific functions
 
 
-def get_role_facts(cursor, role=''):
+def get_role_facts(cursor, role=""):
     facts = {}
-    cursor.execute("""
+    cursor.execute(
+        """
         select r.name, r.assigned_roles
         from roles r
         where (? = '' or r.name ilike ?)
-    """, role, role)
+    """,
+        role,
+        role,
+    )
     while True:
         rows = cursor.fetchmany(100)
         if not rows:
             break
         for row in rows:
             role_key = row.name.lower()
-            facts[role_key] = {
-                'name': row.name,
-                'assigned_roles': []}
+            facts[role_key] = {"name": row.name, "assigned_roles": []}
             if row.assigned_roles:
-                facts[role_key]['assigned_roles'] = row.assigned_roles.replace(' ', '').split(',')
+                facts[role_key]["assigned_roles"] = row.assigned_roles.replace(" ", "").split(",")
     return facts
 
 
-def update_roles(role_facts, cursor, role,
-                 existing, required):
+def update_roles(role_facts, cursor, role, existing, required):
     for assigned_role in set(existing) - set(required):
         cursor.execute(f"revoke {assigned_role} from {role}")
     for assigned_role in set(required) - set(existing):
@@ -136,7 +138,7 @@ def check(role_facts, role, assigned_roles):
     role_key = role.lower()
     if role_key not in role_facts:
         return False
-    if assigned_roles and sorted(assigned_roles) != sorted(role_facts[role_key]['assigned_roles']):
+    if assigned_roles and sorted(assigned_roles) != sorted(role_facts[role_key]["assigned_roles"]):
         return False
     return True
 
@@ -150,9 +152,8 @@ def present(role_facts, cursor, role, assigned_roles):
         return True
     else:
         changed = False
-        if assigned_roles and (sorted(assigned_roles) != sorted(role_facts[role_key]['assigned_roles'])):
-            update_roles(role_facts, cursor, role,
-                         role_facts[role_key]['assigned_roles'], assigned_roles)
+        if assigned_roles and (sorted(assigned_roles) != sorted(role_facts[role_key]["assigned_roles"])):
+            update_roles(role_facts, cursor, role, role_facts[role_key]["assigned_roles"], assigned_roles)
             changed = True
         if changed:
             role_facts.update(get_role_facts(cursor, role))
@@ -162,43 +163,44 @@ def present(role_facts, cursor, role, assigned_roles):
 def absent(role_facts, cursor, role, assigned_roles):
     role_key = role.lower()
     if role_key in role_facts:
-        update_roles(role_facts, cursor, role,
-                     role_facts[role_key]['assigned_roles'], [])
+        update_roles(role_facts, cursor, role, role_facts[role_key]["assigned_roles"], [])
         cursor.execute(f"drop role {role_facts[role_key]['name']} cascade")
         del role_facts[role_key]
         return True
     else:
         return False
 
+
 # module logic
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            role=dict(required=True, aliases=['name']),
-            assigned_roles=dict(aliases=['assigned_role']),
-            state=dict(default='present', choices=['absent', 'present']),
+            role=dict(required=True, aliases=["name"]),
+            assigned_roles=dict(aliases=["assigned_role"]),
+            state=dict(default="present", choices=["absent", "present"]),
             db=dict(),
-            cluster=dict(default='localhost'),
-            port=dict(default='5433'),
-            login_user=dict(default='dbadmin'),
+            cluster=dict(default="localhost"),
+            port=dict(default="5433"),
+            login_user=dict(default="dbadmin"),
             login_password=dict(no_log=True),
-        ), supports_check_mode=True)
+        ),
+        supports_check_mode=True,
+    )
 
     if not pyodbc_found:
-        module.fail_json(msg=missing_required_lib('pyodbc'), exception=PYODBC_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pyodbc"), exception=PYODBC_IMP_ERR)
 
-    role = module.params['role']
+    role = module.params["role"]
     assigned_roles = []
-    if module.params['assigned_roles']:
-        assigned_roles = module.params['assigned_roles'].split(',')
+    if module.params["assigned_roles"]:
+        assigned_roles = module.params["assigned_roles"].split(",")
         assigned_roles = [_f for _f in assigned_roles if _f]
-    state = module.params['state']
-    db = ''
-    if module.params['db']:
-        db = module.params['db']
+    state = module.params["state"]
+    db = ""
+    if module.params["db"]:
+        db = module.params["db"]
 
     changed = False
 
@@ -221,28 +223,28 @@ def main():
         role_facts = get_role_facts(cursor)
         if module.check_mode:
             changed = not check(role_facts, role, assigned_roles)
-        elif state == 'absent':
+        elif state == "absent":
             try:
                 changed = absent(role_facts, cursor, role, assigned_roles)
             except pyodbc.Error as e:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
-        elif state == 'present':
+        elif state == "present":
             try:
                 changed = present(role_facts, cursor, role, assigned_roles)
             except pyodbc.Error as e:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
     except NotSupportedError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={'vertica_roles': role_facts})
+        module.fail_json(msg=to_native(e), ansible_facts={"vertica_roles": role_facts})
     except CannotDropError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={'vertica_roles': role_facts})
+        module.fail_json(msg=to_native(e), ansible_facts={"vertica_roles": role_facts})
     except SystemExit:
         # avoid catching this on python 2.4
         raise
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
-    module.exit_json(changed=changed, role=role, ansible_facts={'vertica_roles': role_facts})
+    module.exit_json(changed=changed, role=role, ansible_facts={"vertica_roles": role_facts})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

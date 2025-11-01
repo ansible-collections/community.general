@@ -95,20 +95,24 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (execute_pyxcli_command,
-                                                                                     connect_ssl, spectrum_accelerate_spec, is_pyxcli_installed)
+from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (
+    execute_pyxcli_command,
+    connect_ssl,
+    spectrum_accelerate_spec,
+    is_pyxcli_installed,
+)
 
 
 def main():
     argument_spec = spectrum_accelerate_spec()
     argument_spec.update(
         dict(
-            state=dict(default='present', choices=['present', 'absent']),
+            state=dict(default="present", choices=["present", "absent"]),
             vol=dict(required=True),
             lun=dict(),
             cluster=dict(),
             host=dict(),
-            override=dict()
+            override=dict(),
         )
     )
 
@@ -119,24 +123,22 @@ def main():
     # required args
     mapping = False
     try:
-        mapped_hosts = xcli_client.cmd.vol_mapping_list(
-            vol=module.params.get('vol')).as_list
+        mapped_hosts = xcli_client.cmd.vol_mapping_list(vol=module.params.get("vol")).as_list
         for host in mapped_hosts:
-            if host['host'] == module.params.get("host", ""):
+            if host["host"] == module.params.get("host", ""):
                 mapping = True
     except Exception:
         pass
-    state = module.params['state']
+    state = module.params["state"]
 
     state_changed = False
-    if state == 'present' and not mapping:
-        state_changed = execute_pyxcli_command(module, 'map_vol', xcli_client)
-    if state == 'absent' and mapping:
-        state_changed = execute_pyxcli_command(
-            module, 'unmap_vol', xcli_client)
+    if state == "present" and not mapping:
+        state_changed = execute_pyxcli_command(module, "map_vol", xcli_client)
+    if state == "absent" and mapping:
+        state_changed = execute_pyxcli_command(module, "unmap_vol", xcli_client)
 
     module.exit_json(changed=state_changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

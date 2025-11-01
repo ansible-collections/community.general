@@ -841,26 +841,60 @@ return_values:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
+    RedfishUtils,
+    REDFISH_COMMON_ARGUMENT_SPEC,
+)
 from ansible.module_utils.common.text.converters import to_native
 
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
-    "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
-                "PowerGracefulShutdown", "PowerReboot", "PowerCycle", "PowerFullPowerCycle",
-                "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride",
-                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink", "VirtualMediaInsert",
-                "VirtualMediaEject", "VerifyBiosAttributes"],
+    "Systems": [
+        "PowerOn",
+        "PowerForceOff",
+        "PowerForceRestart",
+        "PowerGracefulRestart",
+        "PowerGracefulShutdown",
+        "PowerReboot",
+        "PowerCycle",
+        "PowerFullPowerCycle",
+        "SetOneTimeBoot",
+        "EnableContinuousBootOverride",
+        "DisableBootOverride",
+        "IndicatorLedOn",
+        "IndicatorLedOff",
+        "IndicatorLedBlink",
+        "VirtualMediaInsert",
+        "VirtualMediaEject",
+        "VerifyBiosAttributes",
+    ],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
-    "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
-                 "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
-                 "UpdateUserAccountTypes", "UpdateAccountServiceProperties"],
+    "Accounts": [
+        "AddUser",
+        "EnableUser",
+        "DeleteUser",
+        "DisableUser",
+        "UpdateUserRole",
+        "UpdateUserPassword",
+        "UpdateUserName",
+        "UpdateUserAccountTypes",
+        "UpdateAccountServiceProperties",
+    ],
     "Sessions": ["ClearSessions", "CreateSession", "DeleteSession"],
-    "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
-                "ResetToDefaults",
-                "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
-                "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
+    "Manager": [
+        "GracefulRestart",
+        "ClearLogs",
+        "VirtualMediaInsert",
+        "ResetToDefaults",
+        "VirtualMediaEject",
+        "PowerOn",
+        "PowerForceOff",
+        "PowerForceRestart",
+        "PowerGracefulRestart",
+        "PowerGracefulShutdown",
+        "PowerReboot",
+    ],
     "Update": ["SimpleUpdate", "MultipartHTTPPushUpdate", "PerformRequestedOperations"],
 }
 
@@ -870,7 +904,7 @@ def main():
     return_values = {}
     argument_spec = dict(
         category=dict(required=True),
-        command=dict(required=True, type='list', elements='str'),
+        command=dict(required=True, type="list", elements="str"),
         baseuri=dict(required=True),
         username=dict(),
         password=dict(no_log=True),
@@ -880,142 +914,152 @@ def main():
         new_username=dict(aliases=["account_username"]),
         new_password=dict(aliases=["account_password"], no_log=True),
         roleid=dict(aliases=["account_roleid"]),
-        account_types=dict(type='list', elements='str', aliases=["account_accounttypes"]),
-        oem_account_types=dict(type='list', elements='str', aliases=["account_oemaccounttypes"]),
-        update_username=dict(type='str', aliases=["account_updatename"]),
-        account_properties=dict(type='dict', default={}),
+        account_types=dict(type="list", elements="str", aliases=["account_accounttypes"]),
+        oem_account_types=dict(type="list", elements="str", aliases=["account_oemaccounttypes"]),
+        update_username=dict(type="str", aliases=["account_updatename"]),
+        account_properties=dict(type="dict", default={}),
         bootdevice=dict(),
-        timeout=dict(type='int', default=60),
+        timeout=dict(type="int", default=60),
         uefi_target=dict(),
         boot_next=dict(),
-        boot_override_mode=dict(choices=['Legacy', 'UEFI']),
+        boot_override_mode=dict(choices=["Legacy", "UEFI"]),
         resource_id=dict(),
         update_image_uri=dict(),
-        update_image_file=dict(type='path'),
+        update_image_file=dict(type="path"),
         update_protocol=dict(),
-        update_targets=dict(type='list', elements='str', default=[]),
-        update_oem_params=dict(type='dict'),
-        update_custom_oem_header=dict(type='str'),
-        update_custom_oem_mime_type=dict(type='str'),
-        update_custom_oem_params=dict(type='raw'),
-        update_creds=dict(
-            type='dict',
-            options=dict(
-                username=dict(),
-                password=dict(no_log=True)
-            )
+        update_targets=dict(type="list", elements="str", default=[]),
+        update_oem_params=dict(type="dict"),
+        update_custom_oem_header=dict(type="str"),
+        update_custom_oem_mime_type=dict(type="str"),
+        update_custom_oem_params=dict(type="raw"),
+        update_creds=dict(type="dict", options=dict(username=dict(), password=dict(no_log=True))),
+        update_apply_time=dict(
+            choices=[
+                "Immediate",
+                "OnReset",
+                "AtMaintenanceWindowStart",
+                "InMaintenanceWindowOnReset",
+                "OnStartUpdateRequest",
+            ]
         ),
-        update_apply_time=dict(choices=['Immediate', 'OnReset', 'AtMaintenanceWindowStart',
-                                        'InMaintenanceWindowOnReset', 'OnStartUpdateRequest']),
         update_handle=dict(),
         virtual_media=dict(
-            type='dict',
+            type="dict",
             options=dict(
-                media_types=dict(type='list', elements='str', default=[]),
+                media_types=dict(type="list", elements="str", default=[]),
                 image_url=dict(),
-                inserted=dict(type='bool', default=True),
-                write_protected=dict(type='bool', default=True),
+                inserted=dict(type="bool", default=True),
+                write_protected=dict(type="bool", default=True),
                 username=dict(),
                 password=dict(no_log=True),
                 transfer_protocol_type=dict(),
                 transfer_method=dict(),
-            )
+            ),
         ),
-        strip_etag_quotes=dict(type='bool', default=False),
-        reset_to_defaults_mode=dict(choices=['ResetAll', 'PreserveNetworkAndUsers', 'PreserveNetwork']),
+        strip_etag_quotes=dict(type="bool", default=False),
+        reset_to_defaults_mode=dict(choices=["ResetAll", "PreserveNetworkAndUsers", "PreserveNetwork"]),
         bios_attributes=dict(type="dict"),
-        wait=dict(type='bool', default=False),
-        wait_timeout=dict(type='int', default=120),
+        wait=dict(type="bool", default=False),
+        wait_timeout=dict(type="int", default=120),
     )
     argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
         argument_spec,
         required_together=[
-            ('username', 'password'),
-            ('update_custom_oem_header', 'update_custom_oem_params'),
+            ("username", "password"),
+            ("update_custom_oem_header", "update_custom_oem_params"),
         ],
         required_one_of=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
-        supports_check_mode=False
+        supports_check_mode=False,
     )
 
-    category = module.params['category']
-    command_list = module.params['command']
+    category = module.params["category"]
+    command_list = module.params["command"]
 
     # admin credentials used for authentication
-    creds = {'user': module.params['username'],
-             'pswd': module.params['password'],
-             'token': module.params['auth_token']}
+    creds = {"user": module.params["username"], "pswd": module.params["password"], "token": module.params["auth_token"]}
 
     # user to add/modify/delete
     user = {
-        'account_id': module.params['id'],
-        'account_username': module.params['new_username'],
-        'account_password': module.params['new_password'],
-        'account_roleid': module.params['roleid'],
-        'account_accounttypes': module.params['account_types'],
-        'account_oemaccounttypes': module.params['oem_account_types'],
-        'account_updatename': module.params['update_username'],
-        'account_properties': module.params['account_properties'],
-        'account_passwordchangerequired': None,
+        "account_id": module.params["id"],
+        "account_username": module.params["new_username"],
+        "account_password": module.params["new_password"],
+        "account_roleid": module.params["roleid"],
+        "account_accounttypes": module.params["account_types"],
+        "account_oemaccounttypes": module.params["oem_account_types"],
+        "account_updatename": module.params["update_username"],
+        "account_properties": module.params["account_properties"],
+        "account_passwordchangerequired": None,
     }
 
     # timeout
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
     # System, Manager or Chassis ID to modify
-    resource_id = module.params['resource_id']
+    resource_id = module.params["resource_id"]
 
     # update options
     update_opts = {
-        'update_image_uri': module.params['update_image_uri'],
-        'update_image_file': module.params['update_image_file'],
-        'update_protocol': module.params['update_protocol'],
-        'update_targets': module.params['update_targets'],
-        'update_creds': module.params['update_creds'],
-        'update_apply_time': module.params['update_apply_time'],
-        'update_oem_params': module.params['update_oem_params'],
-        'update_custom_oem_header': module.params['update_custom_oem_header'],
-        'update_custom_oem_params': module.params['update_custom_oem_params'],
-        'update_custom_oem_mime_type': module.params['update_custom_oem_mime_type'],
-        'update_handle': module.params['update_handle'],
+        "update_image_uri": module.params["update_image_uri"],
+        "update_image_file": module.params["update_image_file"],
+        "update_protocol": module.params["update_protocol"],
+        "update_targets": module.params["update_targets"],
+        "update_creds": module.params["update_creds"],
+        "update_apply_time": module.params["update_apply_time"],
+        "update_oem_params": module.params["update_oem_params"],
+        "update_custom_oem_header": module.params["update_custom_oem_header"],
+        "update_custom_oem_params": module.params["update_custom_oem_params"],
+        "update_custom_oem_mime_type": module.params["update_custom_oem_mime_type"],
+        "update_handle": module.params["update_handle"],
     }
 
     # Boot override options
     boot_opts = {
-        'bootdevice': module.params['bootdevice'],
-        'uefi_target': module.params['uefi_target'],
-        'boot_next': module.params['boot_next'],
-        'boot_override_mode': module.params['boot_override_mode'],
+        "bootdevice": module.params["bootdevice"],
+        "uefi_target": module.params["uefi_target"],
+        "boot_next": module.params["boot_next"],
+        "boot_override_mode": module.params["boot_override_mode"],
     }
 
     # VirtualMedia options
-    virtual_media = module.params['virtual_media']
+    virtual_media = module.params["virtual_media"]
 
     # Etag options
-    strip_etag_quotes = module.params['strip_etag_quotes']
+    strip_etag_quotes = module.params["strip_etag_quotes"]
 
     # BIOS Attributes options
-    bios_attributes = module.params['bios_attributes']
+    bios_attributes = module.params["bios_attributes"]
 
     # Build root URI
     root_uri = f"https://{module.params['baseuri']}"
-    rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes)
+    rf_utils = RedfishUtils(
+        creds,
+        root_uri,
+        timeout,
+        module,
+        resource_id=resource_id,
+        data_modification=True,
+        strip_etag_quotes=strip_etag_quotes,
+    )
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}"))
+        module.fail_json(
+            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
+        )
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}"))
+            module.fail_json(
+                msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
+            )
 
     # Organize by Categories / Commands
     if category == "Accounts":
@@ -1028,19 +1072,23 @@ def main():
             "UpdateUserPassword": rf_utils.update_user_password,
             "UpdateUserName": rf_utils.update_user_name,
             "UpdateUserAccountTypes": rf_utils.update_user_accounttypes,
-            "UpdateAccountServiceProperties": rf_utils.update_accountservice_properties
+            "UpdateAccountServiceProperties": rf_utils.update_accountservice_properties,
         }
 
         # execute only if we find an Account service resource
         result = rf_utils._find_accountservice_resource()
-        if result['ret'] is False:
+        if result["ret"] is False:
             # If a password change is required and the user is attempting to
             # modify their password, try to proceed.
-            user['account_passwordchangerequired'] = rf_utils.check_password_change_required(result)
-            if len(command_list) == 1 and command_list[0] == "UpdateUserPassword" and user['account_passwordchangerequired']:
+            user["account_passwordchangerequired"] = rf_utils.check_password_change_required(result)
+            if (
+                len(command_list) == 1
+                and command_list[0] == "UpdateUserPassword"
+                and user["account_passwordchangerequired"]
+            ):
                 result = rf_utils.update_user_password(user)
             else:
-                module.fail_json(msg=to_native(result['msg']))
+                module.fail_json(msg=to_native(result["msg"]))
         else:
             for command in command_list:
                 result = ACCOUNTS_COMMANDS[command](user)
@@ -1048,41 +1096,41 @@ def main():
     elif category == "Systems":
         # execute only if we find a System resource
         result = rf_utils._find_systems_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         for command in command_list:
-            if command.startswith('Power'):
+            if command.startswith("Power"):
                 result = rf_utils.manage_system_power(command)
             elif command == "SetOneTimeBoot":
-                boot_opts['override_enabled'] = 'Once'
+                boot_opts["override_enabled"] = "Once"
                 result = rf_utils.set_boot_override(boot_opts)
             elif command == "EnableContinuousBootOverride":
-                boot_opts['override_enabled'] = 'Continuous'
+                boot_opts["override_enabled"] = "Continuous"
                 result = rf_utils.set_boot_override(boot_opts)
             elif command == "DisableBootOverride":
-                boot_opts['override_enabled'] = 'Disabled'
+                boot_opts["override_enabled"] = "Disabled"
                 result = rf_utils.set_boot_override(boot_opts)
-            elif command.startswith('IndicatorLed'):
+            elif command.startswith("IndicatorLed"):
                 result = rf_utils.manage_system_indicator_led(command)
-            elif command == 'VirtualMediaInsert':
+            elif command == "VirtualMediaInsert":
                 result = rf_utils.virtual_media_insert(virtual_media, category)
-            elif command == 'VirtualMediaEject':
+            elif command == "VirtualMediaEject":
                 result = rf_utils.virtual_media_eject(virtual_media, category)
-            elif command == 'VerifyBiosAttributes':
+            elif command == "VerifyBiosAttributes":
                 result = rf_utils.verify_bios_attributes(bios_attributes)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         led_commands = ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"]
 
         # Check if more than one led_command is present
         num_led_commands = sum([command in led_commands for command in command_list])
         if num_led_commands > 1:
-            result = {'ret': False, 'msg': "Only one IndicatorLed command should be sent at a time."}
+            result = {"ret": False, "msg": "Only one IndicatorLed command should be sent at a time."}
         else:
             for command in command_list:
                 if command in led_commands:
@@ -1091,8 +1139,8 @@ def main():
     elif category == "Sessions":
         # execute only if we find SessionService resources
         resource = rf_utils._find_sessionservice_resource()
-        if resource['ret'] is False:
-            module.fail_json(msg=resource['msg'])
+        if resource["ret"] is False:
+            module.fail_json(msg=resource["msg"])
 
         for command in command_list:
             if command == "ClearSessions":
@@ -1100,60 +1148,58 @@ def main():
             elif command == "CreateSession":
                 result = rf_utils.create_session()
             elif command == "DeleteSession":
-                result = rf_utils.delete_session(module.params['session_uri'])
+                result = rf_utils.delete_session(module.params["session_uri"])
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         for command in command_list:
             # standardize on the Power* commands, but allow the legacy
             # GracefulRestart command
-            if command == 'GracefulRestart':
-                command = 'PowerGracefulRestart'
+            if command == "GracefulRestart":
+                command = "PowerGracefulRestart"
 
-            if command.startswith('Power'):
-                result = rf_utils.manage_manager_power(command, module.params['wait'], module.params['wait_timeout'])
-            elif command == 'ClearLogs':
+            if command.startswith("Power"):
+                result = rf_utils.manage_manager_power(command, module.params["wait"], module.params["wait_timeout"])
+            elif command == "ClearLogs":
                 result = rf_utils.clear_logs()
-            elif command == 'VirtualMediaInsert':
+            elif command == "VirtualMediaInsert":
                 result = rf_utils.virtual_media_insert(virtual_media, category)
-            elif command == 'VirtualMediaEject':
+            elif command == "VirtualMediaEject":
                 result = rf_utils.virtual_media_eject(virtual_media, category)
-            elif command == 'ResetToDefaults':
-                result = rf_utils.manager_reset_to_defaults(module.params['reset_to_defaults_mode'])
+            elif command == "ResetToDefaults":
+                result = rf_utils.manager_reset_to_defaults(module.params["reset_to_defaults_mode"])
 
     elif category == "Update":
         # execute only if we find UpdateService resources
         resource = rf_utils._find_updateservice_resource()
-        if resource['ret'] is False:
-            module.fail_json(msg=resource['msg'])
+        if resource["ret"] is False:
+            module.fail_json(msg=resource["msg"])
 
         for command in command_list:
             if command == "SimpleUpdate":
                 result = rf_utils.simple_update(update_opts)
-                if 'update_status' in result:
-                    return_values['update_status'] = result['update_status']
+                if "update_status" in result:
+                    return_values["update_status"] = result["update_status"]
             elif command == "MultipartHTTPPushUpdate":
                 result = rf_utils.multipath_http_push_update(update_opts)
-                if 'update_status' in result:
-                    return_values['update_status'] = result['update_status']
+                if "update_status" in result:
+                    return_values["update_status"] = result["update_status"]
             elif command == "PerformRequestedOperations":
-                result = rf_utils.perform_requested_update_operations(update_opts['update_handle'])
+                result = rf_utils.perform_requested_update_operations(update_opts["update_handle"])
 
     # Return data back or fail with proper message
-    if result['ret'] is True:
-        del result['ret']
-        changed = result.get('changed', True)
-        session = result.get('session', dict())
-        module.exit_json(changed=changed, session=session,
-                         msg='Action was successful',
-                         return_values=return_values)
+    if result["ret"] is True:
+        del result["ret"]
+        changed = result.get("changed", True)
+        session = result.get("session", dict())
+        module.exit_json(changed=changed, session=session, msg="Action was successful", return_values=return_values)
     else:
-        module.fail_json(msg=to_native(result['msg']))
+        module.fail_json(msg=to_native(result["msg"]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

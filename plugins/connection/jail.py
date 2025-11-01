@@ -49,11 +49,11 @@ display = Display()
 
 
 class Connection(ConnectionBase):
-    """ Local BSD Jail based connections """
+    """Local BSD Jail based connections"""
 
-    modified_jailname_key = 'conn_jail_name'
+    modified_jailname_key = "conn_jail_name"
 
-    transport = 'community.general.jail'
+    transport = "community.general.jail"
     # Pipelining may work.  Someone needs to test by setting this to True and
     # having pipelining=True in their ansible.cfg
     has_pipelining = True
@@ -69,8 +69,8 @@ class Connection(ConnectionBase):
         if os.geteuid() != 0:
             raise AnsibleError("jail connection requires running as root")
 
-        self.jls_cmd = self._search_executable('jls')
-        self.jexec_cmd = self._search_executable('jexec')
+        self.jls_cmd = self._search_executable("jls")
+        self.jexec_cmd = self._search_executable("jexec")
 
         if self.jail not in self.list_jails():
             raise AnsibleError(f"incorrect jail name {self.jail}")
@@ -83,23 +83,23 @@ class Connection(ConnectionBase):
             raise AnsibleError(f"{executable} command not found in PATH")
 
     def list_jails(self):
-        p = subprocess.Popen([self.jls_cmd, '-q', 'name'],
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            [self.jls_cmd, "-q", "name"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         stdout, stderr = p.communicate()
 
-        return to_text(stdout, errors='surrogate_or_strict').split()
+        return to_text(stdout, errors="surrogate_or_strict").split()
 
     def _connect(self):
-        """ connect to the jail; nothing to do here """
+        """connect to the jail; nothing to do here"""
         super()._connect()
         if not self._connected:
             display.vvv(f"ESTABLISH JAIL CONNECTION FOR USER: {self._play_context.remote_user}", host=self.jail)
             self._connected = True
 
     def _buffered_exec_command(self, cmd, stdin=subprocess.PIPE):
-        """ run a command on the jail.  This is only needed for implementing
+        """run a command on the jail.  This is only needed for implementing
         put_file() get_file() so that we don't have to read the whole file
         into memory.
 
@@ -108,24 +108,23 @@ class Connection(ConnectionBase):
         """
 
         local_cmd = [self.jexec_cmd]
-        set_env = ''
+        set_env = ""
 
         if self._play_context.remote_user is not None:
-            local_cmd += ['-U', self._play_context.remote_user]
+            local_cmd += ["-U", self._play_context.remote_user]
             # update HOME since -U does not update the jail environment
             set_env = f"HOME=~{self._play_context.remote_user} "
 
-        local_cmd += [self.jail, self._play_context.executable, '-c', set_env + cmd]
+        local_cmd += [self.jail, self._play_context.executable, "-c", set_env + cmd]
 
         display.vvv(f"EXEC {local_cmd}", host=self.jail)
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
-        p = subprocess.Popen(local_cmd, shell=False, stdin=stdin,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
+        p = subprocess.Popen(local_cmd, shell=False, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         return p
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        """ run a command on the jail """
+        """run a command on the jail"""
         super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         p = self._buffered_exec_command(cmd)
@@ -135,33 +134,33 @@ class Connection(ConnectionBase):
 
     @staticmethod
     def _prefix_login_path(remote_path):
-        """ Make sure that we put files into a standard path
+        """Make sure that we put files into a standard path
 
-            If a path is relative, then we need to choose where to put it.
-            ssh chooses $HOME but we aren't guaranteed that a home dir will
-            exist in any given chroot.  So for now we're choosing "/" instead.
-            This also happens to be the former default.
+        If a path is relative, then we need to choose where to put it.
+        ssh chooses $HOME but we aren't guaranteed that a home dir will
+        exist in any given chroot.  So for now we're choosing "/" instead.
+        This also happens to be the former default.
 
-            Can revisit using $HOME instead if it is a problem
+        Can revisit using $HOME instead if it is a problem
         """
         if not remote_path.startswith(os.path.sep):
             remote_path = os.path.join(os.path.sep, remote_path)
         return os.path.normpath(remote_path)
 
     def put_file(self, in_path, out_path):
-        """ transfer a file from local to jail """
+        """transfer a file from local to jail"""
         super().put_file(in_path, out_path)
         display.vvv(f"PUT {in_path} TO {out_path}", host=self.jail)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
         try:
-            with open(to_bytes(in_path, errors='surrogate_or_strict'), 'rb') as in_file:
+            with open(to_bytes(in_path, errors="surrogate_or_strict"), "rb") as in_file:
                 if not os.fstat(in_file.fileno()).st_size:
-                    count = ' count=0'
+                    count = " count=0"
                 else:
-                    count = ''
+                    count = ""
                 try:
-                    p = self._buffered_exec_command(f'dd of={out_path} bs={BUFSIZE}{count}', stdin=in_file)
+                    p = self._buffered_exec_command(f"dd of={out_path} bs={BUFSIZE}{count}", stdin=in_file)
                 except OSError:
                     raise AnsibleError("jail connection requires dd command in the jail")
                 try:
@@ -170,22 +169,24 @@ class Connection(ConnectionBase):
                     traceback.print_exc()
                     raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
                 if p.returncode != 0:
-                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}")
+                    raise AnsibleError(
+                        f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}"
+                    )
         except IOError:
             raise AnsibleError(f"file or module does not exist at: {in_path}")
 
     def fetch_file(self, in_path, out_path):
-        """ fetch a file from jail to local """
+        """fetch a file from jail to local"""
         super().fetch_file(in_path, out_path)
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self.jail)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
         try:
-            p = self._buffered_exec_command(f'dd if={in_path} bs={BUFSIZE}')
+            p = self._buffered_exec_command(f"dd if={in_path} bs={BUFSIZE}")
         except OSError:
             raise AnsibleError("jail connection requires dd command in the jail")
 
-        with open(to_bytes(out_path, errors='surrogate_or_strict'), 'wb+') as out_file:
+        with open(to_bytes(out_path, errors="surrogate_or_strict"), "wb+") as out_file:
             try:
                 chunk = p.stdout.read(BUFSIZE)
                 while chunk:
@@ -196,9 +197,11 @@ class Connection(ConnectionBase):
                 raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}")
+                raise AnsibleError(
+                    f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}"
+                )
 
     def close(self):
-        """ terminate the connection; nothing to do here """
+        """terminate the connection; nothing to do here"""
         super().close()
         self._connected = False

@@ -150,26 +150,23 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def query_package(module, run_pkgng, name):
-
-    rc, out, err = run_pkgng('info', '-e', name)
+    rc, out, err = run_pkgng("info", "-e", name)
 
     return rc == 0
 
 
 def query_update(module, run_pkgng, name):
-
     # Check to see if a package upgrade is available.
     # rc = 0, no updates available or package not installed
     # rc = 1, updates available
-    rc, out, err = run_pkgng('upgrade', '-n', name)
+    rc, out, err = run_pkgng("upgrade", "-n", name)
 
     return rc == 1
 
 
 def pkgng_older_than(module, pkgng_path, compare_version):
-
-    rc, out, err = module.run_command([pkgng_path, '-v'])
-    version = [int(x) for x in re.split(r'[\._]', out)]
+    rc, out, err = module.run_command([pkgng_path, "-v"])
+    version = [int(x) for x in re.split(r"[\._]", out)]
 
     i = 0
     new_pkgng = True
@@ -187,11 +184,11 @@ def upgrade_packages(module, run_pkgng):
     # Run a 'pkg upgrade', updating all packages.
     upgraded_c = 0
 
-    pkgng_args = ['upgrade']
-    pkgng_args.append('-n' if module.check_mode else '-y')
+    pkgng_args = ["upgrade"]
+    pkgng_args.append("-n" if module.check_mode else "-y")
     rc, out, err = run_pkgng(*pkgng_args, check_rc=(not module.check_mode))
 
-    matches = re.findall('^Number of packages to be (?:upgraded|reinstalled): ([0-9]+)', out, re.MULTILINE)
+    matches = re.findall("^Number of packages to be (?:upgraded|reinstalled): ([0-9]+)", out, re.MULTILINE)
     for match in matches:
         upgraded_c += int(match)
 
@@ -211,7 +208,7 @@ def remove_packages(module, run_pkgng, packages):
             continue
 
         if not module.check_mode:
-            rc, out, err = run_pkgng('delete', '-y', package)
+            rc, out, err = run_pkgng("delete", "-y", package)
             stdout += out
             stderr += err
 
@@ -233,7 +230,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
     stderr = ""
 
     if not module.check_mode and not cached:
-        rc, out, err = run_pkgng('update')
+        rc, out, err = run_pkgng("update")
         stdout += out
         stderr += err
         if rc != 0:
@@ -244,10 +241,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
         if already_installed and state == "present":
             continue
 
-        if (
-            already_installed and state == "latest"
-            and not query_update(module, run_pkgng, package)
-        ):
+        if already_installed and state == "latest" and not query_update(module, run_pkgng, package):
             continue
 
         if already_installed:
@@ -256,7 +250,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
             action_queue["install"].append(package)
 
     # install/upgrade all named packages with one pkg command
-    for (action, package_list) in action_queue.items():
+    for action, package_list in action_queue.items():
         if module.check_mode:
             # Do nothing, but count up how many actions
             # would be performed so that the changed/msg
@@ -264,7 +258,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
             action_count[action] += len(package_list)
             continue
 
-        pkgng_args = [action, '-U', '-y'] + package_list
+        pkgng_args = [action, "-U", "-y"] + package_list
         rc, out, err = run_pkgng(*pkgng_args)
         stdout += out
         stderr += err
@@ -272,9 +266,9 @@ def install_packages(module, run_pkgng, packages, cached, state):
         # individually verify packages are in requested state
         for package in package_list:
             verified = False
-            if action == 'install':
+            if action == "install":
                 verified = query_package(module, run_pkgng, package)
-            elif action == 'upgrade':
+            elif action == "upgrade":
                 verified = not query_update(module, run_pkgng, package)
 
             if verified:
@@ -283,21 +277,21 @@ def install_packages(module, run_pkgng, packages, cached, state):
                 module.fail_json(msg=f"failed to {action} {package}", stdout=stdout, stderr=stderr)
 
     if sum(action_count.values()) > 0:
-        past_tense = {'install': 'installed', 'upgrade': 'upgraded'}
+        past_tense = {"install": "installed", "upgrade": "upgraded"}
         messages = []
-        for (action, count) in action_count.items():
+        for action, count in action_count.items():
             messages.append(f"{past_tense.get(action, action)} {count} package{'s' if count != 1 else ''}")
 
-        return (True, '; '.join(messages), stdout, stderr)
+        return (True, "; ".join(messages), stdout, stderr)
 
     return (False, f"package(s) already {state}", stdout, stderr)
 
 
 def annotation_query(module, run_pkgng, package, tag):
-    rc, out, err = run_pkgng('info', '-A', package)
-    match = re.search(rf'^\s*(?P<tag>{tag})\s*:\s*(?P<value>\w+)', out, flags=re.MULTILINE)
+    rc, out, err = run_pkgng("info", "-A", package)
+    match = re.search(rf"^\s*(?P<tag>{tag})\s*:\s*(?P<value>\w+)", out, flags=re.MULTILINE)
     if match:
-        return match.group('value')
+        return match.group("value")
     return False
 
 
@@ -306,14 +300,15 @@ def annotation_add(module, run_pkgng, package, tag, value):
     if not _value:
         # Annotation does not exist, add it.
         if not module.check_mode:
-            rc, out, err = run_pkgng('annotate', '-y', '-A', package, tag, data=value, binary_data=True)
+            rc, out, err = run_pkgng("annotate", "-y", "-A", package, tag, data=value, binary_data=True)
             if rc != 0:
                 module.fail_json(msg=f"could not annotate {package}: {out}", stderr=err)
         return True
     elif _value != value:
         # Annotation exists, but value differs
         module.fail_json(
-            msg=f"failed to annotate {package}, because {tag} is already set to {_value}, but should be set to {value}")
+            msg=f"failed to annotate {package}, because {tag} is already set to {_value}, but should be set to {value}"
+        )
         return False
     else:
         # Annotation exists, nothing to do
@@ -324,7 +319,7 @@ def annotation_delete(module, run_pkgng, package, tag, value):
     _value = annotation_query(module, run_pkgng, package, tag)
     if _value:
         if not module.check_mode:
-            rc, out, err = run_pkgng('annotate', '-y', '-D', package, tag)
+            rc, out, err = run_pkgng("annotate", "-y", "-D", package, tag)
             if rc != 0:
                 module.fail_json(msg=f"could not delete annotation to {package}: {out}", stderr=err)
         return True
@@ -341,15 +336,17 @@ def annotation_modify(module, run_pkgng, package, tag, value):
         return False
     else:
         if not module.check_mode:
-            rc, out, err = run_pkgng('annotate', '-y', '-M', package, tag, data=value, binary_data=True)
+            rc, out, err = run_pkgng("annotate", "-y", "-M", package, tag, data=value, binary_data=True)
 
             # pkg sometimes exits with rc == 1, even though the modification succeeded
             # Check the output for a success message
             if (
                 rc != 0
-                and re.search(rf'^{package}-[^:]+: Modified annotation tagged: {tag}', out, flags=re.MULTILINE) is None
+                and re.search(rf"^{package}-[^:]+: Modified annotation tagged: {tag}", out, flags=re.MULTILINE) is None
             ):
-                module.fail_json(msg=f"failed to annotate {package}, could not change annotation {tag} to {value}: {out}", stderr=err)
+                module.fail_json(
+                    msg=f"failed to annotate {package}, could not change annotation {tag} to {value}: {out}", stderr=err
+                )
         return True
 
 
@@ -359,29 +356,22 @@ def annotate_packages(module, run_pkgng, packages, annotations):
         # Split on commas with optional trailing whitespace,
         # to support the old style of multiple annotations
         # on a single line, rather than YAML list syntax
-        annotations = re.split(r'\s*,\s*', annotations[0])
+        annotations = re.split(r"\s*,\s*", annotations[0])
 
-    operation = {
-        '+': annotation_add,
-        '-': annotation_delete,
-        ':': annotation_modify
-    }
+    operation = {"+": annotation_add, "-": annotation_delete, ":": annotation_modify}
 
     for package in packages:
         for annotation_string in annotations:
             # Note to future maintainers: A dash (-) in a regex character class ([-+:] below)
             # must appear as the first character in the class, or it will be interpreted
             # as a range of characters.
-            annotation = \
-                re.match(r'(?P<operation>[-+:])(?P<tag>[^=]+)(=(?P<value>.+))?', annotation_string)
+            annotation = re.match(r"(?P<operation>[-+:])(?P<tag>[^=]+)(=(?P<value>.+))?", annotation_string)
 
             if annotation is None:
-                module.fail_json(
-                    msg=f"failed to annotate {package}, invalid annotate string: {annotation_string}"
-                )
+                module.fail_json(msg=f"failed to annotate {package}, invalid annotate string: {annotation_string}")
 
             annotation = annotation.groupdict()
-            if operation[annotation['operation']](module, run_pkgng, package, annotation['tag'], annotation['value']):
+            if operation[annotation["operation"]](module, run_pkgng, package, annotation["tag"], annotation["value"]):
                 annotate_c += 1
 
     if annotate_c > 0:
@@ -392,11 +382,11 @@ def annotate_packages(module, run_pkgng, packages, annotations):
 def autoremove_packages(module, run_pkgng):
     stdout = ""
     stderr = ""
-    rc, out, err = run_pkgng('autoremove', '-n')
+    rc, out, err = run_pkgng("autoremove", "-n")
 
     autoremove_c = 0
 
-    match = re.search('^Deinstallation has been requested for the following ([0-9]+) packages', out, re.MULTILINE)
+    match = re.search("^Deinstallation has been requested for the following ([0-9]+) packages", out, re.MULTILINE)
     if match:
         autoremove_c = int(match.group(1))
 
@@ -404,7 +394,7 @@ def autoremove_packages(module, run_pkgng):
         return (False, "no package(s) to autoremove", stdout, stderr)
 
     if not module.check_mode:
-        rc, out, err = run_pkgng('autoremove', '-y')
+        rc, out, err = run_pkgng("autoremove", "-y")
         stdout += out
         stderr += err
 
@@ -415,21 +405,22 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(default="present", choices=["present", "latest", "absent"]),
-            name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
-            cached=dict(default=False, type='bool'),
-            ignore_osver=dict(default=False, type='bool'),
-            annotation=dict(type='list', elements='str'),
+            name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
+            cached=dict(default=False, type="bool"),
+            ignore_osver=dict(default=False, type="bool"),
+            annotation=dict(type="list", elements="str"),
             pkgsite=dict(),
-            rootdir=dict(type='path'),
-            chroot=dict(type='path'),
-            jail=dict(type='str'),
-            autoremove=dict(default=False, type='bool'),
-            use_globs=dict(default=True, type='bool'),
+            rootdir=dict(type="path"),
+            chroot=dict(type="path"),
+            jail=dict(type="str"),
+            autoremove=dict(default=False, type="bool"),
+            use_globs=dict(default=True, type="bool"),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[["rootdir", "chroot", "jail"]])
+        mutually_exclusive=[["rootdir", "chroot", "jail"]],
+    )
 
-    pkgng_path = module.get_bin_path('pkg', True)
+    pkgng_path = module.get_bin_path("pkg", True)
 
     p = module.params
 
@@ -466,27 +457,35 @@ def main():
     def run_pkgng(action, *args, **kwargs):
         cmd = [pkgng_path, dir_arg, action]
 
-        if p["use_globs"] and action in ('info', 'install', 'upgrade',):
-            args = ('-g',) + args
+        if p["use_globs"] and action in (
+            "info",
+            "install",
+            "upgrade",
+        ):
+            args = ("-g",) + args
 
-        pkgng_env = {'BATCH': 'yes'}
+        pkgng_env = {"BATCH": "yes"}
 
         if p["ignore_osver"]:
-            pkgng_env['IGNORE_OSVERSION'] = 'yes'
+            pkgng_env["IGNORE_OSVERSION"] = "yes"
 
-        if p['pkgsite'] is not None and action in ('update', 'install', 'upgrade',):
+        if p["pkgsite"] is not None and action in (
+            "update",
+            "install",
+            "upgrade",
+        ):
             if repo_flag_not_supported:
-                pkgng_env['PACKAGESITE'] = p['pkgsite']
+                pkgng_env["PACKAGESITE"] = p["pkgsite"]
             else:
                 cmd.append(f"--repository={p['pkgsite']}")
 
         # If environ_update is specified to be "passed through"
         # to module.run_command, then merge its values into pkgng_env
-        pkgng_env.update(kwargs.pop('environ_update', dict()))
+        pkgng_env.update(kwargs.pop("environ_update", dict()))
 
         return module.run_command(cmd + list(args), environ_update=pkgng_env, **kwargs)
 
-    if pkgs == ['*'] and p["state"] == 'latest':
+    if pkgs == ["*"] and p["state"] == "latest":
         # Operate on all installed packages. Only state: latest makes sense here.
         _changed, _msg, _stdout, _stderr = upgrade_packages(module, run_pkgng)
         changed = changed or _changed
@@ -500,11 +499,10 @@ def main():
         # with comma or space delimiters. That doesn't result in a YAML list, and
         # wrong actions (install vs upgrade) can be reported if those
         # comma- or space-delimited strings make it to the pkg command line.
-        pkgs = re.split(r'[,\s]', pkgs[0])
-    named_packages = [pkg for pkg in pkgs if pkg != '*']
+        pkgs = re.split(r"[,\s]", pkgs[0])
+    named_packages = [pkg for pkg in pkgs if pkg != "*"]
     if p["state"] in ("present", "latest") and named_packages:
-        _changed, _msg, _out, _err = install_packages(module, run_pkgng, named_packages,
-                                                      p["cached"], p["state"])
+        _changed, _msg, _out, _err = install_packages(module, run_pkgng, named_packages, p["cached"], p["state"])
         stdout += _out
         stderr += _err
         changed = changed or _changed
@@ -532,5 +530,5 @@ def main():
     module.exit_json(changed=changed, msg=", ".join(msgs), stdout=stdout, stderr=stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

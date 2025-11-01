@@ -82,7 +82,7 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 
 
-DEFAULT_DEPLOY_PATH = '/var/lib/jbossas/standalone/deployments'
+DEFAULT_DEPLOY_PATH = "/var/lib/jbossas/standalone/deployments"
 
 
 def is_deployed(deploy_path, deployment):
@@ -100,49 +100,49 @@ def is_failed(deploy_path, deployment):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            src=dict(type='path'),
-            deployment=dict(type='str', required=True),
-            deploy_path=dict(type='path', default=DEFAULT_DEPLOY_PATH),
-            state=dict(type='str', choices=['absent', 'present'], default='present'),
+            src=dict(type="path"),
+            deployment=dict(type="str", required=True),
+            deploy_path=dict(type="path", default=DEFAULT_DEPLOY_PATH),
+            state=dict(type="str", choices=["absent", "present"], default="present"),
         ),
-        required_if=[('state', 'present', ('src',))],
-        supports_check_mode=True
+        required_if=[("state", "present", ("src",))],
+        supports_check_mode=True,
     )
 
     result = dict(changed=False)
 
-    src = module.params['src']
-    deployment = module.params['deployment']
-    deploy_path = module.params['deploy_path']
-    state = module.params['state']
+    src = module.params["src"]
+    deployment = module.params["deployment"]
+    deploy_path = module.params["deploy_path"]
+    state = module.params["state"]
 
     if not os.path.exists(deploy_path):
         module.fail_json(msg="deploy_path does not exist.")
 
-    if state == 'absent' and src:
-        module.warn('Parameter src is ignored when state=absent')
-    elif state == 'present' and not os.path.exists(src):
-        module.fail_json(msg=f'Source file {src} does not exist.')
+    if state == "absent" and src:
+        module.warn("Parameter src is ignored when state=absent")
+    elif state == "present" and not os.path.exists(src):
+        module.fail_json(msg=f"Source file {src} does not exist.")
 
     deployed = is_deployed(deploy_path, deployment)
 
     # === when check_mode ===
     if module.check_mode:
-        if state == 'present':
+        if state == "present":
             if not deployed:
-                result['changed'] = True
+                result["changed"] = True
 
             elif deployed:
                 if module.sha1(src) != module.sha1(os.path.join(deploy_path, deployment)):
-                    result['changed'] = True
+                    result["changed"] = True
 
-        elif state == 'absent' and deployed:
-            result['changed'] = True
+        elif state == "absent" and deployed:
+            result["changed"] = True
 
         module.exit_json(**result)
     # =======================
 
-    if state == 'present' and not deployed:
+    if state == "present" and not deployed:
         if is_failed(deploy_path, deployment):
             # Clean up old failed deployment
             os.remove(os.path.join(deploy_path, f"{deployment}.failed"))
@@ -151,11 +151,11 @@ def main():
         while not deployed:
             deployed = is_deployed(deploy_path, deployment)
             if is_failed(deploy_path, deployment):
-                module.fail_json(msg=f'Deploying {deployment} failed.')
+                module.fail_json(msg=f"Deploying {deployment} failed.")
             time.sleep(1)
-        result['changed'] = True
+        result["changed"] = True
 
-    if state == 'present' and deployed:
+    if state == "present" and deployed:
         if module.sha1(src) != module.sha1(os.path.join(deploy_path, deployment)):
             os.remove(os.path.join(deploy_path, f"{deployment}.deployed"))
             module.preserved_copy(src, os.path.join(deploy_path, deployment))
@@ -163,21 +163,21 @@ def main():
             while not deployed:
                 deployed = is_deployed(deploy_path, deployment)
                 if is_failed(deploy_path, deployment):
-                    module.fail_json(msg=f'Deploying {deployment} failed.')
+                    module.fail_json(msg=f"Deploying {deployment} failed.")
                 time.sleep(1)
-            result['changed'] = True
+            result["changed"] = True
 
-    if state == 'absent' and deployed:
+    if state == "absent" and deployed:
         os.remove(os.path.join(deploy_path, f"{deployment}.deployed"))
         while deployed:
             deployed = not is_undeployed(deploy_path, deployment)
             if is_failed(deploy_path, deployment):
-                module.fail_json(msg=f'Undeploying {deployment} failed.')
+                module.fail_json(msg=f"Undeploying {deployment} failed.")
             time.sleep(1)
-        result['changed'] = True
+        result["changed"] = True
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

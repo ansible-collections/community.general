@@ -65,24 +65,26 @@ from ansible.module_utils.basic import AnsibleModule
 class Icinga2FeatureHelper:
     def __init__(self, module):
         self.module = module
-        self._icinga2 = module.get_bin_path('icinga2', True)
-        self.feature_name = self.module.params['name']
-        self.state = self.module.params['state']
+        self._icinga2 = module.get_bin_path("icinga2", True)
+        self.feature_name = self.module.params["name"]
+        self.state = self.module.params["state"]
 
     def _exec(self, args):
-        cmd = [self._icinga2, 'feature']
+        cmd = [self._icinga2, "feature"]
         rc, out, err = self.module.run_command(cmd + args, check_rc=True)
         return rc, out
 
     def manage(self):
         rc, out = self._exec(["list"])
         if rc != 0:
-            self.module.fail_json(msg="Unable to list icinga2 features. "
-                                      "Ensure icinga2 is installed and present in binary path.")
+            self.module.fail_json(
+                msg="Unable to list icinga2 features. Ensure icinga2 is installed and present in binary path."
+            )
 
         # If feature is already in good state, just exit
-        if (re.search(f"Disabled features:.* {self.feature_name}[ \n]", out) and self.state == "absent") or \
-                (re.search(f"Enabled features:.* {self.feature_name}[ \n]", out) and self.state == "present"):
+        if (re.search(f"Disabled features:.* {self.feature_name}[ \n]", out) and self.state == "absent") or (
+            re.search(f"Enabled features:.* {self.feature_name}[ \n]", out) and self.state == "present"
+        ):
             self.module.exit_json(changed=False)
 
         if self.module.check_mode:
@@ -95,7 +97,9 @@ class Icinga2FeatureHelper:
         change_applied = False
         if self.state == "present":
             if rc != 0:
-                self.module.fail_json(msg=f"Failed to {feature_enable_str} feature {self.feature_name}. icinga2 command returned {out}")
+                self.module.fail_json(
+                    msg=f"Failed to {feature_enable_str} feature {self.feature_name}. icinga2 command returned {out}"
+                )
 
             if re.search("already enabled", out) is None:
                 change_applied = True
@@ -114,15 +118,15 @@ class Icinga2FeatureHelper:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            state=dict(type='str', choices=["present", "absent"], default="present")
+            name=dict(type="str", required=True),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
     Icinga2FeatureHelper(module).manage()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

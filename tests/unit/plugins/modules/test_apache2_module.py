@@ -9,11 +9,11 @@ import pytest
 from ansible_collections.community.general.plugins.modules.apache2_module import create_apache_identifier
 
 REPLACEMENTS = [
-    ('php7.1', 'php7_module'),
-    ('php5.6', 'php5_module'),
-    ('shib2', 'mod_shib'),
-    ('evasive', 'evasive20_module'),
-    ('thismoduledoesnotexist', 'thismoduledoesnotexist_module'),  # the default
+    ("php7.1", "php7_module"),
+    ("php5.6", "php5_module"),
+    ("shib2", "mod_shib"),
+    ("evasive", "evasive20_module"),
+    ("thismoduledoesnotexist", "thismoduledoesnotexist_module"),  # the default
 ]
 
 

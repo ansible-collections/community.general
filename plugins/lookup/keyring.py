@@ -52,7 +52,6 @@ display = Display()
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         if not HAS_KEYRING:
             raise AnsibleError("Can't LOOKUP(keyring): missing required python library 'keyring'")

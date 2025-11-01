@@ -226,28 +226,60 @@ from ansible.module_utils.common.text.converters import to_native
 # others (ls, df, lvresize, lsblk...).
 SIZE_UNITS = dict(
     B=1,
-    kB=1000**1, KB=1000**1, KiB=1024**1, K=1024**1, k=1024**1,
-    MB=1000**2, mB=1000**2, MiB=1024**2, M=1024**2, m=1024**2,
-    GB=1000**3, gB=1000**3, GiB=1024**3, G=1024**3, g=1024**3,
-    TB=1000**4, tB=1000**4, TiB=1024**4, T=1024**4, t=1024**4,
-    PB=1000**5, pB=1000**5, PiB=1024**5, P=1024**5, p=1024**5,
-    EB=1000**6, eB=1000**6, EiB=1024**6, E=1024**6, e=1024**6,
-    ZB=1000**7, zB=1000**7, ZiB=1024**7, Z=1024**7, z=1024**7,
-    YB=1000**8, yB=1000**8, YiB=1024**8, Y=1024**8, y=1024**8,
+    kB=1000**1,
+    KB=1000**1,
+    KiB=1024**1,
+    K=1024**1,
+    k=1024**1,
+    MB=1000**2,
+    mB=1000**2,
+    MiB=1024**2,
+    M=1024**2,
+    m=1024**2,
+    GB=1000**3,
+    gB=1000**3,
+    GiB=1024**3,
+    G=1024**3,
+    g=1024**3,
+    TB=1000**4,
+    tB=1000**4,
+    TiB=1024**4,
+    T=1024**4,
+    t=1024**4,
+    PB=1000**5,
+    pB=1000**5,
+    PiB=1024**5,
+    P=1024**5,
+    p=1024**5,
+    EB=1000**6,
+    eB=1000**6,
+    EiB=1024**6,
+    E=1024**6,
+    e=1024**6,
+    ZB=1000**7,
+    zB=1000**7,
+    ZiB=1024**7,
+    Z=1024**7,
+    z=1024**7,
+    YB=1000**8,
+    yB=1000**8,
+    YiB=1024**8,
+    Y=1024**8,
+    y=1024**8,
 )
 
 
 def bytes_to_human(size, iec=False):
     """Return human-readable size (with SI or IEC suffix) from bytes. This is
-       only to populate the returned result of the module, not to handle the
-       file itself (we only rely on bytes for that).
+    only to populate the returned result of the module, not to handle the
+    file itself (we only rely on bytes for that).
     """
-    unit = 'B'
-    for (u, v) in SIZE_UNITS.items():
+    unit = "B"
+    for u, v in SIZE_UNITS.items():
         if size < v:
             continue
         if iec:
-            if 'i' not in u or size / v >= 1024:
+            if "i" not in u or size / v >= 1024:
                 continue
         else:
             if v % 5 or size / v >= 1000:
@@ -255,19 +287,19 @@ def bytes_to_human(size, iec=False):
         unit = u
 
     hsize = round(size / SIZE_UNITS[unit], 2)
-    if unit == 'B':
+    if unit == "B":
         hsize = int(hsize)
 
-    unit = re.sub(r'^(.)', lambda m: m.expand(r'\1').upper(), unit)
-    if unit == 'KB':
-        unit = 'kB'
+    unit = re.sub(r"^(.)", lambda m: m.expand(r"\1").upper(), unit)
+    if unit == "KB":
+        unit = "kB"
 
-    return f'{hsize} {unit}'
+    return f"{hsize} {unit}"
 
 
 def smart_blocksize(size, unit, product, bsize):
     """Ensure the total size can be written as blocks*blocksize, with blocks
-       and blocksize being integers.
+    and blocksize being integers.
     """
     if not product % bsize:
         return bsize
@@ -279,13 +311,13 @@ def smart_blocksize(size, unit, product, bsize):
     unit_size = SIZE_UNITS[unit]
 
     if size == int(size):
-        if unit_size > SIZE_UNITS['MiB']:
+        if unit_size > SIZE_UNITS["MiB"]:
             if unit_size % 5:
-                return SIZE_UNITS['MiB']
-            return SIZE_UNITS['MB']
+                return SIZE_UNITS["MiB"]
+            return SIZE_UNITS["MB"]
         return unit_size
 
-    if unit == 'B':
+    if unit == "B":
         raise AssertionError("byte is the smallest unit and requires an integer value")
 
     if 0 < product < bsize:
@@ -299,11 +331,11 @@ def smart_blocksize(size, unit, product, bsize):
 
 def split_size_unit(string, isint=False):
     """Split a string between the size value (int or float) and the unit.
-       Support optional space(s) between the numeric value and the unit.
+    Support optional space(s) between the numeric value and the unit.
     """
-    unit = re.sub(r'(\d|\.)', r'', string).strip()
-    value = float(re.sub(unit, r'', string).strip())
-    if isint and unit in ('B', ''):
+    unit = re.sub(r"(\d|\.)", r"", string).strip()
+    value = float(re.sub(unit, r"", string).strip())
+    if isint and unit in ("B", ""):
         if int(value) != value:
             raise AssertionError("invalid blocksize value: bytes require an integer value")
 
@@ -312,14 +344,16 @@ def split_size_unit(string, isint=False):
         product = int(round(value))
     else:
         if unit not in SIZE_UNITS.keys():
-            raise AssertionError(f"invalid size unit ({unit}): unit must be one of {', '.join(sorted(SIZE_UNITS, key=SIZE_UNITS.get))}, or none.")
+            raise AssertionError(
+                f"invalid size unit ({unit}): unit must be one of {', '.join(sorted(SIZE_UNITS, key=SIZE_UNITS.get))}, or none."
+            )
         product = int(round(value * SIZE_UNITS[unit]))
     return value, unit, product
 
 
 def size_string(value):
     """Convert a raw value to a string, but only if it is an integer, a float
-       or a string itself.
+    or a string itself.
     """
     if not isinstance(value, (int, float, str)):
         raise AssertionError(f"invalid value type ({type(value)}): size must be integer, float or string")
@@ -328,60 +362,64 @@ def size_string(value):
 
 def size_spec(args):
     """Return a dictionary with size specifications, especially the size in
-       bytes (after rounding it to an integer number of blocks).
+    bytes (after rounding it to an integer number of blocks).
     """
-    blocksize_in_bytes = split_size_unit(args['blocksize'], True)[2]
+    blocksize_in_bytes = split_size_unit(args["blocksize"], True)[2]
     if blocksize_in_bytes == 0:
         raise AssertionError("block size cannot be equal to zero")
 
-    size_value, size_unit, size_result = split_size_unit(args['size'])
+    size_value, size_unit, size_result = split_size_unit(args["size"])
     if not size_unit:
         blocks = int(math.ceil(size_value))
     else:
         blocksize_in_bytes = smart_blocksize(size_value, size_unit, size_result, blocksize_in_bytes)
         blocks = int(math.ceil(size_result / blocksize_in_bytes))
 
-    args['size_diff'] = round_bytes = int(blocks * blocksize_in_bytes)
-    args['size_spec'] = dict(blocks=blocks, blocksize=blocksize_in_bytes, bytes=round_bytes,
-                             iec=bytes_to_human(round_bytes, True),
-                             si=bytes_to_human(round_bytes))
-    return args['size_spec']
+    args["size_diff"] = round_bytes = int(blocks * blocksize_in_bytes)
+    args["size_spec"] = dict(
+        blocks=blocks,
+        blocksize=blocksize_in_bytes,
+        bytes=round_bytes,
+        iec=bytes_to_human(round_bytes, True),
+        si=bytes_to_human(round_bytes),
+    )
+    return args["size_spec"]
 
 
 def current_size(args):
     """Return the size of the file at the given location if it exists, or None."""
-    path = args['path']
+    path = args["path"]
     if os.path.exists(path):
         if not os.path.isfile(path):
             raise AssertionError(f"{path} exists but is not a regular file")
-        args['file_size'] = os.stat(path).st_size
+        args["file_size"] = os.stat(path).st_size
     else:
-        args['file_size'] = None
-    return args['file_size']
+        args["file_size"] = None
+    return args["file_size"]
 
 
 def complete_dd_cmdline(args, dd_cmd):
     """Compute dd options to grow or truncate a file."""
-    if args['file_size'] == args['size_spec']['bytes'] and not args['force']:
+    if args["file_size"] == args["size_spec"]["bytes"] and not args["force"]:
         # Nothing to do.
         return list()
 
-    bs = args['size_spec']['blocksize']
+    bs = args["size_spec"]["blocksize"]
 
     # For sparse files (create, truncate, grow): write count=0 block.
-    if args['sparse']:
-        seek = args['size_spec']['blocks']
-    elif args['force'] or not os.path.exists(args['path']):     # Create file
+    if args["sparse"]:
+        seek = args["size_spec"]["blocks"]
+    elif args["force"] or not os.path.exists(args["path"]):  # Create file
         seek = 0
-    elif args['size_diff'] < 0:                                 # Truncate file
-        seek = args['size_spec']['blocks']
-    elif args['size_diff'] % bs:                                # Grow file
-        seek = int(args['file_size'] / bs) + 1
+    elif args["size_diff"] < 0:  # Truncate file
+        seek = args["size_spec"]["blocks"]
+    elif args["size_diff"] % bs:  # Grow file
+        seek = int(args["file_size"] / bs) + 1
     else:
-        seek = int(args['file_size'] / bs)
+        seek = int(args["file_size"] / bs)
 
-    count = args['size_spec']['blocks'] - seek
-    dd_cmd += [f'bs={bs}', f'seek={seek}', f'count={count}']
+    count = args["size_spec"]["blocks"] - seek
+    dd_cmd += [f"bs={bs}", f"seek={seek}", f"count={count}"]
 
     return dd_cmd
 
@@ -389,12 +427,12 @@ def complete_dd_cmdline(args, dd_cmd):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path', required=True),
-            size=dict(type='raw', required=True),
-            blocksize=dict(type='raw'),
-            source=dict(type='path', default='/dev/zero'),
-            sparse=dict(type='bool', default=False),
-            force=dict(type='bool', default=False),
+            path=dict(type="path", required=True),
+            size=dict(type="raw", required=True),
+            blocksize=dict(type="raw"),
+            source=dict(type="path", default="/dev/zero"),
+            sparse=dict(type="bool", default=False),
+            force=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
         add_file_common_args=True,
@@ -402,71 +440,69 @@ def main():
     args = dict(**module.params)
     diff = dict(before=dict(), after=dict())
 
-    if args['sparse'] and args['force']:
-        module.fail_json(msg='parameters values are mutually exclusive: force=true|sparse=true')
-    if not os.path.exists(os.path.dirname(args['path'])):
-        module.fail_json(msg='parent directory of the file must exist prior to run this module')
-    if not args['blocksize']:
-        args['blocksize'] = str(os.statvfs(os.path.dirname(args['path'])).f_frsize)
+    if args["sparse"] and args["force"]:
+        module.fail_json(msg="parameters values are mutually exclusive: force=true|sparse=true")
+    if not os.path.exists(os.path.dirname(args["path"])):
+        module.fail_json(msg="parent directory of the file must exist prior to run this module")
+    if not args["blocksize"]:
+        args["blocksize"] = str(os.statvfs(os.path.dirname(args["path"])).f_frsize)
 
     try:
-        args['size'] = size_string(args['size'])
-        args['blocksize'] = size_string(args['blocksize'])
+        args["size"] = size_string(args["size"])
+        args["blocksize"] = size_string(args["blocksize"])
         initial_filesize = current_size(args)
         size_descriptors = size_spec(args)
     except AssertionError as err:
         module.fail_json(msg=to_native(err))
 
-    expected_filesize = size_descriptors['bytes']
+    expected_filesize = size_descriptors["bytes"]
     if initial_filesize:
-        args['size_diff'] = expected_filesize - initial_filesize
-    diff['after']['size'] = expected_filesize
-    diff['before']['size'] = initial_filesize
+        args["size_diff"] = expected_filesize - initial_filesize
+    diff["after"]["size"] = expected_filesize
+    diff["before"]["size"] = initial_filesize
 
-    result = dict(
-        changed=args['force'],
-        size_diff=args['size_diff'],
-        path=args['path'],
-        filesize=size_descriptors)
+    result = dict(changed=args["force"], size_diff=args["size_diff"], path=args["path"], filesize=size_descriptors)
 
-    dd_bin = module.get_bin_path('dd', True)
+    dd_bin = module.get_bin_path("dd", True)
     dd_cmd = [dd_bin, f"if={args['source']}", f"of={args['path']}"]
 
-    if expected_filesize != initial_filesize or args['force']:
-        result['cmd'] = ' '.join(complete_dd_cmdline(args, dd_cmd))
+    if expected_filesize != initial_filesize or args["force"]:
+        result["cmd"] = " ".join(complete_dd_cmdline(args, dd_cmd))
         if module.check_mode:
-            result['changed'] = True
+            result["changed"] = True
         else:
-            result['rc'], dummy, result['stderr'] = module.run_command(dd_cmd)
+            result["rc"], dummy, result["stderr"] = module.run_command(dd_cmd)
 
-            diff['after']['size'] = result_filesize = result['size_diff'] = current_size(args)
+            diff["after"]["size"] = result_filesize = result["size_diff"] = current_size(args)
             if initial_filesize:
-                result['size_diff'] = result_filesize - initial_filesize
-            if not args['force']:
-                result['changed'] = result_filesize != initial_filesize
+                result["size_diff"] = result_filesize - initial_filesize
+            if not args["force"]:
+                result["changed"] = result_filesize != initial_filesize
 
-            if result['rc']:
+            if result["rc"]:
                 msg = f"dd error while creating file {args['path']} with size {args['size']} from source {args['source']}: see stderr for details"
                 module.fail_json(msg=msg, **result)
             if result_filesize != expected_filesize:
-                msg = (f"module error while creating file {args['path']} with size {args['size']} "
-                       f"from source {args['source']}: file is {result_filesize} bytes long")
+                msg = (
+                    f"module error while creating file {args['path']} with size {args['size']} "
+                    f"from source {args['source']}: file is {result_filesize} bytes long"
+                )
                 module.fail_json(msg=msg, **result)
 
     # dd follows symlinks, and so does this module, while file module doesn't.
     # If we call it, this is to manage file's mode, owner and so on, not the
     # symlink's ones.
     file_params = dict(**module.params)
-    if os.path.islink(args['path']):
-        file_params['path'] = result['path'] = os.path.realpath(args['path'])
+    if os.path.islink(args["path"]):
+        file_params["path"] = result["path"] = os.path.realpath(args["path"])
 
-    if args['file_size'] is not None:
+    if args["file_size"] is not None:
         file_args = module.load_file_common_arguments(file_params)
-        result['changed'] = module.set_fs_attributes_if_different(file_args, result['changed'], diff=diff)
-    result['diff'] = diff
+        result["changed"] = module.set_fs_attributes_if_different(file_args, result["changed"], diff=diff)
+    result["diff"] = diff
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

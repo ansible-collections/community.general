@@ -17,9 +17,7 @@ class Failure(Exception):
 
 
 class Session:
-    def __init__(self, uri, transport=None, encoding=None, verbose=0,
-                 allow_none=1, ignore_ssl=False):
-
+    def __init__(self, uri, transport=None, encoding=None, verbose=0, allow_none=1, ignore_ssl=False):
         self.transport = transport
         self._session = None
         self.last_login_method = None
@@ -42,10 +40,10 @@ class Session:
         self.API_version = FAKE_API_VERSION
 
     def xenapi_request(self, methodname, params):
-        if methodname.startswith('login'):
+        if methodname.startswith("login"):
             self._login(methodname, params)
             return None
-        elif methodname == 'logout' or methodname == 'session.logout':
+        elif methodname == "logout" or methodname == "session.logout":
             self._logout()
             return None
         else:
@@ -53,14 +51,14 @@ class Session:
             return None
 
     def __getattr__(self, name):
-        if name == 'handle':
+        if name == "handle":
             return self._session
-        elif name == 'xenapi':
+        elif name == "xenapi":
             # Should be patched with mocker.patch().
             return None
-        elif name.startswith('login') or name.startswith('slave_local'):
+        elif name.startswith("login") or name.startswith("slave_local"):
             return lambda *params: self._login(name, params)
-        elif name == 'logout':
+        elif name == "logout":
             return self._logout
 
 

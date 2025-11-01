@@ -20,6 +20,7 @@ from collections.abc import Mapping
 HPE_ONEVIEW_IMP_ERR = None
 try:
     from hpOneView.oneview_client import OneViewClient
+
     HAS_HPE_ONEVIEW = True
 except ImportError:
     HPE_ONEVIEW_IMP_ERR = traceback.format_exc()
@@ -46,7 +47,7 @@ def transform_list_to_dict(list_):
         if isinstance(value, Mapping):
             ret.update(value)
         else:
-            ret[to_native(value, errors='surrogate_or_strict')] = True
+            ret[to_native(value, errors="surrogate_or_strict")] = True
 
     return ret
 
@@ -121,7 +122,7 @@ class OneViewModuleException(Exception):
     Attributes:
        msg (str): Exception message.
        oneview_response (dict): OneView rest response.
-   """
+    """
 
     def __init__(self, data):
         self.msg = None
@@ -133,7 +134,7 @@ class OneViewModuleException(Exception):
             self.oneview_response = data
 
             if data and isinstance(data, dict):
-                self.msg = data.get('message')
+                self.msg = data.get("message")
 
         if self.oneview_response:
             Exception.__init__(self, self.msg, self.oneview_response)
@@ -163,6 +164,7 @@ class OneViewModuleValueError(OneViewModuleException):
     Attributes:
        msg (str): Exception message.
     """
+
     pass
 
 
@@ -174,27 +176,28 @@ class OneViewModuleResourceNotFound(OneViewModuleException):
     Attributes:
        msg (str): Exception message.
     """
+
     pass
 
 
 class OneViewModuleBase(metaclass=abc.ABCMeta):
-    MSG_CREATED = 'Resource created successfully.'
-    MSG_UPDATED = 'Resource updated successfully.'
-    MSG_DELETED = 'Resource deleted successfully.'
-    MSG_ALREADY_PRESENT = 'Resource is already present.'
-    MSG_ALREADY_ABSENT = 'Resource is already absent.'
-    MSG_DIFF_AT_KEY = 'Difference found at key \'{0}\'. '
+    MSG_CREATED = "Resource created successfully."
+    MSG_UPDATED = "Resource updated successfully."
+    MSG_DELETED = "Resource deleted successfully."
+    MSG_ALREADY_PRESENT = "Resource is already present."
+    MSG_ALREADY_ABSENT = "Resource is already absent."
+    MSG_DIFF_AT_KEY = "Difference found at key '{0}'. "
 
     ONEVIEW_COMMON_ARGS = dict(
-        config=dict(type='path'),
-        hostname=dict(type='str'),
-        username=dict(type='str'),
-        password=dict(type='str', no_log=True),
-        api_version=dict(type='int'),
-        image_streamer_hostname=dict(type='str')
+        config=dict(type="path"),
+        hostname=dict(type="str"),
+        username=dict(type="str"),
+        password=dict(type="str", no_log=True),
+        api_version=dict(type="int"),
+        image_streamer_hostname=dict(type="str"),
     )
 
-    ONEVIEW_VALIDATE_ETAG_ARGS = dict(validate_etag=dict(type='bool', default=True))
+    ONEVIEW_VALIDATE_ETAG_ARGS = dict(validate_etag=dict(type="bool", default=True))
 
     resource_client = None
 
@@ -212,19 +215,18 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
         self._check_hpe_oneview_sdk()
         self._create_oneview_client()
 
-        self.state = self.module.params.get('state')
-        self.data = self.module.params.get('data')
+        self.state = self.module.params.get("state")
+        self.data = self.module.params.get("data")
 
         # Preload params for get_all - used by facts
-        self.facts_params = self.module.params.get('params') or {}
+        self.facts_params = self.module.params.get("params") or {}
 
         # Preload options as dict - used by facts
-        self.options = transform_list_to_dict(self.module.params.get('options'))
+        self.options = transform_list_to_dict(self.module.params.get("options"))
 
         self.validate_etag_support = validate_etag_support
 
     def _build_argument_spec(self, additional_arg_spec, validate_etag_support):
-
         merged_arg_spec = dict()
         merged_arg_spec.update(self.ONEVIEW_COMMON_ARGS)
 
@@ -238,19 +240,21 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
 
     def _check_hpe_oneview_sdk(self):
         if not HAS_HPE_ONEVIEW:
-            self.module.fail_json(msg=missing_required_lib('hpOneView'), exception=HPE_ONEVIEW_IMP_ERR)
+            self.module.fail_json(msg=missing_required_lib("hpOneView"), exception=HPE_ONEVIEW_IMP_ERR)
 
     def _create_oneview_client(self):
-        if self.module.params.get('hostname'):
-            config = dict(ip=self.module.params['hostname'],
-                          credentials=dict(userName=self.module.params['username'], password=self.module.params['password']),
-                          api_version=self.module.params['api_version'],
-                          image_streamer_ip=self.module.params['image_streamer_hostname'])
+        if self.module.params.get("hostname"):
+            config = dict(
+                ip=self.module.params["hostname"],
+                credentials=dict(userName=self.module.params["username"], password=self.module.params["password"]),
+                api_version=self.module.params["api_version"],
+                image_streamer_ip=self.module.params["image_streamer_hostname"],
+            )
             self.oneview_client = OneViewClient(config)
-        elif not self.module.params['config']:
+        elif not self.module.params["config"]:
             self.oneview_client = OneViewClient.from_environment_variables()
         else:
-            self.oneview_client = OneViewClient.from_json_file(self.module.params['config'])
+            self.oneview_client = OneViewClient.from_json_file(self.module.params["config"])
 
     @abc.abstractmethod
     def execute_module(self):
@@ -275,21 +279,21 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
         """
         try:
             if self.validate_etag_support:
-                if not self.module.params.get('validate_etag'):
+                if not self.module.params.get("validate_etag"):
                     self.oneview_client.connection.disable_etag_validation()
 
             result = self.execute_module()
 
             if "changed" not in result:
-                result['changed'] = False
+                result["changed"] = False
 
             self.module.exit_json(**result)
 
         except OneViewModuleException as exception:
-            error_msg = '; '.join(to_native(e) for e in exception.args)
+            error_msg = "; ".join(to_native(e) for e in exception.args)
             self.module.fail_json(msg=error_msg, exception=traceback.format_exc())
 
-    def resource_absent(self, resource, method='delete'):
+    def resource_absent(self, resource, method="delete"):
         """
         Generic implementation of the absent state for the OneView resources.
 
@@ -315,10 +319,10 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
 
         :return: The resource found or None.
         """
-        result = self.resource_client.get_by('name', name)
+        result = self.resource_client.get_by("name", name)
         return result[0] if result else None
 
-    def resource_present(self, resource, fact_name, create_method='create'):
+    def resource_present(self, resource, fact_name, create_method="create"):
         """
         Generic implementation of the present state for the OneView resources.
 
@@ -351,11 +355,7 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
                 changed = True
                 msg = self.MSG_UPDATED
 
-        return dict(
-            msg=msg,
-            changed=changed,
-            ansible_facts={fact_name: resource}
-        )
+        return dict(msg=msg, changed=changed, ansible_facts={fact_name: resource})
 
     def resource_scopes_set(self, state, fact_name, scope_uris):
         """
@@ -370,13 +370,13 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
         """
         if scope_uris is None:
             scope_uris = []
-        resource = state['ansible_facts'][fact_name]
-        operation_data = dict(operation='replace', path='/scopeUris', value=scope_uris)
+        resource = state["ansible_facts"][fact_name]
+        operation_data = dict(operation="replace", path="/scopeUris", value=scope_uris)
 
-        if resource['scopeUris'] is None or set(resource['scopeUris']) != set(scope_uris):
-            state['ansible_facts'][fact_name] = self.resource_client.patch(resource['uri'], **operation_data)
-            state['changed'] = True
-            state['msg'] = self.MSG_UPDATED
+        if resource["scopeUris"] is None or set(resource["scopeUris"]) != set(scope_uris):
+            state["ansible_facts"][fact_name] = self.resource_client.patch(resource["uri"], **operation_data)
+            state["changed"] = True
+            state["msg"] = self.MSG_UPDATED
 
         return state
 

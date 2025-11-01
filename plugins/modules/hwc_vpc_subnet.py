@@ -152,27 +152,38 @@ dns_address:
 """
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
-    Config, HwcClientException, HwcClientException404, HwcModule,
-    are_different_dicts, build_path, get_region, is_empty_value,
-    navigate_value, wait_to_finish)
+    Config,
+    HwcClientException,
+    HwcClientException404,
+    HwcModule,
+    are_different_dicts,
+    build_path,
+    get_region,
+    is_empty_value,
+    navigate_value,
+    wait_to_finish,
+)
 
 
 def build_module():
     return HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            timeouts=dict(type='dict', options=dict(
-                create=dict(default='15m', type='str'),
-                update=dict(default='15m', type='str'),
-            ), default=dict()),
-            cidr=dict(type='str', required=True),
-            gateway_ip=dict(type='str', required=True),
-            name=dict(type='str', required=True),
-            vpc_id=dict(type='str', required=True),
-            availability_zone=dict(type='str'),
-            dhcp_enable=dict(type='bool'),
-            dns_address=dict(type='list', elements='str')
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            timeouts=dict(
+                type="dict",
+                options=dict(
+                    create=dict(default="15m", type="str"),
+                    update=dict(default="15m", type="str"),
+                ),
+                default=dict(),
+            ),
+            cidr=dict(type="str", required=True),
+            gateway_ip=dict(type="str", required=True),
+            name=dict(type="str", required=True),
+            vpc_id=dict(type="str", required=True),
+            availability_zone=dict(type="str"),
+            dhcp_enable=dict(type="bool"),
+            dns_address=dict(type="list", elements="str"),
         ),
         supports_check_mode=True,
     )
@@ -186,7 +197,7 @@ def main():
 
     try:
         resource = None
-        if module.params.get('id'):
+        if module.params.get("id"):
             resource = True
         else:
             v = search_resource(config)
@@ -195,11 +206,11 @@ def main():
 
             if len(v) == 1:
                 resource = v[0]
-                module.params['id'] = navigate_value(resource, ["id"])
+                module.params["id"] = navigate_value(resource, ["id"])
 
         result = {}
         changed = False
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if resource is None:
                 if not module.check_mode:
                     create(config)
@@ -213,7 +224,7 @@ def main():
                 changed = True
 
             result = read_resource(config)
-            result['id'] = module.params.get('id')
+            result["id"] = module.params.get("id")
         else:
             if resource:
                 if not module.check_mode:
@@ -224,7 +235,7 @@ def main():
         module.fail_json(msg=str(ex))
 
     else:
-        result['changed'] = changed
+        result["changed"] = changed
         module.exit_json(**result)
 
 
@@ -243,19 +254,19 @@ def user_input_parameters(module):
 def create(config):
     module = config.module
     client = config.client(get_region(module), "vpc", "project")
-    timeout = 60 * int(module.params['timeouts']['create'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["create"].rstrip("m"))
     opts = user_input_parameters(module)
 
     params = build_create_parameters(opts)
     r = send_create_request(module, params, client)
     obj = async_wait_create(config, r, client, timeout)
-    module.params['id'] = navigate_value(obj, ["subnet", "id"])
+    module.params["id"] = navigate_value(obj, ["subnet", "id"])
 
 
 def update(config):
     module = config.module
     client = config.client(get_region(module), "vpc", "project")
-    timeout = 60 * int(module.params['timeouts']['update'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["update"].rstrip("m"))
     opts = user_input_parameters(module)
 
     params = build_update_parameters(opts)
@@ -283,7 +294,7 @@ def delete(config):
 
         return True, "Pending"
 
-    timeout = 60 * int(module.params['timeouts']['create'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["create"].rstrip("m"))
     try:
         wait_to_finish(["Done"], ["Pending"], _refresh_status, timeout)
     except Exception as ex:
@@ -320,7 +331,7 @@ def search_resource(config):
     link = f"subnets{query_link}"
 
     result = []
-    p = {'marker': ''}
+    p = {"marker": ""}
     while True:
         url = link.format(**p)
         r = send_list_request(module, client, url)
@@ -335,7 +346,7 @@ def search_resource(config):
         if len(result) > 1:
             break
 
-        p['marker'] = r[-1].get('id')
+        p["marker"] = r[-1].get("id")
 
     return result
 
@@ -437,10 +448,7 @@ def async_wait_create(config, result, client, timeout):
             return None, ""
 
     try:
-        return wait_to_finish(
-            ["ACTIVE"],
-            ["UNKNOWN"],
-            _query_status, timeout)
+        return wait_to_finish(["ACTIVE"], ["UNKNOWN"], _query_status, timeout)
     except Exception as ex:
         module.fail_json(msg=f"module(hwc_vpc_subnet): error waiting for api(create) to be done, error= {ex}")
 
@@ -531,10 +539,7 @@ def async_wait_update(config, result, client, timeout):
             return None, ""
 
     try:
-        return wait_to_finish(
-            ["ACTIVE"],
-            ["UNKNOWN"],
-            _query_status, timeout)
+        return wait_to_finish(["ACTIVE"], ["UNKNOWN"], _query_status, timeout)
     except Exception as ex:
         module.fail_json(msg=f"module(hwc_vpc_subnet): error waiting for api(update) to be done, error= {ex}")
 
@@ -624,7 +629,6 @@ def update_properties(module, response, array_index, exclude_output=False):
 
 
 def send_list_request(module, client, url):
-
     r = None
     try:
         r = client.get(url)
@@ -706,5 +710,5 @@ def fill_list_resp_body(body):
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

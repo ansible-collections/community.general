@@ -149,8 +149,13 @@ instance:
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.xenserver import (xenserver_common_argument_spec, XenServerObject, get_object_ref,
-                                                                                  gather_vm_params, gather_vm_facts)
+from ansible_collections.community.general.plugins.module_utils.xenserver import (
+    xenserver_common_argument_spec,
+    XenServerObject,
+    get_object_ref,
+    gather_vm_params,
+    gather_vm_facts,
+)
 
 
 class XenServerVM(XenServerObject):
@@ -170,7 +175,14 @@ class XenServerVM(XenServerObject):
         """
         super().__init__(module)
 
-        self.vm_ref = get_object_ref(self.module, self.module.params['name'], self.module.params['uuid'], obj_type="VM", fail=True, msg_prefix="VM search: ")
+        self.vm_ref = get_object_ref(
+            self.module,
+            self.module.params["name"],
+            self.module.params["uuid"],
+            obj_type="VM",
+            fail=True,
+            msg_prefix="VM search: ",
+        )
         self.gather_params()
 
     def gather_params(self):
@@ -185,30 +197,31 @@ class XenServerVM(XenServerObject):
 def main():
     argument_spec = xenserver_common_argument_spec()
     argument_spec.update(
-        name=dict(type='str', aliases=['name_label']),
-        uuid=dict(type='str'),
+        name=dict(type="str", aliases=["name_label"]),
+        uuid=dict(type="str"),
     )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=[
-                               ['name', 'uuid'],
-                           ],
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=[
+            ["name", "uuid"],
+        ],
+    )
 
-    result = {'failed': False, 'changed': False}
+    result = {"failed": False, "changed": False}
 
     # Module will exit with an error message if no VM is found.
     vm = XenServerVM(module)
 
     # Gather facts.
-    result['instance'] = vm.gather_facts()
+    result["instance"] = vm.gather_facts()
 
-    if result['failed']:
+    if result["failed"]:
         module.fail_json(**result)
     else:
         module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

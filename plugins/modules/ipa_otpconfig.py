@@ -90,24 +90,24 @@ class OTPConfigIPAClient(IPAClient):
         super().__init__(module, host, port, protocol)
 
     def otpconfig_show(self):
-        return self._post_json(method='otpconfig_show', name=None)
+        return self._post_json(method="otpconfig_show", name=None)
 
     def otpconfig_mod(self, name, item):
-        return self._post_json(method='otpconfig_mod', name=name, item=item)
+        return self._post_json(method="otpconfig_mod", name=name, item=item)
 
 
-def get_otpconfig_dict(ipatokentotpauthwindow=None, ipatokentotpsyncwindow=None,
-                       ipatokenhotpauthwindow=None, ipatokenhotpsyncwindow=None):
-
+def get_otpconfig_dict(
+    ipatokentotpauthwindow=None, ipatokentotpsyncwindow=None, ipatokenhotpauthwindow=None, ipatokenhotpsyncwindow=None
+):
     config = {}
     if ipatokentotpauthwindow is not None:
-        config['ipatokentotpauthwindow'] = str(ipatokentotpauthwindow)
+        config["ipatokentotpauthwindow"] = str(ipatokentotpauthwindow)
     if ipatokentotpsyncwindow is not None:
-        config['ipatokentotpsyncwindow'] = str(ipatokentotpsyncwindow)
+        config["ipatokentotpsyncwindow"] = str(ipatokentotpsyncwindow)
     if ipatokenhotpauthwindow is not None:
-        config['ipatokenhotpauthwindow'] = str(ipatokenhotpauthwindow)
+        config["ipatokenhotpauthwindow"] = str(ipatokenhotpauthwindow)
     if ipatokenhotpsyncwindow is not None:
-        config['ipatokenhotpsyncwindow'] = str(ipatokenhotpsyncwindow)
+        config["ipatokenhotpsyncwindow"] = str(ipatokenhotpsyncwindow)
 
     return config
 
@@ -118,10 +118,10 @@ def get_otpconfig_diff(client, ipa_config, module_config):
 
 def ensure(module, client):
     module_otpconfig = get_otpconfig_dict(
-        ipatokentotpauthwindow=module.params.get('ipatokentotpauthwindow'),
-        ipatokentotpsyncwindow=module.params.get('ipatokentotpsyncwindow'),
-        ipatokenhotpauthwindow=module.params.get('ipatokenhotpauthwindow'),
-        ipatokenhotpsyncwindow=module.params.get('ipatokenhotpsyncwindow'),
+        ipatokentotpauthwindow=module.params.get("ipatokentotpauthwindow"),
+        ipatokentotpsyncwindow=module.params.get("ipatokentotpsyncwindow"),
+        ipatokenhotpauthwindow=module.params.get("ipatokenhotpauthwindow"),
+        ipatokenhotpsyncwindow=module.params.get("ipatokenhotpsyncwindow"),
     )
     ipa_otpconfig = client.otpconfig_show()
     diff = get_otpconfig_diff(client, ipa_otpconfig, module_otpconfig)
@@ -142,29 +142,23 @@ def ensure(module, client):
 def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(
-        ipatokentotpauthwindow=dict(type='int', aliases=['totpauthwindow'], no_log=False),
-        ipatokentotpsyncwindow=dict(type='int', aliases=['totpsyncwindow'], no_log=False),
-        ipatokenhotpauthwindow=dict(type='int', aliases=['hotpauthwindow'], no_log=False),
-        ipatokenhotpsyncwindow=dict(type='int', aliases=['hotpsyncwindow'], no_log=False),
+        ipatokentotpauthwindow=dict(type="int", aliases=["totpauthwindow"], no_log=False),
+        ipatokentotpsyncwindow=dict(type="int", aliases=["totpsyncwindow"], no_log=False),
+        ipatokenhotpauthwindow=dict(type="int", aliases=["hotpauthwindow"], no_log=False),
+        ipatokenhotpsyncwindow=dict(type="int", aliases=["hotpsyncwindow"], no_log=False),
     )
 
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     client = OTPConfigIPAClient(
         module=module,
-        host=module.params['ipa_host'],
-        port=module.params['ipa_port'],
-        protocol=module.params['ipa_prot']
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
     )
 
     try:
-        client.login(
-            username=module.params['ipa_user'],
-            password=module.params['ipa_pass']
-        )
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, otpconfig = ensure(module, client)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
@@ -172,5 +166,5 @@ def main():
     module.exit_json(changed=changed, otpconfig=otpconfig)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

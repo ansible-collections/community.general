@@ -92,9 +92,7 @@ class HomebrewValidate:
         if brew_path is None:
             return True
 
-        return isinstance(
-            brew_path, str
-        ) and not cls.INVALID_BREW_PATH_REGEX.search(brew_path)
+        return isinstance(brew_path, str) and not cls.INVALID_BREW_PATH_REGEX.search(brew_path)
 
     @classmethod
     def valid_package(cls, package):
@@ -103,9 +101,7 @@ class HomebrewValidate:
         if package is None:
             return True
 
-        return isinstance(
-            package, str
-        ) and not cls.INVALID_PACKAGE_REGEX.search(package)
+        return isinstance(package, str) and not cls.INVALID_PACKAGE_REGEX.search(package)
 
 
 def parse_brew_path(module):

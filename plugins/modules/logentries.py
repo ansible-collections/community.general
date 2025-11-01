@@ -66,7 +66,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def query_log_status(module, le_path, path, state="present"):
-    """ Returns whether a log is followed or not. """
+    """Returns whether a log is followed or not."""
 
     if state == "present":
         rc, out, err = module.run_command([le_path, "followed", path])
@@ -77,7 +77,7 @@ def query_log_status(module, le_path, path, state="present"):
 
 
 def follow_log(module, le_path, logs, name=None, logtype=None):
-    """ Follows one or more logs if not already followed. """
+    """Follows one or more logs if not already followed."""
 
     followed_count = 0
 
@@ -88,11 +88,11 @@ def follow_log(module, le_path, logs, name=None, logtype=None):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        cmd = [le_path, 'follow', log]
+        cmd = [le_path, "follow", log]
         if name:
-            cmd.extend(['--name', name])
+            cmd.extend(["--name", name])
         if logtype:
-            cmd.extend(['--type', logtype])
+            cmd.extend(["--type", logtype])
         rc, out, err = module.run_command(cmd)
 
         if not query_log_status(module, le_path, log):
@@ -107,7 +107,7 @@ def follow_log(module, le_path, logs, name=None, logtype=None):
 
 
 def unfollow_log(module, le_path, logs):
-    """ Unfollows one or more logs if followed. """
+    """Unfollows one or more logs if followed."""
 
     removed_count = 0
 
@@ -119,7 +119,7 @@ def unfollow_log(module, le_path, logs):
 
         if module.check_mode:
             module.exit_json(changed=True)
-        rc, out, err = module.run_command([le_path, 'rm', log])
+        rc, out, err = module.run_command([le_path, "rm", log])
 
         if query_log_status(module, le_path, log):
             module.fail_json(msg=f"failed to remove '{log}': {err.strip()}")
@@ -137,13 +137,13 @@ def main():
         argument_spec=dict(
             path=dict(required=True),
             state=dict(default="present", choices=["present", "followed", "absent", "unfollowed"]),
-            name=dict(type='str'),
-            logtype=dict(type='str', aliases=['type'])
+            name=dict(type="str"),
+            logtype=dict(type="str", aliases=["type"]),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    le_path = module.get_bin_path('le', True, ['/usr/local/bin'])
+    le_path = module.get_bin_path("le", True, ["/usr/local/bin"])
 
     p = module.params
 
@@ -152,11 +152,11 @@ def main():
     logs = [_f for _f in logs if _f]
 
     if p["state"] in ["present", "followed"]:
-        follow_log(module, le_path, logs, name=p['name'], logtype=p['logtype'])
+        follow_log(module, le_path, logs, name=p["name"], logtype=p["logtype"])
 
     elif p["state"] in ["absent", "unfollowed"]:
         unfollow_log(module, le_path, logs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

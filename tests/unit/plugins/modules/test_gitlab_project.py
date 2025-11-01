@@ -1,4 +1,3 @@
-
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -18,10 +17,16 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from .gitlab import (GitlabModuleTestCase,
-                         python_version_match_requirement,
-                         resp_get_group, resp_get_project_by_name, resp_create_project,
-                         resp_get_project, resp_delete_project, resp_get_user)
+    from .gitlab import (
+        GitlabModuleTestCase,
+        python_version_match_requirement,
+        resp_get_group,
+        resp_get_project_by_name,
+        resp_create_project,
+        resp_get_project,
+        resp_delete_project,
+        resp_get_user,
+    )
 
     # GitLab module requirements
     if python_version_match_requirement():
@@ -70,7 +75,9 @@ class TestGitlabProject(GitlabModuleTestCase):
     @with_httmock(resp_create_project)
     def test_create_project(self):
         group = self.gitlab_instance.groups.get(1)
-        project = self.moduleUtil.create_project(group, {"name": "Diaspora Client", "path": "diaspora-client", "namespace_id": group.id})
+        project = self.moduleUtil.create_project(
+            group, {"name": "Diaspora Client", "path": "diaspora-client", "namespace_id": group.id}
+        )
 
         self.assertEqual(type(project), Project)
         self.assertEqual(project.name, "Diaspora Client")
@@ -97,14 +104,18 @@ class TestGitlabProject(GitlabModuleTestCase):
         # merge_method should be 'merge' by default
         self.assertEqual(project.merge_method, "merge")
 
-        changed, newProject = self.moduleUtil.update_project(project, {"name": "New Name", "merge_method": "rebase_merge"})
+        changed, newProject = self.moduleUtil.update_project(
+            project, {"name": "New Name", "merge_method": "rebase_merge"}
+        )
 
         self.assertEqual(changed, True)
         self.assertEqual(type(newProject), Project)
         self.assertEqual(newProject.name, "New Name")
         self.assertEqual(newProject.merge_method, "rebase_merge")
 
-        changed, newProject = self.moduleUtil.update_project(project, {"name": "New Name", "merge_method": "rebase_merge"})
+        changed, newProject = self.moduleUtil.update_project(
+            project, {"name": "New Name", "merge_method": "rebase_merge"}
+        )
 
         self.assertEqual(changed, False)
         self.assertEqual(newProject.name, "New Name")

@@ -83,9 +83,9 @@ from ansible.plugins.connection import ConnectionBase
 
 
 class Connection(ConnectionBase):
-    """ lxd based connections """
+    """lxd based connections"""
 
-    transport = 'community.general.lxd'
+    transport = "community.general.lxd"
     has_pipelining = True
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
@@ -97,11 +97,11 @@ class Connection(ConnectionBase):
             raise AnsibleError("lxc command not found in PATH")
 
     def _host(self):
-        """ translate remote_addr to lxd (short) hostname """
+        """translate remote_addr to lxd (short) hostname"""
         return self.get_option("remote_addr").split(".", 1)[0]
 
     def _connect(self):
-        """connect to lxd (nothing to do here) """
+        """connect to lxd (nothing to do here)"""
         super()._connect()
 
         if not self._connected:
@@ -124,16 +124,14 @@ class Connection(ConnectionBase):
                 trying to run 'lxc exec' with become method: {self.get_option('lxd_become_method')}",
                 host=self._host(),
             )
-            exec_cmd.extend(
-                [self.get_option("lxd_become_method"), self.get_option("remote_user"), "-c"]
-            )
+            exec_cmd.extend([self.get_option("lxd_become_method"), self.get_option("remote_user"), "-c"])
 
         exec_cmd.extend([self.get_option("executable"), "-c", cmd])
 
         return exec_cmd
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
-        """ execute a command on the lxd host """
+        """execute a command on the lxd host"""
         super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         self._display.vvv(f"EXEC {cmd}", host=self._host())
@@ -141,8 +139,8 @@ class Connection(ConnectionBase):
         local_cmd = self._build_command(cmd)
         self._display.vvvvv(f"EXEC {local_cmd}", host=self._host())
 
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
-        in_data = to_bytes(in_data, errors='surrogate_or_strict', nonstring='passthru')
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
+        in_data = to_bytes(in_data, errors="surrogate_or_strict", nonstring="passthru")
 
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate(in_data)
@@ -165,27 +163,23 @@ class Connection(ConnectionBase):
 
         rc, uid_out, err = self.exec_command("/bin/id -u")
         if rc != 0:
-            raise AnsibleError(
-                f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}"
-            )
+            raise AnsibleError(f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}")
         uid = uid_out.strip()
 
         rc, gid_out, err = self.exec_command("/bin/id -g")
         if rc != 0:
-            raise AnsibleError(
-                f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}"
-            )
+            raise AnsibleError(f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}")
         gid = gid_out.strip()
 
         return int(uid), int(gid)
 
     def put_file(self, in_path, out_path):
-        """ put a file from local to lxd """
+        """put a file from local to lxd"""
         super().put_file(in_path, out_path)
 
         self._display.vvv(f"PUT {in_path} TO {out_path}", host=self._host())
 
-        if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
+        if not os.path.isfile(to_bytes(in_path, errors="surrogate_or_strict")):
             raise AnsibleFileNotFound(f"input path is not a file: {in_path}")
 
         local_cmd = [self._lxc_cmd]
@@ -218,13 +212,13 @@ class Connection(ConnectionBase):
 
         self._display.vvvvv(f"PUT {local_cmd}", host=self._host())
 
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         process.communicate()
 
     def fetch_file(self, in_path, out_path):
-        """ fetch a file from lxd to local """
+        """fetch a file from lxd to local"""
         super().fetch_file(in_path, out_path)
 
         self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self._host())
@@ -232,19 +226,15 @@ class Connection(ConnectionBase):
         local_cmd = [self._lxc_cmd]
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
-        local_cmd.extend([
-            "file", "pull",
-            f"{self.get_option('remote')}:{self._host()}/{in_path}",
-            out_path
-        ])
+        local_cmd.extend(["file", "pull", f"{self.get_option('remote')}:{self._host()}/{in_path}", out_path])
 
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         process.communicate()
 
     def close(self):
-        """ close the connection (nothing to do here) """
+        """close the connection (nothing to do here)"""
         super().close()
 
         self._connected = False

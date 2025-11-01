@@ -189,11 +189,11 @@ def check_package_version(module, name):
 def query_package_provides(module, name, allow_upgrade=False):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
-    if name.endswith('.rpm'):
+    if name.endswith(".rpm"):
         # Likely a local RPM file
         if not HAS_RPM_PYTHON:
             module.fail_json(
-                msg=missing_required_lib('rpm'),
+                msg=missing_required_lib("rpm"),
                 exception=RPM_PYTHON_IMPORT_ERROR,
             )
 
@@ -238,7 +238,6 @@ def update_kernel(module):
 
 
 def remove_packages(module, packages):
-
     if packages is None:
         return (False, "Empty package list")
 
@@ -263,7 +262,6 @@ def remove_packages(module, packages):
 
 
 def install_packages(module, pkgspec, allow_upgrade=False):
-
     if pkgspec is None:
         return (False, "Empty package list")
 
@@ -293,12 +291,16 @@ def install_packages(module, pkgspec, allow_upgrade=False):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['absent', 'installed', 'present', 'removed', 'present_not_latest', 'latest']),
-            update_cache=dict(type='bool', default=False),
-            clean=dict(type='bool', default=False),
-            dist_upgrade=dict(type='bool', default=False),
-            update_kernel=dict(type='bool', default=False),
-            package=dict(type='list', elements='str', aliases=['name', 'pkg']),
+            state=dict(
+                type="str",
+                default="present",
+                choices=["absent", "installed", "present", "removed", "present_not_latest", "latest"],
+            ),
+            update_cache=dict(type="bool", default=False),
+            clean=dict(type="bool", default=False),
+            dist_upgrade=dict(type="bool", default=False),
+            update_kernel=dict(type="bool", default=False),
+            package=dict(type="list", elements="str", aliases=["name", "pkg"]),
         ),
     )
 
@@ -310,30 +312,30 @@ def main():
     modified = False
     output = ""
 
-    if p['update_cache']:
+    if p["update_cache"]:
         update_package_db(module)
 
-    if p['clean']:
+    if p["clean"]:
         (m, out) = clean(module)
         modified = modified or m
 
-    if p['dist_upgrade']:
+    if p["dist_upgrade"]:
         (m, out) = dist_upgrade(module)
         modified = modified or m
         output += out
 
-    if p['update_kernel']:
+    if p["update_kernel"]:
         (m, out) = update_kernel(module)
         modified = modified or m
         output += out
 
-    packages = p['package']
-    if p['state'] in ['installed', 'present', 'present_not_latest', 'latest']:
-        (m, out) = install_packages(module, packages, allow_upgrade=p['state'] == 'latest')
+    packages = p["package"]
+    if p["state"] in ["installed", "present", "present_not_latest", "latest"]:
+        (m, out) = install_packages(module, packages, allow_upgrade=p["state"] == "latest")
         modified = modified or m
         output += out
 
-    if p['state'] in ['absent', 'removed']:
+    if p["state"] in ["absent", "removed"]:
         (m, out) = remove_packages(module, packages)
         modified = modified or m
         output += out
@@ -342,5 +344,5 @@ def main():
     module.exit_json(changed=modified, msg=output)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

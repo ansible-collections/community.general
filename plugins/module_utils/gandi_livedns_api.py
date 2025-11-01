@@ -11,51 +11,42 @@ from ansible.module_utils.urls import fetch_url
 
 
 class GandiLiveDNSAPI:
-
-    api_endpoint = 'https://api.gandi.net/v5/livedns'
+    api_endpoint = "https://api.gandi.net/v5/livedns"
     changed = False
 
     error_strings = {
-        400: 'Bad request',
-        401: 'Permission denied',
-        404: 'Resource not found',
+        400: "Bad request",
+        401: "Permission denied",
+        404: "Resource not found",
     }
 
-    attribute_map = {
-        'record': 'rrset_name',
-        'type': 'rrset_type',
-        'ttl': 'rrset_ttl',
-        'values': 'rrset_values'
-    }
+    attribute_map = {"record": "rrset_name", "type": "rrset_type", "ttl": "rrset_ttl", "values": "rrset_values"}
 
     def __init__(self, module):
         self.module = module
-        self.api_key = module.params['api_key']
-        self.personal_access_token = module.params['personal_access_token']
+        self.api_key = module.params["api_key"]
+        self.personal_access_token = module.params["personal_access_token"]
 
     def _build_error_message(self, module, info):
-        s = ''
-        body = info.get('body')
+        s = ""
+        body = info.get("body")
         if body:
-            errors = module.from_json(body).get('errors')
+            errors = module.from_json(body).get("errors")
             if errors:
                 error = errors[0]
-                name = error.get('name')
+                name = error.get("name")
                 if name:
-                    s += f'{name} :'
-                description = error.get('description')
+                    s += f"{name} :"
+                description = error.get("description")
                 if description:
                     s += description
         return s
 
-    def _gandi_api_call(self, api_call, method='GET', payload=None, error_on_404=True):
+    def _gandi_api_call(self, api_call, method="GET", payload=None, error_on_404=True):
         authorization_header = (
-            f'Bearer {self.personal_access_token}'
-            if self.personal_access_token
-            else f'Apikey {self.api_key}'
+            f"Bearer {self.personal_access_token}" if self.personal_access_token else f"Apikey {self.api_key}"
         )
-        headers = {'Authorization': authorization_header,
-                   'Content-Type': 'application/json'}
+        headers = {"Authorization": authorization_header, "Content-Type": "application/json"}
         data = None
         if payload:
             try:
@@ -63,15 +54,11 @@ class GandiLiveDNSAPI:
             except Exception as e:
                 self.module.fail_json(msg=f"Failed to encode payload as JSON: {e} ")
 
-        resp, info = fetch_url(self.module,
-                               self.api_endpoint + api_call,
-                               headers=headers,
-                               data=data,
-                               method=method)
+        resp, info = fetch_url(self.module, self.api_endpoint + api_call, headers=headers, data=data, method=method)
 
-        error_msg = ''
-        if info['status'] >= 400 and (info['status'] != 404 or error_on_404):
-            err_s = self.error_strings.get(info['status'], '')
+        error_msg = ""
+        if info["status"] >= 400 and (info["status"] != 404 or error_on_404):
+            err_s = self.error_strings.get(info["status"], "")
 
             error_msg = f"API Error {err_s}: {self._build_error_message(self.module, info)}"
 
@@ -83,14 +70,14 @@ class GandiLiveDNSAPI:
 
         if content:
             try:
-                result = json.loads(to_text(content, errors='surrogate_or_strict'))
-            except (getattr(json, 'JSONDecodeError', ValueError)) as e:
+                result = json.loads(to_text(content, errors="surrogate_or_strict"))
+            except getattr(json, "JSONDecodeError", ValueError) as e:
                 error_msg += f"; Failed to parse API response with error {e}: {content}"
 
         if error_msg:
             self.module.fail_json(msg=error_msg)
 
-        return result, info['status']
+        return result, info["status"]
 
     def build_result(self, result, domain):
         if result is None:
@@ -100,11 +87,11 @@ class GandiLiveDNSAPI:
         for k in self.attribute_map:
             v = result.get(self.attribute_map[k], None)
             if v is not None:
-                if k == 'record' and v == '@':
-                    v = ''
+                if k == "record" and v == "@":
+                    v = ""
                 res[k] = v
 
-        res['domain'] = domain
+        res["domain"] = domain
 
         return res
 
@@ -114,11 +101,11 @@ class GandiLiveDNSAPI:
         return [self.build_result(r, domain) for r in results]
 
     def get_records(self, record, type, domain):
-        url = f'/domains/{domain}/records'
+        url = f"/domains/{domain}/records"
         if record:
-            url += f'/{record}'
+            url += f"/{record}"
             if type:
-                url += f'/{type}'
+                url += f"/{type}"
 
         records, status = self._gandi_api_call(url, error_on_404=False)
 
@@ -130,44 +117,45 @@ class GandiLiveDNSAPI:
 
         # filter by type if record is not set
         if not record and type:
-            records = [r
-                       for r in records
-                       if r['rrset_type'] == type]
+            records = [r for r in records if r["rrset_type"] == type]
 
         return records
 
     def create_record(self, record, type, values, ttl, domain):
-        url = f'/domains/{domain}/records'
+        url = f"/domains/{domain}/records"
         new_record = {
-            'rrset_name': record,
-            'rrset_type': type,
-            'rrset_values': values,
-            'rrset_ttl': ttl,
+            "rrset_name": record,
+            "rrset_type": type,
+            "rrset_values": values,
+            "rrset_ttl": ttl,
         }
-        record, status = self._gandi_api_call(url, method='POST', payload=new_record)
+        record, status = self._gandi_api_call(url, method="POST", payload=new_record)
 
-        if status in (200, 201,):
+        if status in (
+            200,
+            201,
+        ):
             return new_record
 
         return None
 
     def update_record(self, record, type, values, ttl, domain):
-        url = f'/domains/{domain}/records/{record}/{type}'
+        url = f"/domains/{domain}/records/{record}/{type}"
         new_record = {
-            'rrset_values': values,
-            'rrset_ttl': ttl,
+            "rrset_values": values,
+            "rrset_ttl": ttl,
         }
-        record = self._gandi_api_call(url, method='PUT', payload=new_record)[0]
+        record = self._gandi_api_call(url, method="PUT", payload=new_record)[0]
         return record
 
     def delete_record(self, record, type, domain):
-        url = f'/domains/{domain}/records/{record}/{type}'
+        url = f"/domains/{domain}/records/{record}/{type}"
 
-        self._gandi_api_call(url, method='DELETE')
+        self._gandi_api_call(url, method="DELETE")
 
     def delete_dns_record(self, record, type, values, domain):
-        if record == '':
-            record = '@'
+        if record == "":
+            record = "@"
 
         records = self.get_records(record, type, domain)
 
@@ -176,11 +164,11 @@ class GandiLiveDNSAPI:
 
             self.changed = True
 
-            if values is not None and set(cur_record['rrset_values']) != set(values):
-                new_values = set(cur_record['rrset_values']) - set(values)
+            if values is not None and set(cur_record["rrset_values"]) != set(values):
+                new_values = set(cur_record["rrset_values"]) - set(values)
                 if new_values:
                     # Removing one or more values from a record, we update the record with the remaining values
-                    self.update_record(record, type, list(new_values), cur_record['rrset_ttl'], domain)
+                    self.update_record(record, type, list(new_values), cur_record["rrset_ttl"], domain)
                     records = self.get_records(record, type, domain)
                     return records[0], self.changed
 
@@ -192,8 +180,8 @@ class GandiLiveDNSAPI:
         return None, self.changed
 
     def ensure_dns_record(self, record, type, ttl, values, domain):
-        if record == '':
-            record = '@'
+        if record == "":
+            record = "@"
 
         records = self.get_records(record, type, domain)
 
@@ -201,19 +189,14 @@ class GandiLiveDNSAPI:
             cur_record = records[0]
 
             do_update = False
-            if ttl is not None and cur_record['rrset_ttl'] != ttl:
+            if ttl is not None and cur_record["rrset_ttl"] != ttl:
                 do_update = True
-            if values is not None and set(cur_record['rrset_values']) != set(values):
+            if values is not None and set(cur_record["rrset_values"]) != set(values):
                 do_update = True
 
             if do_update:
                 if self.module.check_mode:
-                    result = dict(
-                        rrset_type=type,
-                        rrset_name=record,
-                        rrset_values=values,
-                        rrset_ttl=ttl
-                    )
+                    result = dict(rrset_type=type, rrset_name=record, rrset_values=values, rrset_ttl=ttl)
                 else:
                     self.update_record(record, type, values, ttl, domain)
 
@@ -225,12 +208,7 @@ class GandiLiveDNSAPI:
                 return cur_record, self.changed
 
         if self.module.check_mode:
-            new_record = dict(
-                rrset_type=type,
-                rrset_name=record,
-                rrset_values=values,
-                rrset_ttl=ttl
-            )
+            new_record = dict(rrset_type=type, rrset_name=record, rrset_values=values, rrset_ttl=ttl)
             result = new_record
         else:
             result = self.create_record(record, type, values, ttl, domain)

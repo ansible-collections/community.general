@@ -40,9 +40,11 @@ from collections import Counter
 
 
 def counter(sequence):
-    ''' Count elements in a sequence. Returns dict with count result. '''
+    """Count elements in a sequence. Returns dict with count result."""
     if not isinstance(sequence, Sequence):
-        raise AnsibleFilterError(f'Argument for community.general.counter must be a sequence (string or list). {sequence} is {type(sequence)}')
+        raise AnsibleFilterError(
+            f"Argument for community.general.counter must be a sequence (string or list). {sequence} is {type(sequence)}"
+        )
 
     try:
         result = dict(Counter(sequence))
@@ -54,11 +56,11 @@ def counter(sequence):
 
 
 class FilterModule:
-    ''' Ansible counter jinja2 filters '''
+    """Ansible counter jinja2 filters"""
 
     def filters(self):
         filters = {
-            'counter': counter,
+            "counter": counter,
         }
 
         return filters

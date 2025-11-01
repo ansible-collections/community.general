@@ -92,23 +92,21 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
-
-    name = 'community.general.ksu'
+    name = "community.general.ksu"
 
     # messages for detecting prompted password issues
-    fail = ('Password incorrect',)
-    missing = ('No password given',)
+    fail = ("Password incorrect",)
+    missing = ("No password given",)
 
     def check_password_prompt(self, b_output):
-        ''' checks if the expected password prompt exists in b_output '''
+        """checks if the expected password prompt exists in b_output"""
 
-        prompts = self.get_option('prompt_l10n') or ["Kerberos password for .*@.*:"]
+        prompts = self.get_option("prompt_l10n") or ["Kerberos password for .*@.*:"]
         b_prompt = b"|".join(to_bytes(p) for p in prompts)
 
         return bool(re.match(b_prompt, b_output))
 
     def build_become_command(self, cmd, shell):
-
         super().build_become_command(cmd, shell)
 
         # Prompt handling for ``ksu`` is more complicated, this
@@ -118,8 +116,8 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        exe = self.get_option('become_exe')
+        exe = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        user = self.get_option('become_user')
-        return f'{exe} {user} {flags} -e {self._build_success_command(cmd, shell)} '
+        flags = self.get_option("become_flags")
+        user = self.get_option("become_user")
+        return f"{exe} {user} {flags} -e {self._build_success_command(cmd, shell)} "

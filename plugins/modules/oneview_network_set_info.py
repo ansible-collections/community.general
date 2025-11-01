@@ -135,9 +135,9 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 
 class NetworkSetInfoModule(OneViewModuleBase):
     argument_spec = dict(
-        name=dict(type='str'),
-        options=dict(type='list', elements='str'),
-        params=dict(type='dict'),
+        name=dict(type="str"),
+        options=dict(type="list", elements="str"),
+        params=dict(type="dict"),
     )
 
     def __init__(self):
@@ -147,14 +147,13 @@ class NetworkSetInfoModule(OneViewModuleBase):
         )
 
     def execute_module(self):
+        name = self.module.params.get("name")
 
-        name = self.module.params.get('name')
-
-        if 'withoutEthernet' in self.options:
-            filter_by_name = f"\"'name'='{name}'\"" if name else ''
+        if "withoutEthernet" in self.options:
+            filter_by_name = f"\"'name'='{name}'\"" if name else ""
             network_sets = self.oneview_client.network_sets.get_all_without_ethernet(filter=filter_by_name)
         elif name:
-            network_sets = self.oneview_client.network_sets.get_by('name', name)
+            network_sets = self.oneview_client.network_sets.get_by("name", name)
         else:
             network_sets = self.oneview_client.network_sets.get_all(**self.facts_params)
 
@@ -165,5 +164,5 @@ def main():
     NetworkSetInfoModule().run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

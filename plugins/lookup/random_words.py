@@ -92,12 +92,8 @@ class LookupModule(LookupBase):
     """The random_words Ansible lookup class."""
 
     def run(self, terms, variables=None, **kwargs):
-
         if not HAS_XKCDPASS:
-            raise AnsibleLookupError(
-                "Python xkcdpass library is required. "
-                'Please install using "pip install xkcdpass"'
-            )
+            raise AnsibleLookupError('Python xkcdpass library is required. Please install using "pip install xkcdpass"')
 
         self.set_options(var_options=variables, direct=kwargs)
         method = self.get_option("case")
@@ -107,12 +103,8 @@ class LookupModule(LookupBase):
         numwords = self.get_option("numwords")
 
         words = xp.locate_wordfile()
-        wordlist = xp.generate_wordlist(
-            max_length=max_length, min_length=min_length, wordfile=words
-        )
+        wordlist = xp.generate_wordlist(max_length=max_length, min_length=min_length, wordfile=words)
 
-        values = xp.generate_xkcdpassword(
-            wordlist, case=method, delimiter=delimiter, numwords=numwords
-        )
+        values = xp.generate_xkcdpassword(wordlist, case=method, delimiter=delimiter, numwords=numwords)
 
         return [values]

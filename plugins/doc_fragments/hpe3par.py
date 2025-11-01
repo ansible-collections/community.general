@@ -6,7 +6,6 @@ from __future__ import annotations
 
 
 class ModuleDocFragment:
-
     # HPE 3PAR doc fragment
     DOCUMENTATION = r"""
 options:

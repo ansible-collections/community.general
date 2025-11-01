@@ -21,8 +21,9 @@ def pass_function(*args, **kwargs):
     pass
 
 
-GITHUB_DATA = {"url": 'https://api.github.com/repos/ansible/ansible',
-               "response": b"""
+GITHUB_DATA = {
+    "url": "https://api.github.com/repos/ansible/ansible",
+    "response": b"""
 {
   "id": 3638964,
   "name": "ansible",
@@ -133,30 +134,25 @@ GITHUB_DATA = {"url": 'https://api.github.com/repos/ansible/ansible',
   "network_count": 8893,
   "subscribers_count": 1733
 }
-"""
-               }
+""",
+}
 
 
 def test__get_json_data(mocker):
     "test the json conversion of _get_url_data"
 
     timeout = 30
-    params = {
-        'url': GITHUB_DATA['url'],
-        'timeout': timeout
-    }
+    params = {"url": GITHUB_DATA["url"], "timeout": timeout}
     module = mocker.Mock()
     module.params = params
 
     JenkinsPlugin._csrf_enabled = pass_function
     JenkinsPlugin._get_installed_plugins = pass_function
     JenkinsPlugin._get_url_data = mocker.Mock()
-    JenkinsPlugin._get_url_data.return_value = BytesIO(GITHUB_DATA['response'])
+    JenkinsPlugin._get_url_data.return_value = BytesIO(GITHUB_DATA["response"])
     jenkins_plugin = JenkinsPlugin(module)
 
-    json_data = jenkins_plugin._get_json_data(
-        f"{GITHUB_DATA['url']}",
-        'CSRF')
+    json_data = jenkins_plugin._get_json_data(f"{GITHUB_DATA['url']}", "CSRF")
 
     assert isinstance(json_data, Mapping)
 
@@ -221,12 +217,14 @@ def test__get_latest_compatible_plugin_version(fetch_mock, mocker):
 
     plugin_data = {
         "plugins": {
-            "git": OrderedDict([
-                ("4.8.2", {"requiredCore": "2.263.1"}),
-                ("4.8.3", {"requiredCore": "2.263.1"}),
-                ("4.9.0", {"requiredCore": "2.289.1"}),
-                ("4.9.1", {"requiredCore": "2.289.1"}),
-            ])
+            "git": OrderedDict(
+                [
+                    ("4.8.2", {"requiredCore": "2.263.1"}),
+                    ("4.8.3", {"requiredCore": "2.263.1"}),
+                    ("4.9.0", {"requiredCore": "2.289.1"}),
+                    ("4.9.1", {"requiredCore": "2.289.1"}),
+                ]
+            )
         }
     }
     plugin_versions_response = MagicMock()
@@ -246,7 +244,7 @@ def test__get_latest_compatible_plugin_version(fetch_mock, mocker):
 
     jenkins_plugin = JenkinsPlugin(module)
     latest_version = jenkins_plugin._get_latest_compatible_plugin_version()
-    assert latest_version == '4.8.3'
+    assert latest_version == "4.8.3"
 
 
 @patch("ansible_collections.community.general.plugins.modules.jenkins_plugin.fetch_url")

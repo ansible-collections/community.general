@@ -1,4 +1,3 @@
-
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -20,14 +19,20 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from .gitlab import (FakeAnsibleModule,
-                         GitlabModuleTestCase,
-                         python_version_match_requirement,
-                         resp_find_runners_all, resp_find_runners_list,
-                         resp_find_project_runners, resp_find_group_runners,
-                         resp_get_runner,
-                         resp_create_runner, resp_delete_runner,
-                         resp_get_project_by_name, resp_get_group_by_name)
+    from .gitlab import (
+        FakeAnsibleModule,
+        GitlabModuleTestCase,
+        python_version_match_requirement,
+        resp_find_runners_all,
+        resp_find_runners_list,
+        resp_find_project_runners,
+        resp_find_group_runners,
+        resp_get_runner,
+        resp_create_runner,
+        resp_delete_runner,
+        resp_get_project_by_name,
+        resp_get_group_by_name,
+    )
 
     # GitLab module requirements
     if python_version_match_requirement():
@@ -53,8 +58,12 @@ class TestGitlabRunner(GitlabModuleTestCase):
     def setUp(self):
         super().setUp()
 
-        self.module_util_all = GitLabRunner(module=FakeAnsibleModule({"owned": False}), gitlab_instance=self.gitlab_instance)
-        self.module_util_owned = GitLabRunner(module=FakeAnsibleModule({"owned": True}), gitlab_instance=self.gitlab_instance)
+        self.module_util_all = GitLabRunner(
+            module=FakeAnsibleModule({"owned": False}), gitlab_instance=self.gitlab_instance
+        )
+        self.module_util_owned = GitLabRunner(
+            module=FakeAnsibleModule({"owned": True}), gitlab_instance=self.gitlab_instance
+        )
 
     @with_httmock(resp_find_runners_all)
     @with_httmock(resp_get_runner)
@@ -82,8 +91,10 @@ class TestGitlabRunner(GitlabModuleTestCase):
     @with_httmock(resp_get_runner)
     @with_httmock(resp_get_project_by_name)
     def test_project_runner_exist(self):
-        gitlab_project = self.gitlab_instance.projects.get('foo-bar/diaspora-client')
-        module_util = GitLabRunner(module=FakeAnsibleModule(), gitlab_instance=self.gitlab_instance, project=gitlab_project)
+        gitlab_project = self.gitlab_instance.projects.get("foo-bar/diaspora-client")
+        module_util = GitLabRunner(
+            module=FakeAnsibleModule(), gitlab_instance=self.gitlab_instance, project=gitlab_project
+        )
 
         rvalue = module_util.exists_runner("test-1-20220210")
 
@@ -98,7 +109,7 @@ class TestGitlabRunner(GitlabModuleTestCase):
     @with_httmock(resp_get_runner)
     @pytest.mark.skipif(gitlab.__version__ < "2.3.0", reason="require python-gitlab >= 2.3.0")
     def test_group_runner_exist(self):
-        gitlab_group = self.gitlab_instance.groups.get('foo-bar')
+        gitlab_group = self.gitlab_instance.groups.get("foo-bar")
         module_util = GitLabRunner(module=FakeAnsibleModule(), gitlab_instance=self.gitlab_instance, group=gitlab_group)
 
         rvalue = module_util.exists_runner("test-3-20220210")

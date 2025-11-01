@@ -150,8 +150,8 @@ class GitHubResponse:
 
     def links(self):
         links = {}
-        if 'link' in self.info:
-            link_header = self.info['link']
+        if "link" in self.info:
+            link_header = self.info["link"]
             matches = re.findall('<([^>]+)>; rel="([^"]+)"', link_header)
             for url, rel in matches:
                 links[rel] = url
@@ -162,19 +162,17 @@ class GitHubSession:
     def __init__(self, module, token, api_url):
         self.module = module
         self.token = token
-        self.api_url = api_url.rstrip('/')
+        self.api_url = api_url.rstrip("/")
 
     def request(self, method, url, data=None):
         headers = {
-            'Authorization': f'token {self.token}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json',
+            "Authorization": f"token {self.token}",
+            "Content-Type": "application/json",
+            "Accept": "application/vnd.github.v3+json",
         }
-        response, info = fetch_url(
-            self.module, url, method=method, data=data, headers=headers)
-        if not (200 <= info['status'] < 400):
-            self.module.fail_json(
-                msg=f" failed to send request {method} to {url}: {info['msg']}")
+        response, info = fetch_url(self.module, url, method=method, data=data, headers=headers)
+        if not (200 <= info["status"] < 400):
+            self.module.fail_json(msg=f" failed to send request {method} to {url}: {info['msg']}")
         return GitHubResponse(response, info)
 
 
@@ -182,9 +180,9 @@ def get_all_keys(session):
     url = f"{session.api_url}/user/keys"
     result = []
     while url:
-        r = session.request('GET', url)
+        r = session.request("GET", url)
         result.extend(r.json())
-        url = r.links().get('next')
+        url = r.links().get("next")
     return result
 
 
@@ -192,19 +190,18 @@ def create_key(session, name, pubkey, check_mode):
     if check_mode:
         now_t = now()
         return {
-            'id': 0,
-            'key': pubkey,
-            'title': name,
-            'url': 'http://example.com/CHECK_MODE_GITHUB_KEY',
-            'created_at': datetime.datetime.strftime(now_t, '%Y-%m-%dT%H:%M:%SZ'),
-            'read_only': False,
-            'verified': False
+            "id": 0,
+            "key": pubkey,
+            "title": name,
+            "url": "http://example.com/CHECK_MODE_GITHUB_KEY",
+            "created_at": datetime.datetime.strftime(now_t, "%Y-%m-%dT%H:%M:%SZ"),
+            "read_only": False,
+            "verified": False,
         }
     else:
         return session.request(
-            'POST',
-            f"{session.api_url}/user/keys",
-            data=json.dumps({'title': name, 'key': pubkey})).json()
+            "POST", f"{session.api_url}/user/keys", data=json.dumps({"title": name, "key": pubkey})
+        ).json()
 
 
 def delete_keys(session, to_delete, check_mode):
@@ -212,29 +209,30 @@ def delete_keys(session, to_delete, check_mode):
         return
 
     for key in to_delete:
-        session.request('DELETE', f"{session.api_url}/user/keys/{key['id']}")
+        session.request("DELETE", f"{session.api_url}/user/keys/{key['id']}")
 
 
 def ensure_key_absent(session, name, check_mode):
-    to_delete = [key for key in get_all_keys(session) if key['title'] == name]
+    to_delete = [key for key in get_all_keys(session) if key["title"] == name]
     delete_keys(session, to_delete, check_mode=check_mode)
 
-    return {'changed': bool(to_delete),
-            'deleted_keys': to_delete}
+    return {"changed": bool(to_delete), "deleted_keys": to_delete}
 
 
 def ensure_key_present(module, session, name, pubkey, force, check_mode):
     all_keys = get_all_keys(session)
-    matching_keys = [k for k in all_keys if k['title'] == name]
+    matching_keys = [k for k in all_keys if k["title"] == name]
     deleted_keys = []
 
-    new_signature = pubkey.split(' ')[1]
+    new_signature = pubkey.split(" ")[1]
     for key in all_keys:
-        existing_signature = key['key'].split(' ')[1]
-        if new_signature == existing_signature and key['title'] != name:
-            module.fail_json(msg=f"another key with the same content is already registered under the name |{key['title']}|")
+        existing_signature = key["key"].split(" ")[1]
+        if new_signature == existing_signature and key["title"] != name:
+            module.fail_json(
+                msg=f"another key with the same content is already registered under the name |{key['title']}|"
+            )
 
-    if matching_keys and force and matching_keys[0]['key'].split(' ')[1] != new_signature:
+    if matching_keys and force and matching_keys[0]["key"].split(" ")[1] != new_signature:
         delete_keys(session, matching_keys, check_mode=check_mode)
         (deleted_keys, matching_keys) = (matching_keys, [])
 
@@ -244,51 +242,50 @@ def ensure_key_present(module, session, name, pubkey, force, check_mode):
         key = matching_keys[0]
 
     return {
-        'changed': bool(deleted_keys or not matching_keys),
-        'deleted_keys': deleted_keys,
-        'matching_keys': matching_keys,
-        'key': key
+        "changed": bool(deleted_keys or not matching_keys),
+        "deleted_keys": deleted_keys,
+        "matching_keys": matching_keys,
+        "key": key,
     }
 
 
 def main():
     argument_spec = {
-        'token': {'required': True, 'no_log': True},
-        'name': {'required': True},
-        'pubkey': {},
-        'state': {'choices': ['present', 'absent'], 'default': 'present'},
-        'force': {'default': True, 'type': 'bool'},
-        'api_url': {'default': 'https://api.github.com', 'type': 'str'},
+        "token": {"required": True, "no_log": True},
+        "name": {"required": True},
+        "pubkey": {},
+        "state": {"choices": ["present", "absent"], "default": "present"},
+        "force": {"default": True, "type": "bool"},
+        "api_url": {"default": "https://api.github.com", "type": "str"},
     }
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
-    token = module.params['token']
-    name = module.params['name']
-    state = module.params['state']
-    force = module.params['force']
-    pubkey = module.params.get('pubkey')
-    api_url = module.params.get('api_url')
+    token = module.params["token"]
+    name = module.params["name"]
+    state = module.params["state"]
+    force = module.params["force"]
+    pubkey = module.params.get("pubkey")
+    api_url = module.params.get("api_url")
 
     if pubkey:
-        pubkey_parts = pubkey.split(' ')
+        pubkey_parts = pubkey.split(" ")
         # Keys consist of a protocol, the key data, and an optional comment.
         if len(pubkey_parts) < 2:
             module.fail_json(msg='"pubkey" parameter has an invalid format')
-    elif state == 'present':
+    elif state == "present":
         module.fail_json(msg='"pubkey" is required when state=present')
 
     session = GitHubSession(module, token, api_url)
-    if state == 'present':
-        result = ensure_key_present(module, session, name, pubkey, force=force,
-                                    check_mode=module.check_mode)
-    elif state == 'absent':
+    if state == "present":
+        result = ensure_key_present(module, session, name, pubkey, force=force, check_mode=module.check_mode)
+    elif state == "absent":
         result = ensure_key_absent(session, name, check_mode=module.check_mode)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

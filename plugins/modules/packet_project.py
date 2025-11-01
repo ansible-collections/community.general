@@ -133,43 +133,34 @@ PACKET_API_TOKEN_ENV_VAR = "PACKET_API_TOKEN"
 
 
 def act_on_project(target_state, module, packet_conn):
-    result_dict = {'changed': False}
-    given_id = module.params.get('id')
-    given_name = module.params.get('name')
+    result_dict = {"changed": False}
+    given_id = module.params.get("id")
+    given_name = module.params.get("name")
     if given_id:
-        matching_projects = [
-            p for p in packet_conn.list_projects() if given_id == p.id]
+        matching_projects = [p for p in packet_conn.list_projects() if given_id == p.id]
     else:
-        matching_projects = [
-            p for p in packet_conn.list_projects() if given_name == p.name]
+        matching_projects = [p for p in packet_conn.list_projects() if given_name == p.name]
 
-    if target_state == 'present':
+    if target_state == "present":
         if len(matching_projects) == 0:
-            org_id = module.params.get('org_id')
-            custom_data = module.params.get('custom_data')
-            payment_method = module.params.get('payment_method')
+            org_id = module.params.get("org_id")
+            custom_data = module.params.get("custom_data")
+            payment_method = module.params.get("payment_method")
 
             if not org_id:
-                params = {
-                    "name": given_name,
-                    "payment_method_id": payment_method,
-                    "customdata": custom_data
-                }
+                params = {"name": given_name, "payment_method_id": payment_method, "customdata": custom_data}
                 new_project_data = packet_conn.call_api("projects", "POST", params)
                 new_project = packet.Project(new_project_data, packet_conn)
             else:
                 new_project = packet_conn.create_organization_project(
-                    org_id=org_id,
-                    name=given_name,
-                    payment_method_id=payment_method,
-                    customdata=custom_data
+                    org_id=org_id, name=given_name, payment_method_id=payment_method, customdata=custom_data
                 )
 
-            result_dict['changed'] = True
+            result_dict["changed"] = True
             matching_projects.append(new_project)
 
-        result_dict['name'] = matching_projects[0].name
-        result_dict['id'] = matching_projects[0].id
+        result_dict["name"] = matching_projects[0].name
+        result_dict["id"] = matching_projects[0].id
     else:
         if len(matching_projects) > 1:
             _msg = f"More than projects matched for module call with state = absent: {to_native(matching_projects)}"
@@ -177,9 +168,9 @@ def act_on_project(target_state, module, packet_conn):
 
         if len(matching_projects) == 1:
             p = matching_projects[0]
-            result_dict['name'] = p.name
-            result_dict['id'] = p.id
-            result_dict['changed'] = True
+            result_dict["name"] = p.name
+            result_dict["id"] = p.id
+            result_dict["changed"] = True
             try:
                 p.delete()
             except Exception as e:
@@ -191,49 +182,49 @@ def act_on_project(target_state, module, packet_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
-            auth_token=dict(
-                type='str',
-                fallback=(env_fallback, [PACKET_API_TOKEN_ENV_VAR]),
-                no_log=True
-            ),
-            name=dict(type='str'),
-            id=dict(type='str'),
-            org_id=dict(type='str'),
-            payment_method=dict(type='str'),
-            custom_data=dict(type='str'),
+            state=dict(choices=["present", "absent"], default="present"),
+            auth_token=dict(type="str", fallback=(env_fallback, [PACKET_API_TOKEN_ENV_VAR]), no_log=True),
+            name=dict(type="str"),
+            id=dict(type="str"),
+            org_id=dict(type="str"),
+            payment_method=dict(type="str"),
+            custom_data=dict(type="str"),
         ),
         supports_check_mode=True,
-        required_one_of=[("name", "id",)],
+        required_one_of=[
+            (
+                "name",
+                "id",
+            )
+        ],
         mutually_exclusive=[
-            ('name', 'id'),
-        ]
+            ("name", "id"),
+        ],
     )
     if not HAS_PACKET_SDK:
-        module.fail_json(msg='packet required for this module')
+        module.fail_json(msg="packet required for this module")
 
-    if not module.params.get('auth_token'):
+    if not module.params.get("auth_token"):
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get('auth_token')
+    auth_token = module.params.get("auth_token")
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
-    if state in ['present', 'absent']:
+    if state in ["present", "absent"]:
         if module.check_mode:
             module.exit_json(changed=False)
 
         try:
             module.exit_json(**act_on_project(state, module, packet_conn))
         except Exception as e:
-            module.fail_json(
-                msg=f"failed to set project state {state}: {e}")
+            module.fail_json(msg=f"failed to set project state {state}: {e}")
     else:
         module.fail_json(msg=f"{state} is not a valid state for this module")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

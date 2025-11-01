@@ -110,6 +110,7 @@ _value:
 
 try:
     import prettytable
+
     HAS_PRETTYTABLE = True
 except ImportError:
     HAS_PRETTYTABLE = False
@@ -125,6 +126,7 @@ class TypeValidationError(AnsibleFilterError):
         obj: The object with incorrect type
         expected: Description of expected type
     """
+
     def __init__(self, obj, expected):
         type_name = "string" if isinstance(obj, str) else type(obj).__name__
         super().__init__(f"Expected {expected}, got a {type_name}")
@@ -142,10 +144,7 @@ def _validate_list_param(param, param_name, ensure_strings=True):
         AnsibleFilterError: If validation fails
     """
     # Map parameter names to their original error message format
-    error_messages = {
-        "column_order": "a list of column names",
-        "header_names": "a list of header names"
-    }
+    error_messages = {"column_order": "a list of column names", "header_names": "a list of header names"}
 
     # Use the specific error message if available, otherwise use a generic one
     error_msg = error_messages.get(param_name, f"a list for {param_name}")
@@ -182,9 +181,9 @@ def _match_key(item_dict, lookup_key):
 
     # Try boolean conversion for 'true'/'false' strings
     if isinstance(lookup_key, str):
-        if lookup_key.lower() == 'true' and True in item_dict:
+        if lookup_key.lower() == "true" and True in item_dict:
             return True
-        if lookup_key.lower() == 'false' and False in item_dict:
+        if lookup_key.lower() == "false" and False in item_dict:
             return False
 
         # Try numeric conversion for string numbers
@@ -258,9 +257,7 @@ def to_prettytable(data, *args, **kwargs):
         String containing the ASCII table
     """
     if not HAS_PRETTYTABLE:
-        raise AnsibleFilterError(
-            'You need to install "prettytable" Python module to use this filter'
-        )
+        raise AnsibleFilterError('You need to install "prettytable" Python module to use this filter')
 
     # === Input validation ===
     # Validate list type
@@ -278,7 +275,7 @@ def to_prettytable(data, *args, **kwargs):
 
     # === Process column order ===
     # Handle both positional and keyword column_order
-    column_order = kwargs.pop('column_order', None)
+    column_order = kwargs.pop("column_order", None)
 
     # Check for conflict between args and column_order
     if args and column_order is not None:
@@ -295,7 +292,8 @@ def to_prettytable(data, *args, **kwargs):
         # Validate column_order doesn't exceed the number of fields (skip if data is empty)
         if data and len(column_order) > max_fields:
             raise AnsibleFilterError(
-                f"'column_order' has more elements ({len(column_order)}) than available fields in data ({max_fields})")
+                f"'column_order' has more elements ({len(column_order)}) than available fields in data ({max_fields})"
+            )
 
     # === Process headers ===
     # Determine field names and ensure they are strings
@@ -306,24 +304,26 @@ def to_prettytable(data, *args, **kwargs):
         field_names = [to_text(k) for k in sample_dict]
 
     # Process custom headers
-    header_names = kwargs.pop('header_names', None)
+    header_names = kwargs.pop("header_names", None)
     if header_names is not None:
         _validate_list_param(header_names, "header_names")
 
         # Validate header_names doesn't exceed the number of fields (skip if data is empty)
         if data and len(header_names) > max_fields:
             raise AnsibleFilterError(
-                f"'header_names' has more elements ({len(header_names)}) than available fields in data ({max_fields})")
+                f"'header_names' has more elements ({len(header_names)}) than available fields in data ({max_fields})"
+            )
 
         # Validate that column_order and header_names have the same size if both provided
         if column_order is not None and len(column_order) != len(header_names):
             raise AnsibleFilterError(
                 f"'column_order' and 'header_names' must have the same number of elements. "
-                f"Got {len(column_order)} columns and {len(header_names)} headers.")
+                f"Got {len(column_order)} columns and {len(header_names)} headers."
+            )
 
     # === Process alignments ===
     # Get column alignments and validate
-    column_alignments = kwargs.pop('column_alignments', {})
+    column_alignments = kwargs.pop("column_alignments", {})
     valid_alignments = {"left", "center", "right", "l", "c", "r"}
 
     # Validate column_alignments is a dictionary
@@ -344,12 +344,14 @@ def to_prettytable(data, *args, **kwargs):
         if value.lower() not in valid_alignments:
             raise AnsibleFilterError(
                 f"Invalid alignment '{value}' in 'column_alignments'. "
-                f"Valid alignments are: {', '.join(sorted(valid_alignments))}")
+                f"Valid alignments are: {', '.join(sorted(valid_alignments))}"
+            )
 
     # Validate column_alignments doesn't have more keys than fields (skip if data is empty)
     if data and len(column_alignments) > max_fields:
         raise AnsibleFilterError(
-            f"'column_alignments' has more elements ({len(column_alignments)}) than available fields in data ({max_fields})")
+            f"'column_alignments' has more elements ({len(column_alignments)}) than available fields in data ({max_fields})"
+        )
 
     # Check for unknown parameters
     if kwargs:
@@ -404,6 +406,4 @@ class FilterModule:
     """Ansible core jinja2 filters."""
 
     def filters(self):
-        return {
-            'to_prettytable': to_prettytable
-        }
+        return {"to_prettytable": to_prettytable}

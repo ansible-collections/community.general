@@ -127,30 +127,34 @@ actions:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    keycloak_argument_spec, get_token, KeycloakError, KeycloakAPI)
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+    KeycloakAPI,
+)
 
 
 def main():
     argument_spec = keycloak_argument_spec()
     # Avoid alias collision as in keycloak_user: clear auth_username aliases locally
-    argument_spec['auth_username']['aliases'] = []
+    argument_spec["auth_username"]["aliases"] = []
 
     meta_args = dict(
-        realm=dict(type='str', default='master'),
-        id=dict(type='str'),
-        username=dict(type='str'),
-        actions=dict(type='list', elements='str', default=['UPDATE_PASSWORD']),
-        client_id=dict(type='str', aliases=['clientId']),
-        redirect_uri=dict(type='str', aliases=['redirectUri']),
-        lifespan=dict(type='int'),
+        realm=dict(type="str", default="master"),
+        id=dict(type="str"),
+        username=dict(type="str"),
+        actions=dict(type="list", elements="str", default=["UPDATE_PASSWORD"]),
+        client_id=dict(type="str", aliases=["clientId"]),
+        redirect_uri=dict(type="str", aliases=["redirectUri"]),
+        lifespan=dict(type="int"),
     )
     argument_spec.update(meta_args)
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        required_one_of=[['id', 'username']],
-        mutually_exclusive=[['id', 'username']],
+        required_one_of=[["id", "username"]],
+        mutually_exclusive=[["id", "username"]],
     )
 
     try:
@@ -160,23 +164,25 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    user_id = module.params.get('id')
-    username = module.params.get('username')
-    actions = module.params.get('actions')
-    client_id = module.params.get('client_id')
-    redirect_uri = module.params.get('redirect_uri')
-    lifespan = module.params.get('lifespan')
+    realm = module.params.get("realm")
+    user_id = module.params.get("id")
+    username = module.params.get("username")
+    actions = module.params.get("actions")
+    client_id = module.params.get("client_id")
+    redirect_uri = module.params.get("redirect_uri")
+    lifespan = module.params.get("lifespan")
 
     # Resolve user ID if only username is provided
     if user_id is None:
         user_obj = kc.get_user_by_username(username=username, realm=realm)
         if user_obj is None:
             module.fail_json(msg=f"User '{username}' not found in realm {realm}")
-        user_id = user_obj['id']
+        user_id = user_obj["id"]
 
     if module.check_mode:
-        module.exit_json(changed=True, msg=f"Would send execute-actions email to user {user_id}", user_id=user_id, actions=actions)
+        module.exit_json(
+            changed=True, msg=f"Would send execute-actions email to user {user_id}", user_id=user_id, actions=actions
+        )
 
     try:
         kc.send_execute_actions_email(
@@ -185,13 +191,15 @@ def main():
             client_id=client_id,
             data=actions,
             redirect_uri=redirect_uri,
-            lifespan=lifespan
+            lifespan=lifespan,
         )
     except Exception as e:
         module.fail_json(msg=str(e))
 
-    module.exit_json(changed=True, msg=f"Execute-actions email sent to user {user_id}", user_id=user_id, actions=actions)
+    module.exit_json(
+        changed=True, msg=f"Execute-actions email sent to user {user_id}", user_id=user_id, actions=actions
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

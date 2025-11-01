@@ -122,29 +122,29 @@ from ansible.module_utils.basic import AnsibleModule
 
 def get_local_version(pear_output):
     """Take pear remoteinfo output and get the installed version"""
-    lines = pear_output.split('\n')
+    lines = pear_output.split("\n")
     for line in lines:
-        if 'Installed ' in line:
+        if "Installed " in line:
             installed = line.rsplit(None, 1)[-1].strip()
-            if installed == '-':
+            if installed == "-":
                 continue
             return installed
     return None
 
 
 def _get_pear_path(module):
-    if module.params['executable'] and os.path.isfile(module.params['executable']):
-        result = module.params['executable']
+    if module.params["executable"] and os.path.isfile(module.params["executable"]):
+        result = module.params["executable"]
     else:
-        result = module.get_bin_path('pear', True, [module.params['executable']])
+        result = module.get_bin_path("pear", True, [module.params["executable"]])
     return result
 
 
 def get_repository_version(pear_output):
     """Take pear remote-info output and get the latest version"""
-    lines = pear_output.split('\n')
+    lines = pear_output.split("\n")
     for line in lines:
-        if 'Latest ' in line:
+        if "Latest " in line:
             return line.rsplit(None, 1)[-1].strip()
     return None
 
@@ -195,7 +195,6 @@ def remove_packages(module, packages):
         remove_c += 1
 
     if remove_c > 0:
-
         module.exit_json(changed=True, msg=f"removed {remove_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already absent")
@@ -241,14 +240,14 @@ def install_packages(module, state, packages, prompts):
         # if the package is installed and state == present
         # or state == latest and is up-to-date then skip
         installed, updated = query_package(module, package)
-        if installed and (state == 'present' or (state == 'latest' and updated)):
+        if installed and (state == "present" or (state == "latest" and updated)):
             continue
 
-        if state == 'present':
-            command = 'install'
+        if state == "present":
+            command = "install"
 
-        if state == 'latest':
-            command = 'upgrade'
+        if state == "latest":
+            command = "upgrade"
 
         if has_prompt and i < len(prompts):
             prompt_regex = prompts[i][0]
@@ -258,7 +257,9 @@ def install_packages(module, state, packages, prompts):
             data = default_stdin
 
         cmd = [_get_pear_path(module), command, package]
-        rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=prompt_regex, data=data, binary_data=True)
+        rc, stdout, stderr = module.run_command(
+            cmd, check_rc=False, prompt_regex=prompt_regex, data=data, binary_data=True
+        )
         if rc != 0:
             module.fail_json(msg=f"failed to install {package}: {to_text(stdout + stderr)}")
 
@@ -274,9 +275,11 @@ def check_packages(module, packages, state):
     would_be_changed = []
     for package in packages:
         installed, updated = query_package(module, package)
-        if ((state in ["present", "latest"] and not installed) or
-                (state == "absent" and installed) or
-                (state == "latest" and not updated)):
+        if (
+            (state in ["present", "latest"] and not installed)
+            or (state == "absent" and installed)
+            or (state == "latest" and not updated)
+        ):
             would_be_changed.append(package)
     if would_be_changed:
         if state == "absent":
@@ -289,36 +292,37 @@ def check_packages(module, packages, state):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(aliases=['pkg'], required=True),
-            state=dict(default='present', choices=['present', 'installed', "latest", 'absent', 'removed']),
-            executable=dict(type='path'),
-            prompts=dict(type='list', elements='raw'),
+            name=dict(aliases=["pkg"], required=True),
+            state=dict(default="present", choices=["present", "installed", "latest", "absent", "removed"]),
+            executable=dict(type="path"),
+            prompts=dict(type="list", elements="raw"),
         ),
-        supports_check_mode=True)
+        supports_check_mode=True,
+    )
 
     p = module.params
 
     # normalize the state parameter
-    if p['state'] in ['present', 'installed']:
-        p['state'] = 'present'
-    elif p['state'] in ['absent', 'removed']:
-        p['state'] = 'absent'
+    if p["state"] in ["present", "installed"]:
+        p["state"] = "present"
+    elif p["state"] in ["absent", "removed"]:
+        p["state"] = "absent"
 
-    if p['name']:
-        pkgs = p['name'].split(',')
+    if p["name"]:
+        pkgs = p["name"].split(",")
 
         pkg_files = []
         for i, pkg in enumerate(pkgs):
             pkg_files.append(None)
 
         if module.check_mode:
-            check_packages(module, pkgs, p['state'])
+            check_packages(module, pkgs, p["state"])
 
-        if p['state'] in ['present', 'latest']:
-            install_packages(module, p['state'], pkgs, p["prompts"])
-        elif p['state'] == 'absent':
+        if p["state"] in ["present", "latest"]:
+            install_packages(module, p["state"], pkgs, p["prompts"])
+        elif p["state"] == "absent":
             remove_packages(module, pkgs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

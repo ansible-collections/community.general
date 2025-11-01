@@ -125,20 +125,19 @@ except ImportError as e:
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
-
         if not HAS_CONSUL:
             raise AnsibleError(
-                'py-consul is required for consul_kv lookup. see https://github.com/criteo/py-consul?tab=readme-ov-file#installation')
+                "py-consul is required for consul_kv lookup. see https://github.com/criteo/py-consul?tab=readme-ov-file#installation"
+            )
 
         # get options
         self.set_options(direct=kwargs)
 
-        scheme = self.get_option('scheme')
-        host = self.get_option('host')
-        port = self.get_option('port')
-        url = self.get_option('url')
+        scheme = self.get_option("scheme")
+        host = self.get_option("host")
+        port = self.get_option("port")
+        url = self.get_option("url")
         if url is not None:
             u = urlparse(url)
             if u.scheme:
@@ -147,8 +146,8 @@ class LookupModule(LookupBase):
             if u.port is not None:
                 port = u.port
 
-        validate_certs = self.get_option('validate_certs')
-        client_cert = self.get_option('client_cert')
+        validate_certs = self.get_option("validate_certs")
+        client_cert = self.get_option("client_cert")
 
         values = []
         try:
@@ -156,40 +155,41 @@ class LookupModule(LookupBase):
                 params = self.parse_params(term)
                 consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=validate_certs, cert=client_cert)
 
-                results = consul_api.kv.get(params['key'],
-                                            token=params['token'],
-                                            index=params['index'],
-                                            recurse=params['recurse'],
-                                            dc=params['datacenter'])
+                results = consul_api.kv.get(
+                    params["key"],
+                    token=params["token"],
+                    index=params["index"],
+                    recurse=params["recurse"],
+                    dc=params["datacenter"],
+                )
                 if results[1]:
                     # responds with a single or list of result maps
                     if isinstance(results[1], list):
                         for r in results[1]:
-                            values.append(to_text(r['Value']))
+                            values.append(to_text(r["Value"]))
                     else:
-                        values.append(to_text(results[1]['Value']))
+                        values.append(to_text(results[1]["Value"]))
         except Exception as e:
-            raise AnsibleError(
-                f"Error locating '{term}' in kv store. Error was {e}")
+            raise AnsibleError(f"Error locating '{term}' in kv store. Error was {e}")
 
         return values
 
     def parse_params(self, term):
-        params = term.split(' ')
+        params = term.split(" ")
 
         paramvals = {
-            'key': params[0],
-            'token': self.get_option('token'),
-            'recurse': self.get_option('recurse'),
-            'index': self.get_option('index'),
-            'datacenter': self.get_option('datacenter')
+            "key": params[0],
+            "token": self.get_option("token"),
+            "recurse": self.get_option("recurse"),
+            "index": self.get_option("index"),
+            "datacenter": self.get_option("datacenter"),
         }
 
         # parameters specified?
         try:
             for param in params[1:]:
                 if param and len(param) > 0:
-                    name, value = param.split('=')
+                    name, value = param.split("=")
                     if name not in paramvals:
                         raise AnsibleAssertionError(f"{name} not a valid consul lookup parameter")
                     paramvals[name] = value

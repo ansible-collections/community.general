@@ -22,11 +22,5 @@ def systemd_runner(module, command, **kwargs):
         unit=cmd_runner_fmt.as_list(),
     )
 
-    runner = CmdRunner(
-        module,
-        command=command,
-        arg_formats=arg_formats,
-        check_rc=True,
-        **kwargs
-    )
+    runner = CmdRunner(module, command=command, arg_formats=arg_formats, check_rc=True, **kwargs)
     return runner

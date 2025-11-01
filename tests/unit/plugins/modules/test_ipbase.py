@@ -161,7 +161,9 @@ IPBASE_DATA = {
 
 
 class TestIpbase(unittest.TestCase):
-    def test_info(self,):
+    def test_info(
+        self,
+    ):
         "test the json data extraction"
 
         params = {
@@ -173,7 +175,7 @@ class TestIpbase(unittest.TestCase):
         module = Mock()
         module.params = params
 
-        data = json.loads(IPBASE_DATA['response'].decode("utf-8"))
+        data = json.loads(IPBASE_DATA["response"].decode("utf-8"))
 
         IpbaseInfo._get_url_data = Mock()
         IpbaseInfo._get_url_data.return_value = data

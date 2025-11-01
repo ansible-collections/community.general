@@ -202,11 +202,11 @@ from collections import defaultdict
 from operator import itemgetter
 
 
-def list_mergeby(x, y, index, recursive=False, list_merge='replace'):
-    '''Merge 2 lists by attribute 'index'. The function 'merge_hash'
-       from ansible.utils.vars is used.  This function is used by the
-       function lists_mergeby.
-    '''
+def list_mergeby(x, y, index, recursive=False, list_merge="replace"):
+    """Merge 2 lists by attribute 'index'. The function 'merge_hash'
+    from ansible.utils.vars is used.  This function is used by the
+    function lists_mergeby.
+    """
 
     d = defaultdict(dict)
     for lst in (x, y):
@@ -220,13 +220,13 @@ def list_mergeby(x, y, index, recursive=False, list_merge='replace'):
 
 
 def lists_mergeby(*terms, **kwargs):
-    '''Merge 2 or more lists by attribute 'index'. To learn details
-       on how to use the parameters 'recursive' and 'list_merge' see
-       the filter ansible.builtin.combine.
-    '''
+    """Merge 2 or more lists by attribute 'index'. To learn details
+    on how to use the parameters 'recursive' and 'list_merge' see
+    the filter ansible.builtin.combine.
+    """
 
-    recursive = kwargs.pop('recursive', False)
-    list_merge = kwargs.pop('list_merge', 'replace')
+    recursive = kwargs.pop("recursive", False)
+    list_merge = kwargs.pop("list_merge", "replace")
     if kwargs:
         raise AnsibleFilterError("'recursive' and 'list_merge' are the only valid keyword arguments.")
     if len(terms) < 2:
@@ -236,8 +236,7 @@ def lists_mergeby(*terms, **kwargs):
     flat_list = []
     for sublist in terms[:-1]:
         if not isinstance(sublist, Sequence):
-            msg = ("All arguments before the argument index for community.general.lists_mergeby "
-                   "must be lists. %s is %s")
+            msg = "All arguments before the argument index for community.general.lists_mergeby must be lists. %s is %s"
             raise AnsibleFilterError(msg % (sublist, type(sublist)))
         if len(sublist) > 0:
             if all(isinstance(lst, Sequence) for lst in sublist):
@@ -256,8 +255,7 @@ def lists_mergeby(*terms, **kwargs):
     index = terms[-1]
 
     if not isinstance(index, str):
-        msg = ("First argument after the lists for community.general.lists_mergeby must be string. "
-               "%s is %s")
+        msg = "First argument after the lists for community.general.lists_mergeby must be string. %s is %s"
         raise AnsibleFilterError(msg % (index, type(index)))
 
     high_to_low_prio_list_iterator = reversed(lists)
@@ -269,9 +267,9 @@ def lists_mergeby(*terms, **kwargs):
 
 
 class FilterModule:
-    ''' Ansible list filters '''
+    """Ansible list filters"""
 
     def filters(self):
         return {
-            'lists_mergeby': lists_mergeby,
+            "lists_mergeby": lists_mergeby,
         }

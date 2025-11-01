@@ -37,9 +37,10 @@ class CallbackModule(CallbackBase):
     """
     This callback module tells you how long your plays ran for.
     """
+
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'community.general.print_task'
+    CALLBACK_TYPE = "aggregate"
+    CALLBACK_NAME = "community.general.print_task"
 
     CALLBACK_NEEDS_ENABLED = True
 
@@ -48,7 +49,7 @@ class CallbackModule(CallbackBase):
         self._printed_message = False
 
     def _print_task(self, task):
-        if hasattr(task, '_ds'):
+        if hasattr(task, "_ds"):
             task_snippet = load(str([task._ds.copy()]), Loader=SafeLoader)
             task_yaml = dump(task_snippet, sort_keys=False, Dumper=SafeDumper)
             self._display.display(f"\n{task_yaml}\n")

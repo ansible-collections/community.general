@@ -109,17 +109,17 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 class MkSysB(ModuleHelper):
     module = dict(
         argument_spec=dict(
-            backup_crypt_files=dict(type='bool', default=True),
-            backup_dmapi_fs=dict(type='bool', default=True),
-            create_map_files=dict(type='bool', default=False),
-            exclude_files=dict(type='bool', default=False),
-            exclude_wpar_files=dict(type='bool', default=False),
-            extended_attrs=dict(type='bool', default=True),
-            name=dict(type='str', required=True),
-            new_image_data=dict(type='bool', default=True),
-            software_packing=dict(type='bool', default=False),
-            storage_path=dict(type='str', required=True),
-            use_snapshot=dict(type='bool', default=False)
+            backup_crypt_files=dict(type="bool", default=True),
+            backup_dmapi_fs=dict(type="bool", default=True),
+            create_map_files=dict(type="bool", default=False),
+            exclude_files=dict(type="bool", default=False),
+            exclude_wpar_files=dict(type="bool", default=False),
+            extended_attrs=dict(type="bool", default=True),
+            name=dict(type="str", required=True),
+            new_image_data=dict(type="bool", default=True),
+            software_packing=dict(type="bool", default=False),
+            storage_path=dict(type="str", required=True),
+            use_snapshot=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
     )
@@ -147,12 +147,25 @@ class MkSysB(ModuleHelper):
 
         runner = CmdRunner(
             self.module,
-            ['mksysb', '-X'],
+            ["mksysb", "-X"],
             self.command_args_formats,
         )
-        with runner(['create_map_files', 'use_snapshot', 'exclude_files', 'exclude_wpar_files', 'software_packing',
-                     'extended_attrs', 'backup_crypt_files', 'backup_dmapi_fs', 'new_image_data', 'combined_path'],
-                    output_process=process, check_mode_skip=True) as ctx:
+        with runner(
+            [
+                "create_map_files",
+                "use_snapshot",
+                "exclude_files",
+                "exclude_wpar_files",
+                "software_packing",
+                "extended_attrs",
+                "backup_crypt_files",
+                "backup_dmapi_fs",
+                "new_image_data",
+                "combined_path",
+            ],
+            output_process=process,
+            check_mode_skip=True,
+        ) as ctx:
             ctx.run(combined_path=[self.vars.storage_path, self.vars.name])
             if self.verbosity >= 4:
                 self.vars.run_info = ctx.run_info
@@ -164,5 +177,5 @@ def main():
     MkSysB.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

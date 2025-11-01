@@ -166,24 +166,30 @@ remote_ip_prefix:
 """
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
-    Config, HwcClientException, HwcModule, are_different_dicts, build_path,
-    get_region, is_empty_value, navigate_value)
+    Config,
+    HwcClientException,
+    HwcModule,
+    are_different_dicts,
+    build_path,
+    get_region,
+    is_empty_value,
+    navigate_value,
+)
 
 
 def build_module():
     return HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            direction=dict(type='str', required=True),
-            security_group_id=dict(type='str', required=True),
-            description=dict(type='str'),
-            ethertype=dict(type='str'),
-            port_range_max=dict(type='int'),
-            port_range_min=dict(type='int'),
-            protocol=dict(type='str'),
-            remote_group_id=dict(type='str'),
-            remote_ip_prefix=dict(type='str')
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            direction=dict(type="str", required=True),
+            security_group_id=dict(type="str", required=True),
+            description=dict(type="str"),
+            ethertype=dict(type="str"),
+            port_range_max=dict(type="int"),
+            port_range_min=dict(type="int"),
+            protocol=dict(type="str"),
+            remote_group_id=dict(type="str"),
+            remote_ip_prefix=dict(type="str"),
         ),
         supports_check_mode=True,
     )
@@ -197,7 +203,7 @@ def main():
 
     try:
         resource = None
-        if module.params['id']:
+        if module.params["id"]:
             resource = True
         else:
             v = search_resource(config)
@@ -206,11 +212,11 @@ def main():
 
             if len(v) == 1:
                 resource = v[0]
-                module.params['id'] = navigate_value(resource, ["id"])
+                module.params["id"] = navigate_value(resource, ["id"])
 
         result = {}
         changed = False
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if resource is None:
                 if not module.check_mode:
                     create(config)
@@ -220,9 +226,10 @@ def main():
             expect = user_input_parameters(module)
             if are_different_dicts(expect, current):
                 raise Exception(
-                    f"Cannot change option from ({current}) to ({expect}) for an existing security group({module.params.get('id')}).")
+                    f"Cannot change option from ({current}) to ({expect}) for an existing security group({module.params.get('id')})."
+                )
             result = read_resource(config)
-            result['id'] = module.params.get('id')
+            result["id"] = module.params.get("id")
         else:
             if resource:
                 if not module.check_mode:
@@ -233,7 +240,7 @@ def main():
         module.fail_json(msg=str(ex))
 
     else:
-        result['changed'] = changed
+        result["changed"] = changed
         module.exit_json(**result)
 
 
@@ -258,7 +265,7 @@ def create(config):
 
     params = build_create_parameters(opts)
     r = send_create_request(module, params, client)
-    module.params['id'] = navigate_value(r, ["security_group_rule", "id"])
+    module.params["id"] = navigate_value(r, ["security_group_rule", "id"])
 
 
 def delete(config):
@@ -298,7 +305,7 @@ def search_resource(config):
     link = f"security-group-rules{query_link}"
 
     result = []
-    p = {'marker': ''}
+    p = {"marker": ""}
     while True:
         url = link.format(**p)
         r = send_list_request(module, client, url)
@@ -313,7 +320,7 @@ def search_resource(config):
         if len(result) > 1:
             break
 
-        p['marker'] = r[-1].get('id')
+        p["marker"] = r[-1].get("id")
 
     return result
 
@@ -463,7 +470,6 @@ def update_properties(module, response, array_index, exclude_output=False):
 
 
 def send_list_request(module, client, url):
-
     r = None
     try:
         r = client.get(url)
@@ -539,5 +545,5 @@ def fill_list_resp_body(body):
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

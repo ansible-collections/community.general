@@ -31,37 +31,44 @@ class StormConfig(SSHConfig):
         @type file_obj: file
         """
         order = 1
-        host = {"host": ['*'], "config": {}, }
+        host = {
+            "host": ["*"],
+            "config": {},
+        }
         for line in file_obj:
-            line = line.rstrip('\n').lstrip()
-            if line == '':
-                self._config.append({
-                    'type': 'empty_line',
-                    'value': line,
-                    'host': '',
-                    'order': order,
-                })
+            line = line.rstrip("\n").lstrip()
+            if line == "":
+                self._config.append(
+                    {
+                        "type": "empty_line",
+                        "value": line,
+                        "host": "",
+                        "order": order,
+                    }
+                )
                 order += 1
                 continue
 
-            if line.startswith('#'):
-                self._config.append({
-                    'type': 'comment',
-                    'value': line,
-                    'host': '',
-                    'order': order,
-                })
+            if line.startswith("#"):
+                self._config.append(
+                    {
+                        "type": "comment",
+                        "value": line,
+                        "host": "",
+                        "order": order,
+                    }
+                )
                 order += 1
                 continue
 
-            if '=' in line:
+            if "=" in line:
                 # Ensure ProxyCommand gets properly split
-                if line.lower().strip().startswith('proxycommand'):
+                if line.lower().strip().startswith("proxycommand"):
                     proxy_re = re.compile(r"^(proxycommand)\s*=*\s*(.*)", re.I)
                     match = proxy_re.match(line)
                     key, value = match.group(1).lower(), match.group(2)
                 else:
-                    key, value = line.split('=', 1)
+                    key, value = line.split("=", 1)
                     key = key.strip().lower()
             else:
                 # find first whitespace, and split there
@@ -69,26 +76,21 @@ class StormConfig(SSHConfig):
                 while (i < len(line)) and not line[i].isspace():
                     i += 1
                 if i == len(line):
-                    raise Exception(f'Unparsable line: {line!r}')
+                    raise Exception(f"Unparsable line: {line!r}")
                 key = line[:i].lower()
                 value = line[i:].lstrip()
-            if key == 'host':
+            if key == "host":
                 self._config.append(host)
                 value = value.split()
-                host = {
-                    key: value,
-                    'config': {},
-                    'type': 'entry',
-                    'order': order
-                }
+                host = {key: value, "config": {}, "type": "entry", "order": order}
                 order += 1
-            elif key in ['identityfile', 'localforward', 'remoteforward']:
-                if key in host['config']:
-                    host['config'][key].append(value)
+            elif key in ["identityfile", "localforward", "remoteforward"]:
+                if key in host["config"]:
+                    host["config"][key].append(value)
                 else:
-                    host['config'][key] = [value]
-            elif key not in host['config']:
-                host['config'].update({key: value})
+                    host["config"][key] = [value]
+            elif key not in host["config"]:
+                host["config"].update({key: value})
         self._config.append(host)
 
 
@@ -108,7 +110,7 @@ class ConfigParser:
         if not os.path.exists(self.ssh_config_file):
             if not os.path.exists(os.path.dirname(self.ssh_config_file)):
                 os.makedirs(os.path.dirname(self.ssh_config_file))
-            open(self.ssh_config_file, 'w+').close()
+            open(self.ssh_config_file, "w+").close()
             os.chmod(self.ssh_config_file, 0o600)
 
         self.config_data = []
@@ -131,16 +133,18 @@ class ConfigParser:
                 continue
 
             host_item = {
-                'host': entry["host"][0],
-                'options': entry.get("config"),
-                'type': 'entry',
-                'order': entry.get("order", 0),
+                "host": entry["host"][0],
+                "options": entry.get("config"),
+                "type": "entry",
+                "order": entry.get("order", 0),
             }
 
             if len(entry["host"]) > 1:
-                host_item.update({
-                    'host': " ".join(entry["host"]),
-                })
+                host_item.update(
+                    {
+                        "host": " ".join(entry["host"]),
+                    }
+                )
             # minor bug in paramiko.SSHConfig that duplicates
             # "Host *" entries.
             if entry.get("config") and len(entry.get("config")) > 0:
@@ -149,20 +153,20 @@ class ConfigParser:
         return self.config_data
 
     def add_host(self, host, options):
-        self.config_data.append({
-            'host': host,
-            'options': options,
-            'order': self.get_last_index(),
-        })
+        self.config_data.append(
+            {
+                "host": host,
+                "options": options,
+                "order": self.get_last_index(),
+            }
+        )
 
         return self
 
     def update_host(self, host, options, use_regex=False):
         for index, host_entry in enumerate(self.config_data):
-            if host_entry.get("host") == host or \
-                    (use_regex and re.match(host, host_entry.get("host"))):
-
-                if 'deleted_fields' in options:
+            if host_entry.get("host") == host or (use_regex and re.match(host, host_entry.get("host"))):
+                if "deleted_fields" in options:
                     deleted_fields = options.pop("deleted_fields")
                     for deleted_field in deleted_fields:
                         del self.config_data[index]["options"][deleted_field]
@@ -174,7 +178,7 @@ class ConfigParser:
     def search_host(self, search_string):
         results = []
         for host_entry in self.config_data:
-            if host_entry.get("type") != 'entry':
+            if host_entry.get("type") != "entry":
                 continue
             if host_entry.get("host") == "*":
                 continue
@@ -201,7 +205,7 @@ class ConfigParser:
                 found += 1
 
         if found == 0:
-            raise ValueError('No host found')
+            raise ValueError("No host found")
         return self
 
     def delete_all_hosts(self):
@@ -218,7 +222,7 @@ class ConfigParser:
         self.config_data = sorted(self.config_data, key=itemgetter("order"))
 
         for host_item in self.config_data:
-            if host_item.get("type") in ['comment', 'empty_line']:
+            if host_item.get("type") in ["comment", "empty_line"]:
                 file_content += f"{host_item.get('value')}\n"
                 continue
             host_item_content = f"Host {host_item.get('host')}\n"
@@ -235,7 +239,7 @@ class ConfigParser:
         return file_content
 
     def write_to_ssh_config(self):
-        with open(self.ssh_config_file, 'w+') as f:
+        with open(self.ssh_config_file, "w+") as f:
             data = self.dump()
             if data:
                 f.write(data)

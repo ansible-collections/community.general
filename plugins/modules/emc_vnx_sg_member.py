@@ -86,8 +86,14 @@ from ansible_collections.community.general.plugins.module_utils.storage.emc.emc_
 LIB_IMP_ERR = None
 try:
     from storops import VNXSystem
-    from storops.exception import VNXCredentialError, VNXStorageGroupError, \
-        VNXAluAlreadyAttachedError, VNXAttachAluError, VNXDetachAluNotFoundError
+    from storops.exception import (
+        VNXCredentialError,
+        VNXStorageGroupError,
+        VNXAluAlreadyAttachedError,
+        VNXAttachAluError,
+        VNXDetachAluNotFoundError,
+    )
+
     HAS_LIB = True
 except Exception:
     LIB_IMP_ERR = traceback.format_exc()
@@ -96,31 +102,24 @@ except Exception:
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True),
-        lunid=dict(type='int', required=True),
-        state=dict(default='present', choices=['present', 'absent']),
+        name=dict(type="str", required=True),
+        lunid=dict(type="int", required=True),
+        state=dict(default="present", choices=["present", "absent"]),
     )
 
     module_args.update(emc_vnx_argument_spec)
 
-    result = dict(
-        changed=False,
-        hluid=None
-    )
+    result = dict(changed=False, hluid=None)
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     if not HAS_LIB:
-        module.fail_json(msg=missing_required_lib('storops >= 0.5.10'),
-                         exception=LIB_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("storops >= 0.5.10"), exception=LIB_IMP_ERR)
 
-    sp_user = module.params['sp_user']
-    sp_address = module.params['sp_address']
-    sp_password = module.params['sp_password']
-    alu = module.params['lunid']
+    sp_user = module.params["sp_user"]
+    sp_address = module.params["sp_address"]
+    sp_password = module.params["sp_password"]
+    alu = module.params["lunid"]
 
     # if the user is working with this module in only check mode we do not
     # want to make any changes to the environment, just return the current
@@ -130,35 +129,32 @@ def run_module():
 
     try:
         vnx = VNXSystem(sp_address, sp_user, sp_password)
-        sg = vnx.get_sg(module.params['name'])
+        sg = vnx.get_sg(module.params["name"])
         if sg.existed:
-            if module.params['state'] == 'present':
+            if module.params["state"] == "present":
                 if not sg.has_alu(alu):
                     try:
-                        result['hluid'] = sg.attach_alu(alu)
-                        result['changed'] = True
+                        result["hluid"] = sg.attach_alu(alu)
+                        result["changed"] = True
                     except VNXAluAlreadyAttachedError:
-                        result['hluid'] = sg.get_hlu(alu)
+                        result["hluid"] = sg.get_hlu(alu)
                     except (VNXAttachAluError, VNXStorageGroupError) as e:
-                        module.fail_json(msg=f'Error attaching {alu}: {e} ',
-                                         **result)
+                        module.fail_json(msg=f"Error attaching {alu}: {e} ", **result)
                 else:
-                    result['hluid'] = sg.get_hlu(alu)
-            if module.params['state'] == 'absent' and sg.has_alu(alu):
+                    result["hluid"] = sg.get_hlu(alu)
+            if module.params["state"] == "absent" and sg.has_alu(alu):
                 try:
                     sg.detach_alu(alu)
-                    result['changed'] = True
+                    result["changed"] = True
                 except VNXDetachAluNotFoundError:
                     # being not attached when using absent is OK
                     pass
                 except VNXStorageGroupError as e:
-                    module.fail_json(msg=f'Error detaching alu {alu}: {e} ',
-                                     **result)
+                    module.fail_json(msg=f"Error detaching alu {alu}: {e} ", **result)
         else:
-            module.fail_json(msg=f"No such storage group named {module.params['name']}",
-                                 **result)
+            module.fail_json(msg=f"No such storage group named {module.params['name']}", **result)
     except VNXCredentialError as e:
-        module.fail_json(msg=f'{e}', **result)
+        module.fail_json(msg=f"{e}", **result)
 
     module.exit_json(**result)
 
@@ -167,5 +163,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

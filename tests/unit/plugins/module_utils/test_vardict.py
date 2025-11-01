@@ -80,7 +80,9 @@ def test_var_diff_dict():
 
     vd.set("aa", 123, diff=True)
     vd.aa = 456
-    assert vd.diff() == {"before": {"aa": 123, "dd": val_before}, "after": {"aa": 456, "dd": val_after}}, f"actual={vd.diff()}"
+    assert vd.diff() == {"before": {"aa": 123, "dd": val_before}, "after": {"aa": 456, "dd": val_after}}, (
+        f"actual={vd.diff()}"
+    )
 
 
 def test_vardict_set_meta():

@@ -140,19 +140,19 @@ from ansible_collections.community.general.plugins.module_utils.android_sdkmanag
 class AndroidSdk(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
-            package=dict(type='list', elements='str', aliases=['pkg', 'name']),
-            sdk_root=dict(type='path'),
-            channel=dict(type='str', default='stable', choices=['stable', 'beta', 'dev', 'canary']),
-            accept_licenses=dict(type='bool', default=False)
+            state=dict(type="str", default="present", choices=["present", "absent", "latest"]),
+            package=dict(type="list", elements="str", aliases=["pkg", "name"]),
+            sdk_root=dict(type="path"),
+            channel=dict(type="str", default="stable", choices=["stable", "beta", "dev", "canary"]),
+            accept_licenses=dict(type="bool", default=False),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     def __init_module__(self):
         self.sdkmanager = AndroidSdkManager(self.module)
-        self.vars.set('installed', [], change=True)
-        self.vars.set('removed', [], change=True)
+        self.vars.set("installed", [], change=True)
+        self.vars.set("removed", [], change=True)
 
     def _parse_packages(self):
         arg_pkgs = set(self.vars.package)
@@ -203,5 +203,5 @@ def main():
     AndroidSdk.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

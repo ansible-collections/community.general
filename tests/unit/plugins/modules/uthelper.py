@@ -30,14 +30,16 @@ class UTHelper:
     @staticmethod
     def from_module(ansible_module, test_module_name, mocks=None):
         test_module = sys.modules[test_module_name]
-        extensions = ['.yaml', '.yml']
+        extensions = [".yaml", ".yml"]
         for ext in extensions:
-            test_spec_filename = test_module.__file__.replace('.py', ext)
+            test_spec_filename = test_module.__file__.replace(".py", ext)
             if os.path.exists(test_spec_filename):
                 with open(test_spec_filename, "r") as test_spec_filehandle:
                     return UTHelper.from_file(ansible_module, test_module, test_spec_filehandle, mocks=mocks)
 
-        raise Exception(f"Cannot find test case file for {test_module.__file__} with one of the extensions: {extensions}")
+        raise Exception(
+            f"Cannot find test case file for {test_module.__file__} with one of the extensions: {extensions}"
+        )
 
     def add_func_to_test_module(self, name, func):
         setattr(self.test_module, name, func)
@@ -54,7 +56,7 @@ class UTHelper:
 
         self.mocks_map = {m.name: m for m in mocks} if mocks else {}
 
-        for spec_test_case in test_spec['test_cases']:
+        for spec_test_case in test_spec["test_cases"]:
             tc = ModuleTestCase.make_test_case(spec_test_case, test_module, self.mocks_map)
             self.test_cases.append(tc)
             self.fixtures.update(tc.fixtures)
@@ -66,7 +68,7 @@ class UTHelper:
         return Runner(self.ansible_module.main)
 
     def set_test_func(self):
-        @pytest.mark.parametrize('test_case', self.test_cases, ids=[tc.id for tc in self.test_cases])
+        @pytest.mark.parametrize("test_case", self.test_cases, ids=[tc.id for tc in self.test_cases])
         @pytest.mark.usefixtures(*self.fixtures)
         def _test_module(mocker, capfd, patch_ansible_module_uthelper, test_case):
             """
@@ -125,8 +127,10 @@ class ModuleTestCase:
         self._fixtures = {}
 
     def __str__(self):
-        return (f"<ModuleTestCase: id={self.id} {'input ' if self.input else ''}{'output ' if self.output else ''}"
-                f"mocks=({', '.join(self.mocks.keys())}) flags={self.flags}>")
+        return (
+            f"<ModuleTestCase: id={self.id} {'input ' if self.input else ''}{'output ' if self.output else ''}"
+            f"mocks=({', '.join(self.mocks.keys())}) flags={self.flags}>"
+        )
 
     def __repr__(self):
         return f"ModuleTestCase(id={self.id}, input={self.input}, output={self.output}, mocks={self.mocks!r}, flags={self.flags})"
@@ -138,7 +142,7 @@ class ModuleTestCase:
             input=test_case_spec.get("input", {}),
             output=test_case_spec.get("output", {}),
             mocks=test_case_spec.get("mocks", {}),
-            flags=test_case_spec.get("flags", {})
+            flags=test_case_spec.get("flags", {}),
         )
         tc.build_mocks(mocks_map)
         return tc
@@ -175,12 +179,13 @@ class ModuleTestCase:
     def check_testcase(self, results):
         print(f"testcase =\n{self!r}")
         print(f"results =\n{results}")
-        if 'exception' in results:
+        if "exception" in results:
             print(f"exception = \n{results['exception']}")
 
         for test_result in self.output:
-            assert results[test_result] == self.output[test_result], \
+            assert results[test_result] == self.output[test_result], (
                 f"'{test_result}': '{results[test_result]}' != '{self.output[test_result]}'"
+            )
 
     def check_mocks(self, test_case, results):
         for mock in self.mocks.values():
@@ -219,13 +224,14 @@ class RunCommandMock(TestCaseMock):
         def patch_bin(mocker):
             def mockie(self_, path, *args, **kwargs):
                 return f"/testbin/{path}"
-            mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', mockie)
+
+            mocker.patch("ansible.module_utils.basic.AnsibleModule.get_bin_path", mockie)
 
         return {"patch_bin": patch_bin}
 
     def setup(self, mocker):
         def _results():
-            for result in [(x['rc'], x['out'], x['err']) for x in self.mock_specs]:
+            for result in [(x["rc"], x["out"], x["err"]) for x in self.mock_specs]:
                 yield result
             raise Exception("testcase has not enough run_command calls")
 
@@ -237,14 +243,18 @@ class RunCommandMock(TestCaseMock):
                 raise Exception(f"rc = {result[0]}")
             return result
 
-        self.mock_run_cmd = mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command', side_effect=side_effect)
+        self.mock_run_cmd = mocker.patch(
+            "ansible.module_utils.basic.AnsibleModule.run_command", side_effect=side_effect
+        )
 
     def check(self, test_case, results):
         call_args_list = [(item[0][0], item[1]) for item in self.mock_run_cmd.call_args_list]
-        expected_call_args_list = [(item['command'], item.get('environ', {})) for item in self.mock_specs]
+        expected_call_args_list = [(item["command"], item.get("environ", {})) for item in self.mock_specs]
         print(f"call args list =\n{call_args_list}")
         print(f"expected args list =\n{expected_call_args_list}")
 
-        assert self.mock_run_cmd.call_count == len(self.mock_specs), f"{self.mock_run_cmd.call_count} != {len(self.mock_specs)}"
+        assert self.mock_run_cmd.call_count == len(self.mock_specs), (
+            f"{self.mock_run_cmd.call_count} != {len(self.mock_specs)}"
+        )
         if self.mock_run_cmd.call_count:
             assert call_args_list == expected_call_args_list

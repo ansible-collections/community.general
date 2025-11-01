@@ -218,12 +218,11 @@ from ansible.module_utils.urls import fetch_url
 from urllib.parse import urlencode
 
 
-USER_AGENT = 'ansible-community.general.ipbase_info/0.1.0'
-BASE_URL = 'https://api.ipbase.com/v2/info'
+USER_AGENT = "ansible-community.general.ipbase_info/0.1.0"
+BASE_URL = "https://api.ipbase.com/v2/info"
 
 
 class IpbaseInfo:
-
     def __init__(self, module):
         self.module = module
 
@@ -234,43 +233,42 @@ class IpbaseInfo:
             force=True,
             timeout=10,
             headers={
-                'Accept': 'application/json',
-                'User-Agent': USER_AGENT,
-            })
+                "Accept": "application/json",
+                "User-Agent": USER_AGENT,
+            },
+        )
 
-        if info['status'] != 200:
+        if info["status"] != 200:
             self.module.fail_json(msg=f"The API request to ipbase.com returned an error status code {info['status']}")
         else:
             try:
                 content = response.read()
-                result = self.module.from_json(content.decode('utf8'))
+                result = self.module.from_json(content.decode("utf8"))
             except ValueError:
-                self.module.fail_json(
-                    msg=f'Failed to parse the ipbase.com response: {url} {content}')
+                self.module.fail_json(msg=f"Failed to parse the ipbase.com response: {url} {content}")
             else:
                 return result
 
     def info(self):
-
-        ip = self.module.params['ip']
-        apikey = self.module.params['apikey']
-        hostname = self.module.params['hostname']
-        language = self.module.params['language']
+        ip = self.module.params["ip"]
+        apikey = self.module.params["apikey"]
+        hostname = self.module.params["hostname"]
+        language = self.module.params["language"]
 
         url = BASE_URL
 
         params = {}
         if ip:
-            params['ip'] = ip
+            params["ip"] = ip
 
         if apikey:
-            params['apikey'] = apikey
+            params["apikey"] = apikey
 
         if hostname:
-            params['hostname'] = 1
+            params["hostname"] = 1
 
         if language:
-            params['language'] = language
+            params["language"] = language
 
         if params:
             url += f"?{urlencode(params)}"
@@ -280,10 +278,10 @@ class IpbaseInfo:
 
 def main():
     module_args = dict(
-        ip=dict(type='str', no_log=False),
-        apikey=dict(type='str', no_log=True),
-        hostname=dict(type='bool', no_log=False, default=False),
-        language=dict(type='str', no_log=False, default='en'),
+        ip=dict(type="str", no_log=False),
+        apikey=dict(type="str", no_log=True),
+        hostname=dict(type="bool", no_log=False, default=False),
+        language=dict(type="str", no_log=False, default="en"),
     )
 
     module = AnsibleModule(
@@ -295,5 +293,5 @@ def main():
     module.exit_json(**ipbase.info())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

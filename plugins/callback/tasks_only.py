@@ -1,4 +1,3 @@
-
 # Copyright (c) 2025, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -51,8 +50,8 @@ from ansible.plugins.callback.default import CallbackModule as Default
 
 class CallbackModule(Default):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'stdout'
-    CALLBACK_NAME = 'community.general.tasks_only'
+    CALLBACK_TYPE = "stdout"
+    CALLBACK_NAME = "community.general.tasks_only"
 
     def v2_playbook_on_play_start(self, play):
         pass

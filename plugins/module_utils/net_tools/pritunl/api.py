@@ -54,9 +54,7 @@ def _get_pritunl_organizations(api_token, api_secret, base_url, validate_certs=T
     )
 
 
-def _delete_pritunl_organization(
-    api_token, api_secret, base_url, organization_id, validate_certs=True
-):
+def _delete_pritunl_organization(api_token, api_secret, base_url, organization_id, validate_certs=True):
     return pritunl_auth_request(
         base_url=base_url,
         api_token=api_token,
@@ -67,9 +65,7 @@ def _delete_pritunl_organization(
     )
 
 
-def _post_pritunl_organization(
-    api_token, api_secret, base_url, organization_data, validate_certs=True
-):
+def _post_pritunl_organization(api_token, api_secret, base_url, organization_data, validate_certs=True):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -82,9 +78,7 @@ def _post_pritunl_organization(
     )
 
 
-def _get_pritunl_users(
-    api_token, api_secret, base_url, organization_id, validate_certs=True
-):
+def _get_pritunl_users(api_token, api_secret, base_url, organization_id, validate_certs=True):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -95,9 +89,7 @@ def _get_pritunl_users(
     )
 
 
-def _delete_pritunl_user(
-    api_token, api_secret, base_url, organization_id, user_id, validate_certs=True
-):
+def _delete_pritunl_user(api_token, api_secret, base_url, organization_id, user_id, validate_certs=True):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -108,9 +100,7 @@ def _delete_pritunl_user(
     )
 
 
-def _post_pritunl_user(
-    api_token, api_secret, base_url, organization_id, user_data, validate_certs=True
-):
+def _post_pritunl_user(api_token, api_secret, base_url, organization_id, user_data, validate_certs=True):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -144,9 +134,7 @@ def _put_pritunl_user(
     )
 
 
-def list_pritunl_organizations(
-    api_token, api_secret, base_url, validate_certs=True, filters=None
-):
+def list_pritunl_organizations(api_token, api_secret, base_url, validate_certs=True, filters=None):
     orgs = []
 
     response = _get_pritunl_organizations(
@@ -164,18 +152,13 @@ def list_pritunl_organizations(
             if filters is None:
                 orgs.append(org)
             else:
-                if not any(
-                    filter_val != org[filter_key]
-                    for filter_key, filter_val in filters.items()
-                ):
+                if not any(filter_val != org[filter_key] for filter_key, filter_val in filters.items()):
                     orgs.append(org)
 
     return orgs
 
 
-def list_pritunl_users(
-    api_token, api_secret, base_url, organization_id, validate_certs=True, filters=None
-):
+def list_pritunl_users(api_token, api_secret, base_url, organization_id, validate_certs=True, filters=None):
     users = []
 
     response = _get_pritunl_users(
@@ -195,10 +178,7 @@ def list_pritunl_users(
                 users.append(user)
 
             else:
-                if not any(
-                    filter_val != user[filter_key]
-                    for filter_key, filter_val in filters.items()
-                ):
+                if not any(filter_val != user[filter_key] for filter_key, filter_val in filters.items()):
                     users.append(user)
 
     return users
@@ -220,9 +200,7 @@ def post_pritunl_organization(
     )
 
     if response.getcode() != 200:
-        raise PritunlException(
-            f"Could not add organization {organization_name} to Pritunl"
-        )
+        raise PritunlException(f"Could not add organization {organization_name} to Pritunl")
     # The user PUT request returns the updated user object
     return json.loads(response.read())
 
@@ -248,9 +226,7 @@ def post_pritunl_user(
         )
 
         if response.getcode() != 200:
-            raise PritunlException(
-                f"Could not remove user {user_id} from organization {organization_id} from Pritunl"
-            )
+            raise PritunlException(f"Could not remove user {user_id} from organization {organization_id} from Pritunl")
         # user POST request returns an array of a single item,
         # so return this item instead of the list
         return json.loads(response.read())[0]
@@ -266,16 +242,12 @@ def post_pritunl_user(
         )
 
         if response.getcode() != 200:
-            raise PritunlException(
-                f"Could not update user {user_id} from organization {organization_id} from Pritunl"
-            )
+            raise PritunlException(f"Could not update user {user_id} from organization {organization_id} from Pritunl")
         # The user PUT request returns the updated user object
         return json.loads(response.read())
 
 
-def delete_pritunl_organization(
-    api_token, api_secret, base_url, organization_id, validate_certs=True
-):
+def delete_pritunl_organization(api_token, api_secret, base_url, organization_id, validate_certs=True):
     response = _delete_pritunl_organization(
         api_token=api_token,
         api_secret=api_secret,
@@ -285,16 +257,12 @@ def delete_pritunl_organization(
     )
 
     if response.getcode() != 200:
-        raise PritunlException(
-            f"Could not remove organization {organization_id} from Pritunl"
-        )
+        raise PritunlException(f"Could not remove organization {organization_id} from Pritunl")
 
     return json.loads(response.read())
 
 
-def delete_pritunl_user(
-    api_token, api_secret, base_url, organization_id, user_id, validate_certs=True
-):
+def delete_pritunl_user(api_token, api_secret, base_url, organization_id, user_id, validate_certs=True):
     response = _delete_pritunl_user(
         api_token=api_token,
         api_secret=api_secret,
@@ -305,9 +273,7 @@ def delete_pritunl_user(
     )
 
     if response.getcode() != 200:
-        raise PritunlException(
-            f"Could not remove user {user_id} from organization {organization_id} from Pritunl"
-        )
+        raise PritunlException(f"Could not remove user {user_id} from organization {organization_id} from Pritunl")
 
     return json.loads(response.read())
 
@@ -332,9 +298,7 @@ def pritunl_auth_request(
     auth_string = f"{api_token}&{auth_timestamp}&{auth_nonce}&{method.upper()}&{path}"
 
     auth_signature = base64.b64encode(
-        hmac.new(
-            api_secret.encode("utf-8"), auth_string.encode("utf-8"), hashlib.sha256
-        ).digest()
+        hmac.new(api_secret.encode("utf-8"), auth_string.encode("utf-8"), hashlib.sha256).digest()
     )
 
     auth_headers = {

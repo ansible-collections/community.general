@@ -189,34 +189,35 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
     OPERATION_CREATE,
     OPERATION_UPDATE,
     OPERATION_DELETE,
-    _ConsulModule
+    _ConsulModule,
 )
 
-_CHECK_MUTUALLY_EXCLUSIVE = [('args', 'ttl', 'tcp', 'http')]
+_CHECK_MUTUALLY_EXCLUSIVE = [("args", "ttl", "tcp", "http")]
 _CHECK_REQUIRED_BY = {
-    'args': 'interval',
-    'http': 'interval',
-    'tcp': 'interval',
+    "args": "interval",
+    "http": "interval",
+    "tcp": "interval",
 }
 
 _ARGUMENT_SPEC = {
     "state": dict(default="present", choices=["present", "absent"]),
-    "name": dict(type='str'),
-    "id": dict(type='str'),
-    "tags": dict(type='list', elements='str'),
-    "address": dict(type='str'),
-    "meta": dict(type='dict'),
-    "service_port": dict(type='int'),
-    "enable_tag_override": dict(type='bool', default=False),
-    "weights": dict(type='dict', options=dict(
-        passing=dict(type='int', default=1, no_log=False),
-        warning=dict(type='int', default=1)
-    ), default={"passing": 1, "warning": 1})
+    "name": dict(type="str"),
+    "id": dict(type="str"),
+    "tags": dict(type="list", elements="str"),
+    "address": dict(type="str"),
+    "meta": dict(type="dict"),
+    "service_port": dict(type="int"),
+    "enable_tag_override": dict(type="bool", default=False),
+    "weights": dict(
+        type="dict",
+        options=dict(passing=dict(type="int", default=1, no_log=False), warning=dict(type="int", default=1)),
+        default={"passing": 1, "warning": 1},
+    ),
 }
 
 _REQUIRED_IF = [
-    ('state', 'present', ['name']),
-    ('state', 'absent', ('id', 'name'), True),
+    ("state", "present", ["name"]),
+    ("state", "absent", ("id", "name"), True),
 ]
 
 _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)

@@ -107,15 +107,15 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def selfupdate(module, port_path):
-    """ Update Macports and the ports tree. """
+    """Update Macports and the ports tree."""
 
     rc, out, err = module.run_command([port_path, "-v", "selfupdate"])
 
     if rc == 0:
         updated = any(
-            re.search(r'Total number of ports parsed:\s+[^0]', s.strip()) or
-            re.search(r'Installing new Macports release', s.strip())
-            for s in out.split('\n')
+            re.search(r"Total number of ports parsed:\s+[^0]", s.strip())
+            or re.search(r"Installing new Macports release", s.strip())
+            for s in out.split("\n")
             if s
         )
         if updated:
@@ -131,7 +131,7 @@ def selfupdate(module, port_path):
 
 
 def upgrade(module, port_path):
-    """ Upgrade outdated ports. """
+    """Upgrade outdated ports."""
 
     rc, out, err = module.run_command([port_path, "upgrade", "outdated"])
 
@@ -149,10 +149,9 @@ def upgrade(module, port_path):
 
 
 def query_port(module, port_path, name, state="present"):
-    """ Returns whether a port is installed or not. """
+    """Returns whether a port is installed or not."""
 
     if state == "present":
-
         rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
         if rc == 0 and out.strip().startswith(f"{name} "):
@@ -161,7 +160,6 @@ def query_port(module, port_path, name, state="present"):
         return False
 
     elif state == "active":
-
         rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
         if rc == 0 and "(active)" in out:
@@ -171,7 +169,7 @@ def query_port(module, port_path, name, state="present"):
 
 
 def remove_ports(module, port_path, ports, stdout, stderr):
-    """ Uninstalls one or more ports if installed. """
+    """Uninstalls one or more ports if installed."""
 
     remove_c = 0
     # Using a for loop in case of error, we can report the port that failed
@@ -189,14 +187,13 @@ def remove_ports(module, port_path, ports, stdout, stderr):
         remove_c += 1
 
     if remove_c > 0:
-
         module.exit_json(changed=True, msg=f"Removed {remove_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already absent", stdout=stdout, stderr=stderr)
 
 
 def install_ports(module, port_path, ports, variant, stdout, stderr):
-    """ Installs one or more ports if not already installed. """
+    """Installs one or more ports if not already installed."""
 
     install_c = 0
 
@@ -219,7 +216,7 @@ def install_ports(module, port_path, ports, variant, stdout, stderr):
 
 
 def activate_ports(module, port_path, ports, stdout, stderr):
-    """ Activate a port if it is inactive. """
+    """Activate a port if it is inactive."""
 
     activate_c = 0
 
@@ -246,7 +243,7 @@ def activate_ports(module, port_path, ports, stdout, stderr):
 
 
 def deactivate_ports(module, port_path, ports, stdout, stderr):
-    """ Deactivate a port if it is active. """
+    """Deactivate a port if it is active."""
 
     deactivated_c = 0
 
@@ -274,18 +271,18 @@ def deactivate_ports(module, port_path, ports, stdout, stderr):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', elements='str', aliases=["port"]),
-            selfupdate=dict(aliases=["update_cache", "update_ports"], default=False, type='bool'),
+            name=dict(type="list", elements="str", aliases=["port"]),
+            selfupdate=dict(aliases=["update_cache", "update_ports"], default=False, type="bool"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed", "active", "inactive"]),
-            upgrade=dict(default=False, type='bool'),
-            variant=dict(aliases=["variants"], type='str')
+            upgrade=dict(default=False, type="bool"),
+            variant=dict(aliases=["variants"], type="str"),
         )
     )
 
     stdout = ""
     stderr = ""
 
-    port_path = module.get_bin_path('port', True, ['/opt/local/bin'])
+    port_path = module.get_bin_path("port", True, ["/opt/local/bin"])
 
     p = module.params
 
@@ -320,5 +317,5 @@ def main():
         deactivate_ports(module, port_path, pkgs, stdout, stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -99,21 +99,21 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            image=dict(type='path', required=True, aliases=['path', 'src']),
-            dest=dict(type='path', required=True),
-            files=dict(type='list', elements='str', required=True),
-            force=dict(type='bool', default=True),
-            password=dict(type='str', no_log=True),
-            executable=dict(type='path'),  # No default on purpose
+            image=dict(type="path", required=True, aliases=["path", "src"]),
+            dest=dict(type="path", required=True),
+            files=dict(type="list", elements="str", required=True),
+            force=dict(type="bool", default=True),
+            password=dict(type="str", no_log=True),
+            executable=dict(type="path"),  # No default on purpose
         ),
         supports_check_mode=True,
     )
-    image = module.params['image']
-    dest = module.params['dest']
-    files = module.params['files']
-    force = module.params['force']
-    password = module.params['password']
-    executable = module.params['executable']
+    image = module.params["image"]
+    dest = module.params["dest"]
+    files = module.params["files"]
+    force = module.params["force"]
+    password = module.params["password"]
+    executable = module.params["executable"]
 
     result = dict(
         changed=False,
@@ -123,12 +123,12 @@ def main():
 
     # We want to know if the user provided it or not, so we set default here
     if executable is None:
-        executable = '7z'
+        executable = "7z"
 
     binary = module.get_bin_path(executable, None)
 
     # When executable was provided and binary not found, warn user !
-    if module.params['executable'] is not None and not binary:
+    if module.params["executable"] is not None and not binary:
         module.warn(f"Executable '{executable}' is not found on the system, trying to mount ISO instead.")
 
     if not os.path.exists(dest):
@@ -137,7 +137,7 @@ def main():
     if not os.path.exists(os.path.dirname(image)):
         module.fail_json(msg=f"ISO image '{image}' does not exist")
 
-    result['files'] = []
+    result["files"] = []
     extract_files = list(files)
 
     if not force:
@@ -145,11 +145,13 @@ def main():
         for f in files:
             dest_file = os.path.join(dest, os.path.basename(f))
             if os.path.exists(dest_file):
-                result['files'].append(dict(
-                    checksum=None,
-                    dest=dest_file,
-                    src=f,
-                ))
+                result["files"].append(
+                    dict(
+                        checksum=None,
+                        dest=dest_file,
+                        src=f,
+                    )
+                )
                 extract_files.remove(f)
 
     if not extract_files:
@@ -159,27 +161,32 @@ def main():
 
     # Use 7zip when we have a binary, otherwise try to mount
     if binary:
-        cmd = [binary, 'x', image, f'-o{tmp_dir}']
+        cmd = [binary, "x", image, f"-o{tmp_dir}"]
         if password:
             cmd += [f"-p{password}"]
         cmd += extract_files
     else:
-        cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
+        cmd = [module.get_bin_path("mount"), "-o", "loop,ro", image, tmp_dir]
 
     rc, out, err = module.run_command(cmd)
     if rc != 0:
-        result.update(dict(
-            cmd=cmd,
-            rc=rc,
-            stderr=err,
-            stdout=out,
-        ))
+        result.update(
+            dict(
+                cmd=cmd,
+                rc=rc,
+                stderr=err,
+                stdout=out,
+            )
+        )
         shutil.rmtree(tmp_dir)
 
         if binary:
             module.fail_json(msg=f"Failed to extract from ISO image '{image}' to '{tmp_dir}'", **result)
         else:
-            module.fail_json(msg=f"Failed to mount ISO image '{image}' to '{tmp_dir}', and we could not find executable '{executable}'.", **result)
+            module.fail_json(
+                msg=f"Failed to mount ISO image '{image}' to '{tmp_dir}', and we could not find executable '{executable}'.",
+                **result,
+            )
 
     try:
         for f in extract_files:
@@ -196,25 +203,27 @@ def main():
             else:
                 dest_checksum = None
 
-            result['files'].append(dict(
-                checksum=src_checksum,
-                dest=dest_file,
-                src=f,
-            ))
+            result["files"].append(
+                dict(
+                    checksum=src_checksum,
+                    dest=dest_file,
+                    src=f,
+                )
+            )
 
             if src_checksum != dest_checksum:
                 if not module.check_mode:
                     shutil.copy(tmp_src, dest_file)
 
-                result['changed'] = True
+                result["changed"] = True
     finally:
         if not binary:
-            module.run_command([module.get_bin_path('umount'), tmp_dir])
+            module.run_command([module.get_bin_path("umount"), tmp_dir])
 
         shutil.rmtree(tmp_dir)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

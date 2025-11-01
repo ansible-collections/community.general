@@ -78,8 +78,8 @@ from ansible.module_utils.urls import fetch_url
 # Module execution.
 #
 
-def main():
 
+def main():
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, no_log=True),
@@ -87,10 +87,10 @@ def main():
             user=dict(required=False),
             repo=dict(),
             revision=dict(),
-            url=dict(default='https://api.honeybadger.io/v1/deploys'),
-            validate_certs=dict(default=True, type='bool'),
+            url=dict(default="https://api.honeybadger.io/v1/deploys"),
+            validate_certs=dict(default=True, type="bool"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     params = {}
@@ -109,7 +109,7 @@ def main():
 
     params["api_key"] = module.params["token"]
 
-    url = module.params.get('url')
+    url = module.params.get("url")
 
     # If we're in check mode, just exit pretending like we succeeded
     if module.check_mode:
@@ -119,13 +119,13 @@ def main():
         data = urlencode(params)
         response, info = fetch_url(module, url, data=data)
     except Exception as e:
-        module.fail_json(msg=f'Unable to notify Honeybadger: {e}', exception=traceback.format_exc())
+        module.fail_json(msg=f"Unable to notify Honeybadger: {e}", exception=traceback.format_exc())
     else:
-        if info['status'] == 201:
+        if info["status"] == 201:
             module.exit_json(changed=True)
         else:
             module.fail_json(msg=f"HTTP result code: {info['status']} connecting to {url}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

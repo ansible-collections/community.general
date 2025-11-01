@@ -62,47 +62,50 @@ EXAMPLES = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-OPS = ('=', '-', '+')
+OPS = ("=", "-", "+")
 
 
 class CapabilitiesModule:
-    platform = 'Linux'
+    platform = "Linux"
     distribution = None
 
     def __init__(self, module):
         self.module = module
-        self.path = module.params['path'].strip()
-        self.capability = module.params['capability'].strip().lower()
-        self.state = module.params['state']
-        self.getcap_cmd = module.get_bin_path('getcap', required=True)
-        self.setcap_cmd = module.get_bin_path('setcap', required=True)
-        self.capability_tup = self._parse_cap(self.capability, op_required=self.state == 'present')
+        self.path = module.params["path"].strip()
+        self.capability = module.params["capability"].strip().lower()
+        self.state = module.params["state"]
+        self.getcap_cmd = module.get_bin_path("getcap", required=True)
+        self.setcap_cmd = module.get_bin_path("setcap", required=True)
+        self.capability_tup = self._parse_cap(self.capability, op_required=self.state == "present")
 
         self.run()
 
     def run(self):
-
         current = self.getcap(self.path)
         caps = [cap[0] for cap in current]
 
-        if self.state == 'present' and self.capability_tup not in current:
+        if self.state == "present" and self.capability_tup not in current:
             # need to add capability
             if self.module.check_mode:
-                self.module.exit_json(changed=True, msg='capabilities changed')
+                self.module.exit_json(changed=True, msg="capabilities changed")
             else:
                 # remove from current cap list if it is already set (but op/flags differ)
                 current = [x for x in current if x[0] != self.capability_tup[0]]
                 # add new cap with correct op/flags
                 current.append(self.capability_tup)
-                self.module.exit_json(changed=True, state=self.state, msg='capabilities changed', stdout=self.setcap(self.path, current))
-        elif self.state == 'absent' and self.capability_tup[0] in caps:
+                self.module.exit_json(
+                    changed=True, state=self.state, msg="capabilities changed", stdout=self.setcap(self.path, current)
+                )
+        elif self.state == "absent" and self.capability_tup[0] in caps:
             # need to remove capability
             if self.module.check_mode:
-                self.module.exit_json(changed=True, msg='capabilities changed')
+                self.module.exit_json(changed=True, msg="capabilities changed")
             else:
                 # remove from current cap list and then set current list
                 current = [x for x in current if x[0] != self.capability_tup[0]]
-                self.module.exit_json(changed=True, state=self.state, msg='capabilities changed', stdout=self.setcap(self.path, current))
+                self.module.exit_json(
+                    changed=True, state=self.state, msg="capabilities changed", stdout=self.setcap(self.path, current)
+                )
         self.module.exit_json(changed=False, state=self.state)
 
     def getcap(self, path):
@@ -118,9 +121,9 @@ class CapabilitiesModule:
         if rc != 0 or stderr != "":
             self.module.fail_json(msg=f"Unable to get capabilities of {path}", stdout=stdout.strip(), stderr=stderr)
         if stdout.strip() != path:
-            if ' =' in stdout:
+            if " =" in stdout:
                 # process output of an older version of libcap
-                caps = stdout.split(' =')[1].strip().split()
+                caps = stdout.split(" =")[1].strip().split()
             elif stdout.strip().endswith(")"):  # '/foo (Error Message)'
                 self.module.fail_json(msg=f"Unable to get capabilities of {path}", stdout=stdout.strip(), stderr=stderr)
             else:
@@ -131,8 +134,8 @@ class CapabilitiesModule:
                 cap = cap.lower()
                 # getcap condenses capabilities with the same op/flags into a
                 # comma-separated list, so we have to parse that
-                if ',' in cap:
-                    cap_group = cap.split(',')
+                if "," in cap:
+                    cap_group = cap.split(",")
                     cap_group[-1], op, flags = self._parse_cap(cap_group[-1])
                     for subcap in cap_group:
                         rval.append((subcap, op, flags))
@@ -141,7 +144,7 @@ class CapabilitiesModule:
         return rval
 
     def setcap(self, path, caps):
-        caps = ' '.join([''.join(cap) for cap in caps])
+        caps = " ".join(["".join(cap) for cap in caps])
         cmd = [self.setcap_cmd, caps, path]
         rc, stdout, stderr = self.module.run_command(cmd)
         if rc != 0:
@@ -169,13 +172,14 @@ class CapabilitiesModule:
 # ==============================================================
 # main
 
+
 def main():
     # defining module
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='str', required=True, aliases=['key']),
-            capability=dict(type='str', required=True, aliases=['cap']),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
+            path=dict(type="str", required=True, aliases=["key"]),
+            capability=dict(type="str", required=True, aliases=["cap"]),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
         ),
         supports_check_mode=True,
     )
@@ -183,5 +187,5 @@ def main():
     CapabilitiesModule(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -25,18 +25,19 @@ from ansible.plugins.connection import ConnectionBase
 HAVE_SALTSTACK = False
 try:
     import salt.client as sc
+
     HAVE_SALTSTACK = True
 except ImportError:
     pass
 
 
 class Connection(ConnectionBase):
-    """ Salt-based connections """
+    """Salt-based connections"""
 
     has_pipelining = False
     # while the name of the product is salt, naming that module salt cause
     # trouble with module import
-    transport = 'community.general.saltstack'
+    transport = "community.general.saltstack"
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
         super().__init__(play_context, new_stdin, *args, **kwargs)
@@ -51,7 +52,7 @@ class Connection(ConnectionBase):
         return self
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        """ run a command on the remote minion """
+        """run a command on the remote minion"""
         super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         if in_data:
@@ -59,12 +60,14 @@ class Connection(ConnectionBase):
 
         self._display.vvv(f"EXEC {cmd}", host=self.host)
         # need to add 'true;' to work around https://github.com/saltstack/salt/issues/28077
-        res = self.client.cmd(self.host, 'cmd.exec_code_all', ['bash', f"true;{cmd}"])
+        res = self.client.cmd(self.host, "cmd.exec_code_all", ["bash", f"true;{cmd}"])
         if self.host not in res:
-            raise errors.AnsibleError(f"Minion {self.host} didn't answer, check if salt-minion is running and the name is correct")
+            raise errors.AnsibleError(
+                f"Minion {self.host} didn't answer, check if salt-minion is running and the name is correct"
+            )
 
         p = res[self.host]
-        return p['retcode'], p['stdout'], p['stderr']
+        return p["retcode"], p["stdout"], p["stderr"]
 
     @staticmethod
     def _normalize_path(path, prefix):
@@ -74,27 +77,27 @@ class Connection(ConnectionBase):
         return os.path.join(prefix, normpath[1:])
 
     def put_file(self, in_path, out_path):
-        """ transfer a file from local to remote """
+        """transfer a file from local to remote"""
 
         super().put_file(in_path, out_path)
 
-        out_path = self._normalize_path(out_path, '/')
+        out_path = self._normalize_path(out_path, "/")
         self._display.vvv(f"PUT {in_path} TO {out_path}", host=self.host)
-        with open(in_path, 'rb') as in_fh:
+        with open(in_path, "rb") as in_fh:
             content = in_fh.read()
-        self.client.cmd(self.host, 'hashutil.base64_decodefile', [base64.b64encode(content), out_path])
+        self.client.cmd(self.host, "hashutil.base64_decodefile", [base64.b64encode(content), out_path])
 
     # TODO test it
     def fetch_file(self, in_path, out_path):
-        """ fetch a file from remote to local """
+        """fetch a file from remote to local"""
 
         super().fetch_file(in_path, out_path)
 
-        in_path = self._normalize_path(in_path, '/')
+        in_path = self._normalize_path(in_path, "/")
         self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self.host)
-        content = self.client.cmd(self.host, 'cp.get_file_str', [in_path])[self.host]
-        open(out_path, 'wb').write(content)
+        content = self.client.cmd(self.host, "cp.get_file_str", [in_path])[self.host]
+        open(out_path, "wb").write(content)
 
     def close(self):
-        """ terminate the connection; nothing to do here """
+        """terminate the connection; nothing to do here"""
         pass

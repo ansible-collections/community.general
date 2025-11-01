@@ -56,25 +56,24 @@ from ansible.module_utils.basic import AnsibleModule
 def say(module, executable, msg, voice):
     cmd = [executable, msg]
     if voice:
-        cmd.extend(('-v', voice))
+        cmd.extend(("-v", voice))
     module.run_command(cmd, check_rc=True)
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             msg=dict(required=True),
             voice=dict(),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    msg = module.params['msg']
-    voice = module.params['voice']
-    possibles = ('say', 'espeak', 'espeak-ng')
+    msg = module.params["msg"]
+    voice = module.params["voice"]
+    possibles = ("say", "espeak", "espeak-ng")
 
-    if platform.system() != 'Darwin':
+    if platform.system() != "Darwin":
         # 'say' binary available, it might be GNUstep tool which doesn't support 'voice' parameter
         voice = None
 
@@ -93,5 +92,5 @@ def main():
     module.exit_json(msg=msg, changed=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

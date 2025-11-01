@@ -129,33 +129,35 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
+    RedfishUtils,
+    REDFISH_COMMON_ARGUMENT_SPEC,
+)
 from ansible.module_utils.common.text.converters import to_native
 
 
 class IdracRedfishUtils(RedfishUtils):
-
     def get_manager_attributes(self):
         result = {}
         manager_attributes = []
-        properties = ['Attributes', 'Id']
+        properties = ["Attributes", "Id"]
 
         response = self.get_request(self.root_uri + self.manager_uri)
 
-        if response['ret'] is False:
+        if response["ret"] is False:
             return response
-        data = response['data']
+        data = response["data"]
 
         # Manager attributes are supported as part of iDRAC OEM extension
         # Attributes are supported only on iDRAC9
         try:
-            for members in data['Links']['Oem']['Dell']['DellAttributes']:
-                attributes_uri = members['@odata.id']
+            for members in data["Links"]["Oem"]["Dell"]["DellAttributes"]:
+                attributes_uri = members["@odata.id"]
 
                 response = self.get_request(self.root_uri + attributes_uri)
-                if response['ret'] is False:
+                if response["ret"] is False:
                     return response
-                data = response['data']
+                data = response["data"]
 
                 attributes = {}
                 for prop in properties:
@@ -165,57 +167,53 @@ class IdracRedfishUtils(RedfishUtils):
                 if attributes:
                     manager_attributes.append(attributes)
 
-            result['ret'] = True
+            result["ret"] = True
 
         except (AttributeError, KeyError) as e:
-            result['ret'] = False
-            result['msg'] = f"Failed to find attribute/key: {e}"
+            result["ret"] = False
+            result["msg"] = f"Failed to find attribute/key: {e}"
 
         result["entries"] = manager_attributes
         return result
 
 
-CATEGORY_COMMANDS_ALL = {
-    "Manager": ["GetManagerAttributes"]
-}
+CATEGORY_COMMANDS_ALL = {"Manager": ["GetManagerAttributes"]}
 
 
 def main():
     result = {}
     argument_spec = dict(
         category=dict(required=True),
-        command=dict(required=True, type='list', elements='str'),
+        command=dict(required=True, type="list", elements="str"),
         baseuri=dict(required=True),
         username=dict(),
         password=dict(no_log=True),
         auth_token=dict(no_log=True),
-        timeout=dict(type='int', default=10)
+        timeout=dict(type="int", default=10),
     )
     argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
         argument_spec,
         required_together=[
-            ('username', 'password'),
+            ("username", "password"),
         ],
         required_one_of=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
         supports_check_mode=True,
     )
 
-    category = module.params['category']
-    command_list = module.params['command']
+    category = module.params["category"]
+    command_list = module.params["command"]
 
     # admin credentials used for authentication
-    creds = {'user': module.params['username'],
-             'pswd': module.params['password'],
-             'token': module.params['auth_token']}
+    creds = {"user": module.params["username"], "pswd": module.params["password"], "token": module.params["auth_token"]}
 
     # timeout
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
     # Build root URI
     root_uri = f"https://{module.params['baseuri']}"
@@ -223,33 +221,37 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}"))
+        module.fail_json(
+            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
+        )
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}"))
+            module.fail_json(
+                msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
+            )
 
     # Organize by Categories / Commands
 
     if category == "Manager":
         # execute only if we find a Manager resource
         result = rf_utils._find_managers_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         for command in command_list:
             if command == "GetManagerAttributes":
                 result = rf_utils.get_manager_attributes()
 
     # Return data back or fail with proper message
-    if result['ret'] is True:
-        del result['ret']
+    if result["ret"] is True:
+        del result["ret"]
         module.exit_json(redfish_facts=result)
     else:
-        module.fail_json(msg=to_native(result['msg']))
+        module.fail_json(msg=to_native(result["msg"]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -99,24 +99,24 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def get_xattr_keys(module, path, follow):
-    cmd = [module.get_bin_path('getfattr', True), '--absolute-names']
+    cmd = [module.get_bin_path("getfattr", True), "--absolute-names"]
 
     if not follow:
-        cmd.append('-h')
+        cmd.append("-h")
     cmd.append(path)
 
     return _run_xattr(module, cmd)
 
 
 def get_xattr(module, path, key, follow):
-    cmd = [module.get_bin_path('getfattr', True), '--absolute-names']
+    cmd = [module.get_bin_path("getfattr", True), "--absolute-names"]
 
     if not follow:
-        cmd.append('-h')
+        cmd.append("-h")
     if key is None:
-        cmd.append('-d')
+        cmd.append("-d")
     else:
-        cmd.append('-n')
+        cmd.append("-n")
         cmd.append(key)
     cmd.append(path)
 
@@ -124,13 +124,12 @@ def get_xattr(module, path, key, follow):
 
 
 def set_xattr(module, path, key, value, follow):
-
-    cmd = [module.get_bin_path('setfattr', True)]
+    cmd = [module.get_bin_path("setfattr", True)]
     if not follow:
-        cmd.append('-h')
-    cmd.append('-n')
+        cmd.append("-h")
+    cmd.append("-n")
     cmd.append(key)
-    cmd.append('-v')
+    cmd.append("-v")
     cmd.append(value)
     cmd.append(path)
 
@@ -138,11 +137,10 @@ def set_xattr(module, path, key, value, follow):
 
 
 def rm_xattr(module, path, key, follow):
-
-    cmd = [module.get_bin_path('setfattr', True)]
+    cmd = [module.get_bin_path("setfattr", True)]
     if not follow:
-        cmd.append('-h')
-    cmd.append('-x')
+        cmd.append("-h")
+    cmd.append("-x")
     cmd.append(key)
     cmd.append(path)
 
@@ -150,7 +148,6 @@ def rm_xattr(module, path, key, follow):
 
 
 def _run_xattr(module, cmd, check_rc=True):
-
     try:
         (rc, out, err) = module.run_command(cmd, check_rc=check_rc)
     except Exception as e:
@@ -159,34 +156,34 @@ def _run_xattr(module, cmd, check_rc=True):
     # result = {'raw': out}
     result = {}
     for line in out.splitlines():
-        if line.startswith('#') or line == '':
+        if line.startswith("#") or line == "":
             pass
-        elif '=' in line:
-            (key, val) = line.split('=', 1)
+        elif "=" in line:
+            (key, val) = line.split("=", 1)
             result[key] = val.strip('"')
         else:
-            result[line] = ''
+            result[line] = ""
     return result
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path', required=True, aliases=['name']),
-            namespace=dict(type='str', default='user'),
-            key=dict(type='str', no_log=False),
-            value=dict(type='str'),
-            state=dict(type='str', default='read', choices=['absent', 'all', 'keys', 'present', 'read']),
-            follow=dict(type='bool', default=True),
+            path=dict(type="path", required=True, aliases=["name"]),
+            namespace=dict(type="str", default="user"),
+            key=dict(type="str", no_log=False),
+            value=dict(type="str"),
+            state=dict(type="str", default="read", choices=["absent", "all", "keys", "present", "read"]),
+            follow=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
     )
-    path = module.params.get('path')
-    namespace = module.params.get('namespace')
-    key = module.params.get('key')
-    value = module.params.get('value')
-    state = module.params.get('state')
-    follow = module.params.get('follow')
+    path = module.params.get("path")
+    namespace = module.params.get("namespace")
+    key = module.params.get("key")
+    value = module.params.get("value")
+    state = module.params.get("state")
+    follow = module.params.get("follow")
 
     if not os.path.exists(path):
         module.fail_json(msg="path not found or not accessible!")
@@ -195,18 +192,19 @@ def main():
     msg = ""
     res = {}
 
-    if key is None and state in ['absent', 'present']:
+    if key is None and state in ["absent", "present"]:
         module.fail_json(msg=f"{state} needs a key parameter")
 
     # Prepend the key with the namespace if defined
     if (
-            key is not None and
-            namespace is not None and
-            len(namespace) > 0 and
-            not (namespace == 'user' and key.startswith('user.'))):
-        key = f'{namespace}.{key}'
+        key is not None
+        and namespace is not None
+        and len(namespace) > 0
+        and not (namespace == "user" and key.startswith("user."))
+    ):
+        key = f"{namespace}.{key}"
 
-    if state == 'present' or value is not None:
+    if state == "present" or value is not None:
         current = get_xattr(module, path, key, follow)
         if current is None or key not in current or value != current[key]:
             if not module.check_mode:
@@ -214,7 +212,7 @@ def main():
             changed = True
         res = current
         msg = f"{key} set to {value}"
-    elif state == 'absent':
+    elif state == "absent":
         current = get_xattr(module, path, key, follow)
         if current is not None and key in current:
             if not module.check_mode:
@@ -222,10 +220,10 @@ def main():
             changed = True
         res = current
         msg = f"{key} removed"
-    elif state == 'keys':
+    elif state == "keys":
         res = get_xattr_keys(module, path, follow)
         msg = "returning all keys"
-    elif state == 'all':
+    elif state == "all":
         res = get_xattr(module, path, None, follow)
         msg = "dumping all"
     else:
@@ -235,5 +233,5 @@ def main():
     module.exit_json(changed=changed, msg=msg, xattr=res)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

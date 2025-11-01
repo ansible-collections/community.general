@@ -6,7 +6,6 @@ from __future__ import annotations
 
 
 class ModuleDocFragment:
-
     # HWC doc fragment.
     DOCUMENTATION = r"""
 options:

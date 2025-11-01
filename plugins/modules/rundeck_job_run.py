@@ -183,10 +183,7 @@ from time import sleep
 from urllib.parse import quote
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.rundeck import (
-    api_argument_spec,
-    api_request
-)
+from ansible_collections.community.general.plugins.module_utils.rundeck import api_argument_spec, api_request
 
 
 class RundeckJobRun:
@@ -199,17 +196,14 @@ class RundeckJobRun:
         self.filter_nodes = self.module.params["filter_nodes"] or ""
         self.run_at_time = self.module.params["run_at_time"] or ""
         self.loglevel = self.module.params["loglevel"].upper()
-        self.wait_execution = self.module.params['wait_execution']
-        self.wait_execution_delay = self.module.params['wait_execution_delay']
-        self.wait_execution_timeout = self.module.params['wait_execution_timeout']
-        self.abort_on_timeout = self.module.params['abort_on_timeout']
+        self.wait_execution = self.module.params["wait_execution"]
+        self.wait_execution_delay = self.module.params["wait_execution_delay"]
+        self.wait_execution_timeout = self.module.params["wait_execution_timeout"]
+        self.abort_on_timeout = self.module.params["abort_on_timeout"]
 
         for k, v in self.job_options.items():
             if not isinstance(v, str):
-                self.module.exit_json(
-                    msg=f"Job option '{k}' value must be a string",
-                    execution_info={}
-                )
+                self.module.exit_json(msg=f"Job option '{k}' value must be a string", execution_info={})
 
     def job_status_check(self, execution_id):
         response = dict()
@@ -219,23 +213,20 @@ class RundeckJobRun:
         while not timeout:
             endpoint = f"execution/{execution_id}"
             response = api_request(module=self.module, endpoint=endpoint)[0]
-            output = api_request(module=self.module,
-                                 endpoint=f"execution/{execution_id}/output")
+            output = api_request(module=self.module, endpoint=f"execution/{execution_id}/output")
             log_output = "\n".join([x["log"] for x in output[0]["entries"]])
             response.update({"output": log_output})
 
             if response["status"] == "aborted":
                 break
             elif response["status"] == "scheduled":
-                self.module.exit_json(msg=f"Job scheduled to run at {self.run_at_time}",
-                                      execution_info=response,
-                                      changed=True)
+                self.module.exit_json(
+                    msg=f"Job scheduled to run at {self.run_at_time}", execution_info=response, changed=True
+                )
             elif response["status"] == "failed":
-                self.module.fail_json(msg="Job execution failed",
-                                      execution_info=response)
+                self.module.fail_json(msg="Job execution failed", execution_info=response)
             elif response["status"] == "succeeded":
-                self.module.exit_json(msg="Job execution succeeded!",
-                                      execution_info=response)
+                self.module.exit_json(msg="Job execution succeeded!", execution_info=response)
 
             if datetime.now() >= due:
                 timeout = True
@@ -256,58 +247,48 @@ class RundeckJobRun:
                 "loglevel": self.loglevel,
                 "options": self.job_options,
                 "runAtTime": self.run_at_time,
-                "filter": self.filter_nodes
-            }
+                "filter": self.filter_nodes,
+            },
         )
 
         if info["status"] != 200:
             self.module.fail_json(msg=info["msg"])
 
         if not self.wait_execution:
-            self.module.exit_json(msg="Job run send successfully!",
-                                  execution_info=response)
+            self.module.exit_json(msg="Job run send successfully!", execution_info=response)
 
         job_status = self.job_status_check(response["id"])
 
         if job_status["timed_out"]:
             if self.abort_on_timeout:
-                api_request(
-                    module=self.module,
-                    endpoint=f"execution/{response['id']}/abort",
-                    method="GET"
-                )
+                api_request(module=self.module, endpoint=f"execution/{response['id']}/abort", method="GET")
 
                 abort_status = self.job_status_check(response["id"])
 
-                self.module.fail_json(msg="Job execution aborted due the timeout specified",
-                                      execution_info=abort_status)
+                self.module.fail_json(
+                    msg="Job execution aborted due the timeout specified", execution_info=abort_status
+                )
 
-            self.module.fail_json(msg="Job execution timed out",
-                                  execution_info=job_status)
+            self.module.fail_json(msg="Job execution timed out", execution_info=job_status)
 
 
 def main():
     argument_spec = api_argument_spec()
-    argument_spec.update(dict(
-        job_id=dict(required=True, type="str"),
-        job_options=dict(type="dict"),
-        filter_nodes=dict(type="str"),
-        run_at_time=dict(type="str"),
-        wait_execution=dict(type="bool", default=True),
-        wait_execution_delay=dict(type="int", default=5),
-        wait_execution_timeout=dict(type="int", default=120),
-        abort_on_timeout=dict(type="bool", default=False),
-        loglevel=dict(
-            type="str",
-            choices=["debug", "verbose", "info", "warn", "error"],
-            default="info"
+    argument_spec.update(
+        dict(
+            job_id=dict(required=True, type="str"),
+            job_options=dict(type="dict"),
+            filter_nodes=dict(type="str"),
+            run_at_time=dict(type="str"),
+            wait_execution=dict(type="bool", default=True),
+            wait_execution_delay=dict(type="int", default=5),
+            wait_execution_timeout=dict(type="int", default=120),
+            abort_on_timeout=dict(type="bool", default=False),
+            loglevel=dict(type="str", choices=["debug", "verbose", "info", "warn", "error"], default="info"),
         )
-    ))
-
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=False
     )
+
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=False)
 
     if module.params["api_version"] < 14:
         module.fail_json(msg="API version should be at least 14")

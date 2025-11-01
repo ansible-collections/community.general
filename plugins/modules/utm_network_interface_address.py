@@ -119,12 +119,12 @@ def main():
     key_to_check_for_changes = ["comment", "address"]
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            address=dict(type='str', required=True),
-            comment=dict(type='str', default=""),
-            address6=dict(type='str'),
-            resolved=dict(type='bool'),
-            resolved6=dict(type='bool'),
+            name=dict(type="str", required=True),
+            address=dict(type="str", required=True),
+            comment=dict(type="str", default=""),
+            address6=dict(type="str"),
+            resolved=dict(type="bool"),
+            resolved6=dict(type="bool"),
         )
     )
     try:
@@ -133,5 +133,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -74,13 +74,13 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def wakeonlan(module, mac, broadcast, port):
-    """ Send a magic Wake-on-LAN packet. """
+    """Send a magic Wake-on-LAN packet."""
 
     mac_orig = mac
 
     # Remove possible separator from MAC address
     if len(mac) == 12 + 5:
-        mac = mac.replace(mac[2], '')
+        mac = mac.replace(mac[2], "")
 
     # If we don't end up with 12 hexadecimal characters, fail
     if len(mac) != 12:
@@ -93,17 +93,16 @@ def wakeonlan(module, mac, broadcast, port):
         module.fail_json(msg=f"Incorrect MAC address format: {mac_orig}")
 
     # Create payload for magic packet
-    data = b''
+    data = b""
     padding = f"FFFFFFFFFFFF{mac * 20}"
     for i in range(0, len(padding), 2):
-        data = b''.join([data, struct.pack('B', int(padding[i: i + 2], 16))])
+        data = b"".join([data, struct.pack("B", int(padding[i : i + 2], 16))])
 
     # Broadcast payload to network
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
     if not module.check_mode:
-
         try:
             sock.sendto(data, (broadcast, port))
         except socket.error as e:
@@ -116,21 +115,21 @@ def wakeonlan(module, mac, broadcast, port):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            mac=dict(type='str', required=True),
-            broadcast=dict(type='str', default='255.255.255.255'),
-            port=dict(type='int', default=7),
+            mac=dict(type="str", required=True),
+            broadcast=dict(type="str", default="255.255.255.255"),
+            port=dict(type="int", default=7),
         ),
         supports_check_mode=True,
     )
 
-    mac = module.params['mac']
-    broadcast = module.params['broadcast']
-    port = module.params['port']
+    mac = module.params["mac"]
+    broadcast = module.params["broadcast"]
+    port = module.params["port"]
 
     wakeonlan(module, mac, broadcast, port)
 
     module.exit_json(changed=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

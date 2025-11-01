@@ -12,16 +12,16 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 def _values_fmt(values, value_types):
     result = []
     for value, value_type in zip(values, value_types):
-        if value_type == 'bool':
-            value = 'true' if boolean(value) else 'false'
-        result.extend(['--type', f'{value_type}', '--set', f'{value}'])
+        if value_type == "bool":
+            value = "true" if boolean(value) else "false"
+        result.extend(["--type", f"{value_type}", "--set", f"{value}"])
     return result
 
 
 def xfconf_runner(module, **kwargs):
     runner = CmdRunner(
         module,
-        command='xfconf-query',
+        command="xfconf-query",
         arg_formats=dict(
             channel=cmd_runner_fmt.as_opt_val("--channel"),
             property=cmd_runner_fmt.as_opt_val("--property"),
@@ -32,7 +32,7 @@ def xfconf_runner(module, **kwargs):
             values_and_types=_values_fmt,
             version=cmd_runner_fmt.as_fixed("--version"),
         ),
-        **kwargs
+        **kwargs,
     )
     return runner
 

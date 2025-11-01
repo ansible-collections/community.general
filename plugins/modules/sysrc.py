@@ -103,24 +103,24 @@ import re
 class Sysrc(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            value=dict(type='str'),
-            state=dict(type='str', default='present', choices=['absent', 'present', 'value_present', 'value_absent']),
-            path=dict(type='str', default='/etc/rc.conf'),
-            delim=dict(type='str', default=' '),
-            jail=dict(type='str')
+            name=dict(type="str", required=True),
+            value=dict(type="str"),
+            state=dict(type="str", default="present", choices=["absent", "present", "value_present", "value_absent"]),
+            path=dict(type="str", default="/etc/rc.conf"),
+            delim=dict(type="str", default=" "),
+            jail=dict(type="str"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
-    output_params = ('value',)
+    output_params = ("value",)
     use_old_vardict = False
 
     def __init_module__(self):
         # OID style names are not supported
-        if not re.match(r'^\w+$', self.vars.name, re.ASCII):
+        if not re.match(r"^\w+$", self.vars.name, re.ASCII):
             self.module.fail_json(msg="Name may only contain alpha-numeric and underscore characters")
 
-        self.sysrc = self.module.get_bin_path('sysrc', True)
+        self.sysrc = self.module.get_bin_path("sysrc", True)
 
     def _contains(self):
         value = self._get()
@@ -135,28 +135,28 @@ class Sysrc(StateModuleHelper):
         if not os.path.exists(self.vars.path):
             return None
 
-        (rc, out, err) = self._sysrc('-v', '-n', self.vars.name)
+        (rc, out, err) = self._sysrc("-v", "-n", self.vars.name)
         if "unknown variable" in err or "unknown variable" in out:
             # Prior to FreeBSD 11.1 sysrc would write "unknown variable" to stdout and not stderr
             # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=229806
             return None
 
         if out.startswith(self.vars.path):
-            return out.split(':', 1)[1].strip()
+            return out.split(":", 1)[1].strip()
 
         return None
 
     def _modify(self, op, changed):
         (rc, out, err) = self._sysrc(f"{self.vars.name}{op}={self.vars.delim}{self.vars.value}")
         if out.startswith(f"{self.vars.name}:"):
-            return changed(out.split(' -> ')[1].strip().split(self.vars.delim))
+            return changed(out.split(" -> ")[1].strip().split(self.vars.delim))
 
         return False
 
     def _sysrc(self, *args):
-        cmd = [self.sysrc, '-f', self.vars.path]
+        cmd = [self.sysrc, "-f", self.vars.path]
         if self.vars.jail:
-            cmd += ['-j', self.vars.jail]
+            cmd += ["-j", self.vars.jail]
         cmd.extend(args)
 
         (rc, out, err) = self.module.run_command(cmd)
@@ -170,7 +170,7 @@ class Sysrc(StateModuleHelper):
             return
 
         if not self.check_mode:
-            self._sysrc('-x', self.vars.name)
+            self._sysrc("-x", self.vars.name)
 
         self.changed = True
 
@@ -180,7 +180,7 @@ class Sysrc(StateModuleHelper):
             return
 
         if self.vars.value is None:
-            self.vars.set('value', value)
+            self.vars.set("value", value)
             return
 
         if not self.check_mode:
@@ -193,7 +193,7 @@ class Sysrc(StateModuleHelper):
         if not contains:
             return
 
-        self.changed = self.check_mode or self._modify('-', lambda values: self.vars.value not in values)
+        self.changed = self.check_mode or self._modify("-", lambda values: self.vars.value not in values)
 
     def state_value_present(self):
         (contains, value) = self._contains()
@@ -201,15 +201,15 @@ class Sysrc(StateModuleHelper):
             return
 
         if self.vars.value is None:
-            self.vars.set('value', value)
+            self.vars.set("value", value)
             return
 
-        self.changed = self.check_mode or self._modify('+', lambda values: self.vars.value in values)
+        self.changed = self.check_mode or self._modify("+", lambda values: self.vars.value in values)
 
 
 def main():
     Sysrc.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -83,11 +83,10 @@ class AzureLogAnalyticsSource:
     def __build_signature(self, date, workspace_id, shared_key, content_length):
         # Build authorisation signature for Azure log analytics API call
         sigs = f"POST\n{content_length}\napplication/json\nx-ms-date:{date}\n/api/logs"
-        utf8_sigs = sigs.encode('utf-8')
+        utf8_sigs = sigs.encode("utf-8")
         decoded_shared_key = base64.b64decode(shared_key)
-        hmac_sha256_sigs = hmac.new(
-            decoded_shared_key, utf8_sigs, digestmod=hashlib.sha256).digest()
-        encoded_hash = base64.b64encode(hmac_sha256_sigs).decode('utf-8')
+        hmac_sha256_sigs = hmac.new(decoded_shared_key, utf8_sigs, digestmod=hashlib.sha256).digest()
+        encoded_hash = base64.b64encode(hmac_sha256_sigs).decode("utf-8")
         signature = f"SharedKey {workspace_id}:{encoded_hash}"
         return signature
 
@@ -95,10 +94,10 @@ class AzureLogAnalyticsSource:
         return f"https://{workspace_id}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
 
     def __rfc1123date(self):
-        return now().strftime('%a, %d %b %Y %H:%M:%S GMT')
+        return now().strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     def send_event(self, workspace_id, shared_key, state, result, runtime):
-        if result._task_fields['args'].get('_ansible_check_mode') is True:
+        if result._task_fields["args"].get("_ansible_check_mode") is True:
             self.ansible_check_mode = True
 
         if result._task._role:
@@ -107,31 +106,31 @@ class AzureLogAnalyticsSource:
             ansible_role = None
 
         data = {}
-        data['uuid'] = result._task._uuid
-        data['session'] = self.session
-        data['status'] = state
-        data['timestamp'] = self.__rfc1123date()
-        data['host'] = self.host
-        data['user'] = self.user
-        data['runtime'] = runtime
-        data['ansible_version'] = ansible_version
-        data['ansible_check_mode'] = self.ansible_check_mode
-        data['ansible_host'] = result._host.name
-        data['ansible_playbook'] = self.ansible_playbook
-        data['ansible_role'] = ansible_role
-        data['ansible_task'] = result._task_fields
+        data["uuid"] = result._task._uuid
+        data["session"] = self.session
+        data["status"] = state
+        data["timestamp"] = self.__rfc1123date()
+        data["host"] = self.host
+        data["user"] = self.user
+        data["runtime"] = runtime
+        data["ansible_version"] = ansible_version
+        data["ansible_check_mode"] = self.ansible_check_mode
+        data["ansible_host"] = result._host.name
+        data["ansible_playbook"] = self.ansible_playbook
+        data["ansible_role"] = ansible_role
+        data["ansible_task"] = result._task_fields
         # Removing args since it can contain sensitive data
-        if 'args' in data['ansible_task']:
-            data['ansible_task'].pop('args')
-        data['ansible_result'] = result._result
-        if 'content' in data['ansible_result']:
-            data['ansible_result'].pop('content')
+        if "args" in data["ansible_task"]:
+            data["ansible_task"].pop("args")
+        data["ansible_result"] = result._result
+        if "content" in data["ansible_result"]:
+            data["ansible_result"].pop("content")
 
         # Adding extra vars info
-        data['extra_vars'] = self.extra_vars
+        data["extra_vars"] = self.extra_vars
 
         # Preparing the playbook logs as JSON format and send to Azure log analytics
-        jsondata = json.dumps({'event': data}, cls=AnsibleJSONEncoder, sort_keys=True)
+        jsondata = json.dumps({"event": data}, cls=AnsibleJSONEncoder, sort_keys=True)
         content_length = len(jsondata)
         rfc1123date = self.__rfc1123date()
         signature = self.__build_signature(rfc1123date, workspace_id, shared_key, content_length)
@@ -141,19 +140,19 @@ class AzureLogAnalyticsSource:
             workspace_url,
             jsondata,
             headers={
-                'content-type': 'application/json',
-                'Authorization': signature,
-                'Log-Type': 'ansible_playbook',
-                'x-ms-date': rfc1123date
+                "content-type": "application/json",
+                "Authorization": signature,
+                "Log-Type": "ansible_playbook",
+                "x-ms-date": rfc1123date,
             },
-            method='POST'
+            method="POST",
         )
 
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'loganalytics'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "loganalytics"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
@@ -164,15 +163,12 @@ class CallbackModule(CallbackBase):
         self.loganalytics = AzureLogAnalyticsSource()
 
     def _seconds_since_start(self, result):
-        return (
-            now() -
-            self.start_datetimes[result._task._uuid]
-        ).total_seconds()
+        return (now() - self.start_datetimes[result._task._uuid]).total_seconds()
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
-        self.workspace_id = self.get_option('workspace_id')
-        self.shared_key = self.get_option('shared_key')
+        self.workspace_id = self.get_option("workspace_id")
+        self.shared_key = self.get_option("shared_key")
 
     def v2_playbook_on_play_start(self, play):
         vm = play.get_variable_manager()
@@ -190,45 +186,25 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_ok(self, result, **kwargs):
         self.loganalytics.send_event(
-            self.workspace_id,
-            self.shared_key,
-            'OK',
-            result,
-            self._seconds_since_start(result)
+            self.workspace_id, self.shared_key, "OK", result, self._seconds_since_start(result)
         )
 
     def v2_runner_on_skipped(self, result, **kwargs):
         self.loganalytics.send_event(
-            self.workspace_id,
-            self.shared_key,
-            'SKIPPED',
-            result,
-            self._seconds_since_start(result)
+            self.workspace_id, self.shared_key, "SKIPPED", result, self._seconds_since_start(result)
         )
 
     def v2_runner_on_failed(self, result, **kwargs):
         self.loganalytics.send_event(
-            self.workspace_id,
-            self.shared_key,
-            'FAILED',
-            result,
-            self._seconds_since_start(result)
+            self.workspace_id, self.shared_key, "FAILED", result, self._seconds_since_start(result)
         )
 
     def runner_on_async_failed(self, result, **kwargs):
         self.loganalytics.send_event(
-            self.workspace_id,
-            self.shared_key,
-            'FAILED',
-            result,
-            self._seconds_since_start(result)
+            self.workspace_id, self.shared_key, "FAILED", result, self._seconds_since_start(result)
         )
 
     def v2_runner_on_unreachable(self, result, **kwargs):
         self.loganalytics.send_event(
-            self.workspace_id,
-            self.shared_key,
-            'UNREACHABLE',
-            result,
-            self._seconds_since_start(result)
+            self.workspace_id, self.shared_key, "UNREACHABLE", result, self._seconds_since_start(result)
         )

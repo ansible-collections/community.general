@@ -75,22 +75,27 @@ scaleway_organization_info:
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    Scaleway, ScalewayException, scaleway_argument_spec
+    Scaleway,
+    ScalewayException,
+    scaleway_argument_spec,
 )
 
 
 class ScalewayOrganizationInfo(Scaleway):
-
     def __init__(self, module):
         super().__init__(module)
-        self.name = 'organizations'
+        self.name = "organizations"
 
 
 def main():
     argument_spec = scaleway_argument_spec()
-    argument_spec.update(dict(
-        api_url=dict(fallback=(env_fallback, ['SCW_API_URL']), default='https://account.scaleway.com', aliases=['base_url']),
-    ))
+    argument_spec.update(
+        dict(
+            api_url=dict(
+                fallback=(env_fallback, ["SCW_API_URL"]), default="https://account.scaleway.com", aliases=["base_url"]
+            ),
+        )
+    )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -98,12 +103,10 @@ def main():
     )
 
     try:
-        module.exit_json(
-            scaleway_organization_info=ScalewayOrganizationInfo(module).get_resources()
-        )
+        module.exit_json(scaleway_organization_info=ScalewayOrganizationInfo(module).get_resources())
     except ScalewayException as exc:
         module.fail_json(msg=exc.message)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

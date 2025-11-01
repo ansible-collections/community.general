@@ -78,19 +78,18 @@ display = Display()
 
 
 class LookupModule(LookupBase):
-
     @staticmethod
     def Client(server_parameters):
         return SecretServer(**server_parameters)
 
     def run(self, terms, variables, **kwargs):
         if ANOTHER_LIBRARY_IMPORT_ERROR:
-            raise AnsibleError('revbits_ansible must be installed to use this plugin') from ANOTHER_LIBRARY_IMPORT_ERROR
+            raise AnsibleError("revbits_ansible must be installed to use this plugin") from ANOTHER_LIBRARY_IMPORT_ERROR
         self.set_options(var_options=variables, direct=kwargs)
         secret_server = LookupModule.Client(
             {
-                "base_url": self.get_option('base_url'),
-                "api_key": self.get_option('api_key'),
+                "base_url": self.get_option("base_url"),
+                "api_key": self.get_option("api_key"),
             }
         )
         result = []

@@ -89,15 +89,18 @@ profiles:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec, manageiq_entities
+from ansible_collections.community.general.plugins.module_utils.manageiq import (
+    ManageIQ,
+    manageiq_argument_spec,
+    manageiq_entities,
+)
 
 
 def main():
     argument_spec = dict(
-        resource_id=dict(type='int'),
-        resource_name=dict(type='str'),
-        resource_type=dict(required=True, type='str',
-                           choices=list(manageiq_entities().keys())),
+        resource_id=dict(type="int"),
+        resource_name=dict(type="str"),
+        resource_type=dict(required=True, type="str", choices=list(manageiq_entities().keys())),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
@@ -109,9 +112,9 @@ def main():
         supports_check_mode=True,
     )
 
-    resource_id = module.params['resource_id']
-    resource_type_key = module.params['resource_type']
-    resource_name = module.params['resource_name']
+    resource_id = module.params["resource_id"]
+    resource_type_key = module.params["resource_type"]
+    resource_name = module.params["resource_name"]
 
     # get the resource type
     resource_type = manageiq_entities()[resource_type_key]

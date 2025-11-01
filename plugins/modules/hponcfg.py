@@ -84,10 +84,10 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 class HPOnCfg(ModuleHelper):
     module = dict(
         argument_spec=dict(
-            src=dict(type='path', required=True, aliases=['path']),
-            minfw=dict(type='str'),
-            executable=dict(default='hponcfg', type='str'),
-            verbose=dict(default=False, type='bool'),
+            src=dict(type="path", required=True, aliases=["path"]),
+            minfw=dict(type="str"),
+            executable=dict(default="hponcfg", type="str"),
+            verbose=dict(default=False, type="bool"),
         )
     )
     command_args_formats = dict(
@@ -103,7 +103,7 @@ class HPOnCfg(ModuleHelper):
             self.command_args_formats,
             check_rc=True,
         )
-        runner(['src', 'verbose', 'minfw']).run()
+        runner(["src", "verbose", "minfw"]).run()
 
         # Consider every action a change (not idempotent yet!)
         self.changed = True
@@ -113,5 +113,5 @@ def main():
     HPOnCfg.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

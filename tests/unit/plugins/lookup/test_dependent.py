@@ -25,16 +25,16 @@ class TestLookupModule(TestCase):
         self.assertListEqual(
             self.lookup.run(
                 [
-                    {'a': make_trusted('[1, 2]')},
-                    {'b': make_trusted('[item.a + 3, item.a + 6]')},
-                    {'c': make_trusted('[item.a + item.b * 10]')},
+                    {"a": make_trusted("[1, 2]")},
+                    {"b": make_trusted("[item.a + 3, item.a + 6]")},
+                    {"c": make_trusted("[item.a + item.b * 10]")},
                 ],
                 {},
             ),
             [
-                {'a': 1, 'b': 4, 'c': 41},
-                {'a': 1, 'b': 7, 'c': 71},
-                {'a': 2, 'b': 5, 'c': 52},
-                {'a': 2, 'b': 8, 'c': 82},
+                {"a": 1, "b": 4, "c": 41},
+                {"a": 1, "b": 7, "c": 71},
+                {"a": 2, "b": 5, "c": 52},
+                {"a": 2, "b": 8, "c": 82},
             ],
         )

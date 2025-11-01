@@ -194,14 +194,14 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 
-STATE_ABSENT = 'absent'
-STATE_ARCHIVED = 'archive'
-STATE_COMPRESSED = 'compress'
-STATE_INCOMPLETE = 'incomplete'
+STATE_ABSENT = "absent"
+STATE_ARCHIVED = "archive"
+STATE_COMPRESSED = "compress"
+STATE_INCOMPLETE = "incomplete"
 
 
 def common_path(paths):
-    empty = b'' if paths and isinstance(paths[0], bytes) else ''
+    empty = b"" if paths and isinstance(paths[0], bytes) else ""
 
     return os.path.join(
         os.path.dirname(os.path.commonprefix([os.path.join(os.path.dirname(p), empty) for p in paths])), empty
@@ -213,7 +213,7 @@ def expand_paths(paths):
     is_globby = False
     for path in paths:
         b_path = _to_bytes(path)
-        if b'*' in b_path or b'?' in b_path:
+        if b"*" in b_path or b"?" in b_path:
             e_paths = glob.glob(b_path)
             is_globby = True
         else:
@@ -227,34 +227,34 @@ def matches_exclusion_patterns(path, exclusion_patterns):
 
 
 def is_archive(path):
-    return re.search(br'\.(tar|tar\.(gz|bz2|xz)|tgz|tbz2|zip)$', os.path.basename(path), re.IGNORECASE)
+    return re.search(rb"\.(tar|tar\.(gz|bz2|xz)|tgz|tbz2|zip)$", os.path.basename(path), re.IGNORECASE)
 
 
 def strip_prefix(prefix, string):
-    return string[len(prefix):] if string.startswith(prefix) else string
+    return string[len(prefix) :] if string.startswith(prefix) else string
 
 
 def _to_bytes(s):
-    return to_bytes(s, errors='surrogate_or_strict')
+    return to_bytes(s, errors="surrogate_or_strict")
 
 
 def _to_native(s):
-    return to_native(s, errors='surrogate_or_strict')
+    return to_native(s, errors="surrogate_or_strict")
 
 
 def _to_native_ascii(s):
-    return to_native(s, errors='surrogate_or_strict', encoding='ascii')
+    return to_native(s, errors="surrogate_or_strict", encoding="ascii")
 
 
 class Archive(metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
 
-        self.destination = _to_bytes(module.params['dest']) if module.params['dest'] else None
-        self.exclusion_patterns = module.params['exclusion_patterns'] or []
-        self.format = module.params['format']
-        self.must_archive = module.params['force_archive']
-        self.remove = module.params['remove']
+        self.destination = _to_bytes(module.params["dest"]) if module.params["dest"] else None
+        self.exclusion_patterns = module.params["exclusion_patterns"] or []
+        self.format = module.params["format"]
+        self.must_archive = module.params["force_archive"]
+        self.remove = module.params["remove"]
 
         self.changed = False
         self.destination_state = STATE_ABSENT
@@ -264,18 +264,18 @@ class Archive(metaclass=abc.ABCMeta):
         self.targets = []
         self.not_found = []
 
-        paths = module.params['path']
+        paths = module.params["path"]
         self.expanded_paths, has_globs = expand_paths(paths)
-        self.expanded_exclude_paths = expand_paths(module.params['exclude_path'])[0]
+        self.expanded_exclude_paths = expand_paths(module.params["exclude_path"])[0]
 
         self.paths = sorted(set(self.expanded_paths) - set(self.expanded_exclude_paths))
 
         if not self.paths:
             module.fail_json(
-                path=', '.join(paths),
-                expanded_paths=_to_native(b', '.join(self.expanded_paths)),
-                expanded_exclude_paths=_to_native(b', '.join(self.expanded_exclude_paths)),
-                msg='Error, no source paths were found'
+                path=", ".join(paths),
+                expanded_paths=_to_native(b", ".join(self.expanded_paths)),
+                expanded_exclude_paths=_to_native(b", ".join(self.expanded_exclude_paths)),
+                msg="Error, no source paths were found",
             )
 
         self.root = common_path(self.paths)
@@ -284,13 +284,13 @@ class Archive(metaclass=abc.ABCMeta):
             self.must_archive = any([has_globs, os.path.isdir(self.paths[0]), len(self.paths) > 1])
 
         if not self.destination and not self.must_archive:
-            self.destination = b'%s.%s' % (self.paths[0], _to_bytes(self.format))
+            self.destination = b"%s.%s" % (self.paths[0], _to_bytes(self.format))
 
         if self.must_archive and not self.destination:
             module.fail_json(
                 dest=_to_native(self.destination),
-                path=', '.join(paths),
-                msg='Error, must specify "dest" when archiving multiple files or trees'
+                path=", ".join(paths),
+                msg='Error, must specify "dest" when archiving multiple files or trees',
             )
 
         if self.remove:
@@ -305,18 +305,18 @@ class Archive(metaclass=abc.ABCMeta):
             if self.contains(_to_native(archive_name)):
                 self.successes.append(path)
         except Exception as e:
-            self.errors.append(f'{_to_native_ascii(path)}: {e}')
+            self.errors.append(f"{_to_native_ascii(path)}: {e}")
 
     def add_single_target(self, path):
-        if self.format in ('zip', 'tar'):
+        if self.format in ("zip", "tar"):
             self.open()
             self.add(path, strip_prefix(self.root, path))
             self.close()
             self.destination_state = STATE_ARCHIVED
         else:
             try:
-                f_out = self._open_compressed_file(_to_native_ascii(self.destination), 'wb')
-                with open(path, 'rb') as f_in:
+                f_out = self._open_compressed_file(_to_native_ascii(self.destination), "wb")
+                with open(path, "rb") as f_in:
                     shutil.copyfileobj(f_in, f_out)
                 f_out.close()
                 self.successes.append(path)
@@ -325,7 +325,8 @@ class Archive(metaclass=abc.ABCMeta):
                 self.module.fail_json(
                     path=_to_native(path),
                     dest=_to_native(self.destination),
-                    msg=f'Unable to write to compressed file: {e}', exception=format_exc()
+                    msg=f"Unable to write to compressed file: {e}",
+                    exception=format_exc(),
                 )
 
     def add_targets(self):
@@ -344,13 +345,13 @@ class Archive(metaclass=abc.ABCMeta):
                 else:
                     self.add(target, strip_prefix(self.root, target))
         except Exception as e:
-            if self.format in ('zip', 'tar'):
+            if self.format in ("zip", "tar"):
                 archive_format = self.format
             else:
                 archive_format = f"tar.{self.format}"
             self.module.fail_json(
-                msg=f'Error when writing {archive_format} archive at {_to_native(self.destination)}: {e}',
-                exception=format_exc()
+                msg=f"Error when writing {archive_format} archive at {_to_native(self.destination)}: {e}",
+                exception=format_exc(),
             )
         self.close()
 
@@ -397,8 +398,7 @@ class Archive(metaclass=abc.ABCMeta):
             os.remove(path)
         except OSError as e:
             self.module.fail_json(
-                path=_to_native(path),
-                msg=f'Unable to remove source file: {e}', exception=format_exc()
+                path=_to_native(path), msg=f"Unable to remove source file: {e}", exception=format_exc()
             )
 
     def remove_targets(self):
@@ -420,7 +420,7 @@ class Archive(metaclass=abc.ABCMeta):
 
         if self.errors:
             self.module.fail_json(
-                dest=_to_native(self.destination), msg='Error deleting some source files: ', files=self.errors
+                dest=_to_native(self.destination), msg="Error deleting some source files: ", files=self.errors
             )
 
     def update_permissions(self):
@@ -430,31 +430,31 @@ class Archive(metaclass=abc.ABCMeta):
     @property
     def result(self):
         return {
-            'archived': [_to_native(p) for p in self.successes],
-            'dest': _to_native(self.destination),
-            'dest_state': self.destination_state,
-            'changed': self.changed,
-            'arcroot': _to_native(self.root),
-            'missing': [_to_native(p) for p in self.not_found],
-            'expanded_paths': [_to_native(p) for p in self.expanded_paths],
-            'expanded_exclude_paths': [_to_native(p) for p in self.expanded_exclude_paths],
+            "archived": [_to_native(p) for p in self.successes],
+            "dest": _to_native(self.destination),
+            "dest_state": self.destination_state,
+            "changed": self.changed,
+            "arcroot": _to_native(self.root),
+            "missing": [_to_native(p) for p in self.not_found],
+            "expanded_paths": [_to_native(p) for p in self.expanded_paths],
+            "expanded_exclude_paths": [_to_native(p) for p in self.expanded_exclude_paths],
         }
 
     def _check_removal_safety(self):
         for path in self.paths:
-            if os.path.isdir(path) and self.destination.startswith(os.path.join(path, b'')):
+            if os.path.isdir(path) and self.destination.startswith(os.path.join(path, b"")):
                 self.module.fail_json(
-                    path=b', '.join(self.paths),
-                    msg='Error, created archive can not be contained in source paths when remove=true'
+                    path=b", ".join(self.paths),
+                    msg="Error, created archive can not be contained in source paths when remove=true",
                 )
 
     def _open_compressed_file(self, path, mode):
         f = None
-        if self.format == 'gz':
+        if self.format == "gz":
             f = gzip.open(path, mode)
-        elif self.format == 'bz2':
+        elif self.format == "bz2":
             f = bz2.BZ2File(path, mode)
-        elif self.format == 'xz':
+        elif self.format == "xz":
             f = lzma.LZMAFile(path, mode)
         else:
             self.module.fail_json(msg=f"{self.format} is not a valid format")
@@ -497,7 +497,7 @@ class ZipArchive(Archive):
         return True
 
     def open(self):
-        self.file = zipfile.ZipFile(_to_native_ascii(self.destination), 'w', zipfile.ZIP_DEFLATED, True)
+        self.file = zipfile.ZipFile(_to_native_ascii(self.destination), "w", zipfile.ZIP_DEFLATED, True)
 
     def _add(self, path, archive_name):
         if not matches_exclusion_patterns(path, self.exclusion_patterns):
@@ -505,7 +505,7 @@ class ZipArchive(Archive):
 
     def _get_checksums(self, path):
         try:
-            archive = zipfile.ZipFile(_to_native_ascii(path), 'r')
+            archive = zipfile.ZipFile(_to_native_ascii(path), "r")
             checksums = set((info.filename, info.CRC) for info in archive.infolist())
             archive.close()
         except BadZipFile:
@@ -520,8 +520,8 @@ class TarArchive(Archive):
 
     def close(self):
         self.file.close()
-        if self.format == 'xz':
-            with lzma.open(_to_native(self.destination), 'wb') as f:
+        if self.format == "xz":
+            with lzma.open(_to_native(self.destination), "wb") as f:
                 f.write(self.fileIO.getvalue())
             self.fileIO.close()
 
@@ -533,15 +533,15 @@ class TarArchive(Archive):
         return True
 
     def open(self):
-        if self.format in ('gz', 'bz2'):
+        if self.format in ("gz", "bz2"):
             self.file = tarfile.open(_to_native_ascii(self.destination), f"w|{self.format}")
         # python3 tarfile module allows xz format but for python2 we have to create the tarfile
         # in memory and then compress it with lzma.
-        elif self.format == 'xz':
+        elif self.format == "xz":
             self.fileIO = io.BytesIO()
-            self.file = tarfile.open(fileobj=self.fileIO, mode='w')
-        elif self.format == 'tar':
-            self.file = tarfile.open(_to_native_ascii(self.destination), 'w')
+            self.file = tarfile.open(fileobj=self.fileIO, mode="w")
+        elif self.format == "tar":
+            self.file = tarfile.open(_to_native_ascii(self.destination), "w")
         else:
             self.module.fail_json(msg=f"{self.format} is not a valid archive format")
 
@@ -555,8 +555,8 @@ class TarArchive(Archive):
         LZMAError = lzma.LZMAError
 
         try:
-            if self.format == 'xz':
-                with lzma.open(_to_native_ascii(path), 'r') as f:
+            if self.format == "xz":
+                with lzma.open(_to_native_ascii(path), "r") as f:
                     archive = tarfile.open(fileobj=f)
                     checksums = set((info.name, info.chksum) for info in archive.getmembers())
                     archive.close()
@@ -568,14 +568,14 @@ class TarArchive(Archive):
             try:
                 # The python implementations of gzip, bz2, and lzma do not support restoring compressed files
                 # to their original names so only file checksum is returned
-                f = self._open_compressed_file(_to_native_ascii(path), 'r')
+                f = self._open_compressed_file(_to_native_ascii(path), "r")
                 checksum = 0
                 while True:
                     chunk = f.read(16 * 1024 * 1024)
                     if not chunk:
                         break
                     checksum = crc32(chunk, checksum)
-                checksums = set([(b'', checksum)])
+                checksums = set([(b"", checksum)])
                 f.close()
             except Exception:
                 checksums = set()
@@ -583,7 +583,7 @@ class TarArchive(Archive):
 
 
 def get_archive(module):
-    if module.params['format'] == 'zip':
+    if module.params["format"] == "zip":
         return ZipArchive(module)
     else:
         return TarArchive(module)
@@ -592,13 +592,13 @@ def get_archive(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='list', elements='path', required=True),
-            format=dict(type='str', default='gz', choices=['bz2', 'gz', 'tar', 'xz', 'zip']),
-            dest=dict(type='path'),
-            exclude_path=dict(type='list', elements='path', default=[]),
-            exclusion_patterns=dict(type='list', elements='path'),
-            force_archive=dict(type='bool', default=False),
-            remove=dict(type='bool', default=False),
+            path=dict(type="list", elements="path", required=True),
+            format=dict(type="str", default="gz", choices=["bz2", "gz", "tar", "xz", "zip"]),
+            dest=dict(type="path"),
+            exclude_path=dict(type="list", elements="path", default=[]),
+            exclusion_patterns=dict(type="list", elements="path"),
+            force_archive=dict(type="bool", default=False),
+            remove=dict(type="bool", default=False),
         ),
         add_file_common_args=True,
         supports_check_mode=True,
@@ -638,5 +638,5 @@ def main():
     module.exit_json(**archive.result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

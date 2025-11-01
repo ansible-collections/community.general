@@ -148,36 +148,42 @@ from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab, find_project
+    auth_argument_spec,
+    gitlab_authentication,
+    gitlab,
+    find_project,
 )
 
 
 class GitlabMergeRequest:
-
     def __init__(self, module, project, gitlab_instance):
         self._gitlab = gitlab_instance
         self._module = module
         self.project = project
 
-    '''
+    """
     @param branch Name of the branch
-    '''
+    """
+
     def get_branch(self, branch):
         try:
             return self.project.branches.get(branch)
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg=f"Failed to get the branch: {e}")
 
-    '''
+    """
     @param title Title of the Merge Request
     @param source_branch Merge Request's source branch
     @param target_branch Merge Request's target branch
     @param state_filter Merge Request's state to filter on
-    '''
+    """
+
     def get_mr(self, title, source_branch, target_branch, state_filter):
         mrs = []
         try:
-            mrs = self.project.mergerequests.list(search=title, source_branch=source_branch, target_branch=target_branch, state=state_filter)
+            mrs = self.project.mergerequests.list(
+                search=title, source_branch=source_branch, target_branch=target_branch, state=state_filter
+            )
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg=f"Failed to list the Merge Request: {e}")
 
@@ -189,9 +195,10 @@ class GitlabMergeRequest:
             except gitlab.exceptions.GitlabGetError as e:
                 self._module.fail_json(msg=f"Failed to get the Merge Request: {e}")
 
-    '''
+    """
     @param username Name of the user
-    '''
+    """
+
     def get_user(self, username):
         users = []
         try:
@@ -206,15 +213,17 @@ class GitlabMergeRequest:
         else:
             return users[0]
 
-    '''
+    """
     @param users List of usernames
-    '''
+    """
+
     def get_user_ids(self, users):
         return [self.get_user(user).id for user in users]
 
-    '''
+    """
     @param options Options of the Merge Request
-    '''
+    """
+
     def create_mr(self, options):
         if self._module.check_mode:
             self._module.exit_json(changed=True, msg=f"Successfully created the Merge Request {options['title']}")
@@ -224,9 +233,10 @@ class GitlabMergeRequest:
         except gitlab.exceptions.GitlabCreateError as e:
             self._module.fail_json(msg=f"Failed to create Merge Request: {e}")
 
-    '''
+    """
     @param mr Merge Request object to delete
-    '''
+    """
+
     def delete_mr(self, mr):
         if self._module.check_mode:
             self._module.exit_json(changed=True, msg=f"Successfully deleted the Merge Request {mr['title']}")
@@ -236,9 +246,10 @@ class GitlabMergeRequest:
         except gitlab.exceptions.GitlabDeleteError as e:
             self._module.fail_json(msg=f"Failed to delete Merge Request: {e}")
 
-    '''
+    """
     @param mr Merge Request object to update
-    '''
+    """
+
     def update_mr(self, mr, options):
         if self._module.check_mode:
             self._module.exit_json(changed=True, msg=f"Successfully updated the Merge Request {mr['title']}")
@@ -248,26 +259,27 @@ class GitlabMergeRequest:
         except gitlab.exceptions.GitlabUpdateError as e:
             self._module.fail_json(msg=f"Failed to update Merge Request: {e}")
 
-    '''
+    """
     @param mr Merge Request object to evaluate
     @param options New options to update MR with
-    '''
+    """
+
     def mr_has_changed(self, mr, options):
         for key, value in options.items():
             if value is not None:
                 # see https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27355
-                if key == 'remove_source_branch':
-                    key = 'force_remove_source_branch'
+                if key == "remove_source_branch":
+                    key = "force_remove_source_branch"
 
-                if key == 'assignee_ids':
-                    if value != sorted([user["id"] for user in getattr(mr, 'assignees')]):
+                if key == "assignee_ids":
+                    if value != sorted([user["id"] for user in getattr(mr, "assignees")]):
                         return True
 
-                elif key == 'reviewer_ids':
-                    if value != sorted([user["id"] for user in getattr(mr, 'reviewers')]):
+                elif key == "reviewer_ids":
+                    if value != sorted([user["id"] for user in getattr(mr, "reviewers")]):
                         return True
 
-                elif key == 'labels':
+                elif key == "labels":
                     if value != sorted(getattr(mr, key)):
                         return True
 
@@ -281,64 +293,62 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        project=dict(type='str', required=True),
-        source_branch=dict(type='str', required=True),
-        target_branch=dict(type='str', required=True),
-        title=dict(type='str', required=True),
-        description=dict(type='str'),
-        labels=dict(type='str', default=""),
-        description_path=dict(type='path'),
-        remove_source_branch=dict(type='bool', default=False),
-        state_filter=dict(type='str', default="opened", choices=["opened", "closed", "locked", "merged"]),
-        assignee_ids=dict(type='str'),
-        reviewer_ids=dict(type='str'),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
+        project=dict(type="str", required=True),
+        source_branch=dict(type="str", required=True),
+        target_branch=dict(type="str", required=True),
+        title=dict(type="str", required=True),
+        description=dict(type="str"),
+        labels=dict(type="str", default=""),
+        description_path=dict(type="path"),
+        remove_source_branch=dict(type="bool", default=False),
+        state_filter=dict(type="str", default="opened", choices=["opened", "closed", "locked", "merged"]),
+        assignee_ids=dict(type="str"),
+        reviewer_ids=dict(type="str"),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
-            ['description', 'description_path'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
+            ["description", "description_path"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
         required_if=[
-            ['state', 'present', ['source_branch', 'target_branch', 'title'], True],
-            ['state', 'absent', ['source_branch', 'target_branch', 'title'], True],
+            ["state", "present", ["source_branch", "target_branch", "title"], True],
+            ["state", "absent", ["source_branch", "target_branch", "title"], True],
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    project = module.params['project']
-    source_branch = module.params['source_branch']
-    target_branch = module.params['target_branch']
-    title = module.params['title']
-    description = module.params['description']
-    labels = module.params['labels']
-    description_path = module.params['description_path']
-    remove_source_branch = module.params['remove_source_branch']
-    state_filter = module.params['state_filter']
-    assignee_ids = module.params['assignee_ids']
-    reviewer_ids = module.params['reviewer_ids']
-    state = module.params['state']
+    project = module.params["project"]
+    source_branch = module.params["source_branch"]
+    target_branch = module.params["target_branch"]
+    title = module.params["title"]
+    description = module.params["description"]
+    labels = module.params["labels"]
+    description_path = module.params["description_path"]
+    remove_source_branch = module.params["remove_source_branch"]
+    state_filter = module.params["state_filter"]
+    assignee_ids = module.params["assignee_ids"]
+    reviewer_ids = module.params["reviewer_ids"]
+    state = module.params["state"]
 
     gitlab_version = gitlab.__version__
-    if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
+    if LooseVersion(gitlab_version) < LooseVersion("2.3.0"):
         module.fail_json(
             msg=f"community.general.gitlab_merge_request requires python-gitlab Python module >= 2.3.0 (installed version: [{gitlab_version}])."
-                " Please upgrade python-gitlab to version 2.3.0 or above."
+            " Please upgrade python-gitlab to version 2.3.0 or above."
         )
 
     this_project = find_project(gitlab_instance, project)
@@ -360,10 +370,10 @@ def main():
     if state == "present":
         if description_path:
             try:
-                with open(description_path, 'rb') as f:
-                    description = to_text(f.read(), errors='surrogate_or_strict')
+                with open(description_path, "rb") as f:
+                    description = to_text(f.read(), errors="surrogate_or_strict")
             except IOError as e:
-                module.fail_json(msg=f'Cannot open {description_path}: {e}')
+                module.fail_json(msg=f"Cannot open {description_path}: {e}")
 
         # sorting necessary in order to properly detect changes, as we don't want to get false positive
         # results due to differences in ids ordering; see `mr_has_changed()`
@@ -386,30 +396,34 @@ def main():
 
             mr = this_gitlab.create_mr(options)
             module.exit_json(
-                changed=True, msg=f"Created the Merge Request {title} from branch {source_branch} to branch {target_branch}.",
-                mr=mr.asdict()
+                changed=True,
+                msg=f"Created the Merge Request {title} from branch {source_branch} to branch {target_branch}.",
+                mr=mr.asdict(),
             )
         else:
             if this_gitlab.mr_has_changed(this_mr, options):
                 mr = this_gitlab.update_mr(this_mr, options)
                 module.exit_json(
-                    changed=True, msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} updated.",
-                    mr=mr
+                    changed=True,
+                    msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} updated.",
+                    mr=mr,
                 )
             else:
                 module.exit_json(
-                    changed=False, msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} already exist",
-                    mr=this_mr.asdict()
+                    changed=False,
+                    msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} already exist",
+                    mr=this_mr.asdict(),
                 )
     elif this_mr and state == "absent":
         mr = this_gitlab.delete_mr(this_mr)
         module.exit_json(
-            changed=True, msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} deleted.",
-            mr=mr
+            changed=True,
+            msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} deleted.",
+            mr=mr,
         )
     else:
         module.exit_json(changed=False, msg="No changes are needed.", mr=this_mr.asdict())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

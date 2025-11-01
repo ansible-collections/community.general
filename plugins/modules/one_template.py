@@ -161,49 +161,47 @@ from ansible_collections.community.general.plugins.module_utils.opennebula impor
 class TemplateModule(OpenNebulaModule):
     def __init__(self):
         argument_spec = dict(
-            id=dict(type='int'),
-            name=dict(type='str'),
-            state=dict(type='str', choices=['present', 'absent'], default='present'),
-            template=dict(type='str'),
-            filter=dict(type='str', choices=['user_primary_group', 'user', 'all', 'user_groups'], default='user'),
+            id=dict(type="int"),
+            name=dict(type="str"),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
+            template=dict(type="str"),
+            filter=dict(type="str", choices=["user_primary_group", "user", "all", "user_groups"], default="user"),
         )
 
-        mutually_exclusive = [
-            ['id', 'name']
-        ]
+        mutually_exclusive = [["id", "name"]]
 
-        required_one_of = [('id', 'name')]
+        required_one_of = [("id", "name")]
 
-        required_if = [
-            ['state', 'present', ['template']]
-        ]
+        required_if = [["state", "present", ["template"]]]
 
-        OpenNebulaModule.__init__(self,
-                                  argument_spec,
-                                  supports_check_mode=True,
-                                  mutually_exclusive=mutually_exclusive,
-                                  required_one_of=required_one_of,
-                                  required_if=required_if)
+        OpenNebulaModule.__init__(
+            self,
+            argument_spec,
+            supports_check_mode=True,
+            mutually_exclusive=mutually_exclusive,
+            required_one_of=required_one_of,
+            required_if=required_if,
+        )
 
     def run(self, one, module, result):
         params = module.params
-        id = params.get('id')
-        name = params.get('name')
-        desired_state = params.get('state')
-        template_data = params.get('template')
-        filter = params.get('filter')
+        id = params.get("id")
+        name = params.get("name")
+        desired_state = params.get("state")
+        template_data = params.get("template")
+        filter = params.get("filter")
 
         self.result = {}
 
         template = self.get_template_instance(id, name, filter)
         needs_creation = False
-        if not template and desired_state != 'absent':
+        if not template and desired_state != "absent":
             if id:
                 module.fail_json(msg=f"There is no template with id={id}")
             else:
                 needs_creation = True
 
-        if desired_state == 'absent':
+        if desired_state == "absent":
             self.result = self.delete_template(template)
         else:
             if needs_creation:
@@ -218,7 +216,7 @@ class TemplateModule(OpenNebulaModule):
         # Issue: https://github.com/ansible-collections/community.general/issues/9278
         # PR: https://github.com/ansible-collections/community.general/pull/9547
         # the other two parameters are used for pagination, -1 for both essentially means "return all"
-        filter_values = {'user_primary_group': -4, 'user': -3, 'all': -2, 'user_groups': -1}
+        filter_values = {"user_primary_group": -4, "user": -3, "all": -2, "user_groups": -1}
         pool = self.one.templatepool.info(filter_values[filter], -1, -1)
 
         for template in pool.VMTEMPLATE:
@@ -241,13 +239,13 @@ class TemplateModule(OpenNebulaModule):
 
     def get_template_info(self, template):
         info = {
-            'id': template.ID,
-            'name': template.NAME,
-            'template': template.TEMPLATE,
-            'user_name': template.UNAME,
-            'user_id': template.UID,
-            'group_name': template.GNAME,
-            'group_id': template.GID,
+            "id": template.ID,
+            "name": template.NAME,
+            "template": template.TEMPLATE,
+            "user_name": template.UNAME,
+            "user_id": template.UID,
+            "group_name": template.GNAME,
+            "group_id": template.GID,
         }
 
         return info
@@ -257,7 +255,7 @@ class TemplateModule(OpenNebulaModule):
             self.one.template.allocate(f'NAME = "{name}"\n{template_data}')
 
         result = self.get_template_info(self.get_template_by_name(name, filter))
-        result['changed'] = True
+        result["changed"] = True
 
         return result
 
@@ -269,26 +267,26 @@ class TemplateModule(OpenNebulaModule):
         result = self.get_template_info(self.get_template_by_id(template.ID, filter))
         if self.module.check_mode:
             # Unfortunately it is not easy to detect if the template would have changed, therefore always report a change here.
-            result['changed'] = True
+            result["changed"] = True
         else:
             # if the previous parsed template data is not equal to the updated one, this has changed
-            result['changed'] = template.TEMPLATE != result['template']
+            result["changed"] = template.TEMPLATE != result["template"]
 
         return result
 
     def delete_template(self, template):
         if not template:
-            return {'changed': False}
+            return {"changed": False}
 
         if not self.module.check_mode:
             self.one.template.delete(template.ID)
 
-        return {'changed': True}
+        return {"changed": True}
 
 
 def main():
     TemplateModule().run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

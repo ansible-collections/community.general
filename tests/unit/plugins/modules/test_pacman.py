@@ -44,9 +44,7 @@ valid_inventory = {
         "sed": "4.8-1",
         "sqlite": "3.36.0-1",
     },
-    "installed_groups": {
-        "base-devel": set(["gawk", "grep", "file", "findutils", "pacman", "sed", "gzip", "gettext"])
-    },
+    "installed_groups": {"base-devel": set(["gawk", "grep", "file", "findutils", "pacman", "sed", "gzip", "gettext"])},
     "available_pkgs": {
         "acl": "2.3.1-1",
         "amd-ucode": "20211027.1d00989-1",
@@ -164,9 +162,7 @@ class TestPacman:
         with set_module_args({"update_cache": True}):
             P = pacman.Pacman(pacman.setup_module())
 
-            args = dict(
-                msg="msg", stdout="something", stderr="somethingelse", cmd=["command", "with", "args"], rc=1
-            )
+            args = dict(msg="msg", stdout="something", stderr="somethingelse", cmd=["command", "with", "args"], rc=1)
             with pytest.raises(AnsibleFailJson) as e:
                 P.fail(**args)
 
@@ -369,32 +365,44 @@ class TestPacman:
             (
                 {},
                 [
-                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a\nb\nc', ''),
-                    (["pacman", "--sync", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
-                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'b\na\nc', ''),
+                    (["pacman", "--sync", "--list"], {"check_rc": True}, 0, "a\nb\nc", ""),
+                    (["pacman", "--sync", "--refresh"], {"check_rc": False}, 0, "stdout", "stderr"),
+                    (["pacman", "--sync", "--list"], {"check_rc": True}, 0, "b\na\nc", ""),
                 ],
                 False,
             ),
             (
                 {"force": True},
                 [
-                    (["pacman", "--sync", "--refresh", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (["pacman", "--sync", "--refresh", "--refresh"], {"check_rc": False}, 0, "stdout", "stderr"),
                 ],
                 True,
             ),
             (
                 {"update_cache_extra_args": "--some-extra args"},  # shlex test
                 [
-                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a\nb\nc', ''),
-                    (["pacman", "--sync", "--refresh", "--some-extra", "args"], {'check_rc': False}, 0, 'stdout', 'stderr'),
-                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a changed\nb\nc', ''),
+                    (["pacman", "--sync", "--list"], {"check_rc": True}, 0, "a\nb\nc", ""),
+                    (
+                        ["pacman", "--sync", "--refresh", "--some-extra", "args"],
+                        {"check_rc": False},
+                        0,
+                        "stdout",
+                        "stderr",
+                    ),
+                    (["pacman", "--sync", "--list"], {"check_rc": True}, 0, "a changed\nb\nc", ""),
                 ],
                 True,
             ),
             (
                 {"force": True, "update_cache_extra_args": "--some-extra args"},
                 [
-                    (["pacman", "--sync", "--refresh", "--some-extra", "args", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (
+                        ["pacman", "--sync", "--refresh", "--some-extra", "args", "--refresh"],
+                        {"check_rc": False},
+                        0,
+                        "stdout",
+                        "stderr",
+                    ),
                 ],
                 True,
             ),
@@ -402,16 +410,16 @@ class TestPacman:
                 # Test whether pacman --sync --list is not called more than twice
                 {"upgrade": True},
                 [
-                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'core foo 1.0.0-1 [installed]', ''),
-                    (["pacman", "--sync", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
-                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'core foo 1.0.0-1 [installed]', ''),
+                    (["pacman", "--sync", "--list"], {"check_rc": True}, 0, "core foo 1.0.0-1 [installed]", ""),
+                    (["pacman", "--sync", "--refresh"], {"check_rc": False}, 0, "stdout", "stderr"),
+                    (["pacman", "--sync", "--list"], {"check_rc": True}, 0, "core foo 1.0.0-1 [installed]", ""),
                     # The following is _build_inventory:
-                    (["pacman", "--query"], {'check_rc': True}, 0, 'foo 1.0.0-1', ''),
-                    (["pacman", "--query", "--groups"], {'check_rc': True}, 0, '', ''),
-                    (["pacman", "--sync", "--groups", "--groups"], {'check_rc': True}, 0, '', ''),
-                    (["pacman", "--query", "--upgrades"], {'check_rc': False}, 0, '', ''),
-                    (["pacman", "--query", "--explicit"], {'check_rc': True}, 0, 'foo 1.0.0-1', ''),
-                    (["pacman", "--query", "--deps"], {'check_rc': True}, 0, '', ''),
+                    (["pacman", "--query"], {"check_rc": True}, 0, "foo 1.0.0-1", ""),
+                    (["pacman", "--query", "--groups"], {"check_rc": True}, 0, "", ""),
+                    (["pacman", "--sync", "--groups", "--groups"], {"check_rc": True}, 0, "", ""),
+                    (["pacman", "--query", "--upgrades"], {"check_rc": False}, 0, "", ""),
+                    (["pacman", "--query", "--explicit"], {"check_rc": True}, 0, "foo 1.0.0-1", ""),
+                    (["pacman", "--query", "--deps"], {"check_rc": True}, 0, "", ""),
                 ],
                 False,
             ),
@@ -421,7 +429,6 @@ class TestPacman:
         args = {"update_cache": True}
         args.update(module_args)
         with set_module_args(args):
-
             self.mock_run_command.side_effect = [
                 (rc, stdout, stderr) for expected_call, kwargs, rc, stdout, stderr in expected_calls
             ]
@@ -429,9 +436,12 @@ class TestPacman:
                 P = pacman.Pacman(pacman.setup_module())
                 P.run()
 
-        self.mock_run_command.assert_has_calls([
-            mock.call(mock.ANY, expected_call, **kwargs) for expected_call, kwargs, rc, stdout, stderr in expected_calls
-        ])
+        self.mock_run_command.assert_has_calls(
+            [
+                mock.call(mock.ANY, expected_call, **kwargs)
+                for expected_call, kwargs, rc, stdout, stderr in expected_calls
+            ]
+        )
         out = e.value.args[0]
         assert out["cache_updated"] == changed
         assert out["changed"] == changed
@@ -474,7 +484,6 @@ class TestPacman:
         if upgrade_extra_args:
             args["upgrade_extra_args"] = upgrade_extra_args
         with set_module_args(args):
-
             if run_command_data and "return_value" in run_command_data:
                 self.mock_run_command.return_value = run_command_data["return_value"]
 
@@ -628,9 +637,7 @@ class TestPacman:
             ),
         ],
     )
-    def test_package_list(
-        self, mock_valid_inventory, state, pkg_names, expected, run_command_data, raises
-    ):
+    def test_package_list(self, mock_valid_inventory, state, pkg_names, expected, run_command_data, raises):
         with set_module_args({"name": pkg_names, "state": state}):
             P = pacman.Pacman(pacman.setup_module())
             P.inventory = P._build_inventory()

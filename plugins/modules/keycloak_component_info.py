@@ -99,8 +99,12 @@ components:
   elements: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 from urllib.parse import quote
 
@@ -114,16 +118,15 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        name=dict(type='str'),
-        realm=dict(type='str', required=True),
-        parent_id=dict(type='str'),
-        provider_type=dict(type='str'),
+        name=dict(type="str"),
+        realm=dict(type="str", required=True),
+        parent_id=dict(type="str"),
+        provider_type=dict(type="str"),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     result = dict(changed=False, components=[])
 
@@ -135,10 +138,10 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    parentId = module.params.get('parent_id')
-    name = module.params.get('name')
-    providerType = module.params.get('provider_type')
+    realm = module.params.get("realm")
+    parentId = module.params.get("parent_id")
+    name = module.params.get("name")
+    providerType = module.params.get("provider_type")
 
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
@@ -156,10 +159,10 @@ def main():
     if providerType:
         filters.append(f"type={quote(providerType, safe='')}")
 
-    result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
+    result["components"] = kc.get_components(filter="&".join(filters), realm=realm)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

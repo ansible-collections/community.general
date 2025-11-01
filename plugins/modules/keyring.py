@@ -103,7 +103,7 @@ def del_passphrase(module):
     except keyring.errors.KeyringLocked:
         delete_argument = (
             f'echo "{quote(module.params["keyring_password"])}" | gnome-keyring-daemon --unlock\n'
-            f'keyring del {quote(module.params["service"])} {quote(module.params["username"])}\n'
+            f"keyring del {quote(module.params['service'])} {quote(module.params['username'])}\n"
         )
         dummy, dummy, stderr = module.run_command(
             "dbus-run-session -- /bin/bash",
@@ -133,7 +133,7 @@ def set_passphrase(module):
     except keyring.errors.KeyringLocked:
         set_argument = (
             f'echo "{quote(module.params["keyring_password"])}" | gnome-keyring-daemon --unlock\n'
-            f'keyring set {quote(module.params["service"])} {quote(module.params["username"])}\n{quote(module.params["user_password"])}\n'
+            f"keyring set {quote(module.params['service'])} {quote(module.params['username'])}\n{quote(module.params['user_password'])}\n"
         )
         dummy, dummy, stderr = module.run_command(
             "dbus-run-session -- /bin/bash",
@@ -151,9 +151,7 @@ def get_passphrase(module):
     Attempt to retrieve passphrase from keyring using the Python API and fallback to using a shell.
     """
     try:
-        passphrase = keyring.get_password(
-            module.params["service"], module.params["username"]
-        )
+        passphrase = keyring.get_password(module.params["service"], module.params["username"])
         return passphrase
     except keyring.errors.KeyringLocked:
         pass
@@ -163,7 +161,7 @@ def get_passphrase(module):
         pass
     get_argument = (
         f'echo "{quote(module.params["keyring_password"])}" | gnome-keyring-daemon --unlock\n'
-        f'keyring get {quote(module.params["service"])} {quote(module.params["username"])}\n'
+        f"keyring get {quote(module.params['service'])} {quote(module.params['username'])}\n"
     )
     dummy, stdout, dummy = module.run_command(
         "dbus-run-session -- /bin/bash",
@@ -190,12 +188,8 @@ def run_module():
         service=dict(type="str", required=True),
         username=dict(type="str", required=True),
         keyring_password=dict(type="str", required=True, no_log=True),
-        user_password=dict(
-            type="str", no_log=True, aliases=["password"]
-        ),
-        state=dict(
-            type="str", default="present", choices=["absent", "present"]
-        ),
+        user_password=dict(type="str", no_log=True, aliases=["password"]),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
     )
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
@@ -212,14 +206,18 @@ def run_module():
                 set_result = set_passphrase(module)
                 if set_result is None:
                     result["changed"] = True
-                    result["msg"] = f"Passphrase has been updated for {module.params['service']}@{module.params['username']}"
+                    result["msg"] = (
+                        f"Passphrase has been updated for {module.params['service']}@{module.params['username']}"
+                    )
                 if set_result is not None:
                     module.fail_json(msg=set_result)
         if passphrase is None:
             set_result = set_passphrase(module)
             if set_result is None:
                 result["changed"] = True
-                result["msg"] = f"Passphrase has been updated for {module.params['service']}@{module.params['username']}"
+                result["msg"] = (
+                    f"Passphrase has been updated for {module.params['service']}@{module.params['username']}"
+                )
             if set_result is not None:
                 module.fail_json(msg=set_result)
 
@@ -230,7 +228,9 @@ def run_module():
             del_result = del_passphrase(module)
             if del_result is None:
                 result["changed"] = True
-                result["msg"] = f"Passphrase has been removed for {module.params['service']}@{module.params['username']}"
+                result["msg"] = (
+                    f"Passphrase has been removed for {module.params['service']}@{module.params['username']}"
+                )
             if del_result is not None:
                 module.fail_json(msg=del_result)
 

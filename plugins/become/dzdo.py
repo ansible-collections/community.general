@@ -74,11 +74,10 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
-
-    name = 'community.general.dzdo'
+    name = "community.general.dzdo"
 
     # messages for detecting prompted password issues
-    fail = ('Sorry, try again.',)
+    fail = ("Sorry, try again.",)
 
     def build_become_command(self, cmd, shell):
         super().build_become_command(cmd, shell)
@@ -86,14 +85,14 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        becomecmd = self.get_option('become_exe')
+        becomecmd = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        if self.get_option('become_pass'):
-            self.prompt = f'[dzdo via ansible, key={self._id}] password:'
-            flags = f"{flags.replace('-n', '')} -p \"{self.prompt}\""
+        flags = self.get_option("become_flags")
+        if self.get_option("become_pass"):
+            self.prompt = f"[dzdo via ansible, key={self._id}] password:"
+            flags = f'{flags.replace("-n", "")} -p "{self.prompt}"'
 
-        become_user = self.get_option('become_user')
-        user = f'-u {become_user}' if become_user else ''
+        become_user = self.get_option("become_user")
+        user = f"-u {become_user}" if become_user else ""
 
         return f"{becomecmd} {flags} {user} {self._build_success_command(cmd, shell)}"

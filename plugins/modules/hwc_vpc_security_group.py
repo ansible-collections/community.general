@@ -147,18 +147,24 @@ rules:
 """
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
-    Config, HwcClientException, HwcModule, are_different_dicts, build_path,
-    get_region, is_empty_value, navigate_value)
+    Config,
+    HwcClientException,
+    HwcModule,
+    are_different_dicts,
+    build_path,
+    get_region,
+    is_empty_value,
+    navigate_value,
+)
 
 
 def build_module():
     return HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            name=dict(type='str', required=True),
-            enterprise_project_id=dict(type='str'),
-            vpc_id=dict(type='str')
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            name=dict(type="str", required=True),
+            enterprise_project_id=dict(type="str"),
+            vpc_id=dict(type="str"),
         ),
         supports_check_mode=True,
     )
@@ -174,7 +180,7 @@ def main():
         resource = None
         if module.params.get("id"):
             resource = read_resource(config)
-            if module.params['state'] == 'present':
+            if module.params["state"] == "present":
                 check_resource_option(resource, module)
         else:
             v = search_resource(config)
@@ -183,11 +189,11 @@ def main():
 
             if len(v) == 1:
                 resource = update_properties(module, {"read": v[0]}, None)
-                module.params['id'] = navigate_value(resource, ["id"])
+                module.params["id"] = navigate_value(resource, ["id"])
 
         result = {}
         changed = False
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if resource is None:
                 if not module.check_mode:
                     resource = create(config)
@@ -204,7 +210,7 @@ def main():
         module.fail_json(msg=str(ex))
 
     else:
-        result['changed'] = changed
+        result["changed"] = changed
         module.exit_json(**result)
 
 
@@ -229,7 +235,8 @@ def check_resource_option(resource, module):
 
     if are_different_dicts(resource, opts):
         raise Exception(
-            f"Cannot change option from ({resource}) to ({opts}) for an existing security group({module.params['id']}).")
+            f"Cannot change option from ({resource}) to ({opts}) for an existing security group({module.params['id']})."
+        )
 
 
 def create(config):
@@ -239,7 +246,7 @@ def create(config):
 
     params = build_create_parameters(opts)
     r = send_create_request(module, params, client)
-    module.params['id'] = navigate_value(r, ["security_group", "id"])
+    module.params["id"] = navigate_value(r, ["security_group", "id"])
 
     result = update_properties(module, {"read": fill_read_resp_body(r)}, None)
     return result
@@ -291,7 +298,7 @@ def search_resource(config):
     link = f"security-groups{query_link}"
 
     result = []
-    p = {'marker': ''}
+    p = {"marker": ""}
     while True:
         url = link.format(**p)
         r = send_list_request(module, client, url)
@@ -306,7 +313,7 @@ def search_resource(config):
         if len(result) > 1:
             break
 
-        p['marker'] = r[-1].get('id')
+        p["marker"] = r[-1].get("id")
 
     return result
 
@@ -425,8 +432,7 @@ def fill_read_resp_security_group_rules(value):
 def update_properties(module, response, array_index, exclude_output=False):
     r = user_input_parameters(module)
 
-    v = navigate_value(response, ["read", "enterprise_project_id"],
-                       array_index)
+    v = navigate_value(response, ["read", "enterprise_project_id"], array_index)
     r["enterprise_project_id"] = v
 
     v = navigate_value(response, ["read", "name"], array_index)
@@ -455,8 +461,7 @@ def flatten_rules(d, array_index, current_value, exclude_output):
     else:
         has_init_value = False
         result = []
-        v = navigate_value(d, ["read", "security_group_rules"],
-                           array_index)
+        v = navigate_value(d, ["read", "security_group_rules"], array_index)
         if not v:
             return current_value
         n = len(v)
@@ -473,53 +478,43 @@ def flatten_rules(d, array_index, current_value, exclude_output):
             val = result[i]
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "description"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "description"], new_array_index)
             val["description"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "direction"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "direction"], new_array_index)
             val["direction"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "ethertype"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "ethertype"], new_array_index)
             val["ethertype"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "id"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "id"], new_array_index)
             val["id"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "port_range_max"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "port_range_max"], new_array_index)
             val["port_range_max"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "port_range_min"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "port_range_min"], new_array_index)
             val["port_range_min"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "protocol"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "protocol"], new_array_index)
             val["protocol"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "remote_address_group_id"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "remote_address_group_id"], new_array_index)
             val["remote_address_group_id"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "remote_group_id"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "remote_group_id"], new_array_index)
             val["remote_group_id"] = v
 
         if not exclude_output:
-            v = navigate_value(d, ["read", "security_group_rules", "remote_ip_prefix"],
-                               new_array_index)
+            v = navigate_value(d, ["read", "security_group_rules", "remote_ip_prefix"], new_array_index)
             val["remote_ip_prefix"] = v
 
         if len(result) >= (i + 1):
@@ -534,7 +529,6 @@ def flatten_rules(d, array_index, current_value, exclude_output):
 
 
 def send_list_request(module, client, url):
-
     r = None
     try:
         r = client.get(url)
@@ -616,5 +610,5 @@ def fill_list_resp_security_group_rules(value):
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

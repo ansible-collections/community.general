@@ -1,4 +1,3 @@
-
 # Copyright (c) 2018, Ansible Project
 # Copyright (c) 2018, Abhijeet Kasurde <akasurde@redhat.com>
 #
@@ -9,7 +8,12 @@ from __future__ import annotations
 
 from unittest.mock import patch
 from ansible_collections.community.general.plugins.modules import icinga2_feature
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
+    ModuleTestCase,
+    set_module_args,
+)
 from ansible.module_utils import basic
 
 
@@ -25,7 +29,7 @@ class TestIcinga2Feature(ModuleTestCase):
         """Setup."""
         super().setUp()
         self.module = icinga2_feature
-        self.mock_get_bin_path = patch.object(basic.AnsibleModule, 'get_bin_path', get_bin_path)
+        self.mock_get_bin_path = patch.object(basic.AnsibleModule, "get_bin_path", get_bin_path)
         self.mock_get_bin_path.start()
         self.addCleanup(self.mock_get_bin_path.stop)  # ensure that the patching is 'undone'
 
@@ -41,58 +45,61 @@ class TestIcinga2Feature(ModuleTestCase):
 
     def test_enable_feature(self):
         """Check that result is changed."""
-        with set_module_args({
-            'name': 'api',
-        }):
-            with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-                run_command.return_value = 0, '', ''  # successful execution, no output
+        with set_module_args(
+            {
+                "name": "api",
+            }
+        ):
+            with patch.object(basic.AnsibleModule, "run_command") as run_command:
+                run_command.return_value = 0, "", ""  # successful execution, no output
                 with self.assertRaises(AnsibleExitJson) as result:
                     icinga2_feature.main()
-                    self.assertTrue(result.exception.args[0]['changed'])
+                    self.assertTrue(result.exception.args[0]["changed"])
 
         self.assertEqual(run_command.call_count, 2)
-        self.assertEqual(run_command.call_args[0][0][-1], 'api')
+        self.assertEqual(run_command.call_args[0][0][-1], "api")
 
     def test_enable_feature_with_check_mode(self):
         """Check that result is changed in check mode."""
-        with set_module_args({
-            'name': 'api',
-            '_ansible_check_mode': True,
-        }):
-            with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-                run_command.return_value = 0, '', ''  # successful execution, no output
+        with set_module_args(
+            {
+                "name": "api",
+                "_ansible_check_mode": True,
+            }
+        ):
+            with patch.object(basic.AnsibleModule, "run_command") as run_command:
+                run_command.return_value = 0, "", ""  # successful execution, no output
                 with self.assertRaises(AnsibleExitJson) as result:
                     icinga2_feature.main()
-                    self.assertTrue(result.exception.args[0]['changed'])
+                    self.assertTrue(result.exception.args[0]["changed"])
 
         self.assertEqual(run_command.call_count, 1)
 
     def test_disable_feature(self):
         """Check that result is changed."""
-        with set_module_args({
-            'name': 'api',
-            'state': 'absent'
-        }):
-            with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-                run_command.return_value = 0, '', ''  # successful execution, no output
+        with set_module_args({"name": "api", "state": "absent"}):
+            with patch.object(basic.AnsibleModule, "run_command") as run_command:
+                run_command.return_value = 0, "", ""  # successful execution, no output
                 with self.assertRaises(AnsibleExitJson) as result:
                     icinga2_feature.main()
-                    self.assertTrue(result.exception.args[0]['changed'])
+                    self.assertTrue(result.exception.args[0]["changed"])
 
         self.assertEqual(run_command.call_count, 2)
-        self.assertEqual(run_command.call_args[0][0][-1], 'api')
+        self.assertEqual(run_command.call_args[0][0][-1], "api")
 
     def test_disable_feature_with_check_mode(self):
         """Check that result is changed in check mode."""
-        with set_module_args({
-            'name': 'api',
-            'state': 'absent',
-            '_ansible_check_mode': True,
-        }):
-            with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-                run_command.return_value = 0, '', ''  # successful execution, no output
+        with set_module_args(
+            {
+                "name": "api",
+                "state": "absent",
+                "_ansible_check_mode": True,
+            }
+        ):
+            with patch.object(basic.AnsibleModule, "run_command") as run_command:
+                run_command.return_value = 0, "", ""  # successful execution, no output
                 with self.assertRaises(AnsibleExitJson) as result:
                     icinga2_feature.main()
-                    self.assertTrue(result.exception.args[0]['changed'])
+                    self.assertTrue(result.exception.args[0]["changed"])
 
         self.assertEqual(run_command.call_count, 1)

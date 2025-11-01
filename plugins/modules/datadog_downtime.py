@@ -194,13 +194,12 @@ def main():
 
     configuration = Configuration(
         host=module.params["api_host"],
-        api_key={
-            "apiKeyAuth": module.params["api_key"],
-            "appKeyAuth": module.params["app_key"]
-        }
+        api_key={"apiKeyAuth": module.params["api_key"], "appKeyAuth": module.params["app_key"]},
     )
     with ApiClient(configuration) as api_client:
-        api_client.user_agent = f"ansible_collection/community_general (module_name datadog_downtime) {api_client.user_agent}"
+        api_client.user_agent = (
+            f"ansible_collection/community_general (module_name datadog_downtime) {api_client.user_agent}"
+        )
         api_instance = DowntimesApi(api_client)
 
         # Validate api and app keys
@@ -275,11 +274,7 @@ def _update_downtime(module, current_downtime, api_client):
             resp = api.create_downtime(downtime)
         else:
             resp = api.update_downtime(module.params["id"], downtime)
-        if _equal_dicts(
-                resp.to_dict(),
-                current_downtime.to_dict(),
-                ["active", "creator_id", "updater_id"]
-        ):
+        if _equal_dicts(resp.to_dict(), current_downtime.to_dict(), ["active", "creator_id", "updater_id"]):
             module.exit_json(changed=False, downtime=resp.to_dict())
         else:
             module.exit_json(changed=True, downtime=resp.to_dict())

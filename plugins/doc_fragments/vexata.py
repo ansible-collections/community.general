@@ -7,9 +7,8 @@ from __future__ import annotations
 
 
 class ModuleDocFragment:
-
     # Documentation fragment for Vexata VX100 series
-    VX100 = r'''
+    VX100 = r"""
 options:
   array:
     description:
@@ -41,4 +40,4 @@ requirements:
   - vexatapi >= 0.0.1
   - E(VEXATA_USER) and E(VEXATA_PASSWORD) environment variables must be set if
     user and password arguments are not passed to the module directly.
-'''
+"""

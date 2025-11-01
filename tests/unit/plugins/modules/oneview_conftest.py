@@ -13,7 +13,7 @@ from hpOneView.oneview_client import OneViewClient
 
 @pytest.fixture
 def mock_ov_client():
-    patcher_json_file = patch.object(OneViewClient, 'from_json_file')
+    patcher_json_file = patch.object(OneViewClient, "from_json_file")
     client = patcher_json_file.start()
     return client.return_value
 

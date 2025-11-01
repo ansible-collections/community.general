@@ -142,20 +142,24 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab, find_project, find_group
+    auth_argument_spec,
+    gitlab_authentication,
+    gitlab,
+    find_project,
+    find_group,
 )
 
 
 class GitlabIssue:
-
     def __init__(self, module, project, gitlab_instance):
         self._gitlab = gitlab_instance
         self._module = module
         self.project = project
 
-    '''
+    """
     @param milestone_id Title of the milestone
-    '''
+    """
+
     def get_milestone(self, milestone_id, group):
         milestones = []
         try:
@@ -173,10 +177,11 @@ class GitlabIssue:
             except gitlab.exceptions.GitlabGetError as e:
                 self._module.fail_json(msg=f"Failed to get the Milestones: {e}")
 
-    '''
+    """
     @param title Title of the Issue
     @param state_filter Issue's state to filter on
-    '''
+    """
+
     def get_issue(self, title, state_filter):
         issues = []
         try:
@@ -192,9 +197,10 @@ class GitlabIssue:
             except gitlab.exceptions.GitlabGetError as e:
                 self._module.fail_json(msg=f"Failed to get the Issue: {e}")
 
-    '''
+    """
     @param username Name of the user
-    '''
+    """
+
     def get_user(self, username):
         users = []
         try:
@@ -209,15 +215,17 @@ class GitlabIssue:
         else:
             return users[0]
 
-    '''
+    """
     @param users List of usernames
-    '''
+    """
+
     def get_user_ids(self, users):
         return [self.get_user(user).id for user in users]
 
-    '''
+    """
     @param options Options of the Issue
-    '''
+    """
+
     def create_issue(self, options):
         if self._module.check_mode:
             self._module.exit_json(changed=True, msg=f"Successfully created Issue '{options['title']}'.")
@@ -227,9 +235,10 @@ class GitlabIssue:
         except gitlab.exceptions.GitlabCreateError as e:
             self._module.fail_json(msg=f"Failed to create Issue: {e}")
 
-    '''
+    """
     @param issue Issue object to delete
-    '''
+    """
+
     def delete_issue(self, issue):
         if self._module.check_mode:
             self._module.exit_json(changed=True, msg=f"Successfully deleted Issue '{issue['title']}'.")
@@ -239,10 +248,11 @@ class GitlabIssue:
         except gitlab.exceptions.GitlabDeleteError as e:
             self._module.fail_json(msg=f"Failed to delete Issue: '{e}'.")
 
-    '''
+    """
     @param issue Issue object to update
     @param options Options of the Issue
-    '''
+    """
+
     def update_issue(self, issue, options):
         if self._module.check_mode:
             self._module.exit_json(changed=True, msg=f"Successfully updated Issue '{issue['title']}'.")
@@ -252,23 +262,23 @@ class GitlabIssue:
         except gitlab.exceptions.GitlabUpdateError as e:
             self._module.fail_json(msg=f"Failed to update Issue {e}.")
 
-    '''
+    """
     @param issue Issue object to evaluate
     @param options New options to update Issue with
-    '''
+    """
+
     def issue_has_changed(self, issue, options):
         for key, value in options.items():
             if value is not None:
-
-                if key == 'milestone_id':
-                    old_milestone = getattr(issue, 'milestone')['id'] if getattr(issue, 'milestone') else ""
+                if key == "milestone_id":
+                    old_milestone = getattr(issue, "milestone")["id"] if getattr(issue, "milestone") else ""
                     if value != old_milestone:
                         return True
-                elif key == 'assignee_ids':
-                    if value != sorted([user["id"] for user in getattr(issue, 'assignees')]):
+                elif key == "assignee_ids":
+                    if value != sorted([user["id"] for user in getattr(issue, "assignees")]):
                         return True
 
-                elif key == 'labels':
+                elif key == "labels":
                     if value != sorted(getattr(issue, key)):
                         return True
 
@@ -282,53 +292,51 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        assignee_ids=dict(type='list', elements='str'),
-        description=dict(type='str'),
-        description_path=dict(type='path'),
-        issue_type=dict(type='str', default='issue', choices=["issue", "incident", "test_case"]),
-        labels=dict(type='list', elements='str'),
-        milestone_search=dict(type='str'),
-        milestone_group_id=dict(type='str'),
-        project=dict(type='str', required=True),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
-        state_filter=dict(type='str', default="opened", choices=["opened", "closed"]),
-        title=dict(type='str', required=True),
+        assignee_ids=dict(type="list", elements="str"),
+        description=dict(type="str"),
+        description_path=dict(type="path"),
+        issue_type=dict(type="str", default="issue", choices=["issue", "incident", "test_case"]),
+        labels=dict(type="list", elements="str"),
+        milestone_search=dict(type="str"),
+        milestone_group_id=dict(type="str"),
+        project=dict(type="str", required=True),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
+        state_filter=dict(type="str", default="opened", choices=["opened", "closed"]),
+        title=dict(type="str", required=True),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
-            ['description', 'description_path'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
+            ["description", "description_path"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
-            ['milestone_search', 'milestone_group_id'],
+            ["api_username", "api_password"],
+            ["milestone_search", "milestone_group_id"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
-        supports_check_mode=True
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
+        supports_check_mode=True,
     )
 
-    assignee_ids = module.params['assignee_ids']
-    description = module.params['description']
-    description_path = module.params['description_path']
-    issue_type = module.params['issue_type']
-    labels = module.params['labels']
-    milestone_id = module.params['milestone_search']
-    milestone_group_id = module.params['milestone_group_id']
-    project = module.params['project']
-    state = module.params['state']
-    state_filter = module.params['state_filter']
-    title = module.params['title']
+    assignee_ids = module.params["assignee_ids"]
+    description = module.params["description"]
+    description_path = module.params["description_path"]
+    issue_type = module.params["issue_type"]
+    labels = module.params["labels"]
+    milestone_id = module.params["milestone_search"]
+    milestone_group_id = module.params["milestone_group_id"]
+    project = module.params["project"]
+    state = module.params["state"]
+    state_filter = module.params["state_filter"]
+    title = module.params["title"]
 
     # check prerequisites and connect to gitlab server
-    gitlab_instance = gitlab_authentication(module, min_version='2.3.0')
+    gitlab_instance = gitlab_authentication(module, min_version="2.3.0")
 
     this_project = find_project(gitlab_instance, project)
     if this_project is None:
@@ -348,10 +356,10 @@ def main():
     if state == "present":
         if description_path:
             try:
-                with open(description_path, 'rb') as f:
-                    description = to_text(f.read(), errors='surrogate_or_strict')
+                with open(description_path, "rb") as f:
+                    description = to_text(f.read(), errors="surrogate_or_strict")
             except IOError as e:
-                module.fail_json(msg=f'Cannot open {description_path}: {e}')
+                module.fail_json(msg=f"Cannot open {description_path}: {e}")
 
         # sorting necessary in order to properly detect changes, as we don't want to get false positive
         # results due to differences in ids ordering;
@@ -369,32 +377,20 @@ def main():
 
         if not this_issue:
             issue = this_gitlab.create_issue(options)
-            module.exit_json(
-                changed=True, msg=f"Created Issue '{title}'.",
-                issue=issue.asdict()
-            )
+            module.exit_json(changed=True, msg=f"Created Issue '{title}'.", issue=issue.asdict())
         else:
             if this_gitlab.issue_has_changed(this_issue, options):
                 issue = this_gitlab.update_issue(this_issue, options)
-                module.exit_json(
-                    changed=True, msg=f"Updated Issue '{title}'.",
-                    issue=issue
-                )
+                module.exit_json(changed=True, msg=f"Updated Issue '{title}'.", issue=issue)
             else:
-                module.exit_json(
-                    changed=False, msg=f"Issue '{title}' already exists",
-                    issue=this_issue.asdict()
-                )
+                module.exit_json(changed=False, msg=f"Issue '{title}' already exists", issue=this_issue.asdict())
     elif state == "absent":
         if not this_issue:
             module.exit_json(changed=False, msg=f"Issue '{title}' does not exist or has already been deleted.")
         else:
             issue = this_gitlab.delete_issue(this_issue)
-            module.exit_json(
-                changed=True, msg=f"Issue '{title}' deleted.",
-                issue=issue
-            )
+            module.exit_json(changed=True, msg=f"Issue '{title}' deleted.", issue=issue)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

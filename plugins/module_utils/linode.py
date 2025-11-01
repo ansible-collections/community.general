@@ -16,4 +16,4 @@ from ansible.module_utils.ansible_release import __version__ as ansible_version
 
 def get_user_agent(module):
     """Retrieve a user-agent to send with LinodeClient requests."""
-    return f'Ansible-{module}/{ansible_version}'
+    return f"Ansible-{module}/{ansible_version}"

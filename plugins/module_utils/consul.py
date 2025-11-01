@@ -1,4 +1,3 @@
-
 # Copyright (c) 2022, Håkon Lerring
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -65,12 +64,12 @@ def camel_case_key(key):
 
 
 def validate_check(check):
-    validate_duration_keys = ['Interval', 'Ttl', 'Timeout']
+    validate_duration_keys = ["Interval", "Ttl", "Timeout"]
     validate_tcp_regex = r"(?P<host>.*):(?P<port>(?:[0-9]+))$"
-    if check.get('Tcp') is not None:
-        match = re.match(validate_tcp_regex, check['Tcp'])
+    if check.get("Tcp") is not None:
+        match = re.match(validate_tcp_regex, check["Tcp"])
         if not match:
-            raise Exception('tcp check must be in host:port format')
+            raise Exception("tcp check must be in host:port format")
     for duration in validate_duration_keys:
         if duration in check and check[duration] is not None:
             check[duration] = validate_duration(check[duration])
@@ -99,12 +98,7 @@ def _normalize_params(params, arg_spec):
         if k not in arg_spec or v is None:  # Alias
             continue
         spec = arg_spec[k]
-        if (
-            spec.get("type") == "list"
-            and spec.get("elements") == "dict"
-            and spec.get("options")
-            and v
-        ):
+        if spec.get("type") == "list" and spec.get("elements") == "dict" and spec.get("options") and v:
             v = [_normalize_params(d, spec["options"]) for d in v]
         elif spec.get("type") == "dict" and spec.get("options") and v:
             v = _normalize_params(v, spec["options"])
@@ -130,9 +124,7 @@ class _ConsulModule:
         self._module = module
         self.params = _normalize_params(module.params, module.argument_spec)
         self.api_params = {
-            k: camel_case_key(k)
-            for k in self.params
-            if k not in STATE_PARAMETER and k not in AUTH_ARGUMENTS_SPEC
+            k: camel_case_key(k) for k in self.params if k not in STATE_PARAMETER and k not in AUTH_ARGUMENTS_SPEC
         }
 
         self.operational_attributes.update({"CreateIndex", "CreateTime", "Hash", "ModifyIndex"})
@@ -192,11 +184,9 @@ class _ConsulModule:
 
         def needs_camel_case(k):
             spec = self._module.argument_spec[k]
-            return (
-                spec.get("type") == "list"
-                and spec.get("elements") == "dict"
-                and spec.get("options")
-            ) or (spec.get("type") == "dict" and spec.get("options"))
+            return (spec.get("type") == "list" and spec.get("elements") == "dict" and spec.get("options")) or (
+                spec.get("type") == "dict" and spec.get("options")
+            )
 
         if k in self.api_params and v is not None:
             if isinstance(v, dict) and needs_camel_case(k):
@@ -221,9 +211,7 @@ class _ConsulModule:
         return False
 
     def prepare_object(self, existing, obj):
-        existing = {
-            k: v for k, v in existing.items() if k not in self.operational_attributes
-        }
+        existing = {k: v for k, v in existing.items() if k not in self.operational_attributes}
         for k, v in obj.items():
             existing[k] = v
         return existing
@@ -319,9 +307,7 @@ class _ConsulModule:
                 ca_path=ca_path,
             )
             response_data = response.read()
-            status = (
-                response.status if hasattr(response, "status") else response.getcode()
-            )
+            status = response.status if hasattr(response, "status") else response.getcode()
 
         except urllib_error.URLError as e:
             if isinstance(e, urllib_error.HTTPError):

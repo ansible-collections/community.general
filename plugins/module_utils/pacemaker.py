@@ -24,22 +24,26 @@ _state_map = {
 
 
 def fmt_resource_type(value):
-    return [":".join(value[k] for k in ['resource_standard', 'resource_provider', 'resource_name'] if value.get(k) is not None)]
+    return [
+        ":".join(
+            value[k] for k in ["resource_standard", "resource_provider", "resource_name"] if value.get(k) is not None
+        )
+    ]
 
 
 def fmt_resource_operation(value):
     cmd = []
     for op in value:
         cmd.append("op")
-        cmd.append(op.get('operation_action'))
-        for operation_option in op.get('operation_option'):
+        cmd.append(op.get("operation_action"))
+        for operation_option in op.get("operation_option"):
             cmd.append(operation_option)
 
     return cmd
 
 
 def fmt_resource_argument(value):
-    return ['--group' if value['argument_action'] == 'group' else value['argument_action']] + value['argument_option']
+    return ["--group" if value["argument_action"] == "group" else value["argument_action"]] + value["argument_option"]
 
 
 def get_pacemaker_maintenance_mode(runner):
@@ -51,7 +55,7 @@ def get_pacemaker_maintenance_mode(runner):
 
 
 def pacemaker_runner(module, **kwargs):
-    runner_command = ['pcs']
+    runner_command = ["pcs"]
     runner = CmdRunner(
         module,
         command=runner_command,
@@ -74,6 +78,6 @@ def pacemaker_runner(module, **kwargs):
             version=cmd_runner_fmt.as_fixed("--version"),
             output_format=cmd_runner_fmt.as_opt_eq_val("--output-format"),
         ),
-        **kwargs
+        **kwargs,
     )
     return runner

@@ -83,25 +83,29 @@ scaleway_volume_info:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    Scaleway, ScalewayException, scaleway_argument_spec,
-    SCALEWAY_LOCATION)
+    Scaleway,
+    ScalewayException,
+    scaleway_argument_spec,
+    SCALEWAY_LOCATION,
+)
 
 
 class ScalewayVolumeInfo(Scaleway):
-
     def __init__(self, module):
         super().__init__(module)
-        self.name = 'volumes'
+        self.name = "volumes"
 
         region = module.params["region"]
-        self.module.params['api_url'] = SCALEWAY_LOCATION[region]["api_endpoint"]
+        self.module.params["api_url"] = SCALEWAY_LOCATION[region]["api_endpoint"]
 
 
 def main():
     argument_spec = scaleway_argument_spec()
-    argument_spec.update(dict(
-        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
-    ))
+    argument_spec.update(
+        dict(
+            region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
+        )
+    )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -109,12 +113,10 @@ def main():
     )
 
     try:
-        module.exit_json(
-            scaleway_volume_info=ScalewayVolumeInfo(module).get_resources()
-        )
+        module.exit_json(scaleway_volume_info=ScalewayVolumeInfo(module).get_resources())
     except ScalewayException as exc:
         module.fail_json(msg=exc.message)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

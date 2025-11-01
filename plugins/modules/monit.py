@@ -58,27 +58,24 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 STATE_COMMAND_MAP = {
-    'stopped': 'stop',
-    'started': 'start',
-    'monitored': 'monitor',
-    'unmonitored': 'unmonitor',
-    'restarted': 'restart'
+    "stopped": "stop",
+    "started": "start",
+    "monitored": "monitor",
+    "unmonitored": "unmonitor",
+    "restarted": "restart",
 }
 
-MONIT_SERVICES = ['Process', 'File', 'Fifo', 'Filesystem', 'Directory', 'Remote host', 'System', 'Program',
-                  'Network']
+MONIT_SERVICES = ["Process", "File", "Fifo", "Filesystem", "Directory", "Remote host", "System", "Program", "Network"]
 
 
 class StatusValue(namedtuple("Status", "value, is_pending")):
-    MISSING = 'missing'
-    OK = 'ok'
-    NOT_MONITORED = 'not_monitored'
-    INITIALIZING = 'initializing'
-    DOES_NOT_EXIST = 'does_not_exist'
-    EXECUTION_FAILED = 'execution_failed'
-    ALL_STATUS = [
-        MISSING, OK, NOT_MONITORED, INITIALIZING, DOES_NOT_EXIST, EXECUTION_FAILED
-    ]
+    MISSING = "missing"
+    OK = "ok"
+    NOT_MONITORED = "not_monitored"
+    INITIALIZING = "initializing"
+    DOES_NOT_EXIST = "does_not_exist"
+    EXECUTION_FAILED = "execution_failed"
+    ALL_STATUS = [MISSING, OK, NOT_MONITORED, INITIALIZING, DOES_NOT_EXIST, EXECUTION_FAILED]
 
     def __new__(cls, value, is_pending=False):
         return super().__new__(cls, value, is_pending)
@@ -87,7 +84,7 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
         return StatusValue(self.value, True)
 
     def __getattr__(self, item):
-        if item in (f'is_{status}' for status in self.ALL_STATUS):
+        if item in (f"is_{status}" for status in self.ALL_STATUS):
             return self.value == getattr(self, item[3:].upper())
         raise AttributeError(item)
 
@@ -124,17 +121,19 @@ class Monit:
         return self._monit_version
 
     def _get_monit_version(self):
-        rc, out, err = self.module.run_command([self.monit_bin_path, '-V'], check_rc=True)
-        version_line = out.split('\n')[0]
+        rc, out, err = self.module.run_command([self.monit_bin_path, "-V"], check_rc=True)
+        version_line = out.split("\n")[0]
         raw_version = re.search(r"([0-9]+\.){1,2}([0-9]+)?", version_line).group()
-        return raw_version, tuple(map(int, raw_version.split('.')))
+        return raw_version, tuple(map(int, raw_version.split(".")))
 
     def exit_fail(self, msg, status=None, **kwargs):
-        kwargs.update({
-            'msg': msg,
-            'monit_version': self._raw_version,
-            'process_status': str(status) if status else None,
-        })
+        kwargs.update(
+            {
+                "msg": msg,
+                "monit_version": self._raw_version,
+                "process_status": str(status) if status else None,
+            }
+        )
         self.module.fail_json(**kwargs)
 
     def exit_success(self, state):
@@ -156,7 +155,7 @@ class Monit:
         return self._parse_status(out, err)
 
     def _parse_status(self, output, err):
-        escaped_monit_services = '|'.join([re.escape(x) for x in MONIT_SERVICES])
+        escaped_monit_services = "|".join([re.escape(x) for x in MONIT_SERVICES])
         pattern = f"({escaped_monit_services}) '{re.escape(self.process_name)}'"
         if not re.search(pattern, output, re.IGNORECASE):
             return Status.MISSING
@@ -166,31 +165,31 @@ class Monit:
             self.exit_fail("Unable to find process status", stdout=output, stderr=err)
 
         status_val = status_val[0].strip().upper()
-        if ' | ' in status_val:
-            status_val = status_val.split(' | ')[0]
-        if ' - ' not in status_val:
-            status_val = status_val.replace(' ', '_')
+        if " | " in status_val:
+            status_val = status_val.split(" | ")[0]
+        if " - " not in status_val:
+            status_val = status_val.replace(" ", "_")
             try:
                 return getattr(Status, status_val)
             except AttributeError:
                 self.module.warn(f"Unknown monit status '{status_val}', treating as execution failed")
                 return Status.EXECUTION_FAILED
         else:
-            status_val, substatus = status_val.split(' - ')
+            status_val, substatus = status_val.split(" - ")
             action, state = substatus.split()
-            if action in ['START', 'INITIALIZING', 'RESTART', 'MONITOR']:
+            if action in ["START", "INITIALIZING", "RESTART", "MONITOR"]:
                 status = Status.OK
             else:
                 status = Status.NOT_MONITORED
 
-            if state == 'pending':
+            if state == "pending":
                 status = status.pending()
             return status
 
     def is_process_present(self):
-        command = [self.monit_bin_path, 'summary'] + self.command_args
+        command = [self.monit_bin_path, "summary"] + self.command_args
         rc, out, err = self.module.run_command(command, check_rc=True)
-        return bool(re.findall(rf'\b{self.process_name}\b', out))
+        return bool(re.findall(rf"\b{self.process_name}\b", out))
 
     def is_process_running(self):
         return self.get_status().is_ok
@@ -207,7 +206,7 @@ class Monit:
         loop_count = 0
         while running_status.value == current_status.value:
             if loop_count >= self._status_change_retry_count:
-                self.exit_fail('waited too long for monit to change state', running_status)
+                self.exit_fail("waited too long for monit to change state", running_status)
 
             loop_count += 1
             time.sleep(0.5)
@@ -235,13 +234,13 @@ class Monit:
         return current_status
 
     def reload(self):
-        rc, out, err = self.module.run_command([self.monit_bin_path, 'reload'])
+        rc, out, err = self.module.run_command([self.monit_bin_path, "reload"])
         if rc != 0:
-            self.exit_fail('monit reload failed', stdout=out, stderr=err)
-        self.exit_success(state='reloaded')
+            self.exit_fail("monit reload failed", stdout=out, stderr=err)
+        self.exit_success(state="reloaded")
 
     def present(self):
-        self.run_command('reload')
+        self.run_command("reload")
 
         timeout_time = time.time() + self.timeout
         while not self.is_process_present():
@@ -250,7 +249,7 @@ class Monit:
 
             time.sleep(5)
 
-        self.exit_success(state='present')
+        self.exit_success(state="present")
 
     def change_state(self, state, expected_status, invert_expected=None):
         current_status = self.get_status()
@@ -262,53 +261,56 @@ class Monit:
             status_match = not status_match
         if status_match:
             self.exit_success(state=state)
-        self.exit_fail(f'{self.process_name} process not {state}', status)
+        self.exit_fail(f"{self.process_name} process not {state}", status)
 
     def stop(self):
-        self.change_state('stopped', Status.NOT_MONITORED)
+        self.change_state("stopped", Status.NOT_MONITORED)
 
     def unmonitor(self):
-        self.change_state('unmonitored', Status.NOT_MONITORED)
+        self.change_state("unmonitored", Status.NOT_MONITORED)
 
     def restart(self):
-        self.change_state('restarted', Status.OK)
+        self.change_state("restarted", Status.OK)
 
     def start(self):
-        self.change_state('started', Status.OK)
+        self.change_state("started", Status.OK)
 
     def monitor(self):
-        self.change_state('monitored', Status.NOT_MONITORED, invert_expected=True)
+        self.change_state("monitored", Status.NOT_MONITORED, invert_expected=True)
 
 
 def main():
     arg_spec = dict(
         name=dict(required=True),
-        timeout=dict(default=300, type='int'),
-        state=dict(required=True, choices=['present', 'started', 'restarted', 'stopped', 'monitored', 'unmonitored', 'reloaded'])
+        timeout=dict(default=300, type="int"),
+        state=dict(
+            required=True,
+            choices=["present", "started", "restarted", "stopped", "monitored", "unmonitored", "reloaded"],
+        ),
     )
 
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
-    name = module.params['name']
-    state = module.params['state']
-    timeout = module.params['timeout']
+    name = module.params["name"]
+    state = module.params["state"]
+    timeout = module.params["timeout"]
 
-    monit = Monit(module, module.get_bin_path('monit', True), name, timeout)
+    monit = Monit(module, module.get_bin_path("monit", True), name, timeout)
 
     def exit_if_check_mode():
         if module.check_mode:
             module.exit_json(changed=True)
 
-    if state == 'reloaded':
+    if state == "reloaded":
         exit_if_check_mode()
         monit.reload()
 
     present = monit.is_process_present()
 
-    if not present and not state == 'present':
-        module.fail_json(msg=f'{name} process not presently configured with monit', name=name)
+    if not present and not state == "present":
+        module.fail_json(msg=f"{name} process not presently configured with monit", name=name)
 
-    if state == 'present':
+    if state == "present":
         if present:
             module.exit_json(changed=False, name=name, state=state)
         exit_if_check_mode()
@@ -317,31 +319,31 @@ def main():
     monit.wait_for_monit_to_stop_pending()
     running = monit.is_process_running()
 
-    if running and state in ['started', 'monitored']:
+    if running and state in ["started", "monitored"]:
         module.exit_json(changed=False, name=name, state=state)
 
-    if running and state == 'stopped':
+    if running and state == "stopped":
         exit_if_check_mode()
         monit.stop()
 
-    if running and state == 'unmonitored':
+    if running and state == "unmonitored":
         exit_if_check_mode()
         monit.unmonitor()
 
-    elif state == 'restarted':
+    elif state == "restarted":
         exit_if_check_mode()
         monit.restart()
 
-    elif not running and state == 'started':
+    elif not running and state == "started":
         exit_if_check_mode()
         monit.start()
 
-    elif not running and state == 'monitored':
+    elif not running and state == "monitored":
         exit_if_check_mode()
         monit.monitor()
 
     module.exit_json(changed=False, name=name, state=state)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

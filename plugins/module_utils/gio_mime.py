@@ -10,14 +10,14 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 def gio_mime_runner(module, **kwargs):
     return CmdRunner(
         module,
-        command=['gio'],
+        command=["gio"],
         arg_formats=dict(
-            mime=cmd_runner_fmt.as_fixed('mime'),
+            mime=cmd_runner_fmt.as_fixed("mime"),
             mime_type=cmd_runner_fmt.as_list(),
             handler=cmd_runner_fmt.as_list(),
-            version=cmd_runner_fmt.as_fixed('--version'),
+            version=cmd_runner_fmt.as_fixed("--version"),
         ),
-        **kwargs
+        **kwargs,
     )
 
 

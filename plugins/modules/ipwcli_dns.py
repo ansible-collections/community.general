@@ -165,45 +165,48 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 class ResourceRecord:
-
     def __init__(self, module):
         self.module = module
-        self.dnsname = module.params['dnsname']
-        self.dnstype = module.params['type']
-        self.container = module.params['container']
-        self.address = module.params['address']
-        self.ttl = module.params['ttl']
-        self.state = module.params['state']
-        self.priority = module.params['priority']
-        self.weight = module.params['weight']
-        self.port = module.params['port']
-        self.target = module.params['target']
-        self.order = module.params['order']
-        self.preference = module.params['preference']
-        self.flags = module.params['flags']
-        self.service = module.params['service']
-        self.replacement = module.params['replacement']
-        self.user = module.params['username']
-        self.password = module.params['password']
+        self.dnsname = module.params["dnsname"]
+        self.dnstype = module.params["type"]
+        self.container = module.params["container"]
+        self.address = module.params["address"]
+        self.ttl = module.params["ttl"]
+        self.state = module.params["state"]
+        self.priority = module.params["priority"]
+        self.weight = module.params["weight"]
+        self.port = module.params["port"]
+        self.target = module.params["target"]
+        self.order = module.params["order"]
+        self.preference = module.params["preference"]
+        self.flags = module.params["flags"]
+        self.service = module.params["service"]
+        self.replacement = module.params["replacement"]
+        self.user = module.params["username"]
+        self.password = module.params["password"]
 
     def create_naptrrecord(self):
         # create NAPTR record with the given params
-        record = (f'naptrrecord {self.dnsname} -set ttl={self.ttl};container={self.container};order={self.order};'
-                  f'preference={self.preference};flags="{self.flags}";service="{self.service}";replacement="{self.replacement}"')
+        record = (
+            f"naptrrecord {self.dnsname} -set ttl={self.ttl};container={self.container};order={self.order};"
+            f'preference={self.preference};flags="{self.flags}";service="{self.service}";replacement="{self.replacement}"'
+        )
         return record
 
     def create_srvrecord(self):
         # create SRV record with the given params
-        record = (f'srvrecord {self.dnsname} -set ttl={self.ttl};container={self.container};priority={self.priority};'
-                  f'weight={self.weight};port={self.port};target={self.target}')
+        record = (
+            f"srvrecord {self.dnsname} -set ttl={self.ttl};container={self.container};priority={self.priority};"
+            f"weight={self.weight};port={self.port};target={self.target}"
+        )
         return record
 
     def create_arecord(self):
         # create A record with the given params
-        if self.dnstype == 'AAAA':
-            record = f'aaaarecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}'
+        if self.dnstype == "AAAA":
+            record = f"aaaarecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}"
         else:
-            record = f'arecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}'
+            record = f"arecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}"
 
         return record
 
@@ -211,136 +214,133 @@ class ResourceRecord:
         # check if the record exists via list on ipwcli
         search = f"list {record.replace(';', '&&').replace('set', 'where')}"
         cmd = [
-            self.module.get_bin_path('ipwcli', True),
-            f'-user={self.user}',
-            f'-password={self.password}',
+            self.module.get_bin_path("ipwcli", True),
+            f"-user={self.user}",
+            f"-password={self.password}",
         ]
         rc, out, err = self.module.run_command(cmd, data=search)
 
-        if 'Invalid username or password' in out:
-            self.module.fail_json(msg='access denied at ipwcli login: Invalid username or password')
+        if "Invalid username or password" in out:
+            self.module.fail_json(msg="access denied at ipwcli login: Invalid username or password")
 
-        if ((f'ARecord {self.dnsname}' in out and rc == 0) or (f'SRVRecord {self.dnsname}' in out and rc == 0) or
-                (f'NAPTRRecord {self.dnsname}' in out and rc == 0)):
+        if (
+            (f"ARecord {self.dnsname}" in out and rc == 0)
+            or (f"SRVRecord {self.dnsname}" in out and rc == 0)
+            or (f"NAPTRRecord {self.dnsname}" in out and rc == 0)
+        ):
             return True, rc, out, err
 
         return False, rc, out, err
 
     def deploy_record(self, record):
         # check what happens if create fails on ipworks
-        stdin = f'create {record}'
+        stdin = f"create {record}"
         cmd = [
-            self.module.get_bin_path('ipwcli', True),
-            f'-user={self.user}',
-            f'-password={self.password}',
+            self.module.get_bin_path("ipwcli", True),
+            f"-user={self.user}",
+            f"-password={self.password}",
         ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 
-        if 'Invalid username or password' in out:
-            self.module.fail_json(msg='access denied at ipwcli login: Invalid username or password')
+        if "Invalid username or password" in out:
+            self.module.fail_json(msg="access denied at ipwcli login: Invalid username or password")
 
-        if '1 object(s) created.' in out:
+        if "1 object(s) created." in out:
             return rc, out, err
         else:
-            self.module.fail_json(msg='record creation failed', stderr=out)
+            self.module.fail_json(msg="record creation failed", stderr=out)
 
     def delete_record(self, record):
         # check what happens if create fails on ipworks
         stdin = f"delete {record.replace(';', '&&').replace('set', 'where')}"
         cmd = [
-            self.module.get_bin_path('ipwcli', True),
-            f'-user={self.user}',
-            f'-password={self.password}',
+            self.module.get_bin_path("ipwcli", True),
+            f"-user={self.user}",
+            f"-password={self.password}",
         ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 
-        if 'Invalid username or password' in out:
-            self.module.fail_json(msg='access denied at ipwcli login: Invalid username or password')
+        if "Invalid username or password" in out:
+            self.module.fail_json(msg="access denied at ipwcli login: Invalid username or password")
 
-        if '1 object(s) were updated.' in out:
+        if "1 object(s) were updated." in out:
             return rc, out, err
         else:
-            self.module.fail_json(msg='record deletion failed', stderr=out)
+            self.module.fail_json(msg="record deletion failed", stderr=out)
 
 
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
-        dnsname=dict(type='str', required=True),
-        type=dict(type='str', required=True, choices=['A', 'AAAA', 'SRV', 'NAPTR']),
-        container=dict(type='str', required=True),
-        address=dict(type='str'),
-        ttl=dict(type='int', default=3600),
-        state=dict(type='str', default='present', choices=['absent', 'present']),
-        priority=dict(type='int', default=10),
-        weight=dict(type='int', default=10),
-        port=dict(type='int'),
-        target=dict(type='str'),
-        order=dict(type='int'),
-        preference=dict(type='int'),
-        flags=dict(type='str', choices=['S', 'A', 'U', 'P']),
-        service=dict(type='str'),
-        replacement=dict(type='str'),
-        username=dict(type='str', required=True),
-        password=dict(type='str', required=True, no_log=True)
+        dnsname=dict(type="str", required=True),
+        type=dict(type="str", required=True, choices=["A", "AAAA", "SRV", "NAPTR"]),
+        container=dict(type="str", required=True),
+        address=dict(type="str"),
+        ttl=dict(type="int", default=3600),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
+        priority=dict(type="int", default=10),
+        weight=dict(type="int", default=10),
+        port=dict(type="int"),
+        target=dict(type="str"),
+        order=dict(type="int"),
+        preference=dict(type="int"),
+        flags=dict(type="str", choices=["S", "A", "U", "P"]),
+        service=dict(type="str"),
+        replacement=dict(type="str"),
+        username=dict(type="str", required=True),
+        password=dict(type="str", required=True, no_log=True),
     )
 
     # define result
-    result = dict(
-        changed=False,
-        stdout='',
-        stderr='',
-        rc=0,
-        record=''
-    )
+    result = dict(changed=False, stdout="", stderr="", rc=0, record="")
 
     # supports check mode
     module = AnsibleModule(
         argument_spec=module_args,
         required_if=[
-            ['type', 'A', ['address']],
-            ['type', 'AAAA', ['address']],
-            ['type', 'SRV', ['port', 'target']],
-            ['type', 'NAPTR', ['preference', 'order', 'service', 'replacement']],
+            ["type", "A", ["address"]],
+            ["type", "AAAA", ["address"]],
+            ["type", "SRV", ["port", "target"]],
+            ["type", "NAPTR", ["preference", "order", "service", "replacement"]],
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     user = ResourceRecord(module)
 
-    if user.dnstype == 'NAPTR':
+    if user.dnstype == "NAPTR":
         record = user.create_naptrrecord()
-    elif user.dnstype == 'SRV':
+    elif user.dnstype == "SRV":
         record = user.create_srvrecord()
-    elif user.dnstype == 'A' or user.dnstype == 'AAAA':
+    elif user.dnstype == "A" or user.dnstype == "AAAA":
         record = user.create_arecord()
 
     found, rc, out, err = user.list_record(record)
 
-    if found and user.state == 'absent':
+    if found and user.state == "absent":
         if module.check_mode:
             module.exit_json(changed=True)
         rc, out, err = user.delete_record(record)
-        result['changed'] = True
-        result['record'] = record
-        result['rc'] = rc
-        result['stdout'] = out
-        result['stderr'] = err
-    elif not found and user.state == 'present':
+        result["changed"] = True
+        result["record"] = record
+        result["rc"] = rc
+        result["stdout"] = out
+        result["stderr"] = err
+    elif not found and user.state == "present":
         if module.check_mode:
             module.exit_json(changed=True)
         rc, out, err = user.deploy_record(record)
-        result['changed'] = True
-        result['record'] = record
-        result['rc'] = rc
-        result['stdout'] = out
-        result['stderr'] = err
+        result["changed"] = True
+        result["record"] = record
+        result["rc"] = rc
+        result["stdout"] = out
+        result["stderr"] = err
     else:
-        result['changed'] = False
-        result['record'] = record
-        result['rc'] = rc
-        result['stdout'] = out
-        result['stderr'] = err
+        result["changed"] = False
+        result["record"] = record
+        result["rc"] = rc
+        result["stdout"] = out
+        result["stderr"] = err
 
     module.exit_json(**result)
 
@@ -349,5 +349,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

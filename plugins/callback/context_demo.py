@@ -25,9 +25,10 @@ class CallbackModule(CallbackBase):
     This is a very trivial example of how any callback function can get at play and task objects.
     play will be 'None' for runner invocations, and task will be None for 'setup' invocations.
     """
+
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'community.general.context_demo'
+    CALLBACK_TYPE = "aggregate"
+    CALLBACK_NAME = "community.general.context_demo"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, *args, **kwargs):
@@ -40,11 +41,11 @@ class CallbackModule(CallbackBase):
 
         self._display.display("     --- ARGS ")
         for i, a in enumerate(args):
-            self._display.display(f'     {i}: {a}')
+            self._display.display(f"     {i}: {a}")
 
         self._display.display("      --- KWARGS ")
         for k in kwargs:
-            self._display.display(f'     {k}: {kwargs[k]}')
+            self._display.display(f"     {k}: {kwargs[k]}")
 
     def v2_playbook_on_play_start(self, play):
         self.play = play

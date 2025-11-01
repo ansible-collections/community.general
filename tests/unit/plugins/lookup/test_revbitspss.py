@@ -14,7 +14,7 @@ from ansible.plugins.loader import lookup_loader
 
 
 class MockPamSecrets(MagicMock):
-    RESPONSE = 'dummy value'
+    RESPONSE = "dummy value"
 
     def get_pam_secret(self, path):
         return self.RESPONSE
@@ -30,13 +30,7 @@ class TestLookupModule(TestCase):
         MockPamSecrets(),
     )
     def test_get_pam_secret(self):
-        terms = ['dummy secret']
+        terms = ["dummy secret"]
         variables = []
-        kwargs = {
-            "base_url": 'https://dummy.url',
-            "api_key": 'dummy'
-        }
-        self.assertListEqual(
-            [{'dummy secret': 'dummy value'}],
-            self.lookup.run(terms, variables, **kwargs)
-        )
+        kwargs = {"base_url": "https://dummy.url", "api_key": "dummy"}
+        self.assertListEqual([{"dummy secret": "dummy value"}], self.lookup.run(terms, variables, **kwargs))

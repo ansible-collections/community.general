@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, Andrew Pantuso (@ajpantuso) <ajpantuso@gmail.com>
 # Copyright (c) 2018, Dag Wieers (@dagwieers) <dag@wieers.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -27,11 +26,12 @@ def initialize_dialect(dialect, **kwargs):
     # Add Unix dialect from Python 3
     class unix_dialect(csv.Dialect):
         """Describe the usual properties of Unix-generated CSV files."""
-        delimiter = ','
+
+        delimiter = ","
         quotechar = '"'
         doublequote = True
         skipinitialspace = False
-        lineterminator = '\n'
+        lineterminator = "\n"
         quoting = csv.QUOTE_ALL
 
     csv.register_dialect("unix", unix_dialect)
@@ -43,19 +43,19 @@ def initialize_dialect(dialect, **kwargs):
     dialect_params = {k: v for k, v in kwargs.items() if v is not None}
     if dialect_params:
         try:
-            csv.register_dialect('custom', dialect, **dialect_params)
+            csv.register_dialect("custom", dialect, **dialect_params)
         except TypeError as e:
             raise CustomDialectFailureError(f"Unable to create custom dialect: {e}")
-        dialect = 'custom'
+        dialect = "custom"
 
     return dialect
 
 
 def read_csv(data, dialect, fieldnames=None):
-    BOM = to_native('\ufeff')
-    data = to_native(data, errors='surrogate_or_strict')
+    BOM = to_native("\ufeff")
+    data = to_native(data, errors="surrogate_or_strict")
     if data.startswith(BOM):
-        data = data[len(BOM):]
+        data = data[len(BOM) :]
 
     fake_fh = StringIO(data)
 

@@ -10,7 +10,6 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 class DeprecateAttrsMixin:
-
     def _deprecate_setup(self, attr, target, module):
         if target is None:
             target = self
@@ -22,7 +21,9 @@ class DeprecateAttrsMixin:
             elif hasattr(target, "module") and isinstance(target.module, AnsibleModule):
                 module = target.module
             else:
-                raise ValueError("Failed to automatically discover the AnsibleModule instance. Pass 'module' parameter explicitly.")
+                raise ValueError(
+                    "Failed to automatically discover the AnsibleModule instance. Pass 'module' parameter explicitly."
+                )
 
         # setup internal state dicts
         value_attr = "__deprecated_attr_value"
@@ -35,7 +36,9 @@ class DeprecateAttrsMixin:
         trigger_dict = getattr(target, trigger_attr)
         return target, module, value_dict, trigger_dict
 
-    def _deprecate_attr(self, attr, msg, version=None, date=None, collection_name=None, target=None, value=None, module=None):
+    def _deprecate_attr(
+        self, attr, msg, version=None, date=None, collection_name=None, target=None, value=None, module=None
+    ):
         target, module, value_dict, trigger_dict = self._deprecate_setup(attr, target, module)
 
         value_dict[attr] = getattr(target, attr, value)

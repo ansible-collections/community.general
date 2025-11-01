@@ -186,13 +186,13 @@ def install_flat(module, binary, remote, names, method, no_dependencies):
     uri_names = []
     id_names = []
     for name in names:
-        if name.startswith('http://') or name.startswith('https://'):
+        if name.startswith("http://") or name.startswith("https://"):
             uri_names.append(name)
         else:
             id_names.append(name)
     base_command = [binary, "install", f"--{method}"]
     flatpak_version = _flatpak_version(module, binary)
-    if LooseVersion(flatpak_version) < LooseVersion('1.1.3'):
+    if LooseVersion(flatpak_version) < LooseVersion("1.1.3"):
         base_command += ["-y"]
     else:
         base_command += ["--noninteractive"]
@@ -204,19 +204,16 @@ def install_flat(module, binary, remote, names, method, no_dependencies):
     if id_names:
         command = base_command + [remote] + id_names
         _flatpak_command(module, module.check_mode, command)
-    result['changed'] = True
+    result["changed"] = True
 
 
 def update_flat(module, binary, names, method, no_dependencies):
     """Update existing flatpaks."""
     global result  # pylint: disable=global-variable-not-assigned
-    installed_flat_names = [
-        _match_installed_flat_name(module, binary, name, method)
-        for name in names
-    ]
+    installed_flat_names = [_match_installed_flat_name(module, binary, name, method) for name in names]
     command = [binary, "update", f"--{method}"]
     flatpak_version = _flatpak_version(module, binary)
-    if LooseVersion(flatpak_version) < LooseVersion('1.1.3'):
+    if LooseVersion(flatpak_version) < LooseVersion("1.1.3"):
         command += ["-y"]
     else:
         command += ["--noninteractive"]
@@ -224,27 +221,22 @@ def update_flat(module, binary, names, method, no_dependencies):
         command += ["--no-deps"]
     command += installed_flat_names
     stdout = _flatpak_command(module, module.check_mode, command)
-    result["changed"] = (
-        True if module.check_mode else stdout.find("Nothing to do.") == -1
-    )
+    result["changed"] = True if module.check_mode else stdout.find("Nothing to do.") == -1
 
 
 def uninstall_flat(module, binary, names, method):
     """Remove existing flatpaks."""
     global result  # pylint: disable=global-variable-not-assigned
-    installed_flat_names = [
-        _match_installed_flat_name(module, binary, name, method)
-        for name in names
-    ]
+    installed_flat_names = [_match_installed_flat_name(module, binary, name, method) for name in names]
     command = [binary, "uninstall"]
     flatpak_version = _flatpak_version(module, binary)
-    if LooseVersion(flatpak_version) < LooseVersion('1.1.3'):
+    if LooseVersion(flatpak_version) < LooseVersion("1.1.3"):
         command += ["-y"]
     else:
         command += ["--noninteractive"]
     command += [f"--{method}"] + installed_flat_names
     _flatpak_command(module, module.check_mode, command)
-    result['changed'] = True
+    result["changed"] = True
 
 
 def flatpak_exists(module, binary, names, method):
@@ -271,19 +263,17 @@ def _match_installed_flat_name(module, binary, name, method):
     # Try running flatpak list with columns feature
     command = [binary, "list", f"--{method}", "--app", "--columns=application"]
     _flatpak_command(module, False, command, ignore_failure=True)
-    if result['rc'] != 0 and OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE in result['stderr']:
+    if result["rc"] != 0 and OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE in result["stderr"]:
         # Probably flatpak before 1.2
-        matched_flatpak_name = \
-            _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method)
+        matched_flatpak_name = _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method)
     else:
         # Probably flatpak >= 1.2
-        matched_flatpak_name = \
-            _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, method)
+        matched_flatpak_name = _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, method)
 
     if matched_flatpak_name:
         return matched_flatpak_name
     else:
-        result['msg'] = (
+        result["msg"] = (
             "Flatpak removal failed: Could not match any installed flatpaks to "
             f"the name `{_parse_flatpak_name(name)}`. "
             "If you used a URL, try using the reverse DNS name of the flatpak"
@@ -295,7 +285,7 @@ def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, metho
     global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "list", f"--{method}", "--app", "--columns=application"]
     output = _flatpak_command(module, False, command)
-    for row in output.split('\n'):
+    for row in output.split("\n"):
         if parsed_name.lower() == row.lower():
             return row
 
@@ -304,7 +294,7 @@ def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method
     global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "list", f"--{method}", "--app"]
     output = _flatpak_command(module, False, command)
-    for row in output.split('\n'):
+    for row in output.split("\n"):
         if parsed_name.lower() in row.lower():
             return row.split()[0]
 
@@ -315,9 +305,9 @@ def _is_flatpak_id(part):
     # https://docs.flatpak.org/en/latest/conventions.html#application-ids
     # Flathub:
     # https://docs.flathub.org/docs/for-app-authors/requirements#application-id
-    if '.' not in part:
+    if "." not in part:
         return False
-    sections = part.split('.')
+    sections = part.split(".")
     if len(sections) < 2:
         return False
     domain = sections[0]
@@ -330,12 +320,12 @@ def _is_flatpak_id(part):
 
 
 def _parse_flatpak_name(name):
-    if name.startswith('http://') or name.startswith('https://'):
-        file_name = urlparse(name).path.split('/')[-1]
-        file_name_without_extension = file_name.split('.')[0:-1]
+    if name.startswith("http://") or name.startswith("https://"):
+        file_name = urlparse(name).path.split("/")[-1]
+        file_name_without_extension = file_name.split(".")[0:-1]
         common_name = ".".join(file_name_without_extension)
     else:
-        parts = name.split('/')
+        parts = name.split("/")
         for part in parts:
             if _is_flatpak_id(part):
                 common_name = part
@@ -355,63 +345,57 @@ def _flatpak_version(module, binary):
 
 def _flatpak_command(module, noop, command, ignore_failure=False):
     global result  # pylint: disable=global-variable-not-assigned
-    result['command'] = ' '.join(command)
+    result["command"] = " ".join(command)
     if noop:
-        result['rc'] = 0
+        result["rc"] = 0
         return ""
 
-    result['rc'], result['stdout'], result['stderr'] = module.run_command(
-        command, check_rc=not ignore_failure
-    )
-    return result['stdout']
+    result["rc"], result["stdout"], result["stderr"] = module.run_command(command, check_rc=not ignore_failure)
+    return result["stdout"]
 
 
 def main():
     # This module supports check mode
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', elements='str', required=True),
-            remote=dict(type='str', default='flathub'),
-            method=dict(type='str', default='system',
-                        choices=['user', 'system']),
-            state=dict(type='str', default='present',
-                       choices=['absent', 'present', 'latest']),
-            no_dependencies=dict(type='bool', default=False),
-            executable=dict(type='path', default='flatpak')
+            name=dict(type="list", elements="str", required=True),
+            remote=dict(type="str", default="flathub"),
+            method=dict(type="str", default="system", choices=["user", "system"]),
+            state=dict(type="str", default="present", choices=["absent", "present", "latest"]),
+            no_dependencies=dict(type="bool", default=False),
+            executable=dict(type="path", default="flatpak"),
         ),
         supports_check_mode=True,
     )
 
-    name = module.params['name']
-    state = module.params['state']
-    remote = module.params['remote']
-    no_dependencies = module.params['no_dependencies']
-    method = module.params['method']
-    executable = module.params['executable']
+    name = module.params["name"]
+    state = module.params["state"]
+    remote = module.params["remote"]
+    no_dependencies = module.params["no_dependencies"]
+    method = module.params["method"]
+    executable = module.params["executable"]
     binary = module.get_bin_path(executable, None)
 
     global result
-    result = dict(
-        changed=False
-    )
+    result = dict(changed=False)
 
     # If the binary was not found, fail the operation
     if not binary:
         module.fail_json(msg=f"Executable '{executable}' was not found on the system.", **result)
 
-    module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     installed, not_installed = flatpak_exists(module, binary, name, method)
-    if state == 'absent' and installed:
+    if state == "absent" and installed:
         uninstall_flat(module, binary, installed, method)
     else:
-        if state == 'latest' and installed:
+        if state == "latest" and installed:
             update_flat(module, binary, installed, method, no_dependencies)
-        if state in ('present', 'latest') and not_installed:
+        if state in ("present", "latest") and not_installed:
             install_flat(module, binary, remote, not_installed, method, no_dependencies)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

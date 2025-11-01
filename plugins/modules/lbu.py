@@ -80,19 +80,17 @@ import os.path
 def run_module():
     module = AnsibleModule(
         argument_spec={
-            'commit': {'type': 'bool'},
-            'exclude': {'type': 'list', 'elements': 'str'},
-            'include': {'type': 'list', 'elements': 'str'}
+            "commit": {"type": "bool"},
+            "exclude": {"type": "list", "elements": "str"},
+            "include": {"type": "list", "elements": "str"},
         },
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     changed = False
 
     def run_lbu(*args):
-        code, stdout, stderr = module.run_command(
-            [module.get_bin_path('lbu', required=True)] + list(args)
-        )
+        code, stdout, stderr = module.run_command([module.get_bin_path("lbu", required=True)] + list(args))
         if code:
             module.fail_json(changed=changed, msg=stderr)
         return stdout
@@ -100,27 +98,27 @@ def run_module():
     update = False
     commit = False
 
-    for param in ('include', 'exclude'):
+    for param in ("include", "exclude"):
         if module.params[param]:
-            paths = run_lbu(param, '-l').split('\n')
+            paths = run_lbu(param, "-l").split("\n")
             for path in module.params[param]:
                 if os.path.normpath(f"/{path}")[1:] not in paths:
                     update = True
 
-    if module.params['commit']:
-        commit = update or run_lbu('status') > ''
+    if module.params["commit"]:
+        commit = update or run_lbu("status") > ""
 
     if module.check_mode:
         module.exit_json(changed=update or commit)
 
     if update:
-        for param in ('include', 'exclude'):
+        for param in ("include", "exclude"):
             if module.params[param]:
                 run_lbu(param, *module.params[param])
                 changed = True
 
     if commit:
-        run_lbu('commit')
+        run_lbu("commit")
         changed = True
 
     module.exit_json(changed=changed)
@@ -130,5 +128,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

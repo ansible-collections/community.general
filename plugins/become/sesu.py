@@ -75,11 +75,10 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
+    name = "community.general.sesu"
 
-    name = 'community.general.sesu'
-
-    prompt = 'Please enter your password:'
-    fail = missing = ('Sorry, try again with sesu.',)
+    prompt = "Please enter your password:"
+    fail = missing = ("Sorry, try again with sesu.",)
 
     def build_become_command(self, cmd, shell):
         super().build_become_command(cmd, shell)
@@ -87,8 +86,8 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        become = self.get_option('become_exe')
+        become = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        user = self.get_option('become_user')
-        return f'{become} {flags} {user} -c {self._build_success_command(cmd, shell)}'
+        flags = self.get_option("become_flags")
+        user = self.get_option("become_user")
+        return f"{become} {flags} {user} -c {self._build_success_command(cmd, shell)}"
