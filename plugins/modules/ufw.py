@@ -433,9 +433,18 @@ def main():
 
         return major, minor, rev
 
+    def decode_comment(match):
+        try:
+            hexcode = match.group(2)
+            hexcode = "".join([chr(int(hexcode[h:h + 2], 16)) for h in range(0, len(hexcode), 2)])
+            return "{0}{1}{2}".format(match.group(1), repr(hexcode), match.group(3))
+        except Exception as e:
+            return match.group(0)
+
     params = module.params
 
-    commands = {key: params[key] for key in command_keys if params[key]}
+    commands = dict((key, params[key]) for key in command_keys if params[key])
+    diff = None
 
     # Ensure ufw is available
     ufw_bin = module.get_bin_path('ufw', True)
@@ -455,13 +464,16 @@ def main():
         if command == 'state':
             states = {'enabled': 'enable', 'disabled': 'disable',
                       'reloaded': 'reload', 'reset': 'reset'}
-
             if value in ['reloaded', 'reset']:
                 changed = True
 
+            ufw_enabled = pre_state.find(" active") != -1
+            diff = dict(
+                before="Status: {}\n".format("enabled" if ufw_enabled else "disabled"),
+                after="Status: {}\n".format(value),
+            )
             if module.check_mode:
                 # "active" would also match "inactive", hence the space
-                ufw_enabled = pre_state.find(" active") != -1
                 if (value == 'disabled' and ufw_enabled) or (value == 'enabled' and not ufw_enabled):
                     changed = True
             else:
@@ -470,6 +482,15 @@ def main():
         elif command == 'logging':
             extract = re.search(r'Logging: (on|off)(?: \(([a-z]+)\))?', pre_state)
             if extract:
+                diff = dict(
+                    before=extract.group(0),
+                )
+                if value == 'off':
+                    diff["after"] = "Logging: off"
+                elif value == 'on':
+                    diff["after"] = "Logging: on ({})".format(extract.group(2) or "unknown")
+                else:
+                    diff["after"] = "Logging: on ({})".format(value)
                 current_level = extract.group(2)
                 current_on_off_value = extract.group(1)
                 if value != "off":
@@ -480,6 +501,15 @@ def main():
                 elif current_on_off_value != "off":
                     changed = True
             else:
+                diff = dict(
+                    before="Logging: Unknown\n",
+                )
+                if value == 'off':
+                    diff["after"] = "Logging: off"
+                elif value == 'on':
+                    diff["after"] = "Logging: on (unknown)"
+                else:
+                    diff["after"] = "Logging: on ({})".format(value)
                 changed = True
 
             if not module.check_mode:
@@ -501,6 +531,11 @@ def main():
                         changed = True
                 else:
                     changed = True
+                    v = "(unknown)"
+                diff = dict(
+                    before="{} {}\n".format(params['direction'], v),
+                    after="{} {}\n".format(params['direction'], value),
+                )
             else:
                 execute(cmd + [[command], [value], [params['direction']]])
 
@@ -562,6 +597,15 @@ def main():
                 cmd.append([params['comment'], f"comment '{params['comment']}'"])
 
             rules_dry = execute(cmd)
+            cmd = [[ufw_bin], ["--dry-run route allow in on foo out on bar from 1.1.1.2 port 7000 to 8.8.8.8 port 7001 proto tcp"]]
+            remove1 = "### tuple ### route:allow tcp 7001 8.8.8.8 7000 1.1.1.2 in_foo!out_bar\n"
+            remove2 = "-A ufw-user-forward -i foo -o bar -p tcp -d 8.8.8.8 --dport 7001 -s 1.1.1.2 --sport 7000 -j ACCEPT\n"
+            diff = dict(
+                before=execute(cmd).replace(remove1 + remove2, '').replace('\n\n\n', '\n\n'),
+                after=rules_dry,
+            )
+            diff["before"] = re.sub(r"(comment=)([\da-f]+)(\n)", decode_comment, diff["before"])
+            diff["after"] = re.sub(r"(comment=)([\da-f]+)(\n)", decode_comment, diff["after"])
 
             if module.check_mode:
 
@@ -579,16 +623,32 @@ def main():
                             changed = True
                     elif pre_rules != rules_dry:
                         changed = True
+                else:
+                    diff = None
+
+    if not module.check_mode:
+        post_state = execute([[ufw_bin], ['status'], ['verbose']])
+        post_rules = get_current_rules()
+        if (not changed):
+            diff = dict(
+                before="{}\n\n---\n\n{}".format(pre_state, pre_rules),
+                after="{}\n\n---\n\n{}".format(post_state, post_rules),
+            )
+            changed = (pre_state != post_state) or (pre_rules != post_rules)
+
+    if (diff is not None) and (diff["before"] == diff["after"]):
+        diff = None
+
+    if (changed) and (diff is None):
+        raise Exception("ufw module reported a change, but no differences detected")
+    elif (changed is False) and (diff is not None):
+        raise Exception("ufw module reported no change, but differences were detcted", diff, cmds)
 
     # Get the new state
     if module.check_mode:
-        return module.exit_json(changed=changed, commands=cmds)
+        return module.exit_json(changed=changed, commands=cmds, diff=diff)
     else:
-        post_state = execute([[ufw_bin], ['status'], ['verbose']])
-        if not changed:
-            post_rules = get_current_rules()
-            changed = (pre_state != post_state) or (pre_rules != post_rules)
-        return module.exit_json(changed=changed, commands=cmds, msg=post_state.rstrip())
+        return module.exit_json(changed=changed, commands=cmds, msg=post_state.rstrip(), diff=diff)
 
 
 if __name__ == '__main__':

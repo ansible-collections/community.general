@@ -58,6 +58,7 @@ dry_mode_cmd_with_port_700 = {
     "ufw --dry-run insert 1 allow from any to any port 7000 proto tcp": skippg_adding_existing_rules,
     "ufw --dry-run delete allow from any to any port 7000 proto tcp": "",
     "ufw --dry-run delete allow from any to any port 7001 proto tcp": user_rules_with_port_7000,
+    "ufw --dry-run route allow in on foo out on bar from 1.1.1.2 port 7000 to 8.8.8.8 port 7001 proto tcp": "",
     "ufw --dry-run route allow in on foo out on bar from 1.1.1.1 port 7000 to 8.8.8.8 port 7001 proto tcp": "",
     "ufw --dry-run allow in on foo from any to any port 7003 proto tcp": "",
     "ufw --dry-run allow in on foo from 1.1.1.1 port 7002 to 8.8.8.8 port 7003 proto tcp": "",
