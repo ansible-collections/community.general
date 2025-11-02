@@ -67,8 +67,8 @@ options:
 
   changed_deps:
     description:
-      - Replace installed packages for which the ebuild dependencies have changed since the packages were built.
-      - (C(--changed-deps)).
+      - Tells emerge to replace installed packages for which the ebuild dependencies
+      - have changed since the packages were built (C(--changed-deps)).
     type: bool
     default: false
     version_added: 12.0.0
