@@ -1806,3 +1806,23 @@ releases:
       - 10857-github_deploy_key-err.yml
       - 9.5.12.yml
     release_date: '2025-10-06'
+  9.5.13:
+    changes:
+      release_summary: 'Final maintenance release.
+
+
+        This is the last community.general 9.x.y release.
+
+        Please upgrade to community.general 10.x.y, 11.x.y, or 12.x.y.
+
+        Thanks a lot to everyone who contributed to a 9.x.y release!'
+      security_fixes:
+        - 'keycloak_user - the parameter ``credentials[].value`` is now marked as
+          ``no_log=true``. Before it was logged by Ansible, unless the task was marked
+          as ``no_log: true``. Since this parameter can be used for passwords, this
+          resulted in credential leaking (https://github.com/ansible-collections/community.general/issues/11000,
+          https://github.com/ansible-collections/community.general/pull/11005).'
+    fragments:
+      - 11005-keycloak_user.yml
+      - 9.5.13.yml
+    release_date: '2025-11-02'

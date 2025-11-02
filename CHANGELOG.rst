@@ -6,6 +6,23 @@ Community General Release Notes
 
 This changelog describes changes after version 8.0.0.
 
+v9.5.13
+=======
+
+Release Summary
+---------------
+
+Final maintenance release.
+
+This is the last community.general 9.x.y release.
+Please upgrade to community.general 10.x.y, 11.x.y, or 12.x.y.
+Thanks a lot to everyone who contributed to a 9.x.y release!
+
+Security Fixes
+--------------
+
+- keycloak_user - the parameter ``credentials[].value`` is now marked as ``no_log=true``. Before it was logged by Ansible, unless the task was marked as ``no_log: true``. Since this parameter can be used for passwords, this resulted in credential leaking (https://github.com/ansible-collections/community.general/issues/11000, https://github.com/ansible-collections/community.general/pull/11005).
+
 v9.5.12
 =======
 

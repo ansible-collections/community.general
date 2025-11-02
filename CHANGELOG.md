@@ -2,75 +2,78 @@
 
 **Topics**
 
-- <a href="#v9-5-12">v9\.5\.12</a>
+- <a href="#v9-5-13">v9\.5\.13</a>
     - <a href="#release-summary">Release Summary</a>
+    - <a href="#security-fixes">Security Fixes</a>
+- <a href="#v9-5-12">v9\.5\.12</a>
+    - <a href="#release-summary-1">Release Summary</a>
     - <a href="#bugfixes">Bugfixes</a>
 - <a href="#v9-5-11">v9\.5\.11</a>
-    - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#release-summary-2">Release Summary</a>
     - <a href="#bugfixes-1">Bugfixes</a>
 - <a href="#v9-5-10">v9\.5\.10</a>
-    - <a href="#release-summary-2">Release Summary</a>
+    - <a href="#release-summary-3">Release Summary</a>
     - <a href="#bugfixes-2">Bugfixes</a>
 - <a href="#v9-5-9">v9\.5\.9</a>
-    - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#release-summary-4">Release Summary</a>
     - <a href="#bugfixes-3">Bugfixes</a>
 - <a href="#v9-5-8">v9\.5\.8</a>
-    - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#release-summary-5">Release Summary</a>
     - <a href="#bugfixes-4">Bugfixes</a>
 - <a href="#v9-5-7">v9\.5\.7</a>
-    - <a href="#release-summary-5">Release Summary</a>
+    - <a href="#release-summary-6">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
     - <a href="#bugfixes-5">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
 - <a href="#v9-5-6">v9\.5\.6</a>
-    - <a href="#release-summary-6">Release Summary</a>
+    - <a href="#release-summary-7">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#bugfixes-6">Bugfixes</a>
 - <a href="#v9-5-5">v9\.5\.5</a>
-    - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#release-summary-8">Release Summary</a>
     - <a href="#bugfixes-7">Bugfixes</a>
 - <a href="#v9-5-4">v9\.5\.4</a>
-    - <a href="#security-fixes">Security Fixes</a>
+    - <a href="#security-fixes-1">Security Fixes</a>
     - <a href="#bugfixes-8">Bugfixes</a>
 - <a href="#v9-5-3">v9\.5\.3</a>
-    - <a href="#release-summary-8">Release Summary</a>
+    - <a href="#release-summary-9">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
-    - <a href="#security-fixes-1">Security Fixes</a>
+    - <a href="#security-fixes-2">Security Fixes</a>
     - <a href="#bugfixes-9">Bugfixes</a>
 - <a href="#v9-5-2">v9\.5\.2</a>
-    - <a href="#release-summary-9">Release Summary</a>
+    - <a href="#release-summary-10">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
     - <a href="#bugfixes-10">Bugfixes</a>
 - <a href="#v9-5-1">v9\.5\.1</a>
-    - <a href="#release-summary-10">Release Summary</a>
+    - <a href="#release-summary-11">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#bugfixes-11">Bugfixes</a>
 - <a href="#v9-5-0">v9\.5\.0</a>
-    - <a href="#release-summary-11">Release Summary</a>
+    - <a href="#release-summary-12">Release Summary</a>
     - <a href="#minor-changes-5">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes-12">Bugfixes</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v9-4-0">v9\.4\.0</a>
-    - <a href="#release-summary-12">Release Summary</a>
+    - <a href="#release-summary-13">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
     - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-13">Bugfixes</a>
     - <a href="#new-modules-1">New Modules</a>
 - <a href="#v9-3-0">v9\.3\.0</a>
-    - <a href="#release-summary-13">Release Summary</a>
+    - <a href="#release-summary-14">Release Summary</a>
     - <a href="#minor-changes-7">Minor Changes</a>
     - <a href="#bugfixes-14">Bugfixes</a>
     - <a href="#new-modules-2">New Modules</a>
 - <a href="#v9-2-0">v9\.2\.0</a>
-    - <a href="#release-summary-14">Release Summary</a>
+    - <a href="#release-summary-15">Release Summary</a>
     - <a href="#minor-changes-8">Minor Changes</a>
     - <a href="#bugfixes-15">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#filter">Filter</a>
         - <a href="#test">Test</a>
 - <a href="#v9-1-0">v9\.1\.0</a>
-    - <a href="#release-summary-15">Release Summary</a>
+    - <a href="#release-summary-16">Release Summary</a>
     - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#deprecated-features-2">Deprecated Features</a>
     - <a href="#bugfixes-16">Bugfixes</a>
@@ -79,16 +82,16 @@
         - <a href="#filter-1">Filter</a>
     - <a href="#new-modules-3">New Modules</a>
 - <a href="#v9-0-1">v9\.0\.1</a>
-    - <a href="#release-summary-16">Release Summary</a>
+    - <a href="#release-summary-17">Release Summary</a>
     - <a href="#minor-changes-10">Minor Changes</a>
     - <a href="#bugfixes-17">Bugfixes</a>
 - <a href="#v9-0-0">v9\.0\.0</a>
-    - <a href="#release-summary-17">Release Summary</a>
+    - <a href="#release-summary-18">Release Summary</a>
     - <a href="#minor-changes-11">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features-3">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-    - <a href="#security-fixes-2">Security Fixes</a>
+    - <a href="#security-fixes-3">Security Fixes</a>
     - <a href="#bugfixes-18">Bugfixes</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#become">Become</a>
@@ -100,10 +103,27 @@
     - <a href="#new-modules-4">New Modules</a>
 This changelog describes changes after version 8\.0\.0\.
 
+<a id="v9-5-13"></a>
+## v9\.5\.13
+
+<a id="release-summary"></a>
+### Release Summary
+
+Final maintenance release\.
+
+This is the last community\.general 9\.x\.y release\.
+Please upgrade to community\.general 10\.x\.y\, 11\.x\.y\, or 12\.x\.y\.
+Thanks a lot to everyone who contributed to a 9\.x\.y release\!
+
+<a id="security-fixes"></a>
+### Security Fixes
+
+* keycloak\_user \- the parameter <code>credentials\[\]\.value</code> is now marked as <code>no\_log\=true</code>\. Before it was logged by Ansible\, unless the task was marked as <code>no\_log\: true</code>\. Since this parameter can be used for passwords\, this resulted in credential leaking \([https\://github\.com/ansible\-collections/community\.general/issues/11000](https\://github\.com/ansible\-collections/community\.general/issues/11000)\, [https\://github\.com/ansible\-collections/community\.general/pull/11005](https\://github\.com/ansible\-collections/community\.general/pull/11005)\)\.
+
 <a id="v9-5-12"></a>
 ## v9\.5\.12
 
-<a id="release-summary"></a>
+<a id="release-summary-1"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -117,7 +137,7 @@ Bugfix release\.
 <a id="v9-5-11"></a>
 ## v9\.5\.11
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -140,7 +160,7 @@ Bugfix release\.
 <a id="v9-5-10"></a>
 ## v9\.5\.10
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Bugfix release with improved ansible\-core 2\.19 compatibility\.
@@ -156,7 +176,7 @@ Bugfix release with improved ansible\-core 2\.19 compatibility\.
 <a id="v9-5-9"></a>
 ## v9\.5\.9
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -170,7 +190,7 @@ Bugfix release\.
 <a id="v9-5-8"></a>
 ## v9\.5\.8
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -188,7 +208,7 @@ Regular bugfix release\.
 <a id="v9-5-7"></a>
 ## v9\.5\.7
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -221,7 +241,7 @@ Regular bugfix release\.
 <a id="v9-5-6"></a>
 ## v9\.5\.6
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -245,7 +265,7 @@ Regular bugfix release\.
 <a id="v9-5-5"></a>
 ## v9\.5\.5
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -271,7 +291,7 @@ Regular bugfix release\.
 <a id="v9-5-4"></a>
 ## v9\.5\.4
 
-<a id="security-fixes"></a>
+<a id="security-fixes-1"></a>
 ### Security Fixes
 
 * keycloak\_client \- Sanitize <code>saml\.encryption\.private\.key</code> so it does not show in the logs \([https\://github\.com/ansible\-collections/community\.general/pull/9621](https\://github\.com/ansible\-collections/community\.general/pull/9621)\)\.
@@ -288,7 +308,7 @@ Regular bugfix release\.
 <a id="v9-5-3"></a>
 ## v9\.5\.3
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -298,7 +318,7 @@ Regular bugfix release\.
 
 * proxmox module utils \- add method <code>api\_task\_complete</code> that can wait for task completion and return error message \([https\://github\.com/ansible\-collections/community\.general/pull/9256](https\://github\.com/ansible\-collections/community\.general/pull/9256)\)\.
 
-<a id="security-fixes-1"></a>
+<a id="security-fixes-2"></a>
 ### Security Fixes
 
 * keycloak\_authentication \- API calls did not properly set the <code>priority</code> during update resulting in incorrectly sorted authentication flows\. This apparently only affects Keycloak 25 or newer \([https\://github\.com/ansible\-collections/community\.general/pull/9263](https\://github\.com/ansible\-collections/community\.general/pull/9263)\)\.
@@ -316,7 +336,7 @@ Regular bugfix release\.
 <a id="v9-5-2"></a>
 ## v9\.5\.2
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -343,7 +363,7 @@ Regular bugfix release\.
 <a id="v9-5-1"></a>
 ## v9\.5\.1
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -371,7 +391,7 @@ Regular bugfix release\.
 <a id="v9-5-0"></a>
 ## v9\.5\.0
 
-<a id="release-summary-11"></a>
+<a id="release-summary-12"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -470,7 +490,7 @@ From now on\, new features will only go into community\.general 10\.x\.y\.
 <a id="v9-4-0"></a>
 ## v9\.4\.0
 
-<a id="release-summary-12"></a>
+<a id="release-summary-13"></a>
 ### Release Summary
 
 Bugfix and feature release\.
@@ -584,7 +604,7 @@ Bugfix and feature release\.
 <a id="v9-3-0"></a>
 ## v9\.3\.0
 
-<a id="release-summary-13"></a>
+<a id="release-summary-14"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -633,7 +653,7 @@ Regular bugfix and feature release\.
 <a id="v9-2-0"></a>
 ## v9\.2\.0
 
-<a id="release-summary-14"></a>
+<a id="release-summary-15"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -675,7 +695,7 @@ Regular bugfix and feature release\.
 <a id="v9-1-0"></a>
 ## v9\.1\.0
 
-<a id="release-summary-15"></a>
+<a id="release-summary-16"></a>
 ### Release Summary
 
 Regular feature and bugfix release\.
@@ -742,7 +762,7 @@ Regular feature and bugfix release\.
 <a id="v9-0-1"></a>
 ## v9\.0\.1
 
-<a id="release-summary-16"></a>
+<a id="release-summary-17"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 10\.0\.0rc1\.
@@ -771,7 +791,7 @@ Bugfix release for inclusion in Ansible 10\.0\.0rc1\.
 <a id="v9-0-0"></a>
 ## v9\.0\.0
 
-<a id="release-summary-17"></a>
+<a id="release-summary-18"></a>
 ### Release Summary
 
 This is release 9\.0\.0 of <code>community\.general</code>\, released on 2024\-05\-20\.
@@ -940,7 +960,7 @@ This is release 9\.0\.0 of <code>community\.general</code>\, released on 2024\-0
 * stackdriver \- this module relied on HTTPS APIs that do not exist anymore and was thus removed \([https\://github\.com/ansible\-collections/community\.general/pull/8198](https\://github\.com/ansible\-collections/community\.general/pull/8198)\)\.
 * webfaction\_\* modules \- these modules relied on HTTPS APIs that do not exist anymore and were thus removed \([https\://github\.com/ansible\-collections/community\.general/pull/8198](https\://github\.com/ansible\-collections/community\.general/pull/8198)\)\.
 
-<a id="security-fixes-2"></a>
+<a id="security-fixes-3"></a>
 ### Security Fixes
 
 * cobbler\, gitlab\_runners\, icinga2\, linode\, lxd\, nmap\, online\, opennebula\, proxmox\, scaleway\, stackpath\_compute\, virtualbox\, and xen\_orchestra inventory plugin \- make sure all data received from the remote servers is marked as unsafe\, so remote code execution by obtaining texts that can be evaluated as templates is not possible \([https\://www\.die\-welt\.net/2024/03/remote\-code\-execution\-in\-ansible\-dynamic\-inventory\-plugins/](https\://www\.die\-welt\.net/2024/03/remote\-code\-execution\-in\-ansible\-dynamic\-inventory\-plugins/)\, [https\://github\.com/ansible\-collections/community\.general/pull/8098](https\://github\.com/ansible\-collections/community\.general/pull/8098)\)\.
