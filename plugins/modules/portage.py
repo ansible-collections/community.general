@@ -341,7 +341,13 @@ def emerge_packages(module, packages):
     """Run emerge command against given list of atoms."""
     p = module.params
 
-    if p["noreplace"] and not p["changed_deps"] and not p["changed_use"] and not p["newuse"] and not (p["update"] or p["state"] == "latest"):
+    if (
+        p["noreplace"]
+        and not p["changed_deps"]
+        and not p["changed_use"]
+        and not p["newuse"]
+        and not (p["update"] or p["state"] == "latest")
+    ):
         for package in packages:
             if (
                 p["noreplace"]
