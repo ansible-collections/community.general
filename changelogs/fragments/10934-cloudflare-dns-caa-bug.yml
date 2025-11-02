@@ -1,2 +1,0 @@
-bugfixes:
-  - cloudflare_dns - roll back changes to CAA record validation (https://github.com/ansible-collections/community.general/issues/10934, https://github.com/ansible-collections/community.general/pull/10956).

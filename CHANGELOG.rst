@@ -6,6 +6,41 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.1
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Minor Changes
+-------------
+
+- dependent lookup plugin - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
+- pacemaker_cluster.py - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
+- pacemaker_resource.py - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
+- pacemaker_stonith.py - refactor dict initialization, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
+- scaleway module_utils - improve code readability, no impact to users (https://github.com/ansible-collections/community.general/pull/10891).
+
+Security Fixes
+--------------
+
+- keycloak_user - the parameter ``credentials[].value`` is now marked as ``no_log=true``. Before it was logged by Ansible, unless the task was marked as ``no_log: true``. Since this parameter can be used for passwords, this resulted in credential leaking (https://github.com/ansible-collections/community.general/issues/11000, https://github.com/ansible-collections/community.general/pull/11005).
+
+Bugfixes
+--------
+
+- cloudflare_dns - roll back changes to CAA record validation (https://github.com/ansible-collections/community.general/issues/10934, https://github.com/ansible-collections/community.general/pull/10956).
+- cloudflare_dns - roll back changes to SRV record validation (https://github.com/ansible-collections/community.general/issues/10934, https://github.com/ansible-collections/community.general/pull/10937).
+- gitlab_runner - fix exception in check mode when a new runner is created (https://github.com/ansible-collections/community.general/issues/8854).
+- keycloak_clientsecret, keycloak_clientsecret_info - make ``client_auth`` work (https://github.com/ansible-collections/community.general/issues/10932, https://github.com/ansible-collections/community.general/pull/10933).
+- omapi_host - make return values compatible with ansible-core 2.19 and Python 3 (https://github.com/ansible-collections/community.general/pull/11001).
+- onepassword_doc and onepassword_ssh_key lookup plugins - ensure that all connection parameters are passed to CLI class (https://github.com/ansible-collections/community.general/pull/10965).
+- pritunl_user - improve resilience when comparing user parameters if remote fields are ``null`` or missing. List parameters (``groups``, ``mac_addresses``) now safely default to empty lists for comparison and avoids ``KeyError`` issues (https://github.com/ansible-collections/community.general/issues/10954, https://github.com/ansible-collections/community.general/pull/10955).
+- random_string lookup plugin - replace ``random.SystemRandom()`` with ``secrets.SystemRandom()`` when generating strings. This has no practical effect, as both are the same (https://github.com/ansible-collections/community.general/pull/10893).
+- terraform - fix bug when ``null`` values inside complex vars are throwing error instead of being passed to terraform. Now terraform can handle ``null``s in ``complex_vars`` itself (https://github.com/ansible-collections/community.general/pull/10961).
+
 v11.4.0
 =======
 
