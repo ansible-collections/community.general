@@ -206,10 +206,13 @@ class XFConfProperty(StateModuleHelper):
             self.do_raise('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
 
         result = out.rstrip()
-        if 'Value is an array with' in result:
-            result = result.split('\n')
-            result.pop(0)
-            result.pop(0)
+        if "Value is an array with" in result:
+            result = result.split("\n")
+            if len(result) > 1:
+                result.pop(0)
+                result.pop(0)
+            else:
+                return []
 
         return result
 

@@ -1,0 +1,3 @@
+bugfixes:
+  - xfconf - fix handling of empty array properties (https://github.com/ansible-collections/community.general/pull/11026).
+  - xfconf_info - fix handling of empty array properties (https://github.com/ansible-collections/community.general/pull/11026).

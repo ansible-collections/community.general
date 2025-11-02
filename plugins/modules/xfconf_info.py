@@ -153,9 +153,12 @@ class XFConfInfo(ModuleHelper):
         result = out.rstrip()
         if "Value is an array with" in result:
             result = result.split("\n")
-            result.pop(0)
-            result.pop(0)
             self.vars.is_array = True
+            if len(result) > 1:
+                result.pop(0)
+                result.pop(0)
+            else:
+                return []
 
         return result
 
