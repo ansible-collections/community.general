@@ -1,2 +1,2 @@
 minor_changes:
-  - "Adds a 'changed_deps' option to the portage module, which allows users to rebuild packages that have changed ebuild dependencies, corresponding to 'emerge --changed-deps'."
+  - "Adds a ``changed_deps`` option to the portage module. (https://github.com/ansible-collections/community.general/pull/11023)"
