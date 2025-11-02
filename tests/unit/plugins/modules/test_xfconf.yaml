@@ -207,6 +207,55 @@ test_cases:
           rc: 0
           out: ''
           err: ''
+  - id: test_property_array_previously_empty
+    input:
+      channel: xfwm4
+      property: /general/workspace_names
+      state: present
+      value_type: string
+      value: [A, B, C]
+    output:
+      changed: true
+      previous_value: []
+      type: [string, string, string]
+      value: [A, B, C]
+      version: 4.18.1
+    mocks:
+      run_command:
+        - command: [/testbin/xfconf-query, --version]
+          environ: *env-def
+          rc: 0
+          out: *version-output
+          err: ''
+        - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
+          environ: *env-def
+          rc: 0
+          out: "Value is an array with 0 items:\n\n"
+          err: ''
+        - command:
+            - /testbin/xfconf-query
+            - --channel
+            - xfwm4
+            - --property
+            - /general/workspace_names
+            - --create
+            - --force-array
+            - --type
+            - string
+            - --set
+            - A
+            - --type
+            - string
+            - --set
+            - B
+            - --type
+            - string
+            - --set
+            - C
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
   - id: test_property_reset_value
     input:
       channel: xfwm4
