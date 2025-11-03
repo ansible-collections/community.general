@@ -34,7 +34,7 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 * Make sure your PR includes a [changelog fragment](https://docs.ansible.com/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment).
   * You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. (If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
   * Please always include a link to the pull request itself, and if the PR is about an issue, also a link to the issue. Also make sure the fragment ends with a period, and begins with a lower-case letter after `-`. (Again, if you don't do this, we'll add suggestions to fix it, so don't worry too much :) )
-* Avoid reformatting unrelated parts of the codebase in your PR. These types of changes will likely be requested for reversion, create additional work for reviewers, and may cause approval to be delayed.
+* Note that we format the code with `ruff format`. If your change does not match the formatters expectations, CI will fail and your PR will not get merged. See below for how to format code with antsibull-nox.
 
 You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
 
@@ -44,10 +44,23 @@ If you want to test a PR locally, refer to [our testing guide](https://github.co
 
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
 
-## Run sanity or unit locally (with antsibull-nox)
+## Format code; and run sanity or unit tests locally (with antsibull-nox)
 
-The easiest way to run sanity and unit tests locally is to use [antsibull-nox](https://ansible.readthedocs.io/projects/antsibull-nox/).
+The easiest way to format the code, and to run sanity and unit tests locally is to use [antsibull-nox](https://ansible.readthedocs.io/projects/antsibull-nox/).
 (If you have [nox](https://nox.thea.codes/en/stable/) installed, it will automatically install antsibull-nox in a virtual environment for you.)
+
+### Format code
+
+The following commands show how to run ansible-test sanity tests:
+
+```.bash
+# Run all configured formatters:
+nox -Re formatters
+
+# If you notice discrepancies between your local formatter and CI, you might
+# need to re-generate the virtual environment:
+nox -e formatters
+```
 
 ### Sanity tests
 
