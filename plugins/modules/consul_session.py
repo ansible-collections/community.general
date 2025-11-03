@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Steve Gargan <steve.gargan@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: consul_session
@@ -117,74 +115,58 @@ EXAMPLES = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.consul import (
-    AUTH_ARGUMENTS_SPEC, _ConsulModule
-)
+from ansible_collections.community.general.plugins.module_utils.consul import AUTH_ARGUMENTS_SPEC, _ConsulModule
 
 
 def execute(module, consul_module):
+    state = module.params.get("state")
 
-    state = module.params.get('state')
-
-    if state in ['info', 'list', 'node']:
+    if state in ["info", "list", "node"]:
         lookup_sessions(module, consul_module)
-    elif state == 'present':
+    elif state == "present":
         update_session(module, consul_module)
     else:
         remove_session(module, consul_module)
 
 
 def list_sessions(consul_module, datacenter):
-    return consul_module.get(
-        'session/list',
-        params={'dc': datacenter})
+    return consul_module.get("session/list", params={"dc": datacenter})
 
 
 def list_sessions_for_node(consul_module, node, datacenter):
-    return consul_module.get(
-        ('session', 'node', node),
-        params={'dc': datacenter})
+    return consul_module.get(("session", "node", node), params={"dc": datacenter})
 
 
 def get_session_info(consul_module, session_id, datacenter):
-    return consul_module.get(
-        ('session', 'info', session_id),
-        params={'dc': datacenter})
+    return consul_module.get(("session", "info", session_id), params={"dc": datacenter})
 
 
 def lookup_sessions(module, consul_module):
+    datacenter = module.params.get("datacenter")
 
-    datacenter = module.params.get('datacenter')
-
-    state = module.params.get('state')
+    state = module.params.get("state")
     try:
-        if state == 'list':
+        if state == "list":
             sessions_list = list_sessions(consul_module, datacenter)
             # Ditch the index, this can be grabbed from the results
             if sessions_list and len(sessions_list) >= 2:
                 sessions_list = sessions_list[1]
-            module.exit_json(changed=True,
-                             sessions=sessions_list)
-        elif state == 'node':
-            node = module.params.get('node')
+            module.exit_json(changed=True, sessions=sessions_list)
+        elif state == "node":
+            node = module.params.get("node")
             sessions = list_sessions_for_node(consul_module, node, datacenter)
-            module.exit_json(changed=True,
-                             node=node,
-                             sessions=sessions)
-        elif state == 'info':
-            session_id = module.params.get('id')
+            module.exit_json(changed=True, node=node, sessions=sessions)
+        elif state == "info":
+            session_id = module.params.get("id")
 
             session_by_id = get_session_info(consul_module, session_id, datacenter)
-            module.exit_json(changed=True,
-                             session_id=session_id,
-                             sessions=session_by_id)
+            module.exit_json(changed=True, session_id=session_id, sessions=session_by_id)
 
     except Exception as e:
-        module.fail_json(msg="Could not retrieve session info %s" % e)
+        module.fail_json(msg=f"Could not retrieve session info {e}")
 
 
-def create_session(consul_module, name, behavior, ttl, node,
-                   lock_delay, datacenter, checks):
+def create_session(consul_module, name, behavior, ttl, node, lock_delay, datacenter, checks):
     create_data = {
         "LockDelay": lock_delay,
         "Node": node,
@@ -193,99 +175,82 @@ def create_session(consul_module, name, behavior, ttl, node,
         "Behavior": behavior,
     }
     if ttl is not None:
-        create_data["TTL"] = "%ss" % str(ttl)  # TTL is in seconds
-    create_session_response_dict = consul_module.put(
-        'session/create',
-        params={
-            'dc': datacenter},
-        data=create_data)
+        create_data["TTL"] = f"{ttl}s"  # TTL is in seconds
+    create_session_response_dict = consul_module.put("session/create", params={"dc": datacenter}, data=create_data)
     return create_session_response_dict["ID"]
 
 
 def update_session(module, consul_module):
-
-    name = module.params.get('name')
-    delay = module.params.get('delay')
-    checks = module.params.get('checks')
-    datacenter = module.params.get('datacenter')
-    node = module.params.get('node')
-    behavior = module.params.get('behavior')
-    ttl = module.params.get('ttl')
+    name = module.params.get("name")
+    delay = module.params.get("delay")
+    checks = module.params.get("checks")
+    datacenter = module.params.get("datacenter")
+    node = module.params.get("node")
+    behavior = module.params.get("behavior")
+    ttl = module.params.get("ttl")
 
     try:
-        session = create_session(consul_module,
-                                 name=name,
-                                 behavior=behavior,
-                                 ttl=ttl,
-                                 node=node,
-                                 lock_delay=delay,
-                                 datacenter=datacenter,
-                                 checks=checks
-                                 )
-        module.exit_json(changed=True,
-                         session_id=session,
-                         name=name,
-                         behavior=behavior,
-                         ttl=ttl,
-                         delay=delay,
-                         checks=checks,
-                         node=node)
+        session = create_session(
+            consul_module,
+            name=name,
+            behavior=behavior,
+            ttl=ttl,
+            node=node,
+            lock_delay=delay,
+            datacenter=datacenter,
+            checks=checks,
+        )
+        module.exit_json(
+            changed=True,
+            session_id=session,
+            name=name,
+            behavior=behavior,
+            ttl=ttl,
+            delay=delay,
+            checks=checks,
+            node=node,
+        )
     except Exception as e:
-        module.fail_json(msg="Could not create/update session %s" % e)
+        module.fail_json(msg=f"Could not create/update session {e}")
 
 
 def destroy_session(consul_module, session_id):
-    return consul_module.put(('session', 'destroy', session_id))
+    return consul_module.put(("session", "destroy", session_id))
 
 
 def remove_session(module, consul_module):
-    session_id = module.params.get('id')
+    session_id = module.params.get("id")
 
     try:
         destroy_session(consul_module, session_id)
 
-        module.exit_json(changed=True,
-                         session_id=session_id)
+        module.exit_json(changed=True, session_id=session_id)
     except Exception as e:
-        module.fail_json(msg="Could not remove session with id '%s' %s" % (
-                         session_id, e))
+        module.fail_json(msg=f"Could not remove session with id '{session_id}' {e}")
 
 
 def main():
     argument_spec = dict(
-        checks=dict(type='list', elements='str'),
-        delay=dict(type='int', default='15'),
-        behavior=dict(
-            type='str',
-            default='release',
-            choices=[
-                'release',
-                'delete']),
-        ttl=dict(type='int'),
-        id=dict(type='str'),
-        name=dict(type='str'),
-        node=dict(type='str'),
-        state=dict(
-            type='str',
-            default='present',
-            choices=[
-                'absent',
-                'info',
-                'list',
-                'node',
-                'present']),
-        datacenter=dict(type='str'),
-        **AUTH_ARGUMENTS_SPEC
+        checks=dict(type="list", elements="str"),
+        delay=dict(type="int", default="15"),
+        behavior=dict(type="str", default="release", choices=["release", "delete"]),
+        ttl=dict(type="int"),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        node=dict(type="str"),
+        state=dict(type="str", default="present", choices=["absent", "info", "list", "node", "present"]),
+        datacenter=dict(type="str"),
+        **AUTH_ARGUMENTS_SPEC,
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ('state', 'node', ['name']),
-            ('state', 'info', ['id']),
-            ('state', 'remove', ['id']),
+            ("state", "node", ["name"]),
+            ("state", "info", ["id"]),
+            ("state", "remove", ["id"]),
         ],
-        supports_check_mode=False
+        supports_check_mode=False,
     )
     consul_module = _ConsulModule(module)
 
@@ -295,5 +260,5 @@ def main():
         module.fail_json(msg=str(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

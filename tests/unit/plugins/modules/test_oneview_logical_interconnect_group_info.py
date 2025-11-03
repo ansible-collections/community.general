@@ -2,32 +2,27 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+import unittest
 from .hpe_test_utils import FactsParamsTestCase
 from ansible_collections.community.general.plugins.modules.oneview_logical_interconnect_group_info import (
-    LogicalInterconnectGroupInfoModule
+    LogicalInterconnectGroupInfoModule,
 )
 
 
-ERROR_MSG = 'Fake message error'
+ERROR_MSG = "Fake message error"
 
-PARAMS_GET_ALL = dict(
-    config='config.json',
-    name=None
-)
+PARAMS_GET_ALL = dict(config="config.json", name=None)
 
-PARAMS_GET_BY_NAME = dict(
-    config='config.json',
-    name="Test Logical Interconnect Group"
-)
+PARAMS_GET_BY_NAME = dict(config="config.json", name="Test Logical Interconnect Group")
 
-PRESENT_LIGS = [{
-    "name": "Test Logical Interconnect Group",
-    "uri": "/rest/logical-interconnect-groups/ebb4ada8-08df-400e-8fac-9ff987ac5140"
-}]
+PRESENT_LIGS = [
+    {
+        "name": "Test Logical Interconnect Group",
+        "uri": "/rest/logical-interconnect-groups/ebb4ada8-08df-400e-8fac-9ff987ac5140",
+    }
+]
 
 
 class LogicalInterconnectGroupInfoSpec(unittest.TestCase, FactsParamsTestCase):
@@ -43,8 +38,7 @@ class LogicalInterconnectGroupInfoSpec(unittest.TestCase, FactsParamsTestCase):
         LogicalInterconnectGroupInfoModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            logical_interconnect_groups=(PRESENT_LIGS)
+            changed=False, logical_interconnect_groups=(PRESENT_LIGS)
         )
 
     def test_should_get_lig_by_name(self):
@@ -54,10 +48,9 @@ class LogicalInterconnectGroupInfoSpec(unittest.TestCase, FactsParamsTestCase):
         LogicalInterconnectGroupInfoModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            logical_interconnect_groups=(PRESENT_LIGS)
+            changed=False, logical_interconnect_groups=(PRESENT_LIGS)
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

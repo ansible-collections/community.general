@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Adam Števko <adam.stevko@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -144,40 +142,40 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-class BE(object):
+class BE:
     def __init__(self, module):
         self.module = module
 
-        self.name = module.params['name']
-        self.snapshot = module.params['snapshot']
-        self.description = module.params['description']
-        self.options = module.params['options']
-        self.mountpoint = module.params['mountpoint']
-        self.state = module.params['state']
-        self.force = module.params['force']
-        self.is_freebsd = os.uname()[0] == 'FreeBSD'
+        self.name = module.params["name"]
+        self.snapshot = module.params["snapshot"]
+        self.description = module.params["description"]
+        self.options = module.params["options"]
+        self.mountpoint = module.params["mountpoint"]
+        self.state = module.params["state"]
+        self.force = module.params["force"]
+        self.is_freebsd = os.uname()[0] == "FreeBSD"
 
     def _beadm_list(self):
-        cmd = [self.module.get_bin_path('beadm'), 'list', '-H']
-        if '@' in self.name:
-            cmd.append('-s')
+        cmd = [self.module.get_bin_path("beadm"), "list", "-H"]
+        if "@" in self.name:
+            cmd.append("-s")
         return self.module.run_command(cmd)
 
     def _find_be_by_name(self, out):
-        if '@' in self.name:
+        if "@" in self.name:
             for line in out.splitlines():
                 if self.is_freebsd:
                     check = line.split()
                     if check == []:
                         continue
-                    full_name = check[0].split('/')
+                    full_name = check[0].split("/")
                     if full_name == []:
                         continue
                     check[0] = full_name[len(full_name) - 1]
                     if check[0] == self.name:
                         return check
                 else:
-                    check = line.split(';')
+                    check = line.split(";")
                     if check[0] == self.name:
                         return check
         else:
@@ -187,7 +185,7 @@ class BE(object):
                     if check[0] == self.name:
                         return check
                 else:
-                    check = line.split(';')
+                    check = line.split(";")
                     if check[0] == self.name:
                         return check
         return None
@@ -211,35 +209,35 @@ class BE(object):
             if line is None:
                 return False
             if self.is_freebsd:
-                if 'R' in line[1]:
+                if "R" in line[1]:
                     return True
             else:
-                if 'R' in line[2]:
+                if "R" in line[2]:
                     return True
 
         return False
 
     def activate_be(self):
-        cmd = [self.module.get_bin_path('beadm'), 'activate', self.name]
+        cmd = [self.module.get_bin_path("beadm"), "activate", self.name]
         return self.module.run_command(cmd)
 
     def create_be(self):
-        cmd = [self.module.get_bin_path('beadm'), 'create']
+        cmd = [self.module.get_bin_path("beadm"), "create"]
 
         if self.snapshot:
-            cmd.extend(['-e', self.snapshot])
+            cmd.extend(["-e", self.snapshot])
         if not self.is_freebsd:
             if self.description:
-                cmd.extend(['-d', self.description])
+                cmd.extend(["-d", self.description])
             if self.options:
-                cmd.extend(['-o', self.options])
+                cmd.extend(["-o", self.options])
 
         cmd.append(self.name)
 
         return self.module.run_command(cmd)
 
     def destroy_be(self):
-        cmd = [self.module.get_bin_path('beadm'), 'destroy', '-F', self.name]
+        cmd = [self.module.get_bin_path("beadm"), "destroy", "-F", self.name]
         return self.module.run_command(cmd)
 
     def is_mounted(self):
@@ -253,7 +251,7 @@ class BE(object):
                 # On FreeBSD, we exclude currently mounted BE on /, as it is
                 # special and can be activated even if it is mounted. That is not
                 # possible with non-root BEs.
-                if line[2] != '-' and line[2] != '/':
+                if line[2] != "-" and line[2] != "/":
                     return True
             else:
                 if line[3]:
@@ -262,7 +260,7 @@ class BE(object):
         return False
 
     def mount_be(self):
-        cmd = [self.module.get_bin_path('beadm'), 'mount', self.name]
+        cmd = [self.module.get_bin_path("beadm"), "mount", self.name]
 
         if self.mountpoint:
             cmd.append(self.mountpoint)
@@ -270,9 +268,9 @@ class BE(object):
         return self.module.run_command(cmd)
 
     def unmount_be(self):
-        cmd = [self.module.get_bin_path('beadm'), 'unmount']
+        cmd = [self.module.get_bin_path("beadm"), "unmount"]
         if self.force:
-            cmd.append('-f')
+            cmd.append("-f")
         cmd.append(self.name)
 
         return self.module.run_command(cmd)
@@ -281,13 +279,15 @@ class BE(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True, aliases=['be']),
-            snapshot=dict(type='str'),
-            description=dict(type='str'),
-            options=dict(type='str'),
-            mountpoint=dict(type='path'),
-            state=dict(type='str', default='present', choices=['absent', 'activated', 'mounted', 'present', 'unmounted']),
-            force=dict(type='bool', default=False),
+            name=dict(type="str", required=True, aliases=["be"]),
+            snapshot=dict(type="str"),
+            description=dict(type="str"),
+            options=dict(type="str"),
+            mountpoint=dict(type="path"),
+            state=dict(
+                type="str", default="present", choices=["absent", "activated", "mounted", "present", "unmounted"]
+            ),
+            force=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
     )
@@ -295,25 +295,25 @@ def main():
     be = BE(module)
 
     rc = None
-    out = ''
-    err = ''
+    out = ""
+    err = ""
     result = {}
-    result['name'] = be.name
-    result['state'] = be.state
+    result["name"] = be.name
+    result["state"] = be.state
 
     if be.snapshot:
-        result['snapshot'] = be.snapshot
+        result["snapshot"] = be.snapshot
 
     if be.description:
-        result['description'] = be.description
+        result["description"] = be.description
 
     if be.options:
-        result['options'] = be.options
+        result["options"] = be.options
 
     if be.mountpoint:
-        result['mountpoint'] = be.mountpoint
+        result["mountpoint"] = be.mountpoint
 
-    if be.state == 'absent':
+    if be.state == "absent":
         # beadm on FreeBSD and Solarish systems differs in delete behaviour in
         # that we are not allowed to delete activated BE on FreeBSD while on
         # Solarish systems we cannot delete BE if it is mounted. We add mount
@@ -326,19 +326,16 @@ def main():
 
                 if be.is_freebsd:
                     if be.is_activated():
-                        module.fail_json(msg='Unable to remove active BE!')
+                        module.fail_json(msg="Unable to remove active BE!")
 
                 (rc, out, err) = be.destroy_be()
 
                 if rc != 0:
-                    module.fail_json(msg='Error while destroying BE: "%s"' % err,
-                                     name=be.name,
-                                     stderr=err,
-                                     rc=rc)
+                    module.fail_json(msg=f'Error while destroying BE: "{err}"', name=be.name, stderr=err, rc=rc)
             else:
-                module.fail_json(msg='Unable to remove BE as it is mounted!')
+                module.fail_json(msg="Unable to remove BE as it is mounted!")
 
-    elif be.state == 'present':
+    elif be.state == "present":
         if not be.exists():
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -346,12 +343,9 @@ def main():
             (rc, out, err) = be.create_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while creating BE: "%s"' % err,
-                                 name=be.name,
-                                 stderr=err,
-                                 rc=rc)
+                module.fail_json(msg=f'Error while creating BE: "{err}"', name=be.name, stderr=err, rc=rc)
 
-    elif be.state == 'activated':
+    elif be.state == "activated":
         if not be.is_activated():
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -360,16 +354,13 @@ def main():
             # an explicit check for that case.
             if be.is_freebsd:
                 if be.is_mounted():
-                    module.fail_json(msg='Unable to activate mounted BE!')
+                    module.fail_json(msg="Unable to activate mounted BE!")
 
             (rc, out, err) = be.activate_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while activating BE: "%s"' % err,
-                                 name=be.name,
-                                 stderr=err,
-                                 rc=rc)
-    elif be.state == 'mounted':
+                module.fail_json(msg=f'Error while activating BE: "{err}"', name=be.name, stderr=err, rc=rc)
+    elif be.state == "mounted":
         if not be.is_mounted():
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -377,12 +368,9 @@ def main():
             (rc, out, err) = be.mount_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while mounting BE: "%s"' % err,
-                                 name=be.name,
-                                 stderr=err,
-                                 rc=rc)
+                module.fail_json(msg=f'Error while mounting BE: "{err}"', name=be.name, stderr=err, rc=rc)
 
-    elif be.state == 'unmounted':
+    elif be.state == "unmounted":
         if be.is_mounted():
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -390,23 +378,20 @@ def main():
             (rc, out, err) = be.unmount_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while unmounting BE: "%s"' % err,
-                                 name=be.name,
-                                 stderr=err,
-                                 rc=rc)
+                module.fail_json(msg=f'Error while unmounting BE: "{err}"', name=be.name, stderr=err, rc=rc)
 
     if rc is None:
-        result['changed'] = False
+        result["changed"] = False
     else:
-        result['changed'] = True
+        result["changed"] = True
 
     if out:
-        result['stdout'] = out
+        result["stdout"] = out
     if err:
-        result['stderr'] = err
+        result["stderr"] = err
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

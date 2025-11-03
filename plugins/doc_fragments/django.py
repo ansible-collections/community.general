@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     DOCUMENTATION = r"""
 options:
   venv:
     description:
-      - Use the the Python interpreter from this virtual environment.
+      - Use the Python interpreter from this virtual environment.
       - Pass the path to the root of the virtualenv, not the C(bin/) directory nor the C(python) executable.
     type: path
   settings:
@@ -58,4 +56,25 @@ options:
       - Specify the database to be used.
     type: str
     default: default
+"""
+
+    DATA = r"""
+options:
+  excludes:
+    description:
+      - Applications or models to be excluded.
+      - Format must be either V(app_label) or V(app_label.ModelName).
+    type: list
+    elements: str
+  format:
+    description:
+      - Serialization format of the output data.
+    type: str
+    default: json
+    choices: [xml, json, jsonl, yaml]
+notes:
+  - As it is now, the module is B(not idempotent). Ensuring idempotency for this case can be a bit tricky, because it would
+    amount to ensuring beforehand that all the data in the fixture file is already in the database, which is not a trivial feat.
+    Unfortunately, neither C(django loaddata) nor C(django dumpdata) have a C(--dry-run) option, so the only way to know whether
+    there is a change or not is to actually load or dump the data.
 """

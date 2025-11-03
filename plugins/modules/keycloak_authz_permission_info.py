@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 # Copyright (c) 2021, Christophe Gilles <christophe.gilles54@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_authz_permission_info
@@ -110,8 +108,12 @@ queried_state:
       sample: {}
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -124,27 +126,29 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        name=dict(type='str', required=True),
-        client_id=dict(type='str', required=True),
-        realm=dict(type='str', required=True)
+        name=dict(type="str", required=True),
+        client_id=dict(type="str", required=True),
+        realm=dict(type="str", required=True),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=(
-                               [['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
     # Convenience variables
-    name = module.params.get('name')
-    client_id = module.params.get('client_id')
-    realm = module.params.get('realm')
+    name = module.params.get("name")
+    client_id = module.params.get("client_id")
+    realm = module.params.get("realm")
 
-    result = dict(changed=False, msg='', queried_state={})
+    result = dict(changed=False, msg="", queried_state={})
 
     # Obtain access token, initialize API
     try:
@@ -157,18 +161,16 @@ def main():
     # Get id of the client based on client_id
     cid = kc.get_client_id(client_id, realm=realm)
     if not cid:
-        module.fail_json(msg='Invalid client %s for realm %s' %
-                         (client_id, realm))
+        module.fail_json(msg=f"Invalid client {client_id} for realm {realm}")
 
     # Get current state of the permission using its name as the search
     # filter. This returns False if it is not found.
-    permission = kc.get_authz_permission_by_name(
-        name=name, client_id=cid, realm=realm)
+    permission = kc.get_authz_permission_by_name(name=name, client_id=cid, realm=realm)
 
-    result['queried_state'] = permission
+    result["queried_state"] = permission
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

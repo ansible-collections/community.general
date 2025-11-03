@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is BSD licensed.
 # Modules you write using this snippet, which is embedded dynamically by
@@ -12,12 +11,13 @@
 # Contains LXCA common class
 # Lenovo xClarity Administrator (LXCA)
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import traceback
+
 try:
     from pylxca import connect, disconnect
+
     HAS_PYLXCA = True
 except ImportError:
     HAS_PYLXCA = False
@@ -61,12 +61,11 @@ def setup_conn(module):
     """
     lxca_con = None
     try:
-        lxca_con = connect(module.params['auth_url'],
-                           module.params['login_user'],
-                           module.params['login_password'],
-                           "True")
+        lxca_con = connect(
+            module.params["auth_url"], module.params["login_user"], module.params["login_password"], "True"
+        )
     except Exception as exception:
-        error_msg = '; '.join(exception.args)
+        error_msg = "; ".join(exception.args)
         module.fail_json(msg=error_msg, exception=traceback.format_exc())
     return lxca_con
 

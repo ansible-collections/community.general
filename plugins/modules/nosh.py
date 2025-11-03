@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Thomas Caravia <taca@kadisius.eu>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -336,38 +334,38 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def run_sys_ctl(module, args):
-    sys_ctl = [module.get_bin_path('system-control', required=True)]
-    if module.params['user']:
-        sys_ctl = sys_ctl + ['--user']
+    sys_ctl = [module.get_bin_path("system-control", required=True)]
+    if module.params["user"]:
+        sys_ctl = sys_ctl + ["--user"]
     return module.run_command(sys_ctl + args)
 
 
 def get_service_path(module, service):
-    (rc, out, err) = run_sys_ctl(module, ['find', service])
+    (rc, out, err) = run_sys_ctl(module, ["find", service])
     # fail if service not found
     if rc != 0:
-        fail_if_missing(module, False, service, msg='host')
+        fail_if_missing(module, False, service, msg="host")
     else:
         return to_native(out).strip()
 
 
 def service_is_enabled(module, service_path):
-    (rc, out, err) = run_sys_ctl(module, ['is-enabled', service_path])
+    (rc, out, err) = run_sys_ctl(module, ["is-enabled", service_path])
     return rc == 0
 
 
 def service_is_preset_enabled(module, service_path):
-    (rc, out, err) = run_sys_ctl(module, ['preset', '--dry-run', service_path])
+    (rc, out, err) = run_sys_ctl(module, ["preset", "--dry-run", service_path])
     return to_native(out).strip().startswith("enable")
 
 
 def service_is_loaded(module, service_path):
-    (rc, out, err) = run_sys_ctl(module, ['is-loaded', service_path])
+    (rc, out, err) = run_sys_ctl(module, ["is-loaded", service_path])
     return rc == 0
 
 
 def get_service_status(module, service_path):
-    (rc, out, err) = run_sys_ctl(module, ['show-json', service_path])
+    (rc, out, err) = run_sys_ctl(module, ["show-json", service_path])
     # will fail if not service is not loaded
     if err is not None and err:
         module.fail_json(msg=err)
@@ -378,7 +376,7 @@ def get_service_status(module, service_path):
 
 
 def service_is_running(service_status):
-    return service_status['DaemontoolsEncoreState'] in set(['starting', 'started', 'running'])
+    return service_status["DaemontoolsEncoreState"] in set(["starting", "started", "running"])
 
 
 def handle_enabled(module, result, service_path):
@@ -392,39 +390,39 @@ def handle_enabled(module, result, service_path):
     """
 
     # computed prior in control flow
-    preset = result['preset']
-    enabled = result['enabled']
+    preset = result["preset"]
+    enabled = result["enabled"]
 
     # preset, effect only if option set to true (no reverse preset)
-    if module.params['preset']:
-        action = 'preset'
+    if module.params["preset"]:
+        action = "preset"
 
         # run preset if needed
-        if preset != module.params['preset']:
-            result['changed'] = True
+        if preset != module.params["preset"]:
+            result["changed"] = True
             if not module.check_mode:
                 (rc, out, err) = run_sys_ctl(module, [action, service_path])
                 if rc != 0:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service_path, out + err))
-            result['preset'] = not preset
-            result['enabled'] = not enabled
+                    module.fail_json(msg=f"Unable to {action} service {service_path}: {out + err}")
+            result["preset"] = not preset
+            result["enabled"] = not enabled
 
     # enabled/disabled state
-    if module.params['enabled'] is not None:
-        if module.params['enabled']:
-            action = 'enable'
+    if module.params["enabled"] is not None:
+        if module.params["enabled"]:
+            action = "enable"
         else:
-            action = 'disable'
+            action = "disable"
 
         # change enable/disable if needed
-        if enabled != module.params['enabled']:
-            result['changed'] = True
+        if enabled != module.params["enabled"]:
+            result["changed"] = True
             if not module.check_mode:
                 (rc, out, err) = run_sys_ctl(module, [action, service_path])
                 if rc != 0:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service_path, out + err))
-            result['enabled'] = not enabled
-            result['preset'] = not preset
+                    module.fail_json(msg=f"Unable to {action} service {service_path}: {out + err}")
+            result["enabled"] = not enabled
+            result["preset"] = not preset
 
 
 def handle_state(module, result, service_path):
@@ -435,70 +433,71 @@ def handle_state(module, result, service_path):
     can be obtained and the service can only be 'started'.
     """
     # default to desired state, no action
-    result['state'] = module.params['state']
-    state = module.params['state']
+    result["state"] = module.params["state"]
+    state = module.params["state"]
     action = None
 
     # computed prior in control flow, possibly modified by handle_enabled()
-    enabled = result['enabled']
+    enabled = result["enabled"]
 
     # service not loaded -> not started by manager, no status information
     if not service_is_loaded(module, service_path):
-        if state in ['started', 'restarted', 'reloaded']:
-            action = 'start'
-            result['state'] = 'started'
-        elif state == 'reset':
+        if state in ["started", "restarted", "reloaded"]:
+            action = "start"
+            result["state"] = "started"
+        elif state == "reset":
             if enabled:
-                action = 'start'
-                result['state'] = 'started'
+                action = "start"
+                result["state"] = "started"
             else:
-                result['state'] = None
+                result["state"] = None
         else:
-            result['state'] = None
+            result["state"] = None
 
     # service is loaded
     else:
         # get status information
-        result['status'] = get_service_status(module, service_path)
-        running = service_is_running(result['status'])
+        result["status"] = get_service_status(module, service_path)
+        running = service_is_running(result["status"])
 
-        if state == 'started':
+        if state == "started":
             if not running:
-                action = 'start'
-        elif state == 'stopped':
+                action = "start"
+        elif state == "stopped":
             if running:
-                action = 'stop'
+                action = "stop"
         # reset = start/stop according to enabled status
-        elif state == 'reset':
+        elif state == "reset":
             if enabled is not running:
                 if running:
-                    action = 'stop'
-                    result['state'] = 'stopped'
+                    action = "stop"
+                    result["state"] = "stopped"
                 else:
-                    action = 'start'
-                    result['state'] = 'started'
+                    action = "start"
+                    result["state"] = "started"
         # start if not running, 'service' module constraint
-        elif state == 'restarted':
+        elif state == "restarted":
             if not running:
-                action = 'start'
-                result['state'] = 'started'
+                action = "start"
+                result["state"] = "started"
             else:
-                action = 'condrestart'
+                action = "condrestart"
         # start if not running, 'service' module constraint
-        elif state == 'reloaded':
+        elif state == "reloaded":
             if not running:
-                action = 'start'
-                result['state'] = 'started'
+                action = "start"
+                result["state"] = "started"
             else:
-                action = 'hangup'
+                action = "hangup"
 
     # change state as needed
     if action:
-        result['changed'] = True
+        result["changed"] = True
         if not module.check_mode:
             (rc, out, err) = run_sys_ctl(module, [action, service_path])
             if rc != 0:
-                module.fail_json(msg="Unable to %s service %s: %s" % (action, service_path, err))
+                module.fail_json(msg=f"Unable to {action} service {service_path}: {err}")
+
 
 # ===========================================
 # Main control flow
@@ -507,48 +506,48 @@ def handle_state(module, result, service_path):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            state=dict(type='str', choices=['started', 'stopped', 'reset', 'restarted', 'reloaded']),
-            enabled=dict(type='bool'),
-            preset=dict(type='bool'),
-            user=dict(type='bool', default=False),
+            name=dict(type="str", required=True),
+            state=dict(type="str", choices=["started", "stopped", "reset", "restarted", "reloaded"]),
+            enabled=dict(type="bool"),
+            preset=dict(type="bool"),
+            user=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[['enabled', 'preset']],
+        mutually_exclusive=[["enabled", "preset"]],
     )
 
-    service = module.params['name']
+    service = module.params["name"]
     rc = 0
-    out = err = ''
+    out = err = ""
     result = {
-        'name': service,
-        'changed': False,
-        'status': None,
+        "name": service,
+        "changed": False,
+        "status": None,
     }
 
     # check service can be found (or fail) and get path
     service_path = get_service_path(module, service)
 
     # get preliminary service facts
-    result['service_path'] = service_path
-    result['user'] = module.params['user']
-    result['enabled'] = service_is_enabled(module, service_path)
-    result['preset'] = result['enabled'] is service_is_preset_enabled(module, service_path)
+    result["service_path"] = service_path
+    result["user"] = module.params["user"]
+    result["enabled"] = service_is_enabled(module, service_path)
+    result["preset"] = result["enabled"] is service_is_preset_enabled(module, service_path)
 
     # set enabled state, service need not be loaded
-    if module.params['enabled'] is not None or module.params['preset']:
+    if module.params["enabled"] is not None or module.params["preset"]:
         handle_enabled(module, result, service_path)
 
     # set service running state
-    if module.params['state'] is not None:
+    if module.params["state"] is not None:
         handle_state(module, result, service_path)
 
     # get final service status if possible
     if service_is_loaded(module, service_path):
-        result['status'] = get_service_status(module, service_path)
+        result["status"] = get_service_status(module, service_path)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

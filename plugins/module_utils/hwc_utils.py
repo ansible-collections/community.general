@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c), Google Inc, 2017
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import re
 import time
@@ -15,45 +13,44 @@ try:
     from keystoneauth1.adapter import Adapter
     from keystoneauth1.identity import v3
     from keystoneauth1 import session
+
     HAS_THIRD_LIBRARIES = True
 except ImportError:
     THIRD_LIBRARIES_IMP_ERR = traceback.format_exc()
     HAS_THIRD_LIBRARIES = False
 
-from ansible.module_utils.basic import (AnsibleModule, env_fallback,
-                                        missing_required_lib)
+from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
 from ansible.module_utils.common.text.converters import to_text
 
 
 class HwcModuleException(Exception):
     def __init__(self, message):
-        super(HwcModuleException, self).__init__()
+        super().__init__()
 
         self._message = message
 
     def __str__(self):
-        return "[HwcClientException] message=%s" % self._message
+        return f"[HwcClientException] message={self._message}"
 
 
 class HwcClientException(Exception):
     def __init__(self, code, message):
-        super(HwcClientException, self).__init__()
+        super().__init__()
 
         self._code = code
         self._message = message
 
     def __str__(self):
-        msg = " code=%s," % str(self._code) if self._code != 0 else ""
-        return "[HwcClientException]%s message=%s" % (
-            msg, self._message)
+        msg = f" code={self._code}," if self._code != 0 else ""
+        return f"[HwcClientException]{msg} message={self._message}"
 
 
 class HwcClientException404(HwcClientException):
     def __init__(self, message):
-        super(HwcClientException404, self).__init__(404, message)
+        super().__init__(404, message)
 
     def __str__(self):
-        return "[HwcClientException404] message=%s" % self._message
+        return f"[HwcClientException404] message={self._message}"
 
 
 def session_method_wrapper(f):
@@ -62,21 +59,19 @@ def session_method_wrapper(f):
             url = self.endpoint + url
             r = f(self, url, *args, **kwargs)
         except Exception as ex:
-            raise HwcClientException(
-                0, "Sending request failed, error=%s" % ex)
+            raise HwcClientException(0, f"Sending request failed, error={ex}")
 
         result = None
         if r.content:
             try:
                 result = r.json()
             except Exception as ex:
-                raise HwcClientException(
-                    0, "Parsing response to json failed, error: %s" % ex)
+                raise HwcClientException(0, f"Parsing response to json failed, error: {ex}")
 
         code = r.status_code
         if code not in [200, 201, 202, 203, 204, 205, 206, 207, 208, 226]:
             msg = ""
-            for i in ['message', 'error.message']:
+            for i in ["message", "error.message"]:
                 try:
                     msg = navigate_value(result, i)
                     break
@@ -95,13 +90,13 @@ def session_method_wrapper(f):
     return _wrap
 
 
-class _ServiceClient(object):
+class _ServiceClient:
     def __init__(self, client, endpoint, product):
         self._client = client
         self._endpoint = endpoint
         self._default_header = {
-            'User-Agent': "Huawei-Ansible-MM-%s" % product,
-            'Accept': 'application/json',
+            "User-Agent": f"Huawei-Ansible-MM-{product}",
+            "Accept": "application/json",
         }
 
     @property
@@ -114,23 +109,19 @@ class _ServiceClient(object):
 
     @session_method_wrapper
     def get(self, url, body=None, header=None, timeout=None):
-        return self._client.get(url, json=body, timeout=timeout,
-                                headers=self._header(header))
+        return self._client.get(url, json=body, timeout=timeout, headers=self._header(header))
 
     @session_method_wrapper
     def post(self, url, body=None, header=None, timeout=None):
-        return self._client.post(url, json=body, timeout=timeout,
-                                 headers=self._header(header))
+        return self._client.post(url, json=body, timeout=timeout, headers=self._header(header))
 
     @session_method_wrapper
     def delete(self, url, body=None, header=None, timeout=None):
-        return self._client.delete(url, json=body, timeout=timeout,
-                                   headers=self._header(header))
+        return self._client.delete(url, json=body, timeout=timeout, headers=self._header(header))
 
     @session_method_wrapper
     def put(self, url, body=None, header=None, timeout=None):
-        return self._client.put(url, json=body, timeout=timeout,
-                                headers=self._header(header))
+        return self._client.put(url, json=body, timeout=timeout, headers=self._header(header))
 
     def _header(self, header):
         if header and isinstance(header, dict):
@@ -143,7 +134,7 @@ class _ServiceClient(object):
         return header
 
 
-class Config(object):
+class Config:
     def __init__(self, module, product):
         self._project_client = None
         self._domain_client = None
@@ -170,40 +161,33 @@ class Config(object):
     def _gen_provider_client(self):
         m = self._module
         p = {
-            "auth_url": m.params['identity_endpoint'],
-            "password": m.params['password'],
-            "username": m.params['user'],
-            "project_name": m.params['project'],
-            "user_domain_name": m.params['domain'],
-            "reauthenticate": True
+            "auth_url": m.params["identity_endpoint"],
+            "password": m.params["password"],
+            "username": m.params["user"],
+            "project_name": m.params["project"],
+            "user_domain_name": m.params["domain"],
+            "reauthenticate": True,
         }
 
-        self._project_client = Adapter(
-            session.Session(auth=v3.Password(**p)),
-            raise_exc=False)
+        self._project_client = Adapter(session.Session(auth=v3.Password(**p)), raise_exc=False)
 
         p.pop("project_name")
-        self._domain_client = Adapter(
-            session.Session(auth=v3.Password(**p)),
-            raise_exc=False)
+        self._domain_client = Adapter(session.Session(auth=v3.Password(**p)), raise_exc=False)
 
     def _get_service_endpoint(self, client, service_type, region):
-        k = "%s.%s" % (service_type, region if region else "")
+        k = f"{service_type}.{region if region else ''}"
 
         if k in self._endpoints:
             return self._endpoints.get(k)
 
         url = None
         try:
-            url = client.get_endpoint(service_type=service_type,
-                                      region_name=region, interface="public")
+            url = client.get_endpoint(service_type=service_type, region_name=region, interface="public")
         except Exception as ex:
-            raise HwcClientException(
-                0, "Getting endpoint failed, error=%s" % ex)
+            raise HwcClientException(0, f"Getting endpoint failed, error={ex}")
 
         if url == "":
-            raise HwcClientException(
-                0, "Cannot find the endpoint for %s" % service_type)
+            raise HwcClientException(0, f"Cannot find the endpoint for {service_type}")
 
         if url[-1] != "/":
             url += "/"
@@ -213,57 +197,61 @@ class Config(object):
 
     def _validate(self):
         if not HAS_THIRD_LIBRARIES:
-            self.module.fail_json(
-                msg=missing_required_lib('keystoneauth1'),
-                exception=THIRD_LIBRARIES_IMP_ERR)
+            self.module.fail_json(msg=missing_required_lib("keystoneauth1"), exception=THIRD_LIBRARIES_IMP_ERR)
 
 
 class HwcModule(AnsibleModule):
     def __init__(self, *args, **kwargs):
-        arg_spec = kwargs.setdefault('argument_spec', {})
+        arg_spec = kwargs.setdefault("argument_spec", {})
 
         arg_spec.update(
             dict(
                 identity_endpoint=dict(
-                    required=True, type='str',
-                    fallback=(env_fallback, ['ANSIBLE_HWC_IDENTITY_ENDPOINT']),
+                    required=True,
+                    type="str",
+                    fallback=(env_fallback, ["ANSIBLE_HWC_IDENTITY_ENDPOINT"]),
                 ),
                 user=dict(
-                    required=True, type='str',
-                    fallback=(env_fallback, ['ANSIBLE_HWC_USER']),
+                    required=True,
+                    type="str",
+                    fallback=(env_fallback, ["ANSIBLE_HWC_USER"]),
                 ),
                 password=dict(
-                    required=True, type='str', no_log=True,
-                    fallback=(env_fallback, ['ANSIBLE_HWC_PASSWORD']),
+                    required=True,
+                    type="str",
+                    no_log=True,
+                    fallback=(env_fallback, ["ANSIBLE_HWC_PASSWORD"]),
                 ),
                 domain=dict(
-                    required=True, type='str',
-                    fallback=(env_fallback, ['ANSIBLE_HWC_DOMAIN']),
+                    required=True,
+                    type="str",
+                    fallback=(env_fallback, ["ANSIBLE_HWC_DOMAIN"]),
                 ),
                 project=dict(
-                    required=True, type='str',
-                    fallback=(env_fallback, ['ANSIBLE_HWC_PROJECT']),
+                    required=True,
+                    type="str",
+                    fallback=(env_fallback, ["ANSIBLE_HWC_PROJECT"]),
                 ),
                 region=dict(
-                    type='str',
-                    fallback=(env_fallback, ['ANSIBLE_HWC_REGION']),
+                    type="str",
+                    fallback=(env_fallback, ["ANSIBLE_HWC_REGION"]),
                 ),
-                id=dict(type='str')
+                id=dict(type="str"),
             )
         )
 
-        super(HwcModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
-class _DictComparison(object):
-    ''' This class takes in two dictionaries `a` and `b`.
-        These are dictionaries of arbitrary depth, but made up of standard
-        Python types only.
-        This differ will compare all values in `a` to those in `b`.
-        If value in `a` is None, always returns True, indicating
-        this value is no need to compare.
-        Note: On all lists, order does matter.
-    '''
+class _DictComparison:
+    """This class takes in two dictionaries `a` and `b`.
+    These are dictionaries of arbitrary depth, but made up of standard
+    Python types only.
+    This differ will compare all values in `a` to those in `b`.
+    If value in `a` is None, always returns True, indicating
+    this value is no need to compare.
+    Note: On all lists, order does matter.
+    """
 
     def __init__(self, request):
         self.request = request
@@ -319,8 +307,7 @@ class _DictComparison(object):
             return self._compare_dicts(value1, value2)
 
         # Always use to_text values to avoid unicode issues.
-        return (to_text(value1, errors='surrogate_or_strict') == to_text(
-            value2, errors='surrogate_or_strict'))
+        return to_text(value1, errors="surrogate_or_strict") == to_text(value2, errors="surrogate_or_strict")
 
 
 def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
@@ -341,8 +328,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
             not_found_times += 1
 
             if not_found_times > 10:
-                raise HwcModuleException(
-                    "not found the object for %d times" % not_found_times)
+                raise HwcModuleException(f"not found the object for {not_found_times} times")
         else:
             not_found_times = 0
 
@@ -350,8 +336,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
                 return obj
 
             if pending and status not in pending:
-                raise HwcModuleException(
-                    "unexpected status(%s) occurred" % status)
+                raise HwcModuleException(f"unexpected status({status}) occurred")
 
         if not is_last_time:
             wait *= 2
@@ -362,7 +347,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
 
             time.sleep(wait)
 
-    raise HwcModuleException("async wait timeout after %d seconds" % timeout)
+    raise HwcModuleException(f"async wait timeout after {timeout} seconds")
 
 
 def navigate_value(data, index, array_index=None):
@@ -375,13 +360,11 @@ def navigate_value(data, index, array_index=None):
             return None
 
         if not isinstance(d, dict):
-            raise HwcModuleException(
-                "can't navigate value from a non-dict object")
+            raise HwcModuleException("can't navigate value from a non-dict object")
 
         i = index[n]
         if i not in d:
-            raise HwcModuleException(
-                "navigate value failed: key(%s) is not exist in dict" % i)
+            raise HwcModuleException(f"navigate value failed: key({i}) is not exist in dict")
         d = d[i]
 
         if not array_index:
@@ -395,13 +378,11 @@ def navigate_value(data, index, array_index=None):
             return None
 
         if not isinstance(d, list):
-            raise HwcModuleException(
-                "can't navigate value from a non-list object")
+            raise HwcModuleException("can't navigate value from a non-list object")
 
         j = array_index.get(k)
         if j >= len(d):
-            raise HwcModuleException(
-                "navigate value failed: the index is out of list")
+            raise HwcModuleException("navigate value failed: the index is out of list")
         d = d[j]
 
     return d
@@ -428,14 +409,14 @@ def build_path(module, path, kv=None):
 
 
 def get_region(module):
-    if module.params['region']:
-        return module.params['region']
+    if module.params["region"]:
+        return module.params["region"]
 
-    return module.params['project'].split("_")[0]
+    return module.params["project"].split("_")[0]
 
 
 def is_empty_value(v):
-    return (not v)
+    return not v
 
 
 def are_different_dicts(dict1, dict2):

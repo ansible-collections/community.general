@@ -2,35 +2,23 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+import unittest
 
 from .oneview_module_loader import FcoeNetworkInfoModule
 from .hpe_test_utils import FactsParamsTestCase
 
-ERROR_MSG = 'Fake message error'
+ERROR_MSG = "Fake message error"
 
-PARAMS_GET_ALL = dict(
-    config='config.json',
-    name=None
-)
+PARAMS_GET_ALL = dict(config="config.json", name=None)
 
-PARAMS_GET_BY_NAME = dict(
-    config='config.json',
-    name="Test FCoE Networks"
-)
+PARAMS_GET_BY_NAME = dict(config="config.json", name="Test FCoE Networks")
 
-PRESENT_NETWORKS = [{
-    "name": "Test FCoE Networks",
-    "uri": "/rest/fcoe-networks/c6bf9af9-48e7-4236-b08a-77684dc258a5"
-}]
+PRESENT_NETWORKS = [{"name": "Test FCoE Networks", "uri": "/rest/fcoe-networks/c6bf9af9-48e7-4236-b08a-77684dc258a5"}]
 
 
-class FcoeNetworkInfoSpec(unittest.TestCase,
-                          FactsParamsTestCase
-                          ):
+class FcoeNetworkInfoSpec(unittest.TestCase, FactsParamsTestCase):
     def setUp(self):
         self.configure_mocks(self, FcoeNetworkInfoModule)
         self.fcoe_networks = self.mock_ov_client.fcoe_networks
@@ -42,10 +30,7 @@ class FcoeNetworkInfoSpec(unittest.TestCase,
 
         FcoeNetworkInfoModule().run()
 
-        self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            fcoe_networks=PRESENT_NETWORKS
-        )
+        self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, fcoe_networks=PRESENT_NETWORKS)
 
     def test_should_get_fcoe_network_by_name(self):
         self.fcoe_networks.get_by.return_value = PRESENT_NETWORKS
@@ -53,11 +38,8 @@ class FcoeNetworkInfoSpec(unittest.TestCase,
 
         FcoeNetworkInfoModule().run()
 
-        self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            fcoe_networks=PRESENT_NETWORKS
-        )
+        self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, fcoe_networks=PRESENT_NETWORKS)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

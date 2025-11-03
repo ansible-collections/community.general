@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Copyright © Thorsten Glaser <tglaser@b1-systems.de>
+# Copyright © Felix Fontein <felix@fontein.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# sets up networks and services
+needs/root
+destructive
+
+azp/posix/2
+azp/posix/vm
+skip/aix
+skip/alpine  # TODO: make this work
+skip/docker
+skip/fedora  # TODO: make this work (not running in CI right now)
+skip/freebsd
+skip/macos
+skip/osx
+skip/rhel    # TODO: make this work
+skip/ubuntu22.04

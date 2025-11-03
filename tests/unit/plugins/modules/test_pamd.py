@@ -2,10 +2,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+import unittest
 
 from ansible_collections.community.general.plugins.modules.pamd import PamdRule
 from ansible_collections.community.general.plugins.modules.pamd import PamdLine
@@ -15,7 +14,6 @@ from ansible_collections.community.general.plugins.modules.pamd import PamdServi
 
 
 class PamdLineTestCase(unittest.TestCase):
-
     def setUp(self):
         self.pamd_line = PamdLine("This is a test")
 
@@ -27,7 +25,6 @@ class PamdLineTestCase(unittest.TestCase):
 
 
 class PamdIncludeTestCase(unittest.TestCase):
-
     def setUp(self):
         self.good_include = PamdInclude("@include foobar")
         self.bad_include = PamdInclude("include foobar")
@@ -44,7 +41,6 @@ class PamdIncludeTestCase(unittest.TestCase):
 
 
 class PamdCommentTestCase(unittest.TestCase):
-
     def setUp(self):
         self.good_comment = PamdComment("# This is a test comment")
         self.bad_comment = PamdComment("This is a bad test comment")
@@ -62,20 +58,20 @@ class PamdCommentTestCase(unittest.TestCase):
 
 class PamdRuleTestCase(unittest.TestCase):
     def setUp(self):
-        self.rule = PamdRule('account', 'optional', 'pam_keyinit.so', 'revoke')
+        self.rule = PamdRule("account", "optional", "pam_keyinit.so", "revoke")
 
     def test_type(self):
-        self.assertEqual(self.rule.rule_type, 'account')
+        self.assertEqual(self.rule.rule_type, "account")
 
     def test_control(self):
-        self.assertEqual(self.rule.rule_control, 'optional')
-        self.assertEqual(self.rule._control, 'optional')
+        self.assertEqual(self.rule.rule_control, "optional")
+        self.assertEqual(self.rule._control, "optional")
 
     def test_path(self):
-        self.assertEqual(self.rule.rule_path, 'pam_keyinit.so')
+        self.assertEqual(self.rule.rule_path, "pam_keyinit.so")
 
     def test_args(self):
-        self.assertEqual(self.rule.rule_args, ['revoke'])
+        self.assertEqual(self.rule.rule_args, ["revoke"])
 
     def test_valid(self):
         self.assertTrue(self.rule.validate()[0])
@@ -83,10 +79,10 @@ class PamdRuleTestCase(unittest.TestCase):
 
 class PamdRuleBadValidationTestCase(unittest.TestCase):
     def setUp(self):
-        self.bad_type = PamdRule('foobar', 'optional', 'pam_keyinit.so', 'revoke')
-        self.bad_control_simple = PamdRule('account', 'foobar', 'pam_keyinit.so', 'revoke')
-        self.bad_control_value = PamdRule('account', '[foobar=1 default=ignore]', 'pam_keyinit.so', 'revoke')
-        self.bad_control_action = PamdRule('account', '[success=1 default=foobar]', 'pam_keyinit.so', 'revoke')
+        self.bad_type = PamdRule("foobar", "optional", "pam_keyinit.so", "revoke")
+        self.bad_control_simple = PamdRule("account", "foobar", "pam_keyinit.so", "revoke")
+        self.bad_control_value = PamdRule("account", "[foobar=1 default=ignore]", "pam_keyinit.so", "revoke")
+        self.bad_control_action = PamdRule("account", "[success=1 default=foobar]", "pam_keyinit.so", "revoke")
 
     def test_validate_bad_type(self):
         self.assertFalse(self.bad_type.validate()[0])
@@ -154,114 +150,142 @@ auth       required pam_deny.so
         self.assertEqual(num_lines, num_lines_processed)
 
     def test_has_rule(self):
-        self.assertTrue(self.pamd.has_rule('account', 'required', 'pam_permit.so'))
-        self.assertTrue(self.pamd.has_rule('account', '[success=1 default=ignore]', 'pam_succeed_if.so'))
+        self.assertTrue(self.pamd.has_rule("account", "required", "pam_permit.so"))
+        self.assertTrue(self.pamd.has_rule("account", "[success=1 default=ignore]", "pam_succeed_if.so"))
 
     def test_doesnt_have_rule(self):
-        self.assertFalse(self.pamd.has_rule('account', 'requisite', 'pam_permit.so'))
+        self.assertFalse(self.pamd.has_rule("account", "requisite", "pam_permit.so"))
 
     # Test Update
     def test_update_rule_type(self):
-        self.assertTrue(self.pamd.update_rule('session', 'optional', 'pam_keyinit.so', new_type='account'))
-        self.assertTrue(self.pamd.has_rule('account', 'optional', 'pam_keyinit.so'))
-        test_rule = PamdRule('account', 'optional', 'pam_keyinit.so', 'revoke')
+        self.assertTrue(self.pamd.update_rule("session", "optional", "pam_keyinit.so", new_type="account"))
+        self.assertTrue(self.pamd.has_rule("account", "optional", "pam_keyinit.so"))
+        test_rule = PamdRule("account", "optional", "pam_keyinit.so", "revoke")
         self.assertIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_that_doesnt_exist(self):
-        self.assertFalse(self.pamd.update_rule('blah', 'blah', 'blah', new_type='account'))
-        self.assertFalse(self.pamd.has_rule('blah', 'blah', 'blah'))
-        test_rule = PamdRule('blah', 'blah', 'blah', 'account')
+        self.assertFalse(self.pamd.update_rule("blah", "blah", "blah", new_type="account"))
+        self.assertFalse(self.pamd.has_rule("blah", "blah", "blah"))
+        test_rule = PamdRule("blah", "blah", "blah", "account")
         self.assertNotIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_type_two(self):
-        self.assertTrue(self.pamd.update_rule('session', '[success=1 default=ignore]', 'pam_succeed_if.so', new_type='account'))
-        self.assertTrue(self.pamd.has_rule('account', '[success=1 default=ignore]', 'pam_succeed_if.so'))
-        test_rule = PamdRule('account', '[success=1 default=ignore]', 'pam_succeed_if.so')
+        self.assertTrue(
+            self.pamd.update_rule("session", "[success=1 default=ignore]", "pam_succeed_if.so", new_type="account")
+        )
+        self.assertTrue(self.pamd.has_rule("account", "[success=1 default=ignore]", "pam_succeed_if.so"))
+        test_rule = PamdRule("account", "[success=1 default=ignore]", "pam_succeed_if.so")
         self.assertIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_control_simple(self):
-        self.assertTrue(self.pamd.update_rule('session', 'optional', 'pam_keyinit.so', new_control='required'))
-        self.assertTrue(self.pamd.has_rule('session', 'required', 'pam_keyinit.so'))
-        test_rule = PamdRule('session', 'required', 'pam_keyinit.so')
+        self.assertTrue(self.pamd.update_rule("session", "optional", "pam_keyinit.so", new_control="required"))
+        self.assertTrue(self.pamd.has_rule("session", "required", "pam_keyinit.so"))
+        test_rule = PamdRule("session", "required", "pam_keyinit.so")
         self.assertIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_control_complex(self):
-        self.assertTrue(self.pamd.update_rule('session',
-                                              '[success=1 default=ignore]',
-                                              'pam_succeed_if.so',
-                                              new_control='[success=2 test=me default=ignore]'))
-        self.assertTrue(self.pamd.has_rule('session', '[success=2 test=me default=ignore]', 'pam_succeed_if.so'))
-        test_rule = PamdRule('session', '[success=2 test=me default=ignore]', 'pam_succeed_if.so')
+        self.assertTrue(
+            self.pamd.update_rule(
+                "session",
+                "[success=1 default=ignore]",
+                "pam_succeed_if.so",
+                new_control="[success=2 test=me default=ignore]",
+            )
+        )
+        self.assertTrue(self.pamd.has_rule("session", "[success=2 test=me default=ignore]", "pam_succeed_if.so"))
+        test_rule = PamdRule("session", "[success=2 test=me default=ignore]", "pam_succeed_if.so")
         self.assertIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_control_more_complex(self):
-
-        self.assertTrue(self.pamd.update_rule('session',
-                                              '[success=1 test=me default=ignore]',
-                                              'pam_succeed_if.so',
-                                              new_control='[success=2 test=me default=ignore]'))
-        self.assertTrue(self.pamd.has_rule('session', '[success=2 test=me default=ignore]', 'pam_succeed_if.so'))
-        test_rule = PamdRule('session', '[success=2 test=me default=ignore]', 'pam_succeed_if.so')
+        self.assertTrue(
+            self.pamd.update_rule(
+                "session",
+                "[success=1 test=me default=ignore]",
+                "pam_succeed_if.so",
+                new_control="[success=2 test=me default=ignore]",
+            )
+        )
+        self.assertTrue(self.pamd.has_rule("session", "[success=2 test=me default=ignore]", "pam_succeed_if.so"))
+        test_rule = PamdRule("session", "[success=2 test=me default=ignore]", "pam_succeed_if.so")
         self.assertIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_module_path(self):
-        self.assertTrue(self.pamd.update_rule('auth', 'required', 'pam_env.so', new_path='pam_limits.so'))
-        self.assertTrue(self.pamd.has_rule('auth', 'required', 'pam_limits.so'))
+        self.assertTrue(self.pamd.update_rule("auth", "required", "pam_env.so", new_path="pam_limits.so"))
+        self.assertTrue(self.pamd.has_rule("auth", "required", "pam_limits.so"))
 
     def test_update_rule_module_path_slash(self):
-        self.assertTrue(self.pamd.update_rule('auth', 'required', 'pam_env.so', new_path='/lib64/security/pam_duo.so'))
-        self.assertTrue(self.pamd.has_rule('auth', 'required', '/lib64/security/pam_duo.so'))
+        self.assertTrue(self.pamd.update_rule("auth", "required", "pam_env.so", new_path="/lib64/security/pam_duo.so"))
+        self.assertTrue(self.pamd.has_rule("auth", "required", "/lib64/security/pam_duo.so"))
 
     def test_update_rule_module_args(self):
-        self.assertTrue(self.pamd.update_rule('auth', 'sufficient', 'pam_unix.so', new_args='uid uid'))
-        test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', 'uid uid')
+        self.assertTrue(self.pamd.update_rule("auth", "sufficient", "pam_unix.so", new_args="uid uid"))
+        test_rule = PamdRule("auth", "sufficient", "pam_unix.so", "uid uid")
         self.assertIn(str(test_rule), str(self.pamd))
 
-        test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', 'nullok try_first_pass')
+        test_rule = PamdRule("auth", "sufficient", "pam_unix.so", "nullok try_first_pass")
         self.assertNotIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_remove_module_args(self):
-        self.assertTrue(self.pamd.update_rule('auth', 'sufficient', 'pam_unix.so', new_args=''))
-        test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', '')
+        self.assertTrue(self.pamd.update_rule("auth", "sufficient", "pam_unix.so", new_args=""))
+        test_rule = PamdRule("auth", "sufficient", "pam_unix.so", "")
         self.assertIn(str(test_rule), str(self.pamd))
 
-        test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', 'nullok try_first_pass')
+        test_rule = PamdRule("auth", "sufficient", "pam_unix.so", "nullok try_first_pass")
         self.assertNotIn(str(test_rule), str(self.pamd))
 
     def test_update_first_three(self):
-        self.assertTrue(self.pamd.update_rule('auth', 'required', 'pam_env.so',
-                                              new_type='one', new_control='two', new_path='three'))
-        self.assertTrue(self.pamd.has_rule('one', 'two', 'three'))
+        self.assertTrue(
+            self.pamd.update_rule("auth", "required", "pam_env.so", new_type="one", new_control="two", new_path="three")
+        )
+        self.assertTrue(self.pamd.has_rule("one", "two", "three"))
 
     def test_update_first_three_with_module_args(self):
-        self.assertTrue(self.pamd.update_rule('auth', 'sufficient', 'pam_unix.so',
-                                              new_type='one', new_control='two', new_path='three'))
-        self.assertTrue(self.pamd.has_rule('one', 'two', 'three'))
-        test_rule = PamdRule('one', 'two', 'three')
+        self.assertTrue(
+            self.pamd.update_rule(
+                "auth", "sufficient", "pam_unix.so", new_type="one", new_control="two", new_path="three"
+            )
+        )
+        self.assertTrue(self.pamd.has_rule("one", "two", "three"))
+        test_rule = PamdRule("one", "two", "three")
         self.assertIn(str(test_rule), str(self.pamd))
         self.assertIn(str(test_rule), str(self.pamd))
 
     def test_update_all_four(self):
-        self.assertTrue(self.pamd.update_rule('auth', 'sufficient', 'pam_unix.so',
-                                              new_type='one', new_control='two', new_path='three',
-                                              new_args='four five'))
-        test_rule = PamdRule('one', 'two', 'three', 'four five')
+        self.assertTrue(
+            self.pamd.update_rule(
+                "auth",
+                "sufficient",
+                "pam_unix.so",
+                new_type="one",
+                new_control="two",
+                new_path="three",
+                new_args="four five",
+            )
+        )
+        test_rule = PamdRule("one", "two", "three", "four five")
         self.assertIn(str(test_rule), str(self.pamd))
 
-        test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', 'nullok try_first_pass')
+        test_rule = PamdRule("auth", "sufficient", "pam_unix.so", "nullok try_first_pass")
         self.assertNotIn(str(test_rule), str(self.pamd))
 
     def test_update_rule_with_slash(self):
-        self.assertTrue(self.pamd.update_rule('account', '[success=1 default=ignore]', 'pam_succeed_if.so',
-                                              new_type='session', new_path='pam_access.so'))
-        test_rule = PamdRule('session', '[success=1 default=ignore]', 'pam_access.so')
+        self.assertTrue(
+            self.pamd.update_rule(
+                "account",
+                "[success=1 default=ignore]",
+                "pam_succeed_if.so",
+                new_type="session",
+                new_path="pam_access.so",
+            )
+        )
+        test_rule = PamdRule("session", "[success=1 default=ignore]", "pam_access.so")
         self.assertIn(str(test_rule), str(self.pamd))
 
     # Insert Before
     def test_insert_before_rule(self):
-
-        count = self.pamd.insert_before('account', 'required', 'pam_access.so',
-                                        new_type='account', new_control='required', new_path='pam_limits.so')
+        count = self.pamd.insert_before(
+            "account", "required", "pam_access.so", new_type="account", new_control="required", new_path="pam_limits.so"
+        )
         self.assertEqual(count, 1)
 
         rules = self.pamd.get("account", "required", "pam_access.so")
@@ -269,26 +293,48 @@ auth       required pam_deny.so
             self.assertTrue(current_rule.prev.matches("account", "required", "pam_limits.so"))
 
     def test_insert_before_rule_where_rule_doesnt_exist(self):
-
-        count = self.pamd.insert_before('account', 'sufficient', 'pam_access.so',
-                                        new_type='account', new_control='required', new_path='pam_limits.so')
+        count = self.pamd.insert_before(
+            "account",
+            "sufficient",
+            "pam_access.so",
+            new_type="account",
+            new_control="required",
+            new_path="pam_limits.so",
+        )
         self.assertFalse(count)
 
     def test_insert_before_rule_with_args(self):
-        self.assertTrue(self.pamd.insert_before('account', 'required', 'pam_access.so',
-                                                new_type='account', new_control='required', new_path='pam_limits.so',
-                                                new_args='uid'))
+        self.assertTrue(
+            self.pamd.insert_before(
+                "account",
+                "required",
+                "pam_access.so",
+                new_type="account",
+                new_control="required",
+                new_path="pam_limits.so",
+                new_args="uid",
+            )
+        )
 
         rules = self.pamd.get("account", "required", "pam_access.so")
         for current_rule in rules:
-            self.assertTrue(current_rule.prev.matches("account", "required", "pam_limits.so", 'uid'))
+            self.assertTrue(current_rule.prev.matches("account", "required", "pam_limits.so", "uid"))
 
     def test_insert_before_rule_test_duplicates(self):
-        self.assertTrue(self.pamd.insert_before('account', 'required', 'pam_access.so',
-                                                new_type='account', new_control='required', new_path='pam_limits.so'))
+        self.assertTrue(
+            self.pamd.insert_before(
+                "account",
+                "required",
+                "pam_access.so",
+                new_type="account",
+                new_control="required",
+                new_path="pam_limits.so",
+            )
+        )
 
-        self.pamd.insert_before('account', 'required', 'pam_access.so',
-                                new_type='account', new_control='required', new_path='pam_limits.so')
+        self.pamd.insert_before(
+            "account", "required", "pam_access.so", new_type="account", new_control="required", new_path="pam_limits.so"
+        )
 
         rules = self.pamd.get("account", "required", "pam_access.so")
         for current_rule in rules:
@@ -297,37 +343,75 @@ auth       required pam_deny.so
             self.assertFalse(previous_rule.prev.matches("account", "required", "pam_limits.so"))
 
     def test_insert_before_first_rule(self):
-        self.assertTrue(self.pamd.insert_before('auth', 'required', 'pam_env.so',
-                                                new_type='account', new_control='required', new_path='pam_limits.so'))
+        self.assertTrue(
+            self.pamd.insert_before(
+                "auth", "required", "pam_env.so", new_type="account", new_control="required", new_path="pam_limits.so"
+            )
+        )
 
     def test_insert_before_first_rule_simple(self):
         simple_service = PamdService(self.simple_system_auth_string)
-        self.assertTrue(simple_service.insert_before('auth', 'required', 'pam_env.so',
-                        new_type='account', new_control='required', new_path='pam_limits.so'))
+        self.assertTrue(
+            simple_service.insert_before(
+                "auth", "required", "pam_env.so", new_type="account", new_control="required", new_path="pam_limits.so"
+            )
+        )
 
     # Insert After
     def test_insert_after_rule(self):
-        self.assertTrue(self.pamd.insert_after('account', 'required', 'pam_unix.so',
-                                               new_type='account', new_control='required', new_path='pam_permit.so'))
+        self.assertTrue(
+            self.pamd.insert_after(
+                "account",
+                "required",
+                "pam_unix.so",
+                new_type="account",
+                new_control="required",
+                new_path="pam_permit.so",
+            )
+        )
         rules = self.pamd.get("account", "required", "pam_unix.so")
         for current_rule in rules:
             self.assertTrue(current_rule.next.matches("account", "required", "pam_permit.so"))
 
     def test_insert_after_rule_with_args(self):
-        self.assertTrue(self.pamd.insert_after('account', 'required', 'pam_access.so',
-                                               new_type='account', new_control='required', new_path='pam_permit.so',
-                                               new_args='uid'))
+        self.assertTrue(
+            self.pamd.insert_after(
+                "account",
+                "required",
+                "pam_access.so",
+                new_type="account",
+                new_control="required",
+                new_path="pam_permit.so",
+                new_args="uid",
+            )
+        )
         rules = self.pamd.get("account", "required", "pam_access.so")
         for current_rule in rules:
             self.assertTrue(current_rule.next.matches("account", "required", "pam_permit.so", "uid"))
 
     def test_insert_after_test_duplicates(self):
-        self.assertTrue(self.pamd.insert_after('account', 'required', 'pam_access.so',
-                                               new_type='account', new_control='required', new_path='pam_permit.so',
-                                               new_args='uid'))
-        self.assertFalse(self.pamd.insert_after('account', 'required', 'pam_access.so',
-                                                new_type='account', new_control='required', new_path='pam_permit.so',
-                                                new_args='uid'))
+        self.assertTrue(
+            self.pamd.insert_after(
+                "account",
+                "required",
+                "pam_access.so",
+                new_type="account",
+                new_control="required",
+                new_path="pam_permit.so",
+                new_args="uid",
+            )
+        )
+        self.assertFalse(
+            self.pamd.insert_after(
+                "account",
+                "required",
+                "pam_access.so",
+                new_type="account",
+                new_control="required",
+                new_path="pam_permit.so",
+                new_args="uid",
+            )
+        )
 
         rules = self.pamd.get("account", "required", "pam_access.so")
         for current_rule in rules:
@@ -335,52 +419,70 @@ auth       required pam_deny.so
             self.assertFalse(current_rule.next.next.matches("account", "required", "pam_permit.so", "uid"))
 
     def test_insert_after_rule_last_rule(self):
-        self.assertTrue(self.pamd.insert_after('session', 'required', 'pam_unix.so',
-                                               new_type='account', new_control='required', new_path='pam_permit.so',
-                                               new_args='uid'))
+        self.assertTrue(
+            self.pamd.insert_after(
+                "session",
+                "required",
+                "pam_unix.so",
+                new_type="account",
+                new_control="required",
+                new_path="pam_permit.so",
+                new_args="uid",
+            )
+        )
         rules = self.pamd.get("session", "required", "pam_unix.so")
         for current_rule in rules:
             self.assertTrue(current_rule.next.matches("account", "required", "pam_permit.so", "uid"))
 
     # Remove Module Arguments
     def test_remove_module_arguments_one(self):
-        self.assertTrue(self.pamd.remove_module_arguments('auth', 'sufficient', 'pam_unix.so', 'nullok'))
+        self.assertTrue(self.pamd.remove_module_arguments("auth", "sufficient", "pam_unix.so", "nullok"))
 
     def test_remove_module_arguments_one_list(self):
-        self.assertTrue(self.pamd.remove_module_arguments('auth', 'sufficient', 'pam_unix.so', ['nullok']))
+        self.assertTrue(self.pamd.remove_module_arguments("auth", "sufficient", "pam_unix.so", ["nullok"]))
 
     def test_remove_module_arguments_two(self):
-        self.assertTrue(self.pamd.remove_module_arguments('session', '[success=1 default=ignore]', 'pam_succeed_if.so', 'service crond'))
+        self.assertTrue(
+            self.pamd.remove_module_arguments(
+                "session", "[success=1 default=ignore]", "pam_succeed_if.so", "service crond"
+            )
+        )
 
     def test_remove_module_arguments_two_list(self):
-        self.assertTrue(self.pamd.remove_module_arguments('session', '[success=1 default=ignore]', 'pam_succeed_if.so', ['service', 'crond']))
+        self.assertTrue(
+            self.pamd.remove_module_arguments(
+                "session", "[success=1 default=ignore]", "pam_succeed_if.so", ["service", "crond"]
+            )
+        )
 
     def test_remove_module_arguments_where_none_existed(self):
-        self.assertTrue(self.pamd.add_module_arguments('session', 'required', 'pam_limits.so', 'arg1 arg2= arg3=arg3'))
+        self.assertTrue(self.pamd.add_module_arguments("session", "required", "pam_limits.so", "arg1 arg2= arg3=arg3"))
 
     def test_add_module_arguments_where_none_existed(self):
-        self.assertTrue(self.pamd.add_module_arguments('account', 'required', 'pam_unix.so', 'arg1 arg2= arg3=arg3'))
+        self.assertTrue(self.pamd.add_module_arguments("account", "required", "pam_unix.so", "arg1 arg2= arg3=arg3"))
 
     def test_add_module_arguments_where_none_existed_list(self):
-        self.assertTrue(self.pamd.add_module_arguments('account', 'required', 'pam_unix.so', ['arg1', 'arg2=', 'arg3=arg3']))
+        self.assertTrue(
+            self.pamd.add_module_arguments("account", "required", "pam_unix.so", ["arg1", "arg2=", "arg3=arg3"])
+        )
 
     def test_add_module_arguments_where_some_existed(self):
-        self.assertTrue(self.pamd.add_module_arguments('auth', 'sufficient', 'pam_unix.so', 'arg1 arg2= arg3=arg3'))
+        self.assertTrue(self.pamd.add_module_arguments("auth", "sufficient", "pam_unix.so", "arg1 arg2= arg3=arg3"))
 
     def test_remove_rule(self):
-        self.assertTrue(self.pamd.remove('account', 'required', 'pam_unix.so'))
+        self.assertTrue(self.pamd.remove("account", "required", "pam_unix.so"))
         # Second run should not change anything
-        self.assertFalse(self.pamd.remove('account', 'required', 'pam_unix.so'))
-        test_rule = PamdRule('account', 'required', 'pam_unix.so')
+        self.assertFalse(self.pamd.remove("account", "required", "pam_unix.so"))
+        test_rule = PamdRule("account", "required", "pam_unix.so")
         self.assertNotIn(str(test_rule), str(self.pamd))
 
     def test_remove_first_rule(self):
         no_header_service = PamdService(self.no_header_system_auth_string)
-        self.assertTrue(no_header_service.remove('auth', 'required', 'pam_env.so'))
-        test_rule = PamdRule('auth', 'required', 'pam_env.so')
+        self.assertTrue(no_header_service.remove("auth", "required", "pam_env.so"))
+        test_rule = PamdRule("auth", "required", "pam_env.so")
         self.assertNotIn(str(test_rule), str(no_header_service))
 
     def test_remove_last_rule(self):
-        self.assertTrue(self.pamd.remove('session', 'required', 'pam_unix.so'))
-        test_rule = PamdRule('session', 'required', 'pam_unix.so')
+        self.assertTrue(self.pamd.remove("session", "required", "pam_unix.so"))
+        test_rule = PamdRule("session", "required", "pam_unix.so")
         self.assertNotIn(str(test_rule), str(self.pamd))

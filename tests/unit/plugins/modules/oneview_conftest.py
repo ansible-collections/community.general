@@ -2,26 +2,25 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import pytest
 
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
 from hpOneView.oneview_client import OneViewClient
 
 
 @pytest.fixture
 def mock_ov_client():
-    patcher_json_file = patch.object(OneViewClient, 'from_json_file')
+    patcher_json_file = patch.object(OneViewClient, "from_json_file")
     client = patcher_json_file.start()
     return client.return_value
 
 
 @pytest.fixture
 def mock_ansible_module():
-    patcher_ansible = patch(ONEVIEW_MODULE_UTILS_PATH + '.AnsibleModule')
+    patcher_ansible = patch(f"{ONEVIEW_MODULE_UTILS_PATH}.AnsibleModule")
     patcher_ansible = patcher_ansible.start()
     ansible_module = Mock()
     patcher_ansible.return_value = ansible_module

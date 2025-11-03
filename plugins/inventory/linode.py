@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -135,27 +134,24 @@ try:
     from linode_api4 import LinodeClient
     from linode_api4.objects.linode import Instance
     from linode_api4.errors import ApiError as LinodeApiError
+
     HAS_LINODE = True
 except ImportError:
     HAS_LINODE = False
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-
-    NAME = 'community.general.linode'
+    NAME = "community.general.linode"
 
     def _build_client(self, loader):
         """Build the Linode client."""
 
-        access_token = self.get_option('access_token')
+        access_token = self.get_option("access_token")
         if self.templar.is_template(access_token):
             access_token = self.templar.template(variable=access_token)
 
         if access_token is None:
-            raise AnsibleError((
-                'Could not retrieve Linode access token '
-                'from plugin configuration sources'
-            ))
+            raise AnsibleError(("Could not retrieve Linode access token from plugin configuration sources"))
 
         self.client = LinodeClient(access_token)
 
@@ -164,43 +160,28 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         try:
             self.instances = self.client.linode.instances()
         except LinodeApiError as exception:
-            raise AnsibleError(f'Linode client raised: {exception}')
+            raise AnsibleError(f"Linode client raised: {exception}")
 
     def _add_groups(self):
         """Add Linode instance groups to the dynamic inventory."""
-        self.linode_groups = set(
-            filter(None, [
-                instance.group
-                for instance
-                in self.instances
-            ])
-        )
+        self.linode_groups = {instance.group for instance in self.instances if instance.group}
 
         for linode_group in self.linode_groups:
             self.inventory.add_group(linode_group)
 
     def _filter_by_config(self):
         """Filter instances by user specified configuration."""
-        regions = self.get_option('regions')
+        regions = self.get_option("regions")
         if regions:
-            self.instances = [
-                instance for instance in self.instances
-                if instance.region.id in regions
-            ]
+            self.instances = [instance for instance in self.instances if instance.region.id in regions]
 
-        types = self.get_option('types')
+        types = self.get_option("types")
         if types:
-            self.instances = [
-                instance for instance in self.instances
-                if instance.type.id in types
-            ]
+            self.instances = [instance for instance in self.instances if instance.type.id in types]
 
-        tags = self.get_option('tags')
+        tags = self.get_option("tags")
         if tags:
-            self.instances = [
-                instance for instance in self.instances
-                if any(tag in instance.tags for tag in tags)
-            ]
+            self.instances = [instance for instance in self.instances if any(tag in instance.tags for tag in tags)]
 
     def _add_instances_to_groups(self):
         """Add instance names to their dynamic inventory groups."""
@@ -209,28 +190,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_hostvars_for_instances(self):
         """Add hostvars for instances in the dynamic inventory."""
-        ip_style = self.get_option('ip_style')
+        ip_style = self.get_option("ip_style")
         for instance in self.instances:
             hostvars = instance._raw_json
             hostname = make_unsafe(instance.label)
             for hostvar_key in hostvars:
-                if ip_style == 'api' and hostvar_key in ['ipv4', 'ipv6']:
+                if ip_style == "api" and hostvar_key in ["ipv4", "ipv6"]:
                     continue
-                self.inventory.set_variable(
-                    hostname,
-                    hostvar_key,
-                    make_unsafe(hostvars[hostvar_key])
-                )
-            if ip_style == 'api':
+                self.inventory.set_variable(hostname, hostvar_key, make_unsafe(hostvars[hostvar_key]))
+            if ip_style == "api":
                 ips = instance.ips.ipv4.public + instance.ips.ipv4.private
                 ips += [instance.ips.ipv6.slaac, instance.ips.ipv6.link_local]
                 ips += instance.ips.ipv6.pools
 
                 for ip_type in set(ip.type for ip in ips):
                     self.inventory.set_variable(
-                        hostname,
-                        ip_type,
-                        make_unsafe(self._ip_data([ip for ip in ips if ip.type == ip_type]))
+                        hostname, ip_type, make_unsafe(self._ip_data([ip for ip in ips if ip.type == ip_type]))
                     )
 
     def _ip_data(self, ip_list):
@@ -238,13 +213,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for ip in list(ip_list):
             data.append(
                 {
-                    'address': ip.address,
-                    'subnet_mask': ip.subnet_mask,
-                    'gateway': ip.gateway,
-                    'public': ip.public,
-                    'prefix': ip.prefix,
-                    'rdns': ip.rdns,
-                    'type': ip.type
+                    "address": ip.address,
+                    "subnet_mask": ip.subnet_mask,
+                    "gateway": ip.gateway,
+                    "public": ip.public,
+                    "prefix": ip.prefix,
+                    "rdns": ip.rdns,
+                    "type": ip.type,
                 }
             )
         return data
@@ -253,7 +228,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return [i._raw_json for i in self.instances]
 
     def populate(self):
-        strict = self.get_option('strict')
+        strict = self.get_option("strict")
 
         self._filter_by_config()
 
@@ -263,21 +238,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for instance in self.instances:
             hostname = make_unsafe(instance.label)
             variables = self.inventory.get_host(hostname).get_vars()
-            self._add_host_to_composed_groups(
-                self.get_option('groups'),
-                variables,
-                hostname,
-                strict=strict)
-            self._add_host_to_keyed_groups(
-                self.get_option('keyed_groups'),
-                variables,
-                hostname,
-                strict=strict)
-            self._set_composite_vars(
-                self.get_option('compose'),
-                variables,
-                hostname,
-                strict=strict)
+            self._add_host_to_composed_groups(self.get_option("groups"), variables, hostname, strict=strict)
+            self._add_host_to_keyed_groups(self.get_option("keyed_groups"), variables, hostname, strict=strict)
+            self._set_composite_vars(self.get_option("compose"), variables, hostname, strict=strict)
 
     def verify_file(self, path):
         """Verify the Linode configuration file.
@@ -293,7 +256,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         Returns:
             bool(valid): is valid config file"""
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(("linode.yaml", "linode.yml")):
                 valid = True
             else:
@@ -302,18 +265,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def parse(self, inventory, loader, path, cache=True):
         """Dynamically parse Linode the cloud inventory."""
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
         self.instances = None
 
         if not HAS_LINODE:
-            raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
+            raise AnsibleError("the Linode dynamic inventory plugin requires linode_api4.")
 
         self._read_config_data(path)
 
         cache_key = self.get_cache_key(path)
 
         if cache:
-            cache = self.get_option('cache')
+            cache = self.get_option("cache")
 
         update_cache = False
         if cache:

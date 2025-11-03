@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -59,30 +57,26 @@ EXAMPLES = r"""
 """
 
 import json
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
 
 
 API_BASE = "https://api.uptimerobot.com/"
 
-API_ACTIONS = dict(
-    status='getMonitors?',
-    editMonitor='editMonitor?'
-)
+API_ACTIONS = dict(status="getMonitors?", editMonitor="editMonitor?")
 
-API_FORMAT = 'json'
+API_FORMAT = "json"
 API_NOJSONCALLBACK = 1
 CHANGED_STATE = False
 SUPPORTS_CHECK_MODE = False
 
 
 def checkID(module, params):
-
     data = urlencode(params)
-    full_uri = API_BASE + API_ACTIONS['status'] + data
+    full_uri = API_BASE + API_ACTIONS["status"] + data
     req, info = fetch_url(module, full_uri)
     result = to_text(req.read())
     jsonresult = json.loads(result)
@@ -91,66 +85,57 @@ def checkID(module, params):
 
 
 def startMonitor(module, params):
-
-    params['monitorStatus'] = 1
+    params["monitorStatus"] = 1
     data = urlencode(params)
-    full_uri = API_BASE + API_ACTIONS['editMonitor'] + data
+    full_uri = API_BASE + API_ACTIONS["editMonitor"] + data
     req, info = fetch_url(module, full_uri)
     result = to_text(req.read())
     jsonresult = json.loads(result)
     req.close()
-    return jsonresult['stat']
+    return jsonresult["stat"]
 
 
 def pauseMonitor(module, params):
-
-    params['monitorStatus'] = 0
+    params["monitorStatus"] = 0
     data = urlencode(params)
-    full_uri = API_BASE + API_ACTIONS['editMonitor'] + data
+    full_uri = API_BASE + API_ACTIONS["editMonitor"] + data
     req, info = fetch_url(module, full_uri)
     result = to_text(req.read())
     jsonresult = json.loads(result)
     req.close()
-    return jsonresult['stat']
+    return jsonresult["stat"]
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(required=True, choices=['started', 'paused']),
+            state=dict(required=True, choices=["started", "paused"]),
             apikey=dict(required=True, no_log=True),
-            monitorid=dict(required=True)
+            monitorid=dict(required=True),
         ),
-        supports_check_mode=SUPPORTS_CHECK_MODE
+        supports_check_mode=SUPPORTS_CHECK_MODE,
     )
 
     params = dict(
-        apiKey=module.params['apikey'],
-        monitors=module.params['monitorid'],
-        monitorID=module.params['monitorid'],
+        apiKey=module.params["apikey"],
+        monitors=module.params["monitorid"],
+        monitorID=module.params["monitorid"],
         format=API_FORMAT,
-        noJsonCallback=API_NOJSONCALLBACK
+        noJsonCallback=API_NOJSONCALLBACK,
     )
 
     check_result = checkID(module, params)
 
-    if check_result['stat'] != "ok":
-        module.fail_json(
-            msg="failed",
-            result=check_result['message']
-        )
+    if check_result["stat"] != "ok":
+        module.fail_json(msg="failed", result=check_result["message"])
 
-    if module.params['state'] == 'started':
+    if module.params["state"] == "started":
         monitor_result = startMonitor(module, params)
     else:
         monitor_result = pauseMonitor(module, params)
 
-    module.exit_json(
-        msg="success",
-        result=monitor_result
-    )
+    module.exit_json(msg="success", result=monitor_result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

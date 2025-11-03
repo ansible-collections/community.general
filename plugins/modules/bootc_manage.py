@@ -5,8 +5,7 @@
 # or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: bootc_manage
@@ -56,38 +55,40 @@ from ansible.module_utils.common.locale import get_best_parsable_locale
 
 def main():
     argument_spec = dict(
-        state=dict(type='str', required=True, choices=['switch', 'latest']),
-        image=dict(type='str'),
+        state=dict(type="str", required=True, choices=["switch", "latest"]),
+        image=dict(type="str"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ('state', 'switch', ['image']),
+            ("state", "switch", ["image"]),
         ],
     )
 
-    state = module.params['state']
-    image = module.params['image']
+    state = module.params["state"]
+    image = module.params["image"]
 
-    if state == 'switch':
-        command = ['bootc', 'switch', image, '--retain']
-    elif state == 'latest':
-        command = ['bootc', 'upgrade']
+    if state == "switch":
+        command = ["bootc", "switch", image, "--retain"]
+    elif state == "latest":
+        command = ["bootc", "upgrade"]
 
     locale = get_best_parsable_locale(module)
-    module.run_command_environ_update = dict(LANG=locale, LC_ALL=locale, LC_MESSAGES=locale, LC_CTYPE=locale, LANGUAGE=locale)
+    module.run_command_environ_update = dict(
+        LANG=locale, LC_ALL=locale, LC_MESSAGES=locale, LC_CTYPE=locale, LANGUAGE=locale
+    )
     rc, stdout, err = module.run_command(command, check_rc=True)
 
-    if 'Queued for next boot: ' in stdout:
-        result = {'changed': True, 'stdout': stdout}
+    if "Queued for next boot: " in stdout:
+        result = {"changed": True, "stdout": stdout}
         module.exit_json(**result)
-    elif 'No changes in ' in stdout or 'Image specification is unchanged.' in stdout:
-        result = {'changed': False, 'stdout': stdout}
+    elif "No changes in " in stdout or "Image specification is unchanged." in stdout:
+        result = {"changed": False, "stdout": stdout}
         module.exit_json(**result)
     else:
-        result = {'changed': False, 'stderr': err}
-        module.fail_json(msg='ERROR: Command execution failed.', **result)
+        result = {"changed": False, "stderr": err}
+        module.fail_json(msg="ERROR: Command execution failed.", **result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

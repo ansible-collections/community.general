@@ -2,19 +2,18 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 from io import BytesIO
 import json
 from collections import OrderedDict
-
-from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
-from ansible.module_utils.six.moves.collections_abc import Mapping
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+from collections.abc import Mapping
+from unittest.mock import (
     MagicMock,
     patch,
 )
+
+from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
 from ansible.module_utils.urls import basic_auth_header
 
 
@@ -22,8 +21,9 @@ def pass_function(*args, **kwargs):
     pass
 
 
-GITHUB_DATA = {"url": u'https://api.github.com/repos/ansible/ansible',
-               "response": b"""
+GITHUB_DATA = {
+    "url": "https://api.github.com/repos/ansible/ansible",
+    "response": b"""
 {
   "id": 3638964,
   "name": "ansible",
@@ -134,30 +134,25 @@ GITHUB_DATA = {"url": u'https://api.github.com/repos/ansible/ansible',
   "network_count": 8893,
   "subscribers_count": 1733
 }
-"""
-               }
+""",
+}
 
 
 def test__get_json_data(mocker):
     "test the json conversion of _get_url_data"
 
     timeout = 30
-    params = {
-        'url': GITHUB_DATA['url'],
-        'timeout': timeout
-    }
+    params = {"url": GITHUB_DATA["url"], "timeout": timeout}
     module = mocker.Mock()
     module.params = params
 
     JenkinsPlugin._csrf_enabled = pass_function
     JenkinsPlugin._get_installed_plugins = pass_function
     JenkinsPlugin._get_url_data = mocker.Mock()
-    JenkinsPlugin._get_url_data.return_value = BytesIO(GITHUB_DATA['response'])
+    JenkinsPlugin._get_url_data.return_value = BytesIO(GITHUB_DATA["response"])
     jenkins_plugin = JenkinsPlugin(module)
 
-    json_data = jenkins_plugin._get_json_data(
-        "{url}".format(url=GITHUB_DATA['url']),
-        'CSRF')
+    json_data = jenkins_plugin._get_json_data(f"{GITHUB_DATA['url']}", "CSRF")
 
     assert isinstance(json_data, Mapping)
 
@@ -192,7 +187,7 @@ def test__new_fallback_urls(mocker):
 
 
 def isInList(l, i):
-    print("checking if %s in %s" % (i, l))
+    print(f"checking if {i} in {l}")
     for item in l:
         if item == i:
             return True
@@ -222,12 +217,14 @@ def test__get_latest_compatible_plugin_version(fetch_mock, mocker):
 
     plugin_data = {
         "plugins": {
-            "git": OrderedDict([
-                ("4.8.2", {"requiredCore": "2.263.1"}),
-                ("4.8.3", {"requiredCore": "2.263.1"}),
-                ("4.9.0", {"requiredCore": "2.289.1"}),
-                ("4.9.1", {"requiredCore": "2.289.1"}),
-            ])
+            "git": OrderedDict(
+                [
+                    ("4.8.2", {"requiredCore": "2.263.1"}),
+                    ("4.8.3", {"requiredCore": "2.263.1"}),
+                    ("4.9.0", {"requiredCore": "2.289.1"}),
+                    ("4.9.1", {"requiredCore": "2.289.1"}),
+                ]
+            )
         }
     }
     plugin_versions_response = MagicMock()
@@ -247,7 +244,7 @@ def test__get_latest_compatible_plugin_version(fetch_mock, mocker):
 
     jenkins_plugin = JenkinsPlugin(module)
     latest_version = jenkins_plugin._get_latest_compatible_plugin_version()
-    assert latest_version == '4.8.3'
+    assert latest_version == "4.8.3"
 
 
 @patch("ansible_collections.community.general.plugins.modules.jenkins_plugin.fetch_url")

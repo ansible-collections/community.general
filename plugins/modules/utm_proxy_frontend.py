@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018, Johannes Brunswicker <johannes.brunswicker@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: utm_proxy_frontend
@@ -244,33 +242,49 @@ from ansible.module_utils.common.text.converters import to_native
 
 def main():
     endpoint = "reverse_proxy/frontend"
-    key_to_check_for_changes = ["add_content_type_header", "address", "allowed_networks", "certificate",
-                                "comment", "disable_compression", "domain", "exceptions", "htmlrewrite",
-                                "htmlrewrite_cookies", "implicitredirect", "lbmethod", "locations",
-                                "port", "preservehost", "profile", "status", "type", "xheaders"]
+    key_to_check_for_changes = [
+        "add_content_type_header",
+        "address",
+        "allowed_networks",
+        "certificate",
+        "comment",
+        "disable_compression",
+        "domain",
+        "exceptions",
+        "htmlrewrite",
+        "htmlrewrite_cookies",
+        "implicitredirect",
+        "lbmethod",
+        "locations",
+        "port",
+        "preservehost",
+        "profile",
+        "status",
+        "type",
+        "xheaders",
+    ]
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            add_content_type_header=dict(type='bool', default=False),
-            address=dict(type='str', default="REF_DefaultInternalAddress"),
-            allowed_networks=dict(type='list', elements='str', default=["REF_NetworkAny"]),
-            certificate=dict(type='str', default=""),
-            comment=dict(type='str', default=""),
-            disable_compression=dict(type='bool', default=False),
-            domain=dict(type='list', elements='str'),
-            exceptions=dict(type='list', elements='str', default=[]),
-            htmlrewrite=dict(type='bool', default=False),
-            htmlrewrite_cookies=dict(type='bool', default=False),
-            implicitredirect=dict(type='bool', default=False),
-            lbmethod=dict(type='str', default="bybusyness",
-                          choices=['bybusyness', 'bytraffic', 'byrequests', '']),
-            locations=dict(type='list', elements='str', default=[]),
-            port=dict(type='int', default=80),
-            preservehost=dict(type='bool', default=False),
-            profile=dict(type='str', default=""),
-            status=dict(type='bool', default=True),
-            type=dict(type='str', default="http", choices=['http', 'https']),
-            xheaders=dict(type='bool', default=False),
+            name=dict(type="str", required=True),
+            add_content_type_header=dict(type="bool", default=False),
+            address=dict(type="str", default="REF_DefaultInternalAddress"),
+            allowed_networks=dict(type="list", elements="str", default=["REF_NetworkAny"]),
+            certificate=dict(type="str", default=""),
+            comment=dict(type="str", default=""),
+            disable_compression=dict(type="bool", default=False),
+            domain=dict(type="list", elements="str"),
+            exceptions=dict(type="list", elements="str", default=[]),
+            htmlrewrite=dict(type="bool", default=False),
+            htmlrewrite_cookies=dict(type="bool", default=False),
+            implicitredirect=dict(type="bool", default=False),
+            lbmethod=dict(type="str", default="bybusyness", choices=["bybusyness", "bytraffic", "byrequests", ""]),
+            locations=dict(type="list", elements="str", default=[]),
+            port=dict(type="int", default=80),
+            preservehost=dict(type="bool", default=False),
+            profile=dict(type="str", default=""),
+            status=dict(type="bool", default=True),
+            type=dict(type="str", default="http", choices=["http", "https"]),
+            xheaders=dict(type="bool", default=False),
         )
     )
     try:
@@ -279,5 +293,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

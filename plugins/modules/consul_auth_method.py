@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2024, Florian Apolloner (@apollo13)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: consul_auth_method
@@ -155,12 +153,12 @@ def normalize_ttl(ttl):
     new_ttl = ""
     hours, remainder = divmod(ttl, 3600)
     if hours:
-        new_ttl += "{0}h".format(hours)
+        new_ttl += f"{hours}h"
     minutes, seconds = divmod(remainder, 60)
     if minutes:
-        new_ttl += "{0}m".format(minutes)
+        new_ttl += f"{minutes}m"
     if seconds:
-        new_ttl += "{0}s".format(seconds)
+        new_ttl += f"{seconds}s"
     return new_ttl
 
 
@@ -172,12 +170,12 @@ class ConsulAuthMethodModule(_ConsulModule):
     def map_param(self, k, v, is_update):
         if k == "config" and v:
             v = {camel_case_key(k2): v2 for k2, v2 in v.items()}
-        return super(ConsulAuthMethodModule, self).map_param(k, v, is_update)
+        return super().map_param(k, v, is_update)
 
     def needs_update(self, api_obj, module_obj):
         if "MaxTokenTTL" in module_obj:
             module_obj["MaxTokenTTL"] = normalize_ttl(module_obj["MaxTokenTTL"])
-        return super(ConsulAuthMethodModule, self).needs_update(api_obj, module_obj)
+        return super().needs_update(api_obj, module_obj)
 
 
 _ARGUMENT_SPEC = {

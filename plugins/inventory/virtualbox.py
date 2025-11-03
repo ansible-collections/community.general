@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -86,68 +85,70 @@ from ansible_collections.community.general.plugins.plugin_utils.unsafe import ma
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-    ''' Host inventory parser for ansible using local virtualbox. '''
+    """Host inventory parser for ansible using local virtualbox."""
 
-    NAME = 'community.general.virtualbox'
+    NAME = "community.general.virtualbox"
     VBOX = "VBoxManage"
 
     def __init__(self):
         self._vbox_path = None
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
     def _query_vbox_data(self, host, property_path):
         ret = None
         try:
-            cmd = [self._vbox_path, b'guestproperty', b'get',
-                   to_bytes(host, errors='surrogate_or_strict'),
-                   to_bytes(property_path, errors='surrogate_or_strict')]
+            cmd = [
+                self._vbox_path,
+                b"guestproperty",
+                b"get",
+                to_bytes(host, errors="surrogate_or_strict"),
+                to_bytes(property_path, errors="surrogate_or_strict"),
+            ]
             x = Popen(cmd, stdout=PIPE)
-            ipinfo = to_text(x.stdout.read(), errors='surrogate_or_strict')
-            if 'Value' in ipinfo:
-                a, ip = ipinfo.split(':', 1)
+            ipinfo = to_text(x.stdout.read(), errors="surrogate_or_strict")
+            if "Value" in ipinfo:
+                a, ip = ipinfo.split(":", 1)
                 ret = ip.strip()
         except Exception:
             pass
         return ret
 
     def _set_variables(self, hostvars):
-
         # set vars in inventory from hostvars
         for host in hostvars:
-
-            query = self.get_option('query')
+            query = self.get_option("query")
             # create vars from vbox properties
             if query and isinstance(query, MutableMapping):
                 for varname in query:
                     hostvars[host][varname] = self._query_vbox_data(host, query[varname])
 
-            strict = self.get_option('strict')
+            strict = self.get_option("strict")
 
             # create composite vars
-            self._set_composite_vars(self.get_option('compose'), hostvars[host], host, strict=strict)
+            self._set_composite_vars(self.get_option("compose"), hostvars[host], host, strict=strict)
 
             # actually update inventory
             for key in hostvars[host]:
                 self.inventory.set_variable(host, key, hostvars[host][key])
 
             # constructed groups based on conditionals
-            self._add_host_to_composed_groups(self.get_option('groups'), hostvars[host], host, strict=strict)
+            self._add_host_to_composed_groups(self.get_option("groups"), hostvars[host], host, strict=strict)
 
             # constructed keyed_groups
-            self._add_host_to_keyed_groups(self.get_option('keyed_groups'), hostvars[host], host, strict=strict)
+            self._add_host_to_keyed_groups(self.get_option("keyed_groups"), hostvars[host], host, strict=strict)
 
     def _populate_from_cache(self, source_data):
         source_data = make_unsafe(source_data)
-        hostvars = source_data.pop('_meta', {}).get('hostvars', {})
+        hostvars = source_data.pop("_meta", {}).get("hostvars", {})
         for group in source_data:
-            if group == 'all':
+            if group == "all":
                 continue
             else:
                 group = self.inventory.add_group(group)
-                hosts = source_data[group].get('hosts', [])
+                hosts = source_data[group].get("hosts", [])
                 for host in hosts:
                     self._populate_host_vars([host], hostvars.get(host, {}), group)
-                self.inventory.add_child('all', group)
+                self.inventory.add_child("all", group)
         if not source_data:
             for host in hostvars:
                 self.inventory.add_host(host)
@@ -158,32 +159,32 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._populate_from_cache(source_data)
             return source_data
 
-        cacheable_results = {'_meta': {'hostvars': {}}}
+        cacheable_results = {"_meta": {"hostvars": {}}}
 
         hostvars = {}
-        prevkey = pref_k = ''
+        prevkey = pref_k = ""
         current_host = None
 
         # needed to possibly set ansible_host
-        netinfo = self.get_option('network_info_path')
+        netinfo = self.get_option("network_info_path")
 
         for line in source_data:
             line = to_text(line)
-            if ':' not in line:
+            if ":" not in line:
                 continue
             try:
-                k, v = line.split(':', 1)
+                k, v = line.split(":", 1)
             except Exception:
                 # skip non splitable
                 continue
 
-            if k.strip() == '':
+            if k.strip() == "":
                 # skip empty
                 continue
 
             v = v.strip()
             # found host
-            if k.startswith('Name') and ',' not in v:  # some setting strings appear in Name
+            if k.startswith("Name") and "," not in v:  # some setting strings appear in Name
                 current_host = make_unsafe(v)
                 if current_host not in hostvars:
                     hostvars[current_host] = {}
@@ -192,11 +193,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # try to get network info
                 netdata = self._query_vbox_data(current_host, netinfo)
                 if netdata:
-                    self.inventory.set_variable(current_host, 'ansible_host', make_unsafe(netdata))
+                    self.inventory.set_variable(current_host, "ansible_host", make_unsafe(netdata))
 
             # found groups
-            elif k == 'Groups':
-                if self.get_option('enable_advanced_group_parsing'):
+            elif k == "Groups":
+                if self.get_option("enable_advanced_group_parsing"):
                     self._handle_vboxmanage_group_string(v, current_host, cacheable_results)
                 else:
                     self._handle_group_string(v, current_host, cacheable_results)
@@ -205,7 +206,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             else:
                 # found vars, accumulate in hostvars for clean inventory set
                 pref_k = make_unsafe(f"vbox_{k.strip().replace(' ', '_')}")
-                leading_spaces = len(k) - len(k.lstrip(' '))
+                leading_spaces = len(k) - len(k.lstrip(" "))
                 if 0 < leading_spaces <= 2:
                     if prevkey not in hostvars[current_host] or not isinstance(hostvars[current_host][prevkey], dict):
                         hostvars[current_host][prevkey] = {}
@@ -213,26 +214,26 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 elif leading_spaces > 2:
                     continue
                 else:
-                    if v != '':
+                    if v != "":
                         hostvars[current_host][pref_k] = make_unsafe(v)
                 if self._ungrouped_host(current_host, cacheable_results):
-                    if 'ungrouped' not in cacheable_results:
-                        cacheable_results['ungrouped'] = {'hosts': []}
-                    cacheable_results['ungrouped']['hosts'].append(current_host)
+                    if "ungrouped" not in cacheable_results:
+                        cacheable_results["ungrouped"] = {"hosts": []}
+                    cacheable_results["ungrouped"]["hosts"].append(current_host)
 
                 prevkey = pref_k
 
         self._set_variables(hostvars)
         for host in hostvars:
             h = self.inventory.get_host(host)
-            cacheable_results['_meta']['hostvars'][h.name] = h.vars
+            cacheable_results["_meta"]["hostvars"][h.name] = h.vars
 
         return cacheable_results
 
     def _ungrouped_host(self, host, inventory):
         def find_host(host, inventory):
             for k, v in inventory.items():
-                if k == '_meta':
+                if k == "_meta":
                     continue
                 if isinstance(v, dict):
                     yield self._ungrouped_host(host, v)
@@ -243,20 +244,20 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return all(find_host(host, inventory))
 
     def _handle_group_string(self, vboxmanage_group, current_host, cacheable_results):
-        '''Handles parsing the VM's Group assignment from VBoxManage according to this inventory's initial implementation.'''
+        """Handles parsing the VM's Group assignment from VBoxManage according to this inventory's initial implementation."""
         # The original implementation of this inventory plugin treated `/` as
         # a delimeter to split and use as Ansible Groups.
-        for group in vboxmanage_group.split('/'):
+        for group in vboxmanage_group.split("/"):
             if group:
                 group = make_unsafe(group)
                 group = self.inventory.add_group(group)
                 self.inventory.add_child(group, current_host)
                 if group not in cacheable_results:
-                    cacheable_results[group] = {'hosts': []}
-                cacheable_results[group]['hosts'].append(current_host)
+                    cacheable_results[group] = {"hosts": []}
+                cacheable_results[group]["hosts"].append(current_host)
 
     def _handle_vboxmanage_group_string(self, vboxmanage_group, current_host, cacheable_results):
-        '''Handles parsing the VM's Group assignment from VBoxManage according to VirtualBox documentation.'''
+        """Handles parsing the VM's Group assignment from VBoxManage according to VirtualBox documentation."""
         # Per the VirtualBox documentation, a VM can be part of many groups,
         # and it is possible to have nested groups.
         # Many groups are separated by commas ",", and nested groups use
@@ -265,7 +266,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # Multi groups: VBoxManage modifyvm "vm01" --groups "/TestGroup,/TestGroup2"
         # Nested groups: VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2"
 
-        for group in vboxmanage_group.split(','):
+        for group in vboxmanage_group.split(","):
             if not group:
                 # We could get an empty element due how to split works, and
                 # possible assignments from VirtualBox. e.g. ,/Group1
@@ -278,13 +279,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 continue
 
             parent_group = None
-            for subgroup in group.split('/'):
+            for subgroup in group.split("/"):
                 if not subgroup:
                     # Similarly to above, we could get an empty element.
                     # e.g //Group1
                     continue
 
-                if subgroup == '/':
+                if subgroup == "/":
                     # "root" group.
                     # Consider the host to be unassigned
                     continue
@@ -295,27 +296,25 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     self.inventory.add_child(parent_group, subgroup)
                 self.inventory.add_child(subgroup, current_host)
                 if subgroup not in cacheable_results:
-                    cacheable_results[subgroup] = {'hosts': []}
-                cacheable_results[subgroup]['hosts'].append(current_host)
+                    cacheable_results[subgroup] = {"hosts": []}
+                cacheable_results[subgroup]["hosts"].append(current_host)
 
                 parent_group = subgroup
 
     def verify_file(self, path):
-
         valid = False
-        if super(InventoryModule, self).verify_file(path):
-            if path.endswith(('virtualbox.yaml', 'virtualbox.yml', 'vbox.yaml', 'vbox.yml')):
+        if super().verify_file(path):
+            if path.endswith(("virtualbox.yaml", "virtualbox.yml", "vbox.yaml", "vbox.yml")):
                 valid = True
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
-
         try:
             self._vbox_path = get_bin_path(self.VBOX)
         except ValueError as e:
             raise AnsibleParserError(e)
 
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         cache_key = self.get_cache_key(path)
 
@@ -326,7 +325,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         source_data = None
         if cache:
-            cache = self.get_option('cache')
+            cache = self.get_option("cache")
 
         update_cache = False
         if cache:
@@ -336,18 +335,20 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 update_cache = True
 
         if not source_data:
-            b_pwfile = to_bytes(self.get_option('settings_password_file'), errors='surrogate_or_strict', nonstring='passthru')
-            running = self.get_option('running_only')
+            b_pwfile = to_bytes(
+                self.get_option("settings_password_file"), errors="surrogate_or_strict", nonstring="passthru"
+            )
+            running = self.get_option("running_only")
 
             # start getting data
-            cmd = [self._vbox_path, b'list', b'-l']
+            cmd = [self._vbox_path, b"list", b"-l"]
             if running:
-                cmd.append(b'runningvms')
+                cmd.append(b"runningvms")
             else:
-                cmd.append(b'vms')
+                cmd.append(b"vms")
 
             if b_pwfile and os.path.exists(b_pwfile):
-                cmd.append(b'--settingspwfile')
+                cmd.append(b"--settingspwfile")
                 cmd.append(b_pwfile)
 
             try:

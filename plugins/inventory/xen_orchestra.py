@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -111,33 +110,32 @@ try:
     import websocket
     from websocket import create_connection
 
-    if LooseVersion(websocket.__version__) <= LooseVersion('1.0.0'):
+    if LooseVersion(websocket.__version__) <= LooseVersion("1.0.0"):
         raise ImportError
 except ImportError as e:
     HAS_WEBSOCKET = False
 
 
-HALTED = 'Halted'
-PAUSED = 'Paused'
-RUNNING = 'Running'
-SUSPENDED = 'Suspended'
+HALTED = "Halted"
+PAUSED = "Paused"
+RUNNING = "Running"
+SUSPENDED = "Suspended"
 POWER_STATES = [RUNNING, HALTED, SUSPENDED, PAUSED]
-HOST_GROUP = 'xo_hosts'
-POOL_GROUP = 'xo_pools'
+HOST_GROUP = "xo_hosts"
+POOL_GROUP = "xo_pools"
 
 
 def clean_group_name(label):
-    return label.lower().replace(' ', '-').replace('-', '_')
+    return label.lower().replace(" ", "-").replace("-", "_")
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-    ''' Host inventory parser for ansible using XenOrchestra as source. '''
+    """Host inventory parser for ansible using XenOrchestra as source."""
 
-    NAME = 'community.general.xen_orchestra'
+    NAME = "community.general.xen_orchestra"
 
     def __init__(self):
-
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
         # from config
         self.counter = -1
@@ -151,13 +149,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return self.counter
 
     def create_connection(self, xoa_api_host):
-        validate_certs = self.get_option('validate_certs')
-        use_ssl = self.get_option('use_ssl')
-        proto = 'wss' if use_ssl else 'ws'
+        validate_certs = self.get_option("validate_certs")
+        use_ssl = self.get_option("use_ssl")
+        proto = "wss" if use_ssl else "ws"
 
-        sslopt = None if validate_certs else {'cert_reqs': ssl.CERT_NONE}
-        self.conn = create_connection(
-            f'{proto}://{xoa_api_host}/api/', sslopt=sslopt)
+        sslopt = None if validate_certs else {"cert_reqs": ssl.CERT_NONE}
+        self.conn = create_connection(f"{proto}://{xoa_api_host}/api/", sslopt=sslopt)
 
     CALL_TIMEOUT = 100
     """Number of 1/10ths of a second to wait before method call times out."""
@@ -165,74 +162,67 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def call(self, method, params):
         """Calls a method on the XO server with the provided parameters."""
         id = self.pointer
-        self.conn.send(json.dumps({
-            'id': id,
-            'jsonrpc': '2.0',
-            'method': method,
-            'params': params
-        }))
+        self.conn.send(json.dumps({"id": id, "jsonrpc": "2.0", "method": method, "params": params}))
 
         waited = 0
         while waited < self.CALL_TIMEOUT:
             response = json.loads(self.conn.recv())
-            if 'id' in response and response['id'] == id:
+            if "id" in response and response["id"] == id:
                 return response
             else:
                 sleep(0.1)
                 waited += 1
 
-        raise AnsibleError(f'Method call {method} timed out after {self.CALL_TIMEOUT / 10} seconds.')
+        raise AnsibleError(f"Method call {method} timed out after {self.CALL_TIMEOUT / 10} seconds.")
 
     def login(self, user, password):
-        result = self.call('session.signIn', {
-            'username': user, 'password': password
-        })
+        result = self.call("session.signIn", {"username": user, "password": password})
 
-        if 'error' in result:
+        if "error" in result:
             raise AnsibleError(f"Could not connect: {result['error']}")
 
     def get_object(self, name):
-        answer = self.call('xo.getAllObjects', {'filter': {'type': name}})
+        answer = self.call("xo.getAllObjects", {"filter": {"type": name}})
 
-        if 'error' in answer:
+        if "error" in answer:
             raise AnsibleError(f"Could not request: {answer['error']}")
 
-        return answer['result']
+        return answer["result"]
 
     def _get_objects(self):
         self.create_connection(self.xoa_api_host)
         self.login(self.xoa_user, self.xoa_password)
 
         return {
-            'vms': self.get_object('VM'),
-            'pools': self.get_object('pool'),
-            'hosts': self.get_object('host'),
+            "vms": self.get_object("VM"),
+            "pools": self.get_object("pool"),
+            "hosts": self.get_object("host"),
         }
 
     def _apply_constructable(self, name, variables):
-        strict = self.get_option('strict')
-        self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=strict)
-        self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=strict)
-        self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
+        strict = self.get_option("strict")
+        self._add_host_to_composed_groups(self.get_option("groups"), variables, name, strict=strict)
+        self._add_host_to_keyed_groups(self.get_option("keyed_groups"), variables, name, strict=strict)
+        self._set_composite_vars(self.get_option("compose"), variables, name, strict=strict)
 
     def _add_vms(self, vms, hosts, pools):
         vm_name_list = []
         for uuid, vm in vms.items():
-            if self.vm_entry_name_type == 'name_label':
-                if vm['name_label'] not in vm_name_list:
-                    entry_name = vm['name_label']
-                    vm_name_list.append(vm['name_label'])
+            if self.vm_entry_name_type == "name_label":
+                if vm["name_label"] not in vm_name_list:
+                    entry_name = vm["name_label"]
+                    vm_name_list.append(vm["name_label"])
                 else:
-                    vm_duplicate_count = vm_name_list.count(vm['name_label'])
+                    vm_duplicate_count = vm_name_list.count(vm["name_label"])
                     entry_name = f"{vm['name_label']}_{vm_duplicate_count}"
-                    vm_name_list.append(vm['name_label'])
+                    vm_name_list.append(vm["name_label"])
             else:
                 entry_name = uuid
-            group = 'with_ip'
-            ip = vm.get('mainIpAddress')
-            power_state = vm['power_state'].lower()
-            pool_name = self._pool_group_name_for_uuid(pools, vm['$poolId'])
-            host_name = self._host_group_name_for_uuid(hosts, vm['$container'])
+            group = "with_ip"
+            ip = vm.get("mainIpAddress")
+            power_state = vm["power_state"].lower()
+            pool_name = self._pool_group_name_for_uuid(pools, vm["$poolId"])
+            host_name = self._host_group_name_for_uuid(hosts, vm["$container"])
 
             self.inventory.add_host(entry_name)
 
@@ -249,67 +239,58 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             # Grouping VMs with an IP together
             if ip is None:
-                group = 'without_ip'
+                group = "without_ip"
             self.inventory.add_group(group)
             self.inventory.add_child(group, entry_name)
 
             # Adding meta
-            self.inventory.set_variable(entry_name, 'uuid', uuid)
-            self.inventory.set_variable(entry_name, 'ip', ip)
-            self.inventory.set_variable(entry_name, 'ansible_host', ip)
-            self.inventory.set_variable(entry_name, 'power_state', power_state)
-            self.inventory.set_variable(
-                entry_name, 'name_label', vm['name_label'])
-            self.inventory.set_variable(entry_name, 'type', vm['type'])
-            self.inventory.set_variable(
-                entry_name, 'cpus', vm['CPUs']['number'])
-            self.inventory.set_variable(entry_name, 'tags', vm['tags'])
-            self.inventory.set_variable(
-                entry_name, 'memory', vm['memory']['size'])
-            self.inventory.set_variable(
-                entry_name, 'has_ip', group == 'with_ip')
-            self.inventory.set_variable(
-                entry_name, 'is_managed', vm.get('managementAgentDetected', False))
-            self.inventory.set_variable(
-                entry_name, 'os_version', vm['os_version'])
+            self.inventory.set_variable(entry_name, "uuid", uuid)
+            self.inventory.set_variable(entry_name, "ip", ip)
+            self.inventory.set_variable(entry_name, "ansible_host", ip)
+            self.inventory.set_variable(entry_name, "power_state", power_state)
+            self.inventory.set_variable(entry_name, "name_label", vm["name_label"])
+            self.inventory.set_variable(entry_name, "type", vm["type"])
+            self.inventory.set_variable(entry_name, "cpus", vm["CPUs"]["number"])
+            self.inventory.set_variable(entry_name, "tags", vm["tags"])
+            self.inventory.set_variable(entry_name, "memory", vm["memory"]["size"])
+            self.inventory.set_variable(entry_name, "has_ip", group == "with_ip")
+            self.inventory.set_variable(entry_name, "is_managed", vm.get("managementAgentDetected", False))
+            self.inventory.set_variable(entry_name, "os_version", vm["os_version"])
 
             self._apply_constructable(entry_name, self.inventory.get_host(entry_name).get_vars())
 
     def _add_hosts(self, hosts, pools):
         host_name_list = []
         for host in hosts.values():
-            if self.host_entry_name_type == 'name_label':
-                if host['name_label'] not in host_name_list:
-                    entry_name = host['name_label']
-                    host_name_list.append(host['name_label'])
+            if self.host_entry_name_type == "name_label":
+                if host["name_label"] not in host_name_list:
+                    entry_name = host["name_label"]
+                    host_name_list.append(host["name_label"])
                 else:
-                    host_duplicate_count = host_name_list.count(host['name_label'])
+                    host_duplicate_count = host_name_list.count(host["name_label"])
                     entry_name = f"{host['name_label']}_{host_duplicate_count}"
-                    host_name_list.append(host['name_label'])
+                    host_name_list.append(host["name_label"])
             else:
-                entry_name = host['uuid']
+                entry_name = host["uuid"]
 
             group_name = f"xo_host_{clean_group_name(host['name_label'])}"
-            pool_name = self._pool_group_name_for_uuid(pools, host['$poolId'])
+            pool_name = self._pool_group_name_for_uuid(pools, host["$poolId"])
 
             self.inventory.add_group(group_name)
             self.inventory.add_host(entry_name)
             self.inventory.add_child(HOST_GROUP, entry_name)
             self.inventory.add_child(pool_name, entry_name)
 
-            self.inventory.set_variable(entry_name, 'enabled', host['enabled'])
-            self.inventory.set_variable(
-                entry_name, 'hostname', host['hostname'])
-            self.inventory.set_variable(entry_name, 'memory', host['memory'])
-            self.inventory.set_variable(entry_name, 'address', host['address'])
-            self.inventory.set_variable(entry_name, 'cpus', host['cpus'])
-            self.inventory.set_variable(entry_name, 'type', 'host')
-            self.inventory.set_variable(entry_name, 'tags', host['tags'])
-            self.inventory.set_variable(entry_name, 'version', host['version'])
-            self.inventory.set_variable(
-                entry_name, 'power_state', host['power_state'].lower())
-            self.inventory.set_variable(
-                entry_name, 'product_brand', host['productBrand'])
+            self.inventory.set_variable(entry_name, "enabled", host["enabled"])
+            self.inventory.set_variable(entry_name, "hostname", host["hostname"])
+            self.inventory.set_variable(entry_name, "memory", host["memory"])
+            self.inventory.set_variable(entry_name, "address", host["address"])
+            self.inventory.set_variable(entry_name, "cpus", host["cpus"])
+            self.inventory.set_variable(entry_name, "type", "host")
+            self.inventory.set_variable(entry_name, "tags", host["tags"])
+            self.inventory.set_variable(entry_name, "version", host["version"])
+            self.inventory.set_variable(entry_name, "power_state", host["power_state"].lower())
+            self.inventory.set_variable(entry_name, "product_brand", host["productBrand"])
 
         for pool in pools.values():
             group_name = f"xo_pool_{clean_group_name(pool['name_label'])}"
@@ -341,50 +322,52 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for group in POWER_STATES:
             self.inventory.add_group(group.lower())
 
-        self._add_pools(objects['pools'])
-        self._add_hosts(objects['hosts'], objects['pools'])
-        self._add_vms(objects['vms'], objects['hosts'], objects['pools'])
+        self._add_pools(objects["pools"])
+        self._add_hosts(objects["hosts"], objects["pools"])
+        self._add_vms(objects["vms"], objects["hosts"], objects["pools"])
 
     def verify_file(self, path):
-
         valid = False
-        if super(InventoryModule, self).verify_file(path):
-            if path.endswith(('xen_orchestra.yaml', 'xen_orchestra.yml')):
+        if super().verify_file(path):
+            if path.endswith(("xen_orchestra.yaml", "xen_orchestra.yml")):
                 valid = True
             else:
                 self.display.vvv(
-                    'Skipping due to inventory source not ending in "xen_orchestra.yaml" nor "xen_orchestra.yml"')
+                    'Skipping due to inventory source not ending in "xen_orchestra.yaml" nor "xen_orchestra.yml"'
+                )
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_WEBSOCKET:
-            raise AnsibleError('This plugin requires websocket-client 1.0.0 or higher: '
-                               'https://github.com/websocket-client/websocket-client.')
+            raise AnsibleError(
+                "This plugin requires websocket-client 1.0.0 or higher: "
+                "https://github.com/websocket-client/websocket-client."
+            )
 
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         # read config from file, this sets 'options'
         self._read_config_data(path)
         self.inventory = inventory
 
-        self.protocol = 'wss'
-        self.xoa_api_host = self.get_option('api_host')
-        self.xoa_user = self.get_option('user')
-        self.xoa_password = self.get_option('password')
+        self.protocol = "wss"
+        self.xoa_api_host = self.get_option("api_host")
+        self.xoa_user = self.get_option("user")
+        self.xoa_password = self.get_option("password")
         self.cache_key = self.get_cache_key(path)
-        self.use_cache = cache and self.get_option('cache')
+        self.use_cache = cache and self.get_option("cache")
 
-        self.validate_certs = self.get_option('validate_certs')
-        if not self.get_option('use_ssl'):
-            self.protocol = 'ws'
+        self.validate_certs = self.get_option("validate_certs")
+        if not self.get_option("use_ssl"):
+            self.protocol = "ws"
 
-        self.vm_entry_name_type = 'uuid'
-        if not self.get_option('use_vm_uuid'):
-            self.vm_entry_name_type = 'name_label'
+        self.vm_entry_name_type = "uuid"
+        if not self.get_option("use_vm_uuid"):
+            self.vm_entry_name_type = "name_label"
 
-        self.host_entry_name_type = 'uuid'
-        if not self.get_option('use_host_uuid'):
-            self.host_entry_name_type = 'name_label'
+        self.host_entry_name_type = "uuid"
+        if not self.get_option("use_host_uuid"):
+            self.host_entry_name_type = "name_label"
 
         objects = self._get_objects()
         self._populate(make_unsafe(objects))

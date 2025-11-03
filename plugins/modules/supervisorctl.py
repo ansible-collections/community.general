@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2012, Matt Wright <matt@nobien.net>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -121,57 +119,60 @@ from ansible.module_utils.basic import AnsibleModule, is_executable
 
 def main():
     arg_spec = dict(
-        name=dict(type='str', required=True),
-        config=dict(type='path'),
-        server_url=dict(type='str'),
-        username=dict(type='str'),
-        password=dict(type='str', no_log=True),
-        supervisorctl_path=dict(type='path'),
-        state=dict(type='str', required=True, choices=['present', 'started', 'restarted', 'stopped', 'absent', 'signalled']),
-        stop_before_removing=dict(type='bool', default=False),
-        signal=dict(type='str'),
+        name=dict(type="str", required=True),
+        config=dict(type="path"),
+        server_url=dict(type="str"),
+        username=dict(type="str"),
+        password=dict(type="str", no_log=True),
+        supervisorctl_path=dict(type="path"),
+        state=dict(
+            type="str", required=True, choices=["present", "started", "restarted", "stopped", "absent", "signalled"]
+        ),
+        stop_before_removing=dict(type="bool", default=False),
+        signal=dict(type="str"),
     )
 
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True,
-        required_if=[('state', 'signalled', ['signal'])],
+        required_if=[("state", "signalled", ["signal"])],
     )
 
-    name = module.params['name']
+    name = module.params["name"]
     is_group = False
-    if name.endswith(':'):
+    if name.endswith(":"):
         is_group = True
-        name = name.rstrip(':')
-    state = module.params['state']
-    stop_before_removing = module.params.get('stop_before_removing')
-    config = module.params.get('config')
-    server_url = module.params.get('server_url')
-    username = module.params.get('username')
-    password = module.params.get('password')
-    supervisorctl_path = module.params.get('supervisorctl_path')
-    signal = module.params.get('signal')
+        name = name.rstrip(":")
+    state = module.params["state"]
+    stop_before_removing = module.params.get("stop_before_removing")
+    config = module.params.get("config")
+    server_url = module.params.get("server_url")
+    username = module.params.get("username")
+    password = module.params.get("password")
+    supervisorctl_path = module.params.get("supervisorctl_path")
+    signal = module.params.get("signal")
 
     # we check error message for a pattern, so we need to make sure that's in C locale
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     if supervisorctl_path:
         if os.path.exists(supervisorctl_path) and is_executable(supervisorctl_path):
             supervisorctl_args = [supervisorctl_path]
         else:
             module.fail_json(
-                msg="Provided path to supervisorctl does not exist or isn't executable: %s" % supervisorctl_path)
+                msg=f"Provided path to supervisorctl does not exist or isn't executable: {supervisorctl_path}"
+            )
     else:
-        supervisorctl_args = [module.get_bin_path('supervisorctl', True)]
+        supervisorctl_args = [module.get_bin_path("supervisorctl", True)]
 
     if config:
-        supervisorctl_args.extend(['-c', config])
+        supervisorctl_args.extend(["-c", config])
     if server_url:
-        supervisorctl_args.extend(['-s', server_url])
+        supervisorctl_args.extend(["-s", server_url])
     if username:
-        supervisorctl_args.extend(['-u', username])
+        supervisorctl_args.extend(["-u", username])
     if password:
-        supervisorctl_args.extend(['-p', password])
+        supervisorctl_args.extend(["-p", password])
 
     def run_supervisorctl(cmd, name=None, **kwargs):
         args = list(supervisorctl_args)  # copy the master args
@@ -182,21 +183,21 @@ def main():
 
     def get_matched_processes():
         matched = []
-        rc, out, err = run_supervisorctl('status')
+        rc, out, err = run_supervisorctl("status")
         for line in out.splitlines():
             # One status line may look like one of these two:
             # process not in group:
             #   echo_date_lonely RUNNING pid 7680, uptime 13:22:18
             # process in group:
             #   echo_date_group:echo_date_00 RUNNING pid 7681, uptime 13:22:18
-            fields = [field for field in line.split(' ') if field != '']
+            fields = [field for field in line.split(" ") if field != ""]
             process_name = fields[0]
             status = fields[1]
 
             if is_group:
                 # If there is ':', this process must be in a group.
-                if ':' in process_name:
-                    group = process_name.split(':')[0]
+                if ":" in process_name:
+                    group = process_name.split(":")[0]
                     if group != name:
                         continue
                 else:
@@ -224,47 +225,49 @@ def main():
             module.exit_json(changed=True)
         for process_name in to_take_action_on:
             rc, out, err = run_supervisorctl(action, process_name, check_rc=True)
-            if '%s: %s' % (process_name, expected_result) not in out:
+            if f"{process_name}: {expected_result}" not in out:
                 module.fail_json(msg=out)
 
         if exit_module:
             module.exit_json(changed=True, name=name, state=state, affected=to_take_action_on)
 
-    if state == 'restarted':
-        rc, out, err = run_supervisorctl('update', check_rc=True)
+    if state == "restarted":
+        rc, out, err = run_supervisorctl("update", check_rc=True)
         processes = get_matched_processes()
         if len(processes) == 0:
             module.fail_json(name=name, msg="ERROR (no such process)")
 
-        take_action_on_processes(processes, lambda s: True, 'restart', 'started')
+        take_action_on_processes(processes, lambda s: True, "restart", "started")
 
     processes = get_matched_processes()
 
-    if state == 'absent':
+    if state == "absent":
         if len(processes) == 0:
             module.exit_json(changed=False, name=name, state=state)
 
         if stop_before_removing:
-            take_action_on_processes(processes, lambda s: s in ('RUNNING', 'STARTING'), 'stop', 'stopped', exit_module=False)
+            take_action_on_processes(
+                processes, lambda s: s in ("RUNNING", "STARTING"), "stop", "stopped", exit_module=False
+            )
 
         if module.check_mode:
             module.exit_json(changed=True)
-        run_supervisorctl('reread', check_rc=True)
-        rc, out, err = run_supervisorctl('remove', name)
-        if '%s: removed process group' % name in out:
+        run_supervisorctl("reread", check_rc=True)
+        rc, out, err = run_supervisorctl("remove", name)
+        if f"{name}: removed process group" in out:
             module.exit_json(changed=True, name=name, state=state)
         else:
             module.fail_json(msg=out, name=name, state=state)
 
-    if state == 'present':
+    if state == "present":
         if len(processes) > 0:
             module.exit_json(changed=False, name=name, state=state)
 
         if module.check_mode:
             module.exit_json(changed=True)
-        run_supervisorctl('reread', check_rc=True)
-        dummy, out, dummy = run_supervisorctl('add', name)
-        if '%s: added process group' % name in out:
+        run_supervisorctl("reread", check_rc=True)
+        dummy, out, dummy = run_supervisorctl("add", name)
+        if f"{name}: added process group" in out:
             module.exit_json(changed=True, name=name, state=state)
         else:
             module.fail_json(msg=out, name=name, state=state)
@@ -273,15 +276,15 @@ def main():
     if len(processes) == 0:
         module.fail_json(name=name, msg="ERROR (no such process)")
 
-    if state == 'started':
-        take_action_on_processes(processes, lambda s: s not in ('RUNNING', 'STARTING'), 'start', 'started')
+    if state == "started":
+        take_action_on_processes(processes, lambda s: s not in ("RUNNING", "STARTING"), "start", "started")
 
-    if state == 'stopped':
-        take_action_on_processes(processes, lambda s: s in ('RUNNING', 'STARTING'), 'stop', 'stopped')
+    if state == "stopped":
+        take_action_on_processes(processes, lambda s: s in ("RUNNING", "STARTING"), "stop", "stopped")
 
-    if state == 'signalled':
-        take_action_on_processes(processes, lambda s: s in ('RUNNING',), "signal %s" % signal, 'signalled')
+    if state == "signalled":
+        take_action_on_processes(processes, lambda s: s in ("RUNNING",), f"signal {signal}", "signalled")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

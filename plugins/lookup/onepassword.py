@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Scott Buchanan <scott@buchanan.works>
 # Copyright (c) 2016, Andrew Zenk <azenk@umn.edu> (lastpass.py used as starting point)
 # Copyright (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: onepassword
@@ -85,7 +83,6 @@ from ansible.plugins.lookup import LookupBase
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
-from ansible.module_utils.six import with_metaclass
 
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
 
@@ -98,7 +95,7 @@ def _lower_if_possible(value):
         return value
 
 
-class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
+class OnePassCLIBase(metaclass=abc.ABCMeta):
     bin = "op"
 
     def __init__(
@@ -302,11 +299,13 @@ class OnePassCLIv1(OnePassCLIBase):
     def full_signin(self):
         if self.connect_host or self.connect_token:
             raise AnsibleLookupError(
-                "1Password Connect is not available with 1Password CLI version 1. Please use version 2 or later.")
+                "1Password Connect is not available with 1Password CLI version 1. Please use version 2 or later."
+            )
 
         if self.service_account_token:
             raise AnsibleLookupError(
-                "1Password CLI version 1 does not support Service Accounts. Please use version 2 or later.")
+                "1Password CLI version 1 does not support Service Accounts. Please use version 2 or later."
+            )
 
         required_params = [
             "subdomain",
@@ -341,7 +340,7 @@ class OnePassCLIv1(OnePassCLIBase):
         return self._run(args)
 
     def signin(self):
-        self._check_required_params(['master_password'])
+        self._check_required_params(["master_password"])
 
         args = ["signin", "--raw"]
         if self.subdomain:
@@ -354,6 +353,7 @@ class OnePassCLIv2(OnePassCLIBase):
     """
     CLIv2 Syntax Reference: https://developer.1password.com/docs/cli/upgrade#step-2-update-your-scripts
     """
+
     supports_version = "2"
 
     def _parse_field(self, data_json, field_name, section_title=None):
@@ -536,9 +536,13 @@ class OnePassCLIv2(OnePassCLIBase):
         self._check_required_params(required_params)
 
         args = [
-            "account", "add", "--raw",
-            "--address", f"{self.subdomain}.{self.domain}",
-            "--email", to_bytes(self.username),
+            "account",
+            "add",
+            "--raw",
+            "--address",
+            f"{self.subdomain}.{self.domain}",
+            "--email",
+            to_bytes(self.username),
             "--signin",
         ]
 
@@ -577,7 +581,7 @@ class OnePassCLIv2(OnePassCLIBase):
         return self._add_parameters_and_run(args, vault=vault, token=token)
 
     def signin(self):
-        self._check_required_params(['master_password'])
+        self._check_required_params(["master_password"])
 
         args = ["signin", "--raw"]
         if self.subdomain:
@@ -586,9 +590,20 @@ class OnePassCLIv2(OnePassCLIBase):
         return self._run(args, command_input=to_bytes(self.master_password))
 
 
-class OnePass(object):
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
-                 service_account_token=None, account_id=None, connect_host=None, connect_token=None, cli_class=None):
+class OnePass:
+    def __init__(
+        self,
+        subdomain=None,
+        domain="1password.com",
+        username=None,
+        secret_key=None,
+        master_password=None,
+        service_account_token=None,
+        account_id=None,
+        connect_host=None,
+        connect_token=None,
+        cli_class=None,
+    ):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
@@ -610,14 +625,33 @@ class OnePass(object):
 
     def _get_cli_class(self, cli_class=None):
         if cli_class is not None:
-            return cli_class(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
+            return cli_class(
+                self.subdomain,
+                self.domain,
+                self.username,
+                self.secret_key,
+                self.master_password,
+                self.service_account_token,
+                self.account_id,
+                self.connect_host,
+                self.connect_token,
+            )
 
         version = OnePassCLIBase.get_current_version()
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
                 try:
-                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token,
-                               self.account_id, self.connect_host, self.connect_token)
+                    return cls(
+                        self.subdomain,
+                        self.domain,
+                        self.username,
+                        self.secret_key,
+                        self.master_password,
+                        self.service_account_token,
+                        self.account_id,
+                        self.connect_host,
+                        self.connect_token,
+                    )
                 except TypeError as e:
                     raise AnsibleLookupError(e)
 
@@ -668,7 +702,6 @@ class OnePass(object):
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 

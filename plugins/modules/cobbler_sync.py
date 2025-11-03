@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018, Dag Wieers (dagwieers) <dag@wieers.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: cobbler_sync
@@ -56,8 +54,6 @@ author:
 todo:
 notes:
   - Concurrently syncing Cobbler is bound to fail with weird errors.
-  - On Python 2.7.8 and older (such as RHEL7) you may need to tweak the Python behaviour to disable certificate validation.
-    More information at L(Certificate verification in Python standard library HTTP clients,https://access.redhat.com/articles/2039753).
 """
 
 EXAMPLES = r"""
@@ -75,9 +71,9 @@ RETURN = r"""
 """
 
 import ssl
+import xmlrpc.client as xmlrpc_client
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import xmlrpc_client
 from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (
@@ -88,25 +84,25 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(type='str', default='127.0.0.1'),
-            port=dict(type='int'),
-            username=dict(type='str', default='cobbler'),
-            password=dict(type='str', no_log=True),
-            use_ssl=dict(type='bool', default=True),
-            validate_certs=dict(type='bool', default=True),
+            host=dict(type="str", default="127.0.0.1"),
+            port=dict(type="int"),
+            username=dict(type="str", default="cobbler"),
+            password=dict(type="str", no_log=True),
+            use_ssl=dict(type="bool", default=True),
+            validate_certs=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
     )
 
-    username = module.params['username']
-    password = module.params['password']
-    port = module.params['port']
-    use_ssl = module.params['use_ssl']
-    validate_certs = module.params['validate_certs']
+    username = module.params["username"]
+    password = module.params["password"]
+    port = module.params["port"]
+    use_ssl = module.params["use_ssl"]
+    validate_certs = module.params["validate_certs"]
 
-    module.params['proto'] = 'https' if use_ssl else 'http'
+    module.params["proto"] = "https" if use_ssl else "http"
     if not port:
-        module.params['port'] = '443' if use_ssl else '80'
+        module.params["port"] = "443" if use_ssl else "80"
 
     result = dict(
         changed=True,
@@ -125,7 +121,7 @@ def main():
             # Handle target environment that doesn't support HTTPS verification
             ssl._create_default_https_context = ssl._create_unverified_context
 
-    url = '{proto}://{host}:{port}/cobbler_api'.format(**module.params)
+    url = "{proto}://{host}:{port}/cobbler_api".format(**module.params)
     if ssl_context:
         conn = xmlrpc_client.ServerProxy(url, context=ssl_context)
     else:
@@ -134,19 +130,23 @@ def main():
     try:
         token = conn.login(username, password)
     except xmlrpc_client.Fault as e:
-        module.fail_json(msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(url=url, error=to_text(e), **module.params))
+        module.fail_json(
+            msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(
+                url=url, error=to_text(e), **module.params
+            )
+        )
     except Exception as e:
-        module.fail_json(msg="Connection to '{url}' failed. {error}".format(url=url, error=to_text(e)))
+        module.fail_json(msg=f"Connection to '{url}' failed. {e}")
 
     if not module.check_mode:
         try:
             conn.sync(token)
         except Exception as e:
-            module.fail_json(msg="Failed to sync Cobbler. {error}".format(error=to_text(e)))
+            module.fail_json(msg=f"Failed to sync Cobbler. {e}")
 
     elapsed = now() - start
     module.exit_json(elapsed=elapsed.seconds, **result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

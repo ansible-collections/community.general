@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_host
@@ -30,6 +28,11 @@ options:
     description:
       - A description of this host.
     type: str
+  userclass:
+    description:
+      - Host category (semantics placed on this attribute are for local interpretation).
+    type: str
+    version_added: 12.0.0
   force:
     description:
       - Force host name even if not in DNS.
@@ -48,6 +51,12 @@ options:
     aliases: ["macaddress"]
     type: list
     elements: str
+  l:
+    description:
+      - Host locality (for example V(Baltimore, MD)).
+    aliases: ["locality"]
+    type: str
+    version_added: 12.0.0
   ns_host_location:
     description:
       - Host location (for example V(Lab 2)).
@@ -103,7 +112,9 @@ EXAMPLES = r"""
   community.general.ipa_host:
     name: host01.example.com
     description: Example host
+    userclass: Server
     ip_address: 192.168.0.123
+    locality: Baltimore, MD
     ns_host_location: Lab
     ns_os_version: CentOS 7
     ns_hardware_platform: Lenovo T61
@@ -180,55 +191,70 @@ from ansible.module_utils.common.text.converters import to_native
 
 class HostIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(HostIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def host_show(self, name):
-        return self._post_json(method='host_show', name=name)
+        return self._post_json(method="host_show", name=name)
 
     def host_find(self, name):
-        return self._post_json(method='host_find', name=None, item={'all': True, 'fqdn': name})
+        return self._post_json(method="host_find", name=None, item={"all": True, "fqdn": name})
 
     def host_add(self, name, host):
-        return self._post_json(method='host_add', name=name, item=host)
+        return self._post_json(method="host_add", name=name, item=host)
 
     def host_mod(self, name, host):
-        return self._post_json(method='host_mod', name=name, item=host)
+        return self._post_json(method="host_mod", name=name, item=host)
 
     def host_del(self, name, update_dns):
-        return self._post_json(method='host_del', name=name, item={'updatedns': update_dns})
+        return self._post_json(method="host_del", name=name, item={"updatedns": update_dns})
 
     def host_disable(self, name):
-        return self._post_json(method='host_disable', name=name)
+        return self._post_json(method="host_disable", name=name)
 
 
-def get_host_dict(description=None, force=None, ip_address=None, ns_host_location=None, ns_hardware_platform=None,
-                  ns_os_version=None, user_certificate=None, mac_address=None, random_password=None):
+def get_host_dict(
+    description=None,
+    userclass=None,
+    force=None,
+    ip_address=None,
+    l=None,
+    ns_host_location=None,
+    ns_hardware_platform=None,
+    ns_os_version=None,
+    user_certificate=None,
+    mac_address=None,
+    random_password=None,
+):
     data = {}
     if description is not None:
-        data['description'] = description
+        data["description"] = description
+    if userclass is not None:
+        data["userclass"] = userclass
     if force is not None:
-        data['force'] = force
+        data["force"] = force
     if ip_address is not None:
-        data['ip_address'] = ip_address
+        data["ip_address"] = ip_address
+    if l is not None:
+        data["l"] = l
     if ns_host_location is not None:
-        data['nshostlocation'] = ns_host_location
+        data["nshostlocation"] = ns_host_location
     if ns_hardware_platform is not None:
-        data['nshardwareplatform'] = ns_hardware_platform
+        data["nshardwareplatform"] = ns_hardware_platform
     if ns_os_version is not None:
-        data['nsosversion'] = ns_os_version
+        data["nsosversion"] = ns_os_version
     if user_certificate is not None:
-        data['usercertificate'] = [{"__base64__": item} for item in user_certificate]
+        data["usercertificate"] = [{"__base64__": item} for item in user_certificate]
     if mac_address is not None:
-        data['macaddress'] = mac_address
+        data["macaddress"] = mac_address
     if random_password is not None:
-        data['random'] = random_password
+        data["random"] = random_password
     return data
 
 
 def get_host_diff(client, ipa_host, module_host):
-    non_updateable_keys = ['force', 'ip_address']
-    if not module_host.get('random'):
-        non_updateable_keys.append('random')
+    non_updateable_keys = ["force", "ip_address"]
+    if not module_host.get("random"):
+        non_updateable_keys.append("random")
     for key in non_updateable_keys:
         if key in module_host:
             del module_host[key]
@@ -237,32 +263,35 @@ def get_host_diff(client, ipa_host, module_host):
 
 
 def ensure(module, client):
-    name = module.params['fqdn']
-    state = module.params['state']
-    force_creation = module.params['force_creation']
+    name = module.params["fqdn"]
+    state = module.params["state"]
+    force_creation = module.params["force_creation"]
 
     ipa_host = client.host_find(name=name)
-    module_host = get_host_dict(description=module.params['description'],
-                                force=module.params['force'],
-                                ip_address=module.params['ip_address'],
-                                ns_host_location=module.params['ns_host_location'],
-                                ns_hardware_platform=module.params['ns_hardware_platform'],
-                                ns_os_version=module.params['ns_os_version'],
-                                user_certificate=module.params['user_certificate'],
-                                mac_address=module.params['mac_address'],
-                                random_password=module.params['random_password'],
-                                )
+    module_host = get_host_dict(
+        description=module.params["description"],
+        userclass=module.params["userclass"],
+        force=module.params["force"],
+        ip_address=module.params["ip_address"],
+        l=module.params["l"],
+        ns_host_location=module.params["ns_host_location"],
+        ns_hardware_platform=module.params["ns_hardware_platform"],
+        ns_os_version=module.params["ns_os_version"],
+        user_certificate=module.params["user_certificate"],
+        mac_address=module.params["mac_address"],
+        random_password=module.params["random_password"],
+    )
     changed = False
-    if state in ['present', 'enabled', 'disabled']:
-        if not ipa_host and (force_creation or state == 'present'):
+    if state in ["present", "enabled", "disabled"]:
+        if not ipa_host and (force_creation or state == "present"):
             changed = True
             if not module.check_mode:
                 # OTP password generated by FreeIPA is visible only for host_add command
                 # so, return directly from here.
                 return changed, client.host_add(name=name, host=module_host)
         else:
-            if state in ['disabled', 'enabled']:
-                module.fail_json(msg="No host with name " + ipa_host + " found")
+            if state in ["disabled", "enabled"]:
+                module.fail_json(msg=f"No host with name {ipa_host} found")
 
             diff = get_host_diff(client, ipa_host, module_host)
             if len(diff) > 0:
@@ -272,17 +301,17 @@ def ensure(module, client):
                     for key in diff:
                         data[key] = module_host.get(key)
                     if "usercertificate" not in data:
-                        data["usercertificate"] = [
-                            cert['__base64__'] for cert in ipa_host.get("usercertificate", [])
-                        ]
+                        data["usercertificate"] = [cert["__base64__"] for cert in ipa_host.get("usercertificate", [])]
                     ipa_host_show = client.host_show(name=name)
-                    if ipa_host_show.get('has_keytab', True) and (state == 'disabled' or module.params.get('random_password')):
+                    if ipa_host_show.get("has_keytab", True) and (
+                        state == "disabled" or module.params.get("random_password")
+                    ):
                         client.host_disable(name=name)
                     return changed, client.host_mod(name=name, host=data)
-    elif state == 'absent':
+    elif state == "absent":
         if ipa_host:
             changed = True
-            update_dns = module.params.get('update_dns', False)
+            update_dns = module.params.get("update_dns", False)
             if not module.check_mode:
                 client.host_del(name=name, update_dns=update_dns)
 
@@ -292,37 +321,39 @@ def ensure(module, client):
 def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(
-        description=dict(type='str'),
-        fqdn=dict(type='str', required=True, aliases=['name']),
-        force=dict(type='bool'),
-        ip_address=dict(type='str'),
-        ns_host_location=dict(type='str', aliases=['nshostlocation']),
-        ns_hardware_platform=dict(type='str', aliases=['nshardwareplatform']),
-        ns_os_version=dict(type='str', aliases=['nsosversion']),
-        user_certificate=dict(type='list', aliases=['usercertificate'], elements='str'),
-        mac_address=dict(type='list', aliases=['macaddress'], elements='str'),
-        update_dns=dict(type='bool'),
-        state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
-        random_password=dict(type='bool', no_log=False),
-        force_creation=dict(type='bool', default=True)
+        description=dict(type="str"),
+        fqdn=dict(type="str", required=True, aliases=["name"]),
+        force=dict(type="bool"),
+        ip_address=dict(type="str"),
+        l=dict(type="str", aliases=["locality"]),
+        ns_host_location=dict(type="str", aliases=["nshostlocation"]),
+        ns_hardware_platform=dict(type="str", aliases=["nshardwareplatform"]),
+        ns_os_version=dict(type="str", aliases=["nsosversion"]),
+        userclass=dict(type="str"),
+        user_certificate=dict(type="list", aliases=["usercertificate"], elements="str"),
+        mac_address=dict(type="list", aliases=["macaddress"], elements="str"),
+        update_dns=dict(type="bool"),
+        state=dict(type="str", default="present", choices=["present", "absent", "enabled", "disabled"]),
+        random_password=dict(type="bool", no_log=False),
+        force_creation=dict(type="bool", default=True),
     )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    client = HostIPAClient(module=module,
-                           host=module.params['ipa_host'],
-                           port=module.params['ipa_port'],
-                           protocol=module.params['ipa_prot'])
+    client = HostIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
 
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, host = ensure(module, client)
         module.exit_json(changed=changed, host=host)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

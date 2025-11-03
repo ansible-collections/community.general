@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: redis
@@ -152,9 +150,11 @@ else:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.formatters import human_to_bytes
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.redis import (
-    fail_imports, redis_auth_argument_spec, redis_auth_params)
+    fail_imports,
+    redis_auth_argument_spec,
+    redis_auth_params,
+)
 import re
 
 
@@ -188,15 +188,16 @@ def flush(client, db=None):
 def main():
     redis_auth_args = redis_auth_argument_spec(tls_default=False)
     module_args = dict(
-        command=dict(type='str', choices=['config', 'flush', 'replica', 'slave']),
-        master_host=dict(type='str'),
-        master_port=dict(type='int'),
-        replica_mode=dict(type='str', default='replica', choices=['master', 'replica', 'slave'],
-                          aliases=["slave_mode"]),
-        db=dict(type='int'),
-        flush_mode=dict(type='str', default='all', choices=['all', 'db']),
-        name=dict(type='str'),
-        value=dict(type='str'),
+        command=dict(type="str", choices=["config", "flush", "replica", "slave"]),
+        master_host=dict(type="str"),
+        master_port=dict(type="int"),
+        replica_mode=dict(
+            type="str", default="replica", choices=["master", "replica", "slave"], aliases=["slave_mode"]
+        ),
+        db=dict(type="int"),
+        flush_mode=dict(type="str", default="all", choices=["all", "db"]),
+        name=dict(type="str"),
+        value=dict(type="str"),
     )
     module_args.update(redis_auth_args)
     module = AnsibleModule(
@@ -204,43 +205,48 @@ def main():
         supports_check_mode=True,
     )
 
-    fail_imports(module, module.params['tls'])
+    fail_imports(module, module.params["tls"])
 
     redis_params = redis_auth_params(module)
 
-    command = module.params['command']
+    command = module.params["command"]
     if command == "slave":
         command = "replica"
 
     # Replica Command section -----------
     if command == "replica":
-        master_host = module.params['master_host']
-        master_port = module.params['master_port']
-        mode = module.params['replica_mode']
+        master_host = module.params["master_host"]
+        master_port = module.params["master_port"]
+        mode = module.params["replica_mode"]
         if mode == "slave":
             mode = "replica"
 
         # Check if we have all the data
         if mode == "replica":  # Only need data if we want to be replica
             if not master_host:
-                module.fail_json(msg='In replica mode master host must be provided')
+                module.fail_json(msg="In replica mode master host must be provided")
 
             if not master_port:
-                module.fail_json(msg='In replica mode master port must be provided')
+                module.fail_json(msg="In replica mode master port must be provided")
 
         # Connect and check
         r = redis.StrictRedis(**redis_params)
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
         # Check if we are already in the mode that we want
         info = r.info()
         if mode == "master" and info["role"] == "master":
             module.exit_json(changed=False, mode=mode)
 
-        elif mode == "replica" and info["role"] == "slave" and info["master_host"] == master_host and info["master_port"] == master_port:
+        elif (
+            mode == "replica"
+            and info["role"] == "slave"
+            and info["master_host"] == master_host
+            and info["master_port"] == master_port
+        ):
             status = dict(
                 status=mode,
                 master_host=master_host,
@@ -255,24 +261,24 @@ def main():
                 if module.check_mode or set_replica_mode(r, master_host, master_port):
                     info = r.info()
                     status = {
-                        'status': mode,
-                        'master_host': master_host,
-                        'master_port': master_port,
+                        "status": mode,
+                        "master_host": master_host,
+                        "master_port": master_port,
                     }
                     module.exit_json(changed=True, mode=status)
                 else:
-                    module.fail_json(msg='Unable to set replica mode')
+                    module.fail_json(msg="Unable to set replica mode")
 
             else:
                 if module.check_mode or set_master_mode(r):
                     module.exit_json(changed=True, mode=mode)
                 else:
-                    module.fail_json(msg='Unable to set master mode')
+                    module.fail_json(msg="Unable to set master mode")
 
     # flush Command section -----------
     elif command == "flush":
-        db = module.params['db']
-        mode = module.params['flush_mode']
+        db = module.params["db"]
+        mode = module.params["flush_mode"]
 
         # Check if we have all the data
         if mode == "db":
@@ -284,7 +290,7 @@ def main():
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
         # Do the stuff
         # (Check Check_mode before commands so the commands aren't evaluated
@@ -299,29 +305,29 @@ def main():
             if module.check_mode or flush(r, db):
                 module.exit_json(changed=True, flushed=True, db=db)
             else:  # Flush never fails :)
-                module.fail_json(msg="Unable to flush '%d' database" % db)
-    elif command == 'config':
-        name = module.params['name']
+                module.fail_json(msg=f"Unable to flush '{db}' database")
+    elif command == "config":
+        name = module.params["name"]
 
         try:  # try to parse the value as if it were the memory size
-            if re.match(r'^\s*(\d*\.?\d*)\s*([A-Za-z]+)?\s*$', module.params['value'].upper()):
-                value = str(human_to_bytes(module.params['value'].upper()))
+            if re.match(r"^\s*(\d*\.?\d*)\s*([A-Za-z]+)?\s*$", module.params["value"].upper()):
+                value = str(human_to_bytes(module.params["value"].upper()))
             else:
-                value = module.params['value']
+                value = module.params["value"]
         except ValueError:
-            value = module.params['value']
+            value = module.params["value"]
 
         r = redis.StrictRedis(**redis_params)
 
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
         try:
             old_value = r.config_get(name)[name]
         except Exception as e:
-            module.fail_json(msg="unable to read config: %s" % to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"unable to read config: {e}", exception=traceback.format_exc())
         changed = old_value != value
 
         if module.check_mode or not changed:
@@ -330,11 +336,11 @@ def main():
             try:
                 r.config_set(name, value)
             except Exception as e:
-                module.fail_json(msg="unable to write config: %s" % to_native(e), exception=traceback.format_exc())
+                module.fail_json(msg=f"unable to write config: {e}", exception=traceback.format_exc())
             module.exit_json(changed=changed, name=name, value=value)
     else:
-        module.fail_json(msg='A valid command must be provided')
+        module.fail_json(msg="A valid command must be provided")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

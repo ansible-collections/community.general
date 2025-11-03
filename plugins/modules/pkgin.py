@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013 Shaun Zinck <shaun.zinck at gmail.com>
 # Copyright (c) 2015 Lawrence Leonard Gilbert <larry@L2G.to>
@@ -12,8 +11,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -130,7 +128,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-class PackageState(object):
+class PackageState:
     PRESENT = 1
     NOT_INSTALLED = 2
     OUTDATED = 4
@@ -138,32 +136,29 @@ class PackageState(object):
 
 
 def query_package(module, name):
-    """Search for the package by name and return state of the package.
-    """
+    """Search for the package by name and return state of the package."""
 
     # test whether '-p' (parsable) flag is supported.
     rc, out, err = module.run_command([PKGIN_PATH, "-p", "-v"])
 
     if rc == 0:
-        pflag = ['-p']
-        splitchar = ';'
+        pflag = ["-p"]
+        splitchar = ";"
     else:
         pflag = []
-        splitchar = ' '
+        splitchar = " "
 
     # Use "pkgin search" to find the package. The regular expression will
     # only match on the complete name.
-    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", "^%s$" % name])
+    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", f"^{name}$"])
 
     # rc will not be 0 unless the search was a success
     if rc == 0:
-
         # Search results may contain more than one line (e.g., 'emacs'), so iterate
         # through each line to see if we have a match.
-        packages = out.split('\n')
+        packages = out.split("\n")
 
         for package in packages:
-
             # Break up line at spaces.  The first part will be the package with its
             # version (e.g. 'gcc47-libs-4.7.2nb4'), and the second will be the state
             # of the package:
@@ -172,17 +167,17 @@ def query_package(module, name):
             #     '=' - installed and up to date
             #     '>' - installed but newer than the repository version
 
-            if (package in ('reading local summary...',
-                            'processing local summary...',
-                            'downloading pkg_summary.xz done.')) or \
-               (package.startswith('processing remote summary (')):
+            if (
+                package
+                in ("reading local summary...", "processing local summary...", "downloading pkg_summary.xz done.")
+            ) or (package.startswith("processing remote summary (")):
                 continue
 
             pkgname_with_version, raw_state = package.split(splitchar)[0:2]
 
             # Search for package, stripping version
             # (results in sth like 'gcc47-libs' or 'emacs24-nox11')
-            pkg_search_obj = re.search(r'^(.*?)\-[0-9][0-9.]*(nb[0-9]+)*', pkgname_with_version, re.M)
+            pkg_search_obj = re.search(r"^(.*?)\-[0-9][0-9.]*(nb[0-9]+)*", pkgname_with_version, re.M)
 
             # Do not proceed unless we have a match
             if not pkg_search_obj:
@@ -195,9 +190,9 @@ def query_package(module, name):
                 continue
 
             # The package was found; now return its state
-            if raw_state == '<':
+            if raw_state == "<":
                 return PackageState.OUTDATED
-            elif raw_state == '=' or raw_state == '>':
+            elif raw_state == "=" or raw_state == ">":
                 return PackageState.PRESENT
             else:
                 # Package found but not installed
@@ -212,18 +207,17 @@ def query_package(module, name):
 
 
 def format_action_message(module, action, count):
-    vars = {"actioned": action,
-            "count": count}
+    vars = {"actioned": action, "count": count}
 
     if module.check_mode:
-        message = "would have %(actioned)s %(count)d package" % vars
+        message = f"would have {vars['actioned']} {vars['count']} package"
     else:
-        message = "%(actioned)s %(count)d package" % vars
+        message = f"{vars['actioned']} {vars['count']} package"
 
     if count == 1:
         return message
     else:
-        return message + "s"
+        return f"{message}s"
 
 
 def format_pkgin_command(module, command, package=None):
@@ -247,7 +241,6 @@ def format_pkgin_command(module, command, package=None):
 
 
 def remove_packages(module, packages):
-
     remove_c = 0
 
     # Using a for loop in case of error, we can report the package that failed
@@ -256,11 +249,10 @@ def remove_packages(module, packages):
         if query_package(module, package) in [PackageState.NOT_INSTALLED, PackageState.NOT_FOUND]:
             continue
 
-        rc, out, err = module.run_command(
-            format_pkgin_command(module, "remove", package))
+        rc, out, err = module.run_command(format_pkgin_command(module, "remove", package))
 
         if not module.check_mode and query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
-            module.fail_json(msg="failed to remove %s: %s" % (package, out), stdout=out, stderr=err)
+            module.fail_json(msg=f"failed to remove {package}: {out}", stdout=out, stderr=err)
 
         remove_c += 1
 
@@ -271,7 +263,6 @@ def remove_packages(module, packages):
 
 
 def install_packages(module, packages):
-
     install_c = 0
 
     for package in packages:
@@ -279,28 +270,31 @@ def install_packages(module, packages):
         if query_result in [PackageState.PRESENT, PackageState.OUTDATED]:
             continue
         elif query_result is PackageState.NOT_FOUND:
-            module.fail_json(msg="failed to find package %s for installation" % package)
+            module.fail_json(msg=f"failed to find package {package} for installation")
 
-        rc, out, err = module.run_command(
-            format_pkgin_command(module, "install", package))
+        rc, out, err = module.run_command(format_pkgin_command(module, "install", package))
 
-        if not module.check_mode and not query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
-            module.fail_json(msg="failed to install %s: %s" % (package, out), stdout=out, stderr=err)
+        if not module.check_mode and not query_package(module, package) in [
+            PackageState.PRESENT,
+            PackageState.OUTDATED,
+        ]:
+            module.fail_json(msg=f"failed to install {package}: {out}", stdout=out, stderr=err)
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg=format_action_message(module, "installed", install_c), stdout=out, stderr=err)
+        module.exit_json(
+            changed=True, msg=format_action_message(module, "installed", install_c), stdout=out, stderr=err
+        )
 
     module.exit_json(changed=False, msg="package(s) already present")
 
 
 def update_package_db(module):
-    rc, out, err = module.run_command(
-        format_pkgin_command(module, "update"))
+    rc, out, err = module.run_command(format_pkgin_command(module, "update"))
 
     if rc == 0:
-        if re.search('database for.*is up-to-date\n$', out):
+        if re.search("database for.*is up-to-date\n$", out):
             return False, "database is up-to-date"
         else:
             return True, "updated repository database"
@@ -314,14 +308,13 @@ def do_upgrade_packages(module, full=False):
     else:
         cmd = "upgrade"
 
-    rc, out, err = module.run_command(
-        format_pkgin_command(module, cmd))
+    rc, out, err = module.run_command(format_pkgin_command(module, cmd))
 
     if rc == 0:
-        if re.search('^(.*\n|)nothing to do.\n$', out):
+        if re.search("^(.*\n|)nothing to do.\n$", out):
             module.exit_json(changed=False, msg="nothing left to upgrade")
     else:
-        module.fail_json(msg="could not %s packages" % cmd, stdout=out, stderr=err)
+        module.fail_json(msg=f"could not {cmd} packages", stdout=out, stderr=err)
 
 
 def upgrade_packages(module):
@@ -333,8 +326,7 @@ def full_upgrade_packages(module):
 
 
 def clean_cache(module):
-    rc, out, err = module.run_command(
-        format_pkgin_command(module, "clean"))
+    rc, out, err = module.run_command(format_pkgin_command(module, "clean"))
 
     if rc == 0:
         # There's no indication if 'clean' actually removed anything,
@@ -348,41 +340,43 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(default="present", choices=["present", "absent"]),
-            name=dict(aliases=["pkg"], type='list', elements='str'),
-            update_cache=dict(default=False, type='bool'),
-            upgrade=dict(default=False, type='bool'),
-            full_upgrade=dict(default=False, type='bool'),
-            clean=dict(default=False, type='bool'),
-            force=dict(default=False, type='bool')),
-        required_one_of=[['name', 'update_cache', 'upgrade', 'full_upgrade', 'clean']],
-        supports_check_mode=True)
+            name=dict(aliases=["pkg"], type="list", elements="str"),
+            update_cache=dict(default=False, type="bool"),
+            upgrade=dict(default=False, type="bool"),
+            full_upgrade=dict(default=False, type="bool"),
+            clean=dict(default=False, type="bool"),
+            force=dict(default=False, type="bool"),
+        ),
+        required_one_of=[["name", "update_cache", "upgrade", "full_upgrade", "clean"]],
+        supports_check_mode=True,
+    )
 
     global PKGIN_PATH
-    PKGIN_PATH = module.get_bin_path('pkgin', True, ['/opt/local/bin'])
+    PKGIN_PATH = module.get_bin_path("pkgin", True, ["/opt/local/bin"])
 
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     p = module.params
 
     if p["update_cache"]:
         c, msg = update_package_db(module)
-        if not (p['name'] or p["upgrade"] or p["full_upgrade"]):
+        if not (p["name"] or p["upgrade"] or p["full_upgrade"]):
             module.exit_json(changed=c, msg=msg)
 
     if p["upgrade"]:
         upgrade_packages(module)
-        if not p['name']:
-            module.exit_json(changed=True, msg='upgraded packages')
+        if not p["name"]:
+            module.exit_json(changed=True, msg="upgraded packages")
 
     if p["full_upgrade"]:
         full_upgrade_packages(module)
-        if not p['name']:
-            module.exit_json(changed=True, msg='upgraded all packages')
+        if not p["name"]:
+            module.exit_json(changed=True, msg="upgraded all packages")
 
     if p["clean"]:
         clean_cache(module)
-        if not p['name']:
-            module.exit_json(changed=True, msg='cleaned caches')
+        if not p["name"]:
+            module.exit_json(changed=True, msg="cleaned caches")
 
     pkgs = p["name"]
 
@@ -393,5 +387,5 @@ def main():
         remove_packages(module, pkgs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

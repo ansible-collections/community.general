@@ -1,9 +1,8 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: spotinst_aws_elastigroup
@@ -713,7 +712,6 @@ group_id:
 """
 
 HAS_SPOTINST_SDK = False
-__metaclass__ = type
 
 import os
 import time
@@ -728,163 +726,150 @@ try:
 except ImportError:
     pass
 
-eni_fields = ('description',
-              'device_index',
-              'secondary_private_ip_address_count',
-              'associate_public_ip_address',
-              'delete_on_termination',
-              'groups',
-              'network_interface_id',
-              'private_ip_address',
-              'subnet_id',
-              'associate_ipv6_address')
+eni_fields = (
+    "description",
+    "device_index",
+    "secondary_private_ip_address_count",
+    "associate_public_ip_address",
+    "delete_on_termination",
+    "groups",
+    "network_interface_id",
+    "private_ip_address",
+    "subnet_id",
+    "associate_ipv6_address",
+)
 
-private_ip_fields = ('private_ip_address',
-                     'primary')
+private_ip_fields = ("private_ip_address", "primary")
 
-capacity_fields = (dict(ansible_field_name='min_size',
-                        spotinst_field_name='minimum'),
-                   dict(ansible_field_name='max_size',
-                        spotinst_field_name='maximum'),
-                   'target',
-                   'unit')
+capacity_fields = (
+    dict(ansible_field_name="min_size", spotinst_field_name="minimum"),
+    dict(ansible_field_name="max_size", spotinst_field_name="maximum"),
+    "target",
+    "unit",
+)
 
-lspec_fields = ('user_data',
-                'key_pair',
-                'tenancy',
-                'shutdown_script',
-                'monitoring',
-                'ebs_optimized',
-                'image_id',
-                'health_check_type',
-                'health_check_grace_period',
-                'health_check_unhealthy_duration_before_replacement',
-                'security_group_ids')
+lspec_fields = (
+    "user_data",
+    "key_pair",
+    "tenancy",
+    "shutdown_script",
+    "monitoring",
+    "ebs_optimized",
+    "image_id",
+    "health_check_type",
+    "health_check_grace_period",
+    "health_check_unhealthy_duration_before_replacement",
+    "security_group_ids",
+)
 
-iam_fields = (dict(ansible_field_name='iam_role_name',
-                   spotinst_field_name='name'),
-              dict(ansible_field_name='iam_role_arn',
-                   spotinst_field_name='arn'))
+iam_fields = (
+    dict(ansible_field_name="iam_role_name", spotinst_field_name="name"),
+    dict(ansible_field_name="iam_role_arn", spotinst_field_name="arn"),
+)
 
-scheduled_task_fields = ('adjustment',
-                         'adjustment_percentage',
-                         'batch_size_percentage',
-                         'cron_expression',
-                         'frequency',
-                         'grace_period',
-                         'task_type',
-                         'is_enabled',
-                         'scale_target_capacity',
-                         'scale_min_capacity',
-                         'scale_max_capacity')
+scheduled_task_fields = (
+    "adjustment",
+    "adjustment_percentage",
+    "batch_size_percentage",
+    "cron_expression",
+    "frequency",
+    "grace_period",
+    "task_type",
+    "is_enabled",
+    "scale_target_capacity",
+    "scale_min_capacity",
+    "scale_max_capacity",
+)
 
-scaling_policy_fields = ('policy_name',
-                         'namespace',
-                         'metric_name',
-                         'dimensions',
-                         'statistic',
-                         'evaluation_periods',
-                         'period',
-                         'threshold',
-                         'cooldown',
-                         'unit',
-                         'operator')
+scaling_policy_fields = (
+    "policy_name",
+    "namespace",
+    "metric_name",
+    "dimensions",
+    "statistic",
+    "evaluation_periods",
+    "period",
+    "threshold",
+    "cooldown",
+    "unit",
+    "operator",
+)
 
-tracking_policy_fields = ('policy_name',
-                          'namespace',
-                          'source',
-                          'metric_name',
-                          'statistic',
-                          'unit',
-                          'cooldown',
-                          'target',
-                          'threshold')
+tracking_policy_fields = (
+    "policy_name",
+    "namespace",
+    "source",
+    "metric_name",
+    "statistic",
+    "unit",
+    "cooldown",
+    "target",
+    "threshold",
+)
 
-action_fields = (dict(ansible_field_name='action_type',
-                      spotinst_field_name='type'),
-                 'adjustment',
-                 'min_target_capacity',
-                 'max_target_capacity',
-                 'target',
-                 'minimum',
-                 'maximum')
+action_fields = (
+    dict(ansible_field_name="action_type", spotinst_field_name="type"),
+    "adjustment",
+    "min_target_capacity",
+    "max_target_capacity",
+    "target",
+    "minimum",
+    "maximum",
+)
 
-signal_fields = ('name',
-                 'timeout')
+signal_fields = ("name", "timeout")
 
-multai_lb_fields = ('balancer_id',
-                    'project_id',
-                    'target_set_id',
-                    'az_awareness',
-                    'auto_weight')
+multai_lb_fields = ("balancer_id", "project_id", "target_set_id", "az_awareness", "auto_weight")
 
-persistence_fields = ('should_persist_root_device',
-                      'should_persist_block_devices',
-                      'should_persist_private_ip')
+persistence_fields = ("should_persist_root_device", "should_persist_block_devices", "should_persist_private_ip")
 
-strategy_fields = ('risk',
-                   'utilize_reserved_instances',
-                   'fallback_to_od',
-                   'on_demand_count',
-                   'availability_vs_cost',
-                   'draining_timeout',
-                   'spin_up_time',
-                   'lifetime_period')
+strategy_fields = (
+    "risk",
+    "utilize_reserved_instances",
+    "fallback_to_od",
+    "on_demand_count",
+    "availability_vs_cost",
+    "draining_timeout",
+    "spin_up_time",
+    "lifetime_period",
+)
 
-ebs_fields = ('delete_on_termination',
-              'encrypted',
-              'iops',
-              'snapshot_id',
-              'volume_type',
-              'volume_size')
+ebs_fields = ("delete_on_termination", "encrypted", "iops", "snapshot_id", "volume_type", "volume_size")
 
-bdm_fields = ('device_name',
-              'virtual_name',
-              'no_device')
+bdm_fields = ("device_name", "virtual_name", "no_device")
 
-kubernetes_fields = ('api_server',
-                     'token')
+kubernetes_fields = ("api_server", "token")
 
-right_scale_fields = ('account_id',
-                      'refresh_token')
+right_scale_fields = ("account_id", "refresh_token")
 
-rancher_fields = ('access_key',
-                  'secret_key',
-                  'master_host',
-                  'version')
+rancher_fields = ("access_key", "secret_key", "master_host", "version")
 
-chef_fields = ('chef_server',
-               'organization',
-               'user',
-               'pem_key',
-               'chef_version')
+chef_fields = ("chef_server", "organization", "user", "pem_key", "chef_version")
 
-az_fields = ('name',
-             'subnet_id',
-             'placement_group_name')
+az_fields = ("name", "subnet_id", "placement_group_name")
 
-opsworks_fields = ('layer_id',)
+opsworks_fields = ("layer_id",)
 
-scaling_strategy_fields = ('terminate_at_end_of_billing_hour',)
+scaling_strategy_fields = ("terminate_at_end_of_billing_hour",)
 
-mesosphere_fields = ('api_server',)
+mesosphere_fields = ("api_server",)
 
-ecs_fields = ('cluster_name',)
+ecs_fields = ("cluster_name",)
 
-multai_fields = ('multai_token',)
+multai_fields = ("multai_token",)
 
 
 def handle_elastigroup(client, module):
     has_changed = False
     group_id = None
-    message = 'None'
+    message = "None"
 
-    name = module.params.get('name')
-    state = module.params.get('state')
-    uniqueness_by = module.params.get('uniqueness_by')
-    external_group_id = module.params.get('id')
+    name = module.params.get("name")
+    state = module.params.get("state")
+    uniqueness_by = module.params.get("uniqueness_by")
+    external_group_id = module.params.get("id")
 
-    if uniqueness_by == 'id':
+    if uniqueness_by == "id":
         if external_group_id is None:
             should_create = True
         else:
@@ -895,70 +880,69 @@ def handle_elastigroup(client, module):
         should_create, group_id = find_group_with_same_name(groups, name)
 
     if should_create is True:
-        if state == 'present':
+        if state == "present":
             eg = expand_elastigroup(module, is_update=False)
-            module.debug(str(" [INFO] " + message + "\n"))
+            module.debug(f" [INFO] {message}\n")
             group = client.create_elastigroup(group=eg)
-            group_id = group['id']
-            message = 'Created group Successfully.'
+            group_id = group["id"]
+            message = "Created group Successfully."
             has_changed = True
 
-        elif state == 'absent':
-            message = 'Cannot delete non-existent group.'
+        elif state == "absent":
+            message = "Cannot delete non-existent group."
             has_changed = False
     else:
         eg = expand_elastigroup(module, is_update=True)
 
-        if state == 'present':
+        if state == "present":
             group = client.update_elastigroup(group_update=eg, group_id=group_id)
-            message = 'Updated group successfully.'
+            message = "Updated group successfully."
 
             try:
-                roll_config = module.params.get('roll_config')
+                roll_config = module.params.get("roll_config")
                 if roll_config:
                     eg_roll = spotinst.aws_elastigroup.Roll(
-                        batch_size_percentage=roll_config.get('batch_size_percentage'),
-                        grace_period=roll_config.get('grace_period'),
-                        health_check_type=roll_config.get('health_check_type')
+                        batch_size_percentage=roll_config.get("batch_size_percentage"),
+                        grace_period=roll_config.get("grace_period"),
+                        health_check_type=roll_config.get("health_check_type"),
                     )
                     roll_response = client.roll_group(group_roll=eg_roll, group_id=group_id)
-                    message = 'Updated and started rolling the group successfully.'
+                    message = "Updated and started rolling the group successfully."
 
             except SpotinstClientException as exc:
-                message = 'Updated group successfully, but failed to perform roll. Error:' + str(exc)
+                message = f"Updated group successfully, but failed to perform roll. Error:{exc}"
             has_changed = True
 
-        elif state == 'absent':
+        elif state == "absent":
             try:
                 client.delete_elastigroup(group_id=group_id)
             except SpotinstClientException as exc:
                 if "GROUP_DOESNT_EXIST" in exc.message:
                     pass
                 else:
-                    module.fail_json(msg="Error while attempting to delete group : " + exc.message)
+                    module.fail_json(msg=f"Error while attempting to delete group : {exc.message}")
 
-            message = 'Deleted group successfully.'
+            message = "Deleted group successfully."
             has_changed = True
 
     return group_id, message, has_changed
 
 
 def retrieve_group_instances(client, module, group_id):
-    wait_timeout = module.params.get('wait_timeout')
-    wait_for_instances = module.params.get('wait_for_instances')
+    wait_timeout = module.params.get("wait_timeout")
+    wait_for_instances = module.params.get("wait_for_instances")
 
-    health_check_type = module.params.get('health_check_type')
+    health_check_type = module.params.get("health_check_type")
 
     if wait_timeout is None:
         wait_timeout = 300
 
     wait_timeout = time.time() + wait_timeout
-    target = module.params.get('target')
-    state = module.params.get('state')
+    target = module.params.get("target")
+    state = module.params.get("state")
     instances = list()
 
-    if state == 'present' and group_id is not None and wait_for_instances is True:
-
+    if state == "present" and group_id is not None and wait_for_instances is True:
         is_amount_fulfilled = False
         while is_amount_fulfilled is False and wait_timeout > time.time():
             instances = list()
@@ -968,7 +952,7 @@ def retrieve_group_instances(client, module, group_id):
                 healthy_instances = client.get_instance_healthiness(group_id=group_id)
 
                 for healthy_instance in healthy_instances:
-                    if healthy_instance.get('healthStatus') == 'HEALTHY':
+                    if healthy_instance.get("healthStatus") == "HEALTHY":
                         amount_of_fulfilled_instances += 1
                         instances.append(healthy_instance)
 
@@ -976,7 +960,7 @@ def retrieve_group_instances(client, module, group_id):
                 active_instances = client.get_elastigroup_active_instances(group_id=group_id)
 
                 for active_instance in active_instances:
-                    if active_instance.get('private_ip') is not None:
+                    if active_instance.get("private_ip") is not None:
                         amount_of_fulfilled_instances += 1
                         instances.append(active_instance)
 
@@ -990,18 +974,18 @@ def retrieve_group_instances(client, module, group_id):
 
 def find_group_with_same_name(groups, name):
     for group in groups:
-        if group['name'] == name:
-            return False, group.get('id')
+        if group["name"] == name:
+            return False, group.get("id")
 
     return True, None
 
 
 def expand_elastigroup(module, is_update):
-    do_not_update = module.params['do_not_update']
-    name = module.params.get('name')
+    do_not_update = module.params["do_not_update"]
+    name = module.params.get("name")
 
     eg = spotinst.aws_elastigroup.Elastigroup()
-    description = module.params.get('description')
+    description = module.params.get("description")
 
     if name is not None:
         eg.name = name
@@ -1027,12 +1011,12 @@ def expand_elastigroup(module, is_update):
 
 
 def expand_compute(eg, module, is_update, do_not_update):
-    elastic_ips = module.params['elastic_ips']
-    on_demand_instance_type = module.params.get('on_demand_instance_type')
-    spot_instance_types = module.params['spot_instance_types']
-    ebs_volume_pool = module.params['ebs_volume_pool']
-    availability_zones_list = module.params['availability_zones']
-    product = module.params.get('product')
+    elastic_ips = module.params["elastic_ips"]
+    on_demand_instance_type = module.params.get("on_demand_instance_type")
+    spot_instance_types = module.params["spot_instance_types"]
+    ebs_volume_pool = module.params["ebs_volume_pool"]
+    availability_zones_list = module.params["availability_zones"]
+    product = module.params.get("product")
 
     eg_compute = spotinst.aws_elastigroup.Compute()
 
@@ -1057,7 +1041,7 @@ def expand_compute(eg, module, is_update, do_not_update):
 
     expand_ebs_volume_pool(eg_compute, ebs_volume_pool)
 
-    eg_compute.availability_zones = expand_list(availability_zones_list, az_fields, 'AvailabilityZone')
+    eg_compute.availability_zones = expand_list(availability_zones_list, az_fields, "AvailabilityZone")
 
     expand_launch_spec(eg_compute, module, is_update, do_not_update)
 
@@ -1071,10 +1055,10 @@ def expand_ebs_volume_pool(eg_compute, ebs_volumes_list):
         for volume in ebs_volumes_list:
             eg_volume = spotinst.aws_elastigroup.EbsVolume()
 
-            if volume.get('device_name') is not None:
-                eg_volume.device_name = volume.get('device_name')
-            if volume.get('volume_ids') is not None:
-                eg_volume.volume_ids = volume.get('volume_ids')
+            if volume.get("device_name") is not None:
+                eg_volume.device_name = volume.get("device_name")
+            if volume.get("volume_ids") is not None:
+                eg_volume.volume_ids = volume.get("volume_ids")
 
             if eg_volume.device_name is not None:
                 eg_volumes.append(eg_volume)
@@ -1084,20 +1068,20 @@ def expand_ebs_volume_pool(eg_compute, ebs_volumes_list):
 
 
 def expand_launch_spec(eg_compute, module, is_update, do_not_update):
-    eg_launch_spec = expand_fields(lspec_fields, module.params, 'LaunchSpecification')
+    eg_launch_spec = expand_fields(lspec_fields, module.params, "LaunchSpecification")
 
-    if module.params['iam_role_arn'] is not None or module.params['iam_role_name'] is not None:
-        eg_launch_spec.iam_role = expand_fields(iam_fields, module.params, 'IamRole')
+    if module.params["iam_role_arn"] is not None or module.params["iam_role_name"] is not None:
+        eg_launch_spec.iam_role = expand_fields(iam_fields, module.params, "IamRole")
 
-    tags = module.params['tags']
-    load_balancers = module.params['load_balancers']
-    target_group_arns = module.params['target_group_arns']
-    block_device_mappings = module.params['block_device_mappings']
-    network_interfaces = module.params['network_interfaces']
+    tags = module.params["tags"]
+    load_balancers = module.params["load_balancers"]
+    target_group_arns = module.params["target_group_arns"]
+    block_device_mappings = module.params["block_device_mappings"]
+    network_interfaces = module.params["network_interfaces"]
 
     if is_update is True:
-        if 'image_id' in do_not_update:
-            delattr(eg_launch_spec, 'image_id')
+        if "image_id" in do_not_update:
+            delattr(eg_launch_spec, "image_id")
 
     expand_tags(eg_launch_spec, tags)
 
@@ -1111,44 +1095,44 @@ def expand_launch_spec(eg_compute, module, is_update, do_not_update):
 
 
 def expand_integrations(eg, module):
-    rancher = module.params.get('rancher')
-    mesosphere = module.params.get('mesosphere')
-    ecs = module.params.get('ecs')
-    kubernetes = module.params.get('kubernetes')
-    right_scale = module.params.get('right_scale')
-    opsworks = module.params.get('opsworks')
-    chef = module.params.get('chef')
+    rancher = module.params.get("rancher")
+    mesosphere = module.params.get("mesosphere")
+    ecs = module.params.get("ecs")
+    kubernetes = module.params.get("kubernetes")
+    right_scale = module.params.get("right_scale")
+    opsworks = module.params.get("opsworks")
+    chef = module.params.get("chef")
 
     integration_exists = False
 
     eg_integrations = spotinst.aws_elastigroup.ThirdPartyIntegrations()
 
     if mesosphere is not None:
-        eg_integrations.mesosphere = expand_fields(mesosphere_fields, mesosphere, 'Mesosphere')
+        eg_integrations.mesosphere = expand_fields(mesosphere_fields, mesosphere, "Mesosphere")
         integration_exists = True
 
     if ecs is not None:
-        eg_integrations.ecs = expand_fields(ecs_fields, ecs, 'EcsConfiguration')
+        eg_integrations.ecs = expand_fields(ecs_fields, ecs, "EcsConfiguration")
         integration_exists = True
 
     if kubernetes is not None:
-        eg_integrations.kubernetes = expand_fields(kubernetes_fields, kubernetes, 'KubernetesConfiguration')
+        eg_integrations.kubernetes = expand_fields(kubernetes_fields, kubernetes, "KubernetesConfiguration")
         integration_exists = True
 
     if right_scale is not None:
-        eg_integrations.right_scale = expand_fields(right_scale_fields, right_scale, 'RightScaleConfiguration')
+        eg_integrations.right_scale = expand_fields(right_scale_fields, right_scale, "RightScaleConfiguration")
         integration_exists = True
 
     if opsworks is not None:
-        eg_integrations.opsworks = expand_fields(opsworks_fields, opsworks, 'OpsWorksConfiguration')
+        eg_integrations.opsworks = expand_fields(opsworks_fields, opsworks, "OpsWorksConfiguration")
         integration_exists = True
 
     if rancher is not None:
-        eg_integrations.rancher = expand_fields(rancher_fields, rancher, 'Rancher')
+        eg_integrations.rancher = expand_fields(rancher_fields, rancher, "Rancher")
         integration_exists = True
 
     if chef is not None:
-        eg_integrations.chef = expand_fields(chef_fields, chef, 'ChefConfiguration')
+        eg_integrations.chef = expand_fields(chef_fields, chef, "ChefConfiguration")
         integration_exists = True
 
     if integration_exists:
@@ -1156,34 +1140,33 @@ def expand_integrations(eg, module):
 
 
 def expand_capacity(eg, module, is_update, do_not_update):
-    eg_capacity = expand_fields(capacity_fields, module.params, 'Capacity')
+    eg_capacity = expand_fields(capacity_fields, module.params, "Capacity")
 
     if is_update is True:
-        delattr(eg_capacity, 'unit')
+        delattr(eg_capacity, "unit")
 
-        if 'target' in do_not_update:
-            delattr(eg_capacity, 'target')
+        if "target" in do_not_update:
+            delattr(eg_capacity, "target")
 
     eg.capacity = eg_capacity
 
 
 def expand_strategy(eg, module):
-    persistence = module.params.get('persistence')
-    signals = module.params.get('signals')
+    persistence = module.params.get("persistence")
+    signals = module.params.get("signals")
 
-    eg_strategy = expand_fields(strategy_fields, module.params, 'Strategy')
+    eg_strategy = expand_fields(strategy_fields, module.params, "Strategy")
 
-    terminate_at_end_of_billing_hour = module.params.get('terminate_at_end_of_billing_hour')
+    terminate_at_end_of_billing_hour = module.params.get("terminate_at_end_of_billing_hour")
 
     if terminate_at_end_of_billing_hour is not None:
-        eg_strategy.eg_scaling_strategy = expand_fields(scaling_strategy_fields,
-                                                        module.params, 'ScalingStrategy')
+        eg_strategy.eg_scaling_strategy = expand_fields(scaling_strategy_fields, module.params, "ScalingStrategy")
 
     if persistence is not None:
-        eg_strategy.persistence = expand_fields(persistence_fields, persistence, 'Persistence')
+        eg_strategy.persistence = expand_fields(persistence_fields, persistence, "Persistence")
 
     if signals is not None:
-        eg_signals = expand_list(signals, signal_fields, 'Signal')
+        eg_signals = expand_list(signals, signal_fields, "Signal")
 
         if len(eg_signals) > 0:
             eg_strategy.signals = eg_signals
@@ -1192,12 +1175,12 @@ def expand_strategy(eg, module):
 
 
 def expand_multai(eg, module):
-    multai_load_balancers = module.params.get('multai_load_balancers')
+    multai_load_balancers = module.params.get("multai_load_balancers")
 
-    eg_multai = expand_fields(multai_fields, module.params, 'Multai')
+    eg_multai = expand_fields(multai_fields, module.params, "Multai")
 
     if multai_load_balancers is not None:
-        eg_multai_load_balancers = expand_list(multai_load_balancers, multai_lb_fields, 'MultaiLoadBalancer')
+        eg_multai_load_balancers = expand_list(multai_load_balancers, multai_lb_fields, "MultaiLoadBalancer")
 
         if len(eg_multai_load_balancers) > 0:
             eg_multai.balancers = eg_multai_load_balancers
@@ -1205,12 +1188,12 @@ def expand_multai(eg, module):
 
 
 def expand_scheduled_tasks(eg, module):
-    scheduled_tasks = module.params.get('scheduled_tasks')
+    scheduled_tasks = module.params.get("scheduled_tasks")
 
     if scheduled_tasks is not None:
         eg_scheduling = spotinst.aws_elastigroup.Scheduling()
 
-        eg_tasks = expand_list(scheduled_tasks, scheduled_task_fields, 'ScheduledTask')
+        eg_tasks = expand_list(scheduled_tasks, scheduled_task_fields, "ScheduledTask")
 
         if len(eg_tasks) > 0:
             eg_scheduling.tasks = eg_tasks
@@ -1227,7 +1210,7 @@ def expand_load_balancers(eg_launchspec, load_balancers, target_group_arns):
                 eg_elb = spotinst.aws_elastigroup.LoadBalancer()
                 if elb_name is not None:
                     eg_elb.name = elb_name
-                    eg_elb.type = 'CLASSIC'
+                    eg_elb.type = "CLASSIC"
                     eg_total_lbs.append(eg_elb)
 
         if target_group_arns is not None:
@@ -1235,7 +1218,7 @@ def expand_load_balancers(eg_launchspec, load_balancers, target_group_arns):
                 eg_elb = spotinst.aws_elastigroup.LoadBalancer()
                 if target_arn is not None:
                     eg_elb.arn = target_arn
-                    eg_elb.type = 'TARGET_GROUP'
+                    eg_elb.type = "TARGET_GROUP"
                     eg_total_lbs.append(eg_elb)
 
         if len(eg_total_lbs) > 0:
@@ -1263,10 +1246,10 @@ def expand_block_device_mappings(eg_launchspec, bdms):
         eg_bdms = []
 
         for bdm in bdms:
-            eg_bdm = expand_fields(bdm_fields, bdm, 'BlockDeviceMapping')
+            eg_bdm = expand_fields(bdm_fields, bdm, "BlockDeviceMapping")
 
-            if bdm.get('ebs') is not None:
-                eg_bdm.ebs = expand_fields(ebs_fields, bdm.get('ebs'), 'EBS')
+            if bdm.get("ebs") is not None:
+                eg_bdm.ebs = expand_fields(ebs_fields, bdm.get("ebs"), "EBS")
 
             eg_bdms.append(eg_bdm)
 
@@ -1279,9 +1262,9 @@ def expand_network_interfaces(eg_launchspec, enis):
         eg_enis = []
 
         for eni in enis:
-            eg_eni = expand_fields(eni_fields, eni, 'NetworkInterface')
+            eg_eni = expand_fields(eni_fields, eni, "NetworkInterface")
 
-            eg_pias = expand_list(eni.get('private_ip_addresses'), private_ip_fields, 'PrivateIpAddress')
+            eg_pias = expand_list(eni.get("private_ip_addresses"), private_ip_fields, "PrivateIpAddress")
 
             if eg_pias is not None:
                 eg_eni.private_ip_addresses = eg_pias
@@ -1293,9 +1276,9 @@ def expand_network_interfaces(eg_launchspec, enis):
 
 
 def expand_scaling(eg, module):
-    up_scaling_policies = module.params['up_scaling_policies']
-    down_scaling_policies = module.params['down_scaling_policies']
-    target_tracking_policies = module.params['target_tracking_policies']
+    up_scaling_policies = module.params["up_scaling_policies"]
+    down_scaling_policies = module.params["down_scaling_policies"]
+    target_tracking_policies = module.params["target_tracking_policies"]
 
     eg_scaling = spotinst.aws_elastigroup.Scaling()
 
@@ -1336,8 +1319,8 @@ def expand_fields(fields, item, class_name):
     if item is not None:
         for field in fields:
             if isinstance(field, dict):
-                ansible_field_name = field['ansible_field_name']
-                spotinst_field_name = field['spotinst_field_name']
+                ansible_field_name = field["ansible_field_name"]
+                spotinst_field_name = field["spotinst_field_name"]
             else:
                 ansible_field_name = field
                 spotinst_field_name = field
@@ -1351,8 +1334,8 @@ def expand_scaling_policies(scaling_policies):
     eg_scaling_policies = []
 
     for policy in scaling_policies:
-        eg_policy = expand_fields(scaling_policy_fields, policy, 'ScalingPolicy')
-        eg_policy.action = expand_fields(action_fields, policy, 'ScalingPolicyAction')
+        eg_policy = expand_fields(scaling_policy_fields, policy, "ScalingPolicy")
+        eg_policy.action = expand_fields(action_fields, policy, "ScalingPolicyAction")
         eg_scaling_policies.append(eg_policy)
 
     return eg_scaling_policies
@@ -1362,7 +1345,7 @@ def expand_target_tracking_policies(tracking_policies):
     eg_tracking_policies = []
 
     for policy in tracking_policies:
-        eg_policy = expand_fields(tracking_policy_fields, policy, 'TargetTrackingPolicy')
+        eg_policy = expand_fields(tracking_policy_fields, policy, "TargetTrackingPolicy")
         eg_tracking_policies.append(eg_policy)
 
     return eg_tracking_policies
@@ -1370,70 +1353,70 @@ def expand_target_tracking_policies(tracking_policies):
 
 def main():
     fields = dict(
-        account_id=dict(type='str'),
-        availability_vs_cost=dict(type='str', required=True),
-        availability_zones=dict(type='list', elements='dict', required=True),
-        block_device_mappings=dict(type='list', elements='dict'),
-        chef=dict(type='dict'),
-        credentials_path=dict(type='path', default="~/.spotinst/credentials"),
-        do_not_update=dict(default=[], type='list', elements='str'),
-        down_scaling_policies=dict(type='list', elements='dict'),
-        draining_timeout=dict(type='int'),
-        ebs_optimized=dict(type='bool'),
-        ebs_volume_pool=dict(type='list', elements='dict'),
-        ecs=dict(type='dict'),
-        elastic_beanstalk=dict(type='dict'),
-        elastic_ips=dict(type='list', elements='str'),
-        fallback_to_od=dict(type='bool'),
-        id=dict(type='str'),
-        health_check_grace_period=dict(type='int'),
-        health_check_type=dict(type='str'),
-        health_check_unhealthy_duration_before_replacement=dict(type='int'),
-        iam_role_arn=dict(type='str'),
-        iam_role_name=dict(type='str'),
-        image_id=dict(type='str', required=True),
-        key_pair=dict(type='str', no_log=False),
-        kubernetes=dict(type='dict'),
-        lifetime_period=dict(type='int'),
-        load_balancers=dict(type='list', elements='str'),
-        max_size=dict(type='int', required=True),
-        mesosphere=dict(type='dict'),
-        min_size=dict(type='int', required=True),
-        monitoring=dict(type='str'),
-        multai_load_balancers=dict(type='list', elements='dict'),
-        multai_token=dict(type='str', no_log=True),
-        name=dict(type='str', required=True),
-        network_interfaces=dict(type='list', elements='dict'),
-        on_demand_count=dict(type='int'),
-        on_demand_instance_type=dict(type='str'),
-        opsworks=dict(type='dict'),
-        persistence=dict(type='dict'),
-        product=dict(type='str', required=True),
-        rancher=dict(type='dict'),
-        right_scale=dict(type='dict'),
-        risk=dict(type='int'),
-        roll_config=dict(type='dict'),
-        scheduled_tasks=dict(type='list', elements='dict'),
-        security_group_ids=dict(type='list', elements='str', required=True),
-        shutdown_script=dict(type='str'),
-        signals=dict(type='list', elements='dict'),
-        spin_up_time=dict(type='int'),
-        spot_instance_types=dict(type='list', elements='str', required=True),
-        state=dict(default='present', choices=['present', 'absent']),
-        tags=dict(type='list', elements='dict'),
-        target=dict(type='int', required=True),
-        target_group_arns=dict(type='list', elements='str'),
-        tenancy=dict(type='str'),
-        terminate_at_end_of_billing_hour=dict(type='bool'),
-        token=dict(type='str', no_log=True),
-        unit=dict(type='str'),
-        user_data=dict(type='str'),
-        utilize_reserved_instances=dict(type='bool'),
-        uniqueness_by=dict(default='name', choices=['name', 'id']),
-        up_scaling_policies=dict(type='list', elements='dict'),
-        target_tracking_policies=dict(type='list', elements='dict'),
-        wait_for_instances=dict(type='bool', default=False),
-        wait_timeout=dict(type='int')
+        account_id=dict(type="str"),
+        availability_vs_cost=dict(type="str", required=True),
+        availability_zones=dict(type="list", elements="dict", required=True),
+        block_device_mappings=dict(type="list", elements="dict"),
+        chef=dict(type="dict"),
+        credentials_path=dict(type="path", default="~/.spotinst/credentials"),
+        do_not_update=dict(default=[], type="list", elements="str"),
+        down_scaling_policies=dict(type="list", elements="dict"),
+        draining_timeout=dict(type="int"),
+        ebs_optimized=dict(type="bool"),
+        ebs_volume_pool=dict(type="list", elements="dict"),
+        ecs=dict(type="dict"),
+        elastic_beanstalk=dict(type="dict"),
+        elastic_ips=dict(type="list", elements="str"),
+        fallback_to_od=dict(type="bool"),
+        id=dict(type="str"),
+        health_check_grace_period=dict(type="int"),
+        health_check_type=dict(type="str"),
+        health_check_unhealthy_duration_before_replacement=dict(type="int"),
+        iam_role_arn=dict(type="str"),
+        iam_role_name=dict(type="str"),
+        image_id=dict(type="str", required=True),
+        key_pair=dict(type="str", no_log=False),
+        kubernetes=dict(type="dict"),
+        lifetime_period=dict(type="int"),
+        load_balancers=dict(type="list", elements="str"),
+        max_size=dict(type="int", required=True),
+        mesosphere=dict(type="dict"),
+        min_size=dict(type="int", required=True),
+        monitoring=dict(type="str"),
+        multai_load_balancers=dict(type="list", elements="dict"),
+        multai_token=dict(type="str", no_log=True),
+        name=dict(type="str", required=True),
+        network_interfaces=dict(type="list", elements="dict"),
+        on_demand_count=dict(type="int"),
+        on_demand_instance_type=dict(type="str"),
+        opsworks=dict(type="dict"),
+        persistence=dict(type="dict"),
+        product=dict(type="str", required=True),
+        rancher=dict(type="dict"),
+        right_scale=dict(type="dict"),
+        risk=dict(type="int"),
+        roll_config=dict(type="dict"),
+        scheduled_tasks=dict(type="list", elements="dict"),
+        security_group_ids=dict(type="list", elements="str", required=True),
+        shutdown_script=dict(type="str"),
+        signals=dict(type="list", elements="dict"),
+        spin_up_time=dict(type="int"),
+        spot_instance_types=dict(type="list", elements="str", required=True),
+        state=dict(default="present", choices=["present", "absent"]),
+        tags=dict(type="list", elements="dict"),
+        target=dict(type="int", required=True),
+        target_group_arns=dict(type="list", elements="str"),
+        tenancy=dict(type="str"),
+        terminate_at_end_of_billing_hour=dict(type="bool"),
+        token=dict(type="str", no_log=True),
+        unit=dict(type="str"),
+        user_data=dict(type="str"),
+        utilize_reserved_instances=dict(type="bool"),
+        uniqueness_by=dict(default="name", choices=["name", "id"]),
+        up_scaling_policies=dict(type="list", elements="dict"),
+        target_tracking_policies=dict(type="list", elements="dict"),
+        wait_for_instances=dict(type="bool", default=False),
+        wait_timeout=dict(type="int"),
     )
 
     module = AnsibleModule(argument_spec=fields)
@@ -1444,28 +1427,28 @@ def main():
     # Retrieve creds file variables
     creds_file_loaded_vars = dict()
 
-    credentials_path = module.params.get('credentials_path')
+    credentials_path = module.params.get("credentials_path")
 
     try:
         with open(credentials_path, "r") as creds:
             for line in creds:
-                eq_index = line.find('=')
+                eq_index = line.find("=")
                 var_name = line[:eq_index].strip()
-                string_value = line[eq_index + 1:].strip()
+                string_value = line[eq_index + 1 :].strip()
                 creds_file_loaded_vars[var_name] = string_value
     except IOError:
         pass
     # End of creds file retrieval
 
-    token = module.params.get('token')
+    token = module.params.get("token")
     if not token:
-        token = os.environ.get('SPOTINST_TOKEN')
+        token = os.environ.get("SPOTINST_TOKEN")
     if not token:
         token = creds_file_loaded_vars.get("token")
 
-    account = module.params.get('account_id')
+    account = module.params.get("account_id")
     if not account:
-        account = os.environ.get('SPOTINST_ACCOUNT_ID') or os.environ.get('ACCOUNT')
+        account = os.environ.get("SPOTINST_ACCOUNT_ID") or os.environ.get("ACCOUNT")
     if not account:
         account = creds_file_loaded_vars.get("account")
 
@@ -1481,5 +1464,5 @@ def main():
     module.exit_json(changed=has_changed, group_id=group_id, message=message, instances=instances)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

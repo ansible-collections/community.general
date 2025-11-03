@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Thales Netherlands
 # Copyright (c) 2021, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 author:
@@ -138,9 +136,9 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(direct=kwargs)
         initial_value = self.get_option("initial_value", None)
-        self._override = self.get_option('override', 'error')
-        self._pattern_type = self.get_option('pattern_type', 'regex')
-        self._groups = self.get_option('groups', None)
+        self._override = self.get_option("override", "error")
+        self._pattern_type = self.get_option("pattern_type", "regex")
+        self._groups = self.get_option("groups", None)
 
         ret = []
         for term in terms:
@@ -161,7 +159,7 @@ class LookupModule(LookupBase):
         return ret
 
     def _is_host_in_allowed_groups(self, host_groups):
-        if 'all' in self._groups:
+        if "all" in self._groups:
             return True
 
         group_intersection = [host_group_name for host_group_name in host_groups if host_group_name in self._groups]
@@ -193,7 +191,9 @@ class LookupModule(LookupBase):
             result = initial_value
 
         for var_name in var_merge_names:
-            temp_templar = self._templar.copy_with_new_env(available_variables=variables)  # tmp. switch renderer to context of current variables
+            temp_templar = self._templar.copy_with_new_env(
+                available_variables=variables
+            )  # tmp. switch renderer to context of current variables
             var_value = temp_templar.template(variables[var_name])  # Render jinja2 templates
             var_type = _verify_and_get_type(var_value)
 

@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2018 IBM CORPORATION
 # Author(s): Tzur Eliyahu <tzure@il.ibm.com>
 #
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 import traceback
 
@@ -22,49 +20,61 @@ except ImportError:
     PYXCLI_IMP_ERR = traceback.format_exc()
     PYXCLI_INSTALLED = False
 
-AVAILABLE_PYXCLI_FIELDS = ['pool', 'size', 'snapshot_size',
-                           'domain', 'perf_class', 'vol',
-                           'iscsi_chap_name', 'iscsi_chap_secret',
-                           'cluster', 'host', 'lun', 'override',
-                           'fcaddress', 'iscsi_name', 'max_dms',
-                           'max_cgs', 'ldap_id', 'max_mirrors',
-                           'max_pools', 'max_volumes', 'hard_capacity',
-                           'soft_capacity']
+AVAILABLE_PYXCLI_FIELDS = [
+    "pool",
+    "size",
+    "snapshot_size",
+    "domain",
+    "perf_class",
+    "vol",
+    "iscsi_chap_name",
+    "iscsi_chap_secret",
+    "cluster",
+    "host",
+    "lun",
+    "override",
+    "fcaddress",
+    "iscsi_name",
+    "max_dms",
+    "max_cgs",
+    "ldap_id",
+    "max_mirrors",
+    "max_pools",
+    "max_volumes",
+    "hard_capacity",
+    "soft_capacity",
+]
 
 
 def xcli_wrapper(func):
-    """ Catch xcli errors and return a proper message"""
+    """Catch xcli errors and return a proper message"""
+
     @wraps(func)
     def wrapper(module, *args, **kwargs):
         try:
             return func(module, *args, **kwargs)
         except errors.CommandExecutionError as e:
             module.fail_json(msg=to_native(e))
+
     return wrapper
 
 
 @xcli_wrapper
 def connect_ssl(module):
-    endpoints = module.params['endpoints']
-    username = module.params['username']
-    password = module.params['password']
+    endpoints = module.params["endpoints"]
+    username = module.params["username"]
+    password = module.params["password"]
     if not (username and password and endpoints):
-        module.fail_json(
-            msg="Username, password or endpoints arguments "
-            "are missing from the module arguments")
+        module.fail_json(msg="Username, password or endpoints arguments are missing from the module arguments")
 
     try:
-        return client.XCLIClient.connect_multiendpoint_ssl(username,
-                                                           password,
-                                                           endpoints)
+        return client.XCLIClient.connect_multiendpoint_ssl(username, password, endpoints)
     except errors.CommandFailedConnectionError as e:
-        module.fail_json(
-            msg="Connection with Spectrum Accelerate system has "
-            "failed: {[0]}.".format(to_native(e)))
+        module.fail_json(msg=f"Connection with Spectrum Accelerate system has failed: {e}.")
 
 
 def spectrum_accelerate_spec():
-    """ Return arguments spec for AnsibleModule """
+    """Return arguments spec for AnsibleModule"""
     return dict(
         endpoints=dict(required=True),
         username=dict(required=True),
@@ -80,17 +90,16 @@ def execute_pyxcli_command(module, xcli_command, xcli_client):
 
 
 def build_pyxcli_command(fields):
-    """ Builds the args for pyxcli using the exact args from ansible"""
+    """Builds the args for pyxcli using the exact args from ansible"""
     pyxcli_args = {}
     for field in fields:
         if not fields[field]:
             continue
-        if field in AVAILABLE_PYXCLI_FIELDS and fields[field] != '':
+        if field in AVAILABLE_PYXCLI_FIELDS and fields[field] != "":
             pyxcli_args[field] = fields[field]
     return pyxcli_args
 
 
 def is_pyxcli_installed(module):
     if not PYXCLI_INSTALLED:
-        module.fail_json(msg=missing_required_lib('pyxcli'),
-                         exception=PYXCLI_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pyxcli"), exception=PYXCLI_IMP_ERR)

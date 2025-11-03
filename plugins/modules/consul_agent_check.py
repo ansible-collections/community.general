@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, Michael Ilg
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: consul_agent_check
@@ -163,31 +161,31 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
 
 _ARGUMENT_SPEC = {
     "state": dict(default="present", choices=["present", "absent"]),
-    "name": dict(type='str'),
-    "id": dict(type='str'),
-    "interval": dict(type='str'),
-    "notes": dict(type='str'),
-    "args": dict(type='list', elements='str'),
-    "http": dict(type='str'),
-    "tcp": dict(type='str'),
-    "ttl": dict(type='str'),
-    "timeout": dict(type='str'),
-    "service_id": dict(type='str'),
+    "name": dict(type="str"),
+    "id": dict(type="str"),
+    "interval": dict(type="str"),
+    "notes": dict(type="str"),
+    "args": dict(type="list", elements="str"),
+    "http": dict(type="str"),
+    "tcp": dict(type="str"),
+    "ttl": dict(type="str"),
+    "timeout": dict(type="str"),
+    "service_id": dict(type="str"),
 }
 
 _MUTUALLY_EXCLUSIVE = [
-    ('args', 'ttl', 'tcp', 'http'),
+    ("args", "ttl", "tcp", "http"),
 ]
 
 _REQUIRED_IF = [
-    ('state', 'present', ['name']),
-    ('state', 'absent', ('id', 'name'), True),
+    ("state", "present", ["name"]),
+    ("state", "absent", ("id", "name"), True),
 ]
 
 _REQUIRED_BY = {
-    'args': 'interval',
-    'http': 'interval',
-    'tcp': 'interval',
+    "args": "interval",
+    "http": "interval",
+    "tcp": "interval",
 }
 
 _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)
@@ -197,18 +195,27 @@ class ConsulAgentCheckModule(_ConsulModule):
     api_endpoint = "agent/check"
     result_key = "check"
     unique_identifiers = ["id", "name"]
-    operational_attributes = {"Node", "CheckID", "Output", "ServiceName", "ServiceTags",
-                              "Status", "Type", "ExposedPort", "Definition"}
+    operational_attributes = {
+        "Node",
+        "CheckID",
+        "Output",
+        "ServiceName",
+        "ServiceTags",
+        "Status",
+        "Type",
+        "ExposedPort",
+        "Definition",
+    }
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
             return "agent/checks"
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
-            return "/".join([self.api_endpoint, "register"])
+            return f"{self.api_endpoint}/register"
         if operation == OPERATION_DELETE:
-            return "/".join([self.api_endpoint, "deregister", identifier])
+            return f"{self.api_endpoint}/deregister/{identifier}"
 
-        return super(ConsulAgentCheckModule, self).endpoint_url(operation, identifier)
+        return super().endpoint_url(operation, identifier)
 
     def read_object(self):
         url = self.endpoint_url(OPERATION_READ)
@@ -219,7 +226,7 @@ class ConsulAgentCheckModule(_ConsulModule):
         return None
 
     def prepare_object(self, existing, obj):
-        existing = super(ConsulAgentCheckModule, self).prepare_object(existing, obj)
+        existing = super().prepare_object(existing, obj)
         validate_check(existing)
         return existing
 

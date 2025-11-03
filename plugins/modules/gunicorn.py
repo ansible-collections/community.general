@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Alejandro Gomez <alexgomez2202@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -109,9 +107,9 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def search_existing_config(config, option):
-    ''' search in config file for specified option '''
+    """search in config file for specified option"""
     if config and os.path.isfile(config):
-        with open(config, 'r') as f:
+        with open(config, "r") as f:
             for line in f:
                 if option in line:
                     return line
@@ -119,36 +117,35 @@ def search_existing_config(config, option):
 
 
 def remove_tmp_file(file_path):
-    ''' remove temporary files '''
+    """remove temporary files"""
     if os.path.isfile(file_path):
         os.remove(file_path)
 
 
 def main():
-
     # available gunicorn options on module
     gunicorn_options = {
-        'config': '-c',
-        'chdir': '--chdir',
-        'worker': '-k',
-        'user': '-u',
+        "config": "-c",
+        "chdir": "--chdir",
+        "worker": "-k",
+        "user": "-u",
     }
 
     module = AnsibleModule(
         argument_spec=dict(
-            app=dict(required=True, type='str', aliases=['name']),
-            venv=dict(type='path', aliases=['virtualenv']),
-            config=dict(type='path', aliases=['conf']),
-            chdir=dict(type='path'),
-            pid=dict(type='path'),
-            user=dict(type='str'),
-            worker=dict(type='str', choices=['sync', 'eventlet', 'gevent', 'tornado ', 'gthread', 'gaiohttp']),
+            app=dict(required=True, type="str", aliases=["name"]),
+            venv=dict(type="path", aliases=["virtualenv"]),
+            config=dict(type="path", aliases=["conf"]),
+            chdir=dict(type="path"),
+            pid=dict(type="path"),
+            user=dict(type="str"),
+            worker=dict(type="str", choices=["sync", "eventlet", "gevent", "tornado ", "gthread", "gaiohttp"]),
         )
     )
 
     # temporary files in case no option provided
-    tmp_error_log = os.path.join(module.tmpdir, 'gunicorn.temp.error.log')
-    tmp_pid_file = os.path.join(module.tmpdir, 'gunicorn.temp.pid')
+    tmp_error_log = os.path.join(module.tmpdir, "gunicorn.temp.error.log")
+    tmp_pid_file = os.path.join(module.tmpdir, "gunicorn.temp.pid")
 
     # remove temp file if exists
     remove_tmp_file(tmp_pid_file)
@@ -156,15 +153,15 @@ def main():
 
     # obtain app name and venv
     params = module.params
-    app = params['app']
-    venv = params['venv']
-    pid = params['pid']
+    app = params["app"]
+    venv = params["venv"]
+    pid = params["pid"]
 
     # use venv path if exists
     if venv:
-        gunicorn_command = "/".join((venv, 'bin', 'gunicorn'))
+        gunicorn_command = f"{venv}/bin/gunicorn"
     else:
-        gunicorn_command = module.get_bin_path('gunicorn')
+        gunicorn_command = module.get_bin_path("gunicorn")
 
     # to daemonize the process
     options = ["-D"]
@@ -176,19 +173,19 @@ def main():
             options.append(gunicorn_options[option])
             options.append(param)
 
-    error_log = search_existing_config(params['config'], 'errorlog')
+    error_log = search_existing_config(params["config"], "errorlog")
     if not error_log:
         # place error log somewhere in case of fail
         options.append("--error-logfile")
         options.append(tmp_error_log)
 
-    pid_file = search_existing_config(params['config'], 'pid')
-    if not params['pid'] and not pid_file:
+    pid_file = search_existing_config(params["config"], "pid")
+    if not params["pid"] and not pid_file:
         pid = tmp_pid_file
 
     # add option for pid file if not found on config file
     if not pid_file:
-        options.append('--pid')
+        options.append("--pid")
         options.append(pid)
 
     # put args together
@@ -199,31 +196,31 @@ def main():
         # wait for gunicorn to dump to log
         time.sleep(0.5)
         if os.path.isfile(pid):
-            with open(pid, 'r') as f:
+            with open(pid, "r") as f:
                 result = f.readline().strip()
 
-            if not params['pid']:
+            if not params["pid"]:
                 os.remove(pid)
 
             module.exit_json(changed=True, pid=result, debug=" ".join(args))
         else:
             # if user defined own error log, check that
             if error_log:
-                error = 'Please check your {0}'.format(error_log.strip())
+                error = f"Please check your {error_log.strip()}"
             else:
                 if os.path.isfile(tmp_error_log):
-                    with open(tmp_error_log, 'r') as f:
+                    with open(tmp_error_log, "r") as f:
                         error = f.read()
                     # delete tmp log
                     os.remove(tmp_error_log)
                 else:
                     error = "Log not found"
 
-            module.fail_json(msg='Failed to start gunicorn. {0}'.format(error), error=err)
+            module.fail_json(msg=f"Failed to start gunicorn. {error}", error=err)
 
     else:
-        module.fail_json(msg='Failed to start gunicorn {0}'.format(err), error=err)
+        module.fail_json(msg=f"Failed to start gunicorn {err}", error=err)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

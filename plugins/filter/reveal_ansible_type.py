@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Vladimir Botka <vbotka@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -140,9 +139,6 @@ def reveal_ansible_type(data, alias=None):
     return _ansible_type(data, alias)
 
 
-class FilterModule(object):
-
+class FilterModule:
     def filters(self):
-        return {
-            'reveal_ansible_type': reveal_ansible_type
-        }
+        return {"reveal_ansible_type": reveal_ansible_type}

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2019 Huawei
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 ###############################################################################
 # Documentation
@@ -230,31 +228,45 @@ private_ip_address:
 """
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
-    Config, HwcClientException, HwcClientException404, HwcModule,
-    are_different_dicts, build_path, get_region, is_empty_value,
-    navigate_value, wait_to_finish)
+    Config,
+    HwcClientException,
+    HwcClientException404,
+    HwcModule,
+    are_different_dicts,
+    build_path,
+    get_region,
+    is_empty_value,
+    navigate_value,
+    wait_to_finish,
+)
 
 
 def build_module():
     return HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            timeouts=dict(type='dict', options=dict(
-                create=dict(default='5m', type='str'),
-                update=dict(default='5m', type='str'),
-            ), default=dict()),
-            type=dict(type='str', required=True),
-            dedicated_bandwidth=dict(type='dict', options=dict(
-                charge_mode=dict(type='str', required=True),
-                name=dict(type='str', required=True),
-                size=dict(type='int', required=True)
-            )),
-            enterprise_project_id=dict(type='str'),
-            ip_version=dict(type='int'),
-            ipv4_address=dict(type='str'),
-            port_id=dict(type='str'),
-            shared_bandwidth_id=dict(type='str')
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            timeouts=dict(
+                type="dict",
+                options=dict(
+                    create=dict(default="5m", type="str"),
+                    update=dict(default="5m", type="str"),
+                ),
+                default=dict(),
+            ),
+            type=dict(type="str", required=True),
+            dedicated_bandwidth=dict(
+                type="dict",
+                options=dict(
+                    charge_mode=dict(type="str", required=True),
+                    name=dict(type="str", required=True),
+                    size=dict(type="int", required=True),
+                ),
+            ),
+            enterprise_project_id=dict(type="str"),
+            ip_version=dict(type="int"),
+            ipv4_address=dict(type="str"),
+            port_id=dict(type="str"),
+            shared_bandwidth_id=dict(type="str"),
         ),
         supports_check_mode=True,
     )
@@ -268,21 +280,20 @@ def main():
 
     try:
         resource = None
-        if module.params['id']:
+        if module.params["id"]:
             resource = True
         else:
             v = search_resource(config)
             if len(v) > 1:
-                raise Exception("Found more than one resource(%s)" % ", ".join([
-                                navigate_value(i, ["id"]) for i in v]))
+                raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
             if len(v) == 1:
                 resource = v[0]
-                module.params['id'] = navigate_value(resource, ["id"])
+                module.params["id"] = navigate_value(resource, ["id"])
 
         result = {}
         changed = False
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if resource is None:
                 if not module.check_mode:
                     create(config)
@@ -296,7 +307,7 @@ def main():
                 changed = True
 
             result = read_resource(config)
-            result['id'] = module.params.get('id')
+            result["id"] = module.params.get("id")
         else:
             if resource:
                 if not module.check_mode:
@@ -307,7 +318,7 @@ def main():
         module.fail_json(msg=str(ex))
 
     else:
-        result['changed'] = changed
+        result["changed"] = changed
         module.exit_json(**result)
 
 
@@ -326,19 +337,19 @@ def user_input_parameters(module):
 def create(config):
     module = config.module
     client = config.client(get_region(module), "vpc", "project")
-    timeout = 60 * int(module.params['timeouts']['create'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["create"].rstrip("m"))
     opts = user_input_parameters(module)
 
     params = build_create_parameters(opts)
     r = send_create_request(module, params, client)
     obj = async_wait_create(config, r, client, timeout)
-    module.params['id'] = navigate_value(obj, ["publicip", "id"])
+    module.params["id"] = navigate_value(obj, ["publicip", "id"])
 
 
 def update(config):
     module = config.module
     client = config.client(get_region(module), "vpc", "project")
-    timeout = 60 * int(module.params['timeouts']['update'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["update"].rstrip("m"))
     opts = user_input_parameters(module)
 
     params = build_update_parameters(opts)
@@ -370,13 +381,11 @@ def delete(config):
 
         return True, "Pending"
 
-    timeout = 60 * int(module.params['timeouts']['create'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["create"].rstrip("m"))
     try:
         wait_to_finish(["Done"], ["Pending"], _refresh_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_eip): error "
-                             "waiting for api(delete) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_eip): error waiting for api(delete) to be done, error= {ex}")
 
 
 def read_resource(config, exclude_output=False):
@@ -396,15 +405,15 @@ def _build_query_link(opts):
 
     v = navigate_value(opts, ["ip_version"])
     if v:
-        query_params.append("ip_version=" + str(v))
+        query_params.append(f"ip_version={v}")
 
     v = navigate_value(opts, ["enterprise_project_id"])
     if v:
-        query_params.append("enterprise_project_id=" + str(v))
+        query_params.append(f"enterprise_project_id={v}")
 
     query_link = "?marker={marker}&limit=10"
     if query_params:
-        query_link += "&" + "&".join(query_params)
+        query_link += f"&{'&'.join(query_params)}"
 
     return query_link
 
@@ -415,10 +424,10 @@ def search_resource(config):
     opts = user_input_parameters(module)
     identity_obj = _build_identity_object(opts)
     query_link = _build_query_link(opts)
-    link = "publicips" + query_link
+    link = f"publicips{query_link}"
 
     result = []
-    p = {'marker': ''}
+    p = {"marker": ""}
     while True:
         url = link.format(**p)
         r = send_list_request(module, client, url)
@@ -433,7 +442,7 @@ def search_resource(config):
         if len(result) > 1:
             break
 
-        p['marker'] = r[-1].get('id')
+        p["marker"] = r[-1].get("id")
 
     return result
 
@@ -460,23 +469,15 @@ def expand_create_bandwidth(d, array_index):
     v = navigate_value(d, ["dedicated_bandwidth"], array_index)
     sbwid = navigate_value(d, ["shared_bandwidth_id"], array_index)
     if v and sbwid:
-        raise Exception("don't input shared_bandwidth_id and "
-                        "dedicated_bandwidth at same time")
+        raise Exception("don't input shared_bandwidth_id and dedicated_bandwidth at same time")
 
     if not (v or sbwid):
-        raise Exception("must input shared_bandwidth_id or "
-                        "dedicated_bandwidth")
+        raise Exception("must input shared_bandwidth_id or dedicated_bandwidth")
 
     if sbwid:
-        return {
-            "id": sbwid,
-            "share_type": "WHOLE"}
+        return {"id": sbwid, "share_type": "WHOLE"}
 
-    return {
-        "charge_mode": v["charge_mode"],
-        "name": v["name"],
-        "share_type": "PER",
-        "size": v["size"]}
+    return {"charge_mode": v["charge_mode"], "name": v["name"], "share_type": "PER", "size": v["size"]}
 
 
 def expand_create_publicip(d, array_index):
@@ -502,8 +503,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -533,14 +533,9 @@ def async_wait_create(config, result, client, timeout):
             return None, ""
 
     try:
-        return wait_to_finish(
-            ["ACTIVE", "DOWN"],
-            None,
-            _query_status, timeout)
+        return wait_to_finish(["ACTIVE", "DOWN"], None, _query_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_eip): error "
-                             "waiting for api(create) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_eip): error waiting for api(create) to be done, error= {ex}")
 
 
 def build_update_parameters(opts):
@@ -568,8 +563,7 @@ def send_update_request(module, params, client):
     try:
         r = client.put(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(update), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(update), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -594,14 +588,9 @@ def async_wait_update(config, result, client, timeout):
             return None, ""
 
     try:
-        return wait_to_finish(
-            ["ACTIVE", "DOWN"],
-            None,
-            _query_status, timeout)
+        return wait_to_finish(["ACTIVE", "DOWN"], None, _query_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_eip): error "
-                             "waiting for api(update) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_eip): error waiting for api(update) to be done, error= {ex}")
 
 
 def send_delete_request(module, params, client):
@@ -610,8 +599,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -624,8 +612,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["publicip"], None)
@@ -678,8 +665,7 @@ def update_properties(module, response, array_index, exclude_output=False):
     v = flatten_dedicated_bandwidth(response, array_index, v, exclude_output)
     r["dedicated_bandwidth"] = v
 
-    v = navigate_value(response, ["read", "enterprise_project_id"],
-                       array_index)
+    v = navigate_value(response, ["read", "enterprise_project_id"], array_index)
     r["enterprise_project_id"] = v
 
     v = navigate_value(response, ["read", "ip_version"], array_index)
@@ -689,16 +675,14 @@ def update_properties(module, response, array_index, exclude_output=False):
     r["ipv4_address"] = v
 
     if not exclude_output:
-        v = navigate_value(response, ["read", "public_ipv6_address"],
-                           array_index)
+        v = navigate_value(response, ["read", "public_ipv6_address"], array_index)
         r["ipv6_address"] = v
 
     v = navigate_value(response, ["read", "port_id"], array_index)
     r["port_id"] = v
 
     if not exclude_output:
-        v = navigate_value(response, ["read", "private_ip_address"],
-                           array_index)
+        v = navigate_value(response, ["read", "private_ip_address"], array_index)
         r["private_ip_address"] = v
 
     v = r.get("shared_bandwidth_id")
@@ -745,13 +729,11 @@ def flatten_shared_bandwidth_id(d, array_index, current_value, exclude_output):
 
 
 def send_list_request(module, client, url):
-
     r = None
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["publicips"], None)
@@ -805,8 +787,7 @@ def expand_list_bandwidth_id(d, array_index):
     v = navigate_value(d, ["dedicated_bandwidth"], array_index)
     sbwid = navigate_value(d, ["shared_bandwidth_id"], array_index)
     if v and sbwid:
-        raise Exception("don't input shared_bandwidth_id and "
-                        "dedicated_bandwidth at same time")
+        raise Exception("don't input shared_bandwidth_id and dedicated_bandwidth at same time")
 
     return sbwid
 
@@ -847,5 +828,5 @@ def fill_list_resp_body(body):
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

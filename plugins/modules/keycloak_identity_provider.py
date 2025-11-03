@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_identity_provider
@@ -456,33 +454,38 @@ end_state:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 from copy import deepcopy
 
 
 def sanitize(idp):
     idpcopy = deepcopy(idp)
-    if 'config' in idpcopy:
-        if 'clientSecret' in idpcopy['config']:
-            idpcopy['config']['clientSecret'] = '**********'
+    if "config" in idpcopy:
+        if "clientSecret" in idpcopy["config"]:
+            idpcopy["config"]["clientSecret"] = "**********"
     return idpcopy
 
 
 def get_identity_provider_with_mappers(kc, alias, realm):
     idp = kc.get_identity_provider(alias, realm)
     if idp is not None:
-        idp['mappers'] = sorted(kc.get_identity_provider_mappers(alias, realm), key=lambda x: x.get('name'))
+        idp["mappers"] = sorted(kc.get_identity_provider_mappers(alias, realm), key=lambda x: x.get("name"))
         # clientSecret returned by API when using `get_identity_provider(alias, realm)` is always **********
         # to detect changes to the secret, we get the actual cleartext secret from the full realm info
-        if 'config' in idp:
-            if 'clientSecret' in idp['config']:
-                for idp_from_realm in kc.get_realm_by_id(realm).get('identityProviders', []):
-                    if idp_from_realm['internalId'] == idp['internalId']:
-                        cleartext_secret = idp_from_realm.get('config', {}).get('clientSecret')
+        if "config" in idp:
+            if "clientSecret" in idp["config"]:
+                for idp_from_realm in kc.get_realm_by_id(realm).get("identityProviders", []):
+                    if idp_from_realm["internalId"] == idp["internalId"]:
+                        cleartext_secret = idp_from_realm.get("config", {}).get("clientSecret")
                         if cleartext_secret:
-                            idp['config']['clientSecret'] = cleartext_secret
+                            idp["config"]["clientSecret"] = cleartext_secret
     if idp is None:
         idp = {}
     return idp
@@ -496,19 +499,21 @@ def fetch_identity_provider_wellknown_config(kc, config):
     :param config: Dictionary containing identity provider configuration, must include 'fromUrl' key to trigger fetch.
     :return: None. The config dict is updated in-place.
     """
-    if config and 'fromUrl' in config :
-        if 'providerId' in config and config['providerId'] != 'oidc':
+    if config and "fromUrl" in config:
+        if "providerId" in config and config["providerId"] != "oidc":
             kc.module.fail_json(msg="Only 'oidc' provider_id is supported when using 'fromUrl'.")
-        endpoints = ['userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer', 'jwksUrl']
+        endpoints = ["userInfoUrl", "authorizationUrl", "tokenUrl", "logoutUrl", "issuer", "jwksUrl"]
         if any(k in config for k in endpoints):
-            kc.module.fail_json(msg="Cannot specify both 'fromUrl' and 'userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer' or 'jwksUrl'.")
+            kc.module.fail_json(
+                msg="Cannot specify both 'fromUrl' and 'userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer' or 'jwksUrl'."
+            )
         openIdConfig = kc.fetch_idp_endpoints_import_config_url(
-            fromUrl=config['fromUrl'],
-            realm=kc.module.params.get('realm', 'master'))
+            fromUrl=config["fromUrl"], realm=kc.module.params.get("realm", "master")
+        )
         for k in endpoints:
             if k in openIdConfig:
                 config[k] = openIdConfig[k]
-        del config['fromUrl']
+        del config["fromUrl"]
 
 
 def main():
@@ -520,41 +525,44 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     mapper_spec = dict(
-        id=dict(type='str'),
-        name=dict(type='str'),
-        identityProviderAlias=dict(type='str'),
-        identityProviderMapper=dict(type='str'),
-        config=dict(type='dict'),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        identityProviderAlias=dict(type="str"),
+        identityProviderMapper=dict(type="str"),
+        config=dict(type="dict"),
     )
 
     meta_args = dict(
-        state=dict(type='str', default='present', choices=['present', 'absent']),
-        realm=dict(type='str', default='master'),
-        alias=dict(type='str', required=True),
-        add_read_token_role_on_create=dict(type='bool', aliases=['addReadTokenRoleOnCreate']),
-        authenticate_by_default=dict(type='bool', aliases=['authenticateByDefault']),
-        config=dict(type='dict'),
-        display_name=dict(type='str', aliases=['displayName']),
-        enabled=dict(type='bool'),
-        first_broker_login_flow_alias=dict(type='str', aliases=['firstBrokerLoginFlowAlias']),
-        link_only=dict(type='bool', aliases=['linkOnly']),
-        post_broker_login_flow_alias=dict(type='str', aliases=['postBrokerLoginFlowAlias']),
-        provider_id=dict(type='str', aliases=['providerId']),
-        store_token=dict(type='bool', aliases=['storeToken']),
-        trust_email=dict(type='bool', aliases=['trustEmail']),
-        mappers=dict(type='list', elements='dict', options=mapper_spec),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        realm=dict(type="str", default="master"),
+        alias=dict(type="str", required=True),
+        add_read_token_role_on_create=dict(type="bool", aliases=["addReadTokenRoleOnCreate"]),
+        authenticate_by_default=dict(type="bool", aliases=["authenticateByDefault"]),
+        config=dict(type="dict"),
+        display_name=dict(type="str", aliases=["displayName"]),
+        enabled=dict(type="bool"),
+        first_broker_login_flow_alias=dict(type="str", aliases=["firstBrokerLoginFlowAlias"]),
+        link_only=dict(type="bool", aliases=["linkOnly"]),
+        post_broker_login_flow_alias=dict(type="str", aliases=["postBrokerLoginFlowAlias"]),
+        provider_id=dict(type="str", aliases=["providerId"]),
+        store_token=dict(type="bool", aliases=["storeToken"]),
+        trust_email=dict(type="bool", aliases=["trustEmail"]),
+        mappers=dict(type="list", elements="dict", options=mapper_spec),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -564,17 +572,20 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    alias = module.params.get('alias')
-    state = module.params.get('state')
-    config = module.params.get('config')
+    realm = module.params.get("realm")
+    alias = module.params.get("alias")
+    state = module.params.get("state")
+    config = module.params.get("config")
 
     fetch_identity_provider_wellknown_config(kc, config)
 
     # Filter and map the parameters names that apply to the identity provider.
-    idp_params = [x for x in module.params
-                  if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers'] and
-                  module.params.get(x) is not None]
+    idp_params = [
+        x
+        for x in module.params
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "mappers"]
+        and module.params.get(x) is not None
+    ]
 
     # See if it already exists in Keycloak
     before_idp = get_identity_provider_with_mappers(kc, alias, realm)
@@ -589,19 +600,19 @@ def main():
             changeset[camel(param)] = new_param_value
 
     # special handling of mappers list to allow change detection
-    if module.params.get('mappers') is not None:
-        for change in module.params['mappers']:
+    if module.params.get("mappers") is not None:
+        for change in module.params["mappers"]:
             change = {k: v for k, v in change.items() if v is not None}
-            if change.get('id') is None and change.get('name') is None:
-                module.fail_json(msg='Either `name` or `id` has to be specified on each mapper.')
+            if change.get("id") is None and change.get("name") is None:
+                module.fail_json(msg="Either `name` or `id` has to be specified on each mapper.")
             if before_idp == dict():
                 old_mapper = dict()
-            elif change.get('id') is not None:
-                old_mapper = kc.get_identity_provider_mapper(change['id'], alias, realm)
+            elif change.get("id") is not None:
+                old_mapper = kc.get_identity_provider_mapper(change["id"], alias, realm)
                 if old_mapper is None:
                     old_mapper = dict()
             else:
-                found = [x for x in kc.get_identity_provider_mappers(alias, realm) if x['name'] == change['name']]
+                found = [x for x in kc.get_identity_provider_mappers(alias, realm) if x["name"] == change["name"]]
                 if len(found) == 1:
                     old_mapper = found[0]
                 else:
@@ -609,111 +620,114 @@ def main():
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
 
-            if changeset.get('mappers') is None:
-                changeset['mappers'] = list()
+            if changeset.get("mappers") is None:
+                changeset["mappers"] = list()
             # eventually this holds all desired mappers, unchanged, modified and newly added
-            changeset['mappers'].append(new_mapper)
+            changeset["mappers"].append(new_mapper)
 
         # ensure idempotency in case module.params.mappers is not sorted by name
-        changeset['mappers'] = sorted(changeset['mappers'], key=lambda x: x.get('id') if x.get('name') is None else x['name'])
+        changeset["mappers"] = sorted(
+            changeset["mappers"], key=lambda x: x.get("id") if x.get("name") is None else x["name"]
+        )
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_idp = before_idp.copy()
     desired_idp.update(changeset)
 
-    result['proposed'] = sanitize(changeset)
-    result['existing'] = sanitize(before_idp)
+    result["proposed"] = sanitize(changeset)
+    result["existing"] = sanitize(before_idp)
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_idp:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Identity provider does not exist; doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "Identity provider does not exist; doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
+        result["changed"] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize(desired_idp))
+            result["diff"] = dict(before="", after=sanitize(desired_idp))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # create it
         desired_idp = desired_idp.copy()
-        mappers = desired_idp.pop('mappers', [])
+        mappers = desired_idp.pop("mappers", [])
         kc.create_identity_provider(desired_idp, realm)
         for mapper in mappers:
-            if mapper.get('identityProviderAlias') is None:
-                mapper['identityProviderAlias'] = alias
+            if mapper.get("identityProviderAlias") is None:
+                mapper["identityProviderAlias"] = alias
             kc.create_identity_provider_mapper(mapper, alias, realm)
         after_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
-        result['end_state'] = sanitize(after_idp)
+        result["end_state"] = sanitize(after_idp)
 
-        result['msg'] = 'Identity provider {alias} has been created'.format(alias=alias)
+        result["msg"] = f"Identity provider {alias} has been created"
         module.exit_json(**result)
 
     else:
-        if state == 'present':
+        if state == "present":
             # Process an update
 
             # no changes
             if desired_idp == before_idp:
-                result['changed'] = False
-                result['end_state'] = sanitize(desired_idp)
-                result['msg'] = "No changes required to identity provider {alias}.".format(alias=alias)
+                result["changed"] = False
+                result["end_state"] = sanitize(desired_idp)
+                result["msg"] = f"No changes required to identity provider {alias}."
                 module.exit_json(**result)
 
             # doing an update
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_idp), after=sanitize(desired_idp))
+                result["diff"] = dict(before=sanitize(before_idp), after=sanitize(desired_idp))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
             desired_idp = desired_idp.copy()
-            updated_mappers = desired_idp.pop('mappers', [])
-            original_mappers = list(before_idp.get('mappers', []))
+            updated_mappers = desired_idp.pop("mappers", [])
+            original_mappers = list(before_idp.get("mappers", []))
 
             kc.update_identity_provider(desired_idp, realm)
             for mapper in updated_mappers:
-                if mapper.get('id') is not None:
+                if mapper.get("id") is not None:
                     # only update existing if there is a change
                     for i, orig in enumerate(original_mappers):
-                        if mapper['id'] == orig['id']:
+                        if mapper["id"] == orig["id"]:
                             del original_mappers[i]
                             if mapper != orig:
                                 kc.update_identity_provider_mapper(mapper, alias, realm)
                 else:
-                    if mapper.get('identityProviderAlias') is None:
-                        mapper['identityProviderAlias'] = alias
+                    if mapper.get("identityProviderAlias") is None:
+                        mapper["identityProviderAlias"] = alias
                     kc.create_identity_provider_mapper(mapper, alias, realm)
-            for mapper in [x for x in before_idp['mappers']
-                           if [y for y in updated_mappers if y["name"] == x['name']] == []]:
-                kc.delete_identity_provider_mapper(mapper['id'], alias, realm)
+            for mapper in [
+                x for x in before_idp["mappers"] if [y for y in updated_mappers if y["name"] == x["name"]] == []
+            ]:
+                kc.delete_identity_provider_mapper(mapper["id"], alias, realm)
 
             after_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
-            result['end_state'] = sanitize(after_idp)
+            result["end_state"] = sanitize(after_idp)
 
-            result['msg'] = "Identity provider {alias} has been updated".format(alias=alias)
+            result["msg"] = f"Identity provider {alias} has been updated"
             module.exit_json(**result)
 
-        elif state == 'absent':
+        elif state == "absent":
             # Process a deletion
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_idp), after='')
+                result["diff"] = dict(before=sanitize(before_idp), after="")
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -721,12 +735,12 @@ def main():
             # delete it
             kc.delete_identity_provider(alias, realm)
 
-            result['end_state'] = {}
+            result["end_state"] = {}
 
-            result['msg'] = "Identity provider {alias} has been deleted".format(alias=alias)
+            result["msg"] = f"Identity provider {alias} has been deleted"
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

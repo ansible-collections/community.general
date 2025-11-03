@@ -1,17 +1,19 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: oneandone_firewall_policy
 short_description: Configure 1&1 firewall policy
 description:
   - Create, remove, reconfigure, update firewall policies. This module has a dependency on 1and1 >= 1.0.
+deprecated:
+  removed_in: 13.0.0
+  why: DNS fails to resolve the API endpoint used by the module.
+  alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -204,7 +206,7 @@ from ansible_collections.community.general.plugins.module_utils.oneandone import
     get_firewall_policy,
     get_server,
     OneAndOneResources,
-    wait_for_resource_creation_completion
+    wait_for_resource_creation_completion,
 )
 
 HAS_ONEANDONE_SDK = True
@@ -217,9 +219,7 @@ except ImportError:
 
 def _check_mode(module, result):
     if module.check_mode:
-        module.exit_json(
-            changed=result
-        )
+        module.exit_json(changed=result)
 
 
 def _add_server_ips(module, oneandone_conn, firewall_id, server_ids):
@@ -232,8 +232,7 @@ def _add_server_ips(module, oneandone_conn, firewall_id, server_ids):
         for _server_id in server_ids:
             server = get_server(oneandone_conn, _server_id, True)
             attach_server = oneandone.client.AttachServer(
-                server_id=server['id'],
-                server_ip_id=next(iter(server['ips'] or []), None)['id']
+                server_id=server["id"], server_ip_id=next(iter(server["ips"] or []), None)["id"]
             )
             attach_servers.append(attach_server)
 
@@ -243,8 +242,8 @@ def _add_server_ips(module, oneandone_conn, firewall_id, server_ids):
             return False
 
         firewall_policy = oneandone_conn.attach_server_firewall_policy(
-            firewall_id=firewall_id,
-            server_ips=attach_servers)
+            firewall_id=firewall_id, server_ips=attach_servers
+        )
         return firewall_policy
     except Exception as e:
         module.fail_json(msg=str(e))
@@ -256,16 +255,12 @@ def _remove_firewall_server(module, oneandone_conn, firewall_id, server_ip_id):
     """
     try:
         if module.check_mode:
-            firewall_server = oneandone_conn.get_firewall_server(
-                firewall_id=firewall_id,
-                server_ip_id=server_ip_id)
+            firewall_server = oneandone_conn.get_firewall_server(firewall_id=firewall_id, server_ip_id=server_ip_id)
             if firewall_server:
                 return True
             return False
 
-        firewall_policy = oneandone_conn.remove_firewall_server(
-            firewall_id=firewall_id,
-            server_ip_id=server_ip_id)
+        firewall_policy = oneandone_conn.remove_firewall_server(firewall_id=firewall_id, server_ip_id=server_ip_id)
         return firewall_policy
     except Exception as e:
         module.fail_json(msg=str(e))
@@ -280,10 +275,8 @@ def _add_firewall_rules(module, oneandone_conn, firewall_id, rules):
 
         for rule in rules:
             firewall_rule = oneandone.client.FirewallPolicyRule(
-                protocol=rule['protocol'],
-                port_from=rule['port_from'],
-                port_to=rule['port_to'],
-                source=rule['source'])
+                protocol=rule["protocol"], port_from=rule["port_from"], port_to=rule["port_to"], source=rule["source"]
+            )
             firewall_rules.append(firewall_rule)
 
         if module.check_mode:
@@ -293,8 +286,7 @@ def _add_firewall_rules(module, oneandone_conn, firewall_id, rules):
             return False
 
         firewall_policy = oneandone_conn.add_firewall_policy_rule(
-            firewall_id=firewall_id,
-            firewall_policy_rules=firewall_rules
+            firewall_id=firewall_id, firewall_policy_rules=firewall_rules
         )
         return firewall_policy
     except Exception as e:
@@ -307,17 +299,12 @@ def _remove_firewall_rule(module, oneandone_conn, firewall_id, rule_id):
     """
     try:
         if module.check_mode:
-            rule = oneandone_conn.get_firewall_policy_rule(
-                firewall_id=firewall_id,
-                rule_id=rule_id)
+            rule = oneandone_conn.get_firewall_policy_rule(firewall_id=firewall_id, rule_id=rule_id)
             if rule:
                 return True
             return False
 
-        firewall_policy = oneandone_conn.remove_firewall_rule(
-            firewall_id=firewall_id,
-            rule_id=rule_id
-        )
+        firewall_policy = oneandone_conn.remove_firewall_rule(firewall_id=firewall_id, rule_id=rule_id)
         return firewall_policy
     except Exception as e:
         module.fail_json(msg=str(e))
@@ -334,13 +321,13 @@ def update_firewall_policy(module, oneandone_conn):
     oneandone_conn: authenticated oneandone object
     """
     try:
-        firewall_policy_id = module.params.get('firewall_policy')
-        name = module.params.get('name')
-        description = module.params.get('description')
-        add_server_ips = module.params.get('add_server_ips')
-        remove_server_ips = module.params.get('remove_server_ips')
-        add_rules = module.params.get('add_rules')
-        remove_rules = module.params.get('remove_rules')
+        firewall_policy_id = module.params.get("firewall_policy")
+        name = module.params.get("name")
+        description = module.params.get("description")
+        add_server_ips = module.params.get("add_server_ips")
+        remove_server_ips = module.params.get("remove_server_ips")
+        add_rules = module.params.get("add_rules")
+        remove_rules = module.params.get("remove_rules")
 
         changed = False
 
@@ -351,43 +338,30 @@ def update_firewall_policy(module, oneandone_conn):
         if name or description:
             _check_mode(module, True)
             firewall_policy = oneandone_conn.modify_firewall(
-                firewall_id=firewall_policy['id'],
-                name=name,
-                description=description)
+                firewall_id=firewall_policy["id"], name=name, description=description
+            )
             changed = True
 
         if add_server_ips:
             if module.check_mode:
-                _check_mode(module, _add_server_ips(module,
-                                                    oneandone_conn,
-                                                    firewall_policy['id'],
-                                                    add_server_ips))
+                _check_mode(module, _add_server_ips(module, oneandone_conn, firewall_policy["id"], add_server_ips))
 
-            firewall_policy = _add_server_ips(module, oneandone_conn, firewall_policy['id'], add_server_ips)
+            firewall_policy = _add_server_ips(module, oneandone_conn, firewall_policy["id"], add_server_ips)
             changed = True
 
         if remove_server_ips:
             chk_changed = False
             for server_ip_id in remove_server_ips:
                 if module.check_mode:
-                    chk_changed |= _remove_firewall_server(module,
-                                                           oneandone_conn,
-                                                           firewall_policy['id'],
-                                                           server_ip_id)
+                    chk_changed |= _remove_firewall_server(module, oneandone_conn, firewall_policy["id"], server_ip_id)
 
-                _remove_firewall_server(module,
-                                        oneandone_conn,
-                                        firewall_policy['id'],
-                                        server_ip_id)
+                _remove_firewall_server(module, oneandone_conn, firewall_policy["id"], server_ip_id)
             _check_mode(module, chk_changed)
-            firewall_policy = get_firewall_policy(oneandone_conn, firewall_policy['id'], True)
+            firewall_policy = get_firewall_policy(oneandone_conn, firewall_policy["id"], True)
             changed = True
 
         if add_rules:
-            firewall_policy = _add_firewall_rules(module,
-                                                  oneandone_conn,
-                                                  firewall_policy['id'],
-                                                  add_rules)
+            firewall_policy = _add_firewall_rules(module, oneandone_conn, firewall_policy["id"], add_rules)
             _check_mode(module, firewall_policy)
             changed = True
 
@@ -395,17 +369,11 @@ def update_firewall_policy(module, oneandone_conn):
             chk_changed = False
             for rule_id in remove_rules:
                 if module.check_mode:
-                    chk_changed |= _remove_firewall_rule(module,
-                                                         oneandone_conn,
-                                                         firewall_policy['id'],
-                                                         rule_id)
+                    chk_changed |= _remove_firewall_rule(module, oneandone_conn, firewall_policy["id"], rule_id)
 
-                _remove_firewall_rule(module,
-                                      oneandone_conn,
-                                      firewall_policy['id'],
-                                      rule_id)
+                _remove_firewall_rule(module, oneandone_conn, firewall_policy["id"], rule_id)
             _check_mode(module, chk_changed)
-            firewall_policy = get_firewall_policy(oneandone_conn, firewall_policy['id'], True)
+            firewall_policy = get_firewall_policy(oneandone_conn, firewall_policy["id"], True)
             changed = True
 
         return (changed, firewall_policy)
@@ -421,43 +389,34 @@ def create_firewall_policy(module, oneandone_conn):
     oneandone_conn: authenticated oneandone object
     """
     try:
-        name = module.params.get('name')
-        description = module.params.get('description')
-        rules = module.params.get('rules')
-        wait = module.params.get('wait')
-        wait_timeout = module.params.get('wait_timeout')
-        wait_interval = module.params.get('wait_interval')
+        name = module.params.get("name")
+        description = module.params.get("description")
+        rules = module.params.get("rules")
+        wait = module.params.get("wait")
+        wait_timeout = module.params.get("wait_timeout")
+        wait_interval = module.params.get("wait_interval")
 
         firewall_rules = []
 
         for rule in rules:
             firewall_rule = oneandone.client.FirewallPolicyRule(
-                protocol=rule['protocol'],
-                port_from=rule['port_from'],
-                port_to=rule['port_to'],
-                source=rule['source'])
+                protocol=rule["protocol"], port_from=rule["port_from"], port_to=rule["port_to"], source=rule["source"]
+            )
             firewall_rules.append(firewall_rule)
 
-        firewall_policy_obj = oneandone.client.FirewallPolicy(
-            name=name,
-            description=description
-        )
+        firewall_policy_obj = oneandone.client.FirewallPolicy(name=name, description=description)
 
         _check_mode(module, True)
         firewall_policy = oneandone_conn.create_firewall_policy(
-            firewall_policy=firewall_policy_obj,
-            firewall_policy_rules=firewall_rules
+            firewall_policy=firewall_policy_obj, firewall_policy_rules=firewall_rules
         )
 
         if wait:
             wait_for_resource_creation_completion(
-                oneandone_conn,
-                OneAndOneResources.firewall_policy,
-                firewall_policy['id'],
-                wait_timeout,
-                wait_interval)
+                oneandone_conn, OneAndOneResources.firewall_policy, firewall_policy["id"], wait_timeout, wait_interval
+            )
 
-        firewall_policy = get_firewall_policy(oneandone_conn, firewall_policy['id'], True)  # refresh
+        firewall_policy = get_firewall_policy(oneandone_conn, firewall_policy["id"], True)  # refresh
         changed = True if firewall_policy else False
 
         _check_mode(module, False)
@@ -475,7 +434,7 @@ def remove_firewall_policy(module, oneandone_conn):
     oneandone_conn: authenticated oneandone object
     """
     try:
-        fp_id = module.params.get('name')
+        fp_id = module.params.get("name")
         firewall_policy_id = get_firewall_policy(oneandone_conn, fp_id)
         if module.check_mode:
             if firewall_policy_id is None:
@@ -485,10 +444,7 @@ def remove_firewall_policy(module, oneandone_conn):
 
         changed = True if firewall_policy else False
 
-        return (changed, {
-            'id': firewall_policy['id'],
-            'name': firewall_policy['name']
-        })
+        return (changed, {"id": firewall_policy["id"], "name": firewall_policy["name"]})
     except Exception as e:
         module.fail_json(msg=str(e))
 
@@ -496,68 +452,59 @@ def remove_firewall_policy(module, oneandone_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str', no_log=True,
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN')),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
-            name=dict(type='str'),
-            firewall_policy=dict(type='str'),
-            description=dict(type='str'),
-            rules=dict(type='list', elements="dict", default=[]),
-            add_server_ips=dict(type='list', elements="str", default=[]),
-            remove_server_ips=dict(type='list', elements="str", default=[]),
-            add_rules=dict(type='list', elements="dict", default=[]),
-            remove_rules=dict(type='list', elements="str", default=[]),
-            wait=dict(type='bool', default=True),
-            wait_timeout=dict(type='int', default=600),
-            wait_interval=dict(type='int', default=5),
-            state=dict(type='str', default='present', choices=['present', 'absent', 'update']),
+            auth_token=dict(type="str", no_log=True, default=os.environ.get("ONEANDONE_AUTH_TOKEN")),
+            api_url=dict(type="str", default=os.environ.get("ONEANDONE_API_URL")),
+            name=dict(type="str"),
+            firewall_policy=dict(type="str"),
+            description=dict(type="str"),
+            rules=dict(type="list", elements="dict", default=[]),
+            add_server_ips=dict(type="list", elements="str", default=[]),
+            remove_server_ips=dict(type="list", elements="str", default=[]),
+            add_rules=dict(type="list", elements="dict", default=[]),
+            remove_rules=dict(type="list", elements="str", default=[]),
+            wait=dict(type="bool", default=True),
+            wait_timeout=dict(type="int", default=600),
+            wait_interval=dict(type="int", default=5),
+            state=dict(type="str", default="present", choices=["present", "absent", "update"]),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not HAS_ONEANDONE_SDK:
-        module.fail_json(msg='1and1 required for this module')
+        module.fail_json(msg="1and1 required for this module")
 
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='The "auth_token" parameter or ' +
-            'ONEANDONE_AUTH_TOKEN environment variable is required.')
+    if not module.params.get("auth_token"):
+        module.fail_json(msg='The "auth_token" parameter or ONEANDONE_AUTH_TOKEN environment variable is required.')
 
-    if not module.params.get('api_url'):
-        oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'))
+    if not module.params.get("api_url"):
+        oneandone_conn = oneandone.client.OneAndOneService(api_token=module.params.get("auth_token"))
     else:
         oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'), api_url=module.params.get('api_url'))
+            api_token=module.params.get("auth_token"), api_url=module.params.get("api_url")
+        )
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
-    if state == 'absent':
-        if not module.params.get('name'):
-            module.fail_json(
-                msg="'name' parameter is required to delete a firewall policy.")
+    if state == "absent":
+        if not module.params.get("name"):
+            module.fail_json(msg="'name' parameter is required to delete a firewall policy.")
         try:
             (changed, firewall_policy) = remove_firewall_policy(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
 
-    elif state == 'update':
-        if not module.params.get('firewall_policy'):
-            module.fail_json(
-                msg="'firewall_policy' parameter is required to update a firewall policy.")
+    elif state == "update":
+        if not module.params.get("firewall_policy"):
+            module.fail_json(msg="'firewall_policy' parameter is required to update a firewall policy.")
         try:
             (changed, firewall_policy) = update_firewall_policy(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
 
-    elif state == 'present':
-        for param in ('name', 'rules'):
+    elif state == "present":
+        for param in ("name", "rules"):
             if not module.params.get(param):
-                module.fail_json(
-                    msg="%s parameter is required for new firewall policies." % param)
+                module.fail_json(msg=f"{param} parameter is required for new firewall policies.")
         try:
             (changed, firewall_policy) = create_firewall_policy(module, oneandone_conn)
         except Exception as e:
@@ -566,5 +513,5 @@ def main():
     module.exit_json(changed=changed, firewall_policy=firewall_policy)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

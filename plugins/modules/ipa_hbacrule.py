@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_hbacrule
@@ -165,61 +163,66 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 
 class HBACRuleIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(HBACRuleIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def hbacrule_find(self, name):
-        return self._post_json(method='hbacrule_find', name=None, item={'all': True, 'cn': name})
+        return self._post_json(method="hbacrule_find", name=None, item={"all": True, "cn": name})
 
     def hbacrule_add(self, name, item):
-        return self._post_json(method='hbacrule_add', name=name, item=item)
+        return self._post_json(method="hbacrule_add", name=name, item=item)
 
     def hbacrule_mod(self, name, item):
-        return self._post_json(method='hbacrule_mod', name=name, item=item)
+        return self._post_json(method="hbacrule_mod", name=name, item=item)
 
     def hbacrule_del(self, name):
-        return self._post_json(method='hbacrule_del', name=name)
+        return self._post_json(method="hbacrule_del", name=name)
 
     def hbacrule_add_host(self, name, item):
-        return self._post_json(method='hbacrule_add_host', name=name, item=item)
+        return self._post_json(method="hbacrule_add_host", name=name, item=item)
 
     def hbacrule_remove_host(self, name, item):
-        return self._post_json(method='hbacrule_remove_host', name=name, item=item)
+        return self._post_json(method="hbacrule_remove_host", name=name, item=item)
 
     def hbacrule_add_service(self, name, item):
-        return self._post_json(method='hbacrule_add_service', name=name, item=item)
+        return self._post_json(method="hbacrule_add_service", name=name, item=item)
 
     def hbacrule_remove_service(self, name, item):
-        return self._post_json(method='hbacrule_remove_service', name=name, item=item)
+        return self._post_json(method="hbacrule_remove_service", name=name, item=item)
 
     def hbacrule_add_user(self, name, item):
-        return self._post_json(method='hbacrule_add_user', name=name, item=item)
+        return self._post_json(method="hbacrule_add_user", name=name, item=item)
 
     def hbacrule_remove_user(self, name, item):
-        return self._post_json(method='hbacrule_remove_user', name=name, item=item)
+        return self._post_json(method="hbacrule_remove_user", name=name, item=item)
 
     def hbacrule_add_sourcehost(self, name, item):
-        return self._post_json(method='hbacrule_add_sourcehost', name=name, item=item)
+        return self._post_json(method="hbacrule_add_sourcehost", name=name, item=item)
 
     def hbacrule_remove_sourcehost(self, name, item):
-        return self._post_json(method='hbacrule_remove_sourcehost', name=name, item=item)
+        return self._post_json(method="hbacrule_remove_sourcehost", name=name, item=item)
 
 
-def get_hbacrule_dict(description=None, hostcategory=None, ipaenabledflag=None, servicecategory=None,
-                      sourcehostcategory=None,
-                      usercategory=None):
+def get_hbacrule_dict(
+    description=None,
+    hostcategory=None,
+    ipaenabledflag=None,
+    servicecategory=None,
+    sourcehostcategory=None,
+    usercategory=None,
+):
     data = {}
     if description is not None:
-        data['description'] = description
+        data["description"] = description
     if hostcategory is not None:
-        data['hostcategory'] = hostcategory
+        data["hostcategory"] = hostcategory
     if ipaenabledflag is not None:
-        data['ipaenabledflag'] = ipaenabledflag
+        data["ipaenabledflag"] = ipaenabledflag
     if servicecategory is not None:
-        data['servicecategory'] = servicecategory
+        data["servicecategory"] = servicecategory
     if sourcehostcategory is not None:
-        data['sourcehostcategory'] = sourcehostcategory
+        data["sourcehostcategory"] = sourcehostcategory
     if usercategory is not None:
-        data['usercategory'] = usercategory
+        data["usercategory"] = usercategory
     return data
 
 
@@ -228,44 +231,46 @@ def get_hbcarule_diff(client, ipa_hbcarule, module_hbcarule):
 
 
 def ensure(module, client):
-    name = module.params['cn']
-    state = module.params['state']
+    name = module.params["cn"]
+    state = module.params["state"]
 
     ipa_version = client.get_ipa_version()
-    if state in ['present', 'enabled']:
-        if LooseVersion(ipa_version) < LooseVersion('4.9.10'):
-            ipaenabledflag = 'TRUE'
+    if state in ["present", "enabled"]:
+        if LooseVersion(ipa_version) < LooseVersion("4.9.10"):
+            ipaenabledflag = "TRUE"
         else:
             ipaenabledflag = True
     else:
-        if LooseVersion(ipa_version) < LooseVersion('4.9.10'):
-            ipaenabledflag = 'FALSE'
+        if LooseVersion(ipa_version) < LooseVersion("4.9.10"):
+            ipaenabledflag = "FALSE"
         else:
             ipaenabledflag = False
 
-    host = module.params['host']
-    hostcategory = module.params['hostcategory']
-    hostgroup = module.params['hostgroup']
-    service = module.params['service']
-    servicecategory = module.params['servicecategory']
-    servicegroup = module.params['servicegroup']
-    sourcehost = module.params['sourcehost']
-    sourcehostcategory = module.params['sourcehostcategory']
-    sourcehostgroup = module.params['sourcehostgroup']
-    user = module.params['user']
-    usercategory = module.params['usercategory']
-    usergroup = module.params['usergroup']
+    host = module.params["host"]
+    hostcategory = module.params["hostcategory"]
+    hostgroup = module.params["hostgroup"]
+    service = module.params["service"]
+    servicecategory = module.params["servicecategory"]
+    servicegroup = module.params["servicegroup"]
+    sourcehost = module.params["sourcehost"]
+    sourcehostcategory = module.params["sourcehostcategory"]
+    sourcehostgroup = module.params["sourcehostgroup"]
+    user = module.params["user"]
+    usercategory = module.params["usercategory"]
+    usergroup = module.params["usergroup"]
 
-    module_hbacrule = get_hbacrule_dict(description=module.params['description'],
-                                        hostcategory=hostcategory,
-                                        ipaenabledflag=ipaenabledflag,
-                                        servicecategory=servicecategory,
-                                        sourcehostcategory=sourcehostcategory,
-                                        usercategory=usercategory)
+    module_hbacrule = get_hbacrule_dict(
+        description=module.params["description"],
+        hostcategory=hostcategory,
+        ipaenabledflag=ipaenabledflag,
+        servicecategory=servicecategory,
+        sourcehostcategory=sourcehostcategory,
+        usercategory=usercategory,
+    )
     ipa_hbacrule = client.hbacrule_find(name=name)
 
     changed = False
-    if state in ['present', 'enabled', 'disabled']:
+    if state in ["present", "enabled", "disabled"]:
         if not ipa_hbacrule:
             changed = True
             if not module.check_mode:
@@ -281,45 +286,108 @@ def ensure(module, client):
                     client.hbacrule_mod(name=name, item=data)
 
         if host is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('memberhost_host', []), host,
-                                            client.hbacrule_add_host,
-                                            client.hbacrule_remove_host, 'host') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("memberhost_host", []),
+                    host,
+                    client.hbacrule_add_host,
+                    client.hbacrule_remove_host,
+                    "host",
+                )
+                or changed
+            )
 
         if hostgroup is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('memberhost_hostgroup', []), hostgroup,
-                                            client.hbacrule_add_host,
-                                            client.hbacrule_remove_host, 'hostgroup') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("memberhost_hostgroup", []),
+                    hostgroup,
+                    client.hbacrule_add_host,
+                    client.hbacrule_remove_host,
+                    "hostgroup",
+                )
+                or changed
+            )
 
         if service is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('memberservice_hbacsvc', []), service,
-                                            client.hbacrule_add_service,
-                                            client.hbacrule_remove_service, 'hbacsvc') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("memberservice_hbacsvc", []),
+                    service,
+                    client.hbacrule_add_service,
+                    client.hbacrule_remove_service,
+                    "hbacsvc",
+                )
+                or changed
+            )
 
         if servicegroup is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('memberservice_hbacsvcgroup', []),
-                                            servicegroup,
-                                            client.hbacrule_add_service,
-                                            client.hbacrule_remove_service, 'hbacsvcgroup') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("memberservice_hbacsvcgroup", []),
+                    servicegroup,
+                    client.hbacrule_add_service,
+                    client.hbacrule_remove_service,
+                    "hbacsvcgroup",
+                )
+                or changed
+            )
 
         if sourcehost is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('sourcehost_host', []), sourcehost,
-                                            client.hbacrule_add_sourcehost,
-                                            client.hbacrule_remove_sourcehost, 'host') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("sourcehost_host", []),
+                    sourcehost,
+                    client.hbacrule_add_sourcehost,
+                    client.hbacrule_remove_sourcehost,
+                    "host",
+                )
+                or changed
+            )
 
         if sourcehostgroup is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('sourcehost_group', []), sourcehostgroup,
-                                            client.hbacrule_add_sourcehost,
-                                            client.hbacrule_remove_sourcehost, 'hostgroup') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("sourcehost_group", []),
+                    sourcehostgroup,
+                    client.hbacrule_add_sourcehost,
+                    client.hbacrule_remove_sourcehost,
+                    "hostgroup",
+                )
+                or changed
+            )
 
         if user is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('memberuser_user', []), user,
-                                            client.hbacrule_add_user,
-                                            client.hbacrule_remove_user, 'user') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("memberuser_user", []),
+                    user,
+                    client.hbacrule_add_user,
+                    client.hbacrule_remove_user,
+                    "user",
+                )
+                or changed
+            )
 
         if usergroup is not None:
-            changed = client.modify_if_diff(name, ipa_hbacrule.get('memberuser_group', []), usergroup,
-                                            client.hbacrule_add_user,
-                                            client.hbacrule_remove_user, 'group') or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hbacrule.get("memberuser_group", []),
+                    usergroup,
+                    client.hbacrule_add_user,
+                    client.hbacrule_remove_user,
+                    "group",
+                )
+                or changed
+            )
     else:
         if ipa_hbacrule:
             changed = True
@@ -331,39 +399,40 @@ def ensure(module, client):
 
 def main():
     argument_spec = ipa_argument_spec()
-    argument_spec.update(cn=dict(type='str', required=True, aliases=['name']),
-                         description=dict(type='str'),
-                         host=dict(type='list', elements='str'),
-                         hostcategory=dict(type='str', choices=['all']),
-                         hostgroup=dict(type='list', elements='str'),
-                         service=dict(type='list', elements='str'),
-                         servicecategory=dict(type='str', choices=['all']),
-                         servicegroup=dict(type='list', elements='str'),
-                         sourcehost=dict(type='list', elements='str'),
-                         sourcehostcategory=dict(type='str', choices=['all']),
-                         sourcehostgroup=dict(type='list', elements='str'),
-                         state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
-                         user=dict(type='list', elements='str'),
-                         usercategory=dict(type='str', choices=['all']),
-                         usergroup=dict(type='list', elements='str'))
+    argument_spec.update(
+        cn=dict(type="str", required=True, aliases=["name"]),
+        description=dict(type="str"),
+        host=dict(type="list", elements="str"),
+        hostcategory=dict(type="str", choices=["all"]),
+        hostgroup=dict(type="list", elements="str"),
+        service=dict(type="list", elements="str"),
+        servicecategory=dict(type="str", choices=["all"]),
+        servicegroup=dict(type="list", elements="str"),
+        sourcehost=dict(type="list", elements="str"),
+        sourcehostcategory=dict(type="str", choices=["all"]),
+        sourcehostgroup=dict(type="list", elements="str"),
+        state=dict(type="str", default="present", choices=["present", "absent", "enabled", "disabled"]),
+        user=dict(type="list", elements="str"),
+        usercategory=dict(type="str", choices=["all"]),
+        usergroup=dict(type="list", elements="str"),
+    )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True
-                           )
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    client = HBACRuleIPAClient(module=module,
-                               host=module.params['ipa_host'],
-                               port=module.params['ipa_port'],
-                               protocol=module.params['ipa_prot'])
+    client = HBACRuleIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
 
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, hbacrule = ensure(module, client)
         module.exit_json(changed=changed, hbacrule=hbacrule)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

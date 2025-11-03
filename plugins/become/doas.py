@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -95,45 +94,44 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
-
-    name = 'community.general.doas'
+    name = "community.general.doas"
 
     # messages for detecting prompted password issues
-    fail = ('Permission denied',)
-    missing = ('Authorization required',)
+    fail = ("Permission denied",)
+    missing = ("Authorization required",)
 
     # See https://github.com/ansible-collections/community.general/issues/9977,
     # https://github.com/ansible/ansible/pull/78111
     pipelining = False
 
     def check_password_prompt(self, b_output):
-        ''' checks if the expected password prompt exists in b_output '''
+        """checks if the expected password prompt exists in b_output"""
 
         # FIXME: more accurate would be: 'doas (%s@' % remote_user
         # however become plugins don't have that information currently
-        b_prompts = [to_bytes(p) for p in self.get_option('prompt_l10n')] or [br'doas \(', br'Password:']
+        b_prompts = [to_bytes(p) for p in self.get_option("prompt_l10n")] or [rb"doas \(", rb"Password:"]
         b_prompt = b"|".join(b_prompts)
 
         return bool(re.match(b_prompt, b_output))
 
     def build_become_command(self, cmd, shell):
-        super(BecomeModule, self).build_become_command(cmd, shell)
+        super().build_become_command(cmd, shell)
 
         if not cmd:
             return cmd
 
         self.prompt = True
 
-        become_exe = self.get_option('become_exe')
+        become_exe = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        if not self.get_option('become_pass') and '-n' not in flags:
-            flags += ' -n'
+        flags = self.get_option("become_flags")
+        if not self.get_option("become_pass") and "-n" not in flags:
+            flags += " -n"
 
-        become_user = self.get_option('become_user')
-        user = f'-u {become_user}' if become_user else ''
+        become_user = self.get_option("become_user")
+        user = f"-u {become_user}" if become_user else ""
 
         success_cmd = self._build_success_command(cmd, shell, noexe=True)
-        executable = getattr(shell, 'executable', shell.SHELL_FAMILY)
+        executable = getattr(shell, "executable", shell.SHELL_FAMILY)
 
-        return f'{become_exe} {flags} {user} {executable} -c {success_cmd}'
+        return f"{become_exe} {flags} {user} {executable} -c {success_cmd}"

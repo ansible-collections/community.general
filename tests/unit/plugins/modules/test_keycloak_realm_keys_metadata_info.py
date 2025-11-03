@@ -1,23 +1,21 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2021, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
-
+import unittest
 from contextlib import contextmanager
+from io import StringIO
 from itertools import count
+from unittest.mock import patch
 
-from ansible.module_utils.six import StringIO
-from ansible_collections.community.general.plugins.modules import \
-    keycloak_realm_keys_metadata_info
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.general.plugins.modules import keycloak_realm_keys_metadata_info
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-    AnsibleExitJson, ModuleTestCase, set_module_args)
+    AnsibleExitJson,
+    ModuleTestCase,
+    set_module_args,
+)
 
 
 @contextmanager
@@ -45,14 +43,10 @@ def get_response(object_with_future_response, method, get_id_call_count):
     if callable(object_with_future_response):
         return object_with_future_response()
     if isinstance(object_with_future_response, dict):
-        return get_response(
-            object_with_future_response[method], method, get_id_call_count
-        )
+        return get_response(object_with_future_response[method], method, get_id_call_count)
     if isinstance(object_with_future_response, list):
         call_number = next(get_id_call_count)
-        return get_response(
-            object_with_future_response[call_number], method, get_id_call_count
-        )
+        return get_response(object_with_future_response[call_number], method, get_id_call_count)
     return object_with_future_response
 
 
@@ -92,7 +86,7 @@ def mock_good_connection():
 
 class TestKeycloakRealmRole(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealmRole, self).setUp()
+        super().setUp()
         self.module = keycloak_realm_keys_metadata_info
 
     def test_get_public_info(self):
@@ -162,17 +156,13 @@ class TestKeycloakRealmRole(ModuleTestCase):
 
         with set_module_args(module_args):
             with mock_good_connection():
-                with patch_keycloak_api(side_effect=return_value) as (
-                    mock_get_realm_keys_metadata_by_id
-                ):
+                with patch_keycloak_api(side_effect=return_value) as (mock_get_realm_keys_metadata_by_id):
                     with self.assertRaises(AnsibleExitJson) as exec_info:
                         self.module.main()
 
         result = exec_info.exception.args[0]
         self.assertIs(result["changed"], False)
-        self.assertEqual(
-            result["msg"], "Get realm keys metadata successful for ID my-realm"
-        )
+        self.assertEqual(result["msg"], "Get realm keys metadata successful for ID my-realm")
         self.assertEqual(result["keys_metadata"], return_value[0])
 
         self.assertEqual(len(mock_get_realm_keys_metadata_by_id.mock_calls), 1)

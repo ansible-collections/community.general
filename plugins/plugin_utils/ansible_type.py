@@ -2,8 +2,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 from ansible.errors import AnsibleFilterError
 from collections.abc import Mapping
@@ -11,8 +10,10 @@ from collections.abc import Mapping
 try:
     # Introduced with Data Tagging (https://github.com/ansible/ansible/pull/84621):
     from ansible.module_utils.datatag import native_type_name as _native_type_name
+
+    HAS_NATIVE_TYPE_NAME = True
 except ImportError:
-    _native_type_name = None
+    HAS_NATIVE_TYPE_NAME = False
 
 
 def _atype(data, alias, *, use_native_type: bool = False):
@@ -20,7 +21,7 @@ def _atype(data, alias, *, use_native_type: bool = False):
     Returns the name of the type class.
     """
 
-    if use_native_type and _native_type_name:
+    if use_native_type and HAS_NATIVE_TYPE_NAME:
         data_type = _native_type_name(data)
     else:
         data_type = type(data).__name__
@@ -46,16 +47,16 @@ def _ansible_type(data, alias, *, use_native_type: bool = False):
 
     data_type = _atype(data, alias, use_native_type=use_native_type)
 
-    if data_type == 'list' and len(data) > 0:
+    if data_type == "list" and len(data) > 0:
         items = [_atype(i, alias, use_native_type=use_native_type) for i in data]
-        items_type = '|'.join(sorted(set(items)))
-        return ''.join((data_type, '[', items_type, ']'))
+        items_type = "|".join(sorted(set(items)))
+        return f"{data_type}[{items_type}]"
 
-    if data_type == 'dict' and len(data) > 0:
+    if data_type == "dict" and len(data) > 0:
         keys = [_atype(i, alias, use_native_type=use_native_type) for i in data.keys()]
         vals = [_atype(i, alias, use_native_type=use_native_type) for i in data.values()]
-        keys_type = '|'.join(sorted(set(keys)))
-        vals_type = '|'.join(sorted(set(vals)))
-        return ''.join((data_type, '[', keys_type, ', ', vals_type, ']'))
+        keys_type = "|".join(sorted(set(keys)))
+        vals_type = "|".join(sorted(set(vals)))
+        return f"{data_type}[{keys_type}, {vals_type}]"
 
     return data_type

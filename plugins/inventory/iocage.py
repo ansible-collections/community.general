@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2024 Vladimir Botka <vbotka@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -185,54 +183,54 @@ display = Display()
 
 
 def _parse_ip4(ip4):
-    ''' Return dictionary iocage_ip4_dict. default = {ip4: [], msg: ''}.
-        If item matches ifc|IP or ifc|CIDR parse ifc, ip, and mask.
-        Otherwise, append item to msg.
-    '''
+    """Return dictionary iocage_ip4_dict. default = {ip4: [], msg: ''}.
+    If item matches ifc|IP or ifc|CIDR parse ifc, ip, and mask.
+    Otherwise, append item to msg.
+    """
 
     iocage_ip4_dict = {}
-    iocage_ip4_dict['ip4'] = []
-    iocage_ip4_dict['msg'] = ''
+    iocage_ip4_dict["ip4"] = []
+    iocage_ip4_dict["msg"] = ""
 
-    items = ip4.split(',')
+    items = ip4.split(",")
     for item in items:
-        if re.match('^\\w+\\|(?:\\d{1,3}\\.){3}\\d{1,3}.*$', item):
-            i = re.split('\\||/', item)
+        if re.match("^\\w+\\|(?:\\d{1,3}\\.){3}\\d{1,3}.*$", item):
+            i = re.split("\\||/", item)
             if len(i) == 3:
-                iocage_ip4_dict['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': i[2]})
+                iocage_ip4_dict["ip4"].append({"ifc": i[0], "ip": i[1], "mask": i[2]})
             else:
-                iocage_ip4_dict['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': '-'})
+                iocage_ip4_dict["ip4"].append({"ifc": i[0], "ip": i[1], "mask": "-"})
         else:
-            iocage_ip4_dict['msg'] += item
+            iocage_ip4_dict["msg"] += item
 
     return iocage_ip4_dict
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-    ''' Host inventory parser for ansible using iocage as source. '''
+    """Host inventory parser for ansible using iocage as source."""
 
-    NAME = 'community.general.iocage'
-    IOCAGE = '/usr/local/bin/iocage'
+    NAME = "community.general.iocage"
+    IOCAGE = "/usr/local/bin/iocage"
 
     def __init__(self):
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
     def verify_file(self, path):
         valid = False
-        if super(InventoryModule, self).verify_file(path):
-            if path.endswith(('iocage.yaml', 'iocage.yml')):
+        if super().verify_file(path):
+            if path.endswith(("iocage.yaml", "iocage.yml")):
                 valid = True
             else:
                 self.display.vvv('Skipping due to inventory source not ending in "iocage.yaml" nor "iocage.yml"')
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         self._read_config_data(path)
         cache_key = self.get_cache_key(path)
 
-        user_cache_setting = self.get_option('cache')
+        user_cache_setting = self.get_option("cache")
         attempt_to_read_cache = user_cache_setting and cache
         cache_needs_update = user_cache_setting and not cache
 
@@ -249,52 +247,52 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.populate(results)
 
     def get_inventory(self, path):
-        host = self.get_option('host')
-        sudo = self.get_option('sudo')
-        sudo_preserve_env = self.get_option('sudo_preserve_env')
-        env = self.get_option('env')
-        get_properties = self.get_option('get_properties')
-        hooks_results = self.get_option('hooks_results')
-        inventory_hostname_tag = self.get_option('inventory_hostname_tag')
-        inventory_hostname_required = self.get_option('inventory_hostname_required')
+        host = self.get_option("host")
+        sudo = self.get_option("sudo")
+        sudo_preserve_env = self.get_option("sudo_preserve_env")
+        env = self.get_option("env")
+        get_properties = self.get_option("get_properties")
+        hooks_results = self.get_option("hooks_results")
+        inventory_hostname_tag = self.get_option("inventory_hostname_tag")
+        inventory_hostname_required = self.get_option("inventory_hostname_required")
 
         cmd = []
         my_env = os.environ.copy()
-        if host == 'localhost':
+        if host == "localhost":
             my_env.update({str(k): str(v) for k, v in env.items()})
         else:
-            user = self.get_option('user')
+            user = self.get_option("user")
             cmd.append("ssh")
             cmd.append(f"{user}@{host}")
             cmd.extend([f"{k}={v}" for k, v in env.items()])
 
         cmd_list = cmd.copy()
         if sudo:
-            cmd_list.append('sudo')
+            cmd_list.append("sudo")
             if sudo_preserve_env:
-                cmd_list.append('--preserve-env')
+                cmd_list.append("--preserve-env")
         cmd_list.append(self.IOCAGE)
-        cmd_list.append('list')
-        cmd_list.append('--long')
+        cmd_list.append("list")
+        cmd_list.append("--long")
         try:
             p = Popen(cmd_list, stdout=PIPE, stderr=PIPE, env=my_env)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError(f'Failed to run cmd={cmd_list}, rc={p.returncode}, stderr={to_native(stderr)}')
+                raise AnsibleError(f"Failed to run cmd={cmd_list}, rc={p.returncode}, stderr={to_native(stderr)}")
 
             try:
-                t_stdout = to_text(stdout, errors='surrogate_or_strict')
+                t_stdout = to_text(stdout, errors="surrogate_or_strict")
             except UnicodeError as e:
-                raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
+                raise AnsibleError(f"Invalid (non unicode) input returned: {e}") from e
 
         except Exception as e:
-            raise AnsibleParserError(f'Failed to parse {to_native(path)}: {e}') from e
+            raise AnsibleParserError(f"Failed to parse {to_native(path)}: {e}") from e
 
-        results = {'_meta': {'hostvars': {}}}
+        results = {"_meta": {"hostvars": {}}}
         self.get_jails(t_stdout, results)
 
         if get_properties:
-            for hostname, host_vars in results['_meta']['hostvars'].items():
+            for hostname, host_vars in results["_meta"]["hostvars"].items():
                 cmd_get_properties = cmd.copy()
                 cmd_get_properties.append(self.IOCAGE)
                 cmd_get_properties.append("get")
@@ -305,76 +303,78 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     stdout, stderr = p.communicate()
                     if p.returncode != 0:
                         raise AnsibleError(
-                            f'Failed to run cmd={cmd_get_properties}, rc={p.returncode}, stderr={to_native(stderr)}')
+                            f"Failed to run cmd={cmd_get_properties}, rc={p.returncode}, stderr={to_native(stderr)}"
+                        )
 
                     try:
-                        t_stdout = to_text(stdout, errors='surrogate_or_strict')
+                        t_stdout = to_text(stdout, errors="surrogate_or_strict")
                     except UnicodeError as e:
-                        raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
+                        raise AnsibleError(f"Invalid (non unicode) input returned: {e}") from e
 
                 except Exception as e:
-                    raise AnsibleError(f'Failed to get properties: {e}') from e
+                    raise AnsibleError(f"Failed to get properties: {e}") from e
 
                 self.get_properties(t_stdout, results, hostname)
 
         if hooks_results:
             cmd_get_pool = cmd.copy()
             cmd_get_pool.append(self.IOCAGE)
-            cmd_get_pool.append('get')
-            cmd_get_pool.append('--pool')
+            cmd_get_pool.append("get")
+            cmd_get_pool.append("--pool")
             try:
                 p = Popen(cmd_get_pool, stdout=PIPE, stderr=PIPE, env=my_env)
                 stdout, stderr = p.communicate()
                 if p.returncode != 0:
                     raise AnsibleError(
-                        f'Failed to run cmd={cmd_get_pool}, rc={p.returncode}, stderr={to_native(stderr)}')
+                        f"Failed to run cmd={cmd_get_pool}, rc={p.returncode}, stderr={to_native(stderr)}"
+                    )
                 try:
-                    iocage_pool = to_text(stdout, errors='surrogate_or_strict').strip()
+                    iocage_pool = to_text(stdout, errors="surrogate_or_strict").strip()
                 except UnicodeError as e:
-                    raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
+                    raise AnsibleError(f"Invalid (non unicode) input returned: {e}") from e
             except Exception as e:
-                raise AnsibleError(f'Failed to get pool: {e}') from e
+                raise AnsibleError(f"Failed to get pool: {e}") from e
 
-            for hostname, host_vars in results['_meta']['hostvars'].items():
+            for hostname, host_vars in results["_meta"]["hostvars"].items():
                 iocage_hooks = []
                 for hook in hooks_results:
                     path = f"/{iocage_pool}/iocage/jails/{hostname}/root{hook}"
                     cmd_cat_hook = cmd.copy()
-                    cmd_cat_hook.append('cat')
+                    cmd_cat_hook.append("cat")
                     cmd_cat_hook.append(path)
                     try:
                         p = Popen(cmd_cat_hook, stdout=PIPE, stderr=PIPE, env=my_env)
                         stdout, stderr = p.communicate()
                         if p.returncode != 0:
-                            iocage_hooks.append('-')
+                            iocage_hooks.append("-")
                             continue
 
                         try:
-                            iocage_hook = to_text(stdout, errors='surrogate_or_strict').strip()
+                            iocage_hook = to_text(stdout, errors="surrogate_or_strict").strip()
                         except UnicodeError as e:
-                            raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
+                            raise AnsibleError(f"Invalid (non unicode) input returned: {e}") from e
 
                     except Exception:
-                        iocage_hooks.append('-')
+                        iocage_hooks.append("-")
                     else:
                         iocage_hooks.append(iocage_hook)
 
-                results['_meta']['hostvars'][hostname]['iocage_hooks'] = iocage_hooks
+                results["_meta"]["hostvars"][hostname]["iocage_hooks"] = iocage_hooks
 
         # Optionally, get the jails names from the properties notes.
         # Requires the notes format "t1=v1 t2=v2 ..."
         if inventory_hostname_tag:
             if not get_properties:
-                raise AnsibleError('Jail properties are needed to use inventory_hostname_tag. Enable get_properties')
+                raise AnsibleError("Jail properties are needed to use inventory_hostname_tag. Enable get_properties")
             update = {}
-            for hostname, host_vars in results['_meta']['hostvars'].items():
-                tags = dict(tag.split('=', 1) for tag in host_vars['iocage_properties']['notes'].split() if '=' in tag)
+            for hostname, host_vars in results["_meta"]["hostvars"].items():
+                tags = dict(tag.split("=", 1) for tag in host_vars["iocage_properties"]["notes"].split() if "=" in tag)
                 if inventory_hostname_tag in tags:
                     update[hostname] = tags[inventory_hostname_tag]
                 elif inventory_hostname_required:
-                    raise AnsibleError(f'Mandatory tag {inventory_hostname_tag!r} is missing in the properties notes.')
+                    raise AnsibleError(f"Mandatory tag {inventory_hostname_tag!r} is missing in the properties notes.")
             for hostname, alias in update.items():
-                results['_meta']['hostvars'][alias] = results['_meta']['hostvars'].pop(hostname)
+                results["_meta"]["hostvars"][alias] = results["_meta"]["hostvars"].pop(hostname)
 
         return results
 
@@ -382,38 +382,38 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         lines = t_stdout.splitlines()
         if len(lines) < 5:
             return
-        indices = [i for i, val in enumerate(lines[1]) if val == '|']
+        indices = [i for i, val in enumerate(lines[1]) if val == "|"]
         for line in lines[3::2]:
-            jail = [line[i + 1:j].strip() for i, j in zip(indices[:-1], indices[1:])]
+            jail = [line[i + 1 : j].strip() for i, j in zip(indices[:-1], indices[1:])]
             iocage_name = jail[1]
             iocage_ip4_dict = _parse_ip4(jail[6])
-            if iocage_ip4_dict['ip4']:
-                iocage_ip4 = ','.join([d['ip'] for d in iocage_ip4_dict['ip4']])
+            if iocage_ip4_dict["ip4"]:
+                iocage_ip4 = ",".join([d["ip"] for d in iocage_ip4_dict["ip4"]])
             else:
-                iocage_ip4 = '-'
-            results['_meta']['hostvars'][iocage_name] = {}
-            results['_meta']['hostvars'][iocage_name]['iocage_jid'] = jail[0]
-            results['_meta']['hostvars'][iocage_name]['iocage_boot'] = jail[2]
-            results['_meta']['hostvars'][iocage_name]['iocage_state'] = jail[3]
-            results['_meta']['hostvars'][iocage_name]['iocage_type'] = jail[4]
-            results['_meta']['hostvars'][iocage_name]['iocage_release'] = jail[5]
-            results['_meta']['hostvars'][iocage_name]['iocage_ip4_dict'] = iocage_ip4_dict
-            results['_meta']['hostvars'][iocage_name]['iocage_ip4'] = iocage_ip4
-            results['_meta']['hostvars'][iocage_name]['iocage_ip6'] = jail[7]
-            results['_meta']['hostvars'][iocage_name]['iocage_template'] = jail[8]
-            results['_meta']['hostvars'][iocage_name]['iocage_basejail'] = jail[9]
+                iocage_ip4 = "-"
+            results["_meta"]["hostvars"][iocage_name] = {}
+            results["_meta"]["hostvars"][iocage_name]["iocage_jid"] = jail[0]
+            results["_meta"]["hostvars"][iocage_name]["iocage_boot"] = jail[2]
+            results["_meta"]["hostvars"][iocage_name]["iocage_state"] = jail[3]
+            results["_meta"]["hostvars"][iocage_name]["iocage_type"] = jail[4]
+            results["_meta"]["hostvars"][iocage_name]["iocage_release"] = jail[5]
+            results["_meta"]["hostvars"][iocage_name]["iocage_ip4_dict"] = iocage_ip4_dict
+            results["_meta"]["hostvars"][iocage_name]["iocage_ip4"] = iocage_ip4
+            results["_meta"]["hostvars"][iocage_name]["iocage_ip6"] = jail[7]
+            results["_meta"]["hostvars"][iocage_name]["iocage_template"] = jail[8]
+            results["_meta"]["hostvars"][iocage_name]["iocage_basejail"] = jail[9]
 
     def get_properties(self, t_stdout, results, hostname):
-        properties = dict(x.split(':', 1) for x in t_stdout.splitlines())
-        results['_meta']['hostvars'][hostname]['iocage_properties'] = properties
+        properties = dict(x.split(":", 1) for x in t_stdout.splitlines())
+        results["_meta"]["hostvars"][hostname]["iocage_properties"] = properties
 
     def populate(self, results):
-        strict = self.get_option('strict')
+        strict = self.get_option("strict")
 
-        for hostname, host_vars in results['_meta']['hostvars'].items():
-            self.inventory.add_host(hostname, group='all')
+        for hostname, host_vars in results["_meta"]["hostvars"].items():
+            self.inventory.add_host(hostname, group="all")
             for var, value in host_vars.items():
                 self.inventory.set_variable(hostname, var, value)
-            self._set_composite_vars(self.get_option('compose'), host_vars, hostname, strict=True)
-            self._add_host_to_composed_groups(self.get_option('groups'), host_vars, hostname, strict=strict)
-            self._add_host_to_keyed_groups(self.get_option('keyed_groups'), host_vars, hostname, strict=strict)
+            self._set_composite_vars(self.get_option("compose"), host_vars, hostname, strict=True)
+            self._add_host_to_composed_groups(self.get_option("groups"), host_vars, hostname, strict=strict)
+            self._add_host_to_keyed_groups(self.get_option("keyed_groups"), host_vars, hostname, strict=strict)

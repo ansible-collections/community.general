@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016, Andrew Gaffney <andrew@agaffney.org>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: openwrt_init
@@ -86,7 +84,7 @@ init_script = None
 # ===============================
 # Check if service is enabled
 def is_enabled():
-    rc, dummy, dummy = module.run_command([init_script, 'enabled'])
+    rc, dummy, dummy = module.run_command([init_script, "enabled"])
     return rc == 0
 
 
@@ -97,94 +95,94 @@ def main():
     # init
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, type='str', aliases=['service']),
-            state=dict(type='str', choices=['started', 'stopped', 'restarted', 'reloaded']),
-            enabled=dict(type='bool'),
-            pattern=dict(type='str'),
+            name=dict(required=True, type="str", aliases=["service"]),
+            state=dict(type="str", choices=["started", "stopped", "restarted", "reloaded"]),
+            enabled=dict(type="bool"),
+            pattern=dict(type="str"),
         ),
         supports_check_mode=True,
-        required_one_of=[('state', 'enabled')],
+        required_one_of=[("state", "enabled")],
     )
 
     # initialize
-    service = module.params['name']
-    init_script = '/etc/init.d/' + service
+    service = module.params["name"]
+    init_script = f"/etc/init.d/{service}"
     result = {
-        'name': service,
-        'changed': False,
+        "name": service,
+        "changed": False,
     }
     # check if service exists
     if not os.path.exists(init_script):
-        module.fail_json(msg='service %s does not exist' % service)
+        module.fail_json(msg=f"service {service} does not exist")
 
     # Enable/disable service startup at boot if requested
-    if module.params['enabled'] is not None:
+    if module.params["enabled"] is not None:
         # do we need to enable the service?
         enabled = is_enabled()
 
         # default to current state
-        result['enabled'] = enabled
+        result["enabled"] = enabled
 
         # Change enable/disable if needed
-        if enabled != module.params['enabled']:
-            result['changed'] = True
-            action = 'enable' if module.params['enabled'] else 'disable'
+        if enabled != module.params["enabled"]:
+            result["changed"] = True
+            action = "enable" if module.params["enabled"] else "disable"
 
             if not module.check_mode:
                 rc, dummy, err = module.run_command([init_script, action])
                 # openwrt init scripts can return a non-zero exit code on a successful 'enable'
                 # command if the init script doesn't contain a STOP value, so we ignore the exit
                 # code and explicitly check if the service is now in the desired state
-                if is_enabled() != module.params['enabled']:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service, err))
+                if is_enabled() != module.params["enabled"]:
+                    module.fail_json(msg=f"Unable to {action} service {service}: {err}")
 
-            result['enabled'] = not enabled
+            result["enabled"] = not enabled
 
-    if module.params['state'] is not None:
+    if module.params["state"] is not None:
         running = False
 
         # check if service is currently running
-        if module.params['pattern']:
+        if module.params["pattern"]:
             # Find ps binary
-            psbin = module.get_bin_path('ps', True)
+            psbin = module.get_bin_path("ps", True)
 
             # this should be busybox ps, so we only want/need to the 'w' option
-            rc, psout, dummy = module.run_command([psbin, 'w'])
+            rc, psout, dummy = module.run_command([psbin, "w"])
             # If rc is 0, set running as appropriate
             if rc == 0:
                 lines = psout.split("\n")
-                running = any((module.params['pattern'] in line and "pattern=" not in line) for line in lines)
+                running = any((module.params["pattern"] in line and "pattern=" not in line) for line in lines)
         else:
-            rc, dummy, dummy = module.run_command([init_script, 'running'])
+            rc, dummy, dummy = module.run_command([init_script, "running"])
             if rc == 0:
                 running = True
 
         # default to desired state
-        result['state'] = module.params['state']
+        result["state"] = module.params["state"]
 
         # determine action, if any
         action = None
-        if module.params['state'] == 'started':
+        if module.params["state"] == "started":
             if not running:
-                action = 'start'
-                result['changed'] = True
-        elif module.params['state'] == 'stopped':
+                action = "start"
+                result["changed"] = True
+        elif module.params["state"] == "stopped":
             if running:
-                action = 'stop'
-                result['changed'] = True
+                action = "stop"
+                result["changed"] = True
         else:
-            action = module.params['state'][:-2]  # remove 'ed' from restarted/reloaded
-            result['state'] = 'started'
-            result['changed'] = True
+            action = module.params["state"][:-2]  # remove 'ed' from restarted/reloaded
+            result["state"] = "started"
+            result["changed"] = True
 
         if action:
             if not module.check_mode:
                 rc, dummy, err = module.run_command([init_script, action])
                 if rc != 0:
-                    module.fail_json(msg="Unable to %s service %s: %s" % (action, service, err))
+                    module.fail_json(msg=f"Unable to {action} service {service}: {err}")
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

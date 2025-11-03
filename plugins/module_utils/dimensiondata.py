@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2016 Dimension Data
 #
@@ -12,16 +11,21 @@
 #
 # Common functionality to be used by various module components
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
+#
+# DEPRECATED
+#
+# This module utils is deprecated and will be removed in community.general 13.0.0
+#
+
+import configparser
 import os
 import re
 import traceback
 
 # (TODO: remove AnsibleModule from next line!)
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib  # noqa: F401, pylint: disable=unused-import
-from ansible.module_utils.six.moves import configparser
 from os.path import expanduser
 from uuid import UUID
 
@@ -48,7 +52,7 @@ except ImportError:
 MCP_2_LOCATION_NAME_PATTERN = re.compile(r".*MCP\s?2.*")
 
 
-class DimensionDataModule(object):
+class DimensionDataModule:
     """
     The base class containing common functionality used by Dimension Data modules for Ansible.
     """
@@ -66,34 +70,30 @@ class DimensionDataModule(object):
         self.module = module
 
         if not HAS_LIBCLOUD:
-            self.module.fail_json(msg=missing_required_lib('libcloud'), exception=LIBCLOUD_IMP_ERR)
+            self.module.fail_json(msg=missing_required_lib("libcloud"), exception=LIBCLOUD_IMP_ERR)
 
         # Credentials are common to all Dimension Data modules.
         credentials = self.get_credentials()
-        self.user_id = credentials['user_id']
-        self.key = credentials['key']
+        self.user_id = credentials["user_id"]
+        self.key = credentials["key"]
 
         # Region and location are common to all Dimension Data modules.
-        region = self.module.params['region']
-        self.region = 'dd-{0}'.format(region)
-        self.location = self.module.params['location']
+        region = self.module.params["region"]
+        self.region = f"dd-{region}"
+        self.location = self.module.params["location"]
 
-        libcloud.security.VERIFY_SSL_CERT = self.module.params['validate_certs']
+        libcloud.security.VERIFY_SSL_CERT = self.module.params["validate_certs"]
 
-        self.driver = get_driver(Provider.DIMENSIONDATA)(
-            self.user_id,
-            self.key,
-            region=self.region
-        )
+        self.driver = get_driver(Provider.DIMENSIONDATA)(self.user_id, self.key, region=self.region)
 
         # Determine the MCP API version (this depends on the target datacenter).
         self.mcp_version = self.get_mcp_version(self.location)
 
         # Optional "wait-for-completion" arguments
-        if 'wait' in self.module.params:
-            self.wait = self.module.params['wait']
-            self.wait_time = self.module.params['wait_time']
-            self.wait_poll_interval = self.module.params['wait_poll_interval']
+        if "wait" in self.module.params:
+            self.wait = self.module.params["wait"]
+            self.wait_time = self.module.params["wait_time"]
+            self.wait_poll_interval = self.module.params["wait_poll_interval"]
         else:
             self.wait = False
             self.wait_time = 0
@@ -118,31 +118,31 @@ class DimensionDataModule(object):
         """
 
         if not HAS_LIBCLOUD:
-            self.module.fail_json(msg='libcloud is required for this module.')
+            self.module.fail_json(msg="libcloud is required for this module.")
 
         user_id = None
         key = None
 
         # First, try the module configuration
-        if 'mcp_user' in self.module.params:
-            if 'mcp_password' not in self.module.params:
+        if "mcp_user" in self.module.params:
+            if "mcp_password" not in self.module.params:
                 self.module.fail_json(
                     msg='"mcp_user" parameter was specified, but not "mcp_password" (either both must be specified, or neither).'
                 )
 
-            user_id = self.module.params['mcp_user']
-            key = self.module.params['mcp_password']
+            user_id = self.module.params["mcp_user"]
+            key = self.module.params["mcp_password"]
 
         # Fall back to environment
         if not user_id or not key:
-            user_id = os.environ.get('MCP_USER', None)
-            key = os.environ.get('MCP_PASSWORD', None)
+            user_id = os.environ.get("MCP_USER", None)
+            key = os.environ.get("MCP_PASSWORD", None)
 
         # Finally, try dotfile (~/.dimensiondata)
         if not user_id or not key:
-            home = expanduser('~')
+            home = expanduser("~")
             config = configparser.RawConfigParser()
-            config.read("%s/.dimensiondata" % home)
+            config.read(f"{home}/.dimensiondata")
 
             try:
                 user_id = config.get("dimensiondatacloud", "MCP_USER")
@@ -167,9 +167,9 @@ class DimensionDataModule(object):
 
         location = self.driver.ex_get_location_by_id(location)
         if MCP_2_LOCATION_NAME_PATTERN.match(location.name):
-            return '2.0'
+            return "2.0"
 
-        return '1.0'
+        return "1.0"
 
     def get_network_domain(self, locator, location):
         """
@@ -180,7 +180,8 @@ class DimensionDataModule(object):
             network_domain = self.driver.ex_get_network_domain(locator)
         else:
             matching_network_domains = [
-                network_domain for network_domain in self.driver.ex_list_network_domains(location=location)
+                network_domain
+                for network_domain in self.driver.ex_list_network_domains(location=location)
                 if network_domain.name == locator
             ]
 
@@ -192,7 +193,7 @@ class DimensionDataModule(object):
         if network_domain:
             return network_domain
 
-        raise UnknownNetworkError("Network '%s' could not be found" % locator)
+        raise UnknownNetworkError(f"Network '{locator}' could not be found")
 
     def get_vlan(self, locator, location, network_domain):
         """
@@ -202,8 +203,7 @@ class DimensionDataModule(object):
             vlan = self.driver.ex_get_vlan(locator)
         else:
             matching_vlans = [
-                vlan for vlan in self.driver.ex_list_vlans(location, network_domain)
-                if vlan.name == locator
+                vlan for vlan in self.driver.ex_list_vlans(location, network_domain) if vlan.name == locator
             ]
 
             if matching_vlans:
@@ -214,7 +214,7 @@ class DimensionDataModule(object):
         if vlan:
             return vlan
 
-        raise UnknownVLANError("VLAN '%s' could not be found" % locator)
+        raise UnknownVLANError(f"VLAN '{locator}' could not be found")
 
     @staticmethod
     def argument_spec(**additional_argument_spec):
@@ -225,11 +225,11 @@ class DimensionDataModule(object):
         """
 
         spec = dict(
-            region=dict(type='str', default='na'),
-            mcp_user=dict(type='str', required=False),
-            mcp_password=dict(type='str', required=False, no_log=True),
-            location=dict(type='str', required=True),
-            validate_certs=dict(type='bool', required=False, default=True)
+            region=dict(type="str", default="na"),
+            mcp_user=dict(type="str", required=False),
+            mcp_password=dict(type="str", required=False, no_log=True),
+            location=dict(type="str", required=True),
+            validate_certs=dict(type="bool", required=False, default=True),
         )
 
         if additional_argument_spec:
@@ -246,9 +246,9 @@ class DimensionDataModule(object):
         """
 
         spec = DimensionDataModule.argument_spec(
-            wait=dict(type='bool', required=False, default=False),
-            wait_time=dict(type='int', required=False, default=600),
-            wait_poll_interval=dict(type='int', required=False, default=2)
+            wait=dict(type="bool", required=False, default=False),
+            wait_time=dict(type="int", required=False, default=600),
+            wait_poll_interval=dict(type="int", required=False, default=2),
         )
 
         if additional_argument_spec:
@@ -264,9 +264,7 @@ class DimensionDataModule(object):
         :return: An array containing the argument specifications.
         """
 
-        required_together = [
-            ['mcp_user', 'mcp_password']
-        ]
+        required_together = [["mcp_user", "mcp_password"]]
 
         if additional_required_together:
             required_together.extend(additional_required_together)
@@ -315,7 +313,7 @@ def get_dd_regions():
     all_regions = API_ENDPOINTS.keys()
 
     # Only Dimension Data endpoints (no prefix)
-    regions = [region[3:] for region in all_regions if region.startswith('dd-')]
+    regions = [region[3:] for region in all_regions if region.startswith("dd-")]
 
     return regions
 

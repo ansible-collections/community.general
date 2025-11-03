@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Joseph Benden <joe@benden.us>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: xfconf
@@ -173,57 +171,63 @@ from ansible_collections.community.general.plugins.module_utils.xfconf import xf
 
 
 class XFConfProperty(StateModuleHelper):
-    change_params = ('value', )
-    diff_params = ('value', )
-    output_params = ('property', 'channel', 'value')
+    change_params = ("value",)
+    diff_params = ("value",)
+    output_params = ("property", "channel", "value")
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', choices=('present', 'absent'), default='present'),
-            channel=dict(type='str', required=True),
-            property=dict(type='str', required=True),
-            value_type=dict(type='list', elements='str',
-                            choices=('string', 'int', 'double', 'bool', 'uint', 'uchar', 'char', 'uint64', 'int64', 'float')),
-            value=dict(type='list', elements='raw'),
-            force_array=dict(type='bool', default=False, aliases=['array']),
+            state=dict(type="str", choices=("present", "absent"), default="present"),
+            channel=dict(type="str", required=True),
+            property=dict(type="str", required=True),
+            value_type=dict(
+                type="list",
+                elements="str",
+                choices=("string", "int", "double", "bool", "uint", "uchar", "char", "uint64", "int64", "float"),
+            ),
+            value=dict(type="list", elements="raw"),
+            force_array=dict(type="bool", default=False, aliases=["array"]),
         ),
-        required_if=[('state', 'present', ['value', 'value_type'])],
-        required_together=[('value', 'value_type')],
+        required_if=[("state", "present", ["value", "value_type"])],
+        required_together=[("value", "value_type")],
         supports_check_mode=True,
     )
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module)
         self.vars.version = get_xfconf_version(self.runner)
-        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property, self.vars.channel)
-        self.vars.set('previous_value', self._get())
-        self.vars.set('type', self.vars.value_type)
-        self.vars.set_meta('value', initial_value=self.vars.previous_value)
+        self.does_not = f'Property "{self.vars.property}" does not exist on channel "{self.vars.channel}".'
+        self.vars.set("previous_value", self._get())
+        self.vars.set("type", self.vars.value_type)
+        self.vars.set_meta("value", initial_value=self.vars.previous_value)
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
             return None
         if rc or len(err):
-            self.do_raise('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
+            self.do_raise(f"xfconf-query failed with error (rc={rc}): {err}")
 
         result = out.rstrip()
-        if 'Value is an array with' in result:
-            result = result.split('\n')
-            result.pop(0)
-            result.pop(0)
+        if "Value is an array with" in result:
+            result = result.split("\n")
+            if len(result) > 1:
+                result.pop(0)
+                result.pop(0)
+            else:
+                return []
 
         return result
 
     def _get(self):
-        with self.runner('channel property', output_process=self.process_command_output) as ctx:
+        with self.runner("channel property", output_process=self.process_command_output) as ctx:
             return ctx.run()
 
     def state_absent(self):
-        with self.runner('channel property reset', check_mode_skip=True) as ctx:
+        with self.runner("channel property reset", check_mode_skip=True) as ctx:
             ctx.run(reset=True)
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            self.vars.set('run_info', ctx.run_info, verbosity=4)
+            self.vars.set("run_info", ctx.run_info, verbosity=4)
         self.vars.value = None
 
     def state_present(self):
@@ -243,17 +247,14 @@ class XFConfProperty(StateModuleHelper):
             self.do_raise('Number of elements in "value" and "value_type" must be the same')
 
         # calculates if it is an array
-        self.vars.is_array = \
-            bool(self.vars.force_array) or \
-            isinstance(self.vars.previous_value, list) or \
-            values_len > 1
+        self.vars.is_array = bool(self.vars.force_array) or isinstance(self.vars.previous_value, list) or values_len > 1
 
-        with self.runner('channel property create force_array values_and_types', check_mode_skip=True) as ctx:
+        with self.runner("channel property create force_array values_and_types", check_mode_skip=True) as ctx:
             ctx.run(create=True, force_array=self.vars.is_array, values_and_types=(self.vars.value, value_type))
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            self.vars.set('run_info', ctx.run_info, verbosity=4)
+            self.vars.set("run_info", ctx.run_info, verbosity=4)
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
@@ -266,5 +267,5 @@ def main():
     XFConfProperty.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

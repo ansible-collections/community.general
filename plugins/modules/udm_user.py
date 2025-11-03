@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Adfinis SyGroup AG
 # Tobias Rueetschi <tobias.ruetschi@adfinis-sygroup.ch>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -330,6 +328,7 @@ from ansible_collections.community.general.plugins.module_utils.univention_umc i
     base_dn,
 )
 
+CRYPT_IMPORT_ERROR: str | None
 try:
     import crypt
 except ImportError:
@@ -339,8 +338,10 @@ else:
     HAS_CRYPT = True
     CRYPT_IMPORT_ERROR = None
 
+LEGACYCRYPT_IMPORT_ERROR: str | None
 try:
     import legacycrypt
+
     if not HAS_CRYPT:
         crypt = legacycrypt
 except ImportError:
@@ -355,184 +356,120 @@ def main():
     expiry = date.strftime(date.today() + timedelta(days=365), "%Y-%m-%d")
     module = AnsibleModule(
         argument_spec=dict(
-            birthday=dict(type='str'),
-            city=dict(type='str'),
-            country=dict(type='str'),
-            department_number=dict(type='str',
-                                   aliases=['departmentNumber']),
-            description=dict(type='str'),
-            display_name=dict(type='str',
-                              aliases=['displayName']),
-            email=dict(default=[''],
-                       type='list',
-                       elements='str'),
-            employee_number=dict(type='str',
-                                 aliases=['employeeNumber']),
-            employee_type=dict(type='str',
-                               aliases=['employeeType']),
-            firstname=dict(type='str'),
-            gecos=dict(type='str'),
-            groups=dict(default=[],
-                        type='list',
-                        elements='str'),
-            home_share=dict(type='str',
-                            aliases=['homeShare']),
-            home_share_path=dict(type='str',
-                                 aliases=['homeSharePath']),
-            home_telephone_number=dict(default=[],
-                                       type='list',
-                                       elements='str',
-                                       aliases=['homeTelephoneNumber']),
-            homedrive=dict(type='str'),
-            lastname=dict(type='str'),
-            mail_alternative_address=dict(default=[],
-                                          type='list',
-                                          elements='str',
-                                          aliases=['mailAlternativeAddress']),
-            mail_home_server=dict(type='str',
-                                  aliases=['mailHomeServer']),
-            mail_primary_address=dict(type='str',
-                                      aliases=['mailPrimaryAddress']),
-            mobile_telephone_number=dict(default=[],
-                                         type='list',
-                                         elements='str',
-                                         aliases=['mobileTelephoneNumber']),
-            organisation=dict(type='str',
-                              aliases=['organization']),
-            overridePWHistory=dict(default=False,
-                                   type='bool',
-                                   aliases=['override_pw_history']),
-            overridePWLength=dict(default=False,
-                                  type='bool',
-                                  aliases=['override_pw_length']),
-            pager_telephonenumber=dict(default=[],
-                                       type='list',
-                                       elements='str',
-                                       aliases=['pagerTelephonenumber']),
-            password=dict(type='str',
-                          no_log=True),
-            phone=dict(default=[],
-                       type='list',
-                       elements='str'),
-            postcode=dict(type='str'),
-            primary_group=dict(type='str',
-                               aliases=['primaryGroup']),
-            profilepath=dict(type='str'),
-            pwd_change_next_login=dict(type='str',
-                                       choices=['0', '1'],
-                                       aliases=['pwdChangeNextLogin']),
-            room_number=dict(type='str',
-                             aliases=['roomNumber']),
-            samba_privileges=dict(default=[],
-                                  type='list',
-                                  elements='str',
-                                  aliases=['sambaPrivileges']),
-            samba_user_workstations=dict(default=[],
-                                         type='list',
-                                         elements='str',
-                                         aliases=['sambaUserWorkstations']),
-            sambahome=dict(type='str'),
-            scriptpath=dict(type='str'),
-            secretary=dict(default=[],
-                           type='list',
-                           elements='str'),
-            serviceprovider=dict(default=[''],
-                                 type='list',
-                                 elements='str'),
-            shell=dict(default='/bin/bash',
-                       type='str'),
-            street=dict(type='str'),
-            title=dict(type='str'),
-            unixhome=dict(type='str'),
-            userexpiry=dict(type='str'),
-            username=dict(required=True,
-                          aliases=['name'],
-                          type='str'),
-            position=dict(default='',
-                          type='str'),
-            update_password=dict(default='always',
-                                 choices=['always', 'on_create'],
-                                 type='str'),
-            ou=dict(default='',
-                    type='str'),
-            subpath=dict(default='cn=users',
-                         type='str'),
-            state=dict(default='present',
-                       choices=['present', 'absent'],
-                       type='str')
+            birthday=dict(type="str"),
+            city=dict(type="str"),
+            country=dict(type="str"),
+            department_number=dict(type="str", aliases=["departmentNumber"]),
+            description=dict(type="str"),
+            display_name=dict(type="str", aliases=["displayName"]),
+            email=dict(default=[""], type="list", elements="str"),
+            employee_number=dict(type="str", aliases=["employeeNumber"]),
+            employee_type=dict(type="str", aliases=["employeeType"]),
+            firstname=dict(type="str"),
+            gecos=dict(type="str"),
+            groups=dict(default=[], type="list", elements="str"),
+            home_share=dict(type="str", aliases=["homeShare"]),
+            home_share_path=dict(type="str", aliases=["homeSharePath"]),
+            home_telephone_number=dict(default=[], type="list", elements="str", aliases=["homeTelephoneNumber"]),
+            homedrive=dict(type="str"),
+            lastname=dict(type="str"),
+            mail_alternative_address=dict(default=[], type="list", elements="str", aliases=["mailAlternativeAddress"]),
+            mail_home_server=dict(type="str", aliases=["mailHomeServer"]),
+            mail_primary_address=dict(type="str", aliases=["mailPrimaryAddress"]),
+            mobile_telephone_number=dict(default=[], type="list", elements="str", aliases=["mobileTelephoneNumber"]),
+            organisation=dict(type="str", aliases=["organization"]),
+            overridePWHistory=dict(default=False, type="bool", aliases=["override_pw_history"]),
+            overridePWLength=dict(default=False, type="bool", aliases=["override_pw_length"]),
+            pager_telephonenumber=dict(default=[], type="list", elements="str", aliases=["pagerTelephonenumber"]),
+            password=dict(type="str", no_log=True),
+            phone=dict(default=[], type="list", elements="str"),
+            postcode=dict(type="str"),
+            primary_group=dict(type="str", aliases=["primaryGroup"]),
+            profilepath=dict(type="str"),
+            pwd_change_next_login=dict(type="str", choices=["0", "1"], aliases=["pwdChangeNextLogin"]),
+            room_number=dict(type="str", aliases=["roomNumber"]),
+            samba_privileges=dict(default=[], type="list", elements="str", aliases=["sambaPrivileges"]),
+            samba_user_workstations=dict(default=[], type="list", elements="str", aliases=["sambaUserWorkstations"]),
+            sambahome=dict(type="str"),
+            scriptpath=dict(type="str"),
+            secretary=dict(default=[], type="list", elements="str"),
+            serviceprovider=dict(default=[""], type="list", elements="str"),
+            shell=dict(default="/bin/bash", type="str"),
+            street=dict(type="str"),
+            title=dict(type="str"),
+            unixhome=dict(type="str"),
+            userexpiry=dict(type="str"),
+            username=dict(required=True, aliases=["name"], type="str"),
+            position=dict(default="", type="str"),
+            update_password=dict(default="always", choices=["always", "on_create"], type="str"),
+            ou=dict(default="", type="str"),
+            subpath=dict(default="cn=users", type="str"),
+            state=dict(default="present", choices=["present", "absent"], type="str"),
         ),
         supports_check_mode=True,
-        required_if=([
-            ('state', 'present', ['firstname', 'lastname', 'password'])
-        ])
+        required_if=([("state", "present", ["firstname", "lastname", "password"])]),
     )
 
     if not HAS_CRYPT and not HAS_LEGACYCRYPT:
         module.fail_json(
-            msg=missing_required_lib('crypt (part of standard library up to Python 3.12) or legacycrypt (PyPI)'),
+            msg=missing_required_lib("crypt (part of standard library up to Python 3.12) or legacycrypt (PyPI)"),
             exception=LEGACYCRYPT_IMPORT_ERROR,
         )
 
-    username = module.params['username']
-    position = module.params['position']
-    ou = module.params['ou']
-    subpath = module.params['subpath']
-    state = module.params['state']
+    username = module.params["username"]
+    position = module.params["position"]
+    ou = module.params["ou"]
+    subpath = module.params["subpath"]
+    state = module.params["state"]
     changed = False
     diff = None
 
-    users = list(ldap_search(
-        '(&(objectClass=posixAccount)(uid={0}))'.format(username),
-        attr=['uid']
-    ))
-    if position != '':
+    users = list(ldap_search(f"(&(objectClass=posixAccount)(uid={username}))", attr=["uid"]))
+    if position != "":
         container = position
     else:
-        if ou != '':
-            ou = 'ou={0},'.format(ou)
-        if subpath != '':
-            subpath = '{0},'.format(subpath)
-        container = '{0}{1}{2}'.format(subpath, ou, base_dn())
-    user_dn = 'uid={0},{1}'.format(username, container)
+        if ou != "":
+            ou = f"ou={ou},"
+        if subpath != "":
+            subpath = f"{subpath},"
+        container = f"{subpath}{ou}{base_dn()}"
+    user_dn = f"uid={username},{container}"
 
     exists = bool(len(users))
 
-    if state == 'present':
+    if state == "present":
         try:
             if not exists:
-                obj = umc_module_for_add('users/user', container)
+                obj = umc_module_for_add("users/user", container)
             else:
-                obj = umc_module_for_edit('users/user', user_dn)
+                obj = umc_module_for_edit("users/user", user_dn)
 
-            if module.params['displayName'] is None:
-                module.params['displayName'] = '{0} {1}'.format(
-                    module.params['firstname'],
-                    module.params['lastname']
-                )
-            if module.params['unixhome'] is None:
-                module.params['unixhome'] = '/home/{0}'.format(
-                    module.params['username']
-                )
+            if module.params["displayName"] is None:
+                module.params["displayName"] = f"{module.params['firstname']} {module.params['lastname']}"
+            if module.params["unixhome"] is None:
+                module.params["unixhome"] = f"/home/{module.params['username']}"
             for k in obj.keys():
-                if (k != 'password' and
-                        k != 'groups' and
-                        k != 'overridePWHistory' and
-                        k in module.params and
-                        module.params[k] is not None):
+                if (
+                    k != "password"
+                    and k != "groups"
+                    and k != "overridePWHistory"
+                    and k in module.params
+                    and module.params[k] is not None
+                ):
                     obj[k] = module.params[k]
             # handle some special values
-            obj['e-mail'] = module.params['email']
-            if 'userexpiry' in obj and obj.get('userexpiry') is None:
-                obj['userexpiry'] = expiry
-            password = module.params['password']
-            if obj['password'] is None:
-                obj['password'] = password
-            if module.params['update_password'] == 'always':
-                old_password = obj['password'].split('}', 2)[1]
+            obj["e-mail"] = module.params["email"]
+            if "userexpiry" in obj and obj.get("userexpiry") is None:
+                obj["userexpiry"] = expiry
+            password = module.params["password"]
+            if obj["password"] is None:
+                obj["password"] = password
+            if module.params["update_password"] == "always":
+                old_password = obj["password"].split("}", 2)[1]
                 if crypt.crypt(password, old_password) != old_password:
-                    obj['overridePWHistory'] = module.params['overridePWHistory']
-                    obj['overridePWLength'] = module.params['overridePWLength']
-                    obj['password'] = password
+                    obj["overridePWHistory"] = module.params["overridePWHistory"]
+                    obj["overridePWLength"] = module.params["overridePWLength"]
+                    obj["password"] = password
 
             diff = obj.diff()
             if exists:
@@ -547,49 +484,33 @@ def main():
                 elif changed:
                     obj.modify()
         except Exception:
-            module.fail_json(
-                msg="Creating/editing user {0} in {1} failed".format(
-                    username,
-                    container
-                )
-            )
+            module.fail_json(msg=f"Creating/editing user {username} in {container} failed")
         try:
-            groups = module.params['groups']
+            groups = module.params["groups"]
             if groups:
-                filter = '(&(objectClass=posixGroup)(|(cn={0})))'.format(
-                    ')(cn='.join(groups)
-                )
-                group_dns = list(ldap_search(filter, attr=['dn']))
+                filter = f"(&(objectClass=posixGroup)(|(cn={')(cn='.join(groups)})))"
+                group_dns = list(ldap_search(filter, attr=["dn"]))
                 for dn in group_dns:
-                    grp = umc_module_for_edit('groups/group', dn[0])
-                    if user_dn not in grp['users']:
-                        grp['users'].append(user_dn)
+                    grp = umc_module_for_edit("groups/group", dn[0])
+                    if user_dn not in grp["users"]:
+                        grp["users"].append(user_dn)
                         if not module.check_mode:
                             grp.modify()
                         changed = True
         except Exception:
-            module.fail_json(
-                msg="Adding groups to user {0} failed".format(username)
-            )
+            module.fail_json(msg=f"Adding groups to user {username} failed")
 
-    if state == 'absent' and exists:
+    if state == "absent" and exists:
         try:
-            obj = umc_module_for_edit('users/user', user_dn)
+            obj = umc_module_for_edit("users/user", user_dn)
             if not module.check_mode:
                 obj.remove()
             changed = True
         except Exception:
-            module.fail_json(
-                msg="Removing user {0} failed".format(username)
-            )
+            module.fail_json(msg=f"Removing user {username} failed")
 
-    module.exit_json(
-        changed=changed,
-        username=username,
-        diff=diff,
-        container=container
-    )
+    module.exit_json(changed=changed, username=username, diff=diff, container=container)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

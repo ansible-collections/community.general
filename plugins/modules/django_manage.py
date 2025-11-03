@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2013, Scott Anderson <scottanderson42@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -191,27 +189,26 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def _fail(module, cmd, out, err, **kwargs):
-    msg = ''
+    msg = ""
     if out:
-        msg += "stdout: %s" % (out, )
+        msg += f"stdout: {out}"
     if err:
-        msg += "\n:stderr: %s" % (err, )
+        msg += f"\n:stderr: {err}"
     module.fail_json(cmd=cmd, msg=msg, **kwargs)
 
 
 def _ensure_virtualenv(module):
-
-    venv_param = module.params['virtualenv']
+    venv_param = module.params["virtualenv"]
     if venv_param is None:
         return
 
-    vbin = os.path.join(venv_param, 'bin')
-    activate = os.path.join(vbin, 'activate')
+    vbin = os.path.join(venv_param, "bin")
+    activate = os.path.join(vbin, "activate")
 
     if not os.path.exists(activate):
-        module.fail_json(msg='%s does not point to a valid virtual environment' % venv_param)
+        module.fail_json(msg=f"{venv_param} does not point to a valid virtual environment")
 
-    os.environ["PATH"] = "%s:%s" % (vbin, os.environ["PATH"])
+    os.environ["PATH"] = f"{vbin}:{os.environ['PATH']}"
     os.environ["VIRTUAL_ENV"] = venv_param
 
 
@@ -228,9 +225,11 @@ def loaddata_filter_output(line):
 
 
 def migrate_filter_output(line):
-    return ("Migrating forwards " in line) \
-        or ("Installed" in line and "Installed 0 object" not in line) \
+    return (
+        ("Migrating forwards " in line)
+        or ("Installed" in line and "Installed 0 object" not in line)
         or ("Applying" in line)
+    )
 
 
 def collectstatic_filter_output(line):
@@ -239,116 +238,145 @@ def collectstatic_filter_output(line):
 
 def main():
     command_allowed_param_map = dict(
-        createcachetable=('cache_table', 'database', ),
-        flush=('database', ),
-        loaddata=('database', 'fixtures', ),
-        test=('failfast', 'testrunner', 'apps', ),
-        migrate=('apps', 'skip', 'merge', 'database',),
-        collectstatic=('clear', 'link', ),
+        createcachetable=(
+            "cache_table",
+            "database",
+        ),
+        flush=("database",),
+        loaddata=(
+            "database",
+            "fixtures",
+        ),
+        test=(
+            "failfast",
+            "testrunner",
+            "apps",
+        ),
+        migrate=(
+            "apps",
+            "skip",
+            "merge",
+            "database",
+        ),
+        collectstatic=(
+            "clear",
+            "link",
+        ),
     )
 
     command_required_param_map = dict(
-        loaddata=('fixtures', ),
+        loaddata=("fixtures",),
     )
 
     # forces --noinput on every command that needs it
     noinput_commands = (
-        'flush',
-        'migrate',
-        'test',
-        'collectstatic',
+        "flush",
+        "migrate",
+        "test",
+        "collectstatic",
     )
 
     # These params are allowed for certain commands only
-    specific_params = ('apps', 'clear', 'database', 'failfast', 'fixtures', 'testrunner')
+    specific_params = ("apps", "clear", "database", "failfast", "fixtures", "testrunner")
 
     # These params are automatically added to the command if present
-    general_params = ('settings', 'pythonpath', 'database',)
-    specific_boolean_params = ('clear', 'failfast', 'skip', 'merge', 'link')
-    end_of_command_params = ('apps', 'cache_table', 'fixtures')
+    general_params = (
+        "settings",
+        "pythonpath",
+        "database",
+    )
+    specific_boolean_params = ("clear", "failfast", "skip", "merge", "link")
+    end_of_command_params = ("apps", "cache_table", "fixtures")
 
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(required=True, type='str'),
-            project_path=dict(required=True, type='path', aliases=['app_path', 'chdir']),
-            settings=dict(type='path'),
-            pythonpath=dict(type='path', aliases=['python_path']),
-            virtualenv=dict(type='path', aliases=['virtual_env']),
-
+            command=dict(required=True, type="str"),
+            project_path=dict(required=True, type="path", aliases=["app_path", "chdir"]),
+            settings=dict(type="path"),
+            pythonpath=dict(type="path", aliases=["python_path"]),
+            virtualenv=dict(type="path", aliases=["virtual_env"]),
             apps=dict(),
-            cache_table=dict(type='str'),
-            clear=dict(default=False, type='bool'),
-            database=dict(type='str'),
-            failfast=dict(default=False, type='bool', aliases=['fail_fast']),
-            fixtures=dict(type='str'),
-            testrunner=dict(type='str', aliases=['test_runner']),
-            skip=dict(type='bool'),
-            merge=dict(type='bool'),
-            link=dict(type='bool'),
+            cache_table=dict(type="str"),
+            clear=dict(default=False, type="bool"),
+            database=dict(type="str"),
+            failfast=dict(default=False, type="bool", aliases=["fail_fast"]),
+            fixtures=dict(type="str"),
+            testrunner=dict(type="str", aliases=["test_runner"]),
+            skip=dict(type="bool"),
+            merge=dict(type="bool"),
+            link=dict(type="bool"),
         ),
     )
 
-    command_split = shlex.split(module.params['command'])
+    command_split = shlex.split(module.params["command"])
     command_bin = command_split[0]
-    project_path = module.params['project_path']
-    virtualenv = module.params['virtualenv']
+    project_path = module.params["project_path"]
+    virtualenv = module.params["virtualenv"]
 
     for param in specific_params:
         value = module.params[param]
         if value and param not in command_allowed_param_map[command_bin]:
-            module.fail_json(msg='%s param is incompatible with command=%s' % (param, command_bin))
+            module.fail_json(msg=f"{param} param is incompatible with command={command_bin}")
 
     for param in command_required_param_map.get(command_bin, ()):
         if not module.params[param]:
-            module.fail_json(msg='%s param is required for command=%s' % (param, command_bin))
+            module.fail_json(msg=f"{param} param is required for command={command_bin}")
 
     _ensure_virtualenv(module)
 
     run_cmd_args = ["./manage.py"] + command_split
 
-    if command_bin in noinput_commands and '--noinput' not in command_split:
+    if command_bin in noinput_commands and "--noinput" not in command_split:
         run_cmd_args.append("--noinput")
 
     for param in general_params:
         if module.params[param]:
-            run_cmd_args.append('--%s=%s' % (param, module.params[param]))
+            run_cmd_args.append(f"--{param}={module.params[param]}")
 
     for param in specific_boolean_params:
         if module.params[param]:
-            run_cmd_args.append('--%s' % param)
+            run_cmd_args.append(f"--{param}")
 
     # these params always get tacked on the end of the command
     for param in end_of_command_params:
         if module.params[param]:
-            if param in ('fixtures', 'apps'):
+            if param in ("fixtures", "apps"):
                 run_cmd_args.extend(shlex.split(module.params[param]))
             else:
                 run_cmd_args.append(module.params[param])
 
     rc, out, err = module.run_command(run_cmd_args, cwd=project_path)
     if rc != 0:
-        if command_bin == 'createcachetable' and 'table' in err and 'already exists' in err:
-            out = 'already exists.'
+        if command_bin == "createcachetable" and "table" in err and "already exists" in err:
+            out = "already exists."
         else:
             if "Unknown command:" in err:
-                _fail(module, run_cmd_args, err, "Unknown django command: %s" % command_bin)
+                _fail(module, run_cmd_args, err, f"Unknown django command: {command_bin}")
             _fail(module, run_cmd_args, out, err, path=os.environ["PATH"], syspath=sys.path)
 
     changed = False
 
-    lines = out.split('\n')
-    filt = globals().get(command_bin + "_filter_output", None)
+    lines = out.split("\n")
+    filt = globals().get(f"{command_bin}_filter_output", None)
     if filt:
         filtered_output = list(filter(filt, lines))
         if len(filtered_output):
             changed = True
-    check_changed = globals().get("{0}_check_changed".format(command_bin), None)
+    check_changed = globals().get(f"{command_bin}_check_changed", None)
     if check_changed:
         changed = check_changed(out)
 
-    module.exit_json(changed=changed, out=out, cmd=run_cmd_args, app_path=project_path, project_path=project_path,
-                     virtualenv=virtualenv, settings=module.params['settings'], pythonpath=module.params['pythonpath'])
+    module.exit_json(
+        changed=changed,
+        out=out,
+        cmd=run_cmd_args,
+        app_path=project_path,
+        project_path=project_path,
+        virtualenv=virtualenv,
+        settings=module.params["settings"],
+        pythonpath=module.params["pythonpath"],
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

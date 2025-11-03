@@ -2,8 +2,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.modules import pacman_key
@@ -11,11 +10,11 @@ import pytest
 import json
 
 # path used for mocking get_bin_path()
-MOCK_BIN_PATH = '/mocked/path'
+MOCK_BIN_PATH = "/mocked/path"
 
 # Key ID used for tests
-TESTING_KEYID = '14F26682D0916CDD81E37B6D61B7B526D98F0353'
-TESTING_KEYFILE_PATH = '/tmp/pubkey.asc'
+TESTING_KEYID = "14F26682D0916CDD81E37B6D61B7B526D98F0353"
+TESTING_KEYFILE_PATH = "/tmp/pubkey.asc"
 
 # gpg --{show,list}-key output (key present, but expired)
 GPG_SHOWKEY_OUTPUT_EXPIRED = """
@@ -91,60 +90,60 @@ gpg: next trustdb check due at 2021-08-02
 # expected command for gpg --list-keys KEYID
 RUN_CMD_LISTKEYS = [
     MOCK_BIN_PATH,
-    '--homedir=/etc/pacman.d/gnupg',
-    '--no-permission-warning',
-    '--with-colons',
-    '--quiet',
-    '--batch',
-    '--no-tty',
-    '--no-default-keyring',
-    '--list-keys',
+    "--homedir=/etc/pacman.d/gnupg",
+    "--no-permission-warning",
+    "--with-colons",
+    "--quiet",
+    "--batch",
+    "--no-tty",
+    "--no-default-keyring",
+    "--list-keys",
     TESTING_KEYID,
 ]
 
 # expected command for gpg --show-keys KEYFILE
 RUN_CMD_SHOW_KEYFILE = [
     MOCK_BIN_PATH,
-    '--no-permission-warning',
-    '--with-colons',
-    '--quiet',
-    '--batch',
-    '--no-tty',
-    '--with-fingerprint',
-    '--show-keys',
+    "--no-permission-warning",
+    "--with-colons",
+    "--quiet",
+    "--batch",
+    "--no-tty",
+    "--with-fingerprint",
+    "--show-keys",
     TESTING_KEYFILE_PATH,
 ]
 
 # expected command for pacman-key --lsign-key KEYID
 RUN_CMD_LSIGN_KEY = [
     MOCK_BIN_PATH,
-    '--gpgdir',
-    '/etc/pacman.d/gnupg',
-    '--lsign-key',
+    "--gpgdir",
+    "/etc/pacman.d/gnupg",
+    "--lsign-key",
     TESTING_KEYID,
 ]
 
 RUN_CMD_LIST_SECRET_KEY = [
     MOCK_BIN_PATH,
-    '--homedir=/etc/pacman.d/gnupg',
-    '--no-permission-warning',
-    '--with-colons',
-    '--quiet',
-    '--batch',
-    '--no-tty',
-    '--list-secret-key',
+    "--homedir=/etc/pacman.d/gnupg",
+    "--no-permission-warning",
+    "--with-colons",
+    "--quiet",
+    "--batch",
+    "--no-tty",
+    "--list-secret-key",
 ]
 
 # expected command for gpg --check-signatures
 RUN_CMD_CHECK_SIGNATURES = [
     MOCK_BIN_PATH,
-    '--homedir=/etc/pacman.d/gnupg',
-    '--no-permission-warning',
-    '--with-colons',
-    '--quiet',
-    '--batch',
-    '--no-tty',
-    '--check-signatures',
+    "--homedir=/etc/pacman.d/gnupg",
+    "--no-permission-warning",
+    "--with-colons",
+    "--quiet",
+    "--batch",
+    "--no-tty",
+    "--check-signatures",
     TESTING_KEYID,
 ]
 
@@ -155,60 +154,60 @@ TESTCASES = [
     # state: present, id: absent
     [
         {
-            'state': 'present',
+            "state": "present",
         },
         {
-            'id': 'param_missing_id',
-            'msg': 'missing required arguments: id',
-            'failed': True,
+            "id": "param_missing_id",
+            "msg": "missing required arguments: id",
+            "failed": True,
         },
     ],
     # state: present, required parameters: missing
     [
         {
-            'state': 'present',
-            'id': '0xDOESNTMATTER',
+            "state": "present",
+            "id": "0xDOESNTMATTER",
         },
         {
-            'id': 'param_missing_method',
-            'msg': 'state is present but any of the following are missing: data, file, url, keyserver',
-            'failed': True,
+            "id": "param_missing_method",
+            "msg": "state is present but any of the following are missing: data, file, url, keyserver",
+            "failed": True,
         },
     ],
     # state: present, id: invalid (not full-length)
     [
         {
-            'id': '0xDOESNTMATTER',
-            'data': 'FAKEDATA',
+            "id": "0xDOESNTMATTER",
+            "data": "FAKEDATA",
         },
         {
-            'id': 'param_id_not_full',
-            'msg': 'key ID is not full-length: DOESNTMATTER',
-            'failed': True,
+            "id": "param_id_not_full",
+            "msg": "key ID is not full-length: DOESNTMATTER",
+            "failed": True,
         },
     ],
     # state: present, id: invalid (not hexadecimal)
     [
         {
-            'state': 'present',
-            'id': '01234567890ABCDE01234567890ABCDE1234567M',
-            'data': 'FAKEDATA',
+            "state": "present",
+            "id": "01234567890ABCDE01234567890ABCDE1234567M",
+            "data": "FAKEDATA",
         },
         {
-            'id': 'param_id_not_hex',
-            'msg': 'key ID is not hexadecimal: 01234567890ABCDE01234567890ABCDE1234567M',
-            'failed': True,
+            "id": "param_id_not_hex",
+            "msg": "key ID is not hexadecimal: 01234567890ABCDE01234567890ABCDE1234567M",
+            "failed": True,
         },
     ],
     # state: absent, id: absent
     [
         {
-            'state': 'absent',
+            "state": "absent",
         },
         {
-            'id': 'param_absent_state_missing_id',
-            'msg': 'missing required arguments: id',
-            'failed': True,
+            "id": "param_absent_state_missing_id",
+            "msg": "missing required arguments: id",
+            "failed": True,
         },
     ],
     #
@@ -217,95 +216,95 @@ TESTCASES = [
     # state & key present
     [
         {
-            'state': 'present',
-            'id': TESTING_KEYID,
-            'data': 'FAKEDATA',
-            '_ansible_check_mode': True,
+            "state": "present",
+            "id": TESTING_KEYID,
+            "data": "FAKEDATA",
+            "_ansible_check_mode": True,
         },
         {
-            'id': 'checkmode_state_and_key_present',
-            'run_command.calls': [
+            "id": "checkmode_state_and_key_present",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_EXPIRED,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': False,
+            "changed": False,
         },
     ],
     # state present, key absent
     [
         {
-            'state': 'present',
-            'id': TESTING_KEYID,
-            'data': 'FAKEDATA',
-            '_ansible_check_mode': True,
+            "state": "present",
+            "id": TESTING_KEYID,
+            "data": "FAKEDATA",
+            "_ansible_check_mode": True,
         },
         {
-            'id': 'checkmode_state_present_key_absent',
-            'run_command.calls': [
+            "id": "checkmode_state_present_key_absent",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         2,
-                        '',
+                        "",
                         GPG_NOKEY_OUTPUT,
                     ),
                 ),
             ],
-            'changed': True,
+            "changed": True,
         },
     ],
     # state & key absent
     [
         {
-            'state': 'absent',
-            'id': TESTING_KEYID,
-            '_ansible_check_mode': True,
+            "state": "absent",
+            "id": TESTING_KEYID,
+            "_ansible_check_mode": True,
         },
         {
-            'id': 'checkmode_state_and_key_absent',
-            'run_command.calls': [
+            "id": "checkmode_state_and_key_absent",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         2,
-                        '',
+                        "",
                         GPG_NOKEY_OUTPUT,
                     ),
                 ),
             ],
-            'changed': False,
+            "changed": False,
         },
     ],
     # state absent, key present
     [
         {
-            'state': 'absent',
-            'id': TESTING_KEYID,
-            '_ansible_check_mode': True,
+            "state": "absent",
+            "id": TESTING_KEYID,
+            "_ansible_check_mode": True,
         },
         {
-            'id': 'check_mode_state_absent_key_present',
-            'run_command.calls': [
+            "id": "check_mode_state_absent_key_present",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_EXPIRED,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': True,
+            "changed": True,
         },
     ],
     #
@@ -314,74 +313,74 @@ TESTCASES = [
     # state & key present
     [
         {
-            'state': 'present',
-            'id': TESTING_KEYID,
-            'data': 'FAKEDATA',
+            "state": "present",
+            "id": TESTING_KEYID,
+            "data": "FAKEDATA",
         },
         {
-            'id': 'state_and_key_present',
-            'run_command.calls': [
+            "id": "state_and_key_present",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_EXPIRED,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': False,
+            "changed": False,
         },
     ],
     # state present, ensure_trusted & key expired
     [
         {
-            'state': 'present',
-            'ensure_trusted': True,
-            'id': TESTING_KEYID,
-            'data': 'FAKEDATA',
-            '_ansible_check_mode': True,
+            "state": "present",
+            "ensure_trusted": True,
+            "id": TESTING_KEYID,
+            "data": "FAKEDATA",
+            "_ansible_check_mode": True,
         },
         {
-            'id': 'state_present_trusted_key_expired',
-            'run_command.calls': [
+            "id": "state_present_trusted_key_expired",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
                     {
-                        'check_rc': False,
+                        "check_rc": False,
                     },
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_EXPIRED,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': True,
+            "changed": True,
         },
     ],
     # state present & key trusted
     [
         {
-            'state': 'present',
-            'ensure_trusted': True,
-            'id': TESTING_KEYID,
-            'data': 'FAKEDATA',
-            '_ansible_check_mode': True,
+            "state": "present",
+            "ensure_trusted": True,
+            "id": TESTING_KEYID,
+            "data": "FAKEDATA",
+            "_ansible_check_mode": True,
         },
         {
-            'id': 'state_present_and_key_trusted',
-            'run_command.calls': [
+            "id": "state_present_and_key_trusted",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
                     {
-                        'check_rc': False,
+                        "check_rc": False,
                     },
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_TRUSTED,
-                        '',
+                        "",
                     ),
                 ),
                 (
@@ -390,7 +389,7 @@ TESTCASES = [
                     (
                         0,
                         GPG_CHECK_SIGNATURES_OUTPUT,
-                        '',
+                        "",
                     ),
                 ),
                 (
@@ -399,273 +398,273 @@ TESTCASES = [
                     (
                         0,
                         GPG_LIST_SECRET_KEY_OUTPUT,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': False,
+            "changed": False,
         },
     ],
     # state absent, key present
     [
         {
-            'state': 'absent',
-            'id': TESTING_KEYID,
+            "state": "absent",
+            "id": TESTING_KEYID,
         },
         {
-            'id': 'state_absent_key_present',
-            'run_command.calls': [
+            "id": "state_absent_key_present",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_EXPIRED,
-                        '',
+                        "",
                     ),
                 ),
                 (
                     [
                         MOCK_BIN_PATH,
-                        '--gpgdir',
-                        '/etc/pacman.d/gnupg',
-                        '--delete',
+                        "--gpgdir",
+                        "/etc/pacman.d/gnupg",
+                        "--delete",
                         TESTING_KEYID,
                     ],
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         PACMAN_KEY_SUCCESS,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': True,
+            "changed": True,
         },
     ],
     # state & key absent
     [
         {
-            'state': 'absent',
-            'id': TESTING_KEYID,
+            "state": "absent",
+            "id": TESTING_KEYID,
         },
         {
-            'id': 'state_and_key_absent',
-            'run_command.calls': [
+            "id": "state_and_key_absent",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         2,
-                        '',
+                        "",
                         GPG_NOKEY_OUTPUT,
                     ),
                 ),
             ],
-            'changed': False,
+            "changed": False,
         },
     ],
     # state: present, key: absent, method: file
     [
         {
-            'state': 'present',
-            'id': TESTING_KEYID,
-            'file': TESTING_KEYFILE_PATH,
+            "state": "present",
+            "id": TESTING_KEYID,
+            "file": TESTING_KEYFILE_PATH,
         },
         {
-            'id': 'state_present_key_absent_method_file',
-            'run_command.calls': [
+            "id": "state_present_key_absent_method_file",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         2,
-                        '',
+                        "",
                         GPG_NOKEY_OUTPUT,
                     ),
                 ),
                 (
                     RUN_CMD_SHOW_KEYFILE,
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_EXPIRED,
-                        '',
+                        "",
                     ),
                 ),
                 (
                     [
                         MOCK_BIN_PATH,
-                        '--gpgdir',
-                        '/etc/pacman.d/gnupg',
-                        '--add',
-                        '/tmp/pubkey.asc',
+                        "--gpgdir",
+                        "/etc/pacman.d/gnupg",
+                        "--add",
+                        "/tmp/pubkey.asc",
                     ],
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         PACMAN_KEY_SUCCESS,
-                        '',
+                        "",
                     ),
                 ),
                 (
                     RUN_CMD_LSIGN_KEY,
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         PACMAN_KEY_SUCCESS,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': True,
+            "changed": True,
         },
     ],
     # state: present, key: absent, method: file
     # failure: keyid & keyfile don't match
     [
         {
-            'state': 'present',
-            'id': TESTING_KEYID,
-            'file': TESTING_KEYFILE_PATH,
+            "state": "present",
+            "id": TESTING_KEYID,
+            "file": TESTING_KEYFILE_PATH,
         },
         {
-            'id': 'state_present_key_absent_verify_failed',
-            'msg': 'key ID does not match. expected 14F26682D0916CDD81E37B6D61B7B526D98F0353, got 14F26682D0916CDD81E37B6D61B7B526D98F0354',
-            'run_command.calls': [
+            "id": "state_present_key_absent_verify_failed",
+            "msg": "key ID does not match. expected 14F26682D0916CDD81E37B6D61B7B526D98F0353, got 14F26682D0916CDD81E37B6D61B7B526D98F0354",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         2,
-                        '',
+                        "",
                         GPG_NOKEY_OUTPUT,
                     ),
                 ),
                 (
                     RUN_CMD_SHOW_KEYFILE,
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT_EXPIRED.replace('61B7B526D98F0353', '61B7B526D98F0354'),
-                        '',
+                        GPG_SHOWKEY_OUTPUT_EXPIRED.replace("61B7B526D98F0353", "61B7B526D98F0354"),
+                        "",
                     ),
                 ),
             ],
-            'failed': True,
+            "failed": True,
         },
     ],
     # state: present, key: absent, method: keyserver
     [
         {
-            'state': 'present',
-            'id': TESTING_KEYID,
-            'keyserver': 'pgp.mit.edu',
+            "state": "present",
+            "id": TESTING_KEYID,
+            "keyserver": "pgp.mit.edu",
         },
         {
-            'id': 'state_present_key_absent_method_keyserver',
-            'run_command.calls': [
+            "id": "state_present_key_absent_method_keyserver",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         2,
-                        '',
+                        "",
                         GPG_NOKEY_OUTPUT,
                     ),
                 ),
                 (
                     [
                         MOCK_BIN_PATH,
-                        '--gpgdir',
-                        '/etc/pacman.d/gnupg',
-                        '--keyserver',
-                        'pgp.mit.edu',
-                        '--recv-keys',
+                        "--gpgdir",
+                        "/etc/pacman.d/gnupg",
+                        "--keyserver",
+                        "pgp.mit.edu",
+                        "--recv-keys",
                         TESTING_KEYID,
                     ],
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
-                        '''
+                        """
 gpg: key 0x61B7B526D98F0353: 32 signatures not checked due to missing keys
 gpg: key 0x61B7B526D98F0353: public key "Mozilla Software Releases <release@mozilla.com>" imported
 gpg: marginals needed: 3  completes needed: 1  trust model: pgp
 gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
 gpg: Total number processed: 1
 gpg:               imported: 1
-''',
-                        '',
+""",
+                        "",
                     ),
                 ),
                 (
                     RUN_CMD_LSIGN_KEY,
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         PACMAN_KEY_SUCCESS,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'changed': True,
+            "changed": True,
         },
     ],
     # state: present, key: absent, method: data
     [
         {
-            'state': 'present',
-            'id': TESTING_KEYID,
-            'data': 'PGP_DATA',
+            "state": "present",
+            "id": TESTING_KEYID,
+            "data": "PGP_DATA",
         },
         {
-            'id': 'state_present_key_absent_method_data',
-            'run_command.calls': [
+            "id": "state_present_key_absent_method_data",
+            "run_command.calls": [
                 (
                     RUN_CMD_LISTKEYS,
-                    {'check_rc': False},
+                    {"check_rc": False},
                     (
                         2,
-                        '',
+                        "",
                         GPG_NOKEY_OUTPUT,
                     ),
                 ),
                 (
                     RUN_CMD_SHOW_KEYFILE,
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         GPG_SHOWKEY_OUTPUT_EXPIRED,
-                        '',
+                        "",
                     ),
                 ),
                 (
                     [
                         MOCK_BIN_PATH,
-                        '--gpgdir',
-                        '/etc/pacman.d/gnupg',
-                        '--add',
-                        '/tmp/pubkey.asc',
+                        "--gpgdir",
+                        "/etc/pacman.d/gnupg",
+                        "--add",
+                        "/tmp/pubkey.asc",
                     ],
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         PACMAN_KEY_SUCCESS,
-                        '',
+                        "",
                     ),
                 ),
                 (
                     RUN_CMD_LSIGN_KEY,
-                    {'check_rc': True},
+                    {"check_rc": True},
                     (
                         0,
                         PACMAN_KEY_SUCCESS,
-                        '',
+                        "",
                     ),
                 ),
             ],
-            'save_key_output': TESTING_KEYFILE_PATH,
-            'changed': True,
+            "save_key_output": TESTING_KEYFILE_PATH,
+            "changed": True,
         },
     ],
 ]
@@ -675,33 +674,33 @@ gpg:               imported: 1
 def patch_get_bin_path(mocker):
     get_bin_path = mocker.patch.object(
         AnsibleModule,
-        'get_bin_path',
+        "get_bin_path",
         return_value=MOCK_BIN_PATH,
     )
 
 
 @pytest.mark.parametrize(
-    'patch_ansible_module, expected',
+    "patch_ansible_module, expected",
     TESTCASES,
-    ids=[item[1]['id'] for item in TESTCASES],
-    indirect=['patch_ansible_module']
+    ids=[item[1]["id"] for item in TESTCASES],  # type: ignore
+    indirect=["patch_ansible_module"],
 )
-@pytest.mark.usefixtures('patch_ansible_module')
+@pytest.mark.usefixtures("patch_ansible_module")
 def test_operation(mocker, capfd, patch_get_bin_path, expected):
     # patch run_command invocations with mock data
-    if 'run_command.calls' in expected:
+    if "run_command.calls" in expected:
         mock_run_command = mocker.patch.object(
             AnsibleModule,
-            'run_command',
-            side_effect=[item[2] for item in expected['run_command.calls']],
+            "run_command",
+            side_effect=[item[2] for item in expected["run_command.calls"]],
         )
 
     # patch save_key invocations with mock data
-    if 'save_key_output' in expected:
+    if "save_key_output" in expected:
         mock_save_key = mocker.patch.object(
             pacman_key.PacmanKey,
-            'save_key',
-            return_value=expected['save_key_output'],
+            "save_key",
+            return_value=expected["save_key_output"],
         )
 
     # invoke module
@@ -713,15 +712,15 @@ def test_operation(mocker, capfd, patch_get_bin_path, expected):
     results = json.loads(out)
 
     # assertion time!
-    if 'msg' in expected:
-        assert results['msg'] == expected['msg']
-    if 'changed' in expected:
-        assert results['changed'] == expected['changed']
-    if 'failed' in expected:
-        assert results['failed'] == expected['failed']
+    if "msg" in expected:
+        assert results["msg"] == expected["msg"]
+    if "changed" in expected:
+        assert results["changed"] == expected["changed"]
+    if "failed" in expected:
+        assert results["failed"] == expected["failed"]
 
-    if 'run_command.calls' in expected:
-        assert AnsibleModule.run_command.call_count == len(expected['run_command.calls'])
+    if "run_command.calls" in expected:
+        assert AnsibleModule.run_command.call_count == len(expected["run_command.calls"])
         call_args_list = [(item[0][0], item[1]) for item in AnsibleModule.run_command.call_args_list]
-        expected_call_args_list = [(item[0], item[1]) for item in expected['run_command.calls']]
+        expected_call_args_list = [(item[0], item[1]) for item in expected["run_command.calls"]]
         assert call_args_list == expected_call_args_list

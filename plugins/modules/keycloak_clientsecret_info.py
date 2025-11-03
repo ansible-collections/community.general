@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022, Fynn Chen <ethan.cfchen@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: keycloak_clientsecret_info
@@ -94,6 +92,16 @@ EXAMPLES = r"""
     token: TOKEN
   delegate_to: localhost
   no_log: true
+
+- name: Get a new Keycloak client secret, authentication with auth_client_id and auth_client_secret
+  community.general.keycloak_clientsecret_info:
+    id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
+    realm: MyCustomRealm
+    auth_client_id: admin-cli
+    auth_client_secret: SECRET
+    auth_keycloak_url: https://auth.example.com/auth
+  delegate_to: localhost
+  no_log: true
 """
 
 RETURN = r"""
@@ -120,9 +128,14 @@ clientsecret_info:
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    KeycloakAPI, KeycloakError, get_token)
+    KeycloakAPI,
+    KeycloakError,
+    get_token,
+)
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak_clientsecret import (
-    keycloak_clientsecret_module, keycloak_clientsecret_module_resolve_params)
+    keycloak_clientsecret_module,
+    keycloak_clientsecret_module_resolve_params,
+)
 
 
 def main():
@@ -146,13 +159,10 @@ def main():
 
     clientsecret = kc.get_clientsecret(id=id, realm=realm)
 
-    result = {
-        'clientsecret_info': clientsecret,
-        'msg': 'Get client secret successful for ID {id}'.format(id=id)
-    }
+    result = {"clientsecret_info": clientsecret, "msg": f"Get client secret successful for ID {id}"}
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

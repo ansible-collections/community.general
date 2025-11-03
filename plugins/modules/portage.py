@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, William L Thomson Jr
 # Copyright (c) 2013, Yap Sok Ann
@@ -10,8 +9,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -66,6 +64,14 @@ options:
       - Include installed packages where USE flags have changed (C(--newuse)).
     type: bool
     default: false
+
+  changed_deps:
+    description:
+      - Tells emerge to replace installed packages for which the ebuild dependencies
+        have changed since the packages were built (C(--changed-deps)).
+    type: bool
+    default: false
+    version_added: 12.0.0
 
   changed_use:
     description:
@@ -260,6 +266,7 @@ from ansible.module_utils.common.text.converters import to_native
 try:
     from portage.dbapi import vartree
     from portage.exception import InvalidAtom
+
     HAS_PORTAGE = True
     PORTAGE_IMPORT_ERROR = None
 except ImportError:
@@ -268,7 +275,7 @@ except ImportError:
 
 
 def query_package(module, package, action):
-    if package.startswith('@'):
+    if package.startswith("@"):
         return query_set(module, package, action)
     return query_atom(module, package, action)
 
@@ -284,26 +291,26 @@ def query_atom(module, atom, action):
 
 def query_set(module, set_, action):
     system_sets = [
-        '@live-rebuild',
-        '@module-rebuild',
-        '@preserved-rebuild',
-        '@security',
-        '@selected',
-        '@system',
-        '@world',
-        '@x11-module-rebuild',
+        "@live-rebuild",
+        "@module-rebuild",
+        "@preserved-rebuild",
+        "@security",
+        "@selected",
+        "@system",
+        "@world",
+        "@x11-module-rebuild",
     ]
 
     if set_ in system_sets:
-        if action == 'unmerge':
-            module.fail_json(msg='set %s cannot be removed' % set_)
+        if action == "unmerge":
+            module.fail_json(msg=f"set {set_} cannot be removed")
         return False
 
-    world_sets_path = '/var/lib/portage/world_sets'
+    world_sets_path = "/var/lib/portage/world_sets"
     if not os.path.exists(world_sets_path):
         return False
 
-    cmd = ['grep', set_, world_sets_path]
+    cmd = ["grep", set_, world_sets_path]
 
     rc, out, err = module.run_command(cmd)
     return rc == 0
@@ -311,17 +318,17 @@ def query_set(module, set_, action):
 
 def sync_repositories(module, webrsync=False):
     if module.check_mode:
-        module.exit_json(msg='check mode not supported by sync')
+        module.exit_json(msg="check mode not supported by sync")
 
     if webrsync:
-        webrsync_path = module.get_bin_path('emerge-webrsync', required=True)
-        cmd = [webrsync_path, '--quiet']
+        webrsync_path = module.get_bin_path("emerge-webrsync", required=True)
+        cmd = [webrsync_path, "--quiet"]
     else:
-        cmd = [module.emerge_path, '--sync', '--quiet', '--ask=n']
+        cmd = [module.emerge_path, "--sync", "--quiet", "--ask=n"]
 
     rc, out, err = module.run_command(cmd)
     if rc != 0:
-        module.fail_json(msg='could not sync package repositories')
+        module.fail_json(msg="could not sync package repositories")
 
 
 # Note: In the 3 functions below, package querying is done one-by-one,
@@ -334,48 +341,61 @@ def emerge_packages(module, packages):
     """Run emerge command against given list of atoms."""
     p = module.params
 
-    if p['noreplace'] and not p['changed_use'] and not p['newuse'] and not (p['update'] or p['state'] == 'latest'):
+    if (
+        p["noreplace"]
+        and not p["changed_deps"]
+        and not p["changed_use"]
+        and not p["newuse"]
+        and not (p["update"] or p["state"] == "latest")
+    ):
         for package in packages:
-            if p['noreplace'] and not p['changed_use'] and not p['newuse'] and not query_package(module, package, 'emerge'):
+            if (
+                p["noreplace"]
+                and not p["changed_deps"]
+                and not p["changed_use"]
+                and not p["newuse"]
+                and not query_package(module, package, "emerge")
+            ):
                 break
         else:
-            module.exit_json(changed=False, msg='Packages already present.')
+            module.exit_json(changed=False, msg="Packages already present.")
         if module.check_mode:
-            module.exit_json(changed=True, msg='Packages would be installed.')
+            module.exit_json(changed=True, msg="Packages would be installed.")
 
     args = []
     emerge_flags = {
-        'update': '--update',
-        'deep': '--deep',
-        'newuse': '--newuse',
-        'changed_use': '--changed-use',
-        'oneshot': '--oneshot',
-        'noreplace': '--noreplace',
-        'nodeps': '--nodeps',
-        'onlydeps': '--onlydeps',
-        'quiet': '--quiet',
-        'verbose': '--verbose',
-        'getbinpkgonly': '--getbinpkgonly',
-        'getbinpkg': '--getbinpkg',
-        'usepkgonly': '--usepkgonly',
-        'usepkg': '--usepkg',
-        'keepgoing': '--keep-going',
-        'quietbuild': '--quiet-build',
-        'quietfail': '--quiet-fail',
+        "update": "--update",
+        "deep": "--deep",
+        "newuse": "--newuse",
+        "changed_deps": "--changed-deps",
+        "changed_use": "--changed-use",
+        "oneshot": "--oneshot",
+        "noreplace": "--noreplace",
+        "nodeps": "--nodeps",
+        "onlydeps": "--onlydeps",
+        "quiet": "--quiet",
+        "verbose": "--verbose",
+        "getbinpkgonly": "--getbinpkgonly",
+        "getbinpkg": "--getbinpkg",
+        "usepkgonly": "--usepkgonly",
+        "usepkg": "--usepkg",
+        "keepgoing": "--keep-going",
+        "quietbuild": "--quiet-build",
+        "quietfail": "--quiet-fail",
     }
     for flag, arg in emerge_flags.items():
         if p[flag]:
             args.append(arg)
 
-    if p['state'] and p['state'] == 'latest':
+    if p["state"] and p["state"] == "latest":
         args.append("--update")
 
     emerge_flags = {
-        'jobs': '--jobs',
-        'loadavg': '--load-average',
-        'backtrack': '--backtrack',
-        'withbdeps': '--with-bdeps',
-        'select': '--select',
+        "jobs": "--jobs",
+        "loadavg": "--load-average",
+        "backtrack": "--backtrack",
+        "withbdeps": "--with-bdeps",
+        "select": "--select",
     }
 
     for flag, arg in emerge_flags.items():
@@ -387,7 +407,7 @@ def emerge_packages(module, packages):
 
         """Add the --flag=value pair."""
         if isinstance(flag_val, bool):
-            args.extend((arg, to_native('y' if flag_val else 'n')))
+            args.extend((arg, to_native("y" if flag_val else "n")))
         elif not flag_val:
             """If the value is 0 or 0.0: add the flag, but not the value."""
             args.append(arg)
@@ -397,34 +417,42 @@ def emerge_packages(module, packages):
     cmd, (rc, out, err) = run_emerge(module, packages, *args)
     if rc != 0:
         module.fail_json(
-            cmd=cmd, rc=rc, stdout=out, stderr=err,
-            msg='Packages not installed.',
+            cmd=cmd,
+            rc=rc,
+            stdout=out,
+            stderr=err,
+            msg="Packages not installed.",
         )
 
     # Check for SSH error with PORTAGE_BINHOST, since rc is still 0 despite
     #   this error
-    if (p['usepkgonly'] or p['getbinpkg'] or p['getbinpkgonly']) \
-            and 'Permission denied (publickey).' in err:
+    if (p["usepkgonly"] or p["getbinpkg"] or p["getbinpkgonly"]) and "Permission denied (publickey)." in err:
         module.fail_json(
-            cmd=cmd, rc=rc, stdout=out, stderr=err,
-            msg='Please check your PORTAGE_BINHOST configuration in make.conf '
-                'and your SSH authorized_keys file',
+            cmd=cmd,
+            rc=rc,
+            stdout=out,
+            stderr=err,
+            msg="Please check your PORTAGE_BINHOST configuration in make.conf and your SSH authorized_keys file",
         )
 
     changed = True
     for line in out.splitlines():
-        if re.match(r'(?:>+) Emerging (?:binary )?\(1 of', line):
-            msg = 'Packages installed.'
+        if re.match(r"(?:>+) Emerging (?:binary )?\(1 of", line):
+            msg = "Packages installed."
             break
-        elif module.check_mode and re.match(r'\[(binary|ebuild)', line):
-            msg = 'Packages would be installed.'
+        elif module.check_mode and re.match(r"\[(binary|ebuild)", line):
+            msg = "Packages would be installed."
             break
     else:
         changed = False
-        msg = 'No packages installed.'
+        msg = "No packages installed."
 
     module.exit_json(
-        changed=changed, cmd=cmd, rc=rc, stdout=out, stderr=err,
+        changed=changed,
+        cmd=cmd,
+        rc=rc,
+        stdout=out,
+        stderr=err,
         msg=msg,
     )
 
@@ -433,28 +461,35 @@ def unmerge_packages(module, packages):
     p = module.params
 
     for package in packages:
-        if query_package(module, package, 'unmerge'):
+        if query_package(module, package, "unmerge"):
             break
     else:
-        module.exit_json(changed=False, msg='Packages already absent.')
+        module.exit_json(changed=False, msg="Packages already absent.")
 
-    args = ['--unmerge']
+    args = ["--unmerge"]
 
-    for flag in ['quiet', 'verbose']:
+    for flag in ["quiet", "verbose"]:
         if p[flag]:
-            args.append('--%s' % flag)
+            args.append(f"--{flag}")
 
     cmd, (rc, out, err) = run_emerge(module, packages, *args)
 
     if rc != 0:
         module.fail_json(
-            cmd=cmd, rc=rc, stdout=out, stderr=err,
-            msg='Packages not removed.',
+            cmd=cmd,
+            rc=rc,
+            stdout=out,
+            stderr=err,
+            msg="Packages not removed.",
         )
 
     module.exit_json(
-        changed=True, cmd=cmd, rc=rc, stdout=out, stderr=err,
-        msg='Packages removed.',
+        changed=True,
+        cmd=cmd,
+        rc=rc,
+        stdout=out,
+        stderr=err,
+        msg="Packages removed.",
     )
 
 
@@ -463,16 +498,16 @@ def cleanup_packages(module, packages):
 
     if packages:
         for package in packages:
-            if query_package(module, package, 'unmerge'):
+            if query_package(module, package, "unmerge"):
                 break
         else:
-            module.exit_json(changed=False, msg='Packages already absent.')
+            module.exit_json(changed=False, msg="Packages already absent.")
 
-    args = ['--depclean']
+    args = ["--depclean"]
 
-    for flag in ['quiet', 'verbose']:
+    for flag in ["quiet", "verbose"]:
         if p[flag]:
-            args.append('--%s' % flag)
+            args.append(f"--{flag}")
 
     cmd, (rc, out, err) = run_emerge(module, packages, *args)
     if rc != 0:
@@ -480,112 +515,115 @@ def cleanup_packages(module, packages):
 
     removed = 0
     for line in out.splitlines():
-        if not line.startswith('Number removed:'):
+        if not line.startswith("Number removed:"):
             continue
-        parts = line.split(':')
+        parts = line.split(":")
         removed = int(parts[1].strip())
     changed = removed > 0
 
     module.exit_json(
-        changed=changed, cmd=cmd, rc=rc, stdout=out, stderr=err,
-        msg='Depclean completed.',
+        changed=changed,
+        cmd=cmd,
+        rc=rc,
+        stdout=out,
+        stderr=err,
+        msg="Depclean completed.",
     )
 
 
 def run_emerge(module, packages, *args):
     args = list(args)
 
-    args.append('--ask=n')
+    args.append("--ask=n")
     if module.check_mode:
-        args.append('--pretend')
+        args.append("--pretend")
 
     cmd = [module.emerge_path] + args + packages
     return cmd, module.run_command(cmd)
 
 
-portage_present_states = ['present', 'emerged', 'installed', 'latest']
-portage_absent_states = ['absent', 'unmerged', 'removed']
+portage_present_states = ["present", "emerged", "installed", "latest"]
+portage_absent_states = ["absent", "unmerged", "removed"]
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            package=dict(type='list', elements='str', aliases=['name']),
+            package=dict(type="list", elements="str", aliases=["name"]),
             state=dict(
                 default=portage_present_states[0],
                 choices=portage_present_states + portage_absent_states,
             ),
-            update=dict(default=False, type='bool'),
-            backtrack=dict(type='int'),
-            deep=dict(default=False, type='bool'),
-            newuse=dict(default=False, type='bool'),
-            changed_use=dict(default=False, type='bool'),
-            oneshot=dict(default=False, type='bool'),
-            noreplace=dict(default=True, type='bool'),
-            nodeps=dict(default=False, type='bool'),
-            onlydeps=dict(default=False, type='bool'),
-            depclean=dict(default=False, type='bool'),
-            select=dict(type='bool'),
-            quiet=dict(default=False, type='bool'),
-            verbose=dict(default=False, type='bool'),
-            sync=dict(choices=['yes', 'web', 'no']),
-            getbinpkgonly=dict(default=False, type='bool'),
-            getbinpkg=dict(default=False, type='bool'),
-            usepkgonly=dict(default=False, type='bool'),
-            usepkg=dict(default=False, type='bool'),
-            keepgoing=dict(default=False, type='bool'),
-            jobs=dict(type='int'),
-            loadavg=dict(type='float'),
-            withbdeps=dict(type='bool'),
-            quietbuild=dict(default=False, type='bool'),
-            quietfail=dict(default=False, type='bool'),
+            update=dict(default=False, type="bool"),
+            backtrack=dict(type="int"),
+            deep=dict(default=False, type="bool"),
+            newuse=dict(default=False, type="bool"),
+            changed_deps=dict(default=False, type="bool"),
+            changed_use=dict(default=False, type="bool"),
+            oneshot=dict(default=False, type="bool"),
+            noreplace=dict(default=True, type="bool"),
+            nodeps=dict(default=False, type="bool"),
+            onlydeps=dict(default=False, type="bool"),
+            depclean=dict(default=False, type="bool"),
+            select=dict(type="bool"),
+            quiet=dict(default=False, type="bool"),
+            verbose=dict(default=False, type="bool"),
+            sync=dict(choices=["yes", "web", "no"]),
+            getbinpkgonly=dict(default=False, type="bool"),
+            getbinpkg=dict(default=False, type="bool"),
+            usepkgonly=dict(default=False, type="bool"),
+            usepkg=dict(default=False, type="bool"),
+            keepgoing=dict(default=False, type="bool"),
+            jobs=dict(type="int"),
+            loadavg=dict(type="float"),
+            withbdeps=dict(type="bool"),
+            quietbuild=dict(default=False, type="bool"),
+            quietfail=dict(default=False, type="bool"),
         ),
-        required_one_of=[['package', 'sync', 'depclean']],
+        required_one_of=[["package", "sync", "depclean"]],
         mutually_exclusive=[
-            ['nodeps', 'onlydeps'],
-            ['quiet', 'verbose'],
-            ['quietbuild', 'verbose'],
-            ['quietfail', 'verbose'],
-            ['oneshot', 'select'],
+            ["nodeps", "onlydeps"],
+            ["quiet", "verbose"],
+            ["quietbuild", "verbose"],
+            ["quietfail", "verbose"],
+            ["oneshot", "select"],
         ],
         supports_check_mode=True,
     )
 
     if not HAS_PORTAGE:
-        if sys.executable != '/usr/bin/python' and not has_respawned():
-            respawn_module('/usr/bin/python')
+        if sys.executable != "/usr/bin/python" and not has_respawned():
+            respawn_module("/usr/bin/python")
         else:
-            module.fail_json(msg=missing_required_lib('portage'),
-                             exception=PORTAGE_IMPORT_ERROR)
+            module.fail_json(msg=missing_required_lib("portage"), exception=PORTAGE_IMPORT_ERROR)
 
-    module.emerge_path = module.get_bin_path('emerge', required=True)
+    module.emerge_path = module.get_bin_path("emerge", required=True)
 
     p = module.params
 
-    if p['sync'] and p['sync'].strip() != 'no':
-        sync_repositories(module, webrsync=(p['sync'] == 'web'))
-        if not p['package']:
-            module.exit_json(msg='Sync successfully finished.')
+    if p["sync"] and p["sync"].strip() != "no":
+        sync_repositories(module, webrsync=(p["sync"] == "web"))
+        if not p["package"]:
+            module.exit_json(msg="Sync successfully finished.")
 
     packages = []
-    if p['package']:
-        packages.extend(p['package'])
+    if p["package"]:
+        packages.extend(p["package"])
 
-    if p['depclean']:
-        if packages and p['state'] not in portage_absent_states:
+    if p["depclean"]:
+        if packages and p["state"] not in portage_absent_states:
             module.fail_json(
-                msg='Depclean can only be used with package when the state is '
-                    'one of: %s' % portage_absent_states,
+                msg=f"Depclean can only be used with package when the state is one of: {portage_absent_states}",
             )
 
         cleanup_packages(module, packages)
 
-    elif p['state'] in portage_present_states:
+    elif p["state"] in portage_present_states:
         emerge_packages(module, packages)
 
-    elif p['state'] in portage_absent_states:
+    elif p["state"] in portage_absent_states:
         unmerge_packages(module, packages)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

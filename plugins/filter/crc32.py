@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2022, Julien Riou <julien@riou.xyz>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -10,6 +9,7 @@ from ansible.module_utils.common.collections import is_string
 
 try:
     from zlib import crc32
+
     HAS_ZLIB = True
 except ImportError:
     HAS_ZLIB = False
@@ -46,18 +46,17 @@ _value:
 
 def crc32s(value):
     if not is_string(value):
-        raise AnsibleFilterError('Invalid value type (%s) for crc32 (%r)' %
-                                 (type(value), value))
+        raise AnsibleFilterError(f"Invalid value type ({type(value)}) for crc32 ({value!r})")
 
     if not HAS_ZLIB:
-        raise AnsibleFilterError('Failed to import zlib module')
+        raise AnsibleFilterError("Failed to import zlib module")
 
-    data = to_bytes(value, errors='surrogate_or_strict')
-    return "{0:x}".format(crc32(data) & 0xffffffff)
+    data = to_bytes(value, errors="surrogate_or_strict")
+    return f"{crc32(data) & 0xFFFFFFFF:x}"
 
 
 class FilterModule:
     def filters(self):
         return {
-            'crc32': crc32s,
+            "crc32": crc32s,
         }

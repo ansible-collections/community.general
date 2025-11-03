@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Sebastien Rohaut <sebastien.rohaut@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: pam_limits
@@ -150,67 +148,92 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
-def _assert_is_valid_value(module, item, value, prefix=''):
-    if item in ['nice', 'priority']:
+def _assert_is_valid_value(module, item, value, prefix=""):
+    if item in ["nice", "priority"]:
         try:
             valid = -20 <= int(value) <= 19
         except ValueError:
             valid = False
         if not valid:
-            module.fail_json(msg="%s Value of %r for item %r is invalid. Value must be a number in the range -20 to 19 inclusive. "
-                                 "Refer to the limits.conf(5) manual pages for more details." % (prefix, value, item))
-    elif not (value in ['unlimited', 'infinity', '-1'] or value.isdigit()):
-        module.fail_json(msg="%s Value of %r for item %r is invalid. Value must either be 'unlimited', 'infinity' or -1, all of "
-                             "which indicate no limit, or a limit of 0 or larger. Refer to the limits.conf(5) manual pages for "
-                             "more details." % (prefix, value, item))
+            module.fail_json(
+                msg=f"{prefix} Value of {value!r} for item {item!r} is invalid. Value must be a number in the range -20 to 19 inclusive. "
+                "Refer to the limits.conf(5) manual pages for more details."
+            )
+    elif not (value in ["unlimited", "infinity", "-1"] or value.isdigit()):
+        module.fail_json(
+            msg=f"{prefix} Value of {value!r} for item {item!r} is invalid. Value must either be 'unlimited', 'infinity' or -1, all of "
+            "which indicate no limit, or a limit of 0 or larger. Refer to the limits.conf(5) manual pages for "
+            "more details." % (prefix, value, item)
+        )
 
 
 def main():
-    pam_items = ['core', 'data', 'fsize', 'memlock', 'nofile', 'rss', 'stack', 'cpu', 'nproc', 'as', 'maxlogins', 'maxsyslogins', 'priority', 'locks',
-                 'sigpending', 'msgqueue', 'nice', 'rtprio', 'chroot']
+    pam_items = [
+        "core",
+        "data",
+        "fsize",
+        "memlock",
+        "nofile",
+        "rss",
+        "stack",
+        "cpu",
+        "nproc",
+        "as",
+        "maxlogins",
+        "maxsyslogins",
+        "priority",
+        "locks",
+        "sigpending",
+        "msgqueue",
+        "nice",
+        "rtprio",
+        "chroot",
+    ]
 
-    pam_types = ['soft', 'hard', '-']
+    pam_types = ["soft", "hard", "-"]
 
-    limits_conf = '/etc/security/limits.conf'
+    limits_conf = "/etc/security/limits.conf"
 
     module = AnsibleModule(
         argument_spec=dict(
-            domain=dict(required=True, type='str'),
-            limit_type=dict(required=True, type='str', choices=pam_types),
-            limit_item=dict(required=True, type='str', choices=pam_items),
-            value=dict(required=True, type='str'),
-            use_max=dict(default=False, type='bool'),
-            use_min=dict(default=False, type='bool'),
-            backup=dict(default=False, type='bool'),
-            dest=dict(default=limits_conf, type='str'),
-            comment=dict(default='', type='str')
+            domain=dict(required=True, type="str"),
+            limit_type=dict(required=True, type="str", choices=pam_types),
+            limit_item=dict(required=True, type="str", choices=pam_items),
+            value=dict(required=True, type="str"),
+            use_max=dict(default=False, type="bool"),
+            use_min=dict(default=False, type="bool"),
+            backup=dict(default=False, type="bool"),
+            dest=dict(default=limits_conf, type="str"),
+            comment=dict(default="", type="str"),
         ),
         supports_check_mode=True,
     )
 
-    domain = module.params['domain']
-    limit_type = module.params['limit_type']
-    limit_item = module.params['limit_item']
-    value = module.params['value']
-    use_max = module.params['use_max']
-    use_min = module.params['use_min']
-    backup = module.params['backup']
-    limits_conf = module.params['dest']
-    new_comment = module.params['comment']
+    domain = module.params["domain"]
+    limit_type = module.params["limit_type"]
+    limit_item = module.params["limit_item"]
+    value = module.params["value"]
+    use_max = module.params["use_max"]
+    use_min = module.params["use_min"]
+    backup = module.params["backup"]
+    limits_conf = module.params["dest"]
+    new_comment = module.params["comment"]
 
     changed = False
     does_not_exist = False
 
     if os.path.isfile(limits_conf):
         if not os.access(limits_conf, os.W_OK):
-            module.fail_json(msg="%s is not writable. Use sudo" % limits_conf)
+            module.fail_json(msg=f"{limits_conf} is not writable. Use sudo")
     else:
         limits_conf_dir = os.path.dirname(limits_conf)
         if os.path.isdir(limits_conf_dir) and os.access(limits_conf_dir, os.W_OK):
             does_not_exist = True
             changed = True
         else:
-            module.fail_json(msg="directory %s is not writable (check presence, access rights, use sudo)" % limits_conf_dir)
+            module.fail_json(
+                msg=f"directory {limits_conf_dir} is not writable (check presence, access rights, use sudo)"
+            )
 
     if use_max and use_min:
         module.fail_json(msg="Cannot use use_min and use_max at the same time.")
@@ -221,45 +244,45 @@ def main():
     if backup:
         backup_file = module.backup_local(limits_conf)
 
-    space_pattern = re.compile(r'\s+')
+    space_pattern = re.compile(r"\s+")
 
     if does_not_exist:
         lines = []
     else:
-        with open(limits_conf, 'rb') as f:
+        with open(limits_conf, "rb") as f:
             lines = list(f)
 
-    message = ''
+    message = ""
     # Tempfile
-    nf = tempfile.NamedTemporaryFile(mode='w+')
+    nf = tempfile.NamedTemporaryFile(mode="w+")
 
     found = False
     new_value = value
 
     for line in lines:
-        line = to_native(line, errors='surrogate_or_strict')
-        if line.startswith('#'):
+        line = to_native(line, errors="surrogate_or_strict")
+        if line.startswith("#"):
             nf.write(line)
             continue
 
-        newline = re.sub(space_pattern, ' ', line).strip()
+        newline = re.sub(space_pattern, " ", line).strip()
         if not newline:
             nf.write(line)
             continue
 
         # Remove comment in line
-        newline = newline.split('#', 1)[0]
+        newline = newline.split("#", 1)[0]
         try:
-            old_comment = line.split('#', 1)[1]
+            old_comment = line.split("#", 1)[1]
         except Exception:
-            old_comment = ''
+            old_comment = ""
 
         newline = newline.rstrip()
 
         if not new_comment:
             new_comment = old_comment
 
-        line_fields = newline.split(' ')
+        line_fields = newline.split(" ")
 
         if len(line_fields) != 4:
             nf.write(line)
@@ -270,8 +293,9 @@ def main():
         line_item = line_fields[2]
         actual_value = line_fields[3]
 
-        _assert_is_valid_value(module, line_item, actual_value,
-                               prefix="Invalid configuration found in '%s'." % limits_conf)
+        _assert_is_valid_value(
+            module, line_item, actual_value, prefix=f"Invalid configuration found in '{limits_conf}'."
+        )
 
         # Found the line
         if line_domain == domain and line_type == limit_type and line_item == limit_item:
@@ -281,9 +305,9 @@ def main():
                 nf.write(line)
                 continue
 
-            if line_type not in ['nice', 'priority']:
-                actual_value_unlimited = actual_value in ['unlimited', 'infinity', '-1']
-                value_unlimited = value in ['unlimited', 'infinity', '-1']
+            if line_type not in ["nice", "priority"]:
+                actual_value_unlimited = actual_value in ["unlimited", "infinity", "-1"]
+                value_unlimited = value in ["unlimited", "infinity", "-1"]
             else:
                 actual_value_unlimited = value_unlimited = False
 
@@ -309,8 +333,8 @@ def main():
             if new_value != actual_value:
                 changed = True
                 if new_comment:
-                    new_comment = "\t#" + new_comment
-                new_limit = domain + "\t" + limit_type + "\t" + limit_item + "\t" + new_value + new_comment + "\n"
+                    new_comment = f"\t#{new_comment}"
+                new_limit = f"{domain}\t{limit_type}\t{limit_item}\t{new_value}{new_comment}\n"
                 message = new_limit
                 nf.write(new_limit)
             else:
@@ -322,19 +346,19 @@ def main():
     if not found:
         changed = True
         if new_comment:
-            new_comment = "\t#" + new_comment
-        new_limit = domain + "\t" + limit_type + "\t" + limit_item + "\t" + new_value + new_comment + "\n"
+            new_comment = f"\t#{new_comment}"
+        new_limit = f"{domain}\t{limit_type}\t{limit_item}\t{new_value}{new_comment}\n"
         message = new_limit
         nf.write(new_limit)
 
     nf.flush()
 
-    with open(nf.name, 'r') as content:
+    with open(nf.name, "r") as content:
         content_new = content.read()
 
     if not module.check_mode:
         if does_not_exist:
-            with open(limits_conf, 'a'):
+            with open(limits_conf, "a"):
                 pass
 
         # Move tempfile to newfile
@@ -348,14 +372,14 @@ def main():
     res_args = dict(
         changed=changed,
         msg=message,
-        diff=dict(before=b''.join(lines), after=content_new),
+        diff=dict(before=b"".join(lines), after=content_new),
     )
 
     if backup:
-        res_args['backup_file'] = backup_file
+        res_args["backup_file"] = backup_file
 
     module.exit_json(**res_args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

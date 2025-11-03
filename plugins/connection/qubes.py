@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Based on the buildah connection plugin
 # Copyright (c) 2017 Ansible Project
 #               2018 Kushal Das
@@ -54,11 +53,11 @@ class Connection(ConnectionBase):
     """This is a connection plugin for qubes: it uses qubes-run-vm binary to interact with the containers."""
 
     # String used to identify this Connection class from other classes
-    transport = 'community.general.qubes'
+    transport = "community.general.qubes"
     has_pipelining = True
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
         self._remote_vmname = self._play_context.remote_addr
         self._connected = False
@@ -89,28 +88,29 @@ class Connection(ConnectionBase):
 
         local_cmd.append(shell)
 
-        local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
+        local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
         display.vvvv("Local cmd: ", local_cmd)
 
         display.vvv(f"RUN {local_cmd}", host=self._remote_vmname)
-        p = subprocess.Popen(local_cmd, shell=False, stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            local_cmd, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         # Here we are writing the actual command to the remote bash
-        p.stdin.write(to_bytes(cmd, errors='surrogate_or_strict'))
+        p.stdin.write(to_bytes(cmd, errors="surrogate_or_strict"))
         stdout, stderr = p.communicate(input=in_data)
         return p.returncode, stdout, stderr
 
     def _connect(self):
         """No persistent connection is being maintained."""
-        super(Connection, self)._connect()
+        super()._connect()
         self._connected = True
 
-    @ensure_connect
+    @ensure_connect  # type: ignore  # TODO: for some reason, the type infos for ensure_connect suck...
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        """Run specified command in a running QubesVM """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        """Run specified command in a running QubesVM"""
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         display.vvvv(f"CMD IS: {cmd}")
 
@@ -120,25 +120,25 @@ class Connection(ConnectionBase):
         return rc, stdout, stderr
 
     def put_file(self, in_path, out_path):
-        """ Place a local file located in 'in_path' inside VM at 'out_path' """
-        super(Connection, self).put_file(in_path, out_path)
+        """Place a local file located in 'in_path' inside VM at 'out_path'"""
+        super().put_file(in_path, out_path)
         display.vvv(f"PUT {in_path} TO {out_path}", host=self._remote_vmname)
 
         with open(in_path, "rb") as fobj:
             source_data = fobj.read()
 
-        retcode, dummy, dummy = self._qubes(f'cat > "{out_path}\"\n', source_data, "qubes.VMRootShell")
+        retcode, dummy, dummy = self._qubes(f'cat > "{out_path}"\n', source_data, "qubes.VMRootShell")
         # if qubes.VMRootShell service not supported, fallback to qubes.VMShell and
         # hope it will have appropriate permissions
         if retcode == 127:
-            retcode, dummy, dummy = self._qubes(f'cat > "{out_path}\"\n', source_data)
+            retcode, dummy, dummy = self._qubes(f'cat > "{out_path}"\n', source_data)
 
         if retcode != 0:
-            raise AnsibleConnectionFailure(f'Failed to put_file to {out_path}')
+            raise AnsibleConnectionFailure(f"Failed to put_file to {out_path}")
 
     def fetch_file(self, in_path, out_path):
-        """Obtain file specified via 'in_path' from the container and place it at 'out_path' """
-        super(Connection, self).fetch_file(in_path, out_path)
+        """Obtain file specified via 'in_path' from the container and place it at 'out_path'"""
+        super().fetch_file(in_path, out_path)
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self._remote_vmname)
 
         # We are running in dom0
@@ -147,9 +147,9 @@ class Connection(ConnectionBase):
             p = subprocess.Popen(cmd_args_list, shell=False, stdout=fobj)
             p.communicate()
             if p.returncode != 0:
-                raise AnsibleConnectionFailure(f'Failed to fetch file to {out_path}')
+                raise AnsibleConnectionFailure(f"Failed to fetch file to {out_path}")
 
     def close(self):
-        """ Closing the connection """
-        super(Connection, self).close()
+        """Closing the connection"""
+        super().close()
         self._connected = False

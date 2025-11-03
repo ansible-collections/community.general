@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2023, Benedikt Braunger (bebr@adm.ku.dk)
 # Based on code:
@@ -7,8 +6,7 @@
 # Copyright (c) 2019, Markus Bergholz (markuman@gmail.com)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: gitlab_instance_variable
@@ -64,6 +62,12 @@ options:
           - The variable value.
           - Required when O(state=present).
         type: str
+      description:
+        description:
+          - A description for the variable.
+          - Support for descriptions requires GitLab >= 16.8.
+        type: str
+        version_added: '11.4.0'
       masked:
         description:
           - Whether variable value is masked or not.
@@ -145,13 +149,14 @@ instance_variable:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, filter_returned_variables,
-    list_all_kwargs
+    auth_argument_spec,
+    gitlab_authentication,
+    filter_returned_variables,
+    list_all_kwargs,
 )
 
 
-class GitlabInstanceVariables(object):
-
+class GitlabInstanceVariables:
     def __init__(self, module, gitlab_instance):
         self.instance = gitlab_instance
         self._module = module
@@ -163,12 +168,13 @@ class GitlabInstanceVariables(object):
         if self._module.check_mode:
             return True
         var = {
-            "key": var_obj.get('key'),
-            "value": var_obj.get('value'),
-            "masked": var_obj.get('masked'),
-            "protected": var_obj.get('protected'),
-            "raw": var_obj.get('raw'),
-            "variable_type": var_obj.get('variable_type'),
+            "key": var_obj.get("key"),
+            "value": var_obj.get("value"),
+            "description": var_obj.get("description"),
+            "masked": var_obj.get("masked"),
+            "protected": var_obj.get("protected"),
+            "raw": var_obj.get("raw"),
+            "variable_type": var_obj.get("variable_type"),
         }
 
         self.instance.variables.create(var)
@@ -184,7 +190,7 @@ class GitlabInstanceVariables(object):
     def delete_variable(self, var_obj):
         if self._module.check_mode:
             return True
-        self.instance.variables.delete(var_obj.get('key'))
+        self.instance.variables.delete(var_obj.get("key"))
         return True
 
 
@@ -200,16 +206,16 @@ def compare(requested_variables, existing_variables, state):
     updated = list()
     added = list()
 
-    if state == 'present':
+    if state == "present":
         existing_key_scope_vars = list()
         for item in existing_variables:
-            existing_key_scope_vars.append({'key': item.get('key')})
+            existing_key_scope_vars.append({"key": item.get("key")})
 
         for var in requested_variables:
             if var in existing_variables:
                 untouched.append(var)
             else:
-                compare_item = {'key': var.get('name')}
+                compare_item = {"key": var.get("name")}
                 if compare_item in existing_key_scope_vars:
                     updated.append(var)
                 else:
@@ -219,7 +225,6 @@ def compare(requested_variables, existing_variables, state):
 
 
 def native_python_main(this_gitlab, purge, requested_variables, state, module):
-
     change = False
     return_value = dict(added=list(), updated=list(), removed=list(), untouched=list())
 
@@ -229,30 +234,30 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     existing_variables = filter_returned_variables(gitlab_keys)
 
     for item in requested_variables:
-        item['key'] = item.pop('name')
-        item['value'] = str(item.get('value'))
-        if item.get('protected') is None:
-            item['protected'] = False
-        if item.get('masked') is None:
-            item['masked'] = False
-        if item.get('raw') is None:
-            item['raw'] = False
-        if item.get('variable_type') is None:
-            item['variable_type'] = 'env_var'
+        item["key"] = item.pop("name")
+        item["value"] = str(item.get("value"))
+        if item.get("protected") is None:
+            item["protected"] = False
+        if item.get("masked") is None:
+            item["masked"] = False
+        if item.get("raw") is None:
+            item["raw"] = False
+        if item.get("variable_type") is None:
+            item["variable_type"] = "env_var"
 
     if module.check_mode:
         untouched, updated, added = compare(requested_variables, existing_variables, state)
 
-    if state == 'present':
+    if state == "present":
         add_or_update = [x for x in requested_variables if x not in existing_variables]
         for item in add_or_update:
             try:
                 if this_gitlab.create_variable(item):
-                    return_value['added'].append(item)
+                    return_value["added"].append(item)
 
             except Exception:
                 if this_gitlab.update_variable(item):
-                    return_value['updated'].append(item)
+                    return_value["updated"].append(item)
 
         if purge:
             # refetch and filter
@@ -262,33 +267,32 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
                 if this_gitlab.delete_variable(item):
-                    return_value['removed'].append(item)
+                    return_value["removed"].append(item)
 
-    elif state == 'absent':
-        # value does not matter on removing variables.
-        # key and environment scope are sufficient
-        for item in existing_variables:
-            item.pop('value')
-            item.pop('variable_type')
-        for item in requested_variables:
-            item.pop('value')
-            item.pop('variable_type')
+    elif state == "absent":
+        # value, type, and description do not matter on removing variables.
+        keys_ignored_on_deletion = ["value", "variable_type", "description"]
+        for key in keys_ignored_on_deletion:
+            for item in existing_variables:
+                item.pop(key)
+            for item in requested_variables:
+                item.pop(key)
 
         if not purge:
             remove_requested = [x for x in requested_variables if x in existing_variables]
             for item in remove_requested:
                 if this_gitlab.delete_variable(item):
-                    return_value['removed'].append(item)
+                    return_value["removed"].append(item)
 
         else:
             for item in existing_variables:
                 if this_gitlab.delete_variable(item):
-                    return_value['removed'].append(item)
+                    return_value["removed"].append(item)
 
     if module.check_mode:
-        return_value = dict(added=added, updated=updated, removed=return_value['removed'], untouched=untouched)
+        return_value = dict(added=added, updated=updated, removed=return_value["removed"], untouched=untouched)
 
-    if len(return_value['added'] + return_value['removed'] + return_value['updated']) > 0:
+    if len(return_value["added"] + return_value["removed"] + return_value["updated"]) > 0:
         change = True
 
     gitlab_keys = this_gitlab.list_all_instance_variables()
@@ -301,47 +305,51 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        purge=dict(type='bool', default=False),
-        variables=dict(type='list', elements='dict', default=list(), options=dict(
-            name=dict(type='str', required=True),
-            value=dict(type='str', no_log=True),
-            masked=dict(type='bool', default=False),
-            protected=dict(type='bool', default=False),
-            raw=dict(type='bool', default=False),
-            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
-        )),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
+        purge=dict(type="bool", default=False),
+        variables=dict(
+            type="list",
+            elements="dict",
+            default=list(),
+            options=dict(
+                name=dict(type="str", required=True),
+                value=dict(type="str", no_log=True),
+                description=dict(type="str"),
+                masked=dict(type="bool", default=False),
+                protected=dict(type="bool", default=False),
+                raw=dict(type="bool", default=False),
+                variable_type=dict(type="str", default="env_var", choices=["env_var", "file"]),
+            ),
+        ),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
-        supports_check_mode=True
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
+        supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    purge = module.params['purge']
-    state = module.params['state']
+    purge = module.params["purge"]
+    state = module.params["state"]
 
-    variables = module.params['variables']
+    variables = module.params["variables"]
 
-    if state == 'present':
-        if any(x['value'] is None for x in variables):
-            module.fail_json(msg='value parameter is required in state present')
+    if state == "present":
+        if any(x["value"] is None for x in variables):
+            module.fail_json(msg="value parameter is required in state present")
 
     this_gitlab = GitlabInstanceVariables(module=module, gitlab_instance=gitlab_instance)
 
@@ -349,23 +357,23 @@ def main():
 
     # postprocessing
     for item in after:
-        item['name'] = item.pop('key')
+        item["name"] = item.pop("key")
     for item in before:
-        item['name'] = item.pop('key')
+        item["name"] = item.pop("key")
 
-    untouched_key_name = 'key'
+    untouched_key_name = "key"
     if not module.check_mode:
-        untouched_key_name = 'name'
-        raw_return_value['untouched'] = [x for x in before if x in after]
+        untouched_key_name = "name"
+        raw_return_value["untouched"] = [x for x in before if x in after]
 
-    added = [x.get('key') for x in raw_return_value['added']]
-    updated = [x.get('key') for x in raw_return_value['updated']]
-    removed = [x.get('key') for x in raw_return_value['removed']]
-    untouched = [x.get(untouched_key_name) for x in raw_return_value['untouched']]
+    added = [x.get("key") for x in raw_return_value["added"]]
+    updated = [x.get("key") for x in raw_return_value["updated"]]
+    removed = [x.get("key") for x in raw_return_value["removed"]]
+    untouched = [x.get(untouched_key_name) for x in raw_return_value["untouched"]]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
     module.exit_json(changed=changed, instance_variable=return_value)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

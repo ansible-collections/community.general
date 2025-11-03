@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016, Andrew Zenk <azenk@umn.edu>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: lastpass
@@ -52,9 +50,8 @@ class LPassException(AnsibleError):
     pass
 
 
-class LPass(object):
-
-    def __init__(self, path='lpass'):
+class LPass:
+    def __init__(self, path="lpass"):
         self._cli_path = path
 
     @property
@@ -72,7 +69,7 @@ class LPass(object):
         rc = p.wait()
         if rc != expected_rc:
             raise LPassException(err)
-        return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
+        return to_text(out, errors="surrogate_or_strict"), to_text(err, errors="surrogate_or_strict")
 
     def _build_args(self, command, args=None):
         if args is None:
@@ -82,7 +79,7 @@ class LPass(object):
         return args
 
     def get_field(self, key, field):
-        if field in ['username', 'password', 'url', 'notes', 'id', 'name']:
+        if field in ["username", "password", "url", "notes", "id", "name"]:
             out, err = self._run(self._build_args("show", [f"--{field}", key]))
         else:
             out, err = self._run(self._build_args("show", [f"--field={field}", key]))
@@ -90,10 +87,9 @@ class LPass(object):
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
-        field = self.get_option('field')
+        field = self.get_option("field")
 
         lp = LPass()
 

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Adam Števko <adam.stevko@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -157,99 +155,98 @@ from collections import defaultdict
 from ansible.module_utils.basic import AnsibleModule
 
 
-SUPPORTED_TYPES = ['all', 'filesystem', 'volume', 'snapshot', 'bookmark']
+SUPPORTED_TYPES = ["all", "filesystem", "volume", "snapshot", "bookmark"]
 
 
-class ZFSFacts(object):
+class ZFSFacts:
     def __init__(self, module):
-
         self.module = module
 
-        self.name = module.params['name']
-        self.recurse = module.params['recurse']
-        self.parsable = module.params['parsable']
-        self.properties = module.params['properties']
-        self.type = module.params['type']
-        self.depth = module.params['depth']
+        self.name = module.params["name"]
+        self.recurse = module.params["recurse"]
+        self.parsable = module.params["parsable"]
+        self.properties = module.params["properties"]
+        self.type = module.params["type"]
+        self.depth = module.params["depth"]
 
         self._datasets = defaultdict(dict)
         self.facts = []
 
     def dataset_exists(self):
-        cmd = [self.module.get_bin_path('zfs'), 'list', self.name]
+        cmd = [self.module.get_bin_path("zfs"), "list", self.name]
 
         (rc, out, err) = self.module.run_command(cmd)
 
         return rc == 0
 
     def get_facts(self):
-        cmd = [self.module.get_bin_path('zfs'), 'get', '-H']
+        cmd = [self.module.get_bin_path("zfs"), "get", "-H"]
         if self.parsable:
-            cmd.append('-p')
+            cmd.append("-p")
         if self.recurse:
-            cmd.append('-r')
-        if int(self.depth) != 0:
-            cmd.append('-d')
-            cmd.append('%s' % self.depth)
+            cmd.append("-r")
+        if self.depth != 0:
+            cmd.append("-d")
+            cmd.append(f"{self.depth}")
         if self.type:
-            cmd.append('-t')
-            cmd.append(','.join(self.type))
-        cmd.extend(['-o', 'name,property,value', self.properties, self.name])
+            cmd.append("-t")
+            cmd.append(",".join(self.type))
+        cmd.extend(["-o", "name,property,value", self.properties, self.name])
 
         (rc, out, err) = self.module.run_command(cmd)
 
         if rc != 0:
-            self.module.fail_json(msg='Error while trying to get facts about ZFS dataset: %s' % self.name,
-                                  stderr=err,
-                                  rc=rc)
+            self.module.fail_json(
+                msg=f"Error while trying to get facts about ZFS dataset: {self.name}", stderr=err, rc=rc
+            )
 
         for line in out.splitlines():
-            dataset, property, value = line.split('\t')
+            dataset, property, value = line.split("\t")
 
             self._datasets[dataset].update({property: value})
 
         for k, v in self._datasets.items():
-            v.update({'name': k})
+            v.update({"name": k})
             self.facts.append(v)
 
-        return {'ansible_zfs_datasets': self.facts}
+        return {"ansible_zfs_datasets": self.facts}
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=['ds', 'dataset'], type='str'),
-            recurse=dict(default=False, type='bool'),
-            parsable=dict(default=False, type='bool'),
-            properties=dict(default='all', type='str'),
-            type=dict(default='all', type='list', elements='str', choices=SUPPORTED_TYPES),
-            depth=dict(default=0, type='int')
+            name=dict(required=True, aliases=["ds", "dataset"], type="str"),
+            recurse=dict(default=False, type="bool"),
+            parsable=dict(default=False, type="bool"),
+            properties=dict(default="all", type="str"),
+            type=dict(default="all", type="list", elements="str", choices=SUPPORTED_TYPES),
+            depth=dict(default=0, type="int"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    if 'all' in module.params['type'] and len(module.params['type']) > 1:
+    if "all" in module.params["type"] and len(module.params["type"]) > 1:
         module.fail_json(msg="Value 'all' for parameter 'type' is mutually exclusive with other values")
 
     zfs_facts = ZFSFacts(module)
 
     result = {}
-    result['changed'] = False
-    result['name'] = zfs_facts.name
+    result["changed"] = False
+    result["name"] = zfs_facts.name
 
     if zfs_facts.parsable:
-        result['parsable'] = zfs_facts.parsable
+        result["parsable"] = zfs_facts.parsable
 
     if zfs_facts.recurse:
-        result['recurse'] = zfs_facts.recurse
+        result["recurse"] = zfs_facts.recurse
 
     if not zfs_facts.dataset_exists():
-        module.fail_json(msg='ZFS dataset %s does not exist!' % zfs_facts.name)
+        module.fail_json(msg=f"ZFS dataset {zfs_facts.name} does not exist!")
 
-    result['ansible_facts'] = zfs_facts.get_facts()
+    result["ansible_facts"] = zfs_facts.get_facts()
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

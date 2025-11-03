@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2019 Huawei
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 ###############################################################################
 # Documentation
@@ -198,35 +196,43 @@ mac_address:
 """
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
-    Config, HwcClientException, HwcClientException404, HwcModule,
-    are_different_dicts, build_path, get_region, is_empty_value,
-    navigate_value, wait_to_finish)
+    Config,
+    HwcClientException,
+    HwcClientException404,
+    HwcModule,
+    are_different_dicts,
+    build_path,
+    get_region,
+    is_empty_value,
+    navigate_value,
+    wait_to_finish,
+)
 
 
 def build_module():
     return HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            timeouts=dict(type='dict', options=dict(
-                create=dict(default='15m', type='str'),
-            ), default=dict()),
-            subnet_id=dict(type='str', required=True),
-            admin_state_up=dict(type='bool'),
-            allowed_address_pairs=dict(
-                type='list', elements='dict',
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            timeouts=dict(
+                type="dict",
                 options=dict(
-                    ip_address=dict(type='str'),
-                    mac_address=dict(type='str')
+                    create=dict(default="15m", type="str"),
                 ),
+                default=dict(),
             ),
-            extra_dhcp_opts=dict(type='list', elements='dict', options=dict(
-                name=dict(type='str'),
-                value=dict(type='str')
-            )),
-            ip_address=dict(type='str'),
-            name=dict(type='str'),
-            security_groups=dict(type='list', elements='str')
+            subnet_id=dict(type="str", required=True),
+            admin_state_up=dict(type="bool"),
+            allowed_address_pairs=dict(
+                type="list",
+                elements="dict",
+                options=dict(ip_address=dict(type="str"), mac_address=dict(type="str")),
+            ),
+            extra_dhcp_opts=dict(
+                type="list", elements="dict", options=dict(name=dict(type="str"), value=dict(type="str"))
+            ),
+            ip_address=dict(type="str"),
+            name=dict(type="str"),
+            security_groups=dict(type="list", elements="str"),
         ),
         supports_check_mode=True,
     )
@@ -240,21 +246,20 @@ def main():
 
     try:
         resource = None
-        if module.params['id']:
+        if module.params["id"]:
             resource = True
         else:
             v = search_resource(config)
             if len(v) > 1:
-                raise Exception("Found more than one resource(%s)" % ", ".join([
-                                navigate_value(i, ["id"]) for i in v]))
+                raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
             if len(v) == 1:
                 resource = v[0]
-                module.params['id'] = navigate_value(resource, ["id"])
+                module.params["id"] = navigate_value(resource, ["id"])
 
         result = {}
         changed = False
-        if module.params['state'] == 'present':
+        if module.params["state"] == "present":
             if resource is None:
                 if not module.check_mode:
                     create(config)
@@ -268,7 +273,7 @@ def main():
                 changed = True
 
             result = read_resource(config)
-            result['id'] = module.params.get('id')
+            result["id"] = module.params.get("id")
         else:
             if resource:
                 if not module.check_mode:
@@ -279,7 +284,7 @@ def main():
         module.fail_json(msg=str(ex))
 
     else:
-        result['changed'] = changed
+        result["changed"] = changed
         module.exit_json(**result)
 
 
@@ -298,13 +303,13 @@ def user_input_parameters(module):
 def create(config):
     module = config.module
     client = config.client(get_region(module), "vpc", "project")
-    timeout = 60 * int(module.params['timeouts']['create'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["create"].rstrip("m"))
     opts = user_input_parameters(module)
 
     params = build_create_parameters(opts)
     r = send_create_request(module, params, client)
     obj = async_wait_create(config, r, client, timeout)
-    module.params['id'] = navigate_value(obj, ["port", "id"])
+    module.params["id"] = navigate_value(obj, ["port", "id"])
 
 
 def update(config):
@@ -336,13 +341,11 @@ def delete(config):
 
         return True, "Pending"
 
-    timeout = 60 * int(module.params['timeouts']['create'].rstrip('m'))
+    timeout = 60 * int(module.params["timeouts"]["create"].rstrip("m"))
     try:
         wait_to_finish(["Done"], ["Pending"], _refresh_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_port): error "
-                             "waiting for api(delete) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_port): error waiting for api(delete) to be done, error= {ex}")
 
 
 def read_resource(config, exclude_output=False):
@@ -366,19 +369,19 @@ def _build_query_link(opts):
 
     v = navigate_value(opts, ["subnet_id"])
     if v:
-        query_params.append("network_id=" + str(v))
+        query_params.append(f"network_id={v}")
 
     v = navigate_value(opts, ["name"])
     if v:
-        query_params.append("name=" + str(v))
+        query_params.append(f"name={v}")
 
     v = navigate_value(opts, ["admin_state_up"])
     if v:
-        query_params.append("admin_state_up=" + str(v))
+        query_params.append(f"admin_state_up={v}")
 
     query_link = "?marker={marker}&limit=10"
     if query_params:
-        query_link += "&" + "&".join(query_params)
+        query_link += f"&{'&'.join(query_params)}"
 
     return query_link
 
@@ -389,10 +392,10 @@ def search_resource(config):
     opts = user_input_parameters(module)
     identity_obj = _build_identity_object(opts)
     query_link = _build_query_link(opts)
-    link = "ports" + query_link
+    link = f"ports{query_link}"
 
     result = []
-    p = {'marker': ''}
+    p = {"marker": ""}
     while True:
         url = link.format(**p)
         r = send_list_request(module, client, url)
@@ -407,7 +410,7 @@ def search_resource(config):
         if len(result) > 1:
             break
 
-        p['marker'] = r[-1].get('id')
+        p["marker"] = r[-1].get("id")
 
     return result
 
@@ -458,8 +461,7 @@ def expand_create_allowed_address_pairs(d, array_index):
 
     req = []
 
-    v = navigate_value(d, ["allowed_address_pairs"],
-                       new_array_index)
+    v = navigate_value(d, ["allowed_address_pairs"], new_array_index)
     if not v:
         return req
     n = len(v)
@@ -467,13 +469,11 @@ def expand_create_allowed_address_pairs(d, array_index):
         new_array_index["allowed_address_pairs"] = i
         transformed = dict()
 
-        v = navigate_value(d, ["allowed_address_pairs", "ip_address"],
-                           new_array_index)
+        v = navigate_value(d, ["allowed_address_pairs", "ip_address"], new_array_index)
         if not is_empty_value(v):
             transformed["ip_address"] = v
 
-        v = navigate_value(d, ["allowed_address_pairs", "mac_address"],
-                           new_array_index)
+        v = navigate_value(d, ["allowed_address_pairs", "mac_address"], new_array_index)
         if not is_empty_value(v):
             transformed["mac_address"] = v
 
@@ -490,8 +490,7 @@ def expand_create_extra_dhcp_opts(d, array_index):
 
     req = []
 
-    v = navigate_value(d, ["extra_dhcp_opts"],
-                       new_array_index)
+    v = navigate_value(d, ["extra_dhcp_opts"], new_array_index)
     if not v:
         return req
     n = len(v)
@@ -539,8 +538,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_port): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_port): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -570,14 +568,9 @@ def async_wait_create(config, result, client, timeout):
             return None, ""
 
     try:
-        return wait_to_finish(
-            ["ACTIVE", "DOWN"],
-            ["BUILD"],
-            _query_status, timeout)
+        return wait_to_finish(["ACTIVE", "DOWN"], ["BUILD"], _query_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_port): error "
-                             "waiting for api(create) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_port): error waiting for api(create) to be done, error= {ex}")
 
 
 def build_update_parameters(opts):
@@ -614,8 +607,7 @@ def expand_update_allowed_address_pairs(d, array_index):
 
     req = []
 
-    v = navigate_value(d, ["allowed_address_pairs"],
-                       new_array_index)
+    v = navigate_value(d, ["allowed_address_pairs"], new_array_index)
     if not v:
         return req
     n = len(v)
@@ -623,13 +615,11 @@ def expand_update_allowed_address_pairs(d, array_index):
         new_array_index["allowed_address_pairs"] = i
         transformed = dict()
 
-        v = navigate_value(d, ["allowed_address_pairs", "ip_address"],
-                           new_array_index)
+        v = navigate_value(d, ["allowed_address_pairs", "ip_address"], new_array_index)
         if not is_empty_value(v):
             transformed["ip_address"] = v
 
-        v = navigate_value(d, ["allowed_address_pairs", "mac_address"],
-                           new_array_index)
+        v = navigate_value(d, ["allowed_address_pairs", "mac_address"], new_array_index)
         if not is_empty_value(v):
             transformed["mac_address"] = v
 
@@ -646,8 +636,7 @@ def expand_update_extra_dhcp_opts(d, array_index):
 
     req = []
 
-    v = navigate_value(d, ["extra_dhcp_opts"],
-                       new_array_index)
+    v = navigate_value(d, ["extra_dhcp_opts"], new_array_index)
     if not v:
         return req
     n = len(v)
@@ -675,8 +664,7 @@ def send_update_request(module, params, client):
     try:
         r = client.put(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_port): error running "
-               "api(update), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_port): error running api(update), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -688,8 +676,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_port): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_port): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -702,8 +689,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_port): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_port): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["port"], None)
@@ -813,8 +799,7 @@ def update_properties(module, response, array_index, exclude_output=False):
     v = flatten_extra_dhcp_opts(response, array_index, v, exclude_output)
     r["extra_dhcp_opts"] = v
 
-    v = navigate_value(response, ["read", "fixed_ips", "ip_address"],
-                       array_index)
+    v = navigate_value(response, ["read", "fixed_ips", "ip_address"], array_index)
     r["ip_address"] = v
 
     if not exclude_output:
@@ -833,8 +818,7 @@ def update_properties(module, response, array_index, exclude_output=False):
     return r
 
 
-def flatten_allowed_address_pairs(d, array_index,
-                                  current_value, exclude_output):
+def flatten_allowed_address_pairs(d, array_index, current_value, exclude_output):
     n = 0
     result = current_value
     has_init_value = True
@@ -843,8 +827,7 @@ def flatten_allowed_address_pairs(d, array_index,
     else:
         has_init_value = False
         result = []
-        v = navigate_value(d, ["read", "allowed_address_pairs"],
-                           array_index)
+        v = navigate_value(d, ["read", "allowed_address_pairs"], array_index)
         if not v:
             return current_value
         n = len(v)
@@ -860,12 +843,10 @@ def flatten_allowed_address_pairs(d, array_index,
         if len(result) >= (i + 1) and result[i]:
             val = result[i]
 
-        v = navigate_value(d, ["read", "allowed_address_pairs", "ip_address"],
-                           new_array_index)
+        v = navigate_value(d, ["read", "allowed_address_pairs", "ip_address"], new_array_index)
         val["ip_address"] = v
 
-        v = navigate_value(d, ["read", "allowed_address_pairs", "mac_address"],
-                           new_array_index)
+        v = navigate_value(d, ["read", "allowed_address_pairs", "mac_address"], new_array_index)
         val["mac_address"] = v
 
         if len(result) >= (i + 1):
@@ -888,8 +869,7 @@ def flatten_extra_dhcp_opts(d, array_index, current_value, exclude_output):
     else:
         has_init_value = False
         result = []
-        v = navigate_value(d, ["read", "extra_dhcp_opts"],
-                           array_index)
+        v = navigate_value(d, ["read", "extra_dhcp_opts"], array_index)
         if not v:
             return current_value
         n = len(v)
@@ -905,12 +885,10 @@ def flatten_extra_dhcp_opts(d, array_index, current_value, exclude_output):
         if len(result) >= (i + 1) and result[i]:
             val = result[i]
 
-        v = navigate_value(d, ["read", "extra_dhcp_opts", "opt_name"],
-                           new_array_index)
+        v = navigate_value(d, ["read", "extra_dhcp_opts", "opt_name"], new_array_index)
         val["name"] = v
 
-        v = navigate_value(d, ["read", "extra_dhcp_opts", "opt_value"],
-                           new_array_index)
+        v = navigate_value(d, ["read", "extra_dhcp_opts", "opt_value"], new_array_index)
         val["value"] = v
 
         if len(result) >= (i + 1):
@@ -925,13 +903,11 @@ def flatten_extra_dhcp_opts(d, array_index, current_value, exclude_output):
 
 
 def send_list_request(module, client, url):
-
     r = None
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_port): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_port): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["ports"], None)
@@ -989,20 +965,17 @@ def expand_list_allowed_address_pairs(d, array_index):
 
     req = []
 
-    v = navigate_value(d, ["allowed_address_pairs"],
-                       new_array_index)
+    v = navigate_value(d, ["allowed_address_pairs"], new_array_index)
 
     n = len(v) if v else 1
     for i in range(n):
         new_array_index["allowed_address_pairs"] = i
         transformed = dict()
 
-        v = navigate_value(d, ["allowed_address_pairs", "ip_address"],
-                           new_array_index)
+        v = navigate_value(d, ["allowed_address_pairs", "ip_address"], new_array_index)
         transformed["ip_address"] = v
 
-        v = navigate_value(d, ["allowed_address_pairs", "mac_address"],
-                           new_array_index)
+        v = navigate_value(d, ["allowed_address_pairs", "mac_address"], new_array_index)
         transformed["mac_address"] = v
 
         for v in transformed.values():
@@ -1020,8 +993,7 @@ def expand_list_extra_dhcp_opts(d, array_index):
 
     req = []
 
-    v = navigate_value(d, ["extra_dhcp_opts"],
-                       new_array_index)
+    v = navigate_value(d, ["extra_dhcp_opts"], new_array_index)
 
     n = len(v) if v else 1
     for i in range(n):
@@ -1154,5 +1126,5 @@ def fill_list_resp_fixed_ips(value):
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

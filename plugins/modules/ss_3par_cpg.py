@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Hewlett Packard Enterprise Development LP
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -126,9 +124,11 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.storage.hpe3par import hpe3par
+
 try:
     from hpe3par_sdk import client
     from hpe3parclient import exceptions
+
     HAS_3PARCLIENT = True
 except ImportError:
     HAS_3PARCLIENT = False
@@ -136,89 +136,83 @@ except ImportError:
 
 def validate_set_size(raid_type, set_size):
     if raid_type:
-        set_size_array = client.HPE3ParClient.RAID_MAP[raid_type]['set_sizes']
+        set_size_array = client.HPE3ParClient.RAID_MAP[raid_type]["set_sizes"]
         if set_size in set_size_array:
             return True
     return False
 
 
 def cpg_ldlayout_map(ldlayout_dict):
-    if ldlayout_dict['RAIDType'] is not None and ldlayout_dict['RAIDType']:
-        ldlayout_dict['RAIDType'] = client.HPE3ParClient.RAID_MAP[
-            ldlayout_dict['RAIDType']]['raid_value']
-    if ldlayout_dict['HA'] is not None and ldlayout_dict['HA']:
-        ldlayout_dict['HA'] = getattr(
-            client.HPE3ParClient, ldlayout_dict['HA'])
+    if ldlayout_dict["RAIDType"] is not None and ldlayout_dict["RAIDType"]:
+        ldlayout_dict["RAIDType"] = client.HPE3ParClient.RAID_MAP[ldlayout_dict["RAIDType"]]["raid_value"]
+    if ldlayout_dict["HA"] is not None and ldlayout_dict["HA"]:
+        ldlayout_dict["HA"] = getattr(client.HPE3ParClient, ldlayout_dict["HA"])
     return ldlayout_dict
 
 
 def create_cpg(
-        client_obj,
-        cpg_name,
-        domain,
-        growth_increment,
-        growth_limit,
-        growth_warning,
-        raid_type,
-        set_size,
-        high_availability,
-        disk_type):
+    client_obj,
+    cpg_name,
+    domain,
+    growth_increment,
+    growth_limit,
+    growth_warning,
+    raid_type,
+    set_size,
+    high_availability,
+    disk_type,
+):
     try:
         if not validate_set_size(raid_type, set_size):
-            return (False, False, "Set size %s not part of RAID set %s" % (set_size, raid_type))
+            return (False, False, f"Set size {set_size} not part of RAID set {raid_type}")
         if not client_obj.cpgExists(cpg_name):
-
             disk_patterns = []
             if disk_type:
                 disk_type = getattr(client.HPE3ParClient, disk_type)
-                disk_patterns = [{'diskType': disk_type}]
+                disk_patterns = [{"diskType": disk_type}]
             ld_layout = {
-                'RAIDType': raid_type,
-                'setSize': set_size,
-                'HA': high_availability,
-                'diskPatterns': disk_patterns}
+                "RAIDType": raid_type,
+                "setSize": set_size,
+                "HA": high_availability,
+                "diskPatterns": disk_patterns,
+            }
             ld_layout = cpg_ldlayout_map(ld_layout)
             if growth_increment is not None:
-                growth_increment = hpe3par.convert_to_binary_multiple(
-                    growth_increment)
+                growth_increment = hpe3par.convert_to_binary_multiple(growth_increment)
             if growth_limit is not None:
-                growth_limit = hpe3par.convert_to_binary_multiple(
-                    growth_limit)
+                growth_limit = hpe3par.convert_to_binary_multiple(growth_limit)
             if growth_warning is not None:
-                growth_warning = hpe3par.convert_to_binary_multiple(
-                    growth_warning)
+                growth_warning = hpe3par.convert_to_binary_multiple(growth_warning)
             optional = {
-                'domain': domain,
-                'growthIncrementMiB': growth_increment,
-                'growthLimitMiB': growth_limit,
-                'usedLDWarningAlertMiB': growth_warning,
-                'LDLayout': ld_layout}
+                "domain": domain,
+                "growthIncrementMiB": growth_increment,
+                "growthLimitMiB": growth_limit,
+                "usedLDWarningAlertMiB": growth_warning,
+                "LDLayout": ld_layout,
+            }
             client_obj.createCPG(cpg_name, optional)
         else:
             return (True, False, "CPG already present")
     except exceptions.ClientException as e:
-        return (False, False, "CPG creation failed | %s" % (e))
-    return (True, True, "Created CPG %s successfully." % cpg_name)
+        return (False, False, f"CPG creation failed | {e}")
+    return (True, True, f"Created CPG {cpg_name} successfully.")
 
 
-def delete_cpg(
-        client_obj,
-        cpg_name):
+def delete_cpg(client_obj, cpg_name):
     try:
         if client_obj.cpgExists(cpg_name):
             client_obj.deleteCPG(cpg_name)
         else:
             return (True, False, "CPG does not exist")
     except exceptions.ClientException as e:
-        return (False, False, "CPG delete failed | %s" % e)
-    return (True, True, "Deleted CPG %s successfully." % cpg_name)
+        return (False, False, f"CPG delete failed | {e}")
+    return (True, True, f"Deleted CPG {cpg_name} successfully.")
 
 
 def main():
-    module = AnsibleModule(argument_spec=hpe3par.cpg_argument_spec(),
-                           required_together=[['raid_type', 'set_size']])
+    module = AnsibleModule(argument_spec=hpe3par.cpg_argument_spec(), required_together=[["raid_type", "set_size"]])
     if not HAS_3PARCLIENT:
-        module.fail_json(msg='the python hpe3par_sdk library is required (https://pypi.org/project/hpe3par_sdk)')
+        module.fail_json(msg="the python hpe3par_sdk library is required (https://pypi.org/project/hpe3par_sdk)")
 
     if len(module.params["cpg_name"]) < 1 or len(module.params["cpg_name"]) > 31:
         module.fail_json(msg="CPG name must be at least 1 character and not more than 31 characters")
@@ -237,7 +231,7 @@ def main():
     disk_type = module.params["disk_type"]
     secure = module.params["secure"]
 
-    wsapi_url = 'https://%s:8080/api/v1' % storage_system_ip
+    wsapi_url = f"https://{storage_system_ip}:8080/api/v1"
     try:
         client_obj = client.HPE3ParClient(wsapi_url, secure)
     except exceptions.SSLCertFailed:
@@ -247,7 +241,7 @@ def main():
     except exceptions.UnsupportedVersion:
         module.fail_json(msg="Unsupported WSAPI version")
     except Exception as e:
-        module.fail_json(msg="Initializing client failed. %s" % e)
+        module.fail_json(msg=f"Initializing client failed. {e}")
 
     if storage_system_username is None or storage_system_password is None:
         module.fail_json(msg="Storage system username or password is None")
@@ -268,22 +262,19 @@ def main():
                 raid_type,
                 set_size,
                 high_availability,
-                disk_type
+                disk_type,
             )
         except Exception as e:
-            module.fail_json(msg="CPG create failed | %s" % e)
+            module.fail_json(msg=f"CPG create failed | {e}")
         finally:
             client_obj.logout()
 
     elif module.params["state"] == "absent":
         try:
             client_obj.login(storage_system_username, storage_system_password)
-            return_status, changed, msg = delete_cpg(
-                client_obj,
-                cpg_name
-            )
+            return_status, changed, msg = delete_cpg(client_obj, cpg_name)
         except Exception as e:
-            module.fail_json(msg="CPG create failed | %s" % e)
+            module.fail_json(msg=f"CPG create failed | {e}")
         finally:
             client_obj.logout()
 
@@ -293,5 +284,5 @@ def main():
         module.fail_json(msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

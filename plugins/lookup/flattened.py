@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2013, Serge van Ginderachter <serge@vanginderachter.be>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: flattened
@@ -37,13 +35,11 @@ _raw:
   type: list
 """
 from ansible.errors import AnsibleError
-from ansible.module_utils.six import string_types
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.listify import listify_lookup_plugin_terms
 
 
 class LookupModule(LookupBase):
-
     def _check_list_of_one_list(self, term):
         # make sure term is not a list of one (list of one..) item
         # return the final non list item if so
@@ -56,16 +52,15 @@ class LookupModule(LookupBase):
         return term
 
     def _do_flatten(self, terms, variables):
-
         ret = []
         for term in terms:
             term = self._check_list_of_one_list(term)
 
-            if term == 'None' or term == 'null':
+            if term == "None" or term == "null":
                 # ignore undefined items
                 break
 
-            if isinstance(term, string_types):
+            if isinstance(term, str):
                 # convert a variable to a list
                 term2 = listify_lookup_plugin_terms(term, templar=self._templar)
                 # but avoid converting a plain string to a list of one string

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: atomic_host
@@ -67,19 +65,19 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def core(module):
-    revision = module.params['revision']
-    atomic_bin = module.get_bin_path('atomic', required=True)
+    revision = module.params["revision"]
+    atomic_bin = module.get_bin_path("atomic", required=True)
 
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C")
 
-    if revision == 'latest':
-        args = [atomic_bin, 'host', 'upgrade']
+    if revision == "latest":
+        args = [atomic_bin, "host", "upgrade"]
     else:
-        args = [atomic_bin, 'host', 'deploy', revision]
+        args = [atomic_bin, "host", "deploy", revision]
 
     rc, out, err = module.run_command(args, check_rc=False)
 
-    if rc == 77 and revision == 'latest':
+    if rc == 77 and revision == "latest":
         module.exit_json(msg="Already on latest", changed=False)
     elif rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -90,7 +88,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            revision=dict(type='str', default='latest', aliases=["version"]),
+            revision=dict(type="str", default="latest", aliases=["version"]),
         ),
     )
 
@@ -104,5 +102,5 @@ def main():
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

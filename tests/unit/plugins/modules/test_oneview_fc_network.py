@@ -1,47 +1,30 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (2016-2017) Hewlett Packard Enterprise Development LP
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+import unittest
 from .oneview_module_loader import FcNetworkModule
 from .hpe_test_utils import OneViewBaseTestCase
 
-FAKE_MSG_ERROR = 'Fake message error'
+FAKE_MSG_ERROR = "Fake message error"
 
-DEFAULT_FC_NETWORK_TEMPLATE = dict(
-    name='New FC Network 2',
-    autoLoginRedistribution=True,
-    fabricType='FabricAttach'
-)
+DEFAULT_FC_NETWORK_TEMPLATE = dict(name="New FC Network 2", autoLoginRedistribution=True, fabricType="FabricAttach")
 
-PARAMS_FOR_PRESENT = dict(
-    config='config.json',
-    state='present',
-    data=dict(name=DEFAULT_FC_NETWORK_TEMPLATE['name'])
-)
+PARAMS_FOR_PRESENT = dict(config="config.json", state="present", data=dict(name=DEFAULT_FC_NETWORK_TEMPLATE["name"]))
 
 PARAMS_WITH_CHANGES = dict(
-    config='config.json',
-    state='present',
-    data=dict(name=DEFAULT_FC_NETWORK_TEMPLATE['name'],
-              newName="New Name",
-              fabricType='DirectAttach')
+    config="config.json",
+    state="present",
+    data=dict(name=DEFAULT_FC_NETWORK_TEMPLATE["name"], newName="New Name", fabricType="DirectAttach"),
 )
 
-PARAMS_FOR_ABSENT = dict(
-    config='config.json',
-    state='absent',
-    data=dict(name=DEFAULT_FC_NETWORK_TEMPLATE['name'])
-)
+PARAMS_FOR_ABSENT = dict(config="config.json", state="absent", data=dict(name=DEFAULT_FC_NETWORK_TEMPLATE["name"]))
 
 
-class FcNetworkModuleSpec(unittest.TestCase,
-                          OneViewBaseTestCase):
+class FcNetworkModuleSpec(unittest.TestCase, OneViewBaseTestCase):
     """
     OneViewBaseTestCase provides the mocks used in this test case
     """
@@ -59,9 +42,7 @@ class FcNetworkModuleSpec(unittest.TestCase,
         FcNetworkModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=True,
-            msg=FcNetworkModule.MSG_CREATED,
-            ansible_facts=dict(fc_network=DEFAULT_FC_NETWORK_TEMPLATE)
+            changed=True, msg=FcNetworkModule.MSG_CREATED, ansible_facts=dict(fc_network=DEFAULT_FC_NETWORK_TEMPLATE)
         )
 
     def test_should_not_update_when_data_is_equals(self):
@@ -74,13 +55,13 @@ class FcNetworkModuleSpec(unittest.TestCase,
         self.mock_ansible_module.exit_json.assert_called_once_with(
             changed=False,
             msg=FcNetworkModule.MSG_ALREADY_PRESENT,
-            ansible_facts=dict(fc_network=DEFAULT_FC_NETWORK_TEMPLATE)
+            ansible_facts=dict(fc_network=DEFAULT_FC_NETWORK_TEMPLATE),
         )
 
     def test_update_when_data_has_modified_attributes(self):
         data_merged = DEFAULT_FC_NETWORK_TEMPLATE.copy()
 
-        data_merged['fabricType'] = 'DirectAttach'
+        data_merged["fabricType"] = "DirectAttach"
 
         self.resource.get_by.return_value = [DEFAULT_FC_NETWORK_TEMPLATE]
         self.resource.update.return_value = data_merged
@@ -90,9 +71,7 @@ class FcNetworkModuleSpec(unittest.TestCase,
         FcNetworkModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=True,
-            msg=FcNetworkModule.MSG_UPDATED,
-            ansible_facts=dict(fc_network=data_merged)
+            changed=True, msg=FcNetworkModule.MSG_UPDATED, ansible_facts=dict(fc_network=data_merged)
         )
 
     def test_should_remove_fc_network(self):
@@ -102,10 +81,7 @@ class FcNetworkModuleSpec(unittest.TestCase,
 
         FcNetworkModule().run()
 
-        self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=True,
-            msg=FcNetworkModule.MSG_DELETED
-        )
+        self.mock_ansible_module.exit_json.assert_called_once_with(changed=True, msg=FcNetworkModule.MSG_DELETED)
 
     def test_should_do_nothing_when_fc_network_not_exist(self):
         self.resource.get_by.return_value = []
@@ -115,44 +91,40 @@ class FcNetworkModuleSpec(unittest.TestCase,
         FcNetworkModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            msg=FcNetworkModule.MSG_ALREADY_ABSENT
+            changed=False, msg=FcNetworkModule.MSG_ALREADY_ABSENT
         )
 
     def test_update_scopes_when_different(self):
         params_to_scope = PARAMS_FOR_PRESENT.copy()
-        params_to_scope['data']['scopeUris'] = ['test']
+        params_to_scope["data"]["scopeUris"] = ["test"]
         self.mock_ansible_module.params = params_to_scope
 
         resource_data = DEFAULT_FC_NETWORK_TEMPLATE.copy()
-        resource_data['scopeUris'] = ['fake']
-        resource_data['uri'] = 'rest/fc/fake'
+        resource_data["scopeUris"] = ["fake"]
+        resource_data["uri"] = "rest/fc/fake"
         self.resource.get_by.return_value = [resource_data]
 
         patch_return = resource_data.copy()
-        patch_return['scopeUris'] = ['test']
+        patch_return["scopeUris"] = ["test"]
         self.resource.patch.return_value = patch_return
 
         FcNetworkModule().run()
 
-        self.resource.patch.assert_called_once_with('rest/fc/fake',
-                                                    operation='replace',
-                                                    path='/scopeUris',
-                                                    value=['test'])
+        self.resource.patch.assert_called_once_with(
+            "rest/fc/fake", operation="replace", path="/scopeUris", value=["test"]
+        )
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=True,
-            ansible_facts=dict(fc_network=patch_return),
-            msg=FcNetworkModule.MSG_UPDATED
+            changed=True, ansible_facts=dict(fc_network=patch_return), msg=FcNetworkModule.MSG_UPDATED
         )
 
     def test_should_do_nothing_when_scopes_are_the_same(self):
         params_to_scope = PARAMS_FOR_PRESENT.copy()
-        params_to_scope['data']['scopeUris'] = ['test']
+        params_to_scope["data"]["scopeUris"] = ["test"]
         self.mock_ansible_module.params = params_to_scope
 
         resource_data = DEFAULT_FC_NETWORK_TEMPLATE.copy()
-        resource_data['scopeUris'] = ['test']
+        resource_data["scopeUris"] = ["test"]
         self.resource.get_by.return_value = [resource_data]
 
         FcNetworkModule().run()
@@ -160,11 +132,9 @@ class FcNetworkModuleSpec(unittest.TestCase,
         self.resource.patch.not_been_called()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(
-            changed=False,
-            ansible_facts=dict(fc_network=resource_data),
-            msg=FcNetworkModule.MSG_ALREADY_PRESENT
+            changed=False, ansible_facts=dict(fc_network=resource_data), msg=FcNetworkModule.MSG_ALREADY_PRESENT
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

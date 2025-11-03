@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Nimbis Services, Inc.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -114,7 +112,9 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 with deps.declare("passlib"):
-    from passlib.apache import HtpasswdFile, htpasswd_context
+    # Apparently the type infos don't know htpasswd_context, which *does* exist
+    # (but isn't mentioned in the documentation for some reason)
+    from passlib.apache import HtpasswdFile, htpasswd_context  # type: ignore[attr-defined]
     from passlib.context import CryptContext
 
 
@@ -128,57 +128,55 @@ def create_missing_directories(dest):
 
 
 def present(dest, username, password, hash_scheme, create, check_mode):
-    """ Ensures user is present
+    """Ensures user is present
 
-    Returns (msg, changed) """
+    Returns (msg, changed)"""
     if hash_scheme in apache_hashes:
         context = htpasswd_context
     else:
         context = CryptContext(schemes=[hash_scheme] + apache_hashes)
     if not os.path.exists(dest):
         if not create:
-            raise ValueError('Destination %s does not exist' % dest)
+            raise ValueError(f"Destination {dest} does not exist")
         if check_mode:
-            return ("Create %s" % dest, True)
+            return (f"Create {dest}", True)
         create_missing_directories(dest)
         ht = HtpasswdFile(dest, new=True, default_scheme=hash_scheme, context=context)
         ht.set_password(username, password)
         ht.save()
-        return ("Created %s and added %s" % (dest, username), True)
+        return (f"Created {dest} and added {username}", True)
     else:
         ht = HtpasswdFile(dest, new=False, default_scheme=hash_scheme, context=context)
 
         found = ht.check_password(username, password)
 
         if found:
-            return ("%s already present" % username, False)
+            return (f"{username} already present", False)
         else:
             if not check_mode:
                 ht.set_password(username, password)
                 ht.save()
-            return ("Add/update %s" % username, True)
+            return (f"Add/update {username}", True)
 
 
 def absent(dest, username, check_mode):
-    """ Ensures user is absent
+    """Ensures user is absent
 
-    Returns (msg, changed) """
+    Returns (msg, changed)"""
     ht = HtpasswdFile(dest, new=False)
 
     if username not in ht.users():
-        return ("%s not present" % username, False)
+        return (f"{username} not present", False)
     else:
         if not check_mode:
             ht.delete(username)
             ht.save()
-        return ("Remove %s" % username, True)
+        return (f"Remove {username}", True)
 
 
 def check_file_attrs(module, changed, message):
-
     file_args = module.load_file_common_arguments(module.params)
     if module.set_fs_attributes_if_different(file_args, False):
-
         if changed:
             message += " and "
         changed = True
@@ -189,24 +187,21 @@ def check_file_attrs(module, changed, message):
 
 def main():
     arg_spec = dict(
-        path=dict(type='path', required=True, aliases=["dest", "destfile"]),
-        name=dict(type='str', required=True, aliases=["username"]),
-        password=dict(type='str', no_log=True),
-        hash_scheme=dict(type='str', default="apr_md5_crypt", aliases=["crypt_scheme"]),
-        state=dict(type='str', default="present", choices=["present", "absent"]),
-        create=dict(type='bool', default=True),
-
+        path=dict(type="path", required=True, aliases=["dest", "destfile"]),
+        name=dict(type="str", required=True, aliases=["username"]),
+        password=dict(type="str", no_log=True),
+        hash_scheme=dict(type="str", default="apr_md5_crypt", aliases=["crypt_scheme"]),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        create=dict(type="bool", default=True),
     )
-    module = AnsibleModule(argument_spec=arg_spec,
-                           add_file_common_args=True,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=arg_spec, add_file_common_args=True, supports_check_mode=True)
 
-    path = module.params['path']
-    username = module.params['name']
-    password = module.params['password']
-    hash_scheme = module.params['hash_scheme']
-    state = module.params['state']
-    create = module.params['create']
+    path = module.params["path"]
+    username = module.params["name"]
+    password = module.params["password"]
+    hash_scheme = module.params["hash_scheme"]
+    state = module.params["state"]
+    create = module.params["create"]
     check_mode = module.check_mode
 
     deps.validate(module)
@@ -237,15 +232,15 @@ def main():
         pass
 
     try:
-        if state == 'present':
+        if state == "present":
             (msg, changed) = present(path, username, password, hash_scheme, create, check_mode)
-        elif state == 'absent':
+        elif state == "absent":
             if not os.path.exists(path):
-                module.warn("%s does not exist" % path)
-                module.exit_json(msg="%s not present" % username, changed=False)
+                module.warn(f"{path} does not exist")
+                module.exit_json(msg=f"{username} not present", changed=False)
             (msg, changed) = absent(path, username, check_mode)
         else:
-            module.fail_json(msg="Invalid state: %s" % state)
+            module.fail_json(msg=f"Invalid state: {state}")
             return  # needed to make pylint happy
 
         (msg, changed) = check_file_attrs(module, changed, msg)
@@ -254,5 +249,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

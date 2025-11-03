@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # Copyright (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: gitlab_group
@@ -248,75 +246,79 @@ group:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_group, gitlab_authentication, gitlab
+    auth_argument_spec,
+    find_group,
+    gitlab_authentication,
+    gitlab,
 )
 
 
-class GitLabGroup(object):
+class GitLabGroup:
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
         self.group_object = None
 
-    '''
+    """
     @param group Group object
-    '''
+    """
+
     def get_group_id(self, group):
         if group is not None:
             return group.id
         return None
 
-    '''
+    """
     @param name Name of the group
     @param parent Parent group full path
     @param options Group options
-    '''
+    """
+
     def create_or_update_group(self, name, parent, options):
         changed = False
 
         payload = {
-            'auto_devops_enabled': options['auto_devops_enabled'],
-            'default_branch': options['default_branch'],
-            'description': options['description'],
-            'lfs_enabled': options['lfs_enabled'],
-            'membership_lock': options['membership_lock'],
-            'mentions_disabled': options['mentions_disabled'],
-            'name': name,
-            'path': options['path'],
-            'prevent_forking_outside_group': options['prevent_forking_outside_group'],
-            'project_creation_level': options['project_creation_level'],
-            'request_access_enabled': options['request_access_enabled'],
-            'require_two_factor_authentication': options['require_two_factor_authentication'],
-            'share_with_group_lock': options['share_with_group_lock'],
-            'subgroup_creation_level': options['subgroup_creation_level'],
-            'visibility': options['visibility'],
-            'wiki_access_level': options['wiki_access_level'],
+            "auto_devops_enabled": options["auto_devops_enabled"],
+            "default_branch": options["default_branch"],
+            "description": options["description"],
+            "lfs_enabled": options["lfs_enabled"],
+            "membership_lock": options["membership_lock"],
+            "mentions_disabled": options["mentions_disabled"],
+            "name": name,
+            "path": options["path"],
+            "prevent_forking_outside_group": options["prevent_forking_outside_group"],
+            "project_creation_level": options["project_creation_level"],
+            "request_access_enabled": options["request_access_enabled"],
+            "require_two_factor_authentication": options["require_two_factor_authentication"],
+            "share_with_group_lock": options["share_with_group_lock"],
+            "subgroup_creation_level": options["subgroup_creation_level"],
+            "visibility": options["visibility"],
+            "wiki_access_level": options["wiki_access_level"],
         }
-        if options.get('enabled_git_access_protocol') and parent is None:
-            payload['enabled_git_access_protocol'] = options['enabled_git_access_protocol']
-        if options.get('lock_duo_features_enabled') and parent is None:
-            payload['lock_duo_features_enabled'] = options['lock_duo_features_enabled']
-        if options.get('prevent_sharing_groups_outside_hierarchy') and parent is None:
-            payload['prevent_sharing_groups_outside_hierarchy'] = options['prevent_sharing_groups_outside_hierarchy']
-        if options.get('service_access_tokens_expiration_enforced') and parent is None:
-            payload['service_access_tokens_expiration_enforced'] = options['service_access_tokens_expiration_enforced']
-        if options.get('two_factor_grace_period'):
-            payload['two_factor_grace_period'] = int(options['two_factor_grace_period'])
+        if options.get("enabled_git_access_protocol") and parent is None:
+            payload["enabled_git_access_protocol"] = options["enabled_git_access_protocol"]
+        if options.get("lock_duo_features_enabled") and parent is None:
+            payload["lock_duo_features_enabled"] = options["lock_duo_features_enabled"]
+        if options.get("prevent_sharing_groups_outside_hierarchy") and parent is None:
+            payload["prevent_sharing_groups_outside_hierarchy"] = options["prevent_sharing_groups_outside_hierarchy"]
+        if options.get("service_access_tokens_expiration_enforced") and parent is None:
+            payload["service_access_tokens_expiration_enforced"] = options["service_access_tokens_expiration_enforced"]
+        if options.get("two_factor_grace_period"):
+            payload["two_factor_grace_period"] = int(options["two_factor_grace_period"])
 
         # Because we have already call userExists in main()
         if self.group_object is None:
-            payload['parent_id'] = self.get_group_id(parent)
+            payload["parent_id"] = self.get_group_id(parent)
             group = self.create_group(payload)
 
             # add avatar to group
-            if options['avatar_path']:
+            if options["avatar_path"]:
                 try:
-                    group.avatar = open(options['avatar_path'], 'rb')
+                    group.avatar = open(options["avatar_path"], "rb")
                 except IOError as e:
-                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+                    self._module.fail_json(msg=f"Cannot open {options['avatar_path']}: {e}")
             changed = True
         else:
             changed, group = self.update_group(self.group_object, payload)
@@ -324,19 +326,20 @@ class GitLabGroup(object):
         self.group_object = group
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the group %s" % name)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the group {name}")
 
             try:
                 group.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update group: %s " % e)
+                self._module.fail_json(msg=f"Failed to update group: {e} ")
             return True
         else:
             return False
 
-    '''
+    """
     @param arguments Attributes of the group
-    '''
+    """
+
     def create_group(self, arguments):
         if self._module.check_mode:
             return True
@@ -346,15 +349,16 @@ class GitLabGroup(object):
             filtered = {arg_key: arg_value for arg_key, arg_value in arguments.items() if arg_value is not None}
 
             group = self._gitlab.groups.create(filtered)
-        except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create group: %s " % to_native(e))
+        except gitlab.exceptions.GitlabCreateError as e:
+            self._module.fail_json(msg=f"Failed to create group: {e} ")
 
         return group
 
-    '''
+    """
     @param group Group Object
     @param arguments Attributes of the group
-    '''
+    """
+
     def update_group(self, group, arguments):
         changed = False
 
@@ -366,17 +370,20 @@ class GitLabGroup(object):
 
         return (changed, group)
 
-    '''
+    """
     @param force To delete even if projects inside
-    '''
+    """
+
     def delete_group(self, force=False):
         group = self.group_object
 
         if not force and len(group.projects.list(all=False)) >= 1:
             self._module.fail_json(
-                msg=("There are still projects in this group. "
-                     "These needs to be moved or deleted before this group can be removed. "
-                     "Use 'force_delete' to 'true' to force deletion of existing projects.")
+                msg=(
+                    "There are still projects in this group. "
+                    "These needs to be moved or deleted before this group can be removed. "
+                    "Use 'force_delete' to 'true' to force deletion of existing projects."
+                )
             )
         else:
             if self._module.check_mode:
@@ -385,12 +392,13 @@ class GitLabGroup(object):
             try:
                 group.delete()
             except Exception as e:
-                self._module.fail_json(msg="Failed to delete group: %s " % to_native(e))
+                self._module.fail_json(msg=f"Failed to delete group: {e} ")
 
-    '''
+    """
     @param name Name of the group
     @param full_path Complete path of the Group including parent group path. <parent_path>/<group_path>
-    '''
+    """
+
     def exists_group(self, project_identifier):
         # When group/user exists, object will be stored in self.group_object.
         group = find_group(self._gitlab, project_identifier)
@@ -403,80 +411,80 @@ class GitLabGroup(object):
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
-    argument_spec.update(dict(
-        auto_devops_enabled=dict(type='bool'),
-        avatar_path=dict(type='path'),
-        default_branch=dict(type='str'),
-        description=dict(type='str'),
-        enabled_git_access_protocol=dict(type='str', choices=['all', 'ssh', 'http']),
-        force_delete=dict(type='bool', default=False),
-        lfs_enabled=dict(type='bool'),
-        lock_duo_features_enabled=dict(type='bool'),
-        membership_lock=dict(type='bool'),
-        mentions_disabled=dict(type='bool'),
-        name=dict(type='str', required=True),
-        parent=dict(type='str'),
-        path=dict(type='str'),
-        prevent_forking_outside_group=dict(type='bool'),
-        prevent_sharing_groups_outside_hierarchy=dict(type='bool'),
-        project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
-        request_access_enabled=dict(type='bool'),
-        require_two_factor_authentication=dict(type='bool'),
-        service_access_tokens_expiration_enforced=dict(type='bool'),
-        share_with_group_lock=dict(type='bool'),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
-        subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
-        two_factor_grace_period=dict(type='str'),
-        visibility=dict(type='str', default="private", choices=["internal", "private", "public"]),
-        wiki_access_level=dict(type='str', choices=['enabled', 'private', 'disabled']),
-    ))
+    argument_spec.update(
+        dict(
+            auto_devops_enabled=dict(type="bool"),
+            avatar_path=dict(type="path"),
+            default_branch=dict(type="str"),
+            description=dict(type="str"),
+            enabled_git_access_protocol=dict(type="str", choices=["all", "ssh", "http"]),
+            force_delete=dict(type="bool", default=False),
+            lfs_enabled=dict(type="bool"),
+            lock_duo_features_enabled=dict(type="bool"),
+            membership_lock=dict(type="bool"),
+            mentions_disabled=dict(type="bool"),
+            name=dict(type="str", required=True),
+            parent=dict(type="str"),
+            path=dict(type="str"),
+            prevent_forking_outside_group=dict(type="bool"),
+            prevent_sharing_groups_outside_hierarchy=dict(type="bool"),
+            project_creation_level=dict(type="str", choices=["developer", "maintainer", "noone"]),
+            request_access_enabled=dict(type="bool"),
+            require_two_factor_authentication=dict(type="bool"),
+            service_access_tokens_expiration_enforced=dict(type="bool"),
+            share_with_group_lock=dict(type="bool"),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            subgroup_creation_level=dict(type="str", choices=["maintainer", "owner"]),
+            two_factor_grace_period=dict(type="str"),
+            visibility=dict(type="str", default="private", choices=["internal", "private", "public"]),
+            wiki_access_level=dict(type="str", choices=["enabled", "private", "disabled"]),
+        )
+    )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_token', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_token'],
+            ["api_token", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_token"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
         supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    auto_devops_enabled = module.params['auto_devops_enabled']
-    avatar_path = module.params['avatar_path']
-    default_branch = module.params['default_branch']
-    description = module.params['description']
-    enabled_git_access_protocol = module.params['enabled_git_access_protocol']
-    force_delete = module.params['force_delete']
-    group_name = module.params['name']
-    group_path = module.params['path']
-    group_visibility = module.params['visibility']
-    lfs_enabled = module.params['lfs_enabled']
-    lock_duo_features_enabled = module.params['lock_duo_features_enabled']
-    membership_lock = module.params['membership_lock']
-    mentions_disabled = module.params['mentions_disabled']
-    parent_identifier = module.params['parent']
-    prevent_forking_outside_group = module.params['prevent_forking_outside_group']
-    prevent_sharing_groups_outside_hierarchy = module.params['prevent_sharing_groups_outside_hierarchy']
-    project_creation_level = module.params['project_creation_level']
-    request_access_enabled = module.params['request_access_enabled']
-    require_two_factor_authentication = module.params['require_two_factor_authentication']
-    service_access_tokens_expiration_enforced = module.params['service_access_tokens_expiration_enforced']
-    share_with_group_lock = module.params['share_with_group_lock']
-    state = module.params['state']
-    subgroup_creation_level = module.params['subgroup_creation_level']
-    two_factor_grace_period = module.params['two_factor_grace_period']
-    wiki_access_level = module.params['wiki_access_level']
+    auto_devops_enabled = module.params["auto_devops_enabled"]
+    avatar_path = module.params["avatar_path"]
+    default_branch = module.params["default_branch"]
+    description = module.params["description"]
+    enabled_git_access_protocol = module.params["enabled_git_access_protocol"]
+    force_delete = module.params["force_delete"]
+    group_name = module.params["name"]
+    group_path = module.params["path"]
+    group_visibility = module.params["visibility"]
+    lfs_enabled = module.params["lfs_enabled"]
+    lock_duo_features_enabled = module.params["lock_duo_features_enabled"]
+    membership_lock = module.params["membership_lock"]
+    mentions_disabled = module.params["mentions_disabled"]
+    parent_identifier = module.params["parent"]
+    prevent_forking_outside_group = module.params["prevent_forking_outside_group"]
+    prevent_sharing_groups_outside_hierarchy = module.params["prevent_sharing_groups_outside_hierarchy"]
+    project_creation_level = module.params["project_creation_level"]
+    request_access_enabled = module.params["request_access_enabled"]
+    require_two_factor_authentication = module.params["require_two_factor_authentication"]
+    service_access_tokens_expiration_enforced = module.params["service_access_tokens_expiration_enforced"]
+    share_with_group_lock = module.params["share_with_group_lock"]
+    state = module.params["state"]
+    subgroup_creation_level = module.params["subgroup_creation_level"]
+    two_factor_grace_period = module.params["two_factor_grace_period"]
+    wiki_access_level = module.params["wiki_access_level"]
 
     # Define default group_path based on group_name
     if group_path is None:
@@ -490,45 +498,55 @@ def main():
         if not parent_group:
             module.fail_json(msg="Failed to create GitLab group: Parent group doesn't exist")
 
-        group_exists = gitlab_group.exists_group(parent_group.full_path + '/' + group_path)
+        group_exists = gitlab_group.exists_group(f"{parent_group.full_path}/{group_path}")
     else:
         group_exists = gitlab_group.exists_group(group_path)
 
-    if state == 'absent':
+    if state == "absent":
         if group_exists:
             gitlab_group.delete_group(force=force_delete)
-            module.exit_json(changed=True, msg="Successfully deleted group %s" % group_name)
+            module.exit_json(changed=True, msg=f"Successfully deleted group {group_name}")
         else:
             module.exit_json(changed=False, msg="Group deleted or does not exist")
 
-    if state == 'present':
-        if gitlab_group.create_or_update_group(group_name, parent_group, {
-            "auto_devops_enabled": auto_devops_enabled,
-            "avatar_path": avatar_path,
-            "default_branch": default_branch,
-            "description": description,
-            "enabled_git_access_protocol": enabled_git_access_protocol,
-            "lfs_enabled": lfs_enabled,
-            "lock_duo_features_enabled": lock_duo_features_enabled,
-            "membership_lock": membership_lock,
-            "mentions_disabled": mentions_disabled,
-            "path": group_path,
-            "prevent_forking_outside_group": prevent_forking_outside_group,
-            "prevent_sharing_groups_outside_hierarchy": prevent_sharing_groups_outside_hierarchy,
-            "project_creation_level": project_creation_level,
-            "request_access_enabled": request_access_enabled,
-            "require_two_factor_authentication": require_two_factor_authentication,
-            "service_access_tokens_expiration_enforced": service_access_tokens_expiration_enforced,
-            "share_with_group_lock": share_with_group_lock,
-            "subgroup_creation_level": subgroup_creation_level,
-            "two_factor_grace_period": two_factor_grace_period,
-            "visibility": group_visibility,
-            "wiki_access_level": wiki_access_level,
-        }):
-            module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.group_object._attrs)
+    if state == "present":
+        if gitlab_group.create_or_update_group(
+            group_name,
+            parent_group,
+            {
+                "auto_devops_enabled": auto_devops_enabled,
+                "avatar_path": avatar_path,
+                "default_branch": default_branch,
+                "description": description,
+                "enabled_git_access_protocol": enabled_git_access_protocol,
+                "lfs_enabled": lfs_enabled,
+                "lock_duo_features_enabled": lock_duo_features_enabled,
+                "membership_lock": membership_lock,
+                "mentions_disabled": mentions_disabled,
+                "path": group_path,
+                "prevent_forking_outside_group": prevent_forking_outside_group,
+                "prevent_sharing_groups_outside_hierarchy": prevent_sharing_groups_outside_hierarchy,
+                "project_creation_level": project_creation_level,
+                "request_access_enabled": request_access_enabled,
+                "require_two_factor_authentication": require_two_factor_authentication,
+                "service_access_tokens_expiration_enforced": service_access_tokens_expiration_enforced,
+                "share_with_group_lock": share_with_group_lock,
+                "subgroup_creation_level": subgroup_creation_level,
+                "two_factor_grace_period": two_factor_grace_period,
+                "visibility": group_visibility,
+                "wiki_access_level": wiki_access_level,
+            },
+        ):
+            module.exit_json(
+                changed=True,
+                msg=f"Successfully created or updated the group {group_name}",
+                group=gitlab_group.group_object._attrs,
+            )
         else:
-            module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.group_object._attrs)
+            module.exit_json(
+                changed=False, msg=f"No need to update the group {group_name}", group=gitlab_group.group_object._attrs
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

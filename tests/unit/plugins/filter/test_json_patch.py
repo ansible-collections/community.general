@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Stanislav Meduna (@numo68)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type  # pylint: disable=C0103
 
 import unittest
 from ansible_collections.community.general.plugins.filter.json_patch import FilterModule
@@ -50,21 +48,15 @@ class TestJsonPatch(unittest.TestCase):
         self.assertEqual(result, {"a": 1, "d": 3})
 
     def test_patch_replace(self):
-        result = self.json_patch(
-            {"a": 1, "b": {"c": 2}, "d": 3}, "replace", "/b", {"x": 99}
-        )
+        result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "replace", "/b", {"x": 99})
         self.assertEqual(result, {"a": 1, "b": {"x": 99}, "d": 3})
 
     def test_patch_copy(self):
-        result = self.json_patch(
-            {"a": 1, "b": {"c": 2}, "d": 3}, "copy", "/d", **{"from": "/b"}
-        )
+        result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "copy", "/d", **{"from": "/b"})
         self.assertEqual(result, {"a": 1, "b": {"c": 2}, "d": {"c": 2}})
 
     def test_patch_move(self):
-        result = self.json_patch(
-            {"a": 1, "b": {"c": 2}, "d": 3}, "move", "/d", **{"from": "/b"}
-        )
+        result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "move", "/d", **{"from": "/b"})
         self.assertEqual(result, {"a": 1, "d": {"c": 2}})
 
     def test_patch_test_pass(self):
@@ -77,9 +69,7 @@ class TestJsonPatch(unittest.TestCase):
 
     def test_patch_test_fail_fail(self):
         with self.assertRaises(AnsibleFilterError) as context:
-            self.json_patch(
-                {"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 99, fail_test=True
-            )
+            self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 99, fail_test=True)
         self.assertTrue("json_patch: test operation failed" in str(context.exception))
 
     def test_patch_remove_nonexisting(self):
@@ -190,9 +180,7 @@ class TestJsonPatch(unittest.TestCase):
                 {"op": "test", "path": "/baz/1", "value": 20},
             ],
         )
-        self.assertEqual(
-            result, {"bar": [2], "bax": 1, "bay": 1, "baz": [10, 20, 30], "foo": 1}
-        )
+        self.assertEqual(result, {"bar": [2], "bax": 1, "bay": 1, "baz": [10, 20, 30], "foo": 1})
 
     def test_patch_recipe_test_fail(self):
         result = self.json_patch_recipe(
@@ -248,9 +236,7 @@ class TestJsonPatch(unittest.TestCase):
                 [{"op": "test", "path": "/b/c", "value": 99}],
                 True,
             )
-        self.assertTrue(
-            "json_patch_recipe: test operation failed" in str(context.exception)
-        )
+        self.assertTrue("json_patch_recipe: test operation failed" in str(context.exception))
 
     def test_patch_recipe_test_fail_fail_kw(self):
         with self.assertRaises(AnsibleFilterError) as context:
@@ -259,9 +245,7 @@ class TestJsonPatch(unittest.TestCase):
                 [{"op": "test", "path": "/b/c", "value": 99}],
                 fail_test=True,
             )
-        self.assertTrue(
-            "json_patch_recipe: test operation failed" in str(context.exception)
-        )
+        self.assertTrue("json_patch_recipe: test operation failed" in str(context.exception))
 
     # json_diff
 
@@ -302,9 +286,7 @@ class TestJsonPatch(unittest.TestCase):
     def test_diff_arg_checking(self):
         with self.assertRaises(AnsibleFilterError) as context:
             self.json_diff(1, {})
-        self.assertEqual(
-            str(context.exception), "json_diff: input is not dictionary, list or string"
-        )
+        self.assertEqual(str(context.exception), "json_diff: input is not dictionary, list or string")
         with self.assertRaises(AnsibleFilterError) as context:
             self.json_diff({}, 1)
         self.assertEqual(

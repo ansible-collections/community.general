@@ -4,5 +4,4 @@
 
 azp/posix/2
 destructive
-skip/python2.7  # stromssh only supports python3
 skip/freebsd # stromssh installation fails on freebsd

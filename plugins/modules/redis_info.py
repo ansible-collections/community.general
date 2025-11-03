@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2020, Pavlo Bashynskyi (@levonet) <levonet@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -219,15 +217,18 @@ import traceback
 REDIS_IMP_ERR = None
 try:
     from redis import StrictRedis
+
     HAS_REDIS_PACKAGE = True
 except ImportError:
     REDIS_IMP_ERR = traceback.format_exc()
     HAS_REDIS_PACKAGE = False
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.redis import (
-    fail_imports, redis_auth_argument_spec, redis_auth_params)
+    fail_imports,
+    redis_auth_argument_spec,
+    redis_auth_params,
+)
 
 
 def redis_client(**client_params):
@@ -237,7 +238,7 @@ def redis_client(**client_params):
 # Module execution.
 def main():
     module_args = dict(
-        cluster=dict(type='bool', default=False),
+        cluster=dict(type="bool", default=False),
     )
     module_args.update(redis_auth_argument_spec(tls_default=False))
     module = AnsibleModule(
@@ -245,27 +246,27 @@ def main():
         supports_check_mode=True,
     )
 
-    fail_imports(module, module.params['tls'])
+    fail_imports(module, module.params["tls"])
 
     redis_params = redis_auth_params(module)
-    cluster = module.params['cluster']
+    cluster = module.params["cluster"]
 
     # Connect and check
     client = redis_client(**redis_params)
     try:
         client.ping()
     except Exception as e:
-        module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"unable to connect to database: {e}", exception=traceback.format_exc())
 
     info = client.info()
 
     result = dict(changed=False, info=info)
 
     if cluster:
-        result['cluster_info'] = client.execute_command('CLUSTER INFO')
+        result["cluster_info"] = client.execute_command("CLUSTER INFO")
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

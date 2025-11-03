@@ -1,21 +1,18 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Florian Dambrine <android.florian@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
 import json
+from unittest.mock import MagicMock
 
 import pytest
+
 from ansible.module_utils.common.dict_transformations import dict_merge
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl import (
     api,
 )
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
-
-__metaclass__ = type
 
 
 # Pritunl Mocks
@@ -343,7 +340,7 @@ class PritunlDeleteUserMock(MagicMock):
 
 class ModuleFailException(Exception):
     def __init__(self, msg, **kwargs):
-        super(ModuleFailException, self).__init__(msg)
+        super().__init__(msg)
         self.fail_msg = msg
         self.fail_kwargs = kwargs
 
@@ -462,9 +459,7 @@ class TestPritunlApi:
     ):
         api._get_pritunl_organizations = get_pritunl_organization_mock()
 
-        response = api.list_pritunl_organizations(
-            **dict_merge(pritunl_settings, {"filters": org_filters})
-        )
+        response = api.list_pritunl_organizations(**dict_merge(pritunl_settings, {"filters": org_filters}))
 
         assert len(response) == 1
         assert response[0]["name"] == org_expected
@@ -473,14 +468,10 @@ class TestPritunlApi:
         "org_id,org_user_count",
         [("58070daee63f3b2e6e472c36", 3)],
     )
-    def test_list_all_pritunl_user(
-        self, pritunl_settings, get_pritunl_user_mock, org_id, org_user_count
-    ):
+    def test_list_all_pritunl_user(self, pritunl_settings, get_pritunl_user_mock, org_id, org_user_count):
         api._get_pritunl_users = get_pritunl_user_mock()
 
-        response = api.list_pritunl_users(
-            **dict_merge(pritunl_settings, {"organization_id": org_id})
-        )
+        response = api.list_pritunl_users(**dict_merge(pritunl_settings, {"organization_id": org_id}))
 
         assert len(response) == org_user_count
 
@@ -502,9 +493,7 @@ class TestPritunlApi:
         api._get_pritunl_users = get_pritunl_user_mock()
 
         response = api.list_pritunl_users(
-            **dict_merge(
-                pritunl_settings, {"organization_id": org_id, "filters": user_filters}
-            )
+            **dict_merge(pritunl_settings, {"organization_id": org_id, "filters": user_filters})
         )
 
         assert len(response) > 0
@@ -530,7 +519,7 @@ class TestPritunlApi:
         )
 
         # Ensure provided settings match with the ones returned by Pritunl
-        for k, v in iteritems(pritunl_organization_data):
+        for k, v in pritunl_organization_data.items():
             assert create_response[k] == v
 
     @pytest.mark.parametrize("org_id", [("58070daee63f3b2e6e472c36")])
@@ -556,7 +545,7 @@ class TestPritunlApi:
         )
 
         # Ensure provided settings match with the ones returned by Pritunl
-        for k, v in iteritems(pritunl_user_data):
+        for k, v in pritunl_user_data.items():
             assert create_response[k] == v
 
         # Update the newly created user to ensure only certain settings are changed
@@ -579,7 +568,8 @@ class TestPritunlApi:
         )
 
         # Ensure only certain settings changed and the rest remained untouched.
-        for k, v in iteritems(update_response):
+        # TODO: there is something wrong with this check!
+        for k, v in update_response.items():
             if k in update_response:
                 assert update_response[k] == v
             else:
@@ -588,9 +578,7 @@ class TestPritunlApi:
     # Test for DELETE operation on Pritunl API
 
     @pytest.mark.parametrize("org_id", [("58070daee63f3b2e6e472c36")])
-    def test_delete_pritunl_organization(
-        self, pritunl_settings, org_id, delete_pritunl_organization_mock
-    ):
+    def test_delete_pritunl_organization(self, pritunl_settings, org_id, delete_pritunl_organization_mock):
         api._delete_pritunl_organization = delete_pritunl_organization_mock()
 
         response = api.delete_pritunl_organization(
@@ -604,12 +592,8 @@ class TestPritunlApi:
 
         assert response == {}
 
-    @pytest.mark.parametrize(
-        "org_id,user_id", [("58070daee63f3b2e6e472c36", "590add71e63f3b72d8bb951a")]
-    )
-    def test_delete_pritunl_user(
-        self, pritunl_settings, org_id, user_id, delete_pritunl_user_mock
-    ):
+    @pytest.mark.parametrize("org_id,user_id", [("58070daee63f3b2e6e472c36", "590add71e63f3b72d8bb951a")])
+    def test_delete_pritunl_user(self, pritunl_settings, org_id, user_id, delete_pritunl_user_mock):
         api._delete_pritunl_user = delete_pritunl_user_mock()
 
         response = api.delete_pritunl_user(

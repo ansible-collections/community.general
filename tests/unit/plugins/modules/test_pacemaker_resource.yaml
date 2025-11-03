@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Dexter Le (dextersydney2001@gmail.com)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -78,6 +77,10 @@ test_cases:
         argument_action: group
         argument_option:
           - test_group
+      resource_clone_ids:
+        - test_clone
+      resource_clone_meta:
+        - test_clone_meta1=789
       wait: 200
     output:
       changed: true
@@ -100,7 +103,7 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, --wait=200]
+        - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, clone, test_clone, test_clone_meta1=789, --wait=200]
           environ: *env-def
           rc: 0
           out: "Assumed agent name 'ocf:heartbeat:IPaddr2'"
@@ -495,4 +498,73 @@ test_cases:
           environ: *env-def
           rc: 0
           out: "NO resources configured"
+          err: ""
+  - id: test_clone_minimal_input_resource_not_exist
+    input:
+      state: cloned
+      name: virtual-ip
+    output:
+      failed: true
+      msg: "pcs failed with error (rc=1): Error: unable to find group or resource: virtual-ip"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, clone, virtual-ip, --wait=300]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: unable to find group or resource: virtual-ip"
+  - id: test_clone_filled_input_resource_exists
+    input:
+      state: cloned
+      name: virtual-ip
+      resource_clone_ids:
+        - test_clone
+      resource_clone_meta:
+        - test_clone_meta1=789
+      wait: 200
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, clone, virtual-ip, test_clone, meta, test_clone_meta1=789, --wait=200]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""

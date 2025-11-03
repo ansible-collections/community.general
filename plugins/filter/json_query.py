@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2015, Filipe Niero Felisbino <filipenf@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -110,44 +109,46 @@ from ansible.errors import AnsibleError, AnsibleFilterError
 
 try:
     import jmespath
+
     HAS_LIB = True
 except ImportError:
     HAS_LIB = False
 
 
 def json_query(data, expr):
-    '''Query data using jmespath query language ( http://jmespath.org ). Example:
+    """Query data using jmespath query language ( http://jmespath.org ). Example:
     - ansible.builtin.debug: msg="{{ instance | json_query(tagged_instances[*].block_device_mapping.*.volume_id') }}"
-    '''
+    """
     if not HAS_LIB:
-        raise AnsibleError('You need to install "jmespath" prior to running '
-                           'json_query filter')
+        raise AnsibleError('You need to install "jmespath" prior to running json_query filter')
 
     # Hack to handle Ansible Unsafe text, AnsibleMapping and AnsibleSequence
     # See issues https://github.com/ansible-collections/community.general/issues/320
     # and https://github.com/ansible/ansible/issues/85600.
-    jmespath.functions.REVERSE_TYPES_MAP['string'] = jmespath.functions.REVERSE_TYPES_MAP['string'] + (
-        'AnsibleUnicode', 'AnsibleUnsafeText', '_AnsibleTaggedStr',
+    jmespath.functions.REVERSE_TYPES_MAP["string"] = jmespath.functions.REVERSE_TYPES_MAP["string"] + (
+        "AnsibleUnicode",
+        "AnsibleUnsafeText",
+        "_AnsibleTaggedStr",
     )
-    jmespath.functions.REVERSE_TYPES_MAP['array'] = jmespath.functions.REVERSE_TYPES_MAP['array'] + (
-        'AnsibleSequence', '_AnsibleLazyTemplateList',
+    jmespath.functions.REVERSE_TYPES_MAP["array"] = jmespath.functions.REVERSE_TYPES_MAP["array"] + (
+        "AnsibleSequence",
+        "_AnsibleLazyTemplateList",
     )
-    jmespath.functions.REVERSE_TYPES_MAP['object'] = jmespath.functions.REVERSE_TYPES_MAP['object'] + (
-        'AnsibleMapping', '_AnsibleLazyTemplateDict',
+    jmespath.functions.REVERSE_TYPES_MAP["object"] = jmespath.functions.REVERSE_TYPES_MAP["object"] + (
+        "AnsibleMapping",
+        "_AnsibleLazyTemplateDict",
     )
     try:
         return jmespath.search(expr, data)
     except jmespath.exceptions.JMESPathError as e:
-        raise AnsibleFilterError('JMESPathError in json_query filter plugin:\n%s' % e)
+        raise AnsibleFilterError(f"JMESPathError in json_query filter plugin:\n{e}")
     except Exception as e:
         # For older jmespath, we can get ValueError and TypeError without much info.
-        raise AnsibleFilterError('Error in jmespath.search in json_query filter plugin:\n%s' % e)
+        raise AnsibleFilterError(f"Error in jmespath.search in json_query filter plugin:\n{e}")
 
 
-class FilterModule(object):
-    ''' Query filter '''
+class FilterModule:
+    """Query filter"""
 
     def filters(self):
-        return {
-            'json_query': json_query
-        }
+        return {"json_query": json_query}

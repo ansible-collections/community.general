@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2012, Dag Wieers (@dagwieers) <dag@wieers.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -137,7 +135,6 @@ options:
   message_id_domain:
     description:
       - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
-      - Note that this is only available on Python 3+. On Python 2, this value is ignored.
     type: str
     default: ansible
     version_added: 8.2.0
@@ -230,54 +227,52 @@ from email.mime.text import MIMEText
 from email.header import Header
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import PY3
 from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            username=dict(type='str'),
-            password=dict(type='str', no_log=True),
-            host=dict(type='str', default='localhost'),
-            port=dict(type='int', default=25),
-            ehlohost=dict(type='str'),
-            sender=dict(type='str', default='root', aliases=['from']),
-            to=dict(type='list', elements='str', default=['root'], aliases=['recipients']),
-            cc=dict(type='list', elements='str', default=[]),
-            bcc=dict(type='list', elements='str', default=[]),
-            subject=dict(type='str', required=True, aliases=['msg']),
-            body=dict(type='str'),
-            attach=dict(type='list', elements='path', default=[]),
-            headers=dict(type='list', elements='str', default=[]),
-            charset=dict(type='str', default='utf-8'),
-            subtype=dict(type='str', default='plain', choices=['html', 'plain']),
-            secure=dict(type='str', default='try', choices=['always', 'never', 'starttls', 'try']),
-            timeout=dict(type='int', default=20),
-            message_id_domain=dict(type='str', default='ansible'),
+            username=dict(type="str"),
+            password=dict(type="str", no_log=True),
+            host=dict(type="str", default="localhost"),
+            port=dict(type="int", default=25),
+            ehlohost=dict(type="str"),
+            sender=dict(type="str", default="root", aliases=["from"]),
+            to=dict(type="list", elements="str", default=["root"], aliases=["recipients"]),
+            cc=dict(type="list", elements="str", default=[]),
+            bcc=dict(type="list", elements="str", default=[]),
+            subject=dict(type="str", required=True, aliases=["msg"]),
+            body=dict(type="str"),
+            attach=dict(type="list", elements="path", default=[]),
+            headers=dict(type="list", elements="str", default=[]),
+            charset=dict(type="str", default="utf-8"),
+            subtype=dict(type="str", default="plain", choices=["html", "plain"]),
+            secure=dict(type="str", default="try", choices=["always", "never", "starttls", "try"]),
+            timeout=dict(type="int", default=20),
+            message_id_domain=dict(type="str", default="ansible"),
         ),
-        required_together=[['password', 'username']],
+        required_together=[["password", "username"]],
     )
 
-    username = module.params.get('username')
-    password = module.params.get('password')
-    host = module.params.get('host')
-    port = module.params.get('port')
-    local_hostname = module.params.get('ehlohost')
-    sender = module.params.get('sender')
-    recipients = module.params.get('to')
-    copies = module.params.get('cc')
-    blindcopies = module.params.get('bcc')
-    subject = module.params.get('subject')
-    body = module.params.get('body')
-    attach_files = module.params.get('attach')
-    headers = module.params.get('headers')
-    charset = module.params.get('charset')
-    subtype = module.params.get('subtype')
-    secure = module.params.get('secure')
-    timeout = module.params.get('timeout')
-    message_id_domain = module.params['message_id_domain']
+    username = module.params.get("username")
+    password = module.params.get("password")
+    host = module.params.get("host")
+    port = module.params.get("port")
+    local_hostname = module.params.get("ehlohost")
+    sender = module.params.get("sender")
+    recipients = module.params.get("to")
+    copies = module.params.get("cc")
+    blindcopies = module.params.get("bcc")
+    subject = module.params.get("subject")
+    body = module.params.get("body")
+    attach_files = module.params.get("attach")
+    headers = module.params.get("headers")
+    charset = module.params.get("charset")
+    subtype = module.params.get("subtype")
+    secure = module.params.get("secure")
+    timeout = module.params.get("timeout")
+    message_id_domain = module.params["message_id_domain"]
 
     code = 0
     secure_state = False
@@ -287,142 +282,147 @@ def main():
         body = subject
 
     try:
-        if secure != 'never':
+        if secure != "never":
             try:
-                if PY3:
-                    smtp = smtplib.SMTP_SSL(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
-                else:
-                    smtp = smtplib.SMTP_SSL(local_hostname=local_hostname, timeout=timeout)
+                smtp = smtplib.SMTP_SSL(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
                 code, smtpmessage = smtp.connect(host, port)
                 secure_state = True
             except ssl.SSLError as e:
-                if secure == 'always':
-                    module.fail_json(rc=1, msg='Unable to start an encrypted session to %s:%s: %s' %
-                                               (host, port, to_native(e)), exception=traceback.format_exc())
+                if secure == "always":
+                    module.fail_json(
+                        rc=1,
+                        msg=f"Unable to start an encrypted session to {host}:{port}: {to_native(e)}",
+                        exception=traceback.format_exc(),
+                    )
             except Exception:
                 pass
 
         if not secure_state:
-            if PY3:
-                smtp = smtplib.SMTP(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
-            else:
-                smtp = smtplib.SMTP(local_hostname=local_hostname, timeout=timeout)
+            smtp = smtplib.SMTP(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
             code, smtpmessage = smtp.connect(host, port)
 
     except smtplib.SMTPException as e:
-        module.fail_json(rc=1, msg='Unable to Connect %s:%s: %s' % (host, port, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(rc=1, msg=f"Unable to Connect {host}:{port}: {to_native(e)}", exception=traceback.format_exc())
 
     try:
         smtp.ehlo()
     except smtplib.SMTPException as e:
-        module.fail_json(rc=1, msg='Helo failed for host %s:%s: %s' % (host, port, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(
+            rc=1, msg=f"Helo failed for host {host}:{port}: {to_native(e)}", exception=traceback.format_exc()
+        )
 
     if int(code) > 0:
-        if not secure_state and secure in ('starttls', 'try'):
-            if smtp.has_extn('STARTTLS'):
+        if not secure_state and secure in ("starttls", "try"):
+            if smtp.has_extn("STARTTLS"):
                 try:
                     smtp.starttls()
                     secure_state = True
                 except smtplib.SMTPException as e:
-                    module.fail_json(rc=1, msg='Unable to start an encrypted session to %s:%s: %s' %
-                                     (host, port, to_native(e)), exception=traceback.format_exc())
+                    module.fail_json(
+                        rc=1,
+                        msg=f"Unable to start an encrypted session to {host}:{port}: {e}",
+                        exception=traceback.format_exc(),
+                    )
                 try:
                     smtp.ehlo()
                 except smtplib.SMTPException as e:
-                    module.fail_json(rc=1, msg='Helo failed for host %s:%s: %s' % (host, port, to_native(e)), exception=traceback.format_exc())
+                    module.fail_json(
+                        rc=1, msg=f"Helo failed for host {host}:{port}: {e}", exception=traceback.format_exc()
+                    )
             else:
-                if secure == 'starttls':
-                    module.fail_json(rc=1, msg='StartTLS is not offered on server %s:%s' % (host, port))
+                if secure == "starttls":
+                    module.fail_json(rc=1, msg=f"StartTLS is not offered on server {host}:{port}")
 
     if username and password:
-        if smtp.has_extn('AUTH'):
+        if smtp.has_extn("AUTH"):
             try:
                 smtp.login(username, password)
             except smtplib.SMTPAuthenticationError:
-                module.fail_json(rc=1, msg='Authentication to %s:%s failed, please check your username and/or password' % (host, port))
+                module.fail_json(
+                    rc=1, msg=f"Authentication to {host}:{port} failed, please check your username and/or password"
+                )
             except smtplib.SMTPException:
-                module.fail_json(rc=1, msg='No Suitable authentication method was found on %s:%s' % (host, port))
+                module.fail_json(rc=1, msg=f"No Suitable authentication method was found on {host}:{port}")
         else:
-            module.fail_json(rc=1, msg="No Authentication on the server at %s:%s" % (host, port))
+            module.fail_json(rc=1, msg=f"No Authentication on the server at {host}:{port}")
 
     if not secure_state and (username and password):
-        module.warn('Username and Password was sent without encryption')
+        module.warn("Username and Password was sent without encryption")
 
     msg = MIMEMultipart(_charset=charset)
-    msg['From'] = formataddr((sender_phrase, sender_addr))
-    msg['Date'] = formatdate(localtime=True)
-    msg['Subject'] = Header(subject, charset)
-    try:
-        msg['Message-ID'] = make_msgid(domain=message_id_domain)
-    except TypeError:
-        # `domain` is only available in Python 3
-        msg['Message-ID'] = make_msgid()
-        module.warn("The Message-ID domain cannot be set on Python 2; the system's hostname is used")
+    msg["From"] = formataddr((sender_phrase, sender_addr))
+    msg["Date"] = formatdate(localtime=True)
+    msg["Subject"] = Header(subject, charset)
+    msg["Message-ID"] = make_msgid(domain=message_id_domain)
     msg.preamble = "Multipart message"
 
     for header in headers:
         # NOTE: Backward compatible with old syntax using '|' as delimiter
-        for hdr in [x.strip() for x in header.split('|')]:
+        for hdr in [x.strip() for x in header.split("|")]:
             try:
-                h_key, h_val = hdr.split('=', 1)
+                h_key, h_val = hdr.split("=", 1)
                 h_val = to_native(Header(h_val, charset))
                 msg.add_header(h_key, h_val)
             except Exception:
-                module.warn("Skipping header '%s', unable to parse" % hdr)
+                module.warn(f"Skipping header '{hdr}', unable to parse")
 
-    if 'X-Mailer' not in msg:
-        msg.add_header('X-Mailer', 'Ansible mail module')
+    if "X-Mailer" not in msg:
+        msg.add_header("X-Mailer", "Ansible mail module")
 
     addr_list = []
     for addr in [x.strip() for x in blindcopies]:
-        addr_list.append(parseaddr(addr)[1])    # address only, w/o phrase
+        addr_list.append(parseaddr(addr)[1])  # address only, w/o phrase
 
     to_list = []
     for addr in [x.strip() for x in recipients]:
         to_list.append(formataddr(parseaddr(addr)))
-        addr_list.append(parseaddr(addr)[1])    # address only, w/o phrase
-    msg['To'] = ", ".join(to_list)
+        addr_list.append(parseaddr(addr)[1])  # address only, w/o phrase
+    msg["To"] = ", ".join(to_list)
 
     cc_list = []
     for addr in [x.strip() for x in copies]:
         cc_list.append(formataddr(parseaddr(addr)))
-        addr_list.append(parseaddr(addr)[1])    # address only, w/o phrase
-    msg['Cc'] = ", ".join(cc_list)
+        addr_list.append(parseaddr(addr)[1])  # address only, w/o phrase
+    msg["Cc"] = ", ".join(cc_list)
 
-    part = MIMEText(body + "\n\n", _subtype=subtype, _charset=charset)
+    part = MIMEText(f"{body}\n\n", _subtype=subtype, _charset=charset)
     msg.attach(part)
 
     # NOTE: Backward compatibility with old syntax using space as delimiter is not retained
     #       This breaks files with spaces in it :-(
     for filename in attach_files:
         try:
-            part = MIMEBase('application', 'octet-stream')
-            with open(filename, 'rb') as fp:
+            part = MIMEBase("application", "octet-stream")
+            with open(filename, "rb") as fp:
                 part.set_payload(fp.read())
             encoders.encode_base64(part)
-            part.add_header('Content-disposition', 'attachment', filename=os.path.basename(filename))
+            part.add_header("Content-disposition", "attachment", filename=os.path.basename(filename))
             msg.attach(part)
         except Exception as e:
-            module.fail_json(rc=1, msg="Failed to send community.general.mail: can't attach file %s: %s" %
-                             (filename, to_native(e)), exception=traceback.format_exc())
+            module.fail_json(
+                rc=1,
+                msg=f"Failed to send community.general.mail: can't attach file {filename}: {e}",
+                exception=traceback.format_exc(),
+            )
 
     composed = msg.as_string()
 
     try:
         result = smtp.sendmail(sender_addr, set(addr_list), composed)
     except Exception as e:
-        module.fail_json(rc=1, msg="Failed to send mail to '%s': %s" %
-                         (", ".join(set(addr_list)), to_native(e)), exception=traceback.format_exc())
+        module.fail_json(
+            rc=1, msg=f"Failed to send mail to '{', '.join(set(addr_list))}': {e}", exception=traceback.format_exc()
+        )
 
     smtp.quit()
 
     if result:
         for key in result:
-            module.warn("Failed to send mail to '%s': %s %s" % (key, result[key][0], result[key][1]))
-        module.exit_json(msg='Failed to send mail to at least one recipient', result=result)
+            module.warn(f"Failed to send mail to '{key}': {result[key][0]} {result[key][1]}")
+        module.exit_json(msg="Failed to send mail to at least one recipient", result=result)
 
-    module.exit_json(msg='Mail sent successfully', result=result)
+    module.exit_json(msg="Mail sent successfully", result=result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018, Dag Wieers (@dagwieers) <dag@wieers.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: read_csv
@@ -148,36 +146,40 @@ list:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.csv import (initialize_dialect, read_csv, CSVError,
-                                                                            DialectNotAvailableError,
-                                                                            CustomDialectFailureError)
+from ansible_collections.community.general.plugins.module_utils.csv import (
+    initialize_dialect,
+    read_csv,
+    CSVError,
+    DialectNotAvailableError,
+    CustomDialectFailureError,
+)
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path', required=True, aliases=['filename']),
-            dialect=dict(type='str', default='excel'),
-            key=dict(type='str', no_log=False),
-            fieldnames=dict(type='list', elements='str'),
-            unique=dict(type='bool', default=True),
-            delimiter=dict(type='str'),
-            skipinitialspace=dict(type='bool'),
-            strict=dict(type='bool'),
+            path=dict(type="path", required=True, aliases=["filename"]),
+            dialect=dict(type="str", default="excel"),
+            key=dict(type="str", no_log=False),
+            fieldnames=dict(type="list", elements="str"),
+            unique=dict(type="bool", default=True),
+            delimiter=dict(type="str"),
+            skipinitialspace=dict(type="bool"),
+            strict=dict(type="bool"),
         ),
         supports_check_mode=True,
     )
 
-    path = module.params['path']
-    dialect = module.params['dialect']
-    key = module.params['key']
-    fieldnames = module.params['fieldnames']
-    unique = module.params['unique']
+    path = module.params["path"]
+    dialect = module.params["dialect"]
+    key = module.params["key"]
+    fieldnames = module.params["fieldnames"]
+    unique = module.params["unique"]
 
     dialect_params = {
-        "delimiter": module.params['delimiter'],
-        "skipinitialspace": module.params['skipinitialspace'],
-        "strict": module.params['strict'],
+        "delimiter": module.params["delimiter"],
+        "skipinitialspace": module.params["skipinitialspace"],
+        "strict": module.params["strict"],
     }
 
     try:
@@ -186,15 +188,15 @@ def main():
         module.fail_json(msg=to_native(e))
 
     try:
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             data = f.read()
     except (IOError, OSError) as e:
-        module.fail_json(msg="Unable to open file: %s" % to_native(e))
+        module.fail_json(msg=f"Unable to open file: {e}")
 
     reader = read_csv(data, dialect, fieldnames)
 
     if key and key not in reader.fieldnames:
-        module.fail_json(msg="Key '%s' was not found in the CSV header fields: %s" % (key, ', '.join(reader.fieldnames)))
+        module.fail_json(msg=f"Key '{key}' was not found in the CSV header fields: {', '.join(reader.fieldnames)}")
 
     data_dict = dict()
     data_list = list()
@@ -204,18 +206,18 @@ def main():
             for row in reader:
                 data_list.append(row)
         except CSVError as e:
-            module.fail_json(msg="Unable to process file: %s" % to_native(e))
+            module.fail_json(msg=f"Unable to process file: {e}")
     else:
         try:
             for row in reader:
                 if unique and row[key] in data_dict:
-                    module.fail_json(msg="Key '%s' is not unique for value '%s'" % (key, row[key]))
+                    module.fail_json(msg=f"Key '{key}' is not unique for value '{row[key]}'")
                 data_dict[row[key]] = row
         except CSVError as e:
-            module.fail_json(msg="Unable to process file: %s" % to_native(e))
+            module.fail_json(msg=f"Unable to process file: {e}")
 
     module.exit_json(dict=data_dict, list=data_list)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

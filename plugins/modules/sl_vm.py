@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: sl_vm
@@ -174,8 +172,6 @@ options:
 requirements:
   - softlayer >= 4.1.1
 notes:
-  - If using Python 2.7, you must install C(softlayer-python<=5.7.2).
-  - If using Python 3.6, you must install C(softlayer-python<=6.0.0).
   - The C(softlayer-python) library, at version 6.2.6 (from Jan 2025), only supports Python version 3.8, 3.9 and 3.10.
 author:
   - Matt Colton (@mcltn)
@@ -290,15 +286,51 @@ except ImportError:
     HAS_SL = False
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
 
 
 # TODO: get this info from API
-STATES = ['present', 'absent']
-DATACENTERS = ['ams01', 'ams03', 'che01', 'dal01', 'dal05', 'dal06', 'dal09', 'dal10', 'dal12', 'dal13', 'fra02',
-               'fra04', 'fra05', 'hkg02', 'hou02', 'lon02', 'lon04', 'lon06', 'mel01', 'mex01', 'mil01', 'mon01',
-               'osl01', 'par01', 'sao01', 'sea01', 'seo01', 'sjc01', 'sjc03', 'sjc04', 'sng01', 'syd01', 'syd04',
-               'tok02', 'tor01', 'wdc01', 'wdc04', 'wdc06', 'wdc07']
+STATES = ["present", "absent"]
+DATACENTERS = [
+    "ams01",
+    "ams03",
+    "che01",
+    "dal01",
+    "dal05",
+    "dal06",
+    "dal09",
+    "dal10",
+    "dal12",
+    "dal13",
+    "fra02",
+    "fra04",
+    "fra05",
+    "hkg02",
+    "hou02",
+    "lon02",
+    "lon04",
+    "lon06",
+    "mel01",
+    "mex01",
+    "mil01",
+    "mon01",
+    "osl01",
+    "par01",
+    "sao01",
+    "sea01",
+    "seo01",
+    "sjc01",
+    "sjc03",
+    "sjc04",
+    "sng01",
+    "syd01",
+    "syd04",
+    "tok02",
+    "tor01",
+    "wdc01",
+    "wdc04",
+    "wdc06",
+    "wdc07",
+]
 CPU_SIZES = [1, 2, 4, 8, 16, 32, 56]
 MEMORY_SIZES = [1024, 2048, 4096, 6144, 8192, 12288, 16384, 32768, 49152, 65536, 131072, 247808]
 INITIALDISK_SIZES = [25, 100]
@@ -308,52 +340,51 @@ NIC_SPEEDS = [10, 100, 1000]
 
 
 def create_virtual_instance(module):
-
     instances = vsManager.list_instances(
-        hostname=module.params.get('hostname'),
-        domain=module.params.get('domain'),
-        datacenter=module.params.get('datacenter')
+        hostname=module.params.get("hostname"),
+        domain=module.params.get("domain"),
+        datacenter=module.params.get("datacenter"),
     )
 
     if instances:
         return False, None
 
     # Check if OS or Image Template is provided (Can't be both, defaults to OS)
-    if module.params.get('os_code') is not None and module.params.get('os_code') != '':
-        module.params['image_id'] = ''
-    elif module.params.get('image_id') is not None and module.params.get('image_id') != '':
-        module.params['os_code'] = ''
-        module.params['disks'] = []  # Blank out disks since it will use the template
+    if module.params.get("os_code") is not None and module.params.get("os_code") != "":
+        module.params["image_id"] = ""
+    elif module.params.get("image_id") is not None and module.params.get("image_id") != "":
+        module.params["os_code"] = ""
+        module.params["disks"] = []  # Blank out disks since it will use the template
     else:
         return False, None
 
-    tags = module.params.get('tags')
+    tags = module.params.get("tags")
     if isinstance(tags, list):
-        tags = ','.join(map(str, module.params.get('tags')))
+        tags = ",".join(map(str, module.params.get("tags")))
 
     instance = vsManager.create_instance(
-        hostname=module.params.get('hostname'),
-        domain=module.params.get('domain'),
-        cpus=module.params.get('cpus'),
-        memory=module.params.get('memory'),
-        flavor=module.params.get('flavor'),
-        hourly=module.params.get('hourly'),
-        datacenter=module.params.get('datacenter'),
-        os_code=module.params.get('os_code'),
-        image_id=module.params.get('image_id'),
-        local_disk=module.params.get('local_disk'),
-        disks=module.params.get('disks'),
-        ssh_keys=module.params.get('ssh_keys'),
-        nic_speed=module.params.get('nic_speed'),
-        private=module.params.get('private'),
-        public_vlan=module.params.get('public_vlan'),
-        private_vlan=module.params.get('private_vlan'),
-        dedicated=module.params.get('dedicated'),
-        post_uri=module.params.get('post_uri'),
+        hostname=module.params.get("hostname"),
+        domain=module.params.get("domain"),
+        cpus=module.params.get("cpus"),
+        memory=module.params.get("memory"),
+        flavor=module.params.get("flavor"),
+        hourly=module.params.get("hourly"),
+        datacenter=module.params.get("datacenter"),
+        os_code=module.params.get("os_code"),
+        image_id=module.params.get("image_id"),
+        local_disk=module.params.get("local_disk"),
+        disks=module.params.get("disks"),
+        ssh_keys=module.params.get("ssh_keys"),
+        nic_speed=module.params.get("nic_speed"),
+        private=module.params.get("private"),
+        public_vlan=module.params.get("public_vlan"),
+        private_vlan=module.params.get("private_vlan"),
+        dedicated=module.params.get("dedicated"),
+        post_uri=module.params.get("post_uri"),
         tags=tags,
     )
 
-    if instance is not None and instance['id'] > 0:
+    if instance is not None and instance["id"] > 0:
         return True, instance
     else:
         return False, None
@@ -362,7 +393,7 @@ def create_virtual_instance(module):
 def wait_for_instance(module, id):
     instance = None
     completed = False
-    wait_timeout = time.time() + module.params.get('wait_time')
+    wait_timeout = time.time() + module.params.get("wait_time")
     while not completed and wait_timeout > time.time():
         try:
             completed = vsManager.wait_for_ready(id, 10, 2)
@@ -376,19 +407,23 @@ def wait_for_instance(module, id):
 
 def cancel_instance(module):
     canceled = True
-    if module.params.get('instance_id') is None and (module.params.get('tags') or module.params.get('hostname') or module.params.get('domain')):
-        tags = module.params.get('tags')
-        if isinstance(tags, string_types):
-            tags = [module.params.get('tags')]
-        instances = vsManager.list_instances(tags=tags, hostname=module.params.get('hostname'), domain=module.params.get('domain'))
+    if module.params.get("instance_id") is None and (
+        module.params.get("tags") or module.params.get("hostname") or module.params.get("domain")
+    ):
+        tags = module.params.get("tags")
+        if isinstance(tags, str):
+            tags = [module.params.get("tags")]
+        instances = vsManager.list_instances(
+            tags=tags, hostname=module.params.get("hostname"), domain=module.params.get("domain")
+        )
         for instance in instances:
             try:
-                vsManager.cancel_instance(instance['id'])
+                vsManager.cancel_instance(instance["id"])
             except Exception:
                 canceled = False
-    elif module.params.get('instance_id') and module.params.get('instance_id') != 0:
+    elif module.params.get("instance_id") and module.params.get("instance_id") != 0:
         try:
-            vsManager.cancel_instance(instance['id'])
+            vsManager.cancel_instance(instance["id"])
         except Exception:
             canceled = False
     else:
@@ -398,48 +433,47 @@ def cancel_instance(module):
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            instance_id=dict(type='str'),
-            hostname=dict(type='str'),
-            domain=dict(type='str'),
-            datacenter=dict(type='str', choices=DATACENTERS),
-            tags=dict(type='str'),
-            hourly=dict(type='bool', default=True),
-            private=dict(type='bool', default=False),
-            dedicated=dict(type='bool', default=False),
-            local_disk=dict(type='bool', default=True),
-            cpus=dict(type='int', choices=CPU_SIZES),
-            memory=dict(type='int', choices=MEMORY_SIZES),
-            flavor=dict(type='str'),
-            disks=dict(type='list', elements='int', default=[25]),
-            os_code=dict(type='str'),
-            image_id=dict(type='str'),
-            nic_speed=dict(type='int', choices=NIC_SPEEDS),
-            public_vlan=dict(type='str'),
-            private_vlan=dict(type='str'),
-            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
-            post_uri=dict(type='str'),
-            state=dict(type='str', default='present', choices=STATES),
-            wait=dict(type='bool', default=True),
-            wait_time=dict(type='int', default=600),
+            instance_id=dict(type="str"),
+            hostname=dict(type="str"),
+            domain=dict(type="str"),
+            datacenter=dict(type="str", choices=DATACENTERS),
+            tags=dict(type="str"),
+            hourly=dict(type="bool", default=True),
+            private=dict(type="bool", default=False),
+            dedicated=dict(type="bool", default=False),
+            local_disk=dict(type="bool", default=True),
+            cpus=dict(type="int", choices=CPU_SIZES),
+            memory=dict(type="int", choices=MEMORY_SIZES),
+            flavor=dict(type="str"),
+            disks=dict(type="list", elements="int", default=[25]),
+            os_code=dict(type="str"),
+            image_id=dict(type="str"),
+            nic_speed=dict(type="int", choices=NIC_SPEEDS),
+            public_vlan=dict(type="str"),
+            private_vlan=dict(type="str"),
+            ssh_keys=dict(type="list", elements="str", default=[], no_log=False),
+            post_uri=dict(type="str"),
+            state=dict(type="str", default="present", choices=STATES),
+            wait=dict(type="bool", default=True),
+            wait_time=dict(type="int", default=600),
         )
     )
 
     if not HAS_SL:
-        module.fail_json(msg='softlayer python library required for this module')
+        module.fail_json(msg="softlayer python library required for this module")
 
-    if module.params.get('state') == 'absent':
+    if module.params.get("state") == "absent":
         (changed, instance) = cancel_instance(module)
 
-    elif module.params.get('state') == 'present':
+    elif module.params.get("state") == "present":
         (changed, instance) = create_virtual_instance(module)
-        if module.params.get('wait') is True and instance:
-            (changed, instance) = wait_for_instance(module, instance['id'])
+        if module.params.get("wait") is True and instance:
+            (changed, instance) = wait_for_instance(module, instance["id"])
 
     module.exit_json(changed=changed, instance=json.loads(json.dumps(instance, default=lambda o: o.__dict__)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

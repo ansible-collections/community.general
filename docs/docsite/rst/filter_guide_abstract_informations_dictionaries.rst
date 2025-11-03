@@ -31,16 +31,27 @@ You can use the :ansplugin:`community.general.dict_kv filter <community.general.
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
-    TASK [Create a single-entry dictionary]  **************************************************
+    TASK [Create a single-entry dictionary] ***************************************************
     ok: [localhost] => {
         "msg": {
             "thatsmyvar": "myvalue"
         }
     }
 
-    TASK [Create a list of dictionaries where the 'server' field is taken from a list]  *******
+    TASK [Create a list of dictionaries where the 'server' field is taken from a list] ********
     ok: [localhost] => {
         "msg": [
             {
@@ -87,9 +98,20 @@ If you need to convert a list of key-value pairs to a dictionary, you can use th
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
-    TASK [Create a dictionary with the dict function]  ****************************************
+    TASK [Create a dictionary with the dict function] *****************************************
     ok: [localhost] => {
         "msg": {
             "1": 2,
@@ -97,7 +119,7 @@ This produces:
         }
     }
 
-    TASK [Create a dictionary with the community.general.dict filter]  ************************
+    TASK [Create a dictionary with the community.general.dict filter] *************************
     ok: [localhost] => {
         "msg": {
             "1": 2,
@@ -105,7 +127,7 @@ This produces:
         }
     }
 
-    TASK [Create a list of dictionaries with map and the community.general.dict filter]  ******
+    TASK [Create a list of dictionaries with map and the community.general.dict filter] *******
     ok: [localhost] => {
         "msg": [
             {

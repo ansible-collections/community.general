@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -139,39 +138,37 @@ from ansible_collections.community.general.plugins.plugin_utils.unsafe import ma
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-
-    NAME = 'community.general.nmap'
-    find_host = re.compile(r'^Nmap scan report for ([\w,.,-]+)(?: \(([\w,.,:,\[,\]]+)\))?')
-    find_port = re.compile(r'^(\d+)/(\w+)\s+(\w+)\s+(\w+)')
+    NAME = "community.general.nmap"
+    find_host = re.compile(r"^Nmap scan report for ([\w,.,-]+)(?: \(([\w,.,:,\[,\]]+)\))?")
+    find_port = re.compile(r"^(\d+)/(\w+)\s+(\w+)\s+(\w+)")
 
     def __init__(self):
         self._nmap = None
-        super(InventoryModule, self).__init__()
+        super().__init__()
 
     def _populate(self, hosts):
         # Use constructed if applicable
-        strict = self.get_option('strict')
+        strict = self.get_option("strict")
 
         for host in hosts:
             host = make_unsafe(host)
-            hostname = host['name']
+            hostname = host["name"]
             self.inventory.add_host(hostname)
             for var, value in host.items():
                 self.inventory.set_variable(hostname, var, value)
 
             # Composed variables
-            self._set_composite_vars(self.get_option('compose'), host, hostname, strict=strict)
+            self._set_composite_vars(self.get_option("compose"), host, hostname, strict=strict)
 
             # Complex groups based on jinja2 conditionals, hosts that meet the conditional are added to group
-            self._add_host_to_composed_groups(self.get_option('groups'), host, hostname, strict=strict)
+            self._add_host_to_composed_groups(self.get_option("groups"), host, hostname, strict=strict)
 
             # Create groups based on variable values and add the corresponding hosts to it
-            self._add_host_to_keyed_groups(self.get_option('keyed_groups'), host, hostname, strict=strict)
+            self._add_host_to_keyed_groups(self.get_option("keyed_groups"), host, hostname, strict=strict)
 
     def verify_file(self, path):
-
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             file_name, ext = os.path.splitext(path)
 
             if not ext or ext in C.YAML_FILENAME_EXTENSIONS:
@@ -180,13 +177,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
-
         try:
-            self._nmap = get_bin_path('nmap')
+            self._nmap = get_bin_path("nmap")
         except ValueError as e:
-            raise AnsibleParserError(f'nmap inventory plugin requires the nmap cli tool to work: {e}')
+            raise AnsibleParserError(f"nmap inventory plugin requires the nmap cli tool to work: {e}")
 
-        super(InventoryModule, self).parse(inventory, loader, path, cache=cache)
+        super().parse(inventory, loader, path, cache=cache)
 
         self._read_config_data(path)
 
@@ -194,7 +190,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # cache may be True or False at this point to indicate if the inventory is being refreshed
         # get the user's cache option too to see if we should save the cache if it is changing
-        user_cache_setting = self.get_option('cache')
+        user_cache_setting = self.get_option("cache")
 
         # read if the user has caching enabled and the cache isn't being refreshed
         attempt_to_read_cache = user_cache_setting and cache
@@ -212,53 +208,53 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # setup command
             cmd = [self._nmap]
 
-            if self.get_option('sudo'):
-                cmd.insert(0, 'sudo')
+            if self.get_option("sudo"):
+                cmd.insert(0, "sudo")
 
-            if self.get_option('port'):
-                cmd.append('-p')
-                cmd.append(self.get_option('port'))
+            if self.get_option("port"):
+                cmd.append("-p")
+                cmd.append(self.get_option("port"))
 
-            if not self.get_option('ports'):
-                cmd.append('-sP')
+            if not self.get_option("ports"):
+                cmd.append("-sP")
 
-            if self.get_option('ipv4') and not self.get_option('ipv6'):
-                cmd.append('-4')
-            elif self.get_option('ipv6') and not self.get_option('ipv4'):
-                cmd.append('-6')
-            elif not self.get_option('ipv6') and not self.get_option('ipv4'):
-                raise AnsibleParserError('One of ipv4 or ipv6 must be enabled for this plugin')
+            if self.get_option("ipv4") and not self.get_option("ipv6"):
+                cmd.append("-4")
+            elif self.get_option("ipv6") and not self.get_option("ipv4"):
+                cmd.append("-6")
+            elif not self.get_option("ipv6") and not self.get_option("ipv4"):
+                raise AnsibleParserError("One of ipv4 or ipv6 must be enabled for this plugin")
 
-            if self.get_option('exclude'):
-                cmd.append('--exclude')
-                cmd.append(','.join(self.get_option('exclude')))
+            if self.get_option("exclude"):
+                cmd.append("--exclude")
+                cmd.append(",".join(self.get_option("exclude")))
 
-            if self.get_option('dns_resolve'):
-                cmd.append('-n')
+            if self.get_option("dns_resolve"):
+                cmd.append("-n")
 
-            if self.get_option('dns_servers'):
-                cmd.append('--dns-servers')
-                cmd.append(','.join(self.get_option('dns_servers')))
+            if self.get_option("dns_servers"):
+                cmd.append("--dns-servers")
+                cmd.append(",".join(self.get_option("dns_servers")))
 
-            if self.get_option('udp_scan'):
-                cmd.append('-sU')
+            if self.get_option("udp_scan"):
+                cmd.append("-sU")
 
-            if self.get_option('icmp_timestamp'):
-                cmd.append('-PP')
+            if self.get_option("icmp_timestamp"):
+                cmd.append("-PP")
 
-            if self.get_option('open'):
-                cmd.append('--open')
+            if self.get_option("open"):
+                cmd.append("--open")
 
-            if not self.get_option('use_arp_ping'):
-                cmd.append('--disable-arp-ping')
+            if not self.get_option("use_arp_ping"):
+                cmd.append("--disable-arp-ping")
 
-            cmd.append(self.get_option('address'))
+            cmd.append(self.get_option("address"))
             try:
                 # execute
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)
                 stdout, stderr = p.communicate()
                 if p.returncode != 0:
-                    raise AnsibleParserError(f'Failed to run nmap, rc={p.returncode}: {to_native(stderr)}')
+                    raise AnsibleParserError(f"Failed to run nmap, rc={p.returncode}: {to_native(stderr)}")
 
                 # parse results
                 host = None
@@ -267,18 +263,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 results = []
 
                 try:
-                    t_stdout = to_text(stdout, errors='surrogate_or_strict')
+                    t_stdout = to_text(stdout, errors="surrogate_or_strict")
                 except UnicodeError as e:
-                    raise AnsibleParserError(f'Invalid (non unicode) input returned: {e}')
+                    raise AnsibleParserError(f"Invalid (non unicode) input returned: {e}")
 
                 for line in t_stdout.splitlines():
                     hits = self.find_host.match(line)
                     if hits:
                         if host is not None and ports:
-                            results[-1]['ports'] = ports
+                            results[-1]["ports"] = ports
 
                         # if dns only shows arpa, just use ip instead as hostname
-                        if hits.group(1).endswith('.in-addr.arpa'):
+                        if hits.group(1).endswith(".in-addr.arpa"):
                             host = hits.group(2)
                         else:
                             host = hits.group(1)
@@ -292,22 +288,26 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         if host is not None:
                             # update inventory
                             results.append(dict())
-                            results[-1]['name'] = host
-                            results[-1]['ip'] = ip
+                            results[-1]["name"] = host
+                            results[-1]["ip"] = ip
                             ports = []
                         continue
 
                     host_ports = self.find_port.match(line)
                     if host is not None and host_ports:
-                        ports.append({'port': host_ports.group(1),
-                                      'protocol': host_ports.group(2),
-                                      'state': host_ports.group(3),
-                                      'service': host_ports.group(4)})
+                        ports.append(
+                            {
+                                "port": host_ports.group(1),
+                                "protocol": host_ports.group(2),
+                                "state": host_ports.group(3),
+                                "service": host_ports.group(4),
+                            }
+                        )
                         continue
 
                 # if any leftovers
                 if host and ports:
-                    results[-1]['ports'] = ports
+                    results[-1]["ports"] = ports
 
             except Exception as e:
                 raise AnsibleParserError(f"failed to parse {to_native(path)}: {e} ")

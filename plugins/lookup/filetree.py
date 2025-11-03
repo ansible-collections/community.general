@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016 Dag Wieers <dag@wieers.com>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: filetree
@@ -22,6 +20,11 @@ options:
     required: true
     type: list
     elements: string
+  exclude:
+    description:
+      - A regular expression string to exclude files. Applies to the base name of the file or directory.
+    type: str
+    version_added: 12.0.0
 """
 
 EXAMPLES = r"""
@@ -57,6 +60,11 @@ EXAMPLES = r"""
 - name: list all files under web/
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.filetree', 'web/') }}"
+
+- name: list all files under web/; exclude .git and .node_modules
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.filetree', 'web/', exclude='^(\.git|\.node_modules)$') }}
 """
 
 RETURN = r"""
@@ -120,10 +128,12 @@ import os
 import pwd
 import grp
 import stat
+import re
 
 HAVE_SELINUX = False
 try:
     import selinux
+
     HAVE_SELINUX = True
 except ImportError:
     pass
@@ -148,78 +158,86 @@ def selinux_context(path):
         if ret[0] != -1:
             # Limit split to 4 because the selevel, the last in the list,
             # may contain ':' characters
-            context = ret[1].split(':', 3)
+            context = ret[1].split(":", 3)
     return context
 
 
 def file_props(root, path):
-    ''' Returns dictionary with file properties, or return None on failure '''
+    """Returns dictionary with file properties, or return None on failure"""
     abspath = os.path.join(root, path)
 
     try:
         st = os.lstat(abspath)
     except OSError as e:
-        display.warning(f'filetree: Error using stat() on path {abspath} ({e})')
+        display.warning(f"filetree: Error using stat() on path {abspath} ({e})")
         return None
 
     ret = dict(root=root, path=path)
 
     if stat.S_ISLNK(st.st_mode):
-        ret['state'] = 'link'
-        ret['src'] = os.readlink(abspath)
+        ret["state"] = "link"
+        ret["src"] = os.readlink(abspath)
     elif stat.S_ISDIR(st.st_mode):
-        ret['state'] = 'directory'
+        ret["state"] = "directory"
     elif stat.S_ISREG(st.st_mode):
-        ret['state'] = 'file'
-        ret['src'] = abspath
+        ret["state"] = "file"
+        ret["src"] = abspath
     else:
-        display.warning(f'filetree: Error file type of {abspath} is not supported')
+        display.warning(f"filetree: Error file type of {abspath} is not supported")
         return None
 
-    ret['uid'] = st.st_uid
-    ret['gid'] = st.st_gid
+    ret["uid"] = st.st_uid
+    ret["gid"] = st.st_gid
     try:
-        ret['owner'] = pwd.getpwuid(st.st_uid).pw_name
+        ret["owner"] = pwd.getpwuid(st.st_uid).pw_name
     except KeyError:
-        ret['owner'] = st.st_uid
+        ret["owner"] = st.st_uid
     try:
-        ret['group'] = to_text(grp.getgrgid(st.st_gid).gr_name)
+        ret["group"] = to_text(grp.getgrgid(st.st_gid).gr_name)
     except KeyError:
-        ret['group'] = st.st_gid
-    ret['mode'] = f'0{stat.S_IMODE(st.st_mode):03o}'
-    ret['size'] = st.st_size
-    ret['mtime'] = st.st_mtime
-    ret['ctime'] = st.st_ctime
+        ret["group"] = st.st_gid
+    ret["mode"] = f"0{stat.S_IMODE(st.st_mode):03o}"
+    ret["size"] = st.st_size
+    ret["mtime"] = st.st_mtime
+    ret["ctime"] = st.st_ctime
 
     if HAVE_SELINUX and selinux.is_selinux_enabled() == 1:
         context = selinux_context(abspath)
-        ret['seuser'] = context[0]
-        ret['serole'] = context[1]
-        ret['setype'] = context[2]
-        ret['selevel'] = context[3]
+        ret["seuser"] = context[0]
+        ret["serole"] = context[1]
+        ret["setype"] = context[2]
+        ret["selevel"] = context[3]
 
     return ret
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
         basedir = self.get_basedir(variables)
 
+        # Regular expression for exclude
+        exclude = self.get_option("exclude")
+        exclude_pattern = re.compile(exclude) if exclude else None
+
         ret = []
         for term in terms:
             term_file = os.path.basename(term)
-            dwimmed_path = self._loader.path_dwim_relative(basedir, 'files', os.path.dirname(term))
+            dwimmed_path = self._loader.path_dwim_relative(basedir, "files", os.path.dirname(term))
             path = os.path.join(dwimmed_path, term_file)
             display.debug(f"Walking '{path}'")
             for root, dirs, files in os.walk(path, topdown=True):
+                # Filter files and directories using a regular expression
+                if exclude_pattern is not None:
+                    dirs[:] = [d for d in dirs if not exclude_pattern.match(d)]
+                    files[:] = [f for f in files if not exclude_pattern.match(f)]
+
                 for entry in dirs + files:
                     relpath = os.path.relpath(os.path.join(root, entry), path)
 
                     # Skip if relpath was already processed (from another root)
-                    if relpath not in [entry['path'] for entry in ret]:
+                    if relpath not in [entry["path"] for entry in ret]:
                         props = file_props(path, relpath)
                         if props is not None:
                             display.debug(f"  found '{os.path.join(path, relpath)}'")

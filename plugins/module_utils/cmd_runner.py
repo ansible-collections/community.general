@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 import os
 
@@ -32,18 +30,10 @@ class MissingArgumentFormat(CmdRunnerException):
         self.args_formats = args_formats
 
     def __repr__(self):
-        return "MissingArgumentFormat({0!r}, {1!r}, {2!r})".format(
-            self.arg,
-            self.args_order,
-            self.args_formats,
-        )
+        return f"MissingArgumentFormat({self.arg!r}, {self.args_order!r}, {self.args_formats!r})"
 
     def __str__(self):
-        return "Cannot find format for parameter {0} {1} in: {2}".format(
-            self.arg,
-            self.args_order,
-            self.args_formats,
-        )
+        return f"Cannot find format for parameter {self.arg} {self.args_order} in: {self.args_formats}"
 
 
 class MissingArgumentValue(CmdRunnerException):
@@ -52,16 +42,10 @@ class MissingArgumentValue(CmdRunnerException):
         self.arg = arg
 
     def __repr__(self):
-        return "MissingArgumentValue({0!r}, {1!r})".format(
-            self.args_order,
-            self.arg,
-        )
+        return f"MissingArgumentValue({self.args_order!r}, {self.arg!r})"
 
     def __str__(self):
-        return "Cannot find value for parameter {0} in {1}".format(
-            self.arg,
-            self.args_order,
-        )
+        return f"Cannot find value for parameter {self.arg} in {self.args_order}"
 
 
 class FormatError(CmdRunnerException):
@@ -70,25 +54,16 @@ class FormatError(CmdRunnerException):
         self.value = value
         self.args_formats = args_formats
         self.exc = exc
-        super(FormatError, self).__init__()
+        super().__init__()
 
     def __repr__(self):
-        return "FormatError({0!r}, {1!r}, {2!r}, {3!r})".format(
-            self.name,
-            self.value,
-            self.args_formats,
-            self.exc,
-        )
+        return f"FormatError({self.name!r}, {self.value!r}, {self.args_formats!r}, {self.exc!r})"
 
     def __str__(self):
-        return "Failed to format parameter {0} with value {1}: {2}".format(
-            self.name,
-            self.value,
-            self.exc,
-        )
+        return f"Failed to format parameter {self.name} with value {self.value}: {self.exc}"
 
 
-class CmdRunner(object):
+class CmdRunner:
     """
     Wrapper for ``AnsibleModule.run_command()``.
 
@@ -100,8 +75,17 @@ class CmdRunner(object):
     def _prepare_args_order(order):
         return tuple(order) if is_sequence(order) else tuple(order.split())
 
-    def __init__(self, module, command, arg_formats=None, default_args_order=(),
-                 check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
+    def __init__(
+        self,
+        module,
+        command,
+        arg_formats=None,
+        default_args_order=(),
+        check_rc=False,
+        force_lang="C",
+        path_prefix=None,
+        environ_update=None,
+    ):
         self.module = module
         self.command = _ensure_list(command)
         self.default_args_order = self._prepare_args_order(default_args_order)
@@ -126,22 +110,17 @@ class CmdRunner(object):
         self.environ_update = environ_update
 
         _cmd = self.command[0]
-        self.command[0] = _cmd if (os.path.isabs(_cmd) or '/' in _cmd) else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
+        self.command[0] = (
+            _cmd
+            if (os.path.isabs(_cmd) or "/" in _cmd)
+            else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
+        )
 
     @property
     def binary(self):
         return self.command[0]
 
-    # remove parameter ignore_value_none in community.general 12.0.0
-    def __call__(self, args_order=None, output_process=None, ignore_value_none=None, check_mode_skip=False, check_mode_return=None, **kwargs):
-        if ignore_value_none is None:
-            ignore_value_none = True
-        else:
-            self.module.deprecate(
-                "Using ignore_value_none when creating the runner context is now deprecated, "
-                "and the parameter will be removed in community.general 12.0.0. ",
-                version="12.0.0", collection_name="community.general"
-            )
+    def __call__(self, args_order=None, output_process=None, check_mode_skip=False, check_mode_return=None, **kwargs):
         if output_process is None:
             output_process = _process_as_is
         if args_order is None:
@@ -150,12 +129,14 @@ class CmdRunner(object):
         for p in args_order:
             if p not in self.arg_formats:
                 raise MissingArgumentFormat(p, args_order, tuple(self.arg_formats.keys()))
-        return _CmdRunnerContext(runner=self,
-                                 args_order=args_order,
-                                 output_process=output_process,
-                                 ignore_value_none=ignore_value_none,           # DEPRECATION: remove in community.general 12.0.0
-                                 check_mode_skip=check_mode_skip,
-                                 check_mode_return=check_mode_return, **kwargs)
+        return _CmdRunnerContext(
+            runner=self,
+            args_order=args_order,
+            output_process=output_process,
+            check_mode_skip=check_mode_skip,
+            check_mode_return=check_mode_return,
+            **kwargs,
+        )
 
     def has_arg_format(self, arg):
         return arg in self.arg_formats
@@ -164,29 +145,29 @@ class CmdRunner(object):
     context = __call__
 
 
-class _CmdRunnerContext(object):
-    def __init__(self, runner, args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs):
+class _CmdRunnerContext:
+    def __init__(self, runner, args_order, output_process, check_mode_skip, check_mode_return, **kwargs):
         self.runner = runner
         self.args_order = tuple(args_order)
         self.output_process = output_process
-        # DEPRECATION: parameter ignore_value_none at the context level is deprecated and will be removed in community.general 12.0.0
-        self.ignore_value_none = ignore_value_none
         self.check_mode_skip = check_mode_skip
         self.check_mode_return = check_mode_return
         self.run_command_args = dict(kwargs)
 
         self.environ_update = runner.environ_update
-        self.environ_update.update(self.run_command_args.get('environ_update', {}))
+        self.environ_update.update(self.run_command_args.get("environ_update", {}))
         if runner.force_lang:
-            self.environ_update.update({
-                'LANGUAGE': runner.force_lang,
-                'LC_ALL': runner.force_lang,
-            })
-        self.run_command_args['environ_update'] = self.environ_update
+            self.environ_update.update(
+                {
+                    "LANGUAGE": runner.force_lang,
+                    "LC_ALL": runner.force_lang,
+                }
+            )
+        self.run_command_args["environ_update"] = self.environ_update
 
-        if 'check_rc' not in self.run_command_args:
-            self.run_command_args['check_rc'] = runner.check_rc
-        self.check_rc = self.run_command_args['check_rc']
+        if "check_rc" not in self.run_command_args:
+            self.run_command_args["check_rc"] = runner.check_rc
+        self.check_rc = self.run_command_args["check_rc"]
 
         self.cmd = None
         self.results_rc = None
@@ -209,8 +190,7 @@ class _CmdRunnerContext(object):
                     value = named_args[arg_name]
                 elif not runner.arg_formats[arg_name].ignore_missing_value:
                     raise MissingArgumentValue(self.args_order, arg_name)
-                # DEPRECATION: remove parameter ctx_ignore_none in 12.0.0
-                self.cmd.extend(runner.arg_formats[arg_name](value, ctx_ignore_none=self.ignore_value_none))
+                self.cmd.extend(runner.arg_formats[arg_name](value))
             except MissingArgumentValue:
                 raise
             except Exception as e:
@@ -226,7 +206,6 @@ class _CmdRunnerContext(object):
     @property
     def run_info(self):
         return dict(
-            ignore_value_none=self.ignore_value_none,         # DEPRECATION: remove in community.general 12.0.0
             check_rc=self.check_rc,
             environ_update=self.environ_update,
             args_order=self.args_order,

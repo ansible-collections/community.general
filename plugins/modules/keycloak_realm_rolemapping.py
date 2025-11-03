@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_realm_rolemapping
@@ -226,7 +224,10 @@ end_state:
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError,
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
 )
 from ansible.module_utils.basic import AnsibleModule
 
@@ -240,35 +241,36 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     roles_spec = dict(
-        name=dict(type='str'),
-        id=dict(type='str'),
+        name=dict(type="str"),
+        id=dict(type="str"),
     )
 
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-        realm=dict(default='master'),
-        gid=dict(type='str'),
-        group_name=dict(type='str'),
+        state=dict(default="present", choices=["present", "absent"]),
+        realm=dict(default="master"),
+        gid=dict(type="str"),
+        group_name=dict(type="str"),
         parents=dict(
-            type='list', elements='dict',
-            options=dict(
-                id=dict(type='str'),
-                name=dict(type='str')
-            ),
+            type="list",
+            elements="dict",
+            options=dict(id=dict(type="str"), name=dict(type="str")),
         ),
-        roles=dict(type='list', elements='dict', options=roles_spec),
+        roles=dict(type="list", elements="dict", options=roles_spec),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -278,24 +280,24 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    state = module.params.get('state')
-    gid = module.params.get('gid')
-    group_name = module.params.get('group_name')
-    roles = module.params.get('roles')
-    parents = module.params.get('parents')
+    realm = module.params.get("realm")
+    state = module.params.get("state")
+    gid = module.params.get("gid")
+    group_name = module.params.get("group_name")
+    roles = module.params.get("roles")
+    parents = module.params.get("parents")
 
     # Check the parameters
     if gid is None and group_name is None:
-        module.fail_json(msg='Either the `group_name` or `gid` has to be specified.')
+        module.fail_json(msg="Either the `group_name` or `gid` has to be specified.")
 
     # Get the potential missing parameters
     if gid is None:
         group_rep = kc.get_group_by_name(group_name, realm=realm, parents=parents)
         if group_rep is not None:
-            gid = group_rep['id']
+            gid = group_rep["id"]
         else:
-            module.fail_json(msg='Could not fetch group %s:' % group_name)
+            module.fail_json(msg=f"Could not fetch group {group_name}:")
     else:
         group_rep = kc.get_group_by_groupid(gid, realm=realm)
 
@@ -303,80 +305,86 @@ def main():
         module.exit_json(msg="Nothing to do (no roles specified).")
     else:
         for role_index, role in enumerate(roles, start=0):
-            if role['name'] is None and role['id'] is None:
-                module.fail_json(msg='Either the `name` or `id` has to be specified on each role.')
+            if role["name"] is None and role["id"] is None:
+                module.fail_json(msg="Either the `name` or `id` has to be specified on each role.")
             # Fetch missing role_id
-            if role['id'] is None:
-                role_rep = kc.get_realm_role(role['name'], realm=realm)
+            if role["id"] is None:
+                role_rep = kc.get_realm_role(role["name"], realm=realm)
                 if role_rep is not None:
-                    role['id'] = role_rep['id']
+                    role["id"] = role_rep["id"]
                 else:
-                    module.fail_json(msg='Could not fetch realm role %s by name:' % (role['name']))
+                    module.fail_json(msg=f"Could not fetch realm role {role['name']} by name:")
             # Fetch missing role_name
             else:
                 for realm_role in kc.get_realm_roles(realm=realm):
-                    if realm_role['id'] == role['id']:
-                        role['name'] = realm_role['name']
+                    if realm_role["id"] == role["id"]:
+                        role["name"] = realm_role["name"]
                         break
 
-                if role['name'] is None:
-                    module.fail_json(msg='Could not fetch realm role %s by ID' % (role['id']))
+                if role["name"] is None:
+                    module.fail_json(msg=f"Could not fetch realm role {role['id']} by ID")
 
-    assigned_roles_before = group_rep.get('realmRoles', [])
+    assigned_roles_before = group_rep.get("realmRoles", [])
 
-    result['existing'] = assigned_roles_before
-    result['proposed'] = list(assigned_roles_before) if assigned_roles_before else []
+    result["existing"] = assigned_roles_before
+    result["proposed"] = list(assigned_roles_before) if assigned_roles_before else []
 
     update_roles = []
     for role_index, role in enumerate(roles, start=0):
         # Fetch roles to assign if state present
-        if state == 'present':
-            if any(assigned == role['name'] for assigned in assigned_roles_before):
+        if state == "present":
+            if any(assigned == role["name"] for assigned in assigned_roles_before):
                 pass
             else:
-                update_roles.append({
-                    'id': role['id'],
-                    'name': role['name'],
-                })
-                result['proposed'].append(role['name'])
+                update_roles.append(
+                    {
+                        "id": role["id"],
+                        "name": role["name"],
+                    }
+                )
+                result["proposed"].append(role["name"])
         # Fetch roles to remove if state absent
         else:
-            if any(assigned == role['name'] for assigned in assigned_roles_before):
-                update_roles.append({
-                    'id': role['id'],
-                    'name': role['name'],
-                })
-                if role['name'] in result['proposed']:  # Handle double removal
-                    result['proposed'].remove(role['name'])
+            if any(assigned == role["name"] for assigned in assigned_roles_before):
+                update_roles.append(
+                    {
+                        "id": role["id"],
+                        "name": role["name"],
+                    }
+                )
+                if role["name"] in result["proposed"]:  # Handle double removal
+                    result["proposed"].remove(role["name"])
 
     if len(update_roles):
-        result['changed'] = True
+        result["changed"] = True
         if module._diff:
-            result['diff'] = dict(before=assigned_roles_before, after=result['proposed'])
+            result["diff"] = dict(before=assigned_roles_before, after=result["proposed"])
         if module.check_mode:
             module.exit_json(**result)
 
-        if state == 'present':
+        if state == "present":
             # Assign roles
             kc.add_group_realm_rolemapping(gid=gid, role_rep=update_roles, realm=realm)
-            result['msg'] = 'Realm roles %s assigned to groupId %s.' % (update_roles, gid)
+            result["msg"] = f"Realm roles {update_roles} assigned to groupId {gid}."
         else:
             # Remove mapping of role
             kc.delete_group_realm_rolemapping(gid=gid, role_rep=update_roles, realm=realm)
-            result['msg'] = 'Realm roles %s removed from groupId %s.' % (update_roles, gid)
+            result["msg"] = f"Realm roles {update_roles} removed from groupId {gid}."
 
         if gid is None:
-            assigned_roles_after = kc.get_group_by_name(group_name, realm=realm, parents=parents).get('realmRoles', [])
+            assigned_roles_after = kc.get_group_by_name(group_name, realm=realm, parents=parents).get("realmRoles", [])
         else:
-            assigned_roles_after = kc.get_group_by_groupid(gid, realm=realm).get('realmRoles', [])
-        result['end_state'] = assigned_roles_after
+            assigned_roles_after = kc.get_group_by_groupid(gid, realm=realm).get("realmRoles", [])
+        result["end_state"] = assigned_roles_after
         module.exit_json(**result)
     # Do nothing
     else:
-        result['changed'] = False
-        result['msg'] = 'Nothing to do, roles %s are %s with group %s.' % (roles, 'mapped' if state == 'present' else 'not mapped', group_name)
+        result["changed"] = False
+        result["msg"] = (
+            f"Nothing to do, roles {roles} are {'mapped' if state == 'present' else 'not mapped'} with group {group_name}."
+        )
         module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

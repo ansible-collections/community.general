@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2012, Jan-Piet Mens <jpmens(at)gmail.com>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: redis
@@ -78,6 +76,7 @@ _raw:
 HAVE_REDIS = False
 try:
     import redis
+
     HAVE_REDIS = True
 except ImportError:
     pass
@@ -88,9 +87,7 @@ from ansible.plugins.lookup import LookupBase
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables, **kwargs):
-
         if not HAVE_REDIS:
             raise AnsibleError("Can't LOOKUP(redis_kv): module redis is not installed")
 
@@ -98,9 +95,9 @@ class LookupModule(LookupBase):
         self.set_options(direct=kwargs)
 
         # setup connection
-        host = self.get_option('host')
-        port = self.get_option('port')
-        socket = self.get_option('socket')
+        host = self.get_option("host")
+        port = self.get_option("port")
+        socket = self.get_option("socket")
         if socket is None:
             conn = redis.Redis(host=host, port=port)
         else:
@@ -115,5 +112,5 @@ class LookupModule(LookupBase):
                 ret.append(to_text(res))
             except Exception as e:
                 # connection failed or key not found
-                raise AnsibleError(f'Encountered exception while fetching {term}: {e}')
+                raise AnsibleError(f"Encountered exception while fetching {term}: {e}")
         return ret

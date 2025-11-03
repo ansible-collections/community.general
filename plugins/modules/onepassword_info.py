@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Ryan Conway (@rylon)
 # Copyright (c) 2018, Scott Buchanan <sbuchanan@ri.pn> (onepassword.py used as starting point)
@@ -8,8 +7,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -179,15 +177,14 @@ class AnsibleModuleError(Exception):
         return self.results
 
 
-class OnePasswordInfo(object):
-
+class OnePasswordInfo:
     def __init__(self):
-        self.cli_path = module.params.get('cli_path')
-        self.auto_login = module.params.get('auto_login')
+        self.cli_path = module.params.get("cli_path")
+        self.auto_login = module.params.get("auto_login")
         self.logged_in = False
         self.token = None
 
-        terms = module.params.get('search_terms')
+        terms = module.params.get("search_terms")
         self.terms = self.parse_search_terms(terms)
 
         self._config = OnePasswordConfig()
@@ -195,7 +192,7 @@ class OnePasswordInfo(object):
     def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
         if self.token:
             # Adds the session token to all commands if we're logged in.
-            args += [to_bytes('--session=') + self.token]
+            args += [to_bytes("--session=") + self.token]
 
         command = [self.cli_path] + args
         p = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
@@ -208,53 +205,55 @@ class OnePasswordInfo(object):
     def _parse_field(self, data_json, item_id, field_name, section_title=None):
         data = json.loads(data_json)
 
-        if 'documentAttributes' in data['details']:
+        if "documentAttributes" in data["details"]:
             # This is actually a document, let's fetch the document data instead!
-            document = self._run(["get", "document", data['overview']['title']])
-            return {'document': document[1].strip()}
+            document = self._run(["get", "document", data["overview"]["title"]])
+            return {"document": document[1].strip()}
 
         else:
             # This is not a document, let's try to find the requested field
 
             # Some types of 1Password items have a 'password' field directly alongside the 'fields' attribute,
             # not inside it, so we need to check there first.
-            if field_name in data['details']:
-                return {field_name: data['details'][field_name]}
+            if field_name in data["details"]:
+                return {field_name: data["details"][field_name]}
 
             # Otherwise we continue looking inside the 'fields' attribute for the specified field.
             else:
                 if section_title is None:
-                    for field_data in data['details'].get('fields', []):
-                        if field_data.get('name', '').lower() == field_name.lower():
-                            return {field_name: field_data.get('value', '')}
+                    for field_data in data["details"].get("fields", []):
+                        if field_data.get("name", "").lower() == field_name.lower():
+                            return {field_name: field_data.get("value", "")}
 
                 # Not found it yet, so now lets see if there are any sections defined
                 # and search through those for the field. If a section was given, we skip
                 # any non-matching sections, otherwise we search them all until we find the field.
-                for section_data in data['details'].get('sections', []):
-                    if section_title is not None and section_title.lower() != section_data['title'].lower():
+                for section_data in data["details"].get("sections", []):
+                    if section_title is not None and section_title.lower() != section_data["title"].lower():
                         continue
-                    for field_data in section_data.get('fields', []):
-                        if field_data.get('t', '').lower() == field_name.lower():
-                            return {field_name: field_data.get('v', '')}
+                    for field_data in section_data.get("fields", []):
+                        if field_data.get("t", "").lower() == field_name.lower():
+                            return {field_name: field_data.get("v", "")}
 
         # We will get here if the field could not be found in any section and the item wasn't a document to be downloaded.
-        optional_section_title = '' if section_title is None else " in the section '%s'" % section_title
-        module.fail_json(msg="Unable to find an item in 1Password named '%s' with the field '%s'%s." % (item_id, field_name, optional_section_title))
+        optional_section_title = "" if section_title is None else f" in the section '{section_title}'"
+        module.fail_json(
+            msg=f"Unable to find an item in 1Password named '{item_id}' with the field '{field_name}'{optional_section_title}."
+        )
 
     def parse_search_terms(self, terms):
         processed_terms = []
 
         for term in terms:
             if not isinstance(term, dict):
-                term = {'name': term}
+                term = {"name": term}
 
-            if 'name' not in term:
-                module.fail_json(msg="Missing required 'name' field from search term, got: '%s'" % to_native(term))
+            if "name" not in term:
+                module.fail_json(msg=f"Missing required 'name' field from search term, got: '{term}'")
 
-            term['field'] = term.get('field', 'password')
-            term['section'] = term.get('section', None)
-            term['vault'] = term.get('vault', None)
+            term["field"] = term.get("field", "password")
+            term["section"] = term.get("section", None)
+            term["vault"] = term.get("vault", None)
 
             processed_terms.append(term)
 
@@ -264,62 +263,68 @@ class OnePasswordInfo(object):
         try:
             args = ["get", "item", item_id]
             if vault is not None:
-                args += ['--vault={0}'.format(vault)]
+                args += [f"--vault={vault}"]
             rc, output, dummy = self._run(args)
             return output
 
         except Exception as e:
             if re.search(".*not found.*", to_native(e)):
-                module.fail_json(msg="Unable to find an item in 1Password named '%s'." % item_id)
+                module.fail_json(msg=f"Unable to find an item in 1Password named '{item_id}'.")
             else:
-                module.fail_json(msg="Unexpected error attempting to find an item in 1Password named '%s': %s" % (item_id, to_native(e)))
+                module.fail_json(msg=f"Unexpected error attempting to find an item in 1Password named '{item_id}': {e}")
 
     def get_field(self, item_id, field, section=None, vault=None):
         output = self.get_raw(item_id, vault)
-        return self._parse_field(output, item_id, field, section) if output != '' else ''
+        return self._parse_field(output, item_id, field, section) if output != "" else ""
 
     def full_login(self):
         if self.auto_login is not None:
-            if None in [self.auto_login.get('subdomain'), self.auto_login.get('username'),
-                        self.auto_login.get('secret_key'), self.auto_login.get('master_password')]:
-                module.fail_json(msg='Unable to perform initial sign in to 1Password. '
-                                     'subdomain, username, secret_key, and master_password are required to perform initial sign in.')
+            if None in [
+                self.auto_login.get("subdomain"),
+                self.auto_login.get("username"),
+                self.auto_login.get("secret_key"),
+                self.auto_login.get("master_password"),
+            ]:
+                module.fail_json(
+                    msg="Unable to perform initial sign in to 1Password. "
+                    "subdomain, username, secret_key, and master_password are required to perform initial sign in."
+                )
 
             args = [
-                'signin',
-                '{0}.1password.com'.format(self.auto_login['subdomain']),
-                to_bytes(self.auto_login['username']),
-                to_bytes(self.auto_login['secret_key']),
-                '--output=raw',
+                "signin",
+                f"{self.auto_login['subdomain']}.1password.com",
+                to_bytes(self.auto_login["username"]),
+                to_bytes(self.auto_login["secret_key"]),
+                "--output=raw",
             ]
 
             try:
-                rc, out, err = self._run(args, command_input=to_bytes(self.auto_login['master_password']))
+                rc, out, err = self._run(args, command_input=to_bytes(self.auto_login["master_password"]))
                 self.token = out.strip()
             except AnsibleModuleError as e:
-                module.fail_json(msg="Failed to perform initial sign in to 1Password: %s" % to_native(e))
+                module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {to_native(e)}")
         else:
-            module.fail_json(msg="Unable to perform an initial sign in to 1Password. Please run '%s signin' "
-                                 "or define credentials in 'auto_login'. See the module documentation for details." % self.cli_path)
+            module.fail_json(
+                msg=f"Unable to perform an initial sign in to 1Password. Please run '{self.cli_path} signin' "
+                "or define credentials in 'auto_login'. See the module documentation for details."
+            )
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
         if os.path.isfile(self._config.config_file_path):
-
             if self.auto_login is not None:
-
                 # Since we are not currently signed in, master_password is required at a minimum
-                if not self.auto_login.get('master_password'):
+                if not self.auto_login.get("master_password"):
                     module.fail_json(msg="Unable to sign in to 1Password. 'auto_login.master_password' is required.")
 
                 # Try signing in using the master_password and a subdomain if one is provided
                 try:
-                    args = ['signin', '--output=raw']
+                    args = ["signin", "--output=raw"]
 
-                    if self.auto_login.get('subdomain'):
-                        args = ['signin', self.auto_login['subdomain'], '--output=raw']
+                    if self.auto_login.get("subdomain"):
+                        args = ["signin", self.auto_login["subdomain"], "--output=raw"]
 
-                    rc, out, err = self._run(args, command_input=to_bytes(self.auto_login['master_password']))
+                    rc, out, err = self._run(args, command_input=to_bytes(self.auto_login["master_password"]))
                     self.token = out.strip()
 
                 except AnsibleModuleError:
@@ -334,14 +339,14 @@ class OnePasswordInfo(object):
 
     def assert_logged_in(self):
         try:
-            rc, out, err = self._run(['get', 'account'], ignore_errors=True)
+            rc, out, err = self._run(["get", "account"], ignore_errors=True)
             if rc == 0:
                 self.logged_in = True
             if not self.logged_in:
                 self.get_token()
         except OSError as e:
             if e.errno == errno.ENOENT:
-                module.fail_json(msg="1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
+                module.fail_json(msg=f"1Password CLI tool '{self.cli_path}' not installed in path on control machine")
             raise e
 
     def run(self):
@@ -350,16 +355,16 @@ class OnePasswordInfo(object):
         self.assert_logged_in()
 
         for term in self.terms:
-            value = self.get_field(term['name'], term['field'], term['section'], term['vault'])
+            value = self.get_field(term["name"], term["field"], term["section"], term["vault"])
 
-            if term['name'] in result:
+            if term["name"] in result:
                 # If we already have a result for this key, we have to append this result dictionary
                 # to the existing one. This is only applicable when there is a single item
                 # in 1Password which has two different fields, and we want to retrieve both of them.
-                result[term['name']].update(value)
+                result[term["name"]].update(value)
             else:
                 # If this is the first result for this key, simply set it.
-                result[term['name']] = value
+                result[term["name"]] = value
 
         return result
 
@@ -368,22 +373,25 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            cli_path=dict(type='path', default='op'),
-            auto_login=dict(type='dict', options=dict(
-                subdomain=dict(type='str'),
-                username=dict(type='str'),
-                master_password=dict(required=True, type='str', no_log=True),
-                secret_key=dict(type='str', no_log=True),
-            )),
-            search_terms=dict(required=True, type='list', elements='dict'),
+            cli_path=dict(type="path", default="op"),
+            auto_login=dict(
+                type="dict",
+                options=dict(
+                    subdomain=dict(type="str"),
+                    username=dict(type="str"),
+                    master_password=dict(required=True, type="str", no_log=True),
+                    secret_key=dict(type="str", no_log=True),
+                ),
+            ),
+            search_terms=dict(required=True, type="list", elements="dict"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    results = {'onepassword': OnePasswordInfo().run()}
+    results = {"onepassword": OnePasswordInfo().run()}
 
     module.exit_json(changed=False, **results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

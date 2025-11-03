@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: locale_gen
@@ -107,7 +105,7 @@ class LocaleGen(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             name=dict(type="list", elements="str", required=True),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
         ),
         supports_check_mode=True,
     )
@@ -134,12 +132,11 @@ class LocaleGen(StateModuleHelper):
                 "On this machine mechanism=ubuntu_legacy is used. This mechanism is deprecated and will be removed from"
                 " in community.general 13.0.0. If you see this message on a modern Debian or Ubuntu version,"
                 " please create an issue in the community.general repository",
-                version="13.0.0", collection_name="community.general"
+                version="13.0.0",
+                collection_name="community.general",
             )
         else:
-            self.do_raise('{0} and {1} are missing. Is the package "locales" installed?'.format(
-                VAR_LIB_LOCALES, ETC_LOCALE_GEN
-            ))
+            self.do_raise(f'{VAR_LIB_LOCALES} and {ETC_LOCALE_GEN} are missing. Is the package "locales" installed?')
 
         self.runner = locale_runner(self.module)
 
@@ -159,11 +156,11 @@ class LocaleGen(StateModuleHelper):
         checking either :
         * if the locale is present in /etc/locales.gen
         * or if the locale is present in /usr/share/i18n/SUPPORTED"""
-        regexp = r'^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$'
+        regexp = r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$"
         locales_available = self.MECHANISMS[self.vars.mechanism]["available"]
 
         re_compiled = re.compile(regexp)
-        with open(locales_available, 'r') as fd:
+        with open(locales_available, "r") as fd:
             lines = fd.readlines()
         res = [re_compiled.match(line) for line in lines]
         self.vars.set("available_lines", lines, verbosity=4)
@@ -178,7 +175,9 @@ class LocaleGen(StateModuleHelper):
         locales_not_found = self.locale_get_not_present(locales_not_found)
 
         if locales_not_found:
-            self.do_raise("The following locales you have entered are not available on your system: {0}".format(', '.join(locales_not_found)))
+            self.do_raise(
+                f"The following locales you have entered are not available on your system: {', '.join(locales_not_found)}"
+            )
 
     def is_present(self):
         return not self.locale_get_not_present(self.vars.name)
@@ -205,18 +204,18 @@ class LocaleGen(StateModuleHelper):
         return name
 
     def set_locale_glibc(self, names, enabled=True):
-        """ Sets the state of the locale. Defaults to enabled. """
-        with open(ETC_LOCALE_GEN, 'r') as fr:
+        """Sets the state of the locale. Defaults to enabled."""
+        with open(ETC_LOCALE_GEN, "r") as fr:
             lines = fr.readlines()
 
         locale_regexes = []
 
         for name in names:
-            search_string = r'^#?\s*%s (?P<charset>.+)' % re.escape(name)
+            search_string = rf"^#?\s*{re.escape(name)} (?P<charset>.+)"
             if enabled:
-                new_string = r'%s \g<charset>' % (name)
+                new_string = rf"{name} \g<charset>"
             else:
-                new_string = r'# %s \g<charset>' % (name)
+                new_string = rf"# {name} \g<charset>"
             re_search = re.compile(search_string)
             locale_regexes.append([re_search, new_string])
 
@@ -225,7 +224,7 @@ class LocaleGen(StateModuleHelper):
                 lines[i] = search.sub(replace, lines[i])
 
         # Write the modified content back to the file
-        with open(ETC_LOCALE_GEN, 'w') as fw:
+        with open(ETC_LOCALE_GEN, "w") as fw:
             fw.writelines(lines)
 
     def apply_change_glibc(self, targetState, names):
@@ -262,7 +261,7 @@ class LocaleGen(StateModuleHelper):
                 content = fr.readlines()
             with open(VAR_LIB_LOCALES_LOCAL, "w") as fw:
                 for line in content:
-                    locale, charset = line.split(' ')
+                    locale, charset = line.split(" ")
                     if locale not in names:
                         fw.write(line)
             # Purge locales and regenerate.
@@ -281,5 +280,5 @@ def main():
     LocaleGen.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

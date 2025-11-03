@@ -1,16 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2023 Aritra Sen <aretrosen@proton.me>
 # Copyright (c) 2017 Chris Hoffman <christopher.hoffman@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: pnpm
@@ -162,10 +157,9 @@ import json
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
-class Pnpm(object):
+class Pnpm:
     def __init__(self, module, **kwargs):
         self.module = module
         self.name = kwargs["name"]
@@ -183,14 +177,14 @@ class Pnpm(object):
         self.alias_name_ver = None
 
         if self.alias is not None:
-            self.alias_name_ver = self.alias + "@npm:"
+            self.alias_name_ver = f"{self.alias}@npm:"
 
         if self.name is not None:
             self.alias_name_ver = (self.alias_name_ver or "") + self.name
             if self.version is not None:
-                self.alias_name_ver = self.alias_name_ver + "@" + str(self.version)
+                self.alias_name_ver = f"{self.alias_name_ver}@{self.version!s}"
             else:
-                self.alias_name_ver = self.alias_name_ver + "@latest"
+                self.alias_name_ver = f"{self.alias_name_ver}@latest"
 
     def _exec(self, args, run_in_check_mode=False, check_rc=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
@@ -221,14 +215,10 @@ class Pnpm(object):
                     os.makedirs(self.path)
 
                 if not os.path.isdir(self.path):
-                    self.module.fail_json(msg="Path %s is not a directory" % self.path)
+                    self.module.fail_json(msg=f"Path {self.path} is not a directory")
 
-                if not self.alias_name_ver and not os.path.isfile(
-                    os.path.join(self.path, "package.json")
-                ):
-                    self.module.fail_json(
-                        msg="package.json does not exist in provided path"
-                    )
+                if not self.alias_name_ver and not os.path.isfile(os.path.join(self.path, "package.json")):
+                    self.module.fail_json(msg="package.json does not exist in provided path")
 
                 cwd = self.path
 
@@ -253,9 +243,7 @@ class Pnpm(object):
 
             data = json.loads(out)
         except Exception as e:
-            self.module.fail_json(
-                msg="Failed to parse pnpm output with error %s" % to_native(e)
-            )
+            self.module.fail_json(msg=f"Failed to parse pnpm output with error {e}")
 
         if "error" in data:
             return True
@@ -330,9 +318,7 @@ class Pnpm(object):
 
             data = json.loads(out)
         except Exception as e:
-            self.module.fail_json(
-                msg="Failed to parse pnpm output with error %s" % to_native(e)
-            )
+            self.module.fail_json(msg=f"Failed to parse pnpm output with error {e}")
 
         return data.keys()
 
@@ -383,17 +369,13 @@ def main():
         module.fail_json(msg="Cannot specify path when doing global installation")
 
     if globally and (production or dev or optional):
-        module.fail_json(
-            msg="Options production, dev, and optional is meaningless when installing packages globally"
-        )
+        module.fail_json(msg="Options production, dev, and optional is meaningless when installing packages globally")
 
     if name is not None and path is not None and globally:
         module.fail_json(msg="path should not be mentioned when installing globally")
 
     if production and dev and optional:
-        module.fail_json(
-            msg="Options production and dev and optional don't go together"
-        )
+        module.fail_json(msg="Options production and dev and optional don't go together")
 
     if production and dev:
         module.fail_json(msg="Options production and dev don't go together")
@@ -408,9 +390,7 @@ def main():
         module.fail_json(msg="Semver not supported on remote url downloads")
 
     if name is None and optional:
-        module.fail_json(
-            msg="Optional not available when package name not provided, use no_optional instead"
-        )
+        module.fail_json(msg="Optional not available when package name not provided, use no_optional instead")
 
     if state == "absent" and name is None:
         module.fail_json(msg="Package name is required for uninstalling")

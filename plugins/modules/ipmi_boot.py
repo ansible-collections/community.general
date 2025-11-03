@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -146,37 +144,37 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            port=dict(default=623, type='int'),
+            port=dict(default=623, type="int"),
             user=dict(required=True, no_log=True),
             password=dict(required=True, no_log=True),
-            key=dict(type='str', no_log=True),
-            state=dict(default='present', choices=['present', 'absent']),
-            bootdev=dict(required=True, choices=['network', 'hd', 'floppy', 'safe', 'optical', 'setup', 'default']),
-            persistent=dict(default=False, type='bool'),
-            uefiboot=dict(default=False, type='bool')
+            key=dict(type="str", no_log=True),
+            state=dict(default="present", choices=["present", "absent"]),
+            bootdev=dict(required=True, choices=["network", "hd", "floppy", "safe", "optical", "setup", "default"]),
+            persistent=dict(default=False, type="bool"),
+            uefiboot=dict(default=False, type="bool"),
         ),
         supports_check_mode=True,
     )
 
     if command is None:
-        module.fail_json(msg=missing_required_lib('pyghmi'), exception=PYGHMI_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pyghmi"), exception=PYGHMI_IMP_ERR)
 
-    name = module.params['name']
-    port = module.params['port']
-    user = module.params['user']
-    password = module.params['password']
-    state = module.params['state']
-    bootdev = module.params['bootdev']
-    persistent = module.params['persistent']
-    uefiboot = module.params['uefiboot']
+    name = module.params["name"]
+    port = module.params["port"]
+    user = module.params["user"]
+    password = module.params["password"]
+    state = module.params["state"]
+    bootdev = module.params["bootdev"]
+    persistent = module.params["persistent"]
+    uefiboot = module.params["uefiboot"]
     request = dict()
 
-    if state == 'absent' and bootdev == 'default':
+    if state == "absent" and bootdev == "default":
         module.fail_json(msg="The bootdev 'default' cannot be used with state 'absent'.")
 
     try:
-        if module.params['key']:
-            key = binascii.unhexlify(module.params['key'])
+        if module.params["key"]:
+            key = binascii.unhexlify(module.params["key"])
         else:
             key = None
     except Exception as e:
@@ -184,37 +182,35 @@ def main():
 
     # --- run command ---
     try:
-        ipmi_cmd = command.Command(
-            bmc=name, userid=user, password=password, port=port, kg=key
-        )
-        module.debug('ipmi instantiated - name: "%s"' % name)
+        ipmi_cmd = command.Command(bmc=name, userid=user, password=password, port=port, kg=key)
+        module.debug(f'ipmi instantiated - name: "{name}"')
         current = ipmi_cmd.get_bootdev()
         # uefimode may not supported by BMC, so use desired value as default
-        current.setdefault('uefimode', uefiboot)
-        if state == 'present' and current != dict(bootdev=bootdev, persistent=persistent, uefimode=uefiboot):
+        current.setdefault("uefimode", uefiboot)
+        if state == "present" and current != dict(bootdev=bootdev, persistent=persistent, uefimode=uefiboot):
             request = dict(bootdev=bootdev, uefiboot=uefiboot, persist=persistent)
-        elif state == 'absent' and current['bootdev'] == bootdev:
-            request = dict(bootdev='default')
+        elif state == "absent" and current["bootdev"] == bootdev:
+            request = dict(bootdev="default")
         else:
             module.exit_json(changed=False, **current)
 
         if module.check_mode:
-            response = dict(bootdev=request['bootdev'])
+            response = dict(bootdev=request["bootdev"])
         else:
             response = ipmi_cmd.set_bootdev(**request)
 
-        if 'error' in response:
-            module.fail_json(msg=response['error'])
+        if "error" in response:
+            module.fail_json(msg=response["error"])
 
-        if 'persist' in request:
-            response['persistent'] = request['persist']
-        if 'uefiboot' in request:
-            response['uefimode'] = request['uefiboot']
+        if "persist" in request:
+            response["persistent"] = request["persist"]
+        if "uefiboot" in request:
+            response["uefimode"] = request["uefiboot"]
 
         module.exit_json(changed=True, **response)
     except Exception as e:
         module.fail_json(msg=str(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

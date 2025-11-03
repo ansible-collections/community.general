@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2025, Max Mitschke <maxmitschke@fastmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: print_task
@@ -30,7 +28,7 @@ try:
     from yaml import CSafeDumper as SafeDumper
     from yaml import CSafeLoader as SafeLoader
 except ImportError:
-    from yaml import SafeDumper, SafeLoader
+    from yaml import SafeDumper, SafeLoader  # type: ignore
 
 from ansible.plugins.callback import CallbackBase
 
@@ -39,18 +37,19 @@ class CallbackModule(CallbackBase):
     """
     This callback module tells you how long your plays ran for.
     """
+
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'community.general.print_task'
+    CALLBACK_TYPE = "aggregate"
+    CALLBACK_NAME = "community.general.print_task"
 
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self):
-        super(CallbackModule, self).__init__()
+        super().__init__()
         self._printed_message = False
 
     def _print_task(self, task):
-        if hasattr(task, '_ds'):
+        if hasattr(task, "_ds"):
             task_snippet = load(str([task._ds.copy()]), Loader=SafeLoader)
             task_yaml = dump(task_snippet, sort_keys=False, Dumper=SafeDumper)
             self._display.display(f"\n{task_yaml}\n")

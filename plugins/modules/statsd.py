@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: statsd
@@ -102,10 +100,11 @@ EXAMPLES = r"""
 """
 
 
-from ansible.module_utils.basic import (AnsibleModule, missing_required_lib)
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 try:
     from statsd import StatsClient, TCPStatsClient
+
     HAS_STATSD = True
 except ImportError:
     HAS_STATSD = False
@@ -120,59 +119,58 @@ def tcp_statsd_client(**client_params):
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['present']),
-            host=dict(type='str', default='localhost'),
-            port=dict(type='int', default=8125),
-            protocol=dict(type='str', default='udp', choices=['udp', 'tcp']),
-            timeout=dict(type='float', default=1.0),
-            metric=dict(type='str', required=True),
-            metric_type=dict(type='str', required=True, choices=['counter', 'gauge']),
-            metric_prefix=dict(type='str', default=''),
-            value=dict(type='int', required=True),
-            delta=dict(type='bool', default=False),
+            state=dict(type="str", default="present", choices=["present"]),
+            host=dict(type="str", default="localhost"),
+            port=dict(type="int", default=8125),
+            protocol=dict(type="str", default="udp", choices=["udp", "tcp"]),
+            timeout=dict(type="float", default=1.0),
+            metric=dict(type="str", required=True),
+            metric_type=dict(type="str", required=True, choices=["counter", "gauge"]),
+            metric_prefix=dict(type="str", default=""),
+            value=dict(type="int", required=True),
+            delta=dict(type="bool", default=False),
         ),
-        supports_check_mode=False
+        supports_check_mode=False,
     )
 
     if not HAS_STATSD:
-        module.fail_json(msg=missing_required_lib('statsd'))
+        module.fail_json(msg=missing_required_lib("statsd"))
 
-    host = module.params.get('host')
-    port = module.params.get('port')
-    protocol = module.params.get('protocol')
-    timeout = module.params.get('timeout')
-    metric = module.params.get('metric')
-    metric_type = module.params.get('metric_type')
-    metric_prefix = module.params.get('metric_prefix')
-    value = module.params.get('value')
-    delta = module.params.get('delta')
+    host = module.params.get("host")
+    port = module.params.get("port")
+    protocol = module.params.get("protocol")
+    timeout = module.params.get("timeout")
+    metric = module.params.get("metric")
+    metric_type = module.params.get("metric_type")
+    metric_prefix = module.params.get("metric_prefix")
+    value = module.params.get("value")
+    delta = module.params.get("delta")
 
-    if protocol == 'udp':
+    if protocol == "udp":
         client = udp_statsd_client(host=host, port=port, prefix=metric_prefix, maxudpsize=512, ipv6=False)
-    elif protocol == 'tcp':
+    elif protocol == "tcp":
         client = tcp_statsd_client(host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
 
-    metric_name = '%s/%s' % (metric_prefix, metric) if metric_prefix else metric
-    metric_display_value = '%s (delta=%s)' % (value, delta) if metric_type == 'gauge' else value
+    metric_name = f"{metric_prefix}/{metric}" if metric_prefix else metric
+    metric_display_value = f"{value} (delta={delta})" if metric_type == "gauge" else value
 
     try:
-        if metric_type == 'counter':
+        if metric_type == "counter":
             client.incr(metric, value)
-        elif metric_type == 'gauge':
+        elif metric_type == "gauge":
             client.gauge(metric, value, delta=delta)
 
     except Exception as exc:
-        module.fail_json(msg='Failed sending to StatsD %s' % str(exc))
+        module.fail_json(msg=f"Failed sending to StatsD {exc}")
 
     finally:
-        if protocol == 'tcp':
+        if protocol == "tcp":
             client.close()
 
-    module.exit_json(msg="Sent %s %s -> %s to StatsD" % (metric_type, metric_name, str(metric_display_value)), changed=True)
+    module.exit_json(msg=f"Sent {metric_type} {metric_name} -> {metric_display_value!s} to StatsD", changed=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

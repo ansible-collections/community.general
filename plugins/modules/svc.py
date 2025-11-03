@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2015, Brian Coca <bcoca@ansible.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: svc
@@ -100,12 +98,12 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def _load_dist_subclass(cls, *args, **kwargs):
-    '''
+    """
     Used for derivative implementations
-    '''
+    """
     subclass = None
 
-    distro = kwargs['module'].params['distro']
+    distro = kwargs["module"].params["distro"]
 
     # get the most specific superclass for this platform
     if distro is not None:
@@ -118,7 +116,7 @@ def _load_dist_subclass(cls, *args, **kwargs):
     return super(cls, subclass).__new__(subclass)
 
 
-class Svc(object):
+class Svc:
     """
     Main class that handles daemontools, can be subclassed and overridden in case
     we want to use a 'derivative' like encore, s6, etc
@@ -128,14 +126,14 @@ class Svc(object):
     #    return _load_dist_subclass(cls, args, kwargs)
 
     def __init__(self, module):
-        self.extra_paths = ['/command', '/usr/local/bin']
-        self.report_vars = ['state', 'enabled', 'downed', 'svc_full', 'src_full', 'pid', 'duration', 'full_state']
+        self.extra_paths = ["/command", "/usr/local/bin"]
+        self.report_vars = ["state", "enabled", "downed", "svc_full", "src_full", "pid", "duration", "full_state"]
 
         self.module = module
 
-        self.name = module.params['name']
-        self.service_dir = module.params['service_dir']
-        self.service_src = module.params['service_src']
+        self.name = module.params["name"]
+        self.service_dir = module.params["service_dir"]
+        self.service_src = module.params["service_src"]
         self.enabled = None
         self.downed = None
         self.full_state = None
@@ -143,38 +141,38 @@ class Svc(object):
         self.pid = None
         self.duration = None
 
-        self.svc_cmd = module.get_bin_path('svc', opt_dirs=self.extra_paths)
-        self.svstat_cmd = module.get_bin_path('svstat', opt_dirs=self.extra_paths)
-        self.svc_full = '/'.join([self.service_dir, self.name])
-        self.src_full = '/'.join([self.service_src, self.name])
+        self.svc_cmd = module.get_bin_path("svc", opt_dirs=self.extra_paths)
+        self.svstat_cmd = module.get_bin_path("svstat", opt_dirs=self.extra_paths)
+        self.svc_full = f"{self.service_dir}/{self.name}"
+        self.src_full = f"{self.service_src}/{self.name}"
 
         self.enabled = os.path.lexists(self.svc_full)
         if self.enabled:
-            self.downed = os.path.lexists('%s/down' % self.svc_full)
+            self.downed = os.path.lexists(f"{self.svc_full}/down")
             self.get_status()
         else:
-            self.downed = os.path.lexists('%s/down' % self.src_full)
-            self.state = 'stopped'
+            self.downed = os.path.lexists(f"{self.src_full}/down")
+            self.state = "stopped"
 
     def enable(self):
         if os.path.exists(self.src_full):
             try:
                 os.symlink(self.src_full, self.svc_full)
             except OSError as e:
-                self.module.fail_json(path=self.src_full, msg='Error while linking: %s' % to_native(e))
+                self.module.fail_json(path=self.src_full, msg=f"Error while linking: {to_native(e)}")
         else:
-            self.module.fail_json(msg="Could not find source for service to enable (%s)." % self.src_full)
+            self.module.fail_json(msg=f"Could not find source for service to enable ({self.src_full}).")
 
     def disable(self):
         try:
             os.unlink(self.svc_full)
         except OSError as e:
-            self.module.fail_json(path=self.svc_full, msg='Error while unlinking: %s' % to_native(e))
-        self.execute_command([self.svc_cmd, '-dx', self.src_full])
+            self.module.fail_json(path=self.svc_full, msg=f"Error while unlinking: {e}")
+        self.execute_command([self.svc_cmd, "-dx", self.src_full])
 
-        src_log = '%s/log' % self.src_full
+        src_log = f"{self.src_full}/log"
         if os.path.exists(src_log):
-            self.execute_command([self.svc_cmd, '-dx', src_log])
+            self.execute_command([self.svc_cmd, "-dx", src_log])
 
     def get_status(self):
         rc, out, err = self.execute_command([self.svstat_cmd, self.svc_full])
@@ -184,53 +182,53 @@ class Svc(object):
         else:
             self.full_state = out
 
-            m = re.search(r'\(pid (\d+)\)', out)
+            m = re.search(r"\(pid (\d+)\)", out)
             if m:
                 self.pid = m.group(1)
 
-            m = re.search(r'(\d+) seconds', out)
+            m = re.search(r"(\d+) seconds", out)
             if m:
                 self.duration = m.group(1)
 
-            if re.search(' up ', out):
-                self.state = 'start'
-            elif re.search(' down ', out):
-                self.state = 'stopp'
+            if re.search(" up ", out):
+                self.state = "start"
+            elif re.search(" down ", out):
+                self.state = "stopp"
             else:
-                self.state = 'unknown'
+                self.state = "unknown"
                 return
 
-            if re.search(' want ', out):
-                self.state += 'ing'
+            if re.search(" want ", out):
+                self.state += "ing"
             else:
-                self.state += 'ed'
+                self.state += "ed"
 
     def start(self):
-        return self.execute_command([self.svc_cmd, '-u', self.svc_full])
+        return self.execute_command([self.svc_cmd, "-u", self.svc_full])
 
     def stopp(self):
         return self.stop()
 
     def stop(self):
-        return self.execute_command([self.svc_cmd, '-d', self.svc_full])
+        return self.execute_command([self.svc_cmd, "-d", self.svc_full])
 
     def once(self):
-        return self.execute_command([self.svc_cmd, '-o', self.svc_full])
+        return self.execute_command([self.svc_cmd, "-o", self.svc_full])
 
     def reload(self):
-        return self.execute_command([self.svc_cmd, '-1', self.svc_full])
+        return self.execute_command([self.svc_cmd, "-1", self.svc_full])
 
     def restart(self):
-        return self.execute_command([self.svc_cmd, '-t', self.svc_full])
+        return self.execute_command([self.svc_cmd, "-t", self.svc_full])
 
     def kill(self):
-        return self.execute_command([self.svc_cmd, '-k', self.svc_full])
+        return self.execute_command([self.svc_cmd, "-k", self.svc_full])
 
     def execute_command(self, cmd):
         try:
             rc, out, err = self.module.run_command(cmd)
         except Exception as e:
-            self.module.fail_json(msg="failed to execute: %s" % to_native(e), exception=traceback.format_exc())
+            self.module.fail_json(msg=f"failed to execute: {e}", exception=traceback.format_exc())
         return (rc, out, err)
 
     def report(self):
@@ -244,24 +242,25 @@ class Svc(object):
 # ===========================================
 # Main control flow
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            state=dict(type='str', choices=['killed', 'once', 'reloaded', 'restarted', 'started', 'stopped']),
-            enabled=dict(type='bool'),
-            downed=dict(type='bool'),
-            service_dir=dict(type='str', default='/service'),
-            service_src=dict(type='str', default='/etc/service'),
+            name=dict(type="str", required=True),
+            state=dict(type="str", choices=["killed", "once", "reloaded", "restarted", "started", "stopped"]),
+            enabled=dict(type="bool"),
+            downed=dict(type="bool"),
+            service_dir=dict(type="str", default="/service"),
+            service_src=dict(type="str", default="/etc/service"),
         ),
         supports_check_mode=True,
     )
 
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
-    state = module.params['state']
-    enabled = module.params['enabled']
-    downed = module.params['downed']
+    state = module.params["state"]
+    enabled = module.params["enabled"]
+    downed = module.params["downed"]
 
     svc = Svc(module)
     changed = False
@@ -276,7 +275,7 @@ def main():
                 else:
                     svc.disable()
             except (OSError, IOError) as e:
-                module.fail_json(msg="Could not change service link: %s" % to_native(e))
+                module.fail_json(msg=f"Could not change service link: {e}")
 
     if state is not None and state != svc.state:
         changed = True
@@ -286,17 +285,17 @@ def main():
     if downed is not None and downed != svc.downed:
         changed = True
         if not module.check_mode:
-            d_file = "%s/down" % svc.svc_full
+            d_file = f"{svc.svc_full}/down"
             try:
                 if downed:
                     open(d_file, "a").close()
                 else:
                     os.unlink(d_file)
             except (OSError, IOError) as e:
-                module.fail_json(msg="Could not change downed file: %s " % (to_native(e)))
+                module.fail_json(msg=f"Could not change downed file: {e} ")
 
     module.exit_json(changed=changed, svc=svc.report())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, 2014, Jan-Piet Mens <jpmens () gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -122,9 +120,6 @@ EXAMPLES = r"""
 import os
 import ssl
 import traceback
-import platform
-
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 HAS_PAHOMQTT = True
 PAHOMQTT_IMP_ERR = None
@@ -136,53 +131,52 @@ except ImportError:
     HAS_PAHOMQTT = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 # ===========================================
 # Main
 #
 
+
 def main():
-    tls_map = {}
-
-    try:
-        tls_map['tlsv1.2'] = ssl.PROTOCOL_TLSv1_2
-    except AttributeError:
-        pass
-
-    try:
-        tls_map['tlsv1.1'] = ssl.PROTOCOL_TLSv1_1
-    except AttributeError:
-        pass
+    # From https://docs.python.org/3/library/ssl.html#constants, this:
+    #
+    # > Deprecated since version 3.6: OpenSSL has deprecated all version specific protocols. Use the default protocol PROTOCOL_TLS_SERVER or
+    # > PROTOCOL_TLS_CLIENT with SSLContext.minimum_version and SSLContext.maximum_version instead.
+    #
+    # @TODO: update the use of `ssl` constants
+    tls_map = {
+        "tlsv1.2": ssl.PROTOCOL_TLSv1_2,
+        "tlsv1.1": ssl.PROTOCOL_TLSv1_1,
+    }
 
     module = AnsibleModule(
         argument_spec=dict(
-            server=dict(default='localhost'),
-            port=dict(default=1883, type='int'),
+            server=dict(default="localhost"),
+            port=dict(default=1883, type="int"),
             topic=dict(required=True),
             payload=dict(required=True),
             client_id=dict(),
             qos=dict(default="0", choices=["0", "1", "2"]),
-            retain=dict(default=False, type='bool'),
+            retain=dict(default=False, type="bool"),
             username=dict(),
             password=dict(no_log=True),
-            ca_cert=dict(type='path', aliases=['ca_certs']),
-            client_cert=dict(type='path', aliases=['certfile']),
-            client_key=dict(type='path', aliases=['keyfile']),
-            tls_version=dict(choices=['tlsv1.1', 'tlsv1.2'])
+            ca_cert=dict(type="path", aliases=["ca_certs"]),
+            client_cert=dict(type="path", aliases=["certfile"]),
+            client_key=dict(type="path", aliases=["keyfile"]),
+            tls_version=dict(choices=["tlsv1.1", "tlsv1.2"]),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not HAS_PAHOMQTT:
-        module.fail_json(msg=missing_required_lib('paho-mqtt'), exception=PAHOMQTT_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("paho-mqtt"), exception=PAHOMQTT_IMP_ERR)
 
-    server = module.params.get("server", 'localhost')
+    server = module.params.get("server", "localhost")
     port = module.params.get("port", 1883)
     topic = module.params.get("topic")
     payload = module.params.get("payload")
-    client_id = module.params.get("client_id", '')
+    client_id = module.params.get("client_id", "")
     qos = int(module.params.get("qos", 0))
     retain = module.params.get("retain")
     username = module.params.get("username", None)
@@ -193,56 +187,36 @@ def main():
     tls_version = module.params.get("tls_version", None)
 
     if client_id is None:
-        client_id = "%s_%s" % (socket.getfqdn(), os.getpid())
+        client_id = f"{socket.getfqdn()}_{os.getpid()}"
 
-    if payload and payload == 'None':
+    if payload and payload == "None":
         payload = None
 
     auth = None
     if username is not None:
-        auth = {'username': username, 'password': password}
+        auth = {"username": username, "password": password}
 
     tls = None
     if ca_certs is not None:
         if tls_version:
-            tls_version = tls_map.get(tls_version, ssl.PROTOCOL_SSLv23)
-        else:
-            if LooseVersion(platform.python_version()) <= LooseVersion("3.5.2"):
-                # Specifying `None` on later versions of python seems sufficient to
-                # instruct python to autonegotiate the SSL/TLS connection. On versions
-                # 3.5.2 and lower though we need to specify the version.
-                #
-                # Note that this is an alias for PROTOCOL_TLS, but PROTOCOL_TLS was
-                # not available until 3.5.3.
-                tls_version = ssl.PROTOCOL_SSLv23
+            tls_version = tls_map.get(tls_version, ssl.PROTOCOL_TLS)
 
         tls = {
-            'ca_certs': ca_certs,
-            'certfile': certfile,
-            'keyfile': keyfile,
-            'tls_version': tls_version,
+            "ca_certs": ca_certs,
+            "certfile": certfile,
+            "keyfile": keyfile,
+            "tls_version": tls_version,
         }
 
     try:
         mqtt.single(
-            topic,
-            payload,
-            qos=qos,
-            retain=retain,
-            client_id=client_id,
-            hostname=server,
-            port=port,
-            auth=auth,
-            tls=tls
+            topic, payload, qos=qos, retain=retain, client_id=client_id, hostname=server, port=port, auth=auth, tls=tls
         )
     except Exception as e:
-        module.fail_json(
-            msg="unable to publish to MQTT broker %s" % to_native(e),
-            exception=traceback.format_exc()
-        )
+        module.fail_json(msg=f"unable to publish to MQTT broker {e}", exception=traceback.format_exc())
 
     module.exit_json(changed=False, topic=topic)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

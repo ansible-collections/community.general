@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_user_federation
@@ -720,34 +718,39 @@ end_state:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 from copy import deepcopy
 
 
 def normalize_kc_comp(comp):
-    if 'config' in comp:
+    if "config" in comp:
         # kc completely removes the parameter `krbPrincipalAttribute` if it is set to `''`; the unset kc parameter is equivalent to `''`;
         # to make change detection and diff more accurate we set it again in the kc responses
-        if 'krbPrincipalAttribute' not in comp['config']:
-            comp['config']['krbPrincipalAttribute'] = ['']
+        if "krbPrincipalAttribute" not in comp["config"]:
+            comp["config"]["krbPrincipalAttribute"] = [""]
 
         # kc stores a timestamp of the last sync in `lastSync` to time the periodic sync, it is removed to minimize diff/changes
-        comp['config'].pop('lastSync', None)
+        comp["config"].pop("lastSync", None)
 
 
 def sanitize(comp):
     compcopy = deepcopy(comp)
-    if 'config' in compcopy:
-        compcopy['config'] = {k: v[0] for k, v in compcopy['config'].items()}
-        if 'bindCredential' in compcopy['config']:
-            compcopy['config']['bindCredential'] = '**********'
-    if 'mappers' in compcopy:
-        for mapper in compcopy['mappers']:
-            if 'config' in mapper:
-                mapper['config'] = {k: v[0] for k, v in mapper['config'].items()}
+    if "config" in compcopy:
+        compcopy["config"] = {k: v[0] for k, v in compcopy["config"].items()}
+        if "bindCredential" in compcopy["config"]:
+            compcopy["config"]["bindCredential"] = "**********"
+    if "mappers" in compcopy:
+        for mapper in compcopy["mappers"]:
+            if "config" in mapper:
+                mapper["config"] = {k: v[0] for k, v in mapper["config"].items()}
     return compcopy
 
 
@@ -760,93 +763,102 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     config_spec = dict(
-        allowKerberosAuthentication=dict(type='bool', default=False),
-        allowPasswordAuthentication=dict(type='bool'),
-        authType=dict(type='str', choices=['none', 'simple'], default='none'),
-        batchSizeForSync=dict(type='int', default=1000),
-        bindCredential=dict(type='str', no_log=True),
-        bindDn=dict(type='str'),
-        cachePolicy=dict(type='str', choices=['DEFAULT', 'EVICT_DAILY', 'EVICT_WEEKLY', 'MAX_LIFESPAN', 'NO_CACHE'], default='DEFAULT'),
-        changedSyncPeriod=dict(type='int', default=-1),
-        connectionPooling=dict(type='bool', default=True),
-        connectionPoolingAuthentication=dict(type='str', choices=['none', 'simple', 'DIGEST-MD5']),
-        connectionPoolingDebug=dict(type='str'),
-        connectionPoolingInitSize=dict(type='int'),
-        connectionPoolingMaxSize=dict(type='int'),
-        connectionPoolingPrefSize=dict(type='int'),
-        connectionPoolingProtocol=dict(type='str'),
-        connectionPoolingTimeout=dict(type='int'),
-        connectionTimeout=dict(type='int'),
-        connectionUrl=dict(type='str'),
-        customUserSearchFilter=dict(type='str'),
-        debug=dict(type='bool'),
-        editMode=dict(type='str', choices=['READ_ONLY', 'WRITABLE', 'UNSYNCED']),
-        enabled=dict(type='bool', default=True),
-        evictionDay=dict(type='str'),
-        evictionHour=dict(type='str'),
-        evictionMinute=dict(type='str'),
-        fullSyncPeriod=dict(type='int', default=-1),
-        importEnabled=dict(type='bool', default=True),
-        kerberosRealm=dict(type='str'),
-        keyTab=dict(type='str', no_log=False),
-        maxLifespan=dict(type='int'),
-        pagination=dict(type='bool', default=True),
-        priority=dict(type='int', default=0),
-        rdnLDAPAttribute=dict(type='str'),
-        readTimeout=dict(type='int'),
-        referral=dict(type='str', choices=['ignore', 'follow']),
-        searchScope=dict(type='str', choices=['1', '2'], default='1'),
-        serverPrincipal=dict(type='str'),
-        krbPrincipalAttribute=dict(type='str'),
-        startTls=dict(type='bool', default=False),
-        syncRegistrations=dict(type='bool', default=False),
-        trustEmail=dict(type='bool', default=False),
-        updateProfileFirstLogin=dict(type='bool'),
-        useKerberosForPasswordAuthentication=dict(type='bool', default=False),
-        usePasswordModifyExtendedOp=dict(type='bool', default=False, no_log=False),
-        useTruststoreSpi=dict(type='str', choices=['always', 'ldapsOnly', 'never'], default='ldapsOnly'),
-        userObjectClasses=dict(type='str'),
-        usernameLDAPAttribute=dict(type='str'),
-        usersDn=dict(type='str'),
-        uuidLDAPAttribute=dict(type='str'),
-        validatePasswordPolicy=dict(type='bool', default=False),
-        vendor=dict(type='str'),
+        allowKerberosAuthentication=dict(type="bool", default=False),
+        allowPasswordAuthentication=dict(type="bool"),
+        authType=dict(type="str", choices=["none", "simple"], default="none"),
+        batchSizeForSync=dict(type="int", default=1000),
+        bindCredential=dict(type="str", no_log=True),
+        bindDn=dict(type="str"),
+        cachePolicy=dict(
+            type="str",
+            choices=["DEFAULT", "EVICT_DAILY", "EVICT_WEEKLY", "MAX_LIFESPAN", "NO_CACHE"],
+            default="DEFAULT",
+        ),
+        changedSyncPeriod=dict(type="int", default=-1),
+        connectionPooling=dict(type="bool", default=True),
+        connectionPoolingAuthentication=dict(type="str", choices=["none", "simple", "DIGEST-MD5"]),
+        connectionPoolingDebug=dict(type="str"),
+        connectionPoolingInitSize=dict(type="int"),
+        connectionPoolingMaxSize=dict(type="int"),
+        connectionPoolingPrefSize=dict(type="int"),
+        connectionPoolingProtocol=dict(type="str"),
+        connectionPoolingTimeout=dict(type="int"),
+        connectionTimeout=dict(type="int"),
+        connectionUrl=dict(type="str"),
+        customUserSearchFilter=dict(type="str"),
+        debug=dict(type="bool"),
+        editMode=dict(type="str", choices=["READ_ONLY", "WRITABLE", "UNSYNCED"]),
+        enabled=dict(type="bool", default=True),
+        evictionDay=dict(type="str"),
+        evictionHour=dict(type="str"),
+        evictionMinute=dict(type="str"),
+        fullSyncPeriod=dict(type="int", default=-1),
+        importEnabled=dict(type="bool", default=True),
+        kerberosRealm=dict(type="str"),
+        keyTab=dict(type="str", no_log=False),
+        maxLifespan=dict(type="int"),
+        pagination=dict(type="bool", default=True),
+        priority=dict(type="int", default=0),
+        rdnLDAPAttribute=dict(type="str"),
+        readTimeout=dict(type="int"),
+        referral=dict(type="str", choices=["ignore", "follow"]),
+        searchScope=dict(type="str", choices=["1", "2"], default="1"),
+        serverPrincipal=dict(type="str"),
+        krbPrincipalAttribute=dict(type="str"),
+        startTls=dict(type="bool", default=False),
+        syncRegistrations=dict(type="bool", default=False),
+        trustEmail=dict(type="bool", default=False),
+        updateProfileFirstLogin=dict(type="bool"),
+        useKerberosForPasswordAuthentication=dict(type="bool", default=False),
+        usePasswordModifyExtendedOp=dict(type="bool", default=False, no_log=False),
+        useTruststoreSpi=dict(type="str", choices=["always", "ldapsOnly", "never"], default="ldapsOnly"),
+        userObjectClasses=dict(type="str"),
+        usernameLDAPAttribute=dict(type="str"),
+        usersDn=dict(type="str"),
+        uuidLDAPAttribute=dict(type="str"),
+        validatePasswordPolicy=dict(type="bool", default=False),
+        vendor=dict(type="str"),
     )
 
     mapper_spec = dict(
-        id=dict(type='str'),
-        name=dict(type='str'),
-        parentId=dict(type='str'),
-        providerId=dict(type='str'),
-        providerType=dict(type='str', default='org.keycloak.storage.ldap.mappers.LDAPStorageMapper'),
-        config=dict(type='dict'),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        parentId=dict(type="str"),
+        providerId=dict(type="str"),
+        providerType=dict(type="str", default="org.keycloak.storage.ldap.mappers.LDAPStorageMapper"),
+        config=dict(type="dict"),
     )
 
     meta_args = dict(
-        config=dict(type='dict', options=config_spec),
-        state=dict(type='str', default='present', choices=['present', 'absent']),
-        realm=dict(type='str', default='master'),
-        id=dict(type='str'),
-        name=dict(type='str'),
-        provider_id=dict(type='str', aliases=['providerId']),
-        provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
-        parent_id=dict(type='str', aliases=['parentId']),
-        remove_unspecified_mappers=dict(type='bool', default=True),
-        bind_credential_update_mode=dict(type='str', default='always', choices=['always', 'only_indirect']),
-        mappers=dict(type='list', elements='dict', options=mapper_spec),
+        config=dict(type="dict", options=config_spec),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        realm=dict(type="str", default="master"),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        provider_id=dict(type="str", aliases=["providerId"]),
+        provider_type=dict(type="str", aliases=["providerType"], default="org.keycloak.storage.UserStorageProvider"),
+        parent_id=dict(type="str", aliases=["parentId"]),
+        remove_unspecified_mappers=dict(type="bool", default=True),
+        bind_credential_update_mode=dict(type="str", default="always", choices=["always", "only_indirect"]),
+        mappers=dict(type="list", elements="dict", options=mapper_spec),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['id', 'name'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [
+                ["id", "name"],
+                ["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"],
+            ]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -856,44 +868,48 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    state = module.params.get('state')
-    config = module.params.get('config')
-    mappers = module.params.get('mappers')
-    cid = module.params.get('id')
-    name = module.params.get('name')
+    realm = module.params.get("realm")
+    state = module.params.get("state")
+    config = module.params.get("config")
+    mappers = module.params.get("mappers")
+    cid = module.params.get("id")
+    name = module.params.get("name")
 
     # Keycloak API expects config parameters to be arrays containing a single string element
     if config is not None:
-        module.params['config'] = {
-            k: [str(v).lower() if not isinstance(v, str) else v]
-            for k, v in config.items()
-            if config[k] is not None
+        module.params["config"] = {
+            k: [str(v).lower() if not isinstance(v, str) else v] for k, v in config.items() if config[k] is not None
         }
 
     if mappers is not None:
         for mapper in mappers:
-            if mapper.get('config') is not None:
-                mapper['config'] = {
+            if mapper.get("config") is not None:
+                mapper["config"] = {
                     k: [str(v).lower() if not isinstance(v, str) else v]
-                    for k, v in mapper['config'].items()
-                    if mapper['config'][k] is not None
+                    for k, v in mapper["config"].items()
+                    if mapper["config"][k] is not None
                 }
 
     # Filter and map the parameters names that apply
-    comp_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys())
-                   + ['state', 'realm', 'mappers', 'remove_unspecified_mappers', 'bind_credential_update_mode']
-                   and module.params.get(x) is not None]
+    comp_params = [
+        x
+        for x in module.params
+        if x
+        not in list(keycloak_argument_spec().keys())
+        + ["state", "realm", "mappers", "remove_unspecified_mappers", "bind_credential_update_mode"]
+        and module.params.get(x) is not None
+    ]
 
     # See if it already exists in Keycloak
     if cid is None:
-        found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', name=name)), realm)
+        found = kc.get_components(urlencode(dict(type="org.keycloak.storage.UserStorageProvider", name=name)), realm)
         if len(found) > 1:
-            module.fail_json(msg='No ID given and found multiple user federations with name `{name}`. Cannot continue.'.format(name=name))
+            module.fail_json(
+                msg=f"No ID given and found multiple user federations with name `{name}`. Cannot continue."
+            )
         before_comp = next(iter(found), None)
         if before_comp is not None:
-            cid = before_comp['id']
+            cid = before_comp["id"]
     else:
         before_comp = kc.get_component(cid, realm)
 
@@ -902,7 +918,9 @@ def main():
 
     # if user federation exists, get associated mappers
     if cid is not None and before_comp:
-        before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
+        before_comp["mappers"] = sorted(
+            kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get("name") or ""
+        )
 
     normalize_kc_comp(before_comp)
 
@@ -912,29 +930,40 @@ def main():
     for param in comp_params:
         new_param_value = module.params.get(param)
         old_value = before_comp[camel(param)] if camel(param) in before_comp else None
-        if param == 'mappers':
+        if param == "mappers":
             new_param_value = [{k: v for k, v in x.items() if v is not None} for x in new_param_value]
         if new_param_value != old_value:
             changeset[camel(param)] = new_param_value
 
     # special handling of mappers list to allow change detection
-    if module.params.get('mappers') is not None:
-        if module.params['provider_id'] in ['kerberos', 'sssd']:
-            module.fail_json(msg='Cannot configure mappers for {type} provider.'.format(type=module.params['provider_id']))
-        for change in module.params['mappers']:
+    if module.params.get("mappers") is not None:
+        if module.params["provider_id"] in ["kerberos", "sssd"]:
+            module.fail_json(msg=f"Cannot configure mappers for {module.params['provider_id']} provider.")
+        for change in module.params["mappers"]:
             change = {k: v for k, v in change.items() if v is not None}
-            if change.get('id') is None and change.get('name') is None:
-                module.fail_json(msg='Either `name` or `id` has to be specified on each mapper.')
+            if change.get("id") is None and change.get("name") is None:
+                module.fail_json(msg="Either `name` or `id` has to be specified on each mapper.")
             if cid is None:
                 old_mapper = {}
-            elif change.get('id') is not None:
-                old_mapper = next((before_mapper for before_mapper in before_comp.get('mappers', []) if before_mapper["id"] == change['id']), None)
+            elif change.get("id") is not None:
+                old_mapper = next(
+                    (
+                        before_mapper
+                        for before_mapper in before_comp.get("mappers", [])
+                        if before_mapper["id"] == change["id"]
+                    ),
+                    None,
+                )
                 if old_mapper is None:
                     old_mapper = {}
             else:
-                found = [before_mapper for before_mapper in before_comp.get('mappers', []) if before_mapper['name'] == change['name']]
+                found = [
+                    before_mapper
+                    for before_mapper in before_comp.get("mappers", [])
+                    if before_mapper["name"] == change["name"]
+                ]
                 if len(found) > 1:
-                    module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=change['name']))
+                    module.fail_json(msg=f"Found multiple mappers with name `{change['name']}`. Cannot continue.")
                 if len(found) == 1:
                     old_mapper = found[0]
                 else:
@@ -942,55 +971,59 @@ def main():
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
             # changeset contains all desired mappers: those existing, to update or to create
-            if changeset.get('mappers') is None:
-                changeset['mappers'] = list()
-            changeset['mappers'].append(new_mapper)
-        changeset['mappers'] = sorted(changeset['mappers'], key=lambda x: x.get('name') or '')
+            if changeset.get("mappers") is None:
+                changeset["mappers"] = list()
+            changeset["mappers"].append(new_mapper)
+        changeset["mappers"] = sorted(changeset["mappers"], key=lambda x: x.get("name") or "")
 
         # to keep unspecified existing mappers we add them to the desired mappers list, unless they're already present
-        if not module.params['remove_unspecified_mappers'] and 'mappers' in before_comp:
-            changeset_mapper_ids = [mapper['id'] for mapper in changeset['mappers'] if 'id' in mapper]
-            changeset['mappers'].extend([mapper for mapper in before_comp['mappers'] if mapper['id'] not in changeset_mapper_ids])
+        if not module.params["remove_unspecified_mappers"] and "mappers" in before_comp:
+            changeset_mapper_ids = [mapper["id"] for mapper in changeset["mappers"] if "id" in mapper]
+            changeset["mappers"].extend(
+                [mapper for mapper in before_comp["mappers"] if mapper["id"] not in changeset_mapper_ids]
+            )
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_comp = before_comp.copy()
     desired_comp.update(changeset)
 
-    result['proposed'] = sanitize(changeset)
-    result['existing'] = sanitize(before_comp)
+    result["proposed"] = sanitize(changeset)
+    result["existing"] = sanitize(before_comp)
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_comp:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'User federation does not exist; doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "User federation does not exist; doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
+        result["changed"] = True
 
         if module.check_mode:
             if module._diff:
-                result['diff'] = dict(before='', after=sanitize(desired_comp))
+                result["diff"] = dict(before="", after=sanitize(desired_comp))
             module.exit_json(**result)
 
         # create it
-        desired_mappers = desired_comp.pop('mappers', [])
+        desired_mappers = desired_comp.pop("mappers", [])
         after_comp = kc.create_component(desired_comp, realm)
-        cid = after_comp['id']
+        cid = after_comp["id"]
         updated_mappers = []
         # when creating a user federation, keycloak automatically creates default mappers
         default_mappers = kc.get_components(urlencode(dict(parent=cid)), realm)
 
         # create new mappers or update existing default mappers
         for desired_mapper in desired_mappers:
-            found = [default_mapper for default_mapper in default_mappers if default_mapper['name'] == desired_mapper['name']]
+            found = [
+                default_mapper for default_mapper in default_mappers if default_mapper["name"] == desired_mapper["name"]
+            ]
             if len(found) > 1:
-                module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=desired_mapper['name']))
+                module.fail_json(msg=f"Found multiple mappers with name `{desired_mapper['name']}`. Cannot continue.")
             if len(found) == 1:
                 old_mapper = found[0]
             else:
@@ -999,93 +1032,95 @@ def main():
             new_mapper = old_mapper.copy()
             new_mapper.update(desired_mapper)
 
-            if new_mapper.get('id') is not None:
+            if new_mapper.get("id") is not None:
                 kc.update_component(new_mapper, realm)
                 updated_mappers.append(new_mapper)
             else:
-                if new_mapper.get('parentId') is None:
-                    new_mapper['parentId'] = cid
+                if new_mapper.get("parentId") is None:
+                    new_mapper["parentId"] = cid
                 updated_mappers.append(kc.create_component(new_mapper, realm))
 
-        if module.params['remove_unspecified_mappers']:
+        if module.params["remove_unspecified_mappers"]:
             # we remove all unwanted default mappers
             # we use ids so we dont accidently remove one of the previously updated default mapper
             for default_mapper in default_mappers:
-                if not default_mapper['id'] in [x['id'] for x in updated_mappers]:
-                    kc.delete_component(default_mapper['id'], realm)
+                if not default_mapper["id"] in [x["id"] for x in updated_mappers]:
+                    kc.delete_component(default_mapper["id"], realm)
 
-        after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+        after_comp["mappers"] = kc.get_components(urlencode(dict(parent=cid)), realm)
         normalize_kc_comp(after_comp)
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize(after_comp))
-        result['end_state'] = sanitize(after_comp)
-        result['msg'] = "User federation {id} has been created".format(id=cid)
+            result["diff"] = dict(before="", after=sanitize(after_comp))
+        result["end_state"] = sanitize(after_comp)
+        result["msg"] = f"User federation {cid} has been created"
         module.exit_json(**result)
 
     else:
-        if state == 'present':
+        if state == "present":
             # Process an update
 
             desired_copy = deepcopy(desired_comp)
             before_copy = deepcopy(before_comp)
             # exclude bindCredential when checking wether an update is required, therefore
             # updating it only if there are other changes
-            if module.params['bind_credential_update_mode'] == 'only_indirect':
-                desired_copy.get('config', []).pop('bindCredential', None)
-                before_copy.get('config', []).pop('bindCredential', None)
+            if module.params["bind_credential_update_mode"] == "only_indirect":
+                desired_copy.get("config", []).pop("bindCredential", None)
+                before_copy.get("config", []).pop("bindCredential", None)
             # no changes
             if desired_copy == before_copy:
-                result['changed'] = False
-                result['end_state'] = sanitize(desired_comp)
-                result['msg'] = "No changes required to user federation {id}.".format(id=cid)
+                result["changed"] = False
+                result["end_state"] = sanitize(desired_comp)
+                result["msg"] = f"No changes required to user federation {cid}."
                 module.exit_json(**result)
 
             # doing an update
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(desired_comp))
+                result["diff"] = dict(before=sanitize(before_comp), after=sanitize(desired_comp))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
-            desired_mappers = desired_comp.pop('mappers', [])
+            desired_mappers = desired_comp.pop("mappers", [])
             kc.update_component(desired_comp, realm)
 
-            for before_mapper in before_comp.get('mappers', []):
+            for before_mapper in before_comp.get("mappers", []):
                 # remove unwanted existing mappers that will not be updated
-                if not before_mapper['id'] in [x['id'] for x in desired_mappers if 'id' in x]:
-                    kc.delete_component(before_mapper['id'], realm)
+                if not before_mapper["id"] in [x["id"] for x in desired_mappers if "id" in x]:
+                    kc.delete_component(before_mapper["id"], realm)
 
             for mapper in desired_mappers:
-                if mapper in before_comp.get('mappers', []):
+                if mapper in before_comp.get("mappers", []):
                     continue
-                if mapper.get('id') is not None:
+                if mapper.get("id") is not None:
                     kc.update_component(mapper, realm)
                 else:
-                    if mapper.get('parentId') is None:
-                        mapper['parentId'] = desired_comp['id']
+                    if mapper.get("parentId") is None:
+                        mapper["parentId"] = desired_comp["id"]
                     kc.create_component(mapper, realm)
 
             after_comp = kc.get_component(cid, realm)
-            after_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
+            after_comp["mappers"] = sorted(
+                kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get("name") or ""
+            )
             normalize_kc_comp(after_comp)
             after_comp_sanitized = sanitize(after_comp)
             before_comp_sanitized = sanitize(before_comp)
-            result['end_state'] = after_comp_sanitized
+            result["end_state"] = after_comp_sanitized
             if module._diff:
-                result['diff'] = dict(before=before_comp_sanitized, after=after_comp_sanitized)
-            result['changed'] = before_comp_sanitized != after_comp_sanitized
-            result['msg'] = "User federation {id} has been updated".format(id=cid)
+                result["diff"] = dict(before=before_comp_sanitized, after=after_comp_sanitized)
+            result["changed"] = before_comp_sanitized != after_comp_sanitized
+            result["msg"] = f"User federation {cid} has been updated"
             module.exit_json(**result)
 
-        elif state == 'absent':
+        elif state == "absent":
             # Process a deletion
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_comp), after='')
+                result["diff"] = dict(before=sanitize(before_comp), after="")
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -1093,12 +1128,12 @@ def main():
             # delete it
             kc.delete_component(cid, realm)
 
-            result['end_state'] = {}
+            result["end_state"] = {}
 
-            result['msg'] = "User federation {id} has been deleted".format(id=cid)
+            result["msg"] = f"User federation {cid} has been deleted"
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

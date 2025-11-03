@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018, Stephan Schwarz <stearz@gmx.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: utm_proxy_auth_profile
@@ -301,44 +299,62 @@ from ansible.module_utils.common.text.converters import to_native
 
 def main():
     endpoint = "reverse_proxy/auth_profile"
-    key_to_check_for_changes = ["aaa", "basic_prompt", "backend_mode", "backend_strip_basic_auth",
-                                "backend_user_prefix", "backend_user_suffix", "comment", "frontend_cookie",
-                                "frontend_cookie_secret", "frontend_form", "frontend_form_template",
-                                "frontend_login", "frontend_logout", "frontend_mode", "frontend_realm",
-                                "frontend_session_allow_persistency", "frontend_session_lifetime",
-                                "frontend_session_lifetime_limited", "frontend_session_lifetime_scope",
-                                "frontend_session_timeout", "frontend_session_timeout_enabled",
-                                "frontend_session_timeout_scope", "logout_delegation_urls", "logout_mode",
-                                "redirect_to_requested_url"]
+    key_to_check_for_changes = [
+        "aaa",
+        "basic_prompt",
+        "backend_mode",
+        "backend_strip_basic_auth",
+        "backend_user_prefix",
+        "backend_user_suffix",
+        "comment",
+        "frontend_cookie",
+        "frontend_cookie_secret",
+        "frontend_form",
+        "frontend_form_template",
+        "frontend_login",
+        "frontend_logout",
+        "frontend_mode",
+        "frontend_realm",
+        "frontend_session_allow_persistency",
+        "frontend_session_lifetime",
+        "frontend_session_lifetime_limited",
+        "frontend_session_lifetime_scope",
+        "frontend_session_timeout",
+        "frontend_session_timeout_enabled",
+        "frontend_session_timeout_scope",
+        "logout_delegation_urls",
+        "logout_mode",
+        "redirect_to_requested_url",
+    ]
 
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            aaa=dict(type='list', elements='str', required=True),
-            basic_prompt=dict(type='str', required=True),
-            backend_mode=dict(type='str', default="None", choices=['Basic', 'None']),
-            backend_strip_basic_auth=dict(type='bool', default=True),
-            backend_user_prefix=dict(type='str', default=""),
-            backend_user_suffix=dict(type='str', default=""),
-            comment=dict(type='str', default=""),
-            frontend_cookie=dict(type='str'),
-            frontend_cookie_secret=dict(type='str', no_log=True),
-            frontend_form=dict(type='str'),
-            frontend_form_template=dict(type='str', default=""),
-            frontend_login=dict(type='str'),
-            frontend_logout=dict(type='str'),
-            frontend_mode=dict(type='str', default="Basic", choices=['Basic', 'Form']),
-            frontend_realm=dict(type='str'),
-            frontend_session_allow_persistency=dict(type='bool', default=False),
-            frontend_session_lifetime=dict(type='int', required=True),
-            frontend_session_lifetime_limited=dict(type='bool', default=True),
-            frontend_session_lifetime_scope=dict(type='str', default="hours", choices=['days', 'hours', 'minutes']),
-            frontend_session_timeout=dict(type='int', required=True),
-            frontend_session_timeout_enabled=dict(type='bool', default=True),
-            frontend_session_timeout_scope=dict(type='str', default="minutes", choices=['days', 'hours', 'minutes']),
-            logout_delegation_urls=dict(type='list', elements='str', default=[]),
-            logout_mode=dict(type='str', default="None", choices=['None', 'Delegation']),
-            redirect_to_requested_url=dict(type='bool', default=False)
+            name=dict(type="str", required=True),
+            aaa=dict(type="list", elements="str", required=True),
+            basic_prompt=dict(type="str", required=True),
+            backend_mode=dict(type="str", default="None", choices=["Basic", "None"]),
+            backend_strip_basic_auth=dict(type="bool", default=True),
+            backend_user_prefix=dict(type="str", default=""),
+            backend_user_suffix=dict(type="str", default=""),
+            comment=dict(type="str", default=""),
+            frontend_cookie=dict(type="str"),
+            frontend_cookie_secret=dict(type="str", no_log=True),
+            frontend_form=dict(type="str"),
+            frontend_form_template=dict(type="str", default=""),
+            frontend_login=dict(type="str"),
+            frontend_logout=dict(type="str"),
+            frontend_mode=dict(type="str", default="Basic", choices=["Basic", "Form"]),
+            frontend_realm=dict(type="str"),
+            frontend_session_allow_persistency=dict(type="bool", default=False),
+            frontend_session_lifetime=dict(type="int", required=True),
+            frontend_session_lifetime_limited=dict(type="bool", default=True),
+            frontend_session_lifetime_scope=dict(type="str", default="hours", choices=["days", "hours", "minutes"]),
+            frontend_session_timeout=dict(type="int", required=True),
+            frontend_session_timeout_enabled=dict(type="bool", default=True),
+            frontend_session_timeout_scope=dict(type="str", default="minutes", choices=["days", "hours", "minutes"]),
+            logout_delegation_urls=dict(type="list", elements="str", default=[]),
+            logout_mode=dict(type="str", default="None", choices=["None", "Delegation"]),
+            redirect_to_requested_url=dict(type="bool", default=False),
         )
     )
     try:
@@ -347,5 +363,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

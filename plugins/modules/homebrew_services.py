@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Andrew Dunham <andrew@du.nham.ca>
 # Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
@@ -9,10 +8,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: homebrew_services
@@ -104,9 +100,7 @@ if sys.version_info < (3, 5):
 
     # Stores validated arguments for an instance of an action.
     # See DOCUMENTATION string for argument-specific information.
-    HomebrewServiceArgs = namedtuple(
-        "HomebrewServiceArgs", ["name", "state", "brew_path"]
-    )
+    HomebrewServiceArgs = namedtuple("HomebrewServiceArgs", ["name", "state", "brew_path"])
 
     # Stores the state of a Homebrew service.
     HomebrewServiceState = namedtuple("HomebrewServiceState", ["running", "pid"])
@@ -116,14 +110,10 @@ else:
 
     # Stores validated arguments for an instance of an action.
     # See DOCUMENTATION string for argument-specific information.
-    HomebrewServiceArgs = NamedTuple(
-        "HomebrewServiceArgs", [("name", str), ("state", str), ("brew_path", str)]
-    )
+    HomebrewServiceArgs = NamedTuple("HomebrewServiceArgs", [("name", str), ("state", str), ("brew_path", str)])
 
     # Stores the state of a Homebrew service.
-    HomebrewServiceState = NamedTuple(
-        "HomebrewServiceState", [("running", bool), ("pid", Optional[int])]
-    )
+    HomebrewServiceState = NamedTuple("HomebrewServiceState", [("running", bool), ("pid", Optional[int])])
 
 
 def _brew_service_state(args, module):
@@ -134,7 +124,7 @@ def _brew_service_state(args, module):
     try:
         data = json.loads(stdout)[0]
     except json.JSONDecodeError:
-        module.fail_json(msg="Failed to parse JSON output:\n{0}".format(stdout))
+        module.fail_json(msg=f"Failed to parse JSON output:\n{stdout}")
 
     return HomebrewServiceState(running=data["status"] == "started", pid=data["pid"])
 
@@ -143,11 +133,7 @@ def _exit_with_state(args, module, changed=False, message=None):
     # type: (HomebrewServiceArgs, AnsibleModule, bool, Optional[str]) -> None
     state = _brew_service_state(args, module)
     if message is None:
-        message = (
-            "Running: {state.running}, Changed: {changed}, PID: {state.pid}".format(
-                state=state, changed=changed
-            )
-        )
+        message = f"Running: {state.running}, Changed: {changed}, PID: {state.pid}"
     module.exit_json(msg=message, pid=state.pid, running=state.running, changed=changed)
 
 
@@ -156,11 +142,11 @@ def validate_and_load_arguments(module):
     """Reuse the Homebrew module's validation logic to validate these arguments."""
     package = module.params["name"]  # type: ignore
     if not HomebrewValidate.valid_package(package):
-        module.fail_json(msg="Invalid package name: {0}".format(package))
+        module.fail_json(msg=f"Invalid package name: {package}")
 
     state = module.params["state"]  # type: ignore
     if state not in ["present", "absent", "restarted"]:
-        module.fail_json(msg="Invalid state: {0}".format(state))
+        module.fail_json(msg=f"Invalid state: {state}")
 
     brew_path = parse_brew_path(module)
 
@@ -205,9 +191,7 @@ def restart_service(args, module):
     # type: (HomebrewServiceArgs, AnsibleModule) -> None
     """Restart the requested brew service. This always results in a change."""
     if module.check_mode:
-        _exit_with_state(
-            args, module, changed=True, message="Service would be restarted"
-        )
+        _exit_with_state(args, module, changed=True, message="Service would be restarted")
 
     restart_cmd = [args.brew_path, "services", "restart", args.name]
     rc, stdout, stderr = module.run_command(restart_cmd, check_rc=True)
@@ -235,9 +219,7 @@ def main():
         supports_check_mode=True,
     )
 
-    module.run_command_environ_update = dict(
-        LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C"
-    )
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     # Pre-validate arguments.
     service_args = validate_and_load_arguments(module)

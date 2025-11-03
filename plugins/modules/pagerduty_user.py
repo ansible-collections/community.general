@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: pagerduty_user
@@ -92,88 +90,87 @@ with deps.declare("pdpyras", url="https://github.com/PagerDuty/pdpyras"):
     from pdpyras import APISession, PDClientError
 
 
-class PagerDutyUser(object):
+class PagerDutyUser:
     def __init__(self, module, session):
         self._module = module
         self._apisession = session
 
     # check if the user exists
     def does_user_exist(self, pd_email):
-        for user in self._apisession.iter_all('users'):
-            if user['email'] == pd_email:
-                return user['id']
+        for user in self._apisession.iter_all("users"):
+            if user["email"] == pd_email:
+                return user["id"]
 
     # create a user account on PD
     def add_pd_user(self, pd_name, pd_email, pd_role):
         try:
-            user = self._apisession.persist('users', 'email', {
-                "name": pd_name,
-                "email": pd_email,
-                "type": "user",
-                "role": pd_role,
-            })
+            user = self._apisession.persist(
+                "users",
+                "email",
+                {
+                    "name": pd_name,
+                    "email": pd_email,
+                    "type": "user",
+                    "role": pd_role,
+                },
+            )
             return user
 
         except PDClientError as e:
             if e.response.status_code == 400:
-                self._module.fail_json(
-                    msg="Failed to add %s due to invalid argument" % (pd_name))
+                self._module.fail_json(msg=f"Failed to add {pd_name} due to invalid argument")
             if e.response.status_code == 401:
-                self._module.fail_json(msg="Failed to add %s due to invalid API key" % (pd_name))
+                self._module.fail_json(msg=f"Failed to add {pd_name} due to invalid API key")
             if e.response.status_code == 402:
                 self._module.fail_json(
-                    msg="Failed to add %s due to inability to perform the action within the API token" % (pd_name))
+                    msg=f"Failed to add {pd_name} due to inability to perform the action within the API token"
+                )
             if e.response.status_code == 403:
                 self._module.fail_json(
-                    msg="Failed to add %s due to inability to review the requested resource within the API token" % (pd_name))
+                    msg=f"Failed to add {pd_name} due to inability to review the requested resource within the API token"
+                )
             if e.response.status_code == 429:
-                self._module.fail_json(
-                    msg="Failed to add %s due to reaching the limit of making requests" % (pd_name))
+                self._module.fail_json(msg=f"Failed to add {pd_name} due to reaching the limit of making requests")
 
     # delete a user account from PD
     def delete_user(self, pd_user_id, pd_name):
         try:
-            user_path = path.join('/users/', pd_user_id)
+            user_path = path.join("/users/", pd_user_id)
             self._apisession.rdelete(user_path)
 
         except PDClientError as e:
             if e.response.status_code == 404:
-                self._module.fail_json(
-                    msg="Failed to remove %s as user was not found" % (pd_name))
+                self._module.fail_json(msg=f"Failed to remove {pd_name} as user was not found")
             if e.response.status_code == 403:
                 self._module.fail_json(
-                    msg="Failed to remove %s due to inability to review the requested resource within the API token" % (pd_name))
+                    msg=f"Failed to remove {pd_name} due to inability to review the requested resource within the API token"
+                )
             if e.response.status_code == 401:
                 # print out the list of incidents
                 pd_incidents = self.get_incidents_assigned_to_user(pd_user_id)
-                self._module.fail_json(msg="Failed to remove %s as user has assigned incidents %s" % (pd_name, pd_incidents))
+                self._module.fail_json(msg=f"Failed to remove {pd_name} as user has assigned incidents {pd_incidents}")
             if e.response.status_code == 429:
-                self._module.fail_json(
-                    msg="Failed to remove %s due to reaching the limit of making requests" % (pd_name))
+                self._module.fail_json(msg=f"Failed to remove {pd_name} due to reaching the limit of making requests")
 
     # get incidents assigned to a user
     def get_incidents_assigned_to_user(self, pd_user_id):
         incident_info = {}
-        incidents = self._apisession.list_all('incidents', params={'user_ids[]': [pd_user_id]})
+        incidents = self._apisession.list_all("incidents", params={"user_ids[]": [pd_user_id]})
 
         for incident in incidents:
-            incident_info = {
-                'title': incident['title'],
-                'key': incident['incident_key'],
-                'status': incident['status']
-            }
+            incident_info = {"title": incident["title"], "key": incident["incident_key"], "status": incident["status"]}
         return incident_info
 
     # add a user to a team/teams
     def add_user_to_teams(self, pd_user_id, pd_teams, pd_role):
         updated_team = None
         for team in pd_teams:
-            team_info = self._apisession.find('teams', team, attribute='name')
+            team_info = self._apisession.find("teams", team, attribute="name")
             if team_info is not None:
                 try:
-                    updated_team = self._apisession.rput('/teams/' + team_info['id'] + '/users/' + pd_user_id, json={
-                        'role': pd_role
-                    })
+                    updated_team = self._apisession.rput(
+                        f"/teams/{team_info['id']}/users/{pd_user_id}", json={"role": pd_role}
+                    )
                 except PDClientError:
                     updated_team = None
         return updated_team
@@ -182,35 +179,49 @@ class PagerDutyUser(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            access_token=dict(type='str', required=True, no_log=True),
-            pd_user=dict(type='str', required=True),
-            pd_email=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            pd_role=dict(type='str', default='responder',
-                         choices=['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_stakeholder', 'restricted_access']),
-            pd_teams=dict(type='list', elements='str')),
-        required_if=[['state', 'present', ['pd_teams']], ],
+            access_token=dict(type="str", required=True, no_log=True),
+            pd_user=dict(type="str", required=True),
+            pd_email=dict(type="str", required=True),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            pd_role=dict(
+                type="str",
+                default="responder",
+                choices=[
+                    "global_admin",
+                    "manager",
+                    "responder",
+                    "observer",
+                    "stakeholder",
+                    "limited_stakeholder",
+                    "restricted_access",
+                ],
+            ),
+            pd_teams=dict(type="list", elements="str"),
+        ),
+        required_if=[
+            ["state", "present", ["pd_teams"]],
+        ],
         supports_check_mode=True,
     )
 
     deps.validate(module)
 
-    access_token = module.params['access_token']
-    pd_user = module.params['pd_user']
-    pd_email = module.params['pd_email']
-    state = module.params['state']
-    pd_role = module.params['pd_role']
-    pd_teams = module.params['pd_teams']
+    access_token = module.params["access_token"]
+    pd_user = module.params["pd_user"]
+    pd_email = module.params["pd_email"]
+    state = module.params["state"]
+    pd_role = module.params["pd_role"]
+    pd_teams = module.params["pd_teams"]
 
     if pd_role:
         pd_role_gui_value = {
-            'global_admin': 'admin',
-            'manager': 'user',
-            'responder': 'limited_user',
-            'observer': 'observer',
-            'stakeholder': 'read_only_user',
-            'limited_stakeholder': 'read_only_limited_user',
-            'restricted_access': 'restricted_access'
+            "global_admin": "admin",
+            "manager": "user",
+            "responder": "limited_user",
+            "observer": "observer",
+            "stakeholder": "read_only_user",
+            "limited_stakeholder": "read_only_limited_user",
+            "restricted_access": "restricted_access",
         }
         pd_role = pd_role_gui_value[pd_role]
 
@@ -218,7 +229,7 @@ def main():
     try:
         session = APISession(access_token)
     except PDClientError as e:
-        module.fail_json(msg="Failed to authenticate with PagerDuty: %s" % e)
+        module.fail_json(msg=f"Failed to authenticate with PagerDuty: {e}")
 
     user = PagerDutyUser(module, session)
 
@@ -229,14 +240,14 @@ def main():
             # remove user
             if not module.check_mode:
                 user.delete_user(user_exists, pd_user)
-            module.exit_json(changed=True, result="Successfully deleted user %s" % pd_user)
+            module.exit_json(changed=True, result=f"Successfully deleted user {pd_user}")
         else:
-            module.exit_json(changed=False, result="User %s already exists." % pd_user)
+            module.exit_json(changed=False, result=f"User {pd_user} already exists.")
 
         # in case that the user does not exist
     else:
         if state == "absent":
-            module.exit_json(changed=False, result="User %s was not found." % pd_user)
+            module.exit_json(changed=False, result=f"User {pd_user} was not found.")
 
         else:
             # add user, adds user with the default notification rule and contact info (email)
@@ -246,7 +257,7 @@ def main():
                 pd_user_id = user.does_user_exist(pd_email)
                 # add a user to the team/s
                 user.add_user_to_teams(pd_user_id, pd_teams, pd_role)
-            module.exit_json(changed=True, result="Successfully created & added user %s to team %s" % (pd_user, pd_teams))
+            module.exit_json(changed=True, result=f"Successfully created & added user {pd_user} to team {pd_teams}")
 
 
 if __name__ == "__main__":

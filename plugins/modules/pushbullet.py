@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -110,33 +108,32 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 # Main
 #
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            api_key=dict(type='str', required=True, no_log=True),
-            channel=dict(type='str'),
-            device=dict(type='str'),
-            push_type=dict(type='str', default="note", choices=['note', 'link']),
-            title=dict(type='str', required=True),
-            body=dict(type='str'),
-            url=dict(type='str'),
+            api_key=dict(type="str", required=True, no_log=True),
+            channel=dict(type="str"),
+            device=dict(type="str"),
+            push_type=dict(type="str", default="note", choices=["note", "link"]),
+            title=dict(type="str", required=True),
+            body=dict(type="str"),
+            url=dict(type="str"),
         ),
-        mutually_exclusive=(
-            ['channel', 'device'],
-        ),
-        supports_check_mode=True
+        mutually_exclusive=(["channel", "device"],),
+        supports_check_mode=True,
     )
 
-    api_key = module.params['api_key']
-    channel = module.params['channel']
-    device = module.params['device']
-    push_type = module.params['push_type']
-    title = module.params['title']
-    body = module.params['body']
-    url = module.params['url']
+    api_key = module.params["api_key"]
+    channel = module.params["channel"]
+    device = module.params["device"]
+    push_type = module.params["push_type"]
+    title = module.params["title"]
+    body = module.params["body"]
+    url = module.params["url"]
 
     if not pushbullet_found:
-        module.fail_json(msg=missing_required_lib('pushbullet.py'), exception=PUSHBULLET_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pushbullet.py"), exception=PUSHBULLET_IMP_ERR)
 
     # Init pushbullet
     try:
@@ -158,7 +155,9 @@ def main():
         if device in devices_by_nickname:
             target = devices_by_nickname[device]
         else:
-            module.fail_json(msg="Device '%s' not found. Available devices: '%s'" % (device, "', '".join(devices_by_nickname.keys())))
+            module.fail_json(
+                msg="Device '%s' not found. Available devices: '%s'" % (device, "', '".join(devices_by_nickname.keys()))
+            )
 
     # Search for given channel
     if channel is not None:
@@ -169,7 +168,9 @@ def main():
         if channel in channels_by_tag:
             target = channels_by_tag[channel]
         else:
-            module.fail_json(msg="Channel '%s' not found. Available channels: '%s'" % (channel, "', '".join(channels_by_tag.keys())))
+            module.fail_json(
+                msg="Channel '%s' not found. Available channels: '%s'" % (channel, "', '".join(channels_by_tag.keys()))
+            )
 
     # If in check mode, exit saying that we succeeded
     if module.check_mode:
@@ -183,10 +184,10 @@ def main():
             target.push_note(title, body)
         module.exit_json(changed=False, msg="OK")
     except PushError as e:
-        module.fail_json(msg="An error occurred, Pushbullet's response: %s" % str(e))
+        module.fail_json(msg=f"An error occurred, Pushbullet's response: {e}")
 
     module.fail_json(msg="An unknown error has occurred")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -79,6 +77,7 @@ import traceback
 PINGDOM_IMP_ERR = None
 try:
     import pingdom
+
     HAS_PINGDOM = True
 except Exception:
     PINGDOM_IMP_ERR = traceback.format_exc()
@@ -88,7 +87,6 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 def pause(checkid, uid, passwd, key):
-
     c = pingdom.PingdomConnection(uid, passwd, key)
     c.modify_check(checkid, paused=True)
     check = c.get_check(checkid)
@@ -100,7 +98,6 @@ def pause(checkid, uid, passwd, key):
 
 
 def unpause(checkid, uid, passwd, key):
-
     c = pingdom.PingdomConnection(uid, passwd, key)
     c.modify_check(checkid, paused=False)
     check = c.get_check(checkid)
@@ -112,10 +109,9 @@ def unpause(checkid, uid, passwd, key):
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(required=True, choices=['running', 'paused', 'started', 'stopped']),
+            state=dict(required=True, choices=["running", "paused", "started", "stopped"]),
             checkid=dict(required=True),
             uid=dict(required=True),
             passwd=dict(required=True, no_log=True),
@@ -126,11 +122,11 @@ def main():
     if not HAS_PINGDOM:
         module.fail_json(msg=missing_required_lib("pingdom"), exception=PINGDOM_IMP_ERR)
 
-    checkid = module.params['checkid']
-    state = module.params['state']
-    uid = module.params['uid']
-    passwd = module.params['passwd']
-    key = module.params['key']
+    checkid = module.params["checkid"]
+    state = module.params["state"]
+    uid = module.params["uid"]
+    passwd = module.params["passwd"]
+    key = module.params["key"]
 
     if state == "paused" or state == "stopped":
         (rc, name, result) = pause(checkid, uid, passwd, key)
@@ -144,5 +140,5 @@ def main():
     module.exit_json(checkid=checkid, name=name, status=result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -87,22 +86,21 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
+    name = "community.general.pbrun"
 
-    name = 'community.general.pbrun'
-
-    prompt = 'Password:'
+    prompt = "Password:"
 
     def build_become_command(self, cmd, shell):
-        super(BecomeModule, self).build_become_command(cmd, shell)
+        super().build_become_command(cmd, shell)
 
         if not cmd:
             return cmd
 
-        become_exe = self.get_option('become_exe')
+        become_exe = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        become_user = self.get_option('become_user')
-        user = f'-u {become_user}' if become_user else ''
-        noexe = not self.get_option('wrap_exe')
+        flags = self.get_option("become_flags")
+        become_user = self.get_option("become_user")
+        user = f"-u {become_user}" if become_user else ""
+        noexe = not self.get_option("wrap_exe")
 
         return f"{become_exe} {flags} {user} {self._build_success_command(cmd, shell, noexe=noexe)}"

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Based on local.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # Based on chroot.py (c) 2013, Maykel Moya <mmoya@speedyrails.com>
 # Copyright (c) 2013, Michael Scherer <misc@zarb.org>
@@ -30,6 +29,7 @@ options:
 HAVE_FUNC = False
 try:
     import func.overlord.client as fc
+
     HAVE_FUNC = True
 except ImportError:
     pass
@@ -46,7 +46,7 @@ display = Display()
 
 
 class Connection(ConnectionBase):
-    """ Func-based connections """
+    """Func-based connections"""
 
     has_pipelining = False
 
@@ -65,7 +65,7 @@ class Connection(ConnectionBase):
         return self
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
-        """ run a command on the remote minion """
+        """run a command on the remote minion"""
 
         if in_data:
             raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -83,16 +83,16 @@ class Connection(ConnectionBase):
         return os.path.join(prefix, normpath[1:])
 
     def put_file(self, in_path, out_path):
-        """ transfer a file from local to remote """
+        """transfer a file from local to remote"""
 
-        out_path = self._normalize_path(out_path, '/')
+        out_path = self._normalize_path(out_path, "/")
         display.vvv(f"PUT {in_path} TO {out_path}", host=self.host)
         self.client.local.copyfile.send(in_path, out_path)
 
     def fetch_file(self, in_path, out_path):
-        """ fetch a file from remote to local """
+        """fetch a file from remote to local"""
 
-        in_path = self._normalize_path(in_path, '/')
+        in_path = self._normalize_path(in_path, "/")
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self.host)
         # need to use a tmp dir due to difference of semantic for getfile
         # ( who take a # directory as destination) and fetch_file, who
@@ -103,5 +103,5 @@ class Connection(ConnectionBase):
         shutil.rmtree(tmpdir)
 
     def close(self):
-        """ terminate the connection; nothing to do here """
+        """terminate the connection; nothing to do here"""
         pass

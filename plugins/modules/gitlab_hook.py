@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # Copyright (c) 2018, Marcus Watkins <marwatk@marcuswatkins.net>
@@ -8,8 +7,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: gitlab_hook
@@ -173,75 +171,86 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_project, gitlab_authentication, list_all_kwargs
+    auth_argument_spec,
+    find_project,
+    gitlab_authentication,
+    list_all_kwargs,
 )
 
 
-class GitLabHook(object):
+class GitLabHook:
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
         self.hook_object = None
 
-    '''
+    """
     @param project Project Object
     @param hook_url Url to call on event
     @param description Description of the group
     @param parent Parent group full path
-    '''
+    """
+
     def create_or_update_hook(self, project, hook_url, options):
         changed = False
 
         # Because we have already call userExists in main()
         if self.hook_object is None:
-            hook = self.create_hook(project, {
-                'url': hook_url,
-                'push_events': options['push_events'],
-                'push_events_branch_filter': options['push_events_branch_filter'],
-                'issues_events': options['issues_events'],
-                'merge_requests_events': options['merge_requests_events'],
-                'tag_push_events': options['tag_push_events'],
-                'note_events': options['note_events'],
-                'job_events': options['job_events'],
-                'pipeline_events': options['pipeline_events'],
-                'wiki_page_events': options['wiki_page_events'],
-                'releases_events': options['releases_events'],
-                'enable_ssl_verification': options['enable_ssl_verification'],
-                'token': options['token'],
-            })
+            hook = self.create_hook(
+                project,
+                {
+                    "url": hook_url,
+                    "push_events": options["push_events"],
+                    "push_events_branch_filter": options["push_events_branch_filter"],
+                    "issues_events": options["issues_events"],
+                    "merge_requests_events": options["merge_requests_events"],
+                    "tag_push_events": options["tag_push_events"],
+                    "note_events": options["note_events"],
+                    "job_events": options["job_events"],
+                    "pipeline_events": options["pipeline_events"],
+                    "wiki_page_events": options["wiki_page_events"],
+                    "releases_events": options["releases_events"],
+                    "enable_ssl_verification": options["enable_ssl_verification"],
+                    "token": options["token"],
+                },
+            )
             changed = True
         else:
-            changed, hook = self.update_hook(self.hook_object, {
-                'push_events': options['push_events'],
-                'push_events_branch_filter': options['push_events_branch_filter'],
-                'issues_events': options['issues_events'],
-                'merge_requests_events': options['merge_requests_events'],
-                'tag_push_events': options['tag_push_events'],
-                'note_events': options['note_events'],
-                'job_events': options['job_events'],
-                'pipeline_events': options['pipeline_events'],
-                'wiki_page_events': options['wiki_page_events'],
-                'releases_events': options['releases_events'],
-                'enable_ssl_verification': options['enable_ssl_verification'],
-                'token': options['token'],
-            })
+            changed, hook = self.update_hook(
+                self.hook_object,
+                {
+                    "push_events": options["push_events"],
+                    "push_events_branch_filter": options["push_events_branch_filter"],
+                    "issues_events": options["issues_events"],
+                    "merge_requests_events": options["merge_requests_events"],
+                    "tag_push_events": options["tag_push_events"],
+                    "note_events": options["note_events"],
+                    "job_events": options["job_events"],
+                    "pipeline_events": options["pipeline_events"],
+                    "wiki_page_events": options["wiki_page_events"],
+                    "releases_events": options["releases_events"],
+                    "enable_ssl_verification": options["enable_ssl_verification"],
+                    "token": options["token"],
+                },
+            )
 
         self.hook_object = hook
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the hook {hook_url}")
 
             try:
                 hook.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update hook: %s " % e)
+                self._module.fail_json(msg=f"Failed to update hook: {e} ")
 
         return changed
 
-    '''
+    """
     @param project Project Object
     @param arguments Attributes of the hook
-    '''
+    """
+
     def create_hook(self, project, arguments):
         if self._module.check_mode:
             return True
@@ -250,10 +259,11 @@ class GitLabHook(object):
 
         return hook
 
-    '''
+    """
     @param hook Hook Object
     @param arguments Attributes of the hook
-    '''
+    """
+
     def update_hook(self, hook, arguments):
         changed = False
 
@@ -265,19 +275,21 @@ class GitLabHook(object):
 
         return (changed, hook)
 
-    '''
+    """
     @param project Project object
     @param hook_url Url to call on event
-    '''
+    """
+
     def find_hook(self, project, hook_url):
         for hook in project.hooks.list(**list_all_kwargs):
             if hook.url == hook_url:
                 return hook
 
-    '''
+    """
     @param project Project object
     @param hook_url Url to call on event
-    '''
+    """
+
     def exists_hook(self, project, hook_url):
         # When project exists, object will be stored in self.project_object.
         hook = self.find_hook(project, hook_url)
@@ -294,97 +306,104 @@ class GitLabHook(object):
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
-    argument_spec.update(dict(
-        state=dict(type='str', default="present", choices=["absent", "present"]),
-        project=dict(type='str', required=True),
-        hook_url=dict(type='str', required=True),
-        push_events=dict(type='bool', default=True),
-        push_events_branch_filter=dict(type='str', default=''),
-        issues_events=dict(type='bool', default=False),
-        merge_requests_events=dict(type='bool', default=False),
-        tag_push_events=dict(type='bool', default=False),
-        note_events=dict(type='bool', default=False),
-        job_events=dict(type='bool', default=False),
-        pipeline_events=dict(type='bool', default=False),
-        wiki_page_events=dict(type='bool', default=False),
-        releases_events=dict(type='bool'),
-        hook_validate_certs=dict(type='bool', default=False, aliases=['enable_ssl_verification']),
-        token=dict(type='str', no_log=True),
-    ))
+    argument_spec.update(
+        dict(
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            project=dict(type="str", required=True),
+            hook_url=dict(type="str", required=True),
+            push_events=dict(type="bool", default=True),
+            push_events_branch_filter=dict(type="str", default=""),
+            issues_events=dict(type="bool", default=False),
+            merge_requests_events=dict(type="bool", default=False),
+            tag_push_events=dict(type="bool", default=False),
+            note_events=dict(type="bool", default=False),
+            job_events=dict(type="bool", default=False),
+            pipeline_events=dict(type="bool", default=False),
+            wiki_page_events=dict(type="bool", default=False),
+            releases_events=dict(type="bool"),
+            hook_validate_certs=dict(type="bool", default=False, aliases=["enable_ssl_verification"]),
+            token=dict(type="str", no_log=True),
+        )
+    )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
         ],
-        required_together=[
-            ['api_username', 'api_password']
-        ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
+        required_together=[["api_username", "api_password"]],
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
         supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    state = module.params['state']
-    project_identifier = module.params['project']
-    hook_url = module.params['hook_url']
-    push_events = module.params['push_events']
-    push_events_branch_filter = module.params['push_events_branch_filter']
-    issues_events = module.params['issues_events']
-    merge_requests_events = module.params['merge_requests_events']
-    tag_push_events = module.params['tag_push_events']
-    note_events = module.params['note_events']
-    job_events = module.params['job_events']
-    pipeline_events = module.params['pipeline_events']
-    wiki_page_events = module.params['wiki_page_events']
-    releases_events = module.params['releases_events']
-    enable_ssl_verification = module.params['hook_validate_certs']
-    hook_token = module.params['token']
+    state = module.params["state"]
+    project_identifier = module.params["project"]
+    hook_url = module.params["hook_url"]
+    push_events = module.params["push_events"]
+    push_events_branch_filter = module.params["push_events_branch_filter"]
+    issues_events = module.params["issues_events"]
+    merge_requests_events = module.params["merge_requests_events"]
+    tag_push_events = module.params["tag_push_events"]
+    note_events = module.params["note_events"]
+    job_events = module.params["job_events"]
+    pipeline_events = module.params["pipeline_events"]
+    wiki_page_events = module.params["wiki_page_events"]
+    releases_events = module.params["releases_events"]
+    enable_ssl_verification = module.params["hook_validate_certs"]
+    hook_token = module.params["token"]
 
     gitlab_hook = GitLabHook(module, gitlab_instance)
 
     project = find_project(gitlab_instance, project_identifier)
 
     if project is None:
-        module.fail_json(msg="Failed to create hook: project %s doesn't exists" % project_identifier)
+        module.fail_json(msg=f"Failed to create hook: project {project_identifier} doesn't exists")
 
     hook_exists = gitlab_hook.exists_hook(project, hook_url)
 
-    if state == 'absent':
+    if state == "absent":
         if hook_exists:
             gitlab_hook.delete_hook()
-            module.exit_json(changed=True, msg="Successfully deleted hook %s" % hook_url)
+            module.exit_json(changed=True, msg=f"Successfully deleted hook {hook_url}")
         else:
             module.exit_json(changed=False, msg="Hook deleted or does not exists")
 
-    if state == 'present':
-        if gitlab_hook.create_or_update_hook(project, hook_url, {
-            "push_events": push_events,
-            "push_events_branch_filter": push_events_branch_filter,
-            "issues_events": issues_events,
-            "merge_requests_events": merge_requests_events,
-            "tag_push_events": tag_push_events,
-            "note_events": note_events,
-            "job_events": job_events,
-            "pipeline_events": pipeline_events,
-            "wiki_page_events": wiki_page_events,
-            "releases_events": releases_events,
-            "enable_ssl_verification": enable_ssl_verification,
-            "token": hook_token,
-        }):
-
-            module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url, hook=gitlab_hook.hook_object._attrs)
+    if state == "present":
+        if gitlab_hook.create_or_update_hook(
+            project,
+            hook_url,
+            {
+                "push_events": push_events,
+                "push_events_branch_filter": push_events_branch_filter,
+                "issues_events": issues_events,
+                "merge_requests_events": merge_requests_events,
+                "tag_push_events": tag_push_events,
+                "note_events": note_events,
+                "job_events": job_events,
+                "pipeline_events": pipeline_events,
+                "wiki_page_events": wiki_page_events,
+                "releases_events": releases_events,
+                "enable_ssl_verification": enable_ssl_verification,
+                "token": hook_token,
+            },
+        ):
+            module.exit_json(
+                changed=True,
+                msg=f"Successfully created or updated the hook {hook_url}",
+                hook=gitlab_hook.hook_object._attrs,
+            )
         else:
-            module.exit_json(changed=False, msg="No need to update the hook %s" % hook_url, hook=gitlab_hook.hook_object._attrs)
+            module.exit_json(
+                changed=False, msg=f"No need to update the hook {hook_url}", hook=gitlab_hook.hook_object._attrs
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

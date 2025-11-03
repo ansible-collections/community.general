@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -130,10 +128,7 @@ def webex_msg(module):
     results = {}
     ansible = module.params
 
-    headers = {
-        'Authorization': 'Bearer {0}'.format(ansible['personal_token']),
-        'content-type': 'application/json'
-    }
+    headers = {"Authorization": f"Bearer {ansible['personal_token']}", "content-type": "application/json"}
 
     if module.check_mode:
         url = "https://webexapis.com/v1/people/me"
@@ -142,47 +137,43 @@ def webex_msg(module):
     else:
         url = "https://webexapis.com/v1/messages"
 
-        payload = {
-            ansible['recipient_type']: ansible['recipient_id'],
-            ansible['msg_type']: ansible['msg']
-        }
+        payload = {ansible["recipient_type"]: ansible["recipient_id"], ansible["msg_type"]: ansible["msg"]}
 
         payload = module.jsonify(payload)
 
     response, info = fetch_url(module, url, data=payload, headers=headers)
 
-    status_code = info['status']
-    msg = info['msg']
+    status_code = info["status"]
+    msg = info["msg"]
 
     # Module will fail if the response is not 200
     if status_code != 200:
-        results['failed'] = True
-        results['status_code'] = status_code
-        results['message'] = msg
+        results["failed"] = True
+        results["status_code"] = status_code
+        results["message"] = msg
     else:
-        results['failed'] = False
-        results['status_code'] = status_code
+        results["failed"] = False
+        results["status_code"] = status_code
 
         if module.check_mode:
-            results['message'] = 'Authentication Successful.'
+            results["message"] = "Authentication Successful."
         else:
-            results['message'] = msg
+            results["message"] = msg
 
     return results
 
 
 def main():
-    '''Ansible main. '''
+    """Ansible main."""
     module = AnsibleModule(
         argument_spec=dict(
-            recipient_type=dict(required=True, choices=['roomId', 'toPersonEmail', 'toPersonId']),
+            recipient_type=dict(required=True, choices=["roomId", "toPersonEmail", "toPersonId"]),
             recipient_id=dict(required=True, no_log=True),
-            msg_type=dict(default='text', aliases=['message_type'], choices=['text', 'markdown']),
-            personal_token=dict(required=True, no_log=True, aliases=['token']),
+            msg_type=dict(default="text", aliases=["message_type"], choices=["text", "markdown"]),
+            personal_token=dict(required=True, no_log=True, aliases=["token"]),
             msg=dict(required=True),
         ),
-
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     results = webex_msg(module)

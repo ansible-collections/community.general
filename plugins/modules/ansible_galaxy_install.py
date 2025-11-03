@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ansible_galaxy_install
@@ -195,39 +193,39 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 
 class AnsibleGalaxyInstall(ModuleHelper):
-    _RE_GALAXY_VERSION = re.compile(r'^ansible-galaxy(?: \[core)? (?P<version>\d+\.\d+\.\d+)(?:\.\w+)?(?:\])?')
-    _RE_LIST_PATH = re.compile(r'^# (?P<path>.*)$')
-    _RE_LIST_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
-    _RE_LIST_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
+    _RE_GALAXY_VERSION = re.compile(r"^ansible-galaxy(?: \[core)? (?P<version>\d+\.\d+\.\d+)(?:\.\w+)?(?:\])?")
+    _RE_LIST_PATH = re.compile(r"^# (?P<path>.*)$")
+    _RE_LIST_COLL = re.compile(r"^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$")
+    _RE_LIST_ROLE = re.compile(r"^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$")
     _RE_INSTALL_OUTPUT = re.compile(
-        r'^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)) was installed successfully$'
+        r"^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)) was installed successfully$"
     )
     ansible_version = None
 
-    output_params = ('type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
+    output_params = ("type", "name", "dest", "requirements_file", "force", "no_deps")
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', choices=['present', 'latest'], default='present'),
-            type=dict(type='str', choices=('collection', 'role', 'both'), required=True),
-            name=dict(type='str'),
-            requirements_file=dict(type='path'),
-            dest=dict(type='path'),
-            force=dict(type='bool', default=False),
-            no_deps=dict(type='bool', default=False),
+            state=dict(type="str", choices=["present", "latest"], default="present"),
+            type=dict(type="str", choices=("collection", "role", "both"), required=True),
+            name=dict(type="str"),
+            requirements_file=dict(type="path"),
+            dest=dict(type="path"),
+            force=dict(type="bool", default=False),
+            no_deps=dict(type="bool", default=False),
         ),
-        mutually_exclusive=[('name', 'requirements_file')],
-        required_one_of=[('name', 'requirements_file')],
-        required_if=[('type', 'both', ['requirements_file'])],
+        mutually_exclusive=[("name", "requirements_file")],
+        required_one_of=[("name", "requirements_file")],
+        required_if=[("type", "both", ["requirements_file"])],
         supports_check_mode=False,
     )
 
-    command = 'ansible-galaxy'
+    command = "ansible-galaxy"
     command_args_formats = dict(
-        type=cmd_runner_fmt.as_func(lambda v: [] if v == 'both' else [v]),
+        type=cmd_runner_fmt.as_func(lambda v: [] if v == "both" else [v]),
         galaxy_cmd=cmd_runner_fmt.as_list(),
         upgrade=cmd_runner_fmt.as_bool("--upgrade"),
-        requirements_file=cmd_runner_fmt.as_opt_val('-r'),
-        dest=cmd_runner_fmt.as_opt_val('-p'),
+        requirements_file=cmd_runner_fmt.as_opt_val("-r"),
+        dest=cmd_runner_fmt.as_opt_val("-p"),
         force=cmd_runner_fmt.as_bool("--force"),
         no_deps=cmd_runner_fmt.as_bool("--no-deps"),
         version=cmd_runner_fmt.as_fixed("--version"),
@@ -235,7 +233,9 @@ class AnsibleGalaxyInstall(ModuleHelper):
     )
 
     def _make_runner(self, lang):
-        return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang, check_rc=True)
+        return CmdRunner(
+            self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang, check_rc=True
+        )
 
     def _get_ansible_galaxy_version(self):
         class UnsupportedLocale(ModuleHelperException):
@@ -247,7 +247,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
             line = out.splitlines()[0]
             match = self._RE_GALAXY_VERSION.match(line)
             if not match:
-                self.do_raise("Unable to determine ansible-galaxy version from: {0}".format(line))
+                self.do_raise(f"Unable to determine ansible-galaxy version from: {line}")
             version = match.group("version")
             return version
 
@@ -262,7 +262,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
 
     def __init_module__(self):
         self.runner, self.vars.version = self._get_ansible_galaxy_version()
-        self.ansible_version = tuple(int(x) for x in self.vars.version.split('.')[:3])
+        self.ansible_version = tuple(int(x) for x in self.vars.version.split(".")[:3])
         if self.ansible_version < (2, 11):
             self.module.fail_json(msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed.")
         self.vars.set("new_collections", {}, change=True)
@@ -276,8 +276,8 @@ class AnsibleGalaxyInstall(ModuleHelper):
         def process(rc, out, err):
             return [] if "None of the provided paths were usable" in out else out.splitlines()
 
-        with self.runner('type galaxy_cmd dest', output_process=process, check_rc=False) as ctx:
-            elems = ctx.run(type=_type, galaxy_cmd='list')
+        with self.runner("type galaxy_cmd dest", output_process=process, check_rc=False) as ctx:
+            elems = ctx.run(type=_type, galaxy_cmd="list")
 
         elems_dict = {}
         current_path = None
@@ -286,27 +286,26 @@ class AnsibleGalaxyInstall(ModuleHelper):
                 match = path_re.match(line)
                 if not match:
                     continue
-                if self.vars.dest is not None and match.group('path') != self.vars.dest:
+                if self.vars.dest is not None and match.group("path") != self.vars.dest:
                     current_path = None
                     continue
-                current_path = match.group('path') if match else None
+                current_path = match.group("path") if match else None
                 elems_dict[current_path] = {}
 
             elif current_path is not None:
                 match = elem_re.match(line)
-                if not match or (self.vars.name is not None and match.group('elem') != self.vars.name):
+                if not match or (self.vars.name is not None and match.group("elem") != self.vars.name):
                     continue
-                elems_dict[current_path][match.group('elem')] = match.group('version')
+                elems_dict[current_path][match.group("elem")] = match.group("version")
         return elems_dict
 
     def _list_collections(self):
-        return self._list_element('collection', self._RE_LIST_PATH, self._RE_LIST_COLL)
+        return self._list_element("collection", self._RE_LIST_PATH, self._RE_LIST_COLL)
 
     def _list_roles(self):
-        return self._list_element('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
+        return self._list_element("role", self._RE_LIST_PATH, self._RE_LIST_ROLE)
 
     def __run__(self):
-
         def process(rc, out, err):
             for line in out.splitlines():
                 match = self._RE_INSTALL_OUTPUT.match(line)
@@ -317,8 +316,10 @@ class AnsibleGalaxyInstall(ModuleHelper):
                 elif match.group("role"):
                     self.vars.new_roles[match.group("role")] = match.group("rversion")
 
-        upgrade = (self.vars.type == "collection" and self.vars.state == "latest")
-        with self.runner("type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process) as ctx:
+        upgrade = self.vars.type == "collection" and self.vars.state == "latest"
+        with self.runner(
+            "type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process
+        ) as ctx:
             ctx.run(galaxy_cmd="install", upgrade=upgrade)
             if self.verbosity > 2:
                 self.vars.set("run_info", ctx.run_info)
@@ -328,5 +329,5 @@ def main():
     AnsibleGalaxyInstall.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

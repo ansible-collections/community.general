@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2021, Christian Wollinger <cwollinger@web.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: discord
@@ -132,90 +130,88 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def discord_check_mode(module):
+    webhook_id = module.params["webhook_id"]
+    webhook_token = module.params["webhook_token"]
 
-    webhook_id = module.params['webhook_id']
-    webhook_token = module.params['webhook_token']
+    headers = {"content-type": "application/json"}
 
-    headers = {
-        'content-type': 'application/json'
-    }
+    url = f"https://discord.com/api/webhooks/{webhook_id}/{webhook_token}"
 
-    url = "https://discord.com/api/webhooks/%s/%s" % (
-        webhook_id, webhook_token)
-
-    response, info = fetch_url(module, url, method='GET', headers=headers)
+    response, info = fetch_url(module, url, method="GET", headers=headers)
     return response, info
 
 
 def discord_text_msg(module):
+    webhook_id = module.params["webhook_id"]
+    webhook_token = module.params["webhook_token"]
+    content = module.params["content"]
+    user = module.params["username"]
+    avatar_url = module.params["avatar_url"]
+    tts = module.params["tts"]
+    embeds = module.params["embeds"]
 
-    webhook_id = module.params['webhook_id']
-    webhook_token = module.params['webhook_token']
-    content = module.params['content']
-    user = module.params['username']
-    avatar_url = module.params['avatar_url']
-    tts = module.params['tts']
-    embeds = module.params['embeds']
+    headers = {"content-type": "application/json"}
 
-    headers = {
-        'content-type': 'application/json'
-    }
-
-    url = "https://discord.com/api/webhooks/%s/%s" % (
-        webhook_id, webhook_token)
+    url = f"https://discord.com/api/webhooks/{webhook_id}/{webhook_token}"
 
     payload = {
-        'content': content,
-        'username': user,
-        'avatar_url': avatar_url,
-        'tts': tts,
-        'embeds': embeds,
+        "content": content,
+        "username": user,
+        "avatar_url": avatar_url,
+        "tts": tts,
+        "embeds": embeds,
     }
 
     payload = module.jsonify(payload)
 
-    response, info = fetch_url(module, url, data=payload, headers=headers, method='POST')
+    response, info = fetch_url(module, url, data=payload, headers=headers, method="POST")
     return response, info
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            webhook_id=dict(type='str', required=True),
-            webhook_token=dict(type='str', required=True, no_log=True),
-            content=dict(type='str'),
-            username=dict(type='str'),
-            avatar_url=dict(type='str'),
-            tts=dict(type='bool', default=False),
-            embeds=dict(type='list', elements='dict'),
+            webhook_id=dict(type="str", required=True),
+            webhook_token=dict(type="str", required=True, no_log=True),
+            content=dict(type="str"),
+            username=dict(type="str"),
+            avatar_url=dict(type="str"),
+            tts=dict(type="bool", default=False),
+            embeds=dict(type="list", elements="dict"),
         ),
-        required_one_of=[['content', 'embeds']],
-        supports_check_mode=True
+        required_one_of=[["content", "embeds"]],
+        supports_check_mode=True,
     )
 
     result = dict(
         changed=False,
-        http_code='',
+        http_code="",
     )
 
     if module.check_mode:
         response, info = discord_check_mode(module)
-        if info['status'] != 200:
+        if info["status"] != 200:
             try:
-                module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+                module.fail_json(
+                    http_code=info["status"], msg=info["msg"], response=module.from_json(info["body"]), info=info
+                )
             except Exception:
-                module.fail_json(http_code=info['status'], msg=info['msg'], info=info)
+                module.fail_json(http_code=info["status"], msg=info["msg"], info=info)
         else:
-            module.exit_json(msg=info['msg'], changed=False, http_code=info['status'], response=module.from_json(response.read()))
+            module.exit_json(
+                msg=info["msg"], changed=False, http_code=info["status"], response=module.from_json(response.read())
+            )
     else:
         response, info = discord_text_msg(module)
-        if info['status'] != 204:
+        if info["status"] != 204:
             try:
-                module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+                module.fail_json(
+                    http_code=info["status"], msg=info["msg"], response=module.from_json(info["body"]), info=info
+                )
             except Exception:
-                module.fail_json(http_code=info['status'], msg=info['msg'], info=info)
+                module.fail_json(http_code=info["status"], msg=info["msg"], info=info)
         else:
-            module.exit_json(msg=info['msg'], changed=True, http_code=info['status'])
+            module.exit_json(msg=info["msg"], changed=True, http_code=info["status"])
 
 
 if __name__ == "__main__":

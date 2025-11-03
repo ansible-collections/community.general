@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is BSD licensed.
 # Modules you write using this snippet, which is embedded dynamically by Ansible
@@ -10,26 +9,24 @@
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import os
 import hmac
 import re
 
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 try:
     from hashlib import sha1
 except ImportError:
-    import sha as sha1
+    import sha as sha1  # type: ignore[no-redef]
 
 HASHED_KEY_MAGIC = "|1|"
 
 
 def is_ssh_url(url):
-
-    """ check if url is ssh """
+    """check if url is ssh"""
 
     if "@" in url and "://" not in url:
         return True
@@ -40,12 +37,11 @@ def is_ssh_url(url):
 
 
 def get_fqdn_and_port(repo_url):
-
-    """ chop the hostname and port out of a url """
+    """chop the hostname and port out of a url"""
 
     fqdn = None
     port = None
-    ipv6_re = re.compile(r'(\[[^]]*\])(?::([0-9]+))?')
+    ipv6_re = re.compile(r"(\[[^]]*\])(?::([0-9]+))?")
     if "@" in repo_url and "://" not in repo_url:
         # most likely an user@host:path or user@host/path type URL
         repo_url = repo_url.split("@", 1)[1]
@@ -60,17 +56,14 @@ def get_fqdn_and_port(repo_url):
     elif "://" in repo_url:
         # this should be something we can parse with urlparse
         parts = urlparse(repo_url)
-        # parts[1] will be empty on python2.4 on ssh:// or git:// urls, so
-        # ensure we actually have a parts[1] before continuing.
-        if parts[1] != '':
-            fqdn = parts[1]
-            if "@" in fqdn:
-                fqdn = fqdn.split("@", 1)[1]
-            match = ipv6_re.match(fqdn)
-            if match:
-                fqdn, port = match.groups()
-            elif ":" in fqdn:
-                fqdn, port = fqdn.split(":")[0:2]
+        fqdn = parts[1]
+        if "@" in fqdn:
+            fqdn = fqdn.split("@", 1)[1]
+        match = ipv6_re.match(fqdn)
+        if match:
+            fqdn, port = match.groups()
+        elif ":" in fqdn:
+            fqdn, port = fqdn.split(":")[0:2]
     return fqdn, port
 
 
@@ -81,9 +74,9 @@ def check_hostkey(module, fqdn):
 # this is a variant of code found in connection_plugins/paramiko.py and we should modify
 # the paramiko code to import and use this.
 
-def not_in_host_file(self, host):
 
-    if 'USER' in os.environ:
+def not_in_host_file(self, host):
+    if "USER" in os.environ:
         user_host_file = os.path.expandvars("~${USER}/.ssh/known_hosts")
     else:
         user_host_file = "~/.ssh/known_hosts"
@@ -116,10 +109,10 @@ def not_in_host_file(self, host):
             if tokens[0].find(HASHED_KEY_MAGIC) == 0:
                 # this is a hashed known host entry
                 try:
-                    (kn_salt, kn_host) = tokens[0][len(HASHED_KEY_MAGIC):].split("|", 2)
-                    hash = hmac.new(kn_salt.decode('base64'), digestmod=sha1)
+                    (kn_salt, kn_host) = tokens[0][len(HASHED_KEY_MAGIC) :].split("|", 2)
+                    hash = hmac.new(kn_salt.decode("base64"), digestmod=sha1)
                     hash.update(host)
-                    if hash.digest() == kn_host.decode('base64'):
+                    if hash.digest() == kn_host.decode("base64"):
                         return False
                 except Exception:
                     # invalid hashed host key, skip it
@@ -133,12 +126,11 @@ def not_in_host_file(self, host):
 
 
 def add_host_key(module, fqdn, port=22, key_type="rsa", create_dir=False):
+    """use ssh-keyscan to add the hostkey"""
 
-    """ use ssh-keyscan to add the hostkey """
+    keyscan_cmd = module.get_bin_path("ssh-keyscan", True)
 
-    keyscan_cmd = module.get_bin_path('ssh-keyscan', True)
-
-    if 'USER' in os.environ:
+    if "USER" in os.environ:
         user_ssh_dir = os.path.expandvars("~${USER}/.ssh/")
         user_host_file = os.path.expandvars("~${USER}/.ssh/known_hosts")
     else:
@@ -149,30 +141,30 @@ def add_host_key(module, fqdn, port=22, key_type="rsa", create_dir=False):
     if not os.path.exists(user_ssh_dir):
         if create_dir:
             try:
-                os.makedirs(user_ssh_dir, int('700', 8))
+                os.makedirs(user_ssh_dir, int("700", 8))
             except Exception:
-                module.fail_json(msg="failed to create host key directory: %s" % user_ssh_dir)
+                module.fail_json(msg=f"failed to create host key directory: {user_ssh_dir}")
         else:
-            module.fail_json(msg="%s does not exist" % user_ssh_dir)
+            module.fail_json(msg=f"{user_ssh_dir} does not exist")
     elif not os.path.isdir(user_ssh_dir):
-        module.fail_json(msg="%s is not a directory" % user_ssh_dir)
+        module.fail_json(msg=f"{user_ssh_dir} is not a directory")
 
     if port:
-        this_cmd = "%s -t %s -p %s %s" % (keyscan_cmd, key_type, port, fqdn)
+        this_cmd = f"{keyscan_cmd} -t {key_type} -p {port} {fqdn}"
     else:
-        this_cmd = "%s -t %s %s" % (keyscan_cmd, key_type, fqdn)
+        this_cmd = f"{keyscan_cmd} -t {key_type} {fqdn}"
 
     rc, out, err = module.run_command(this_cmd)
     # ssh-keyscan gives a 0 exit code and prints nothing on timeout
     if rc != 0 or not out:
-        msg = 'failed to retrieve hostkey'
+        msg = "failed to retrieve hostkey"
         if not out:
-            msg += '. "%s" returned no matches.' % this_cmd
+            msg += f'. "{this_cmd}" returned no matches.'
         else:
-            msg += ' using command "%s". [stdout]: %s' % (this_cmd, out)
+            msg += f' using command "{this_cmd}". [stdout]: {out}'
 
         if err:
-            msg += ' [stderr]: %s' % err
+            msg += f" [stderr]: {err}"
 
         module.fail_json(msg=msg)
 

@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # (c) 2023, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2023 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 from ansible_collections.community.general.plugins.module_utils.vardict import VarDict
@@ -52,7 +50,7 @@ def test_var_diff_scalar():
     assert var.fact is False
     assert var.initial_value == 123
     assert var.value == 456
-    assert vd.diff() == {"before": {"aa": 123}, "after": {"aa": 456}}, "actual={0}".format(vd.diff())
+    assert vd.diff() == {"before": {"aa": 123}, "after": {"aa": 456}}, f"actual={vd.diff()}"
 
 
 def test_var_diff_dict():
@@ -78,11 +76,13 @@ def test_var_diff_dict():
     assert var.fact is False
     assert var.initial_value == val_before
     assert var.value == val_after
-    assert vd.diff() == {"before": {"dd": val_before}, "after": {"dd": val_after}}, "actual={0}".format(vd.diff())
+    assert vd.diff() == {"before": {"dd": val_before}, "after": {"dd": val_after}}, f"actual={vd.diff()}"
 
     vd.set("aa", 123, diff=True)
     vd.aa = 456
-    assert vd.diff() == {"before": {"aa": 123, "dd": val_before}, "after": {"aa": 456, "dd": val_after}}, "actual={0}".format(vd.diff())
+    assert vd.diff() == {"before": {"aa": 123, "dd": val_before}, "after": {"aa": 456, "dd": val_after}}, (
+        f"actual={vd.diff()}"
+    )
 
 
 def test_vardict_set_meta():

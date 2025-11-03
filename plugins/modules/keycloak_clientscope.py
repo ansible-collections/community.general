@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_clientscope
@@ -290,13 +288,19 @@ end_state:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+    is_struct_included,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
 def normalise_cr(clientscoperep, remove_ids=False):
-    """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
+    """Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
     the change detection is more effective.
 
     :param clientscoperep: the clientscoperep dict to be sanitized
@@ -307,30 +311,32 @@ def normalise_cr(clientscoperep, remove_ids=False):
     # Avoid the dict passed in to be modified
     clientscoperep = clientscoperep.copy()
 
-    if 'protocolMappers' in clientscoperep:
-        clientscoperep['protocolMappers'] = sorted(clientscoperep['protocolMappers'], key=lambda x: (x.get('name'), x.get('protocol'), x.get('protocolMapper')))
-        for mapper in clientscoperep['protocolMappers']:
+    if "protocolMappers" in clientscoperep:
+        clientscoperep["protocolMappers"] = sorted(
+            clientscoperep["protocolMappers"], key=lambda x: (x.get("name"), x.get("protocol"), x.get("protocolMapper"))
+        )
+        for mapper in clientscoperep["protocolMappers"]:
             if remove_ids:
-                mapper.pop('id', None)
+                mapper.pop("id", None)
 
             # Set to a default value.
-            mapper['consentRequired'] = mapper.get('consentRequired', False)
+            mapper["consentRequired"] = mapper.get("consentRequired", False)
 
     return clientscoperep
 
 
 def sanitize_cr(clientscoperep):
-    """ Removes probably sensitive details from a clientscoperep representation.
+    """Removes probably sensitive details from a clientscoperep representation.
 
     :param clientscoperep: the clientscoperep dict to be sanitized
     :return: sanitized clientrep dict
     """
     result = clientscoperep.copy()
-    if 'secret' in result:
-        result['secret'] = 'no_log'
-    if 'attributes' in result:
-        if 'saml.signing.private.key' in result['attributes']:
-            result['attributes']['saml.signing.private.key'] = 'no_log'
+    if "secret" in result:
+        result["secret"] = "no_log"
+    if "attributes" in result:
+        if "saml.signing.private.key" in result["attributes"]:
+            result["attributes"]["saml.signing.private.key"] = "no_log"
     return normalise_cr(result)
 
 
@@ -343,35 +349,40 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     protmapper_spec = dict(
-        id=dict(type='str'),
-        name=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed', 'docker-v2']),
-        protocolMapper=dict(type='str'),
-        config=dict(type='dict'),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        protocol=dict(type="str", choices=["openid-connect", "saml", "wsfed", "docker-v2"]),
+        protocolMapper=dict(type="str"),
+        config=dict(type="dict"),
     )
 
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-        realm=dict(default='master'),
-        id=dict(type='str'),
-        name=dict(type='str'),
-        description=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed', 'docker-v2']),
-        attributes=dict(type='dict'),
-        protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
+        state=dict(default="present", choices=["present", "absent"]),
+        realm=dict(default="master"),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        description=dict(type="str"),
+        protocol=dict(type="str", choices=["openid-connect", "saml", "wsfed", "docker-v2"]),
+        attributes=dict(type="dict"),
+        protocol_mappers=dict(type="list", elements="dict", options=protmapper_spec, aliases=["protocolMappers"]),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['id', 'name'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [
+                ["id", "name"],
+                ["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"],
+            ]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -381,16 +392,18 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    state = module.params.get('state')
-    cid = module.params.get('id')
-    name = module.params.get('name')
-    protocol_mappers = module.params.get('protocol_mappers')
+    realm = module.params.get("realm")
+    state = module.params.get("state")
+    cid = module.params.get("id")
+    name = module.params.get("name")
+    protocol_mappers = module.params.get("protocol_mappers")
 
     # Filter and map the parameters names that apply to the client scope
-    clientscope_params = [x for x in module.params
-                          if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                          module.params.get(x) is not None]
+    clientscope_params = [
+        x
+        for x in module.params
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm"] and module.params.get(x) is not None
+    ]
 
     # See if it already exists in Keycloak
     if cid is None:
@@ -409,7 +422,7 @@ def main():
 
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
-        if clientscope_param == 'protocol_mappers':
+        if clientscope_param == "protocol_mappers":
             new_param_value = [{k: v for k, v in x.items() if v is not None} for x in new_param_value]
         changeset[camel(clientscope_param)] = new_param_value
 
@@ -419,23 +432,23 @@ def main():
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_clientscope:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Clientscope does not exist; doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "Clientscope does not exist; doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
+        result["changed"] = True
 
         if name is None:
-            module.fail_json(msg='name must be specified when creating a new clientscope')
+            module.fail_json(msg="name must be specified when creating a new clientscope")
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(desired_clientscope))
+            result["diff"] = dict(before="", after=sanitize_cr(desired_clientscope))
 
         if module.check_mode:
             module.exit_json(**result)
@@ -444,38 +457,36 @@ def main():
         kc.create_clientscope(desired_clientscope, realm=realm)
         after_clientscope = kc.get_clientscope_by_name(name, realm)
 
-        result['end_state'] = sanitize_cr(after_clientscope)
+        result["end_state"] = sanitize_cr(after_clientscope)
 
-        result['msg'] = 'Clientscope {name} has been created with ID {id}'.format(name=after_clientscope['name'],
-                                                                                  id=after_clientscope['id'])
+        result["msg"] = f"Clientscope {after_clientscope['name']} has been created with ID {after_clientscope['id']}"
 
     else:
-        if state == 'present':
+        if state == "present":
             # Process an update
 
             # no changes
             # remove ids for compare, problematic if desired has no ids set (not required),
             # normalize for consentRequired in protocolMappers
             if normalise_cr(desired_clientscope, remove_ids=True) == normalise_cr(before_clientscope, remove_ids=True):
-                result['changed'] = False
-                result['end_state'] = sanitize_cr(desired_clientscope)
-                result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])
+                result["changed"] = False
+                result["end_state"] = sanitize_cr(desired_clientscope)
+                result["msg"] = f"No changes required to clientscope {before_clientscope['name']}."
                 module.exit_json(**result)
 
             # doing an update
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_clientscope), after=sanitize_cr(desired_clientscope))
+                result["diff"] = dict(before=sanitize_cr(before_clientscope), after=sanitize_cr(desired_clientscope))
 
             if module.check_mode:
                 # We can only compare the current clientscope with the proposed updates we have
                 before_norm = normalise_cr(before_clientscope, remove_ids=True)
                 desired_norm = normalise_cr(desired_clientscope, remove_ids=True)
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_norm),
-                                          after=sanitize_cr(desired_norm))
-                result['changed'] = not is_struct_included(desired_norm, before_norm)
+                    result["diff"] = dict(before=sanitize_cr(before_norm), after=sanitize_cr(desired_norm))
+                result["changed"] = not is_struct_included(desired_norm, before_norm)
                 module.exit_json(**result)
 
             # do the update
@@ -485,41 +496,43 @@ def main():
             if protocol_mappers is not None:
                 for protocol_mapper in protocol_mappers:
                     # update if protocolmapper exist
-                    current_protocolmapper = kc.get_clientscope_protocolmapper_by_name(desired_clientscope['id'], protocol_mapper['name'], realm=realm)
+                    current_protocolmapper = kc.get_clientscope_protocolmapper_by_name(
+                        desired_clientscope["id"], protocol_mapper["name"], realm=realm
+                    )
                     if current_protocolmapper is not None:
-                        protocol_mapper['id'] = current_protocolmapper['id']
-                        kc.update_clientscope_protocolmappers(desired_clientscope['id'], protocol_mapper, realm=realm)
+                        protocol_mapper["id"] = current_protocolmapper["id"]
+                        kc.update_clientscope_protocolmappers(desired_clientscope["id"], protocol_mapper, realm=realm)
                     # create otherwise
                     else:
-                        kc.create_clientscope_protocolmapper(desired_clientscope['id'], protocol_mapper, realm=realm)
+                        kc.create_clientscope_protocolmapper(desired_clientscope["id"], protocol_mapper, realm=realm)
 
-            after_clientscope = kc.get_clientscope_by_clientscopeid(desired_clientscope['id'], realm=realm)
+            after_clientscope = kc.get_clientscope_by_clientscopeid(desired_clientscope["id"], realm=realm)
 
-            result['end_state'] = after_clientscope
+            result["end_state"] = after_clientscope
 
-            result['msg'] = "Clientscope {id} has been updated".format(id=after_clientscope['id'])
+            result["msg"] = f"Clientscope {after_clientscope['id']} has been updated"
             module.exit_json(**result)
 
         else:
             # Process a deletion (because state was not 'present')
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_clientscope), after='')
+                result["diff"] = dict(before=sanitize_cr(before_clientscope), after="")
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # delete it
-            cid = before_clientscope['id']
+            cid = before_clientscope["id"]
             kc.delete_clientscope(cid=cid, realm=realm)
 
-            result['end_state'] = {}
+            result["end_state"] = {}
 
-            result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
+            result["msg"] = f"Clientscope {before_clientscope['name']} has been deleted"
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

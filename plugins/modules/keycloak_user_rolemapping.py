@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022, Dušan Marković (@bratwurzt)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_user_rolemapping
@@ -72,15 +70,17 @@ options:
   client_id:
     type: str
     description:
-      - Name of the client to be mapped (different than O(cid)).
+      - Name of the client (different than O(cid)) whose role is to be mapped.
       - This parameter is required if O(cid) is not provided (can be replaced by O(cid) to reduce the number of API calls
         that must be made).
+      - If neither O(cid) nor O(client_id) is specified, a B(realm) role is mapped instead.
   cid:
     type: str
     description:
-      - ID of the client to be mapped.
+      - ID of the client whose role is to be mapped.
       - This parameter is not required for updating or deleting the rolemapping but providing it reduces the number of API
         calls required.
+      - If neither O(cid) nor O(client_id) is specified, a B(realm) role is mapped instead.
   roles:
     description:
       - Roles to be mapped to the user.
@@ -108,6 +108,23 @@ author:
 """
 
 EXAMPLES = r"""
+- name: Map a realm role to a user, authentication with credentials
+  community.general.keycloak_user_rolemapping:
+    realm: MyCustomRealm
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    state: present
+    user_id: user1Id
+    roles:
+      - name: role_name1
+        id: role_id1
+      - name: role_name2
+        id: role_id2
+  delegate_to: localhost
+
 - name: Map a client role to a user, authentication with credentials
   community.general.keycloak_user_rolemapping:
     realm: MyCustomRealm
@@ -221,8 +238,12 @@ end_state:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -235,32 +256,37 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     roles_spec = dict(
-        name=dict(type='str'),
-        id=dict(type='str'),
+        name=dict(type="str"),
+        id=dict(type="str"),
     )
 
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-        realm=dict(default='master'),
-        uid=dict(type='str'),
-        target_username=dict(type='str'),
-        service_account_user_client_id=dict(type='str'),
-        cid=dict(type='str'),
-        client_id=dict(type='str'),
-        roles=dict(type='list', elements='dict', options=roles_spec),
+        state=dict(default="present", choices=["present", "absent"]),
+        realm=dict(default="master"),
+        uid=dict(type="str"),
+        target_username=dict(type="str"),
+        service_account_user_client_id=dict(type="str"),
+        cid=dict(type="str"),
+        client_id=dict(type="str"),
+        roles=dict(type="list", elements="dict", options=roles_spec),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret'],
-                                             ['uid', 'target_username', 'service_account_user_client_id']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [
+                ["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"],
+                ["uid", "target_username", "service_account_user_client_id"],
+            ]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -270,62 +296,70 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    state = module.params.get('state')
-    cid = module.params.get('cid')
-    client_id = module.params.get('client_id')
-    uid = module.params.get('uid')
-    target_username = module.params.get('target_username')
-    service_account_user_client_id = module.params.get('service_account_user_client_id')
-    roles = module.params.get('roles')
+    realm = module.params.get("realm")
+    state = module.params.get("state")
+    cid = module.params.get("cid")
+    client_id = module.params.get("client_id")
+    uid = module.params.get("uid")
+    target_username = module.params.get("target_username")
+    service_account_user_client_id = module.params.get("service_account_user_client_id")
+    roles = module.params.get("roles")
 
     # Check the parameters
     if uid is None and target_username is None and service_account_user_client_id is None:
-        module.fail_json(msg='Either the `target_username`, `uid` or `service_account_user_client_id` has to be specified.')
+        module.fail_json(
+            msg="Either the `target_username`, `uid` or `service_account_user_client_id` has to be specified."
+        )
 
     # Get the potential missing parameters
     if uid is None and service_account_user_client_id is None:
         user_rep = kc.get_user_by_username(username=target_username, realm=realm)
         if user_rep is not None:
-            uid = user_rep.get('id')
+            uid = user_rep.get("id")
         else:
-            module.fail_json(msg='Could not fetch user for username %s:' % target_username)
+            module.fail_json(msg=f"Could not fetch user for username {target_username}:")
     else:
         if uid is None and target_username is None:
             user_rep = kc.get_service_account_user_by_client_id(client_id=service_account_user_client_id, realm=realm)
             if user_rep is not None:
-                uid = user_rep['id']
+                uid = user_rep["id"]
             else:
-                module.fail_json(msg='Could not fetch service-account-user for client_id %s:' % target_username)
+                module.fail_json(msg=f"Could not fetch service-account-user for client_id {target_username}:")
 
     if cid is None and client_id is not None:
         cid = kc.get_client_id(client_id=client_id, realm=realm)
         if cid is None:
-            module.fail_json(msg='Could not fetch client %s:' % client_id)
+            module.fail_json(msg=f"Could not fetch client {client_id}:")
     if roles is None:
         module.exit_json(msg="Nothing to do (no roles specified).")
     else:
         for role_index, role in enumerate(roles, start=0):
-            if role.get('name') is None and role.get('id') is None:
-                module.fail_json(msg='Either the `name` or `id` has to be specified on each role.')
+            if role.get("name") is None and role.get("id") is None:
+                module.fail_json(msg="Either the `name` or `id` has to be specified on each role.")
             # Fetch missing role_id
-            if role.get('id') is None:
+            if role.get("id") is None:
                 if cid is None:
-                    role_id = kc.get_realm_role(name=role.get('name'), realm=realm)['id']
+                    role_id = kc.get_realm_role(name=role.get("name"), realm=realm)["id"]
                 else:
-                    role_id = kc.get_client_role_id_by_name(cid=cid, name=role.get('name'), realm=realm)
+                    role_id = kc.get_client_role_id_by_name(cid=cid, name=role.get("name"), realm=realm)
                 if role_id is not None:
-                    role['id'] = role_id
+                    role["id"] = role_id
                 else:
-                    module.fail_json(msg='Could not fetch role %s for client_id %s or realm %s' % (role.get('name'), client_id, realm))
+                    module.fail_json(
+                        msg=f"Could not fetch role {role.get('name')} for client_id {client_id} or realm {realm}"
+                    )
             # Fetch missing role_name
             else:
                 if cid is None:
-                    role['name'] = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get('id'), realm=realm)['name']
+                    role["name"] = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get("id"), realm=realm)["name"]
                 else:
-                    role['name'] = kc.get_client_user_rolemapping_by_id(uid=uid, cid=cid, rid=role.get('id'), realm=realm)['name']
-                if role.get('name') is None:
-                    module.fail_json(msg='Could not fetch role %s for client_id %s or realm %s' % (role.get('id'), client_id, realm))
+                    role["name"] = kc.get_client_user_rolemapping_by_id(
+                        uid=uid, cid=cid, rid=role.get("id"), realm=realm
+                    )["name"]
+                if role.get("name") is None:
+                    module.fail_json(
+                        msg=f"Could not fetch role {role.get('id')} for client_id {client_id} or realm {realm}"
+                    )
 
     # Get effective role mappings
     if cid is None:
@@ -335,65 +369,69 @@ def main():
         available_roles_before = kc.get_client_user_available_rolemappings(uid=uid, cid=cid, realm=realm)
         assigned_roles_before = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
 
-    result['existing'] = assigned_roles_before
-    result['proposed'] = roles
+    result["existing"] = assigned_roles_before
+    result["proposed"] = roles
 
     update_roles = []
     for role_index, role in enumerate(roles, start=0):
         # Fetch roles to assign if state present
-        if state == 'present':
+        if state == "present":
             for available_role in available_roles_before:
-                if role.get('name') == available_role.get('name'):
-                    update_roles.append({
-                        'id': role.get('id'),
-                        'name': role.get('name'),
-                    })
+                if role.get("name") == available_role.get("name"):
+                    update_roles.append(
+                        {
+                            "id": role.get("id"),
+                            "name": role.get("name"),
+                        }
+                    )
         # Fetch roles to remove if state absent
         else:
             for assigned_role in assigned_roles_before:
-                if role.get('name') == assigned_role.get('name'):
-                    update_roles.append({
-                        'id': role.get('id'),
-                        'name': role.get('name'),
-                    })
+                if role.get("name") == assigned_role.get("name"):
+                    update_roles.append(
+                        {
+                            "id": role.get("id"),
+                            "name": role.get("name"),
+                        }
+                    )
 
     if len(update_roles):
-        if state == 'present':
+        if state == "present":
             # Assign roles
-            result['changed'] = True
+            result["changed"] = True
             if module._diff:
-                result['diff'] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
+                result["diff"] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
-            result['msg'] = 'Roles %s assigned to userId %s.' % (update_roles, uid)
+            result["msg"] = f"Roles {update_roles} assigned to userId {uid}."
             if cid is None:
                 assigned_roles_after = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
             else:
                 assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
-            result['end_state'] = assigned_roles_after
+            result["end_state"] = assigned_roles_after
             module.exit_json(**result)
         else:
             # Remove mapping of role
-            result['changed'] = True
+            result["changed"] = True
             if module._diff:
-                result['diff'] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
+                result["diff"] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
             if module.check_mode:
                 module.exit_json(**result)
             kc.delete_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
-            result['msg'] = 'Roles %s removed from userId %s.' % (update_roles, uid)
+            result["msg"] = f"Roles {update_roles} removed from userId {uid}."
             if cid is None:
                 assigned_roles_after = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
             else:
                 assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
-            result['end_state'] = assigned_roles_after
+            result["end_state"] = assigned_roles_after
             module.exit_json(**result)
     # Do nothing
     else:
-        result['changed'] = False
-        result['msg'] = 'Nothing to do, roles %s are correctly mapped to user for username %s.' % (roles, target_username)
+        result["changed"] = False
+        result["msg"] = f"Nothing to do, roles {roles} are correctly mapped to user for username {target_username}."
         module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

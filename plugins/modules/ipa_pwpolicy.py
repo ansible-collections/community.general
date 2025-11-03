@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_pwpolicy
@@ -164,49 +162,63 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 class PwPolicyIPAClient(IPAClient):
-    '''The global policy will be selected when `name` is `None`'''
+    """The global policy will be selected when `name` is `None`"""
+
     def __init__(self, module, host, port, protocol):
-        super(PwPolicyIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def pwpolicy_find(self, name):
         if name is None:
             # Manually set the cn to the global policy because pwpolicy_find will return a random
             # different policy if cn is `None`
-            name = 'global_policy'
-        return self._post_json(method='pwpolicy_find', name=None, item={'all': True, 'cn': name})
+            name = "global_policy"
+        return self._post_json(method="pwpolicy_find", name=None, item={"all": True, "cn": name})
 
     def pwpolicy_add(self, name, item):
-        return self._post_json(method='pwpolicy_add', name=name, item=item)
+        return self._post_json(method="pwpolicy_add", name=name, item=item)
 
     def pwpolicy_mod(self, name, item):
-        return self._post_json(method='pwpolicy_mod', name=name, item=item)
+        return self._post_json(method="pwpolicy_mod", name=name, item=item)
 
     def pwpolicy_del(self, name):
-        return self._post_json(method='pwpolicy_del', name=name)
+        return self._post_json(method="pwpolicy_del", name=name)
 
 
-def get_pwpolicy_dict(maxpwdlife=None, minpwdlife=None, historylength=None, minclasses=None,
-                      minlength=None, priority=None, maxfailcount=None, failinterval=None,
-                      lockouttime=None, gracelimit=None, maxrepeat=None, maxsequence=None, dictcheck=None, usercheck=None):
+def get_pwpolicy_dict(
+    maxpwdlife=None,
+    minpwdlife=None,
+    historylength=None,
+    minclasses=None,
+    minlength=None,
+    priority=None,
+    maxfailcount=None,
+    failinterval=None,
+    lockouttime=None,
+    gracelimit=None,
+    maxrepeat=None,
+    maxsequence=None,
+    dictcheck=None,
+    usercheck=None,
+):
     pwpolicy = {}
     pwpolicy_options = {
-        'krbmaxpwdlife': maxpwdlife,
-        'krbminpwdlife': minpwdlife,
-        'krbpwdhistorylength': historylength,
-        'krbpwdmindiffchars': minclasses,
-        'krbpwdminlength': minlength,
-        'cospriority': priority,
-        'krbpwdmaxfailure': maxfailcount,
-        'krbpwdfailurecountinterval': failinterval,
-        'krbpwdlockoutduration': lockouttime,
-        'passwordgracelimit': gracelimit,
-        'ipapwdmaxrepeat': maxrepeat,
-        'ipapwdmaxsequence': maxsequence,
+        "krbmaxpwdlife": maxpwdlife,
+        "krbminpwdlife": minpwdlife,
+        "krbpwdhistorylength": historylength,
+        "krbpwdmindiffchars": minclasses,
+        "krbpwdminlength": minlength,
+        "cospriority": priority,
+        "krbpwdmaxfailure": maxfailcount,
+        "krbpwdfailurecountinterval": failinterval,
+        "krbpwdlockoutduration": lockouttime,
+        "passwordgracelimit": gracelimit,
+        "ipapwdmaxrepeat": maxrepeat,
+        "ipapwdmaxsequence": maxsequence,
     }
 
     pwpolicy_boolean_options = {
-        'ipapwddictcheck': dictcheck,
-        'ipapwdusercheck': usercheck,
+        "ipapwddictcheck": dictcheck,
+        "ipapwdusercheck": usercheck,
     }
 
     for option, value in pwpolicy_options.items():
@@ -225,29 +237,30 @@ def get_pwpolicy_diff(client, ipa_pwpolicy, module_pwpolicy):
 
 
 def ensure(module, client):
-    state = module.params['state']
-    name = module.params['group']
+    state = module.params["state"]
+    name = module.params["group"]
 
-    module_pwpolicy = get_pwpolicy_dict(maxpwdlife=module.params.get('maxpwdlife'),
-                                        minpwdlife=module.params.get('minpwdlife'),
-                                        historylength=module.params.get('historylength'),
-                                        minclasses=module.params.get('minclasses'),
-                                        minlength=module.params.get('minlength'),
-                                        priority=module.params.get('priority'),
-                                        maxfailcount=module.params.get('maxfailcount'),
-                                        failinterval=module.params.get('failinterval'),
-                                        lockouttime=module.params.get('lockouttime'),
-                                        gracelimit=module.params.get('gracelimit'),
-                                        maxrepeat=module.params.get('maxrepeat'),
-                                        maxsequence=module.params.get('maxsequence'),
-                                        dictcheck=module.params.get('dictcheck'),
-                                        usercheck=module.params.get('usercheck'),
-                                        )
+    module_pwpolicy = get_pwpolicy_dict(
+        maxpwdlife=module.params.get("maxpwdlife"),
+        minpwdlife=module.params.get("minpwdlife"),
+        historylength=module.params.get("historylength"),
+        minclasses=module.params.get("minclasses"),
+        minlength=module.params.get("minlength"),
+        priority=module.params.get("priority"),
+        maxfailcount=module.params.get("maxfailcount"),
+        failinterval=module.params.get("failinterval"),
+        lockouttime=module.params.get("lockouttime"),
+        gracelimit=module.params.get("gracelimit"),
+        maxrepeat=module.params.get("maxrepeat"),
+        maxsequence=module.params.get("maxsequence"),
+        dictcheck=module.params.get("dictcheck"),
+        usercheck=module.params.get("usercheck"),
+    )
 
     ipa_pwpolicy = client.pwpolicy_find(name=name)
 
     changed = False
-    if state == 'present':
+    if state == "present":
         if not ipa_pwpolicy:
             changed = True
             if not module.check_mode:
@@ -269,35 +282,36 @@ def ensure(module, client):
 
 def main():
     argument_spec = ipa_argument_spec()
-    argument_spec.update(group=dict(type='str', aliases=['name']),
-                         state=dict(type='str', default='present', choices=['present', 'absent']),
-                         maxpwdlife=dict(type='str'),
-                         minpwdlife=dict(type='str'),
-                         historylength=dict(type='str'),
-                         minclasses=dict(type='str'),
-                         minlength=dict(type='str'),
-                         priority=dict(type='str'),
-                         maxfailcount=dict(type='str'),
-                         failinterval=dict(type='str'),
-                         lockouttime=dict(type='str'),
-                         gracelimit=dict(type='int'),
-                         maxrepeat=dict(type='int'),
-                         maxsequence=dict(type='int'),
-                         dictcheck=dict(type='bool'),
-                         usercheck=dict(type='bool'),
-                         )
+    argument_spec.update(
+        group=dict(type="str", aliases=["name"]),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        maxpwdlife=dict(type="str"),
+        minpwdlife=dict(type="str"),
+        historylength=dict(type="str"),
+        minclasses=dict(type="str"),
+        minlength=dict(type="str"),
+        priority=dict(type="str"),
+        maxfailcount=dict(type="str"),
+        failinterval=dict(type="str"),
+        lockouttime=dict(type="str"),
+        gracelimit=dict(type="int"),
+        maxrepeat=dict(type="int"),
+        maxsequence=dict(type="int"),
+        dictcheck=dict(type="bool"),
+        usercheck=dict(type="bool"),
+    )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    client = PwPolicyIPAClient(module=module,
-                               host=module.params['ipa_host'],
-                               port=module.params['ipa_port'],
-                               protocol=module.params['ipa_prot'])
+    client = PwPolicyIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
 
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, pwpolicy = ensure(module, client)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
@@ -305,5 +319,5 @@ def main():
     module.exit_json(changed=changed, pwpolicy=pwpolicy)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

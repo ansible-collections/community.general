@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Shinichi TAMURA (@tmshn)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: timezone
@@ -47,7 +45,7 @@ options:
     aliases: [rtc]
     choices: [local, UTC]
 notes:
-  - On Ubuntu 24.04 the C(util-linux-extra) package is required to provide the C(hwclock) command.
+  - On Ubuntu 24.04 and Debian 13 (Trixie), the C(util-linux-extra) package is required to provide the C(hwclock) command.
   - On SmartOS the C(sm-set-timezone) utility (part of the smtools package) is required to set the zone timezone.
   - On AIX only Olson/tz database timezones are usable (POSIX is not supported). An OS reboot is also required on AIX for
     the new timezone setting to take effect. Note that AIX 6.1+ is needed (OS level 61 or newer).
@@ -73,10 +71,9 @@ import string
 import filecmp
 
 from ansible.module_utils.basic import AnsibleModule, get_distribution
-from ansible.module_utils.six import iteritems
 
 
-class Timezone(object):
+class Timezone:
     """This is a generic Timezone manipulation class that is subclassed based on platform.
 
     A subclass may wish to override the following action methods:
@@ -93,38 +90,38 @@ class Timezone(object):
         Args:
             module: The AnsibleModule.
         """
-        if platform.system() == 'Linux':
-            timedatectl = module.get_bin_path('timedatectl')
+        if platform.system() == "Linux":
+            timedatectl = module.get_bin_path("timedatectl")
             if timedatectl is not None:
                 rc, stdout, stderr = module.run_command(timedatectl)
                 if rc == 0:
                     return super(Timezone, SystemdTimezone).__new__(SystemdTimezone)
                 else:
-                    module.debug('timedatectl command was found but not usable: %s. using other method.' % stderr)
+                    module.debug(f"timedatectl command was found but not usable: {stderr}. using other method.")
                     return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
             else:
                 return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
-        elif re.match('^joyent_.*Z', platform.version()):
+        elif re.match("^joyent_.*Z", platform.version()):
             # platform.system() returns SunOS, which is too broad. So look at the
             # platform version instead. However we have to ensure that we're not
             # running in the global zone where changing the timezone has no effect.
-            zonename_cmd = module.get_bin_path('zonename')
+            zonename_cmd = module.get_bin_path("zonename")
             if zonename_cmd is not None:
                 (rc, stdout, dummy) = module.run_command(zonename_cmd)
-                if rc == 0 and stdout.strip() == 'global':
-                    module.fail_json(msg='Adjusting timezone is not supported in Global Zone')
+                if rc == 0 and stdout.strip() == "global":
+                    module.fail_json(msg="Adjusting timezone is not supported in Global Zone")
 
             return super(Timezone, SmartOSTimezone).__new__(SmartOSTimezone)
-        elif platform.system() == 'Darwin':
+        elif platform.system() == "Darwin":
             return super(Timezone, DarwinTimezone).__new__(DarwinTimezone)
-        elif re.match('^(Free|Net|Open)BSD', platform.platform()):
+        elif re.match("^(Free|Net|Open)BSD", platform.platform()):
             return super(Timezone, BSDTimezone).__new__(BSDTimezone)
-        elif platform.system() == 'AIX':
+        elif platform.system() == "AIX":
             AIXoslevel = int(platform.version() + platform.release())
             if AIXoslevel >= 61:
                 return super(Timezone, AIXTimezone).__new__(AIXTimezone)
             else:
-                module.fail_json(msg='AIX os level must be >= 61 for timezone module (Target: %s).' % AIXoslevel)
+                module.fail_json(msg=f"AIX os level must be >= 61 for timezone module (Target: {AIXoslevel}).")
         else:
             # Not supported yet
             return super(Timezone, Timezone).__new__(Timezone)
@@ -135,7 +132,7 @@ class Timezone(object):
         Args:
             module: The AnsibleModule.
         """
-        super(Timezone, self).__init__()
+        super().__init__()
         self.msg = []
         # `self.value` holds the values for each params on each phases.
         # Initially there's only info of "planned" phase, but the
@@ -155,11 +152,11 @@ class Timezone(object):
         Args:
             msg: The error message.
         """
-        error_msg = ['Error message:', msg]
+        error_msg = ["Error message:", msg]
         if len(self.msg) > 0:
-            error_msg.append('Other message(s):')
+            error_msg.append("Other message(s):")
             error_msg.extend(self.msg)
-        self.module.fail_json(msg='\n'.join(error_msg))
+        self.module.fail_json(msg="\n".join(error_msg))
 
     def execute(self, *commands, **kwargs):
         """Execute the shell command.
@@ -175,11 +172,11 @@ class Timezone(object):
             stdout: Standard output of the command.
         """
         (rc, stdout, stderr) = self.module.run_command(list(commands), check_rc=True)
-        if kwargs.get('log', False):
-            self.msg.append('executed `%s`' % ' '.join(commands))
+        if kwargs.get("log", False):
+            self.msg.append(f"executed `{' '.join(commands)}`")
         return stdout
 
-    def diff(self, phase1='before', phase2='after'):
+    def diff(self, phase1="before", phase2="after"):
         """Calculate the difference between given 2 phases.
 
         Args:
@@ -191,7 +188,7 @@ class Timezone(object):
                 `--diff` option of ansible-playbook.
         """
         diff = {phase1: {}, phase2: {}}
-        for key, value in iteritems(self.value):
+        for key, value in self.value.items():
             diff[phase1][key] = value[phase1]
             diff[phase2][key] = value[phase2]
         return diff
@@ -205,16 +202,16 @@ class Timezone(object):
         Returns:
             NO RETURN VALUE
         """
-        if phase == 'planned':
+        if phase == "planned":
             return
-        for key, value in iteritems(self.value):
+        for key, value in self.value.items():
             value[phase] = self.get(key, phase)
 
     def change(self):
         """Make the changes effect based on `self.value`."""
-        for key, value in iteritems(self.value):
-            if value['before'] != value['planned']:
-                self.set(key, value['planned'])
+        for key, value in self.value.items():
+            if value["before"] != value["planned"]:
+                self.set(key, value["planned"])
 
     # ===========================================
     # Platform specific methods (must be replaced by subclass).
@@ -231,7 +228,7 @@ class Timezone(object):
         Return:
             value: The value for the key at the given phase.
         """
-        self.abort('get(key, phase) is not implemented on target platform')
+        self.abort("get(key, phase) is not implemented on target platform")
 
     def set(self, key, value):
         """Set the value for the key (of course, for the phase 'after').
@@ -242,13 +239,13 @@ class Timezone(object):
             key: Key to set the value
             value: Value to set
         """
-        self.abort('set(key, value) is not implemented on target platform')
+        self.abort("set(key, value) is not implemented on target platform")
 
     def _verify_timezone(self):
-        tz = self.value['name']['planned']
-        tzfile = '/usr/share/zoneinfo/%s' % tz
+        tz = self.value["name"]["planned"]
+        tzfile = f"/usr/share/zoneinfo/{tz}"
         if not os.path.isfile(tzfile):
-            self.abort('given timezone "%s" is not available' % tz)
+            self.abort(f'given timezone "{tz}" is not available')
         return tzfile
 
 
@@ -259,46 +256,43 @@ class SystemdTimezone(Timezone):
     """
 
     regexps = dict(
-        hwclock=re.compile(r'^\s*RTC in local TZ\s*:\s*([^\s]+)', re.MULTILINE),
-        name=re.compile(r'^\s*Time ?zone\s*:\s*([^\s]+)', re.MULTILINE)
+        hwclock=re.compile(r"^\s*RTC in local TZ\s*:\s*([^\s]+)", re.MULTILINE),
+        name=re.compile(r"^\s*Time ?zone\s*:\s*([^\s]+)", re.MULTILINE),
     )
 
-    subcmds = dict(
-        hwclock='set-local-rtc',
-        name='set-timezone'
-    )
+    subcmds = dict(hwclock="set-local-rtc", name="set-timezone")
 
     def __init__(self, module):
-        super(SystemdTimezone, self).__init__(module)
-        self.timedatectl = module.get_bin_path('timedatectl', required=True)
+        super().__init__(module)
+        self.timedatectl = module.get_bin_path("timedatectl", required=True)
         self.status = dict()
         # Validate given timezone
-        if 'name' in self.value:
+        if "name" in self.value:
             self._verify_timezone()
 
     def _get_status(self, phase):
         if phase not in self.status:
-            self.status[phase] = self.execute(self.timedatectl, 'status')
+            self.status[phase] = self.execute(self.timedatectl, "status")
         return self.status[phase]
 
     def get(self, key, phase):
         status = self._get_status(phase)
         value = self.regexps[key].search(status).group(1)
-        if key == 'hwclock':
+        if key == "hwclock":
             # For key='hwclock'; convert yes/no -> local/UTC
             if self.module.boolean(value):
-                value = 'local'
+                value = "local"
             else:
-                value = 'UTC'
+                value = "UTC"
         return value
 
     def set(self, key, value):
         # For key='hwclock'; convert UTC/local -> yes/no
-        if key == 'hwclock':
-            if value == 'local':
-                value = 'yes'
+        if key == "hwclock":
+            if value == "local":
+                value = "yes"
             else:
-                value = 'no'
+                value = "no"
         self.execute(self.timedatectl, self.subcmds[key], value, log=True)
 
 
@@ -315,98 +309,100 @@ class NosystemdTimezone(Timezone):
     conf_files = dict(
         name=None,  # To be set in __init__
         hwclock=None,  # To be set in __init__
-        adjtime='/etc/adjtime'
+        adjtime="/etc/adjtime",
     )
 
     # It is fine if all tree config files don't exist
-    allow_no_file = dict(
-        name=True,
-        hwclock=True,
-        adjtime=True
-    )
+    allow_no_file = dict(name=True, hwclock=True, adjtime=True)
 
     regexps = dict(
         name=None,  # To be set in __init__
-        hwclock=re.compile(r'^UTC\s*=\s*([^\s]+)', re.MULTILINE),
-        adjtime=re.compile(r'^(UTC|LOCAL)$', re.MULTILINE)
+        hwclock=re.compile(r"^UTC\s*=\s*([^\s]+)", re.MULTILINE),
+        adjtime=re.compile(r"^(UTC|LOCAL)$", re.MULTILINE),
     )
 
     dist_regexps = dict(
         SuSE=re.compile(r'^TIMEZONE\s*=\s*"?([^"\s]+)"?', re.MULTILINE),
-        redhat=re.compile(r'^ZONE\s*=\s*"?([^"\s]+)"?', re.MULTILINE)
+        redhat=re.compile(r'^ZONE\s*=\s*"?([^"\s]+)"?', re.MULTILINE),
     )
 
-    dist_tzline_format = dict(
-        SuSE='TIMEZONE="%s"\n',
-        redhat='ZONE="%s"\n'
-    )
+    dist_tzline_format = dict(SuSE='TIMEZONE="%s"\n', redhat='ZONE="%s"\n')
 
     def __init__(self, module):
-        super(NosystemdTimezone, self).__init__(module)
+        super().__init__(module)
         # Validate given timezone
-        planned_tz = ''
-        if 'name' in self.value:
+        planned_tz = ""
+        if "name" in self.value:
             tzfile = self._verify_timezone()
-            planned_tz = self.value['name']['planned']
+            planned_tz = self.value["name"]["planned"]
             # `--remove-destination` is needed if /etc/localtime is a symlink so
             # that it overwrites it instead of following it.
-            self.update_timezone = [[self.module.get_bin_path('cp', required=True), '--remove-destination', tzfile, '/etc/localtime']]
-        self.update_hwclock = self.module.get_bin_path('hwclock', required=True)
+            self.update_timezone = [
+                [self.module.get_bin_path("cp", required=True), "--remove-destination", tzfile, "/etc/localtime"]
+            ]
+        self.update_hwclock = self.module.get_bin_path("hwclock", required=True)
         distribution = get_distribution()
-        self.conf_files['name'] = '/etc/timezone'
-        self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
-        self.tzline_format = '%s\n'
+        self.conf_files["name"] = "/etc/timezone"
+        self.regexps["name"] = re.compile(r"^([^\s]+)", re.MULTILINE)
+        self.tzline_format = "%s\n"
         # Distribution-specific configurations
-        if self.module.get_bin_path('dpkg-reconfigure') is not None:
+        if self.module.get_bin_path("dpkg-reconfigure") is not None:
             # Debian/Ubuntu
-            if 'name' in self.value:
-                self.update_timezone = [[self.module.get_bin_path('ln', required=True), '-sf', tzfile, '/etc/localtime'],
-                                        [self.module.get_bin_path('dpkg-reconfigure', required=True), '--frontend', 'noninteractive', 'tzdata']]
-            self.conf_files['hwclock'] = '/etc/default/rcS'
-        elif distribution == 'Alpine' or distribution == 'Gentoo':
-            self.conf_files['hwclock'] = '/etc/conf.d/hwclock'
-            if distribution == 'Alpine':
-                self.update_timezone = [[self.module.get_bin_path('setup-timezone', required=True), '-z', planned_tz]]
+            if "name" in self.value:
+                self.update_timezone = [
+                    [self.module.get_bin_path("ln", required=True), "-sf", tzfile, "/etc/localtime"],
+                    [
+                        self.module.get_bin_path("dpkg-reconfigure", required=True),
+                        "--frontend",
+                        "noninteractive",
+                        "tzdata",
+                    ],
+                ]
+            self.conf_files["hwclock"] = "/etc/default/rcS"
+        elif distribution == "Alpine" or distribution == "Gentoo":
+            self.conf_files["hwclock"] = "/etc/conf.d/hwclock"
+            if distribution == "Alpine":
+                self.update_timezone = [[self.module.get_bin_path("setup-timezone", required=True), "-z", planned_tz]]
         else:
             # RHEL/CentOS/SUSE
-            if self.module.get_bin_path('tzdata-update') is not None:
+            if self.module.get_bin_path("tzdata-update") is not None:
                 # tzdata-update cannot update the timezone if /etc/localtime is
                 # a symlink so we have to use cp to update the time zone which
                 # was set above.
-                if not os.path.islink('/etc/localtime'):
-                    self.update_timezone = [[self.module.get_bin_path('tzdata-update', required=True)]]
+                if not os.path.islink("/etc/localtime"):
+                    self.update_timezone = [[self.module.get_bin_path("tzdata-update", required=True)]]
                 # else:
                 #   self.update_timezone       = 'cp --remove-destination ...' <- configured above
-            self.conf_files['name'] = '/etc/sysconfig/clock'
-            self.conf_files['hwclock'] = '/etc/sysconfig/clock'
+            self.conf_files["name"] = "/etc/sysconfig/clock"
+            self.conf_files["hwclock"] = "/etc/sysconfig/clock"
             try:
-                with open(self.conf_files['name'], 'r') as f:
+                with open(self.conf_files["name"], "r") as f:
                     sysconfig_clock = f.read()
             except IOError as err:
-                if self._allow_ioerror(err, 'name'):
+                if self._allow_ioerror(err, "name"):
                     # If the config file doesn't exist detect the distribution and set regexps.
-                    if distribution == 'SuSE':
+                    if distribution == "SuSE":
                         # For SUSE
-                        self.regexps['name'] = self.dist_regexps['SuSE']
-                        self.tzline_format = self.dist_tzline_format['SuSE']
+                        self.regexps["name"] = self.dist_regexps["SuSE"]
+                        self.tzline_format = self.dist_tzline_format["SuSE"]
                     else:
                         # For RHEL/CentOS
-                        self.regexps['name'] = self.dist_regexps['redhat']
-                        self.tzline_format = self.dist_tzline_format['redhat']
+                        self.regexps["name"] = self.dist_regexps["redhat"]
+                        self.tzline_format = self.dist_tzline_format["redhat"]
                 else:
-                    self.abort('could not read configuration file "%s"' % self.conf_files['name'])
+                    self.abort(f'could not read configuration file "{self.conf_files["name"]}"')
             else:
                 # The key for timezone might be `ZONE` or `TIMEZONE`
                 # (the former is used in RHEL/CentOS and the latter is used in SUSE linux).
                 # So check the content of /etc/sysconfig/clock and decide which key to use.
-                if re.search(r'^TIMEZONE\s*=', sysconfig_clock, re.MULTILINE):
+                if re.search(r"^TIMEZONE\s*=", sysconfig_clock, re.MULTILINE):
                     # For SUSE
-                    self.regexps['name'] = self.dist_regexps['SuSE']
-                    self.tzline_format = self.dist_tzline_format['SuSE']
+                    self.regexps["name"] = self.dist_regexps["SuSE"]
+                    self.tzline_format = self.dist_tzline_format["SuSE"]
                 else:
                     # For RHEL/CentOS
-                    self.regexps['name'] = self.dist_regexps['redhat']
-                    self.tzline_format = self.dist_tzline_format['redhat']
+                    self.regexps["name"] = self.dist_regexps["redhat"]
+                    self.tzline_format = self.dist_tzline_format["redhat"]
 
     def _allow_ioerror(self, err, key):
         # In some cases, even if the target file does not exist,
@@ -431,13 +427,13 @@ class NosystemdTimezone(Timezone):
         """
         # Read the file
         try:
-            with open(filename, 'r') as file:
+            with open(filename, "r") as file:
                 lines = file.readlines()
         except IOError as err:
             if self._allow_ioerror(err, key):
                 lines = []
             else:
-                self.abort('tried to configure %s using a file "%s", but could not read it' % (key, filename))
+                self.abort(f'tried to configure {key} using a file "{filename}", but could not read it')
         # Find the all matched lines
         matched_indices = []
         for i, line in enumerate(lines):
@@ -454,82 +450,84 @@ class NosystemdTimezone(Timezone):
         lines.insert(insert_line, value)
         # Write the changes
         try:
-            with open(filename, 'w') as file:
+            with open(filename, "w") as file:
                 file.writelines(lines)
         except IOError:
-            self.abort('tried to configure %s using a file "%s", but could not write to it' % (key, filename))
-        self.msg.append('Added 1 line and deleted %s line(s) on %s' % (len(matched_indices), filename))
+            self.abort(f'tried to configure {key} using a file "{filename}", but could not write to it')
+        self.msg.append(f"Added 1 line and deleted {len(matched_indices)} line(s) on {filename}")
 
     def _get_value_from_config(self, key, phase):
         filename = self.conf_files[key]
         try:
-            with open(filename, mode='r') as file:
+            with open(filename, mode="r") as file:
                 status = file.read()
         except IOError as err:
             if self._allow_ioerror(err, key):
-                if key == 'hwclock':
-                    return 'n/a'
-                elif key == 'adjtime':
-                    return 'UTC'
-                elif key == 'name':
-                    return 'n/a'
+                if key == "hwclock":
+                    return "n/a"
+                elif key == "adjtime":
+                    return "UTC"
+                elif key == "name":
+                    return "n/a"
             else:
-                self.abort('tried to configure %s using a file "%s", but could not read it' % (key, filename))
+                self.abort(f'tried to configure {key} using a file "{filename}", but could not read it')
         else:
             try:
                 value = self.regexps[key].search(status).group(1)
             except AttributeError:
-                if key == 'hwclock':
+                if key == "hwclock":
                     # If we cannot find UTC in the config that's fine.
-                    return 'n/a'
-                elif key == 'adjtime':
+                    return "n/a"
+                elif key == "adjtime":
                     # If we cannot find UTC/LOCAL in /etc/cannot that means UTC
                     # will be used by default.
-                    return 'UTC'
-                elif key == 'name':
-                    if phase == 'before':
+                    return "UTC"
+                elif key == "name":
+                    if phase == "before":
                         # In 'before' phase UTC/LOCAL doesn't need to be set in
                         # the timezone config file, so we ignore this error.
-                        return 'n/a'
+                        return "n/a"
                     else:
-                        self.abort('tried to configure %s using a file "%s", but could not find a valid value in it' % (key, filename))
+                        self.abort(
+                            f'tried to configure {key} using a file "{filename}", but could not find a valid value in it'
+                        )
             else:
-                if key == 'hwclock':
+                if key == "hwclock":
                     # convert yes/no -> UTC/local
                     if self.module.boolean(value):
-                        value = 'UTC'
+                        value = "UTC"
                     else:
-                        value = 'local'
-                elif key == 'adjtime':
+                        value = "local"
+                elif key == "adjtime":
                     # convert LOCAL -> local
-                    if value != 'UTC':
+                    if value != "UTC":
                         value = value.lower()
         return value
 
     def get(self, key, phase):
-        planned = self.value[key]['planned']
-        if key == 'hwclock':
+        planned = self.value[key]["planned"]
+        if key == "hwclock":
             value = self._get_value_from_config(key, phase)
             if value == planned:
                 # If the value in the config file is the same as the 'planned'
                 # value, we need to check /etc/adjtime.
-                value = self._get_value_from_config('adjtime', phase)
-        elif key == 'name':
+                value = self._get_value_from_config("adjtime", phase)
+        elif key == "name":
             value = self._get_value_from_config(key, phase)
             if value == planned:
                 # If the planned values is the same as the one in the config file
                 # we need to check if /etc/localtime is also set to the 'planned' zone.
-                if os.path.islink('/etc/localtime'):
+                if os.path.islink("/etc/localtime"):
                     # If /etc/localtime is a symlink and is not set to the TZ we 'planned'
                     # to set, we need to return the TZ which the symlink points to.
-                    if os.path.exists('/etc/localtime'):
+                    if os.path.exists("/etc/localtime"):
                         # We use readlink() because on some distros zone files are symlinks
                         # to other zone files, so it is hard to get which TZ is actually set
                         # if we follow the symlink.
-                        path = os.readlink('/etc/localtime')
+                        path = os.readlink("/etc/localtime")
                         # most linuxes has it in /usr/share/zoneinfo
                         # alpine linux links under /etc/zoneinfo
-                        linktz = re.search(r'(?:/(?:usr/share|etc)/zoneinfo/)(.*)', path, re.MULTILINE)
+                        linktz = re.search(r"(?:/(?:usr/share|etc)/zoneinfo/)(.*)", path, re.MULTILINE)
                         if linktz:
                             valuelink = linktz.group(1)
                             if valuelink != planned:
@@ -537,51 +535,49 @@ class NosystemdTimezone(Timezone):
                         else:
                             # Set current TZ to 'n/a' if the symlink points to a path
                             # which isn't a zone file.
-                            value = 'n/a'
+                            value = "n/a"
                     else:
                         # Set current TZ to 'n/a' if the symlink to the zone file is broken.
-                        value = 'n/a'
+                        value = "n/a"
                 else:
                     # If /etc/localtime is not a symlink best we can do is compare it with
                     # the 'planned' zone info file and return 'n/a' if they are different.
                     try:
-                        if not filecmp.cmp('/etc/localtime', '/usr/share/zoneinfo/' + planned):
-                            return 'n/a'
+                        if not filecmp.cmp("/etc/localtime", f"/usr/share/zoneinfo/{planned}"):
+                            return "n/a"
                     except Exception:
-                        return 'n/a'
+                        return "n/a"
         else:
-            self.abort('unknown parameter "%s"' % key)
+            self.abort(f'unknown parameter "{key}"')
         return value
 
     def set_timezone(self, value):
-        self._edit_file(filename=self.conf_files['name'],
-                        regexp=self.regexps['name'],
-                        value=self.tzline_format % value,
-                        key='name')
+        self._edit_file(
+            filename=self.conf_files["name"], regexp=self.regexps["name"], value=self.tzline_format % value, key="name"
+        )
         for cmd in self.update_timezone:
             self.execute(*cmd)
 
     def set_hwclock(self, value):
-        if value == 'local':
-            option = '--localtime'
-            utc = 'no'
+        if value == "local":
+            option = "--localtime"
+            utc = "no"
         else:
-            option = '--utc'
-            utc = 'yes'
-        if self.conf_files['hwclock'] is not None:
-            self._edit_file(filename=self.conf_files['hwclock'],
-                            regexp=self.regexps['hwclock'],
-                            value='UTC=%s\n' % utc,
-                            key='hwclock')
-        self.execute(self.update_hwclock, '--systohc', option, log=True)
+            option = "--utc"
+            utc = "yes"
+        if self.conf_files["hwclock"] is not None:
+            self._edit_file(
+                filename=self.conf_files["hwclock"], regexp=self.regexps["hwclock"], value=f"UTC={utc}\n", key="hwclock"
+            )
+        self.execute(self.update_hwclock, "--systohc", option, log=True)
 
     def set(self, key, value):
-        if key == 'name':
+        if key == "name":
             self.set_timezone(value)
-        elif key == 'hwclock':
+        elif key == "hwclock":
             self.set_hwclock(value)
         else:
-            self.abort('unknown parameter "%s"' % key)
+            self.abort(f'unknown parameter "{key}"')
 
 
 class SmartOSTimezone(Timezone):
@@ -595,33 +591,33 @@ class SmartOSTimezone(Timezone):
     """
 
     def __init__(self, module):
-        super(SmartOSTimezone, self).__init__(module)
-        self.settimezone = self.module.get_bin_path('sm-set-timezone', required=False)
+        super().__init__(module)
+        self.settimezone = self.module.get_bin_path("sm-set-timezone", required=False)
         if not self.settimezone:
-            module.fail_json(msg='sm-set-timezone not found. Make sure the smtools package is installed.')
+            module.fail_json(msg="sm-set-timezone not found. Make sure the smtools package is installed.")
 
     def get(self, key, phase):
         """Lookup the current timezone name in `/etc/default/init`. If anything else
         is requested, or if the TZ field is not set we fail.
         """
-        if key == 'name':
+        if key == "name":
             try:
-                with open('/etc/default/init', 'r') as f:
+                with open("/etc/default/init", "r") as f:
                     for line in f:
-                        m = re.match('^TZ=(.*)$', line.strip())
+                        m = re.match("^TZ=(.*)$", line.strip())
                         if m:
                             return m.groups()[0]
             except Exception:
-                self.module.fail_json(msg='Failed to read /etc/default/init')
+                self.module.fail_json(msg="Failed to read /etc/default/init")
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
     def set(self, key, value):
         """Set the requested timezone through sm-set-timezone, an invalid timezone name
         will be rejected and we have no further input validation to perform.
         """
-        if key == 'name':
-            cmd = ['sm-set-timezone', value]
+        if key == "name":
+            cmd = ["sm-set-timezone", value]
 
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
@@ -630,11 +626,11 @@ class SmartOSTimezone(Timezone):
 
             # sm-set-timezone knows no state and will always set the timezone.
             # XXX: https://github.com/joyent/smtools/pull/2
-            m = re.match(r'^\* Changed (to)? timezone (to)? (%s).*' % value, stdout.splitlines()[1])
+            m = re.match(rf"^\* Changed (to)? timezone (to)? ({value}).*", stdout.splitlines()[1])
             if not (m and m.groups()[-1] == value):
-                self.module.fail_json(msg='Failed to set timezone')
+                self.module.fail_json(msg="Failed to set timezone")
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
 
 class DarwinTimezone(Timezone):
@@ -643,47 +639,45 @@ class DarwinTimezone(Timezone):
     the timezone.
     """
 
-    regexps = dict(
-        name=re.compile(r'^\s*Time ?Zone\s*:\s*([^\s]+)', re.MULTILINE)
-    )
+    regexps = dict(name=re.compile(r"^\s*Time ?Zone\s*:\s*([^\s]+)", re.MULTILINE))
 
     def __init__(self, module):
-        super(DarwinTimezone, self).__init__(module)
-        self.systemsetup = module.get_bin_path('systemsetup', required=True)
+        super().__init__(module)
+        self.systemsetup = module.get_bin_path("systemsetup", required=True)
         self.status = dict()
         # Validate given timezone
-        if 'name' in self.value:
+        if "name" in self.value:
             self._verify_timezone()
 
     def _get_current_timezone(self, phase):
         """Lookup the current timezone via `systemsetup -gettimezone`."""
         if phase not in self.status:
-            self.status[phase] = self.execute(self.systemsetup, '-gettimezone')
+            self.status[phase] = self.execute(self.systemsetup, "-gettimezone")
         return self.status[phase]
 
     def _verify_timezone(self):
-        tz = self.value['name']['planned']
+        tz = self.value["name"]["planned"]
         # Lookup the list of supported timezones via `systemsetup -listtimezones`.
         # Note: Skip the first line that contains the label 'Time Zones:'
-        out = self.execute(self.systemsetup, '-listtimezones').splitlines()[1:]
+        out = self.execute(self.systemsetup, "-listtimezones").splitlines()[1:]
         tz_list = list(map(lambda x: x.strip(), out))
         if tz not in tz_list:
-            self.abort('given timezone "%s" is not available' % tz)
+            self.abort(f'given timezone "{tz}" is not available')
         return tz
 
     def get(self, key, phase):
-        if key == 'name':
+        if key == "name":
             status = self._get_current_timezone(phase)
             value = self.regexps[key].search(status).group(1)
             return value
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
     def set(self, key, value):
-        if key == 'name':
-            self.execute(self.systemsetup, '-settimezone', value, log=True)
+        if key == "name":
+            self.execute(self.systemsetup, "-settimezone", value, log=True)
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
 
 class BSDTimezone(Timezone):
@@ -693,17 +687,17 @@ class BSDTimezone(Timezone):
     """
 
     def __init__(self, module):
-        super(BSDTimezone, self).__init__(module)
+        super().__init__(module)
 
     def __get_timezone(self):
-        zoneinfo_dir = '/usr/share/zoneinfo/'
-        localtime_file = '/etc/localtime'
+        zoneinfo_dir = "/usr/share/zoneinfo/"
+        localtime_file = "/etc/localtime"
 
         # Strategy 1:
         #   If /etc/localtime does not exist, assume the timezone is UTC.
         if not os.path.exists(localtime_file):
-            self.module.warn('Could not read /etc/localtime. Assuming UTC.')
-            return 'UTC'
+            self.module.warn("Could not read /etc/localtime. Assuming UTC.")
+            return "UTC"
 
         # Strategy 2:
         #   Follow symlink of /etc/localtime
@@ -715,7 +709,7 @@ class BSDTimezone(Timezone):
                 # OSError means "end of symlink chain" or broken link.
                 break
         else:
-            return zoneinfo_file.replace(zoneinfo_dir, '')
+            return zoneinfo_file.replace(zoneinfo_dir, "")
 
         # Strategy 3:
         #   (If /etc/localtime is not symlinked)
@@ -724,30 +718,30 @@ class BSDTimezone(Timezone):
             for fname in sorted(fnames):
                 zoneinfo_file = os.path.join(dname, fname)
                 if not os.path.islink(zoneinfo_file) and filecmp.cmp(zoneinfo_file, localtime_file):
-                    return zoneinfo_file.replace(zoneinfo_dir, '')
+                    return zoneinfo_file.replace(zoneinfo_dir, "")
 
         # Strategy 4:
         #   As a fall-back, return 'UTC' as default assumption.
-        self.module.warn('Could not identify timezone name from /etc/localtime. Assuming UTC.')
-        return 'UTC'
+        self.module.warn("Could not identify timezone name from /etc/localtime. Assuming UTC.")
+        return "UTC"
 
     def get(self, key, phase):
         """Lookup the current timezone by resolving `/etc/localtime`."""
-        if key == 'name':
+        if key == "name":
             return self.__get_timezone()
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
     def set(self, key, value):
-        if key == 'name':
+        if key == "name":
             # First determine if the requested timezone is valid by looking in
             # the zoneinfo directory.
-            zonefile = '/usr/share/zoneinfo/' + value
+            zonefile = f"/usr/share/zoneinfo/{value}"
             try:
                 if not os.path.isfile(zonefile):
-                    self.module.fail_json(msg='%s is not a recognized timezone' % value)
+                    self.module.fail_json(msg=f"{value} is not a recognized timezone")
             except Exception:
-                self.module.fail_json(msg='Failed to stat %s' % zonefile)
+                self.module.fail_json(msg=f"Failed to stat {zonefile}")
 
             # Now (somewhat) atomically update the symlink by creating a new
             # symlink and move it into place. Otherwise we have to remove the
@@ -755,16 +749,16 @@ class BSDTimezone(Timezone):
             # create a race condition in case another process tries to read
             # /etc/localtime between removal and creation.
             suffix = "".join([random.choice(string.ascii_letters + string.digits) for x in range(0, 10)])
-            new_localtime = '/etc/localtime.' + suffix
+            new_localtime = f"/etc/localtime.{suffix}"
 
             try:
                 os.symlink(zonefile, new_localtime)
-                os.rename(new_localtime, '/etc/localtime')
+                os.rename(new_localtime, "/etc/localtime")
             except Exception:
                 os.remove(new_localtime)
-                self.module.fail_json(msg='Could not update /etc/localtime')
+                self.module.fail_json(msg="Could not update /etc/localtime")
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
 
 class AIXTimezone(Timezone):
@@ -783,18 +777,18 @@ class AIXTimezone(Timezone):
     """
 
     def __init__(self, module):
-        super(AIXTimezone, self).__init__(module)
-        self.settimezone = self.module.get_bin_path('chtz', required=True)
+        super().__init__(module)
+        self.settimezone = self.module.get_bin_path("chtz", required=True)
 
     def __get_timezone(self):
-        """ Return the current value of TZ= in /etc/environment """
+        """Return the current value of TZ= in /etc/environment"""
         try:
-            with open('/etc/environment', 'r') as f:
+            with open("/etc/environment", "r") as f:
                 etcenvironment = f.read()
         except Exception:
-            self.module.fail_json(msg='Issue reading contents of /etc/environment')
+            self.module.fail_json(msg="Issue reading contents of /etc/environment")
 
-        match = re.search(r'^TZ=(.*)$', etcenvironment, re.MULTILINE)
+        match = re.search(r"^TZ=(.*)$", etcenvironment, re.MULTILINE)
         if match:
             return match.group(1)
         else:
@@ -804,16 +798,16 @@ class AIXTimezone(Timezone):
         """Lookup the current timezone name in `/etc/environment`. If anything else
         is requested, or if the TZ field is not set we fail.
         """
-        if key == 'name':
+        if key == "name":
             return self.__get_timezone()
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
     def set(self, key, value):
         """Set the requested timezone through chtz, an invalid timezone name
         will be rejected and we have no further input validation to perform.
         """
-        if key == 'name':
+        if key == "name":
             # chtz seems to always return 0 on AIX 7.2, even for invalid timezone values.
             # It will only return non-zero if the chtz command itself fails, it does not check for
             #  valid timezones. We need to perform a basic check to confirm that the timezone
@@ -829,15 +823,15 @@ class AIXTimezone(Timezone):
 
             # First determine if the requested timezone is valid by looking in the zoneinfo
             #  directory.
-            zonefile = '/usr/share/lib/zoneinfo/' + value
+            zonefile = f"/usr/share/lib/zoneinfo/{value}"
             try:
                 if not os.path.isfile(zonefile):
-                    self.module.fail_json(msg='%s is not a recognized timezone.' % value)
+                    self.module.fail_json(msg=f"{value} is not a recognized timezone.")
             except Exception:
-                self.module.fail_json(msg='Failed to check %s.' % zonefile)
+                self.module.fail_json(msg=f"Failed to check {zonefile}.")
 
             # Now set the TZ using chtz
-            cmd = ['chtz', value]
+            cmd = ["chtz", value]
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
@@ -847,51 +841,48 @@ class AIXTimezone(Timezone):
             #  change.
             TZ = self.__get_timezone()
             if TZ != value:
-                msg = 'TZ value does not match post-change (Actual: %s, Expected: %s).' % (TZ, value)
+                msg = f"TZ value does not match post-change (Actual: {TZ}, Expected: {value})."
                 self.module.fail_json(msg=msg)
 
         else:
-            self.module.fail_json(msg='%s is not a supported option on target platform' % key)
+            self.module.fail_json(msg=f"{key} is not a supported option on target platform")
 
 
 def main():
     # Construct 'module' and 'tz'
     module = AnsibleModule(
         argument_spec=dict(
-            hwclock=dict(type='str', choices=['local', 'UTC'], aliases=['rtc']),
-            name=dict(type='str'),
+            hwclock=dict(type="str", choices=["local", "UTC"], aliases=["rtc"]),
+            name=dict(type="str"),
         ),
-        required_one_of=[
-            ['hwclock', 'name']
-        ],
+        required_one_of=[["hwclock", "name"]],
         supports_check_mode=True,
     )
     tz = Timezone(module)
 
     # Check the current state
-    tz.check(phase='before')
+    tz.check(phase="before")
     if module.check_mode:
-        diff = tz.diff('before', 'planned')
+        diff = tz.diff("before", "planned")
         # In check mode, 'planned' state is treated as 'after' state
-        diff['after'] = diff.pop('planned')
+        diff["after"] = diff.pop("planned")
     else:
         # Make change
         tz.change()
         # Check the current state
-        tz.check(phase='after')
+        tz.check(phase="after")
         # Examine if the current state matches planned state
-        (after, planned) = tz.diff('after', 'planned').values()
+        (after, planned) = tz.diff("after", "planned").values()
         if after != planned:
-            tz.abort('still not desired state, though changes have made - '
-                     'planned: %s, after: %s' % (str(planned), str(after)))
-        diff = tz.diff('before', 'after')
+            tz.abort(f"still not desired state, though changes have made - planned: {planned}, after: {after}")
+        diff = tz.diff("before", "after")
 
-    changed = (diff['before'] != diff['after'])
+    changed = diff["before"] != diff["after"]
     if len(tz.msg) > 0:
-        module.exit_json(changed=changed, diff=diff, msg='\n'.join(tz.msg))
+        module.exit_json(changed=changed, diff=diff, msg="\n".join(tz.msg))
     else:
         module.exit_json(changed=changed, diff=diff)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

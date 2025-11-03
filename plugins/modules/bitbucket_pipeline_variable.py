@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Evgeniy Krysanov <evgeniy.krysanov@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: bitbucket_pipeline_variable
@@ -87,12 +85,14 @@ from ansible.module_utils.basic import AnsibleModule, _load_params
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 
 error_messages = {
-    'required_value': '`value` is required when the `state` is `present`',
+    "required_value": "`value` is required when the `state` is `present`",
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    'pipeline-variable-list': '%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/variables/' % BitbucketHelper.BITBUCKET_API_URL,
-    'pipeline-variable-detail': '%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/variables/{variable_uuid}' % BitbucketHelper.BITBUCKET_API_URL,
+    "pipeline-variable-list": "%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/variables/"
+    % BitbucketHelper.BITBUCKET_API_URL,
+    "pipeline-variable-detail": "%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/variables/{variable_uuid}"
+    % BitbucketHelper.BITBUCKET_API_URL,
 }
 
 
@@ -117,113 +117,104 @@ def get_existing_pipeline_variable(module, bitbucket):
 
     The `value` key in dict is absent in case of secured variable.
     """
-    variables_base_url = BITBUCKET_API_ENDPOINTS['pipeline-variable-list'].format(
-        workspace=module.params['workspace'],
-        repo_slug=module.params['repository'],
+    variables_base_url = BITBUCKET_API_ENDPOINTS["pipeline-variable-list"].format(
+        workspace=module.params["workspace"],
+        repo_slug=module.params["repository"],
     )
     # Look through the all response pages in search of variable we need
     page = 1
     while True:
-        next_url = "%s?page=%s" % (variables_base_url, page)
+        next_url = f"{variables_base_url}?page={page}"
         info, content = bitbucket.request(
             api_url=next_url,
-            method='GET',
+            method="GET",
         )
 
-        if info['status'] == 404:
-            module.fail_json(msg='Invalid `repository` or `workspace`.')
+        if info["status"] == 404:
+            module.fail_json(msg="Invalid `repository` or `workspace`.")
 
-        if info['status'] != 200:
-            module.fail_json(msg='Failed to retrieve the list of pipeline variables: {0}'.format(info))
+        if info["status"] != 200:
+            module.fail_json(msg=f"Failed to retrieve the list of pipeline variables: {info}")
 
         # We are at the end of list
-        if 'pagelen' in content and content['pagelen'] == 0:
+        if "pagelen" in content and content["pagelen"] == 0:
             return None
 
         page += 1
-        var = next(filter(lambda v: v['key'] == module.params['name'], content['values']), None)
+        var = next((v for v in content["values"] if v["key"] == module.params["name"]), None)
 
         if var is not None:
-            var['name'] = var.pop('key')
+            var["name"] = var.pop("key")
             return var
 
 
 def create_pipeline_variable(module, bitbucket):
     info, content = bitbucket.request(
-        api_url=BITBUCKET_API_ENDPOINTS['pipeline-variable-list'].format(
-            workspace=module.params['workspace'],
-            repo_slug=module.params['repository'],
+        api_url=BITBUCKET_API_ENDPOINTS["pipeline-variable-list"].format(
+            workspace=module.params["workspace"],
+            repo_slug=module.params["repository"],
         ),
-        method='POST',
+        method="POST",
         data={
-            'key': module.params['name'],
-            'value': module.params['value'],
-            'secured': module.params['secured'],
+            "key": module.params["name"],
+            "value": module.params["value"],
+            "secured": module.params["secured"],
         },
     )
 
-    if info['status'] != 201:
-        module.fail_json(msg='Failed to create pipeline variable `{name}`: {info}'.format(
-            name=module.params['name'],
-            info=info,
-        ))
+    if info["status"] != 201:
+        module.fail_json(msg=f"Failed to create pipeline variable `{module.params['name']}`: {info}")
 
 
 def update_pipeline_variable(module, bitbucket, variable_uuid):
     info, content = bitbucket.request(
-        api_url=BITBUCKET_API_ENDPOINTS['pipeline-variable-detail'].format(
-            workspace=module.params['workspace'],
-            repo_slug=module.params['repository'],
+        api_url=BITBUCKET_API_ENDPOINTS["pipeline-variable-detail"].format(
+            workspace=module.params["workspace"],
+            repo_slug=module.params["repository"],
             variable_uuid=variable_uuid,
         ),
-        method='PUT',
+        method="PUT",
         data={
-            'value': module.params['value'],
-            'secured': module.params['secured'],
+            "value": module.params["value"],
+            "secured": module.params["secured"],
         },
     )
 
-    if info['status'] != 200:
-        module.fail_json(msg='Failed to update pipeline variable `{name}`: {info}'.format(
-            name=module.params['name'],
-            info=info,
-        ))
+    if info["status"] != 200:
+        module.fail_json(msg=f"Failed to update pipeline variable `{module.params['name']}`: {info}")
 
 
 def delete_pipeline_variable(module, bitbucket, variable_uuid):
     info, content = bitbucket.request(
-        api_url=BITBUCKET_API_ENDPOINTS['pipeline-variable-detail'].format(
-            workspace=module.params['workspace'],
-            repo_slug=module.params['repository'],
+        api_url=BITBUCKET_API_ENDPOINTS["pipeline-variable-detail"].format(
+            workspace=module.params["workspace"],
+            repo_slug=module.params["repository"],
             variable_uuid=variable_uuid,
         ),
-        method='DELETE',
+        method="DELETE",
     )
 
-    if info['status'] != 204:
-        module.fail_json(msg='Failed to delete pipeline variable `{name}`: {info}'.format(
-            name=module.params['name'],
-            info=info,
-        ))
+    if info["status"] != 204:
+        module.fail_json(msg=f"Failed to delete pipeline variable `{module.params['name']}`: {info}")
 
 
 class BitBucketPipelineVariable(AnsibleModule):
     def __init__(self, *args, **kwargs):
         params = _load_params() or {}
-        if params.get('secured'):
-            kwargs['argument_spec']['value'].update({'no_log': True})
-        super(BitBucketPipelineVariable, self).__init__(*args, **kwargs)
+        if params.get("secured"):
+            kwargs["argument_spec"]["value"].update({"no_log": True})
+        super().__init__(*args, **kwargs)
 
 
 def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
-        repository=dict(type='str', required=True),
-        workspace=dict(type='str', required=True),
-        name=dict(type='str', required=True),
-        value=dict(type='str'),
-        secured=dict(type='bool', default=False),
-        state=dict(type='str', choices=['present', 'absent'], required=True),
+        repository=dict(type="str", required=True),
+        workspace=dict(type="str", required=True),
+        name=dict(type="str", required=True),
+        value=dict(type="str"),
+        secured=dict(type="bool", default=False),
+        state=dict(type="str", choices=["present", "absent"], required=True),
     )
     module = BitBucketPipelineVariable(
         argument_spec=argument_spec,
@@ -234,13 +225,13 @@ def main():
 
     bitbucket = BitbucketHelper(module)
 
-    value = module.params['value']
-    state = module.params['state']
-    secured = module.params['secured']
+    value = module.params["value"]
+    state = module.params["state"]
+    secured = module.params["secured"]
 
     # Check parameters
-    if (value is None) and (state == 'present'):
-        module.fail_json(msg=error_messages['required_value'])
+    if (value is None) and (state == "present"):
+        module.fail_json(msg=error_messages["required_value"])
 
     # Retrieve access token for authorized API requests
     bitbucket.fetch_access_token()
@@ -250,26 +241,26 @@ def main():
     changed = False
 
     # Create new variable in case it doesn't exists
-    if not existing_variable and (state == 'present'):
+    if not existing_variable and (state == "present"):
         if not module.check_mode:
             create_pipeline_variable(module, bitbucket)
         changed = True
 
     # Update variable if it is secured or the old value does not match the new one
-    elif existing_variable and (state == 'present'):
-        if (existing_variable['secured'] != secured) or (existing_variable.get('value') != value):
+    elif existing_variable and (state == "present"):
+        if (existing_variable["secured"] != secured) or (existing_variable.get("value") != value):
             if not module.check_mode:
-                update_pipeline_variable(module, bitbucket, existing_variable['uuid'])
+                update_pipeline_variable(module, bitbucket, existing_variable["uuid"])
             changed = True
 
     # Delete variable
-    elif existing_variable and (state == 'absent'):
+    elif existing_variable and (state == "absent"):
         if not module.check_mode:
-            delete_pipeline_variable(module, bitbucket, existing_variable['uuid'])
+            delete_pipeline_variable(module, bitbucket, existing_variable["uuid"])
         changed = True
 
     module.exit_json(changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

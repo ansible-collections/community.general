@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022 Western Digital Corporation
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ocapi_command
@@ -167,17 +165,17 @@ operationStatusId:
   sample: 2
 """
 
+from urllib.parse import urljoin
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six.moves.urllib.parse import urljoin
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "PowerModeLow", "PowerModeNormal"],
     "Systems": ["PowerGracefulRestart"],
     "Update": ["FWUpload", "FWUpdate", "FWActivate"],
-    "Jobs": ["DeleteJob"]
+    "Jobs": ["DeleteJob"],
 }
 
 
@@ -186,41 +184,42 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
-            command=dict(required=True, type='str'),
-            job_name=dict(type='str'),
-            baseuri=dict(required=True, type='str'),
-            proxy_slot_number=dict(type='int'),
-            update_image_path=dict(type='str'),
+            command=dict(required=True, type="str"),
+            job_name=dict(type="str"),
+            baseuri=dict(required=True, type="str"),
+            proxy_slot_number=dict(type="int"),
+            update_image_path=dict(type="str"),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
-            timeout=dict(type='int', default=10)
+            timeout=dict(type="int", default=10),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    category = module.params['category']
-    command = module.params['command']
+    category = module.params["category"]
+    command = module.params["command"]
 
     # admin credentials used for authentication
-    creds = {
-        'user': module.params['username'],
-        'pswd': module.params['password']
-    }
+    creds = {"user": module.params["username"], "pswd": module.params["password"]}
 
     # timeout
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
-    base_uri = "https://" + module.params["baseuri"]
+    base_uri = f"https://{module.params['baseuri']}"
     proxy_slot_number = module.params.get("proxy_slot_number")
     ocapi_utils = OcapiUtils(creds, base_uri, proxy_slot_number, timeout, module)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(
+            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
+        )
 
     # Check that the command is valid
     if command not in CATEGORY_COMMANDS_ALL[category]:
-        module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (command, CATEGORY_COMMANDS_ALL[category])))
+        module.fail_json(
+            msg=to_native(f"Invalid Command '{command}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
+        )
 
     # Organize by Categories / Commands
     if category == "Chassis":
@@ -246,21 +245,21 @@ def main():
             job_name = module.params.get("job_name")
             if job_name is None:
                 module.fail_json("Missing job_name")
-            job_uri = urljoin(base_uri, "Jobs/" + job_name)
+            job_uri = urljoin(base_uri, f"Jobs/{job_name}")
             result = ocapi_utils.delete_job(job_uri)
 
-    if result['ret'] is False:
-        module.fail_json(msg=to_native(result['msg']))
+    if result["ret"] is False:
+        module.fail_json(msg=to_native(result["msg"]))
     else:
-        del result['ret']
-        changed = result.get('changed', True)
-        session = result.get('session', dict())
+        del result["ret"]
+        changed = result.get("changed", True)
+        session = result.get("session", dict())
         kwargs = {
             "changed": changed,
             "session": session,
-            "msg": "Action was successful." if not module.check_mode else result.get(
-                "msg", "No action performed in check mode."
-            )
+            "msg": "Action was successful."
+            if not module.check_mode
+            else result.get("msg", "No action performed in check mode."),
         }
         result_keys = [result_key for result_key in result if result_key not in kwargs]
         for result_key in result_keys:
@@ -268,5 +267,5 @@ def main():
         module.exit_json(**kwargs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

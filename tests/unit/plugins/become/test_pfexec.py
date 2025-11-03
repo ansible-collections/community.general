@@ -5,8 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import re
 
@@ -21,18 +20,18 @@ def test_pfexec_basic(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    pfexec_exe = 'pfexec'
-    pfexec_flags = '-H -S -n'
+    pfexec_exe = "pfexec"
+    pfexec_flags = "-H -S -n"
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_method': 'community.general.pfexec',
+        "become_method": "community.general.pfexec",
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s 'echo %s; %s'""" % (pfexec_exe, pfexec_flags, success, default_cmd), cmd) is not None
+    assert re.match(f"""{pfexec_exe} {pfexec_flags} 'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_pfexec(mocker, parser, reset_cli_args):
@@ -41,20 +40,20 @@ def test_pfexec(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    pfexec_exe = 'pfexec'
-    pfexec_flags = ''
+    pfexec_exe = "pfexec"
+    pfexec_flags = ""
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.pfexec',
-        'become_flags': pfexec_flags,
+        "become_user": "foo",
+        "become_method": "community.general.pfexec",
+        "become_flags": pfexec_flags,
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s 'echo %s; %s'""" % (pfexec_exe, pfexec_flags, success, default_cmd), cmd) is not None
+    assert re.match(f"""{pfexec_exe} {pfexec_flags} 'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_pfexec_varoptions(mocker, parser, reset_cli_args):
@@ -63,20 +62,20 @@ def test_pfexec_varoptions(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    pfexec_exe = 'pfexec'
-    pfexec_flags = ''
+    pfexec_exe = "pfexec"
+    pfexec_flags = ""
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.pfexec',
-        'become_flags': 'xxx',
+        "become_user": "foo",
+        "become_method": "community.general.pfexec",
+        "become_flags": "xxx",
     }
     var_options = {
-        'ansible_become_user': 'bar',
-        'ansible_become_flags': pfexec_flags,
+        "ansible_become_user": "bar",
+        "ansible_become_flags": pfexec_flags,
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s 'echo %s; %s'""" % (pfexec_exe, pfexec_flags, success, default_cmd), cmd) is not None
+    assert re.match(f"""{pfexec_exe} {pfexec_flags} 'echo {success}; {default_cmd}'""", cmd) is not None

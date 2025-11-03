@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Daniel Korn <korndaniel1@gmail.com>
 # Copyright (c) 2017, Yaacov Zamir <yzamir@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -126,20 +124,21 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import (
-    ManageIQ, ManageIQTags, manageiq_argument_spec, manageiq_entities
+    ManageIQ,
+    ManageIQTags,
+    manageiq_argument_spec,
+    manageiq_entities,
 )
 
 
 def main():
-    actions = {'present': 'assign', 'absent': 'unassign'}
+    actions = {"present": "assign", "absent": "unassign"}
     argument_spec = dict(
-        tags=dict(type='list', elements='dict'),
-        resource_id=dict(type='int'),
-        resource_name=dict(type='str'),
-        resource_type=dict(required=True, type='str',
-                           choices=list(manageiq_entities().keys())),
-        state=dict(type='str',
-                   choices=['present', 'absent'], default='present'),
+        tags=dict(type="list", elements="dict"),
+        resource_id=dict(type="int"),
+        resource_name=dict(type="str"),
+        resource_type=dict(required=True, type="str", choices=list(manageiq_entities().keys())),
+        state=dict(type="str", choices=["present", "absent"], default="present"),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
@@ -148,17 +147,14 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[["resource_id", "resource_name"]],
         required_one_of=[["resource_id", "resource_name"]],
-        required_if=[
-            ('state', 'present', ['tags']),
-            ('state', 'absent', ['tags'])
-        ],
+        required_if=[("state", "present", ["tags"]), ("state", "absent", ["tags"])],
     )
 
-    tags = module.params['tags']
-    resource_id = module.params['resource_id']
-    resource_type_key = module.params['resource_type']
-    resource_name = module.params['resource_name']
-    state = module.params['state']
+    tags = module.params["tags"]
+    resource_id = module.params["resource_id"]
+    resource_type_key = module.params["resource_type"]
+    resource_name = module.params["resource_name"]
+    state = module.params["state"]
 
     # get the action and resource type
     action = actions[state]

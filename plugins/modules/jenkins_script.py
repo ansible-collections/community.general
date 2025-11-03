@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, James Hogarth <james.hogarth@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -104,41 +102,39 @@ output:
 """
 
 import json
+from http import cookiejar
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import http_cookiejar as cookiejar
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_native
 
 
 def is_csrf_protection_enabled(module):
-    resp, info = fetch_url(module,
-                           module.params['url'] + '/api/json',
-                           timeout=module.params['timeout'],
-                           method='GET')
+    resp, info = fetch_url(module, f"{module.params['url']}/api/json", timeout=module.params["timeout"], method="GET")
     if info["status"] != 200:
-        module.fail_json(msg="HTTP error " + str(info["status"]) + " " + info["msg"], output='')
+        module.fail_json(msg=f"HTTP error {info['status']} {info['msg']}", output="")
 
     content = to_native(resp.read())
-    return json.loads(content).get('useCrumbs', False)
+    return json.loads(content).get("useCrumbs", False)
 
 
 def get_crumb(module, cookies):
-    resp, info = fetch_url(module,
-                           module.params['url'] + '/crumbIssuer/api/json',
-                           method='GET',
-                           timeout=module.params['timeout'],
-                           cookies=cookies)
+    resp, info = fetch_url(
+        module,
+        f"{module.params['url']}/crumbIssuer/api/json",
+        method="GET",
+        timeout=module.params["timeout"],
+        cookies=cookies,
+    )
     if info["status"] != 200:
-        module.fail_json(msg="HTTP error " + str(info["status"]) + " " + info["msg"], output='')
+        module.fail_json(msg=f"HTTP error {info['status']} {info['msg']}", output="")
 
     content = to_native(resp.read())
     return json.loads(content)
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             script=dict(required=True, type="str"),
@@ -147,53 +143,56 @@ def main():
             user=dict(type="str"),
             password=dict(no_log=True, type="str"),
             timeout=dict(type="int", default=10),
-            args=dict(type="dict")
+            args=dict(type="dict"),
         )
     )
 
-    if module.params['user'] is not None:
-        if module.params['password'] is None:
-            module.fail_json(msg="password required when user provided", output='')
-        module.params['url_username'] = module.params['user']
-        module.params['url_password'] = module.params['password']
-        module.params['force_basic_auth'] = True
+    if module.params["user"] is not None:
+        if module.params["password"] is None:
+            module.fail_json(msg="password required when user provided", output="")
+        module.params["url_username"] = module.params["user"]
+        module.params["url_password"] = module.params["password"]
+        module.params["force_basic_auth"] = True
 
-    if module.params['args'] is not None:
+    if module.params["args"] is not None:
         from string import Template
+
         try:
-            script_contents = Template(module.params['script']).substitute(module.params['args'])
+            script_contents = Template(module.params["script"]).substitute(module.params["args"])
         except KeyError as err:
-            module.fail_json(msg="Error with templating variable: %s" % err, output='')
+            module.fail_json(msg=f"Error with templating variable: {err}", output="")
     else:
-        script_contents = module.params['script']
+        script_contents = module.params["script"]
 
     headers = {}
     cookies = None
     if is_csrf_protection_enabled(module):
         cookies = cookiejar.LWPCookieJar()
         crumb = get_crumb(module, cookies)
-        headers = {crumb['crumbRequestField']: crumb['crumb']}
+        headers = {crumb["crumbRequestField"]: crumb["crumb"]}
 
-    resp, info = fetch_url(module,
-                           module.params['url'] + "/scriptText",
-                           data=urlencode({'script': script_contents}),
-                           headers=headers,
-                           method="POST",
-                           timeout=module.params['timeout'],
-                           cookies=cookies)
+    resp, info = fetch_url(
+        module,
+        f"{module.params['url']}/scriptText",
+        data=urlencode({"script": script_contents}),
+        headers=headers,
+        method="POST",
+        timeout=module.params["timeout"],
+        cookies=cookies,
+    )
 
     if info["status"] != 200:
-        module.fail_json(msg="HTTP error " + str(info["status"]) + " " + info["msg"], output='')
+        module.fail_json(msg=f"HTTP error {info['status']} {info['msg']}", output="")
 
     result = to_native(resp.read())
 
-    if 'Exception:' in result and 'at java.lang.Thread' in result:
-        module.fail_json(msg="script failed with stacktrace:\n " + result, output='')
+    if "Exception:" in result and "at java.lang.Thread" in result:
+        module.fail_json(msg=f"script failed with stacktrace:\n {result}", output="")
 
     module.exit_json(
         output=result,
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

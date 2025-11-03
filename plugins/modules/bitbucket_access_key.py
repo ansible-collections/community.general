@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Evgeniy Krysanov <evgeniy.krysanov@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: bitbucket_access_key
@@ -78,15 +76,16 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 
 error_messages = {
-    'required_key': '`key` is required when the `state` is `present`',
-    'required_permission': 'OAuth consumer `client_id` should have permissions to read and administrate the repository',
-    'invalid_workspace_or_repo': 'Invalid `repository` or `workspace`',
-    'invalid_key': 'Invalid SSH key or key is already in use',
+    "required_key": "`key` is required when the `state` is `present`",
+    "required_permission": "OAuth consumer `client_id` should have permissions to read and administrate the repository",
+    "invalid_workspace_or_repo": "Invalid `repository` or `workspace`",
+    "invalid_key": "Invalid SSH key or key is already in use",
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    'deploy-key-list': '%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/' % BitbucketHelper.BITBUCKET_API_URL,
-    'deploy-key-detail': '%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}' % BitbucketHelper.BITBUCKET_API_URL,
+    "deploy-key-list": "%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/" % BitbucketHelper.BITBUCKET_API_URL,
+    "deploy-key-detail": "%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}"
+    % BitbucketHelper.BITBUCKET_API_URL,
 }
 
 
@@ -135,29 +134,29 @@ def get_existing_deploy_key(module, bitbucket):
         }
     """
     content = {
-        'next': BITBUCKET_API_ENDPOINTS['deploy-key-list'].format(
-            workspace=module.params['workspace'],
-            repo_slug=module.params['repository'],
+        "next": BITBUCKET_API_ENDPOINTS["deploy-key-list"].format(
+            workspace=module.params["workspace"],
+            repo_slug=module.params["repository"],
         )
     }
 
     # Look through the all response pages in search of deploy key we need
-    while 'next' in content:
+    while "next" in content:
         info, content = bitbucket.request(
-            api_url=content['next'],
-            method='GET',
+            api_url=content["next"],
+            method="GET",
         )
 
-        if info['status'] == 404:
-            module.fail_json(msg=error_messages['invalid_workspace_or_repo'])
+        if info["status"] == 404:
+            module.fail_json(msg=error_messages["invalid_workspace_or_repo"])
 
-        if info['status'] == 403:
-            module.fail_json(msg=error_messages['required_permission'])
+        if info["status"] == 403:
+            module.fail_json(msg=error_messages["required_permission"])
 
-        if info['status'] != 200:
-            module.fail_json(msg='Failed to retrieve the list of deploy keys: {0}'.format(info))
+        if info["status"] != 200:
+            module.fail_json(msg=f"Failed to retrieve the list of deploy keys: {info}")
 
-        res = next(iter(filter(lambda v: v['label'] == module.params['label'], content['values'])), None)
+        res = next((v for v in content["values"] if v["label"] == module.params["label"]), None)
 
         if res is not None:
             return res
@@ -167,66 +166,61 @@ def get_existing_deploy_key(module, bitbucket):
 
 def create_deploy_key(module, bitbucket):
     info, content = bitbucket.request(
-        api_url=BITBUCKET_API_ENDPOINTS['deploy-key-list'].format(
-            workspace=module.params['workspace'],
-            repo_slug=module.params['repository'],
+        api_url=BITBUCKET_API_ENDPOINTS["deploy-key-list"].format(
+            workspace=module.params["workspace"],
+            repo_slug=module.params["repository"],
         ),
-        method='POST',
+        method="POST",
         data={
-            'key': module.params['key'],
-            'label': module.params['label'],
+            "key": module.params["key"],
+            "label": module.params["label"],
         },
     )
 
-    if info['status'] == 404:
-        module.fail_json(msg=error_messages['invalid_workspace_or_repo'])
+    if info["status"] == 404:
+        module.fail_json(msg=error_messages["invalid_workspace_or_repo"])
 
-    if info['status'] == 403:
-        module.fail_json(msg=error_messages['required_permission'])
+    if info["status"] == 403:
+        module.fail_json(msg=error_messages["required_permission"])
 
-    if info['status'] == 400:
-        module.fail_json(msg=error_messages['invalid_key'])
+    if info["status"] == 400:
+        module.fail_json(msg=error_messages["invalid_key"])
 
-    if info['status'] != 200:
-        module.fail_json(msg='Failed to create deploy key `{label}`: {info}'.format(
-            label=module.params['label'],
-            info=info,
-        ))
+    if info["status"] != 200:
+        module.fail_json(msg=f"Failed to create deploy key `{module.params['label']}`: {info}")
 
 
 def delete_deploy_key(module, bitbucket, key_id):
     info, content = bitbucket.request(
-        api_url=BITBUCKET_API_ENDPOINTS['deploy-key-detail'].format(
-            workspace=module.params['workspace'],
-            repo_slug=module.params['repository'],
+        api_url=BITBUCKET_API_ENDPOINTS["deploy-key-detail"].format(
+            workspace=module.params["workspace"],
+            repo_slug=module.params["repository"],
             key_id=key_id,
         ),
-        method='DELETE',
+        method="DELETE",
     )
 
-    if info['status'] == 404:
-        module.fail_json(msg=error_messages['invalid_workspace_or_repo'])
+    if info["status"] == 404:
+        module.fail_json(msg=error_messages["invalid_workspace_or_repo"])
 
-    if info['status'] == 403:
-        module.fail_json(msg=error_messages['required_permission'])
+    if info["status"] == 403:
+        module.fail_json(msg=error_messages["required_permission"])
 
-    if info['status'] != 204:
-        module.fail_json(msg='Failed to delete deploy key `{label}`: {info}'.format(
-            label=module.params['label'],
-            info=info,
-        ))
+    if info["status"] != 204:
+        module.fail_json(msg=f"Failed to delete deploy key `{module.params['label']}`: {info}")
 
 
 def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
-        repository=dict(type='str', required=True),
+        repository=dict(type="str", required=True),
         workspace=dict(
-            type='str', required=True,
+            type="str",
+            required=True,
         ),
-        key=dict(type='str', no_log=False),
-        label=dict(type='str', required=True),
-        state=dict(type='str', choices=['present', 'absent'], required=True),
+        key=dict(type="str", no_log=False),
+        label=dict(type="str", required=True),
+        state=dict(type="str", choices=["present", "absent"], required=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -237,12 +231,12 @@ def main():
 
     bitbucket = BitbucketHelper(module)
 
-    key = module.params['key']
-    state = module.params['state']
+    key = module.params["key"]
+    state = module.params["state"]
 
     # Check parameters
-    if (key is None) and (state == 'present'):
-        module.fail_json(msg=error_messages['required_key'])
+    if (key is None) and (state == "present"):
+        module.fail_json(msg=error_messages["required_key"])
 
     # Retrieve access token for authorized API requests
     bitbucket.fetch_access_token()
@@ -252,29 +246,29 @@ def main():
     changed = False
 
     # Create new deploy key in case it doesn't exists
-    if not existing_deploy_key and (state == 'present'):
+    if not existing_deploy_key and (state == "present"):
         if not module.check_mode:
             create_deploy_key(module, bitbucket)
         changed = True
 
     # Update deploy key if the old value does not match the new one
-    elif existing_deploy_key and (state == 'present'):
-        if not key.startswith(existing_deploy_key.get('key')):
+    elif existing_deploy_key and (state == "present"):
+        if not key.startswith(existing_deploy_key.get("key")):
             if not module.check_mode:
                 # Bitbucket doesn't support update key for the same label,
                 # so we need to delete the old one first
-                delete_deploy_key(module, bitbucket, existing_deploy_key['id'])
+                delete_deploy_key(module, bitbucket, existing_deploy_key["id"])
                 create_deploy_key(module, bitbucket)
             changed = True
 
     # Delete deploy key
-    elif existing_deploy_key and (state == 'absent'):
+    elif existing_deploy_key and (state == "absent"):
         if not module.check_mode:
-            delete_deploy_key(module, bitbucket, existing_deploy_key['id'])
+            delete_deploy_key(module, bitbucket, existing_deploy_key["id"])
         changed = True
 
     module.exit_json(changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

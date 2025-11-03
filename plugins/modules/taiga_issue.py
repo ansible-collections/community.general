@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Alejandro Guirao <lekumberri@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -125,22 +123,33 @@ import traceback
 from os import getenv
 from os.path import isfile
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 TAIGA_IMP_ERR = None
 try:
     from taiga import TaigaAPI
     from taiga.exceptions import TaigaException
+
     TAIGA_MODULE_IMPORTED = True
 except ImportError:
     TAIGA_IMP_ERR = traceback.format_exc()
     TAIGA_MODULE_IMPORTED = False
 
 
-def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
-                 issue_status, issue_type, issue_severity, issue_description,
-                 issue_attachment, issue_attachment_description,
-                 issue_tags, state, check_mode=False):
+def manage_issue(
+    taiga_host,
+    project_name,
+    issue_subject,
+    issue_priority,
+    issue_status,
+    issue_type,
+    issue_severity,
+    issue_description,
+    issue_attachment,
+    issue_attachment_description,
+    issue_tags,
+    state,
+    check_mode=False,
+):
     """
     Method that creates/deletes issues depending whether they exist and the state desired
 
@@ -157,42 +166,42 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
     changed = False
 
     try:
-        token = getenv('TAIGA_TOKEN')
+        token = getenv("TAIGA_TOKEN")
         if token:
             api = TaigaAPI(host=taiga_host, token=token)
         else:
             api = TaigaAPI(host=taiga_host)
-            username = getenv('TAIGA_USERNAME')
-            password = getenv('TAIGA_PASSWORD')
+            username = getenv("TAIGA_USERNAME")
+            password = getenv("TAIGA_PASSWORD")
             if not any([username, password]):
                 return False, changed, "Missing credentials", {}
             api.auth(username=username, password=password)
 
         user_id = api.me().id
-        project_list = list(filter(lambda x: x.name == project_name, api.projects.list(member=user_id)))
+        project_list = [x for x in api.projects.list(member=user_id) if x.name == project_name]
         if len(project_list) != 1:
-            return False, changed, "Unable to find project %s" % project_name, {}
+            return False, changed, f"Unable to find project {project_name}", {}
         project = project_list[0]
         project_id = project.id
 
-        priority_list = list(filter(lambda x: x.name == issue_priority, api.priorities.list(project=project_id)))
+        priority_list = [x for x in api.priorities.list(project=project_id) if x.name == issue_priority]
         if len(priority_list) != 1:
-            return False, changed, "Unable to find issue priority %s for project %s" % (issue_priority, project_name), {}
+            return False, changed, f"Unable to find issue priority {issue_priority} for project {project_name}", {}
         priority_id = priority_list[0].id
 
-        status_list = list(filter(lambda x: x.name == issue_status, api.issue_statuses.list(project=project_id)))
+        status_list = [x for x in api.issue_statuses.list(project=project_id) if x.name == issue_status]
         if len(status_list) != 1:
-            return False, changed, "Unable to find issue status %s for project %s" % (issue_status, project_name), {}
+            return False, changed, f"Unable to find issue status {issue_status} for project {project_name}", {}
         status_id = status_list[0].id
 
-        type_list = list(filter(lambda x: x.name == issue_type, project.list_issue_types()))
+        type_list = [x for x in project.list_issue_types() if x.name == issue_type]
         if len(type_list) != 1:
-            return False, changed, "Unable to find issue type %s for project %s" % (issue_type, project_name), {}
+            return False, changed, f"Unable to find issue type {issue_type} for project {project_name}", {}
         type_id = type_list[0].id
 
-        severity_list = list(filter(lambda x: x.name == issue_severity, project.list_severities()))
+        severity_list = [x for x in project.list_severities() if x.name == issue_severity]
         if len(severity_list) != 1:
-            return False, changed, "Unable to find severity %s for project %s" % (issue_severity, project_name), {}
+            return False, changed, f"Unable to find severity {issue_severity} for project {project_name}", {}
         severity_id = severity_list[0].id
 
         issue = {
@@ -207,7 +216,7 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
         }
 
         # An issue is identified by the project_name, the issue_subject and the issue_type
-        matching_issue_list = list(filter(lambda x: x.subject == issue_subject and x.type == type_id, project.list_issues()))
+        matching_issue_list = [x for x in project.list_issues() if x.subject == issue_subject and x.type == type_id]
         matching_issue_list_len = len(matching_issue_list)
 
         if matching_issue_list_len == 0:
@@ -217,8 +226,15 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
                 changed = True
                 if not check_mode:
                     # Create the issue
-                    new_issue = project.add_issue(issue_subject, priority_id, status_id, type_id, severity_id, tags=issue_tags,
-                                                  description=issue_description)
+                    new_issue = project.add_issue(
+                        issue_subject,
+                        priority_id,
+                        status_id,
+                        type_id,
+                        severity_id,
+                        tags=issue_tags,
+                        description=issue_description,
+                    )
                     if issue_attachment:
                         new_issue.attach(issue_attachment, description=issue_attachment_description)
                         issue["attachment"] = issue_attachment
@@ -245,51 +261,51 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
 
         else:
             # More than 1 matching issue
-            return False, changed, "More than one issue with subject %s in project %s" % (issue_subject, project_name), {}
+            return False, changed, f"More than one issue with subject {issue_subject} in project {project_name}", {}
 
     except TaigaException as exc:
-        msg = "An exception happened: %s" % to_native(exc)
+        msg = f"An exception happened: {exc}"
         return False, changed, msg, {}
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            taiga_host=dict(type='str', default="https://api.taiga.io"),
-            project=dict(type='str', required=True),
-            subject=dict(type='str', required=True),
-            issue_type=dict(type='str', required=True),
-            priority=dict(type='str', default="Normal"),
-            status=dict(type='str', default="New"),
-            severity=dict(type='str', default="Normal"),
-            description=dict(type='str', default=""),
-            attachment=dict(type='path'),
-            attachment_description=dict(type='str', default=""),
-            tags=dict(default=[], type='list', elements='str'),
-            state=dict(type='str', choices=['present', 'absent'], default='present'),
+            taiga_host=dict(type="str", default="https://api.taiga.io"),
+            project=dict(type="str", required=True),
+            subject=dict(type="str", required=True),
+            issue_type=dict(type="str", required=True),
+            priority=dict(type="str", default="Normal"),
+            status=dict(type="str", default="New"),
+            severity=dict(type="str", default="Normal"),
+            description=dict(type="str", default=""),
+            attachment=dict(type="path"),
+            attachment_description=dict(type="str", default=""),
+            tags=dict(default=[], type="list", elements="str"),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not TAIGA_MODULE_IMPORTED:
         module.fail_json(msg=missing_required_lib("python-taiga"), exception=TAIGA_IMP_ERR)
 
-    taiga_host = module.params['taiga_host']
-    project_name = module.params['project']
-    issue_subject = module.params['subject']
-    issue_priority = module.params['priority']
-    issue_status = module.params['status']
-    issue_type = module.params['issue_type']
-    issue_severity = module.params['severity']
-    issue_description = module.params['description']
-    issue_attachment = module.params['attachment']
-    issue_attachment_description = module.params['attachment_description']
+    taiga_host = module.params["taiga_host"]
+    project_name = module.params["project"]
+    issue_subject = module.params["subject"]
+    issue_priority = module.params["priority"]
+    issue_status = module.params["status"]
+    issue_type = module.params["issue_type"]
+    issue_severity = module.params["severity"]
+    issue_description = module.params["description"]
+    issue_attachment = module.params["attachment"]
+    issue_attachment_description = module.params["attachment_description"]
     if issue_attachment:
         if not isfile(issue_attachment):
-            msg = "%s is not a file" % issue_attachment
+            msg = f"{issue_attachment} is not a file"
             module.fail_json(msg=msg)
-    issue_tags = module.params['tags']
-    state = module.params['state']
+    issue_tags = module.params["tags"]
+    state = module.params["state"]
 
     return_status, changed, msg, issue_attr_dict = manage_issue(
         taiga_host,
@@ -304,7 +320,7 @@ def main():
         issue_attachment_description,
         issue_tags,
         state,
-        check_mode=module.check_mode
+        check_mode=module.check_mode,
     )
     if return_status:
         if issue_attr_dict:
@@ -315,5 +331,5 @@ def main():
         module.fail_json(msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -8,3 +8,4 @@ skip/macos
 skip/osx
 skip/freebsd
 skip/rhel10.0  # FIXME
+disabled  # FIXME - https://github.com/ansible-collections/community.general/issues/10987

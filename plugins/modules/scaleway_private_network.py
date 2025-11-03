@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Scaleway VPC management module
 #
@@ -7,9 +6,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: scaleway_private_network
@@ -119,52 +117,55 @@ scaleway_private_network:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
+from ansible_collections.community.general.plugins.module_utils.scaleway import (
+    SCALEWAY_LOCATION,
+    scaleway_argument_spec,
+    Scaleway,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
 def get_private_network(api, name, page=1):
     page_size = 10
-    response = api.get('private-networks', params={'name': name, 'order_by': 'name_asc', 'page': page, 'page_size': page_size})
+    response = api.get(
+        "private-networks", params={"name": name, "order_by": "name_asc", "page": page, "page_size": page_size}
+    )
     if not response.ok:
-        msg = "Error during get private network creation: %s: '%s' (%s)" % (response.info['msg'], response.json['message'], response.json)
+        msg = f"Error during get private network creation: {response.info['msg']}: '{response.json['message']}' ({response.json})"
         api.module.fail_json(msg=msg)
 
-    if response.json['total_count'] == 0:
+    if response.json["total_count"] == 0:
         return None
 
     i = 0
-    while i < len(response.json['private_networks']):
-        if response.json['private_networks'][i]['name'] == name:
-            return response.json['private_networks'][i]
+    while i < len(response.json["private_networks"]):
+        if response.json["private_networks"][i]["name"] == name:
+            return response.json["private_networks"][i]
         i += 1
 
     # search on next page if needed
-    if (page * page_size) < response.json['total_count']:
+    if (page * page_size) < response.json["total_count"]:
         return get_private_network(api, name, page + 1)
 
     return None
 
 
 def present_strategy(api, wished_private_network):
-
     changed = False
-    private_network = get_private_network(api, wished_private_network['name'])
+    private_network = get_private_network(api, wished_private_network["name"])
     if private_network is not None:
-        if set(wished_private_network['tags']) == set(private_network['tags']):
+        if set(wished_private_network["tags"]) == set(private_network["tags"]):
             return changed, private_network
         else:
             # private network need to be updated
-            data = {'name': wished_private_network['name'],
-                    'tags': wished_private_network['tags']
-                    }
+            data = {"name": wished_private_network["name"], "tags": wished_private_network["tags"]}
             changed = True
             if api.module.check_mode:
                 return changed, {"status": "private network would be updated"}
 
-            response = api.patch(path='private-networks/' + private_network['id'], data=data)
+            response = api.patch(path=f"private-networks/{private_network['id']}", data=data)
             if not response.ok:
-                api.module.fail_json(msg='Error updating private network [{0}: {1}]'.format(response.status_code, response.json))
+                api.module.fail_json(msg=f"Error updating private network [{response.status_code}: {response.json}]")
 
             return changed, response.json
 
@@ -173,23 +174,23 @@ def present_strategy(api, wished_private_network):
     if api.module.check_mode:
         return changed, {"status": "private network would be created"}
 
-    data = {'name': wished_private_network['name'],
-            'project_id': wished_private_network['project'],
-            'tags': wished_private_network['tags']
-            }
+    data = {
+        "name": wished_private_network["name"],
+        "project_id": wished_private_network["project"],
+        "tags": wished_private_network["tags"],
+    }
 
-    response = api.post(path='private-networks/', data=data)
+    response = api.post(path="private-networks/", data=data)
 
     if not response.ok:
-        api.module.fail_json(msg='Error creating private network [{0}: {1}]'.format(response.status_code, response.json))
+        api.module.fail_json(msg=f"Error creating private network [{response.status_code}: {response.json}]")
 
     return changed, response.json
 
 
 def absent_strategy(api, wished_private_network):
-
     changed = False
-    private_network = get_private_network(api, wished_private_network['name'])
+    private_network = get_private_network(api, wished_private_network["name"])
     if private_network is None:
         return changed, {}
 
@@ -197,25 +198,23 @@ def absent_strategy(api, wished_private_network):
     if api.module.check_mode:
         return changed, {"status": "private network would be destroyed"}
 
-    response = api.delete('private-networks/' + private_network['id'])
+    response = api.delete(f"private-networks/{private_network['id']}")
 
     if not response.ok:
-        api.module.fail_json(msg='Error deleting private network [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f"Error deleting private network [{response.status_code}: {response.json}]")
 
     return changed, response.json
 
 
 def core(module):
-
     wished_private_network = {
-        "project": module.params['project'],
-        "tags": module.params['tags'],
-        "name": module.params['name']
+        "project": module.params["project"],
+        "tags": module.params["tags"],
+        "name": module.params["name"],
     }
 
     region = module.params["region"]
-    module.params['api_url'] = SCALEWAY_LOCATION[region]["api_endpoint_vpc"]
+    module.params["api_url"] = SCALEWAY_LOCATION[region]["api_endpoint_vpc"]
 
     api = Scaleway(module=module)
     if module.params["state"] == "absent":
@@ -227,13 +226,15 @@ def core(module):
 
 def main():
     argument_spec = scaleway_argument_spec()
-    argument_spec.update(dict(
-        state=dict(default='present', choices=['absent', 'present']),
-        project=dict(required=True),
-        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
-        tags=dict(type="list", elements="str", default=[]),
-        name=dict()
-    ))
+    argument_spec.update(
+        dict(
+            state=dict(default="present", choices=["absent", "present"]),
+            project=dict(required=True),
+            region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
+            tags=dict(type="list", elements="str", default=[]),
+            name=dict(),
+        )
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -242,5 +243,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

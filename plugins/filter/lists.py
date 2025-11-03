@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -33,7 +32,7 @@ def flatten_list(lst):
     result = []
     for sublist in lst:
         if not is_sequence(sublist):
-            msg = ("All arguments must be lists. %s is %s")
+            msg = "All arguments must be lists. %s is %s"
             raise AnsibleFilterError(msg % (sublist, type(sublist)))
         if len(sublist) > 0:
             if all(is_sequence(sub) for sub in sublist):
@@ -46,15 +45,11 @@ def flatten_list(lst):
 
 def lists_union(*args, **kwargs):
     lists = args
-    flatten = kwargs.pop('flatten', False)
+    flatten = kwargs.pop("flatten", False)
 
     if kwargs:
         # Some unused kwargs remain
-        raise AnsibleFilterError(
-            "lists_union() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
-        )
+        raise AnsibleFilterError(f"lists_union() got unexpected keywords arguments: {', '.join(kwargs.keys())}")
 
     if flatten:
         lists = flatten_list(args)
@@ -77,15 +72,11 @@ def do_union(a, b):
 
 def lists_intersect(*args, **kwargs):
     lists = args
-    flatten = kwargs.pop('flatten', False)
+    flatten = kwargs.pop("flatten", False)
 
     if kwargs:
         # Some unused kwargs remain
-        raise AnsibleFilterError(
-            "lists_intersect() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
-        )
+        raise AnsibleFilterError(f"lists_intersect() got unexpected keywords arguments: {', '.join(kwargs.keys())}")
 
     if flatten:
         lists = flatten_list(args)
@@ -117,15 +108,11 @@ def do_intersect(a, b):
 
 def lists_difference(*args, **kwargs):
     lists = args
-    flatten = kwargs.pop('flatten', False)
+    flatten = kwargs.pop("flatten", False)
 
     if kwargs:
         # Some unused kwargs remain
-        raise AnsibleFilterError(
-            "lists_difference() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
-        )
+        raise AnsibleFilterError(f"lists_difference() got unexpected keywords arguments: {', '.join(kwargs.keys())}")
 
     if flatten:
         lists = flatten_list(args)
@@ -157,15 +144,11 @@ def do_difference(a, b):
 
 def lists_symmetric_difference(*args, **kwargs):
     lists = args
-    flatten = kwargs.pop('flatten', False)
+    flatten = kwargs.pop("flatten", False)
 
     if kwargs:
         # Some unused kwargs remain
-        raise AnsibleFilterError(
-            "lists_difference() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
-        )
+        raise AnsibleFilterError(f"lists_difference() got unexpected keywords arguments: {', '.join(kwargs.keys())}")
 
     if flatten:
         lists = flatten_list(args)
@@ -197,13 +180,13 @@ def do_symmetric_difference(a, b):
     return sym_diff
 
 
-class FilterModule(object):
-    ''' Ansible lists jinja2 filters '''
+class FilterModule:
+    """Ansible lists jinja2 filters"""
 
     def filters(self):
         return {
-            'lists_union': lists_union,
-            'lists_intersect': lists_intersect,
-            'lists_difference': lists_difference,
-            'lists_symmetric_difference': lists_symmetric_difference,
+            "lists_union": lists_union,
+            "lists_intersect": lists_intersect,
+            "lists_difference": lists_difference,
+            "lists_symmetric_difference": lists_symmetric_difference,
         }

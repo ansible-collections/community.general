@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 # Copyright (c) 2021, Christophe Gilles <christophe.gilles54@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_authentication_required_actions
@@ -174,22 +172,26 @@ end_state:
       type: str
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
 def sanitize_required_actions(objects):
     for obj in objects:
-        alias = obj['alias']
-        name = obj['name']
-        provider_id = obj['providerId']
+        alias = obj["alias"]
+        name = obj["name"]
+        provider_id = obj["providerId"]
 
         if not name:
-            obj['name'] = alias
+            obj["name"] = alias
 
         if provider_id != alias:
-            obj['providerId'] = alias
+            obj["providerId"] = alias
 
     return objects
 
@@ -215,21 +217,21 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        realm=dict(type='str', required=True),
+        realm=dict(type="str", required=True),
         required_actions=dict(
-            type='list',
-            elements='dict',
+            type="list",
+            elements="dict",
             options=dict(
-                alias=dict(type='str', required=True),
-                config=dict(type='dict'),
-                defaultAction=dict(type='bool'),
-                enabled=dict(type='bool'),
-                name=dict(type='str'),
-                priority=dict(type='int'),
-                providerId=dict(type='str')
-            )
+                alias=dict(type="str", required=True),
+                config=dict(type="dict"),
+                defaultAction=dict(type="bool"),
+                enabled=dict(type="bool"),
+                name=dict(type="str"),
+                priority=dict(type="int"),
+                providerId=dict(type="str"),
+            ),
         ),
-        state=dict(type='str', choices=['present', 'absent'], required=True)
+        state=dict(type="str", choices=["present", "absent"], required=True),
     )
 
     argument_spec.update(meta_args)
@@ -237,12 +239,14 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-        required_together=([['auth_username', 'auth_password']]),
-        required_by={'refresh_token': 'auth_realm'},
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
     )
 
-    result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
+    result = dict(changed=False, msg="", end_state={}, diff=dict(before={}, after={}))
 
     # Obtain access token, initialize API
     try:
@@ -253,9 +257,9 @@ def main():
     kc = KeycloakAPI(module, connection_header)
 
     # Convenience variables
-    realm = module.params.get('realm')
-    desired_required_actions = module.params.get('required_actions')
-    state = module.params.get('state')
+    realm = module.params.get("realm")
+    desired_required_actions = module.params.get("required_actions")
+    state = module.params.get("state")
 
     # Sanitize required actions
     desired_required_actions = sanitize_required_actions(desired_required_actions)
@@ -266,7 +270,7 @@ def main():
     # Get required actions
     before_required_actions = kc.get_required_actions(realm=realm)
 
-    if state == 'present':
+    if state == "present":
         # Initialize empty lists to hold the required actions that need to be
         # registered, updated, and original ones of the updated one
         register_required_actions = []
@@ -279,7 +283,7 @@ def main():
 
             # Loop through the before required actions and check if the aliases match
             for before_required_action in before_required_actions:
-                if desired_required_action['alias'] == before_required_action['alias']:
+                if desired_required_action["alias"] == before_required_action["alias"]:
                     update_required = False
 
                     # Fill in the parameters
@@ -290,7 +294,10 @@ def main():
                     # Loop through the keys of the desired and before required actions
                     # and check if there are any differences between them
                     for key in desired_required_action.keys():
-                        if key in before_required_action and desired_required_action[key] != before_required_action[key]:
+                        if (
+                            key in before_required_action
+                            and desired_required_action[key] != before_required_action[key]
+                        ):
                             update_required = True
                             break
 
@@ -305,17 +312,15 @@ def main():
             # add it to the list of required actions to register
             if not found:
                 # Check if name is provided
-                if 'name' not in desired_required_action or desired_required_action['name'] is None:
+                if "name" not in desired_required_action or desired_required_action["name"] is None:
                     module.fail_json(
-                        msg='Unable to register required action %s in realm %s: name not included'
-                        % (desired_required_action['alias'], realm)
+                        msg=f"Unable to register required action {desired_required_action['alias']} in realm {realm}: name not included"
                     )
 
                 # Check if provider ID is provided
-                if 'providerId' not in desired_required_action or desired_required_action['providerId'] is None:
+                if "providerId" not in desired_required_action or desired_required_action["providerId"] is None:
                     module.fail_json(
-                        msg='Unable to register required action %s in realm %s: providerId not included'
-                        % (desired_required_action['alias'], realm)
+                        msg=f"Unable to register required action {desired_required_action['alias']} in realm {realm}: providerId not included"
                     )
 
                 register_required_actions.append(desired_required_action)
@@ -325,23 +330,20 @@ def main():
             diff_required_actions = updated_required_actions.copy()
             diff_required_actions.extend(register_required_actions)
 
-            result['diff'] = dict(
-                before=before_updated_required_actions,
-                after=diff_required_actions
-            )
+            result["diff"] = dict(before=before_updated_required_actions, after=diff_required_actions)
 
         # Handle changed
         if register_required_actions or updated_required_actions:
-            result['changed'] = True
+            result["changed"] = True
 
         # Handle check mode
         if module.check_mode:
             if register_required_actions or updated_required_actions:
-                result['change'] = True
-                result['msg'] = 'Required actions would be registered/updated'
+                result["change"] = True
+                result["msg"] = "Required actions would be registered/updated"
             else:
-                result['change'] = False
-                result['msg'] = 'Required actions would not be registered/updated'
+                result["change"] = False
+                result["msg"] = "Required actions would not be registered/updated"
 
             module.exit_json(**result)
 
@@ -349,12 +351,16 @@ def main():
         if register_required_actions:
             for register_required_action in register_required_actions:
                 kc.register_required_action(realm=realm, rep=register_required_action)
-                kc.update_required_action(alias=register_required_action['alias'], realm=realm, rep=register_required_action)
+                kc.update_required_action(
+                    alias=register_required_action["alias"], realm=realm, rep=register_required_action
+                )
 
         # Update required actions
         if updated_required_actions:
             for updated_required_action in updated_required_actions:
-                kc.update_required_action(alias=updated_required_action['alias'], realm=realm, rep=updated_required_action)
+                kc.update_required_action(
+                    alias=updated_required_action["alias"], realm=realm, rep=updated_required_action
+                )
 
         # Initialize the final list of required actions
         final_required_actions = []
@@ -365,7 +371,7 @@ def main():
             updated_required_action_found = False
 
             for updated_required_action in updated_required_actions:
-                if updated_required_action['alias'] == before_required_action['alias']:
+                if updated_required_action["alias"] == before_required_action["alias"]:
                     # Merge the two dictionaries, favoring the values from updated_required_action
                     merged_dict = {}
                     for key in before_required_action.keys():
@@ -393,15 +399,15 @@ def main():
 
         # Append any remaining updated_required_actions that were not merged
         for updated_required_action in updated_required_actions:
-            if not any(updated_required_action['alias'] == action['alias'] for action in final_required_actions):
+            if not any(updated_required_action["alias"] == action["alias"] for action in final_required_actions):
                 final_required_actions.append(updated_required_action)
 
         # Append newly registered required actions
         final_required_actions.extend(register_required_actions)
 
         # Handle message and end state
-        result['msg'] = 'Required actions registered/updated'
-        result['end_state'] = final_required_actions
+        result["msg"] = "Required actions registered/updated"
+        result["end_state"] = final_required_actions
     else:
         # Filter out the deleted required actions
         final_required_actions = []
@@ -411,7 +417,7 @@ def main():
             delete_action = False
 
             for desired_required_action in desired_required_actions:
-                if before_required_action['alias'] == desired_required_action['alias']:
+                if before_required_action["alias"] == desired_required_action["alias"]:
                     delete_action = True
                     break
 
@@ -422,37 +428,34 @@ def main():
 
         # Handle diff
         if module._diff:
-            result['diff'] = dict(
-                before=before_required_actions,
-                after=final_required_actions
-            )
+            result["diff"] = dict(before=before_required_actions, after=final_required_actions)
 
         # Handle changed
         if delete_required_actions:
-            result['changed'] = True
+            result["changed"] = True
 
         # Handle check mode
         if module.check_mode:
             if final_required_actions:
-                result['change'] = True
-                result['msg'] = 'Required actions would be deleted'
+                result["change"] = True
+                result["msg"] = "Required actions would be deleted"
             else:
-                result['change'] = False
-                result['msg'] = 'Required actions would not be deleted'
+                result["change"] = False
+                result["msg"] = "Required actions would not be deleted"
 
             module.exit_json(**result)
 
         # Delete required actions
         if delete_required_actions:
             for delete_required_action in delete_required_actions:
-                kc.delete_required_action(alias=delete_required_action['alias'], realm=realm)
+                kc.delete_required_action(alias=delete_required_action["alias"], realm=realm)
 
         # Handle message and end state
-        result['msg'] = 'Required actions deleted'
-        result['end_state'] = final_required_actions
+        result["msg"] = "Required actions deleted"
+        result["end_state"] = final_required_actions
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

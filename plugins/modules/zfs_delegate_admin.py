@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Nate Coraor <nate@coraor.org>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: zfs_delegate_admin
@@ -118,159 +116,152 @@ from itertools import product
 from ansible.module_utils.basic import AnsibleModule
 
 
-class ZfsDelegateAdmin(object):
+class ZfsDelegateAdmin:
     def __init__(self, module):
         self.module = module
-        self.name = module.params.get('name')
-        self.state = module.params.get('state')
-        self.users = module.params.get('users')
-        self.groups = module.params.get('groups')
-        self.everyone = module.params.get('everyone')
-        self.perms = module.params.get('permissions')
+        self.name = module.params.get("name")
+        self.state = module.params.get("state")
+        self.users = module.params.get("users")
+        self.groups = module.params.get("groups")
+        self.everyone = module.params.get("everyone")
+        self.perms = module.params.get("permissions")
         self.scope = None
         self.changed = False
         self.initial_perms = None
-        self.subcommand = 'allow'
+        self.subcommand = "allow"
         self.recursive_opt = []
         self.run_method = self.update
 
         self.setup(module)
 
     def setup(self, module):
-        """ Validate params and set up for run.
-        """
-        if self.state == 'absent':
-            self.subcommand = 'unallow'
-            if module.params.get('recursive'):
-                self.recursive_opt = ['-r']
+        """Validate params and set up for run."""
+        if self.state == "absent":
+            self.subcommand = "unallow"
+            if module.params.get("recursive"):
+                self.recursive_opt = ["-r"]
 
-        local = module.params.get('local')
-        descendents = module.params.get('descendents')
+        local = module.params.get("local")
+        descendents = module.params.get("descendents")
         if (local and descendents) or (not local and not descendents):
-            self.scope = 'ld'
+            self.scope = "ld"
         elif local:
-            self.scope = 'l'
+            self.scope = "l"
         elif descendents:
-            self.scope = 'd'
+            self.scope = "d"
         else:
-            self.module.fail_json(msg='Impossible value for local and descendents')
+            self.module.fail_json(msg="Impossible value for local and descendents")
 
         if not (self.users or self.groups or self.everyone):
-            if self.state == 'present':
-                self.module.fail_json(msg='One of `users`, `groups`, or `everyone` must be set')
-            elif self.state == 'absent':
+            if self.state == "present":
+                self.module.fail_json(msg="One of `users`, `groups`, or `everyone` must be set")
+            elif self.state == "absent":
                 self.run_method = self.clear
             # ansible ensures the else cannot happen here
 
-        self.zfs_path = module.get_bin_path('zfs', True)
+        self.zfs_path = module.get_bin_path("zfs", True)
 
     @property
     def current_perms(self):
-        """ Parse the output of `zfs allow <name>` to retrieve current permissions.
-        """
-        out = self.run_zfs_raw(subcommand='allow')
+        """Parse the output of `zfs allow <name>` to retrieve current permissions."""
+        out = self.run_zfs_raw(subcommand="allow")
         perms = {
-            'l': {'u': {}, 'g': {}, 'e': []},
-            'd': {'u': {}, 'g': {}, 'e': []},
-            'ld': {'u': {}, 'g': {}, 'e': []},
+            "l": {"u": {}, "g": {}, "e": []},
+            "d": {"u": {}, "g": {}, "e": []},
+            "ld": {"u": {}, "g": {}, "e": []},
         }
         linemap = {
-            'Local permissions:': 'l',
-            'Descendent permissions:': 'd',
-            'Local+Descendent permissions:': 'ld',
+            "Local permissions:": "l",
+            "Descendent permissions:": "d",
+            "Local+Descendent permissions:": "ld",
         }
         scope = None
         for line in out.splitlines():
             scope = linemap.get(line, scope)
             if not scope:
                 continue
-            if ' (unknown: ' in line:
-                line = line.replace('(unknown: ', '', 1)
-                line = line.replace(')', '', 1)
+            if " (unknown: " in line:
+                line = line.replace("(unknown: ", "", 1)
+                line = line.replace(")", "", 1)
             try:
-                if line.startswith('\tuser ') or line.startswith('\tgroup '):
+                if line.startswith("\tuser ") or line.startswith("\tgroup "):
                     ent_type, ent, cur_perms = line.split()
-                    perms[scope][ent_type[0]][ent] = cur_perms.split(',')
-                elif line.startswith('\teveryone '):
-                    perms[scope]['e'] = line.split()[1].split(',')
+                    perms[scope][ent_type[0]][ent] = cur_perms.split(",")
+                elif line.startswith("\teveryone "):
+                    perms[scope]["e"] = line.split()[1].split(",")
             except ValueError:
-                self.module.fail_json(msg="Cannot parse user/group permission output by `zfs allow`: '%s'" % line)
+                self.module.fail_json(msg=f"Cannot parse user/group permission output by `zfs allow`: '{line}'")
         return perms
 
     def run_zfs_raw(self, subcommand=None, args=None):
-        """ Run a raw zfs command, fail on error.
-        """
+        """Run a raw zfs command, fail on error."""
         cmd = [self.zfs_path, subcommand or self.subcommand] + (args or []) + [self.name]
         rc, out, err = self.module.run_command(cmd)
         if rc:
-            self.module.fail_json(msg='Command `%s` failed: %s' % (' '.join(cmd), err))
+            self.module.fail_json(msg=f"Command `{' '.join(cmd)}` failed: {err}")
         return out
 
     def run_zfs(self, args):
-        """ Run zfs allow/unallow with appropriate options as per module arguments.
-        """
-        args = self.recursive_opt + ['-' + self.scope] + args
+        """Run zfs allow/unallow with appropriate options as per module arguments."""
+        args = self.recursive_opt + [f"-{self.scope}"] + args
         if self.perms:
-            args.append(','.join(self.perms))
+            args.append(",".join(self.perms))
         return self.run_zfs_raw(args=args)
 
     def clear(self):
-        """ Called by run() to clear all permissions.
-        """
+        """Called by run() to clear all permissions."""
         changed = False
-        stdout = ''
-        for scope, ent_type in product(('ld', 'l', 'd'), ('u', 'g')):
+        stdout = ""
+        for scope, ent_type in product(("ld", "l", "d"), ("u", "g")):
             for ent in self.initial_perms[scope][ent_type].keys():
-                stdout += self.run_zfs(['-%s' % ent_type, ent])
+                stdout += self.run_zfs([f"-{ent_type}", ent])
                 changed = True
-        for scope in ('ld', 'l', 'd'):
-            if self.initial_perms[scope]['e']:
-                stdout += self.run_zfs(['-e'])
+        for scope in ("ld", "l", "d"):
+            if self.initial_perms[scope]["e"]:
+                stdout += self.run_zfs(["-e"])
                 changed = True
         return (changed, stdout)
 
     def update(self):
-        """ Update permissions as per module arguments.
-        """
-        stdout = ''
-        for ent_type, entities in (('u', self.users), ('g', self.groups)):
+        """Update permissions as per module arguments."""
+        stdout = ""
+        for ent_type, entities in (("u", self.users), ("g", self.groups)):
             if entities:
-                stdout += self.run_zfs(['-%s' % ent_type, ','.join(entities)])
+                stdout += self.run_zfs([f"-{ent_type}", ",".join(entities)])
         if self.everyone:
-            stdout += self.run_zfs(['-e'])
+            stdout += self.run_zfs(["-e"])
         return (self.initial_perms != self.current_perms, stdout)
 
     def run(self):
-        """ Run an operation, return results for Ansible.
-        """
-        exit_args = {'state': self.state}
+        """Run an operation, return results for Ansible."""
+        exit_args = {"state": self.state}
         self.initial_perms = self.current_perms
-        exit_args['changed'], stdout = self.run_method()
-        if exit_args['changed']:
-            exit_args['msg'] = 'ZFS delegated admin permissions updated'
-            exit_args['stdout'] = stdout
+        exit_args["changed"], stdout = self.run_method()
+        if exit_args["changed"]:
+            exit_args["msg"] = "ZFS delegated admin permissions updated"
+            exit_args["stdout"] = stdout
         self.module.exit_json(**exit_args)
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
-            users=dict(type='list', elements='str'),
-            groups=dict(type='list', elements='str'),
-            everyone=dict(type='bool', default=False),
-            permissions=dict(type='list', elements='str'),
-            local=dict(type='bool'),
-            descendents=dict(type='bool'),
-            recursive=dict(type='bool', default=False),
+            name=dict(type="str", required=True),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            users=dict(type="list", elements="str"),
+            groups=dict(type="list", elements="str"),
+            everyone=dict(type="bool", default=False),
+            permissions=dict(type="list", elements="str"),
+            local=dict(type="bool"),
+            descendents=dict(type="bool"),
+            recursive=dict(type="bool", default=False),
         ),
         supports_check_mode=False,
-        required_if=[('state', 'present', ['permissions'])],
+        required_if=[("state", "present", ["permissions"])],
     )
     zfs_delegate_admin = ZfsDelegateAdmin(module)
     zfs_delegate_admin.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

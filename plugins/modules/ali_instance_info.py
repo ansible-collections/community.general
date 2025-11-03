@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017-present Alibaba Group Holding Limited. He Guimin <heguimin36@163.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -20,9 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible. If not, see http://www.gnu.org/licenses/.
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: ali_instance_info
@@ -346,17 +344,17 @@ ids:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
-    ecs_argument_spec, ecs_connect, FOOTMARK_IMP_ERR, HAS_FOOTMARK
+    ecs_argument_spec,
+    ecs_connect,
+    FOOTMARK_IMP_ERR,
+    HAS_FOOTMARK,
 )
 
 
 def main():
     argument_spec = ecs_argument_spec()
-    argument_spec.update(dict(
-        name_prefix=dict(type='str'),
-        tags=dict(type='dict', aliases=['instance_tags']),
-        filters=dict(type='dict')
-    )
+    argument_spec.update(
+        dict(name_prefix=dict(type="str"), tags=dict(type="dict", aliases=["instance_tags"]), filters=dict(type="dict"))
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -364,16 +362,16 @@ def main():
     )
 
     if HAS_FOOTMARK is False:
-        module.fail_json(msg=missing_required_lib('footmark'), exception=FOOTMARK_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("footmark"), exception=FOOTMARK_IMP_ERR)
 
     ecs = ecs_connect(module)
 
     instances = []
     instance_ids = []
     ids = []
-    name_prefix = module.params['name_prefix']
+    name_prefix = module.params["name_prefix"]
 
-    filters = module.params['filters']
+    filters = module.params["filters"]
     if not filters:
         filters = {}
     for key, value in list(filters.items()):
@@ -382,22 +380,22 @@ def main():
                 if id not in ids:
                     ids.append(value)
     if ids:
-        filters['instance_ids'] = ids
-    if module.params['tags']:
-        filters['tags'] = module.params['tags']
+        filters["instance_ids"] = ids
+    if module.params["tags"]:
+        filters["tags"] = module.params["tags"]
 
     for inst in ecs.describe_instances(**filters):
         if name_prefix:
             if not str(inst.instance_name).startswith(name_prefix):
                 continue
         volumes = ecs.describe_disks(instance_id=inst.id)
-        setattr(inst, 'block_device_mappings', volumes)
-        setattr(inst, 'user_data', inst.describe_user_data())
+        setattr(inst, "block_device_mappings", volumes)
+        setattr(inst, "user_data", inst.describe_user_data())
         instances.append(inst.read())
         instance_ids.append(inst.id)
 
     module.exit_json(changed=False, ids=instance_ids, instances=instances)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Edward Nunez <edward.nunez@cyberark.com>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
@@ -91,13 +89,11 @@ from ansible.utils.display import Display
 
 display = Display()
 
-CLIPASSWORDSDK_CMD = os.getenv('AIM_CLIPASSWORDSDK_CMD', '/opt/CARKaim/sdk/clipasswordsdk')
+CLIPASSWORDSDK_CMD = os.getenv("AIM_CLIPASSWORDSDK_CMD", "/opt/CARKaim/sdk/clipasswordsdk")
 
 
 class CyberarkPassword:
-
     def __init__(self, appid=None, query=None, output=None, **kwargs):
-
         self.appid = appid
         self.query = query
         self.output = output
@@ -106,7 +102,7 @@ class CyberarkPassword:
         # FailRequestOnPasswordChange, Queryformat, Reason, etc.
         self.extra_parms = []
         for key, value in kwargs.items():
-            self.extra_parms.append('-p')
+            self.extra_parms.append("-p")
             self.extra_parms.append(f"{key}={value}")
 
         if self.appid is None:
@@ -125,17 +121,21 @@ class CyberarkPassword:
         self.b_delimiter = b"@#@"  # Known delimiter to split output results
 
     def get(self):
-
         result_dict = {}
 
         try:
             all_parms = [
                 CLIPASSWORDSDK_CMD,
-                'GetPassword',
-                '-p', f'AppDescs.AppID={self.appid}',
-                '-p', f'Query={self.query}',
-                '-o', self.output,
-                '-d', self.b_delimiter]
+                "GetPassword",
+                "-p",
+                f"AppDescs.AppID={self.appid}",
+                "-p",
+                f"Query={self.query}",
+                "-o",
+                self.output,
+                "-d",
+                self.b_delimiter,
+            ]
             all_parms.extend(self.extra_parms)
 
             b_credential = b""
@@ -148,7 +148,7 @@ class CyberarkPassword:
             if tmp_error:
                 raise AnsibleError(f"ERROR => {tmp_error} ")
 
-            if b_credential and b_credential.endswith(b'\n'):
+            if b_credential and b_credential.endswith(b"\n"):
                 b_credential = b_credential[:-1]
 
             output_names = self.output.split(",")
@@ -166,13 +166,14 @@ class CyberarkPassword:
         except subprocess.CalledProcessError as e:
             raise AnsibleError(e.output)
         except OSError as e:
-            raise AnsibleError(f"ERROR - AIM not installed or clipasswordsdk not in standard location. ERROR=({e.errno}) => {e.strerror} ")
+            raise AnsibleError(
+                f"ERROR - AIM not installed or clipasswordsdk not in standard location. ERROR=({e.errno}) => {e.strerror} "
+            )
 
         return [result_dict]
 
 
 class LookupModule(LookupBase):
-
     """
     USAGE:
 

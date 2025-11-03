@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: jenkins_node
@@ -152,7 +150,6 @@ import traceback
 from xml.etree import ElementTree as et
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare(
@@ -167,17 +164,17 @@ IS_PYTHON_2 = sys.version_info[0] <= 2
 
 
 class JenkinsNode:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
 
-        self.name = module.params['name']
-        self.state = module.params['state']
-        self.token = module.params['token']
-        self.user = module.params['user']
-        self.url = module.params['url']
-        self.num_executors = module.params['num_executors']
-        self.labels = module.params['labels']
-        self.offline_message = module.params['offline_message']  # type: str | None
+        self.name = module.params["name"]
+        self.state = module.params["state"]
+        self.token = module.params["token"]
+        self.user = module.params["user"]
+        self.url = module.params["url"]
+        self.num_executors = module.params["num_executors"]
+        self.labels = module.params["labels"]
+        self.offline_message: str | None = module.params["offline_message"]
 
         if self.offline_message is not None:
             self.offline_message = self.offline_message.strip()
@@ -188,21 +185,21 @@ class JenkinsNode:
         if self.labels is not None:
             for label in self.labels:
                 if " " in label:
-                    self.module.fail_json("labels must not contain spaces: got invalid label {}".format(label))
+                    self.module.fail_json(f"labels must not contain spaces: got invalid label {label}")
 
         self.instance = self.get_jenkins_instance()
         self.result = {
-            'changed': False,
-            'url': self.url,
-            'user': self.user,
-            'name': self.name,
-            'state': self.state,
-            'created': False,
-            'deleted': False,
-            'disabled': False,
-            'enabled': False,
-            'configured': False,
-            'warnings': [],
+            "changed": False,
+            "url": self.url,
+            "user": self.user,
+            "name": self.name,
+            "state": self.state,
+            "created": False,
+            "deleted": False,
+            "disabled": False,
+            "enabled": False,
+            "configured": False,
+            "warnings": [],
         }
 
     def get_jenkins_instance(self):
@@ -214,7 +211,7 @@ class JenkinsNode:
             else:
                 return jenkins.Jenkins(self.url)
         except Exception as e:
-            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
+            self.module.fail_json(msg=f"Unable to connect to Jenkins server, {e}")
 
     def configure_node(self, present):
         if not present:
@@ -230,17 +227,17 @@ class JenkinsNode:
         root = et.fromstring(data)
 
         if self.num_executors is not None:
-            elem = root.find('numExecutors')
+            elem = root.find("numExecutors")
             if elem is None:
-                elem = et.SubElement(root, 'numExecutors')
+                elem = et.SubElement(root, "numExecutors")
             if elem.text is None or int(elem.text) != self.num_executors:
                 elem.text = str(self.num_executors)
                 configured = True
 
         if self.labels is not None:
-            elem = root.find('label')
+            elem = root.find("label")
             if elem is None:
-                elem = et.SubElement(root, 'label')
+                elem = et.SubElement(root, "label")
             labels = []
             if elem.text:
                 labels = elem.text.split()
@@ -256,9 +253,9 @@ class JenkinsNode:
 
             self.instance.reconfig_node(self.name, data)
 
-        self.result['configured'] = configured
+        self.result["configured"] = configured
         if configured:
-            self.result['changed'] = True
+            self.result["changed"] = True
 
     def present_node(self, configure=True):  # type: (bool) -> bool
         """Assert node present.
@@ -269,6 +266,7 @@ class JenkinsNode:
         Returns:
             True if the node is present, False otherwise (i.e. is check mode).
         """
+
         def create_node():
             try:
                 self.instance.create_node(self.name, launcher=jenkins.LAUNCHER_SSH)
@@ -277,10 +275,10 @@ class JenkinsNode:
                 # handling redirects returned when posting to resources. If the node is
                 # created OK then can ignore the error.
                 if not self.instance.node_exists(self.name):
-                    self.module.fail_json(msg="Create node failed: %s" % to_native(e), exception=traceback.format_exc())
+                    self.module.fail_json(msg=f"Create node failed: {e}", exception=traceback.format_exc())
 
                 # TODO: Remove authorization workaround.
-                self.result['warnings'].append(
+                self.result["warnings"].append(
                     "suppressed 401 Not Authorized on redirect after node created: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
                 )
 
@@ -296,9 +294,9 @@ class JenkinsNode:
         if configure:
             self.configure_node(present)
 
-        self.result['created'] = created
+        self.result["created"] = created
         if created:
-            self.result['changed'] = True
+            self.result["changed"] = True
 
         return present  # Used to gate downstream queries when in check mode.
 
@@ -311,10 +309,10 @@ class JenkinsNode:
                 # handling redirects returned when posting to resources. If the node is
                 # deleted OK then can ignore the error.
                 if self.instance.node_exists(self.name):
-                    self.module.fail_json(msg="Delete node failed: %s" % to_native(e), exception=traceback.format_exc())
+                    self.module.fail_json(msg=f"Delete node failed: {e}", exception=traceback.format_exc())
 
                 # TODO: Remove authorization workaround.
-                self.result['warnings'].append(
+                self.result["warnings"].append(
                     "suppressed 401 Not Authorized on redirect after node deleted: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
                 )
 
@@ -326,9 +324,9 @@ class JenkinsNode:
 
             deleted = True
 
-        self.result['deleted'] = deleted
+        self.result["deleted"] = deleted
         if deleted:
-            self.result['changed'] = True
+            self.result["changed"] = True
 
     def enabled_node(self):
         def get_offline():  # type: () -> bool
@@ -339,6 +337,7 @@ class JenkinsNode:
         enabled = False
 
         if present:
+
             def enable_node():
                 try:
                     self.instance.enable_node(self.name)
@@ -349,10 +348,10 @@ class JenkinsNode:
                     offline = get_offline()
 
                     if offline:
-                        self.module.fail_json(msg="Enable node failed: %s" % to_native(e), exception=traceback.format_exc())
+                        self.module.fail_json(msg=f"Enable node failed: {e}", exception=traceback.format_exc())
 
                     # TODO: Remove authorization workaround.
-                    self.result['warnings'].append(
+                    self.result["warnings"].append(
                         "suppressed 401 Not Authorized on redirect after node enabled: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
                     )
 
@@ -370,9 +369,9 @@ class JenkinsNode:
                 raise Exception("enabled_node present is False outside of check mode")
             enabled = False
 
-        self.result['enabled'] = enabled
+        self.result["enabled"] = enabled
         if enabled:
-            self.result['changed'] = True
+            self.result["changed"] = True
 
     def disabled_node(self):
         def get_offline_info():
@@ -402,9 +401,7 @@ class JenkinsNode:
                     # Toggling the node online to set the message when toggling offline
                     # again is not an option as during this transient online time jobs
                     # may be scheduled on the node which is not acceptable.
-                    self.result["warnings"].append(
-                        "unable to change offline message when already offline"
-                    )
+                    self.result["warnings"].append("unable to change offline message when already offline")
                 else:
                     offline_message = self.offline_message
                     changed = True
@@ -419,10 +416,10 @@ class JenkinsNode:
                     offline, _offline_message = get_offline_info()
 
                     if not offline:
-                        self.module.fail_json(msg="Disable node failed: %s" % to_native(e), exception=traceback.format_exc())
+                        self.module.fail_json(msg=f"Disable node failed: {e}", exception=traceback.format_exc())
 
                     # TODO: Remove authorization workaround.
-                    self.result['warnings'].append(
+                    self.result["warnings"].append(
                         "suppressed 401 Not Authorized on redirect after node disabled: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
                     )
 
@@ -442,10 +439,10 @@ class JenkinsNode:
         if disabled:
             changed = True
 
-        self.result['disabled'] = disabled
+        self.result["disabled"] = disabled
 
         if changed:
-            self.result['changed'] = True
+            self.result["changed"] = True
 
         self.configure_node(present)
 
@@ -453,14 +450,14 @@ class JenkinsNode:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, type='str'),
-            url=dict(default='http://localhost:8080'),
+            name=dict(required=True, type="str"),
+            url=dict(default="http://localhost:8080"),
             user=dict(),
             token=dict(no_log=True),
-            state=dict(choices=['enabled', 'disabled', 'present', 'absent'], default='present'),
-            num_executors=dict(type='int'),
-            labels=dict(type='list', elements='str'),
-            offline_message=dict(type='str'),
+            state=dict(choices=["enabled", "disabled", "present", "absent"], default="present"),
+            num_executors=dict(type="int"),
+            labels=dict(type="list", elements="str"),
+            offline_message=dict(type="str"),
         ),
         supports_check_mode=True,
     )
@@ -469,12 +466,12 @@ def main():
 
     jenkins_node = JenkinsNode(module)
 
-    state = module.params.get('state')
-    if state == 'enabled':
+    state = module.params.get("state")
+    if state == "enabled":
         jenkins_node.enabled_node()
-    elif state == 'disabled':
+    elif state == "disabled":
         jenkins_node.disabled_node()
-    elif state == 'present':
+    elif state == "present":
         jenkins_node.present_node()
     else:
         jenkins_node.absent_node()
@@ -482,5 +479,5 @@ def main():
     module.exit_json(**jenkins_node.result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

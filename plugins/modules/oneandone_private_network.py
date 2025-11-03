@@ -1,17 +1,19 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: oneandone_private_network
 short_description: Configure 1&1 private networking
 description:
   - Create, remove, reconfigure, update a private network. This module has a dependency on 1and1 >= 1.0.
+deprecated:
+  removed_in: 13.0.0
+  why: DNS fails to resolve the API endpoint used by the module.
+  alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -155,7 +157,7 @@ from ansible_collections.community.general.plugins.module_utils.oneandone import
     get_datacenter,
     OneAndOneResources,
     wait_for_resource_creation_completion,
-    wait_for_resource_deletion_completion
+    wait_for_resource_deletion_completion,
 )
 
 HAS_ONEANDONE_SDK = True
@@ -165,14 +167,12 @@ try:
 except ImportError:
     HAS_ONEANDONE_SDK = False
 
-DATACENTERS = ['US', 'ES', 'DE', 'GB']
+DATACENTERS = ["US", "ES", "DE", "GB"]
 
 
 def _check_mode(module, result):
     if module.check_mode:
-        module.exit_json(
-            changed=result
-        )
+        module.exit_json(changed=result)
 
 
 def _add_servers(module, oneandone_conn, name, members):
@@ -185,8 +185,8 @@ def _add_servers(module, oneandone_conn, name, members):
             return False
 
         network = oneandone_conn.attach_private_network_servers(
-            private_network_id=private_network_id,
-            server_ids=members)
+            private_network_id=private_network_id, server_ids=members
+        )
 
         return network
     except Exception as e:
@@ -200,15 +200,13 @@ def _remove_member(module, oneandone_conn, name, member_id):
         if module.check_mode:
             if private_network_id:
                 network_member = oneandone_conn.get_private_network_server(
-                    private_network_id=private_network_id,
-                    server_id=member_id)
+                    private_network_id=private_network_id, server_id=member_id
+                )
                 if network_member:
                     return True
             return False
 
-        network = oneandone_conn.remove_private_network_server(
-            private_network_id=name,
-            server_id=member_id)
+        network = oneandone_conn.remove_private_network_server(private_network_id=name, server_id=member_id)
 
         return network
     except Exception as ex:
@@ -225,20 +223,19 @@ def create_network(module, oneandone_conn):
     Returns a dictionary containing a 'changed' attribute indicating whether
     any network was added.
     """
-    name = module.params.get('name')
-    description = module.params.get('description')
-    network_address = module.params.get('network_address')
-    subnet_mask = module.params.get('subnet_mask')
-    datacenter = module.params.get('datacenter')
-    wait = module.params.get('wait')
-    wait_timeout = module.params.get('wait_timeout')
-    wait_interval = module.params.get('wait_interval')
+    name = module.params.get("name")
+    description = module.params.get("description")
+    network_address = module.params.get("network_address")
+    subnet_mask = module.params.get("subnet_mask")
+    datacenter = module.params.get("datacenter")
+    wait = module.params.get("wait")
+    wait_timeout = module.params.get("wait_timeout")
+    wait_interval = module.params.get("wait_interval")
 
     if datacenter is not None:
         datacenter_id = get_datacenter(oneandone_conn, datacenter)
         if datacenter_id is None:
-            module.fail_json(
-                msg='datacenter %s not found.' % datacenter)
+            module.fail_json(msg=f"datacenter {datacenter} not found.")
 
     try:
         _check_mode(module, True)
@@ -248,19 +245,15 @@ def create_network(module, oneandone_conn):
                 description=description,
                 network_address=network_address,
                 subnet_mask=subnet_mask,
-                datacenter_id=datacenter_id
-            ))
+                datacenter_id=datacenter_id,
+            )
+        )
 
         if wait:
             wait_for_resource_creation_completion(
-                oneandone_conn,
-                OneAndOneResources.private_network,
-                network['id'],
-                wait_timeout,
-                wait_interval)
-            network = get_private_network(oneandone_conn,
-                                          network['id'],
-                                          True)
+                oneandone_conn, OneAndOneResources.private_network, network["id"], wait_timeout, wait_interval
+            )
+            network = get_private_network(oneandone_conn, network["id"], True)
 
         changed = True if network else False
 
@@ -279,30 +272,29 @@ def update_network(module, oneandone_conn):
     oneandone_conn: authenticated oneandone object
     """
     try:
-        _private_network_id = module.params.get('private_network')
-        _name = module.params.get('name')
-        _description = module.params.get('description')
-        _network_address = module.params.get('network_address')
-        _subnet_mask = module.params.get('subnet_mask')
-        _add_members = module.params.get('add_members')
-        _remove_members = module.params.get('remove_members')
+        _private_network_id = module.params.get("private_network")
+        _name = module.params.get("name")
+        _description = module.params.get("description")
+        _network_address = module.params.get("network_address")
+        _subnet_mask = module.params.get("subnet_mask")
+        _add_members = module.params.get("add_members")
+        _remove_members = module.params.get("remove_members")
 
         changed = False
 
-        private_network = get_private_network(oneandone_conn,
-                                              _private_network_id,
-                                              True)
+        private_network = get_private_network(oneandone_conn, _private_network_id, True)
         if private_network is None:
             _check_mode(module, False)
 
         if _name or _description or _network_address or _subnet_mask:
             _check_mode(module, True)
             private_network = oneandone_conn.modify_private_network(
-                private_network_id=private_network['id'],
+                private_network_id=private_network["id"],
                 name=_name,
                 description=_description,
                 network_address=_network_address,
-                subnet_mask=_subnet_mask)
+                subnet_mask=_subnet_mask,
+            )
             changed = True
 
         if _add_members:
@@ -313,7 +305,7 @@ def update_network(module, oneandone_conn):
                 instance_obj = oneandone.client.AttachServer(server_id=instance_id)
 
                 instances.extend([instance_obj])
-            private_network = _add_servers(module, oneandone_conn, private_network['id'], instances)
+            private_network = _add_servers(module, oneandone_conn, private_network["id"], instances)
             _check_mode(module, private_network)
             changed = True
 
@@ -323,19 +315,11 @@ def update_network(module, oneandone_conn):
                 instance = get_server(oneandone_conn, member, True)
 
                 if module.check_mode:
-                    chk_changed |= _remove_member(module,
-                                                  oneandone_conn,
-                                                  private_network['id'],
-                                                  instance['id'])
+                    chk_changed |= _remove_member(module, oneandone_conn, private_network["id"], instance["id"])
                 _check_mode(module, instance and chk_changed)
 
-                _remove_member(module,
-                               oneandone_conn,
-                               private_network['id'],
-                               instance['id'])
-            private_network = get_private_network(oneandone_conn,
-                                                  private_network['id'],
-                                                  True)
+                _remove_member(module, oneandone_conn, private_network["id"], instance["id"])
+            private_network = get_private_network(oneandone_conn, private_network["id"], True)
             changed = True
 
         return (changed, private_network)
@@ -351,9 +335,9 @@ def remove_network(module, oneandone_conn):
     oneandone_conn: authenticated oneandone object.
     """
     try:
-        pn_id = module.params.get('name')
-        wait_timeout = module.params.get('wait_timeout')
-        wait_interval = module.params.get('wait_interval')
+        pn_id = module.params.get("name")
+        wait_timeout = module.params.get("wait_timeout")
+        wait_interval = module.params.get("wait_interval")
 
         private_network_id = get_private_network(oneandone_conn, pn_id)
         if module.check_mode:
@@ -361,18 +345,13 @@ def remove_network(module, oneandone_conn):
                 _check_mode(module, False)
             _check_mode(module, True)
         private_network = oneandone_conn.delete_private_network(private_network_id)
-        wait_for_resource_deletion_completion(oneandone_conn,
-                                              OneAndOneResources.private_network,
-                                              private_network['id'],
-                                              wait_timeout,
-                                              wait_interval)
+        wait_for_resource_deletion_completion(
+            oneandone_conn, OneAndOneResources.private_network, private_network["id"], wait_timeout, wait_interval
+        )
 
         changed = True if private_network else False
 
-        return (changed, {
-            'id': private_network['id'],
-            'name': private_network['name']
-        })
+        return (changed, {"id": private_network["id"], "name": private_network["name"]})
     except Exception as e:
         module.fail_json(msg=str(e))
 
@@ -380,65 +359,56 @@ def remove_network(module, oneandone_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str', no_log=True,
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN')),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
-            private_network=dict(type='str'),
-            name=dict(type='str'),
-            description=dict(type='str'),
-            network_address=dict(type='str'),
-            subnet_mask=dict(type='str'),
-            add_members=dict(type='list', elements="str", default=[]),
-            remove_members=dict(type='list', elements="str", default=[]),
-            datacenter=dict(
-                choices=DATACENTERS),
-            wait=dict(type='bool', default=True),
-            wait_timeout=dict(type='int', default=600),
-            wait_interval=dict(type='int', default=5),
-            state=dict(type='str', default='present', choices=['present', 'absent', 'update']),
+            auth_token=dict(type="str", no_log=True, default=os.environ.get("ONEANDONE_AUTH_TOKEN")),
+            api_url=dict(type="str", default=os.environ.get("ONEANDONE_API_URL")),
+            private_network=dict(type="str"),
+            name=dict(type="str"),
+            description=dict(type="str"),
+            network_address=dict(type="str"),
+            subnet_mask=dict(type="str"),
+            add_members=dict(type="list", elements="str", default=[]),
+            remove_members=dict(type="list", elements="str", default=[]),
+            datacenter=dict(choices=DATACENTERS),
+            wait=dict(type="bool", default=True),
+            wait_timeout=dict(type="int", default=600),
+            wait_interval=dict(type="int", default=5),
+            state=dict(type="str", default="present", choices=["present", "absent", "update"]),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not HAS_ONEANDONE_SDK:
-        module.fail_json(msg='1and1 required for this module')
+        module.fail_json(msg="1and1 required for this module")
 
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='auth_token parameter is required.')
+    if not module.params.get("auth_token"):
+        module.fail_json(msg="auth_token parameter is required.")
 
-    if not module.params.get('api_url'):
-        oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'))
+    if not module.params.get("api_url"):
+        oneandone_conn = oneandone.client.OneAndOneService(api_token=module.params.get("auth_token"))
     else:
         oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'), api_url=module.params.get('api_url'))
+            api_token=module.params.get("auth_token"), api_url=module.params.get("api_url")
+        )
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
-    if state == 'absent':
-        if not module.params.get('name'):
-            module.fail_json(
-                msg="'name' parameter is required for deleting a network.")
+    if state == "absent":
+        if not module.params.get("name"):
+            module.fail_json(msg="'name' parameter is required for deleting a network.")
         try:
             (changed, private_network) = remove_network(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
-    elif state == 'update':
-        if not module.params.get('private_network'):
-            module.fail_json(
-                msg="'private_network' parameter is required for updating a network.")
+    elif state == "update":
+        if not module.params.get("private_network"):
+            module.fail_json(msg="'private_network' parameter is required for updating a network.")
         try:
             (changed, private_network) = update_network(module, oneandone_conn)
         except Exception as e:
             module.fail_json(msg=str(e))
-    elif state == 'present':
-        if not module.params.get('name'):
-            module.fail_json(
-                msg="'name' parameter is required for new networks.")
+    elif state == "present":
+        if not module.params.get("name"):
+            module.fail_json(msg="'name' parameter is required for new networks.")
         try:
             (changed, private_network) = create_network(module, oneandone_conn)
         except Exception as e:
@@ -447,5 +417,5 @@ def main():
     module.exit_json(changed=changed, private_network=private_network)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

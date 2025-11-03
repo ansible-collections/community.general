@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_role
@@ -142,67 +140,67 @@ from ansible.module_utils.common.text.converters import to_native
 
 class RoleIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(RoleIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def role_find(self, name):
-        return self._post_json(method='role_find', name=None, item={'all': True, 'cn': name})
+        return self._post_json(method="role_find", name=None, item={"all": True, "cn": name})
 
     def role_add(self, name, item):
-        return self._post_json(method='role_add', name=name, item=item)
+        return self._post_json(method="role_add", name=name, item=item)
 
     def role_mod(self, name, item):
-        return self._post_json(method='role_mod', name=name, item=item)
+        return self._post_json(method="role_mod", name=name, item=item)
 
     def role_del(self, name):
-        return self._post_json(method='role_del', name=name)
+        return self._post_json(method="role_del", name=name)
 
     def role_add_member(self, name, item):
-        return self._post_json(method='role_add_member', name=name, item=item)
+        return self._post_json(method="role_add_member", name=name, item=item)
 
     def role_add_group(self, name, item):
-        return self.role_add_member(name=name, item={'group': item})
+        return self.role_add_member(name=name, item={"group": item})
 
     def role_add_host(self, name, item):
-        return self.role_add_member(name=name, item={'host': item})
+        return self.role_add_member(name=name, item={"host": item})
 
     def role_add_hostgroup(self, name, item):
-        return self.role_add_member(name=name, item={'hostgroup': item})
+        return self.role_add_member(name=name, item={"hostgroup": item})
 
     def role_add_service(self, name, item):
-        return self.role_add_member(name=name, item={'service': item})
+        return self.role_add_member(name=name, item={"service": item})
 
     def role_add_user(self, name, item):
-        return self.role_add_member(name=name, item={'user': item})
+        return self.role_add_member(name=name, item={"user": item})
 
     def role_remove_member(self, name, item):
-        return self._post_json(method='role_remove_member', name=name, item=item)
+        return self._post_json(method="role_remove_member", name=name, item=item)
 
     def role_remove_group(self, name, item):
-        return self.role_remove_member(name=name, item={'group': item})
+        return self.role_remove_member(name=name, item={"group": item})
 
     def role_remove_host(self, name, item):
-        return self.role_remove_member(name=name, item={'host': item})
+        return self.role_remove_member(name=name, item={"host": item})
 
     def role_remove_hostgroup(self, name, item):
-        return self.role_remove_member(name=name, item={'hostgroup': item})
+        return self.role_remove_member(name=name, item={"hostgroup": item})
 
     def role_remove_service(self, name, item):
-        return self.role_remove_member(name=name, item={'service': item})
+        return self.role_remove_member(name=name, item={"service": item})
 
     def role_remove_user(self, name, item):
-        return self.role_remove_member(name=name, item={'user': item})
+        return self.role_remove_member(name=name, item={"user": item})
 
     def role_add_privilege(self, name, item):
-        return self._post_json(method='role_add_privilege', name=name, item={'privilege': item})
+        return self._post_json(method="role_add_privilege", name=name, item={"privilege": item})
 
     def role_remove_privilege(self, name, item):
-        return self._post_json(method='role_remove_privilege', name=name, item={'privilege': item})
+        return self._post_json(method="role_remove_privilege", name=name, item={"privilege": item})
 
 
 def get_role_dict(description=None):
     data = {}
     if description is not None:
-        data['description'] = description
+        data["description"] = description
     return data
 
 
@@ -211,20 +209,20 @@ def get_role_diff(client, ipa_role, module_role):
 
 
 def ensure(module, client):
-    state = module.params['state']
-    name = module.params['cn']
-    group = module.params['group']
-    host = module.params['host']
-    hostgroup = module.params['hostgroup']
-    privilege = module.params['privilege']
-    service = module.params['service']
-    user = module.params['user']
+    state = module.params["state"]
+    name = module.params["cn"]
+    group = module.params["group"]
+    host = module.params["host"]
+    hostgroup = module.params["hostgroup"]
+    privilege = module.params["privilege"]
+    service = module.params["service"]
+    user = module.params["user"]
 
-    module_role = get_role_dict(description=module.params['description'])
+    module_role = get_role_dict(description=module.params["description"])
     ipa_role = client.role_find(name=name)
 
     changed = False
-    if state == 'present':
+    if state == "present":
         if not ipa_role:
             changed = True
             if not module.check_mode:
@@ -240,31 +238,61 @@ def ensure(module, client):
                     client.role_mod(name=name, item=data)
 
         if group is not None:
-            changed = client.modify_if_diff(name, ipa_role.get('member_group', []), group,
-                                            client.role_add_group,
-                                            client.role_remove_group) or changed
+            changed = (
+                client.modify_if_diff(
+                    name, ipa_role.get("member_group", []), group, client.role_add_group, client.role_remove_group
+                )
+                or changed
+            )
         if host is not None:
-            changed = client.modify_if_diff(name, ipa_role.get('member_host', []), host,
-                                            client.role_add_host,
-                                            client.role_remove_host) or changed
+            changed = (
+                client.modify_if_diff(
+                    name, ipa_role.get("member_host", []), host, client.role_add_host, client.role_remove_host
+                )
+                or changed
+            )
 
         if hostgroup is not None:
-            changed = client.modify_if_diff(name, ipa_role.get('member_hostgroup', []), hostgroup,
-                                            client.role_add_hostgroup,
-                                            client.role_remove_hostgroup) or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_role.get("member_hostgroup", []),
+                    hostgroup,
+                    client.role_add_hostgroup,
+                    client.role_remove_hostgroup,
+                )
+                or changed
+            )
 
         if privilege is not None:
-            changed = client.modify_if_diff(name, ipa_role.get('memberof_privilege', []), privilege,
-                                            client.role_add_privilege,
-                                            client.role_remove_privilege) or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_role.get("memberof_privilege", []),
+                    privilege,
+                    client.role_add_privilege,
+                    client.role_remove_privilege,
+                )
+                or changed
+            )
         if service is not None:
-            changed = client.modify_if_diff(name, ipa_role.get('member_service', []), service,
-                                            client.role_add_service,
-                                            client.role_remove_service) or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_role.get("member_service", []),
+                    service,
+                    client.role_add_service,
+                    client.role_remove_service,
+                )
+                or changed
+            )
         if user is not None:
-            changed = client.modify_if_diff(name, ipa_role.get('member_user', []), user,
-                                            client.role_add_user,
-                                            client.role_remove_user) or changed
+            changed = (
+                client.modify_if_diff(
+                    name, ipa_role.get("member_user", []), user, client.role_add_user, client.role_remove_user
+                )
+                or changed
+            )
 
     else:
         if ipa_role:
@@ -277,32 +305,34 @@ def ensure(module, client):
 
 def main():
     argument_spec = ipa_argument_spec()
-    argument_spec.update(cn=dict(type='str', required=True, aliases=['name']),
-                         description=dict(type='str'),
-                         group=dict(type='list', elements='str'),
-                         host=dict(type='list', elements='str'),
-                         hostgroup=dict(type='list', elements='str'),
-                         privilege=dict(type='list', elements='str'),
-                         service=dict(type='list', elements='str'),
-                         state=dict(type='str', default='present', choices=['present', 'absent']),
-                         user=dict(type='list', elements='str'))
+    argument_spec.update(
+        cn=dict(type="str", required=True, aliases=["name"]),
+        description=dict(type="str"),
+        group=dict(type="list", elements="str"),
+        host=dict(type="list", elements="str"),
+        hostgroup=dict(type="list", elements="str"),
+        privilege=dict(type="list", elements="str"),
+        service=dict(type="list", elements="str"),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        user=dict(type="list", elements="str"),
+    )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    client = RoleIPAClient(module=module,
-                           host=module.params['ipa_host'],
-                           port=module.params['ipa_port'],
-                           protocol=module.params['ipa_prot'])
+    client = RoleIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
 
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, role = ensure(module, client)
         module.exit_json(changed=changed, role=role)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

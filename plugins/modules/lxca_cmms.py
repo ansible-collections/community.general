@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -94,15 +92,20 @@ result:
 
 import traceback
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common import LXCA_COMMON_ARGS, has_pylxca, connection_object
+from ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common import (
+    LXCA_COMMON_ARGS,
+    has_pylxca,
+    connection_object,
+)
+
 try:
     from pylxca import cmms
 except ImportError:
     pass
 
 
-UUID_REQUIRED = 'UUID of device is required for cmms_by_uuid command.'
-CHASSIS_UUID_REQUIRED = 'UUID of chassis is required for cmms_by_chassis_uuid command.'
+UUID_REQUIRED = "UUID of device is required for cmms_by_uuid command."
+CHASSIS_UUID_REQUIRED = "UUID of chassis is required for cmms_by_chassis_uuid command."
 SUCCESS_MSG = "Success %s result"
 
 
@@ -111,15 +114,15 @@ def _cmms(module, lxca_con):
 
 
 def _cmms_by_uuid(module, lxca_con):
-    if not module.params['uuid']:
+    if not module.params["uuid"]:
         module.fail_json(msg=UUID_REQUIRED)
-    return cmms(lxca_con, module.params['uuid'])
+    return cmms(lxca_con, module.params["uuid"])
 
 
 def _cmms_by_chassis_uuid(module, lxca_con):
-    if not module.params['chassis']:
+    if not module.params["chassis"]:
         module.fail_json(msg=CHASSIS_UUID_REQUIRED)
-    return cmms(lxca_con, chassis=module.params['chassis'])
+    return cmms(lxca_con, chassis=module.params["chassis"])
 
 
 def setup_module_object():
@@ -135,17 +138,16 @@ def setup_module_object():
 
 
 FUNC_DICT = {
-    'cmms': _cmms,
-    'cmms_by_uuid': _cmms_by_uuid,
-    'cmms_by_chassis_uuid': _cmms_by_chassis_uuid,
+    "cmms": _cmms,
+    "cmms_by_uuid": _cmms_by_uuid,
+    "cmms_by_chassis_uuid": _cmms_by_chassis_uuid,
 }
 
 
 INPUT_ARG_SPEC = dict(
-    command_options=dict(default='cmms', choices=['cmms', 'cmms_by_uuid',
-                                                  'cmms_by_chassis_uuid']),
+    command_options=dict(default="cmms", choices=["cmms", "cmms_by_uuid", "cmms_by_chassis_uuid"]),
     uuid=dict(),
-    chassis=dict()
+    chassis=dict(),
 )
 
 
@@ -156,12 +158,10 @@ def execute_module(module):
     """
     try:
         with connection_object(module) as lxca_con:
-            result = FUNC_DICT[module.params['command_options']](module, lxca_con)
-            module.exit_json(changed=False,
-                             msg=SUCCESS_MSG % module.params['command_options'],
-                             result=result)
+            result = FUNC_DICT[module.params["command_options"]](module, lxca_con)
+            module.exit_json(changed=False, msg=SUCCESS_MSG % module.params["command_options"], result=result)
     except Exception as exception:
-        error_msg = '; '.join((e) for e in exception.args)
+        error_msg = "; ".join((e) for e in exception.args)
         module.fail_json(msg=error_msg, exception=traceback.format_exc())
 
 
@@ -171,5 +171,5 @@ def main():
     execute_module(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

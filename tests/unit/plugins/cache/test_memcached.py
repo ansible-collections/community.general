@@ -3,16 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import pytest
 
-pytest.importorskip('memcache')
+pytest.importorskip("memcache")
 
 from ansible.plugins.loader import cache_loader
 from ansible_collections.community.general.plugins.cache.memcached import CacheModule as MemcachedCache
 
 
 def test_memcached_cachemodule():
-    assert isinstance(cache_loader.get('community.general.memcached'), MemcachedCache)
+    assert isinstance(cache_loader.get("community.general.memcached"), MemcachedCache)

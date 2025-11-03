@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018 Nicolai Buchwitz <nb@tipi-net.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: netcup_dns
@@ -210,39 +208,52 @@ def main():
         argument_spec=dict(
             api_key=dict(required=True, no_log=True),
             api_password=dict(required=True, no_log=True),
-            customer_id=dict(required=True, type='int'),
-
+            customer_id=dict(required=True, type="int"),
             domain=dict(required=True),
-            record=dict(default='@', aliases=['name']),
-            type=dict(required=True, choices=['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT',
-                                              'TLSA', 'NS', 'DS', 'OPENPGPKEY', 'SMIMEA',
-                                              'SSHFP']),
+            record=dict(default="@", aliases=["name"]),
+            type=dict(
+                required=True,
+                choices=[
+                    "A",
+                    "AAAA",
+                    "MX",
+                    "CNAME",
+                    "CAA",
+                    "SRV",
+                    "TXT",
+                    "TLSA",
+                    "NS",
+                    "DS",
+                    "OPENPGPKEY",
+                    "SMIMEA",
+                    "SSHFP",
+                ],
+            ),
             value=dict(required=True),
-            priority=dict(type='int'),
-            solo=dict(type='bool', default=False),
-            state=dict(choices=['present', 'absent'], default='present'),
-            timeout=dict(type='int', default=5),
-
+            priority=dict(type="int"),
+            solo=dict(type="bool", default=False),
+            state=dict(choices=["present", "absent"], default="present"),
+            timeout=dict(type="int", default=5),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not HAS_NCDNSAPI:
-        module.fail_json(msg=missing_required_lib('nc-dnsapi'), exception=NCDNSAPI_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("nc-dnsapi"), exception=NCDNSAPI_IMP_ERR)
 
-    api_key = module.params.get('api_key')
-    api_password = module.params.get('api_password')
-    customer_id = module.params.get('customer_id')
-    domain = module.params.get('domain')
-    record_type = module.params.get('type')
-    record = module.params.get('record')
-    value = module.params.get('value')
-    priority = module.params.get('priority')
-    solo = module.params.get('solo')
-    state = module.params.get('state')
-    timeout = module.params.get('timeout')
+    api_key = module.params.get("api_key")
+    api_password = module.params.get("api_password")
+    customer_id = module.params.get("customer_id")
+    domain = module.params.get("domain")
+    record_type = module.params.get("type")
+    record = module.params.get("record")
+    value = module.params.get("value")
+    priority = module.params.get("priority")
+    solo = module.params.get("solo")
+    state = module.params.get("state")
+    timeout = module.params.get("timeout")
 
-    if record_type == 'MX' and not priority:
+    if record_type == "MX" and not priority:
         module.fail_json(msg="record type MX required the 'priority' argument")
 
     has_changed = False
@@ -261,12 +272,15 @@ def main():
 
                     break
 
-            if state == 'present':
+            if state == "present":
                 if solo:
-                    obsolete_records = [r for r in all_records if
-                                        r.hostname == record.hostname
-                                        and r.type == record.type
-                                        and not r.destination == record.destination]
+                    obsolete_records = [
+                        r
+                        for r in all_records
+                        if r.hostname == record.hostname
+                        and r.type == record.type
+                        and not r.destination == record.destination
+                    ]
 
                     if obsolete_records:
                         if not module.check_mode:
@@ -279,7 +293,7 @@ def main():
                         all_records = api.add_dns_record(domain, record)
 
                     has_changed = True
-            elif state == 'absent' and record_exists:
+            elif state == "absent" and record_exists:
                 if not module.check_mode:
                     all_records = api.delete_dns_record(domain, record)
 
@@ -295,5 +309,5 @@ def record_data(r):
     return {"name": r.hostname, "type": r.type, "value": r.destination, "priority": r.priority, "id": r.id}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

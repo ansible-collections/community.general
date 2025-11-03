@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2019, Bojan Vitnik <bvitnik@mainstream.rs>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import json
 import pytest
@@ -128,46 +126,60 @@ testcase_module_params_wait = {
 }
 
 
-@pytest.mark.parametrize('power_state', testcase_set_powerstate['params'], ids=testcase_set_powerstate['ids'])
-def test_xenserver_guest_powerstate_set_power_state(mocker, fake_ansible_module, XenAPI, xenserver_guest_powerstate, power_state):
+@pytest.mark.parametrize("power_state", testcase_set_powerstate["params"], ids=testcase_set_powerstate["ids"])  # type: ignore
+def test_xenserver_guest_powerstate_set_power_state(
+    mocker, fake_ansible_module, XenAPI, xenserver_guest_powerstate, power_state
+):
     """Tests power state change handling."""
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref',
-                 return_value=fake_xenapi_ref('VM'))
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params',
-                 return_value={"power_state": "Someoldstate"})
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref",
+        return_value=fake_xenapi_ref("VM"),
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params",
+        return_value={"power_state": "Someoldstate"},
+    )
     mocked_set_vm_power_state = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state',
-        return_value=power_state)
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state",
+        return_value=power_state,
+    )
 
-    mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
+    mocked_xenapi = mocker.patch.object(XenAPI.Session, "xenapi", create=True)
 
     mocked_returns = {
-        "pool.get_all.return_value": [fake_xenapi_ref('pool')],
-        "pool.get_default_SR.return_value": fake_xenapi_ref('SR'),
+        "pool.get_all.return_value": [fake_xenapi_ref("pool")],
+        "pool.get_default_SR.return_value": fake_xenapi_ref("SR"),
     }
 
     mocked_xenapi.configure_mock(**mocked_returns)
 
-    mocker.patch('ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version', return_value=[7, 2, 0])
+    mocker.patch(
+        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        return_value=[7, 2, 0],
+    )
 
-    fake_ansible_module.params.update({
-        "name": "somename",
-        "uuid": "someuuid",
-        "state_change_timeout": 1,
-    })
+    fake_ansible_module.params.update(
+        {
+            "name": "somename",
+            "uuid": "someuuid",
+            "state_change_timeout": 1,
+        }
+    )
 
     vm = xenserver_guest_powerstate.XenServerVM(fake_ansible_module)
     state_changed = vm.set_power_state(None)
 
-    mocked_set_vm_power_state.assert_called_once_with(fake_ansible_module, fake_xenapi_ref('VM'), None, 1)
+    mocked_set_vm_power_state.assert_called_once_with(fake_ansible_module, fake_xenapi_ref("VM"), None, 1)
     assert state_changed == power_state[0]
-    assert vm.vm_params['power_state'] == power_state[1].capitalize()
+    assert vm.vm_params["power_state"] == power_state[1].capitalize()
 
 
-@pytest.mark.parametrize('patch_ansible_module',
-                         testcase_module_params_state_present['params'],
-                         ids=testcase_module_params_state_present['ids'],
-                         indirect=True)
+@pytest.mark.parametrize(
+    "patch_ansible_module",
+    testcase_module_params_state_present["params"],  # type: ignore
+    ids=testcase_module_params_state_present["ids"],  # type: ignore
+    indirect=True,
+)
 def test_xenserver_guest_powerstate_present(mocker, patch_ansible_module, capfd, XenAPI, xenserver_guest_powerstate):
     """
     Tests regular module invocation including parsing and propagation of
@@ -175,28 +187,40 @@ def test_xenserver_guest_powerstate_present(mocker, patch_ansible_module, capfd,
     """
     fake_vm_facts = {"fake-vm-fact": True}
 
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref',
-                 return_value=fake_xenapi_ref('VM'))
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params', return_value={})
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_facts',
-                 return_value=fake_vm_facts)
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref",
+        return_value=fake_xenapi_ref("VM"),
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params",
+        return_value={},
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_facts",
+        return_value=fake_vm_facts,
+    )
     mocked_set_vm_power_state = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state',
-        return_value=(True, "somenewstate"))
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state",
+        return_value=(True, "somenewstate"),
+    )
     mocked_wait_for_vm_ip_address = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.wait_for_vm_ip_address',
-        return_value={})
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.wait_for_vm_ip_address",
+        return_value={},
+    )
 
-    mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
+    mocked_xenapi = mocker.patch.object(XenAPI.Session, "xenapi", create=True)
 
     mocked_returns = {
-        "pool.get_all.return_value": [fake_xenapi_ref('pool')],
-        "pool.get_default_SR.return_value": fake_xenapi_ref('SR'),
+        "pool.get_all.return_value": [fake_xenapi_ref("pool")],
+        "pool.get_default_SR.return_value": fake_xenapi_ref("SR"),
     }
 
     mocked_xenapi.configure_mock(**mocked_returns)
 
-    mocker.patch('ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version', return_value=[7, 2, 0])
+    mocker.patch(
+        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        return_value=[7, 2, 0],
+    )
 
     with pytest.raises(SystemExit):
         xenserver_guest_powerstate.main()
@@ -206,14 +230,16 @@ def test_xenserver_guest_powerstate_present(mocker, patch_ansible_module, capfd,
 
     mocked_set_vm_power_state.assert_not_called()
     mocked_wait_for_vm_ip_address.assert_not_called()
-    assert result['changed'] is False
-    assert result['instance'] == fake_vm_facts
+    assert result["changed"] is False
+    assert result["instance"] == fake_vm_facts
 
 
-@pytest.mark.parametrize('patch_ansible_module',
-                         testcase_module_params_state_other['params'],
-                         ids=testcase_module_params_state_other['ids'],
-                         indirect=True)
+@pytest.mark.parametrize(
+    "patch_ansible_module",
+    testcase_module_params_state_other["params"],  # type: ignore
+    ids=testcase_module_params_state_other["ids"],  # type: ignore
+    indirect=True,
+)
 def test_xenserver_guest_powerstate_other(mocker, patch_ansible_module, capfd, XenAPI, xenserver_guest_powerstate):
     """
     Tests regular module invocation including parsing and propagation of
@@ -222,27 +248,40 @@ def test_xenserver_guest_powerstate_other(mocker, patch_ansible_module, capfd, X
     """
     fake_vm_facts = {"fake-vm-fact": True}
 
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref',
-                 return_value=fake_xenapi_ref('VM'))
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params', return_value={})
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_facts', return_value=fake_vm_facts)
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref",
+        return_value=fake_xenapi_ref("VM"),
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params",
+        return_value={},
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_facts",
+        return_value=fake_vm_facts,
+    )
     mocked_set_vm_power_state = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state',
-        return_value=(True, "somenewstate"))
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state",
+        return_value=(True, "somenewstate"),
+    )
     mocked_wait_for_vm_ip_address = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.wait_for_vm_ip_address',
-        return_value={})
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.wait_for_vm_ip_address",
+        return_value={},
+    )
 
-    mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
+    mocked_xenapi = mocker.patch.object(XenAPI.Session, "xenapi", create=True)
 
     mocked_returns = {
-        "pool.get_all.return_value": [fake_xenapi_ref('pool')],
-        "pool.get_default_SR.return_value": fake_xenapi_ref('SR'),
+        "pool.get_all.return_value": [fake_xenapi_ref("pool")],
+        "pool.get_default_SR.return_value": fake_xenapi_ref("SR"),
     }
 
     mocked_xenapi.configure_mock(**mocked_returns)
 
-    mocker.patch('ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version', return_value=[7, 2, 0])
+    mocker.patch(
+        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        return_value=[7, 2, 0],
+    )
 
     with pytest.raises(SystemExit):
         xenserver_guest_powerstate.main()
@@ -252,14 +291,16 @@ def test_xenserver_guest_powerstate_other(mocker, patch_ansible_module, capfd, X
 
     mocked_set_vm_power_state.assert_called_once()
     mocked_wait_for_vm_ip_address.assert_not_called()
-    assert result['changed'] is True
-    assert result['instance'] == fake_vm_facts
+    assert result["changed"] is True
+    assert result["instance"] == fake_vm_facts
 
 
-@pytest.mark.parametrize('patch_ansible_module',
-                         testcase_module_params_wait['params'],
-                         ids=testcase_module_params_wait['ids'],
-                         indirect=True)
+@pytest.mark.parametrize(
+    "patch_ansible_module",
+    testcase_module_params_wait["params"],  # type: ignore
+    ids=testcase_module_params_wait["ids"],  # type: ignore
+    indirect=True,
+)
 def test_xenserver_guest_powerstate_wait(mocker, patch_ansible_module, capfd, XenAPI, xenserver_guest_powerstate):
     """
     Tests regular module invocation including parsing and propagation of
@@ -267,27 +308,40 @@ def test_xenserver_guest_powerstate_wait(mocker, patch_ansible_module, capfd, Xe
     """
     fake_vm_facts = {"fake-vm-fact": True}
 
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref',
-                 return_value=fake_xenapi_ref('VM'))
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params', return_value={})
-    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_facts', return_value=fake_vm_facts)
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.get_object_ref",
+        return_value=fake_xenapi_ref("VM"),
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_params",
+        return_value={},
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_facts",
+        return_value=fake_vm_facts,
+    )
     mocked_set_vm_power_state = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state',
-        return_value=(True, "somenewstate"))
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state",
+        return_value=(True, "somenewstate"),
+    )
     mocked_wait_for_vm_ip_address = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.wait_for_vm_ip_address',
-        return_value={})
+        "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.wait_for_vm_ip_address",
+        return_value={},
+    )
 
-    mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
+    mocked_xenapi = mocker.patch.object(XenAPI.Session, "xenapi", create=True)
 
     mocked_returns = {
-        "pool.get_all.return_value": [fake_xenapi_ref('pool')],
-        "pool.get_default_SR.return_value": fake_xenapi_ref('SR'),
+        "pool.get_all.return_value": [fake_xenapi_ref("pool")],
+        "pool.get_default_SR.return_value": fake_xenapi_ref("SR"),
     }
 
     mocked_xenapi.configure_mock(**mocked_returns)
 
-    mocker.patch('ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version', return_value=[7, 2, 0])
+    mocker.patch(
+        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        return_value=[7, 2, 0],
+    )
 
     with pytest.raises(SystemExit):
         xenserver_guest_powerstate.main()
@@ -296,4 +350,4 @@ def test_xenserver_guest_powerstate_wait(mocker, patch_ansible_module, capfd, Xe
     result = json.loads(out)
 
     mocked_wait_for_vm_ip_address.assert_called_once()
-    assert result['instance'] == fake_vm_facts
+    assert result["instance"] == fake_vm_facts

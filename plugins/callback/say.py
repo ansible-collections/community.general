@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2012, Michael DeHaan, <michael.dehaan@gmail.com>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -31,14 +30,14 @@ class CallbackModule(CallbackBase):
     """
     makes Ansible much more exciting.
     """
+
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'community.general.say'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "community.general.say"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self):
-
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         self.FAILED_VOICE = None
         self.REGULAR_VOICE = None
@@ -46,21 +45,23 @@ class CallbackModule(CallbackBase):
         self.LASER_VOICE = None
 
         try:
-            self.synthesizer = get_bin_path('say')
-            if platform.system() != 'Darwin':
+            self.synthesizer = get_bin_path("say")
+            if platform.system() != "Darwin":
                 # 'say' binary available, it might be GNUstep tool which doesn't support 'voice' parameter
-                self._display.warning(f"'say' executable found but system is '{platform.system()}': ignoring voice parameter")
+                self._display.warning(
+                    f"'say' executable found but system is '{platform.system()}': ignoring voice parameter"
+                )
             else:
-                self.FAILED_VOICE = 'Zarvox'
-                self.REGULAR_VOICE = 'Trinoids'
-                self.HAPPY_VOICE = 'Cellos'
-                self.LASER_VOICE = 'Princess'
+                self.FAILED_VOICE = "Zarvox"
+                self.REGULAR_VOICE = "Trinoids"
+                self.HAPPY_VOICE = "Cellos"
+                self.LASER_VOICE = "Princess"
         except ValueError:
             try:
-                self.synthesizer = get_bin_path('espeak')
-                self.FAILED_VOICE = 'klatt'
-                self.HAPPY_VOICE = 'f5'
-                self.LASER_VOICE = 'whisper'
+                self.synthesizer = get_bin_path("espeak")
+                self.FAILED_VOICE = "klatt"
+                self.HAPPY_VOICE = "f5"
+                self.LASER_VOICE = "whisper"
             except ValueError:
                 self.synthesizer = None
 
@@ -68,12 +69,14 @@ class CallbackModule(CallbackBase):
         # ansible will not call any callback if disabled is set to True
         if not self.synthesizer:
             self.disabled = True
-            self._display.warning(f"Unable to find either 'say' or 'espeak' executable, plugin {os.path.basename(__file__)} disabled")
+            self._display.warning(
+                f"Unable to find either 'say' or 'espeak' executable, plugin {os.path.basename(__file__)} disabled"
+            )
 
     def say(self, msg, voice):
         cmd = [self.synthesizer, msg]
         if voice:
-            cmd.extend(('-v', voice))
+            cmd.extend(("-v", voice))
         subprocess.call(cmd)
 
     def runner_on_failed(self, host, res, ignore_errors=False):

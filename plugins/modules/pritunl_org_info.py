@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Florian Dambrine <android.florian@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: pritunl_org_info
@@ -99,7 +97,7 @@ def get_pritunl_organizations(module):
 
     if org_name and len(organizations) == 0:
         # When an org_name is provided but no organization match return an error
-        module.fail_json(msg="Organization '%s' does not exist" % org_name)
+        module.fail_json(msg=f"Organization '{org_name}' does not exist")
 
     result = {}
     result["changed"] = False
@@ -111,11 +109,7 @@ def get_pritunl_organizations(module):
 def main():
     argument_spec = pritunl_argument_spec()
 
-    argument_spec.update(
-        dict(
-            organization=dict(type="str", aliases=["org"])
-        )
-    )
+    argument_spec.update(dict(organization=dict(type="str", aliases=["org"])))
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 

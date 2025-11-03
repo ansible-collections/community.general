@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 # Copyright (c) 2021, Christophe Gilles <christophe.gilles54@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_authz_custom_policy
@@ -112,8 +110,12 @@ end_state:
       sample: File delete
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -126,25 +128,26 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        state=dict(type='str', default='present',
-                   choices=['present', 'absent']),
-        name=dict(type='str', required=True),
-        policy_type=dict(type='str', required=True),
-        client_id=dict(type='str', required=True),
-        realm=dict(type='str', required=True)
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        name=dict(type="str", required=True),
+        policy_type=dict(type="str", required=True),
+        client_id=dict(type="str", required=True),
+        realm=dict(type="str", required=True),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=(
-                               [['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', end_state={})
+    result = dict(changed=False, msg="", end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -155,56 +158,54 @@ def main():
     kc = KeycloakAPI(module, connection_header)
 
     # Convenience variables
-    state = module.params.get('state')
-    name = module.params.get('name')
-    policy_type = module.params.get('policy_type')
-    client_id = module.params.get('client_id')
-    realm = module.params.get('realm')
+    state = module.params.get("state")
+    name = module.params.get("name")
+    policy_type = module.params.get("policy_type")
+    client_id = module.params.get("client_id")
+    realm = module.params.get("realm")
 
     cid = kc.get_client_id(client_id, realm=realm)
     if not cid:
-        module.fail_json(msg='Invalid client %s for realm %s' %
-                         (client_id, realm))
+        module.fail_json(msg=f"Invalid client {client_id} for realm {realm}")
 
-    before_authz_custom_policy = kc.get_authz_policy_by_name(
-        name=name, client_id=cid, realm=realm)
+    before_authz_custom_policy = kc.get_authz_policy_by_name(name=name, client_id=cid, realm=realm)
 
     desired_authz_custom_policy = {}
-    desired_authz_custom_policy['name'] = name
-    desired_authz_custom_policy['type'] = policy_type
+    desired_authz_custom_policy["name"] = name
+    desired_authz_custom_policy["type"] = policy_type
 
     # Modifying existing custom policies is not possible
-    if before_authz_custom_policy and state == 'present':
-        result['msg'] = "Custom policy %s already exists" % (name)
-        result['changed'] = False
-        result['end_state'] = desired_authz_custom_policy
-    elif not before_authz_custom_policy and state == 'present':
+    if before_authz_custom_policy and state == "present":
+        result["msg"] = f"Custom policy {name} already exists"
+        result["changed"] = False
+        result["end_state"] = desired_authz_custom_policy
+    elif not before_authz_custom_policy and state == "present":
         if module.check_mode:
-            result['msg'] = "Would create custom policy %s" % (name)
+            result["msg"] = f"Would create custom policy {name}"
         else:
             kc.create_authz_custom_policy(
-                payload=desired_authz_custom_policy, policy_type=policy_type, client_id=cid, realm=realm)
-            result['msg'] = "Custom policy %s created" % (name)
+                payload=desired_authz_custom_policy, policy_type=policy_type, client_id=cid, realm=realm
+            )
+            result["msg"] = f"Custom policy {name} created"
 
-        result['changed'] = True
-        result['end_state'] = desired_authz_custom_policy
-    elif before_authz_custom_policy and state == 'absent':
+        result["changed"] = True
+        result["end_state"] = desired_authz_custom_policy
+    elif before_authz_custom_policy and state == "absent":
         if module.check_mode:
-            result['msg'] = "Would remove custom policy %s" % (name)
+            result["msg"] = f"Would remove custom policy {name}"
         else:
-            kc.remove_authz_custom_policy(
-                policy_id=before_authz_custom_policy['id'], client_id=cid, realm=realm)
-            result['msg'] = "Custom policy %s removed" % (name)
+            kc.remove_authz_custom_policy(policy_id=before_authz_custom_policy["id"], client_id=cid, realm=realm)
+            result["msg"] = f"Custom policy {name} removed"
 
-        result['changed'] = True
-        result['end_state'] = {}
-    elif not before_authz_custom_policy and state == 'absent':
-        result['msg'] = "Custom policy %s does not exist" % (name)
-        result['changed'] = False
-        result['end_state'] = {}
+        result["changed"] = True
+        result["end_state"] = {}
+    elif not before_authz_custom_policy and state == "absent":
+        result["msg"] = f"Custom policy {name} does not exist"
+        result["changed"] = False
+        result["end_state"] = {}
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -5,8 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import re
 
@@ -21,19 +20,18 @@ def test_pbrun_basic(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    pbrun_exe = 'pbrun'
-    pbrun_flags = ''
+    pbrun_exe = "pbrun"
+    pbrun_flags = ""
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_method': 'community.general.pbrun',
+        "become_method": "community.general.pbrun",
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s  'echo %s; %s'""" % (pbrun_exe, pbrun_flags,
-                                                  success, default_cmd), cmd) is not None
+    assert re.match(f"""{pbrun_exe} {pbrun_flags}  'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_pbrun(mocker, parser, reset_cli_args):
@@ -42,21 +40,23 @@ def test_pbrun(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    pbrun_exe = 'pbrun'
-    pbrun_flags = ''
+    pbrun_exe = "pbrun"
+    pbrun_flags = ""
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.pbrun',
-        'become_flags': pbrun_flags,
+        "become_user": "foo",
+        "become_method": "community.general.pbrun",
+        "become_flags": pbrun_flags,
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, task['become_user'],
-                                                       success, default_cmd), cmd) is not None
+    assert (
+        re.match(f"""{pbrun_exe} {pbrun_flags} -u {task["become_user"]} 'echo {success}; {default_cmd}'""", cmd)
+        is not None
+    )
 
 
 def test_pbrun_var_varoptions(mocker, parser, reset_cli_args):
@@ -65,21 +65,26 @@ def test_pbrun_var_varoptions(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    pbrun_exe = 'pbrun'
-    pbrun_flags = ''
+    pbrun_exe = "pbrun"
+    pbrun_flags = ""
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.pbrun',
-        'become_flags': 'xxx',
+        "become_user": "foo",
+        "become_method": "community.general.pbrun",
+        "become_flags": "xxx",
     }
     var_options = {
-        'ansible_become_user': 'bar',
-        'ansible_become_flags': pbrun_flags,
+        "ansible_become_user": "bar",
+        "ansible_become_flags": pbrun_flags,
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, var_options['ansible_become_user'],
-                                                       success, default_cmd), cmd) is not None
+    assert (
+        re.match(
+            f"""{pbrun_exe} {pbrun_flags} -u {var_options["ansible_become_user"]} 'echo {success}; {default_cmd}'""",
+            cmd,
+        )
+        is not None
+    )

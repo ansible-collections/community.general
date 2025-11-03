@@ -2,29 +2,32 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
+from unittest.mock import patch
 from ansible.module_utils import basic
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args, AnsibleExitJson, AnsibleFailJson, ModuleTestCase
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    set_module_args,
+    AnsibleExitJson,
+    AnsibleFailJson,
+    ModuleTestCase,
+)
 from ansible_collections.community.general.plugins.modules import sysupgrade
 
 
 class TestSysupgradeModule(ModuleTestCase):
-
     def setUp(self):
-        super(TestSysupgradeModule, self).setUp()
+        super().setUp()
         self.module = sysupgrade
-        self.mock_get_bin_path = (patch('ansible.module_utils.basic.AnsibleModule.get_bin_path'))
+        self.mock_get_bin_path = patch("ansible.module_utils.basic.AnsibleModule.get_bin_path")
         self.get_bin_path = self.mock_get_bin_path.start()
 
     def tearDown(self):
-        super(TestSysupgradeModule, self).tearDown()
+        super().tearDown()
         self.mock_get_bin_path.stop()
 
     def test_upgrade_success(self):
-        """ Upgrade was successful """
+        """Upgrade was successful"""
 
         rc = 0
         stdout = """
@@ -53,10 +56,10 @@ class TestSysupgradeModule(ModuleTestCase):
                 run_command.return_value = (rc, stdout, stderr)
                 with self.assertRaises(AnsibleExitJson) as result:
                     self.module.main()
-                self.assertTrue(result.exception.args[0]['changed'])
+                self.assertTrue(result.exception.args[0]["changed"])
 
     def test_upgrade_failed(self):
-        """ Upgrade failed """
+        """Upgrade failed"""
 
         rc = 1
         stdout = ""
@@ -67,5 +70,5 @@ class TestSysupgradeModule(ModuleTestCase):
                 run_command_mock.return_value = (rc, stdout, stderr)
                 with self.assertRaises(AnsibleFailJson) as result:
                     self.module.main()
-                self.assertTrue(result.exception.args[0]['failed'])
-                self.assertIn('need root', result.exception.args[0]['msg'])
+                self.assertTrue(result.exception.args[0]["failed"])
+                self.assertIn("need root", result.exception.args[0]["msg"])

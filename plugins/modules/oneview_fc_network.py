@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016-2017 Hewlett Packard Enterprise Development LP
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: oneview_fc_network
@@ -86,38 +84,35 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 
 
 class FcNetworkModule(OneViewModuleBase):
-    MSG_CREATED = 'FC Network created successfully.'
-    MSG_UPDATED = 'FC Network updated successfully.'
-    MSG_DELETED = 'FC Network deleted successfully.'
-    MSG_ALREADY_PRESENT = 'FC Network is already present.'
-    MSG_ALREADY_ABSENT = 'FC Network is already absent.'
-    RESOURCE_FACT_NAME = 'fc_network'
+    MSG_CREATED = "FC Network created successfully."
+    MSG_UPDATED = "FC Network updated successfully."
+    MSG_DELETED = "FC Network deleted successfully."
+    MSG_ALREADY_PRESENT = "FC Network is already present."
+    MSG_ALREADY_ABSENT = "FC Network is already absent."
+    RESOURCE_FACT_NAME = "fc_network"
 
     def __init__(self):
+        additional_arg_spec = dict(
+            data=dict(required=True, type="dict"), state=dict(required=True, choices=["present", "absent"])
+        )
 
-        additional_arg_spec = dict(data=dict(required=True, type='dict'),
-                                   state=dict(
-                                       required=True,
-                                       choices=['present', 'absent']))
-
-        super(FcNetworkModule, self).__init__(additional_arg_spec=additional_arg_spec,
-                                              validate_etag_support=True)
+        super().__init__(additional_arg_spec=additional_arg_spec, validate_etag_support=True)
 
         self.resource_client = self.oneview_client.fc_networks
 
     def execute_module(self):
-        resource = self.get_by_name(self.data['name'])
+        resource = self.get_by_name(self.data["name"])
 
-        if self.state == 'present':
+        if self.state == "present":
             return self._present(resource)
         else:
             return self.resource_absent(resource)
 
     def _present(self, resource):
-        scope_uris = self.data.pop('scopeUris', None)
+        scope_uris = self.data.pop("scopeUris", None)
         result = self.resource_present(resource, self.RESOURCE_FACT_NAME)
         if scope_uris is not None:
-            result = self.resource_scopes_set(result, 'fc_network', scope_uris)
+            result = self.resource_scopes_set(result, "fc_network", scope_uris)
         return result
 
 
@@ -125,5 +120,5 @@ def main():
     FcNetworkModule().run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

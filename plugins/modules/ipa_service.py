@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_service
@@ -101,43 +99,43 @@ from ansible.module_utils.common.text.converters import to_native
 
 class ServiceIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(ServiceIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def service_find(self, name):
-        return self._post_json(method='service_find', name=None, item={'all': True, 'krbcanonicalname': name})
+        return self._post_json(method="service_find", name=None, item={"all": True, "krbcanonicalname": name})
 
     def service_add(self, name, service):
-        return self._post_json(method='service_add', name=name, item=service)
+        return self._post_json(method="service_add", name=name, item=service)
 
     def service_mod(self, name, service):
-        return self._post_json(method='service_mod', name=name, item=service)
+        return self._post_json(method="service_mod", name=name, item=service)
 
     def service_del(self, name):
-        return self._post_json(method='service_del', name=name)
+        return self._post_json(method="service_del", name=name)
 
     def service_disable(self, name):
-        return self._post_json(method='service_disable', name=name)
+        return self._post_json(method="service_disable", name=name)
 
     def service_add_host(self, name, item):
-        return self._post_json(method='service_add_host', name=name, item={'host': item})
+        return self._post_json(method="service_add_host", name=name, item={"host": item})
 
     def service_remove_host(self, name, item):
-        return self._post_json(method='service_remove_host', name=name, item={'host': item})
+        return self._post_json(method="service_remove_host", name=name, item={"host": item})
 
 
 def get_service_dict(force=None, krbcanonicalname=None, skip_host_check=None):
     data = {}
     if force is not None:
-        data['force'] = force
+        data["force"] = force
     if krbcanonicalname is not None:
-        data['krbcanonicalname'] = krbcanonicalname
+        data["krbcanonicalname"] = krbcanonicalname
     if skip_host_check is not None:
-        data['skip_host_check'] = skip_host_check
+        data["skip_host_check"] = skip_host_check
     return data
 
 
 def get_service_diff(client, ipa_host, module_service):
-    non_updateable_keys = ['force', 'krbcanonicalname', 'skip_host_check']
+    non_updateable_keys = ["force", "krbcanonicalname", "skip_host_check"]
     for key in non_updateable_keys:
         if key in module_service:
             del module_service[key]
@@ -146,14 +144,14 @@ def get_service_diff(client, ipa_host, module_service):
 
 
 def ensure(module, client):
-    name = module.params['krbcanonicalname']
-    state = module.params['state']
-    hosts = module.params['hosts']
+    name = module.params["krbcanonicalname"]
+    state = module.params["state"]
+    hosts = module.params["hosts"]
 
     ipa_service = client.service_find(name=name)
-    module_service = get_service_dict(force=module.params['force'], skip_host_check=module.params['skip_host_check'])
+    module_service = get_service_dict(force=module.params["force"], skip_host_check=module.params["skip_host_check"])
     changed = False
-    if state in ['present', 'enabled', 'disabled']:
+    if state in ["present", "enabled", "disabled"]:
         if not ipa_service:
             changed = True
             if not module.check_mode:
@@ -168,14 +166,14 @@ def ensure(module, client):
                         data[key] = module_service.get(key)
                     client.service_mod(name=name, service=data)
         if hosts is not None:
-            if 'managedby_host' in ipa_service:
-                for host in ipa_service['managedby_host']:
+            if "managedby_host" in ipa_service:
+                for host in ipa_service["managedby_host"]:
                     if host not in hosts:
                         if not module.check_mode:
                             client.service_remove_host(name=name, item=host)
                         changed = True
                 for host in hosts:
-                    if host not in ipa_service['managedby_host']:
+                    if host not in ipa_service["managedby_host"]:
                         if not module.check_mode:
                             client.service_add_host(name=name, item=host)
                         changed = True
@@ -197,29 +195,29 @@ def ensure(module, client):
 def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(
-        krbcanonicalname=dict(type='str', required=True, aliases=['name']),
-        force=dict(type='bool'),
-        skip_host_check=dict(type='bool', default=False),
-        hosts=dict(type='list', elements='str'),
-        state=dict(type='str', default='present',
-                   choices=['present', 'absent']))
+        krbcanonicalname=dict(type="str", required=True, aliases=["name"]),
+        force=dict(type="bool"),
+        skip_host_check=dict(type="bool", default=False),
+        hosts=dict(type="list", elements="str"),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+    )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    client = ServiceIPAClient(module=module,
-                              host=module.params['ipa_host'],
-                              port=module.params['ipa_port'],
-                              protocol=module.params['ipa_prot'])
+    client = ServiceIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
 
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, host = ensure(module, client)
         module.exit_json(changed=changed, host=host)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

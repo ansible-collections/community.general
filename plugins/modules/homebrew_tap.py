@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
 # Copyright (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
@@ -9,8 +8,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -86,59 +84,63 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def a_valid_tap(tap):
-    '''Returns True if the tap is valid.'''
-    regex = re.compile(r'^([\w-]+)/(homebrew-)?([\w-]+)$')
+    """Returns True if the tap is valid."""
+    regex = re.compile(r"^([\w-]+)/(homebrew-)?([\w-]+)$")
     return regex.match(tap)
 
 
 def already_tapped(module, brew_path, tap):
-    '''Returns True if already tapped.'''
+    """Returns True if already tapped."""
 
-    rc, out, err = module.run_command([
-        brew_path,
-        'tap',
-    ])
+    rc, out, err = module.run_command(
+        [
+            brew_path,
+            "tap",
+        ]
+    )
 
-    taps = [tap_.strip().lower() for tap_ in out.split('\n') if tap_]
-    tap_name = re.sub('homebrew-', '', tap.lower())
+    taps = [tap_.strip().lower() for tap_ in out.split("\n") if tap_]
+    tap_name = re.sub("homebrew-", "", tap.lower())
 
     return tap_name in taps
 
 
 def add_tap(module, brew_path, tap, url=None):
-    '''Adds a single tap.'''
-    failed, changed, msg = False, False, ''
+    """Adds a single tap."""
+    failed, changed, msg = False, False, ""
 
     if not a_valid_tap(tap):
         failed = True
-        msg = 'not a valid tap: %s' % tap
+        msg = f"not a valid tap: {tap}"
 
     elif not already_tapped(module, brew_path, tap):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        rc, out, err = module.run_command([
-            brew_path,
-            'tap',
-            tap,
-            url,
-        ])
+        rc, out, err = module.run_command(
+            [
+                brew_path,
+                "tap",
+                tap,
+                url,
+            ]
+        )
         if rc == 0:
             changed = True
-            msg = 'successfully tapped: %s' % tap
+            msg = f"successfully tapped: {tap}"
         else:
             failed = True
-            msg = 'failed to tap: %s due to %s' % (tap, err)
+            msg = f"failed to tap: {tap} due to {err}"
 
     else:
-        msg = 'already tapped: %s' % tap
+        msg = f"already tapped: {tap}"
 
     return (failed, changed, msg)
 
 
 def add_taps(module, brew_path, taps):
-    '''Adds one or more taps.'''
-    failed, changed, unchanged, added, msg = False, False, 0, 0, ''
+    """Adds one or more taps."""
+    failed, changed, unchanged, added, msg = False, False, 0, 0, ""
 
     for tap in taps:
         (failed, changed, msg) = add_tap(module, brew_path, tap)
@@ -150,50 +152,52 @@ def add_taps(module, brew_path, taps):
             unchanged += 1
 
     if failed:
-        msg = 'added: %d, unchanged: %d, error: ' + msg
+        msg = f"added: %d, unchanged: %d, error: {msg}"
         msg = msg % (added, unchanged)
     elif added:
         changed = True
-        msg = 'added: %d, unchanged: %d' % (added, unchanged)
+        msg = f"added: {added}, unchanged: {unchanged}"
     else:
-        msg = 'added: %d, unchanged: %d' % (added, unchanged)
+        msg = f"added: {added}, unchanged: {unchanged}"
 
     return (failed, changed, msg)
 
 
 def remove_tap(module, brew_path, tap):
-    '''Removes a single tap.'''
-    failed, changed, msg = False, False, ''
+    """Removes a single tap."""
+    failed, changed, msg = False, False, ""
 
     if not a_valid_tap(tap):
         failed = True
-        msg = 'not a valid tap: %s' % tap
+        msg = f"not a valid tap: {tap}"
 
     elif already_tapped(module, brew_path, tap):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        rc, out, err = module.run_command([
-            brew_path,
-            'untap',
-            tap,
-        ])
+        rc, out, err = module.run_command(
+            [
+                brew_path,
+                "untap",
+                tap,
+            ]
+        )
         if not already_tapped(module, brew_path, tap):
             changed = True
-            msg = 'successfully untapped: %s' % tap
+            msg = f"successfully untapped: {tap}"
         else:
             failed = True
-            msg = 'failed to untap: %s due to %s' % (tap, err)
+            msg = f"failed to untap: {tap} due to {err}"
 
     else:
-        msg = 'already untapped: %s' % tap
+        msg = f"already untapped: {tap}"
 
     return (failed, changed, msg)
 
 
 def remove_taps(module, brew_path, taps):
-    '''Removes one or more taps.'''
-    failed, changed, unchanged, removed, msg = False, False, 0, 0, ''
+    """Removes one or more taps."""
+    failed, changed, unchanged, removed, msg = False, False, 0, 0, ""
 
     for tap in taps:
         (failed, changed, msg) = remove_tap(module, brew_path, tap)
@@ -205,13 +209,13 @@ def remove_taps(module, brew_path, taps):
             unchanged += 1
 
     if failed:
-        msg = 'removed: %d, unchanged: %d, error: ' + msg
+        msg = f"removed: %d, unchanged: %d, error: {msg}"
         msg = msg % (removed, unchanged)
     elif removed:
         changed = True
-        msg = 'removed: %d, unchanged: %d' % (removed, unchanged)
+        msg = f"removed: {removed}, unchanged: {unchanged}"
     else:
-        msg = 'removed: %d, unchanged: %d' % (removed, unchanged)
+        msg = f"removed: {removed}, unchanged: {unchanged}"
 
     return (failed, changed, msg)
 
@@ -219,31 +223,31 @@ def remove_taps(module, brew_path, taps):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(aliases=['tap'], type='list', required=True, elements='str'),
+            name=dict(aliases=["tap"], type="list", required=True, elements="str"),
             url=dict(),
-            state=dict(default='present', choices=['present', 'absent']),
+            state=dict(default="present", choices=["present", "absent"]),
             path=dict(
                 default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
-                type='path',
+                type="path",
             ),
         ),
         supports_check_mode=True,
     )
 
-    path = module.params['path']
+    path = module.params["path"]
     if path:
-        path = path.split(':')
+        path = path.split(":")
 
     brew_path = module.get_bin_path(
-        'brew',
+        "brew",
         required=True,
         opt_dirs=path,
     )
 
-    taps = module.params['name']
-    url = module.params['url']
+    taps = module.params["name"]
+    url = module.params["url"]
 
-    if module.params['state'] == 'present':
+    if module.params["state"] == "present":
         if url is None:
             # No tap URL provided explicitly, continue with bulk addition
             # of all the taps.
@@ -262,7 +266,7 @@ def main():
         else:
             module.exit_json(changed=changed, msg=msg)
 
-    elif module.params['state'] == 'absent':
+    elif module.params["state"] == "absent":
         failed, changed, msg = remove_taps(module, brew_path, taps)
 
         if failed:
@@ -271,5 +275,5 @@ def main():
             module.exit_json(changed=changed, msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

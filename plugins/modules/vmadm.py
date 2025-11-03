@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Jasper Lievisse Adriaanse <j@jasper.la>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -419,20 +417,21 @@ from ansible.module_utils.common.text.converters import to_native
 def get_vm_prop(module, uuid, prop):
     # Lookup a property for the given VM.
     # Returns the property, or None if not found.
-    cmd = [module.vmadm, 'lookup', '-j', '-o', prop, 'uuid={0}'.format(uuid)]
+    cmd = [module.vmadm, "lookup", "-j", "-o", prop, f"uuid={uuid}"]
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
-        module.fail_json(
-            msg='Could not perform lookup of {0} on {1}'.format(prop, uuid), exception=stderr)
+        module.fail_json(msg=f"Could not perform lookup of {prop} on {uuid}", exception=stderr)
 
     try:
         stdout_json = json.loads(stdout)
     except Exception as e:
         module.fail_json(
-            msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(prop),
-            details=to_native(e), exception=traceback.format_exc())
+            msg=f"Invalid JSON returned by vmadm for uuid lookup of {prop}",
+            details=to_native(e),
+            exception=traceback.format_exc(),
+        )
 
     if stdout_json:
         return stdout_json[0].get(prop)
@@ -441,13 +440,12 @@ def get_vm_prop(module, uuid, prop):
 def get_vm_uuid(module, alias):
     # Lookup the uuid that goes with the given alias.
     # Returns the uuid or '' if not found.
-    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid', 'alias={0}'.format(alias)]
+    cmd = [module.vmadm, "lookup", "-j", "-o", "uuid", f"alias={alias}"]
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
-        module.fail_json(
-            msg='Could not retrieve UUID of {0}'.format(alias), exception=stderr)
+        module.fail_json(msg=f"Could not retrieve UUID of {alias}", exception=stderr)
 
     # If no VM was found matching the given alias, we get back an empty array.
     # That is not an error condition as we might be explicitly checking for its
@@ -456,28 +454,29 @@ def get_vm_uuid(module, alias):
         stdout_json = json.loads(stdout)
     except Exception as e:
         module.fail_json(
-            msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(alias),
-            details=to_native(e), exception=traceback.format_exc())
+            msg=f"Invalid JSON returned by vmadm for uuid lookup of {alias}",
+            details=to_native(e),
+            exception=traceback.format_exc(),
+        )
 
     if stdout_json:
-        return stdout_json[0].get('uuid')
+        return stdout_json[0].get("uuid")
 
 
 def get_all_vm_uuids(module):
     # Retrieve the UUIDs for all VMs.
-    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid']
+    cmd = [module.vmadm, "lookup", "-j", "-o", "uuid"]
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
-        module.fail_json(msg='Failed to get VMs list', exception=stderr)
+        module.fail_json(msg="Failed to get VMs list", exception=stderr)
 
     try:
         stdout_json = json.loads(stdout)
-        return [v['uuid'] for v in stdout_json]
+        return [v["uuid"] for v in stdout_json]
     except Exception as e:
-        module.fail_json(msg='Could not retrieve VM UUIDs', details=to_native(e),
-                         exception=traceback.format_exc())
+        module.fail_json(msg="Could not retrieve VM UUIDs", details=to_native(e), exception=traceback.format_exc())
 
 
 def new_vm(module, uuid, vm_state):
@@ -487,38 +486,39 @@ def new_vm(module, uuid, vm_state):
 
     if rc != 0:
         changed = False
-        module.fail_json(msg='Could not create VM', exception=stderr)
+        module.fail_json(msg="Could not create VM", exception=stderr)
     else:
         changed = True
         # 'vmadm create' returns all output to stderr...
-        match = re.match('Successfully created VM (.*)', stderr)
+        match = re.match("Successfully created VM (.*)", stderr)
         if match:
             vm_uuid = match.groups()[0]
             if not is_valid_uuid(vm_uuid):
-                module.fail_json(msg='Invalid UUID for VM {0}?'.format(vm_uuid))
+                module.fail_json(msg=f"Invalid UUID for VM {vm_uuid}?")
         else:
-            module.fail_json(msg='Could not retrieve UUID of newly created(?) VM')
+            module.fail_json(msg="Could not retrieve UUID of newly created(?) VM")
 
         # Now that the VM is created, ensure it is in the desired state (if not 'running')
-        if vm_state != 'running':
+        if vm_state != "running":
             ret = set_vm_state(module, vm_uuid, vm_state)
             if not ret:
-                module.fail_json(msg='Could not set VM {0} to state {1}'.format(vm_uuid, vm_state))
+                module.fail_json(msg=f"Could not set VM {vm_uuid} to state {vm_state}")
 
     try:
         os.unlink(payload_file)
     except Exception as e:
         # Since the payload may contain sensitive information, fail hard
         # if we cannot remove the file so the operator knows about it.
-        module.fail_json(msg='Could not remove temporary JSON payload file {0}: {1}'.format(payload_file, to_native(e)),
-                         exception=traceback.format_exc())
+        module.fail_json(
+            msg=f"Could not remove temporary JSON payload file {payload_file}: {e}", exception=traceback.format_exc()
+        )
 
     return changed, vm_uuid
 
 
 def vmadm_create_vm(module, payload_file):
     # Create a new VM using the provided payload.
-    cmd = [module.vmadm, 'create', '-f', payload_file]
+    cmd = [module.vmadm, "create", "-f", payload_file]
 
     return module.run_command(cmd)
 
@@ -527,27 +527,27 @@ def set_vm_state(module, vm_uuid, vm_state):
     p = module.params
 
     # Check if the VM is already in the desired state.
-    state = get_vm_prop(module, vm_uuid, 'state')
+    state = get_vm_prop(module, vm_uuid, "state")
     if state and (state == vm_state):
         return None
 
     # Lookup table for the state to be in, and which command to use for that.
     # vm_state: [vmadm commandm, forceable?]
     cmds = {
-        'stopped': ['stop', True],
-        'running': ['start', False],
-        'deleted': ['delete', True],
-        'rebooted': ['reboot', False]
+        "stopped": ["stop", True],
+        "running": ["start", False],
+        "deleted": ["delete", True],
+        "rebooted": ["reboot", False],
     }
 
     command, forceable = cmds[vm_state]
-    force = ['-F'] if p['force'] and forceable else []
+    force = ["-F"] if p["force"] and forceable else []
 
     cmd = [module.vmadm, command] + force + [vm_uuid]
 
     (dummy, dummy, stderr) = module.run_command(cmd)
 
-    match = re.match('^Successfully.*', stderr)
+    match = re.match("^Successfully.*", stderr)
     return match is not None
 
 
@@ -555,18 +555,13 @@ def create_payload(module, uuid):
     # Create the JSON payload (vmdef) and return the filename.
 
     # Filter out the few options that are not valid VM properties.
-    module_options = ['force', 'state']
-    vmdef = {
-        k: v
-        for k, v in module.params.items()
-        if k not in module_options and v
-    }
+    module_options = ["force", "state"]
+    vmdef = {k: v for k, v in module.params.items() if k not in module_options and v}
 
     try:
         vmdef_json = json.dumps(vmdef)
     except Exception as e:
-        module.fail_json(
-            msg='Could not create valid JSON payload', exception=traceback.format_exc())
+        module.fail_json(msg="Could not create valid JSON payload", exception=traceback.format_exc())
 
     # Create the temporary file that contains our payload, and set tight
     # permissions for it may container sensitive information.
@@ -576,10 +571,10 @@ def create_payload(module, uuid):
         # the payload (thus removing the `save_payload` option).
         fname = tempfile.mkstemp()[1]
         os.chmod(fname, 0o400)
-        with open(fname, 'w') as fh:
+        with open(fname, "w") as fh:
             fh.write(vmdef_json)
     except Exception as e:
-        module.fail_json(msg='Could not save JSON payload: %s' % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"Could not save JSON payload: {e}", exception=traceback.format_exc())
 
     return fname
 
@@ -593,30 +588,30 @@ def vm_state_transition(module, uuid, vm_state):
     elif ret:
         return True
     else:
-        module.fail_json(msg='Failed to set VM {0} to state {1}'.format(uuid, vm_state))
+        module.fail_json(msg=f"Failed to set VM {uuid} to state {vm_state}")
 
 
 def is_valid_uuid(uuid):
-    return re.match('^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$', uuid, re.IGNORECASE) is not None
+    return re.match("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", uuid, re.IGNORECASE) is not None
 
 
 def validate_uuids(module):
     failed = [
         name
-        for name, pvalue in [(x, module.params[x]) for x in ['uuid', 'image_uuid']]
-        if pvalue and pvalue != '*' and not is_valid_uuid(pvalue)
+        for name, pvalue in [(x, module.params[x]) for x in ["uuid", "image_uuid"]]
+        if pvalue and pvalue != "*" and not is_valid_uuid(pvalue)
     ]
 
     if failed:
-        module.fail_json(msg='No valid UUID(s) found for: {0}'.format(", ".join(failed)))
+        module.fail_json(msg=f"No valid UUID(s) found for: {', '.join(failed)}")
 
 
 def manage_all_vms(module, vm_state):
     # Handle operations for all VMs, which can by definition only
     # be state transitions.
-    state = module.params['state']
+    state = module.params["state"]
 
-    if state == 'created':
+    if state == "created":
         module.fail_json(msg='State "created" is only valid for tasks with a single VM')
 
     # If any of the VMs has a change, the task as a whole has a change.
@@ -624,12 +619,12 @@ def manage_all_vms(module, vm_state):
 
     # First get all VM uuids and for each check their state, and adjust it if needed.
     for uuid in get_all_vm_uuids(module):
-        current_vm_state = get_vm_prop(module, uuid, 'state')
-        if not current_vm_state and vm_state == 'deleted':
+        current_vm_state = get_vm_prop(module, uuid, "state")
+        if not current_vm_state and vm_state == "deleted":
             any_changed = False
         else:
             if module.check_mode:
-                if (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state):
+                if (not current_vm_state) or (get_vm_prop(module, uuid, "state") != state):
                     any_changed = True
             else:
                 any_changed = vm_state_transition(module, uuid, vm_state) or any_changed
@@ -643,57 +638,81 @@ def main():
     # Dict of all options that are simple to define based on their type.
     # They're not required and have a default of None.
     properties = {
-        'str': [
-            'boot', 'disk_driver', 'dns_domain', 'fs_allowed', 'hostname',
-            'image_uuid', 'internal_metadata_namespace', 'kernel_version',
-            'limit_priv', 'nic_driver', 'owner_uuid', 'qemu_opts',
-            'qemu_extra_opts', 'spice_opts', 'uuid', 'vga',
-            'zfs_data_compression', 'zfs_root_compression', 'zpool'
+        "str": [
+            "boot",
+            "disk_driver",
+            "dns_domain",
+            "fs_allowed",
+            "hostname",
+            "image_uuid",
+            "internal_metadata_namespace",
+            "kernel_version",
+            "limit_priv",
+            "nic_driver",
+            "owner_uuid",
+            "qemu_opts",
+            "qemu_extra_opts",
+            "spice_opts",
+            "uuid",
+            "vga",
+            "zfs_data_compression",
+            "zfs_root_compression",
+            "zpool",
         ],
-        'bool': [
-            'archive_on_delete', 'autoboot', 'delegate_dataset',
-            'docker', 'firewall_enabled', 'force', 'indestructible_delegated',
-            'indestructible_zoneroot', 'maintain_resolvers', 'nowait'
+        "bool": [
+            "archive_on_delete",
+            "autoboot",
+            "delegate_dataset",
+            "docker",
+            "firewall_enabled",
+            "force",
+            "indestructible_delegated",
+            "indestructible_zoneroot",
+            "maintain_resolvers",
+            "nowait",
         ],
-        'int': [
-            'cpu_cap', 'cpu_shares', 'flexible_disk_size',
-            'max_locked_memory', 'max_lwps', 'max_physical_memory',
-            'max_swap', 'mdata_exec_timeout', 'quota', 'ram',
-            'tmpfs', 'vcpus', 'virtio_txburst', 'virtio_txtimer',
-            'vnc_port', 'zfs_data_recsize', 'zfs_filesystem_limit',
-            'zfs_io_priority', 'zfs_root_recsize', 'zfs_snapshot_limit'
+        "int": [
+            "cpu_cap",
+            "cpu_shares",
+            "flexible_disk_size",
+            "max_locked_memory",
+            "max_lwps",
+            "max_physical_memory",
+            "max_swap",
+            "mdata_exec_timeout",
+            "quota",
+            "ram",
+            "tmpfs",
+            "vcpus",
+            "virtio_txburst",
+            "virtio_txtimer",
+            "vnc_port",
+            "zfs_data_recsize",
+            "zfs_filesystem_limit",
+            "zfs_io_priority",
+            "zfs_root_recsize",
+            "zfs_snapshot_limit",
         ],
-        'dict': ['customer_metadata', 'internal_metadata', 'routes'],
+        "dict": ["customer_metadata", "internal_metadata", "routes"],
     }
 
     # Start with the options that are not as trivial as those above.
     options = dict(
         state=dict(
-            default='running',
-            type='str',
-            choices=['present', 'running', 'absent', 'deleted', 'stopped', 'created', 'restarted', 'rebooted']
+            default="running",
+            type="str",
+            choices=["present", "running", "absent", "deleted", "stopped", "created", "restarted", "rebooted"],
         ),
-        name=dict(
-            type='str',
-            aliases=['alias']
-        ),
-        brand=dict(
-            default='joyent',
-            type='str',
-            choices=['joyent', 'joyent-minimal', 'lx', 'kvm', 'bhyve']
-        ),
-        cpu_type=dict(
-            default='qemu64',
-            type='str',
-            choices=['host', 'qemu64']
-        ),
+        name=dict(type="str", aliases=["alias"]),
+        brand=dict(default="joyent", type="str", choices=["joyent", "joyent-minimal", "lx", "kvm", "bhyve"]),
+        cpu_type=dict(default="qemu64", type="str", choices=["host", "qemu64"]),
         # Regular strings, however these require additional options.
-        spice_password=dict(type='str', no_log=True),
-        vnc_password=dict(type='str', no_log=True),
-        disks=dict(type='list', elements='dict'),
-        nics=dict(type='list', elements='dict'),
-        resolvers=dict(type='list', elements='str'),
-        filesystems=dict(type='list', elements='dict'),
+        spice_password=dict(type="str", no_log=True),
+        vnc_password=dict(type="str", no_log=True),
+        disks=dict(type="list", elements="dict"),
+        nics=dict(type="list", elements="dict"),
+        resolvers=dict(type="list", elements="str"),
+        filesystems=dict(type="list", elements="dict"),
     )
 
     # Add our 'simple' options to options dict.
@@ -702,52 +721,48 @@ def main():
             option = dict(type=type)
             options[p] = option
 
-    module = AnsibleModule(
-        argument_spec=options,
-        supports_check_mode=True,
-        required_one_of=[['name', 'uuid']]
-    )
+    module = AnsibleModule(argument_spec=options, supports_check_mode=True, required_one_of=[["name", "uuid"]])
 
-    module.vmadm = module.get_bin_path('vmadm', required=True)
+    module.vmadm = module.get_bin_path("vmadm", required=True)
 
     p = module.params
-    uuid = p['uuid']
-    state = p['state']
+    uuid = p["uuid"]
+    state = p["state"]
 
     # Translate the state parameter into something we can use later on.
-    if state in ['present', 'running']:
-        vm_state = 'running'
-    elif state in ['stopped', 'created']:
-        vm_state = 'stopped'
-    elif state in ['absent', 'deleted']:
-        vm_state = 'deleted'
-    elif state in ['restarted', 'rebooted']:
-        vm_state = 'rebooted'
+    if state in ["present", "running"]:
+        vm_state = "running"
+    elif state in ["stopped", "created"]:
+        vm_state = "stopped"
+    elif state in ["absent", "deleted"]:
+        vm_state = "deleted"
+    elif state in ["restarted", "rebooted"]:
+        vm_state = "rebooted"
 
-    result = {'state': state}
+    result = {"state": state}
 
     # While it is possible to refer to a given VM by its `alias`, it is easier
     # to operate on VMs by their UUID. So if we're not given a `uuid`, look
     # it up.
     if not uuid:
-        uuid = get_vm_uuid(module, p['name'])
+        uuid = get_vm_uuid(module, p["name"])
         # Bit of a chicken and egg problem here for VMs with state == deleted.
         # If they're going to be removed in this play, we have to lookup the
         # uuid. If they're already deleted there's nothing to lookup.
         # So if state == deleted and get_vm_uuid() returned '', the VM is already
         # deleted and there's nothing else to do.
-        if uuid is None and vm_state == 'deleted':
-            result['name'] = p['name']
+        if uuid is None and vm_state == "deleted":
+            result["name"] = p["name"]
             module.exit_json(**result)
 
     validate_uuids(module)
 
-    if p['name']:
-        result['name'] = p['name']
-    result['uuid'] = uuid
+    if p["name"]:
+        result["name"] = p["name"]
+    result["uuid"] = uuid
 
-    if uuid == '*':
-        result['changed'] = manage_all_vms(module, vm_state)
+    if uuid == "*":
+        result["changed"] = manage_all_vms(module, vm_state)
         module.exit_json(**result)
 
     # The general flow is as follows:
@@ -765,24 +780,24 @@ def main():
     # Managing VM snapshots should be part of a standalone module.
 
     # First obtain the VM state to determine what needs to be done with it.
-    current_vm_state = get_vm_prop(module, uuid, 'state')
+    current_vm_state = get_vm_prop(module, uuid, "state")
 
     # First handle the case where the VM should be deleted and is not present.
-    if not current_vm_state and vm_state == 'deleted':
-        result['changed'] = False
+    if not current_vm_state and vm_state == "deleted":
+        result["changed"] = False
     elif module.check_mode:
         # Shortcut for check mode, if there is no VM yet, it will need to be created.
         # Or, if the VM is not in the desired state yet, it needs to transition.
-        result['changed'] = (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state)
+        result["changed"] = (not current_vm_state) or (get_vm_prop(module, uuid, "state") != state)
     elif not current_vm_state:
         # No VM was found that matched the given ID (alias or uuid), so we create it.
-        result['changed'], result['uuid'] = new_vm(module, uuid, vm_state)
+        result["changed"], result["uuid"] = new_vm(module, uuid, vm_state)
     else:
         # VM was found, operate on its state directly.
-        result['changed'] = vm_state_transition(module, uuid, vm_state)
+        result["changed"] = vm_state_transition(module, uuid, vm_state)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

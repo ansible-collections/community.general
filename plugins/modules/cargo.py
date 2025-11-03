@@ -1,14 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021 Radek Sprta <mail@radeksprta.eu>
 # Copyright (c) 2024 Colin Nolan <cn580@alumni.york.ac.uk>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: cargo
@@ -130,7 +126,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Cargo(object):
+class Cargo:
     def __init__(self, module, **kwargs):
         self.module = module
         self.executable = [kwargs["executable"] or module.get_bin_path("cargo", True)]
@@ -149,12 +145,10 @@ class Cargo(object):
     @path.setter
     def path(self, path):
         if path is not None and not os.path.isdir(path):
-            self.module.fail_json(msg="Path %s is not a directory" % path)
+            self.module.fail_json(msg=f"Path {path} is not a directory")
         self._path = path
 
-    def _exec(
-        self, args, run_in_check_mode=False, check_rc=True, add_package_name=True
-    ):
+    def _exec(self, args, run_in_check_mode=False, check_rc=True, add_package_name=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
             cmd = self.executable + args
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
@@ -199,9 +193,7 @@ class Cargo(object):
     def is_outdated(self, name):
         installed_version = self.get_installed().get(name)
         latest_version = (
-            self.get_latest_published_version(name)
-            if not self.directory
-            else self.get_source_directory_version(name)
+            self.get_latest_published_version(name) if not self.directory else self.get_source_directory_version(name)
         )
         return installed_version != latest_version
 
@@ -211,9 +203,7 @@ class Cargo(object):
 
         match = re.search(r'"(.+)"', data)
         if not match:
-            self.module.fail_json(
-                msg="No published version for package %s found" % name
-            )
+            self.module.fail_json(msg=f"No published version for package {name} found")
         return match.group(1)
 
     def get_source_directory_version(self, name):
@@ -234,8 +224,7 @@ class Cargo(object):
         )
         if not package:
             self.module.fail_json(
-                msg="Package %s not defined in source, found: %s"
-                % (name, [x["name"] for x in manifest["packages"]])
+                msg=f"Package {name} not defined in source, found: {[x['name'] for x in manifest['packages']]}"
             )
         return package["version"]
 
@@ -270,27 +259,20 @@ def main():
         module.fail_json(msg="Source directory does not exist")
 
     # Set LANG env since we parse stdout
-    module.run_command_environ_update = dict(
-        LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C"
-    )
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     cargo = Cargo(module, **module.params)
     changed, out, err = False, None, None
     installed_packages = cargo.get_installed()
     if state == "present":
         to_install = [
-            n
-            for n in name
-            if (n not in installed_packages)
-            or (version and version != installed_packages[n])
+            n for n in name if (n not in installed_packages) or (version and version != installed_packages[n])
         ]
         if to_install:
             changed = True
             out, err = cargo.install(to_install)
     elif state == "latest":
-        to_update = [
-            n for n in name if n not in installed_packages or cargo.is_outdated(n)
-        ]
+        to_update = [n for n in name if n not in installed_packages or cargo.is_outdated(n)]
         if to_update:
             changed = True
             out, err = cargo.install(to_update)

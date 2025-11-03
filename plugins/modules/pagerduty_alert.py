@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -220,42 +218,37 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six.moves.urllib.parse import urlparse, urlencode, urlunparse
 from datetime import datetime
+from urllib.parse import urlparse, urlencode, urlunparse
 
 
 def check(module, name, state, service_id, integration_key, api_key, incident_key=None, http_call=fetch_url):
-    url = 'https://api.pagerduty.com/incidents'
+    url = "https://api.pagerduty.com/incidents"
     headers = {
         "Content-type": "application/json",
-        "Authorization": "Token token=%s" % api_key,
-        'Accept': 'application/vnd.pagerduty+json;version=2'
+        "Authorization": f"Token token={api_key}",
+        "Accept": "application/vnd.pagerduty+json;version=2",
     }
 
-    params = {
-        'service_ids[]': service_id,
-        'sort_by': 'incident_number:desc',
-        'time_zone': 'UTC'
-    }
+    params = {"service_ids[]": service_id, "sort_by": "incident_number:desc", "time_zone": "UTC"}
     if incident_key:
-        params['incident_key'] = incident_key
+        params["incident_key"] = incident_key
 
     url_parts = list(urlparse(url))
     url_parts[4] = urlencode(params, True)
 
     url = urlunparse(url_parts)
 
-    response, info = http_call(module, url, method='get', headers=headers)
+    response, info = http_call(module, url, method="get", headers=headers)
 
-    if info['status'] != 200:
-        module.fail_json(msg="failed to check current incident status."
-                             "Reason: %s" % info['msg'])
+    if info["status"] != 200:
+        module.fail_json(msg=f"failed to check current incident status.Reason: {info['msg']}")
 
     incidents = json.loads(response.read())["incidents"]
     msg = "No corresponding incident"
 
     if len(incidents) == 0:
-        if state in ('acknowledged', 'resolved'):
+        if state in ("acknowledged", "resolved"):
             return msg, False
         return msg, True
     elif state != incidents[0]["status"]:
@@ -264,12 +257,9 @@ def check(module, name, state, service_id, integration_key, api_key, incident_ke
     return incidents[0], False
 
 
-def send_event_v1(module, service_key, event_type, desc,
-                  incident_key=None, client=None, client_url=None):
+def send_event_v1(module, service_key, event_type, desc, incident_key=None, client=None, client_url=None):
     url = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
-    headers = {
-        "Content-type": "application/json"
-    }
+    headers = {"Content-type": "application/json"}
 
     data = {
         "service_key": service_key,
@@ -277,24 +267,19 @@ def send_event_v1(module, service_key, event_type, desc,
         "incident_key": incident_key,
         "description": desc,
         "client": client,
-        "client_url": client_url
+        "client_url": client_url,
     }
 
-    response, info = fetch_url(module, url, method='post',
-                               headers=headers, data=json.dumps(data))
-    if info['status'] != 200:
-        module.fail_json(msg="failed to %s. Reason: %s" %
-                         (event_type, info['msg']))
+    response, info = fetch_url(module, url, method="post", headers=headers, data=json.dumps(data))
+    if info["status"] != 200:
+        module.fail_json(msg=f"failed to {event_type}. Reason: {info['msg']}")
     json_out = json.loads(response.read())
     return json_out
 
 
-def send_event_v2(module, service_key, event_type, payload, link,
-                  incident_key=None, client=None, client_url=None):
+def send_event_v2(module, service_key, event_type, payload, link, incident_key=None, client=None, client_url=None):
     url = "https://events.pagerduty.com/v2/enqueue"
-    headers = {
-        "Content-type": "application/json"
-    }
+    headers = {"Content-type": "application/json"}
     data = {
         "routing_key": service_key,
         "event_action": event_type,
@@ -308,11 +293,9 @@ def send_event_v2(module, service_key, event_type, payload, link,
         data["dedup_key"] = incident_key
     if event_type != "trigger":
         data.pop("payload")
-    response, info = fetch_url(module, url, method="post",
-                               headers=headers, data=json.dumps(data))
+    response, info = fetch_url(module, url, method="post", headers=headers, data=json.dumps(data))
     if info["status"] != 202:
-        module.fail_json(msg="failed to %s. Reason: %s" %
-                         (event_type, info['msg']))
+        module.fail_json(msg=f"failed to {event_type}. Reason: {info['msg']}")
     json_out = json.loads(response.read())
     return json_out, True
 
@@ -325,80 +308,71 @@ def main():
             integration_key=dict(no_log=True),
             service_id=dict(),
             service_key=dict(no_log=True),
-            state=dict(
-                required=True, choices=['triggered', 'acknowledged', 'resolved']
-            ),
-            api_version=dict(type='str', default='v1', choices=['v1', 'v2']),
+            state=dict(required=True, choices=["triggered", "acknowledged", "resolved"]),
+            api_version=dict(type="str", default="v1", choices=["v1", "v2"]),
             client=dict(),
             client_url=dict(),
             component=dict(),
-            custom_details=dict(type='dict'),
-            desc=dict(default='Created via Ansible'),
+            custom_details=dict(type="dict"),
+            desc=dict(default="Created via Ansible"),
             incident_class=dict(),
             incident_key=dict(no_log=False),
             link_url=dict(),
             link_text=dict(),
             source=dict(),
-            severity=dict(
-                default='critical', choices=['critical', 'warning', 'error', 'info']
-            ),
+            severity=dict(default="critical", choices=["critical", "warning", "error", "info"]),
         ),
         required_if=[
-            ('api_version', 'v1', ['service_id', 'api_key']),
-            ('state', 'acknowledged', ['incident_key']),
-            ('state', 'resolved', ['incident_key']),
+            ("api_version", "v1", ["service_id", "api_key"]),
+            ("state", "acknowledged", ["incident_key"]),
+            ("state", "resolved", ["incident_key"]),
         ],
-        required_one_of=[('service_key', 'integration_key')],
+        required_one_of=[("service_key", "integration_key")],
         supports_check_mode=True,
     )
 
-    name = module.params['name']
-    service_id = module.params.get('service_id')
-    integration_key = module.params.get('integration_key')
-    service_key = module.params.get('service_key')
-    api_key = module.params.get('api_key')
-    state = module.params.get('state')
-    client = module.params.get('client')
-    client_url = module.params.get('client_url')
-    desc = module.params.get('desc')
-    incident_key = module.params.get('incident_key')
+    name = module.params["name"]
+    service_id = module.params.get("service_id")
+    integration_key = module.params.get("integration_key")
+    service_key = module.params.get("service_key")
+    api_key = module.params.get("api_key")
+    state = module.params.get("state")
+    client = module.params.get("client")
+    client_url = module.params.get("client_url")
+    desc = module.params.get("desc")
+    incident_key = module.params.get("incident_key")
     payload = {
-        'summary': desc,
-        'source': module.params.get('source'),
-        'timestamp': datetime.now().isoformat(),
-        'severity': module.params.get('severity'),
-        'component': module.params.get('component'),
-        'class': module.params.get('incident_class'),
-        'custom_details': module.params.get('custom_details'),
+        "summary": desc,
+        "source": module.params.get("source"),
+        "timestamp": datetime.now().isoformat(),
+        "severity": module.params.get("severity"),
+        "component": module.params.get("component"),
+        "class": module.params.get("incident_class"),
+        "custom_details": module.params.get("custom_details"),
     }
     link = {}
-    if module.params.get('link_url'):
-        link['href'] = module.params.get('link_url')
-        if module.params.get('link_text'):
-            link['text'] = module.params.get('link_text')
+    if module.params.get("link_url"):
+        link["href"] = module.params.get("link_url")
+        if module.params.get("link_text"):
+            link["text"] = module.params.get("link_text")
     if integration_key is None:
         integration_key = service_key
-        module.warn(
-            '"service_key" is obsolete parameter and will be removed.'
-            ' Please, use "integration_key" instead'
-        )
+        module.warn('"service_key" is obsolete parameter and will be removed. Please, use "integration_key" instead')
 
     state_event_dict = {
-        'triggered': 'trigger',
-        'acknowledged': 'acknowledge',
-        'resolved': 'resolve',
+        "triggered": "trigger",
+        "acknowledged": "acknowledge",
+        "resolved": "resolve",
     }
 
     event_type = state_event_dict[state]
-    if module.params.get('api_version') == 'v1':
-        out, changed = check(module, name, state, service_id,
-                             integration_key, api_key, incident_key)
+    if module.params.get("api_version") == "v1":
+        out, changed = check(module, name, state, service_id, integration_key, api_key, incident_key)
         if not module.check_mode and changed is True:
-            out = send_event_v1(module, integration_key, event_type, desc,
-                                incident_key, client, client_url)
+            out = send_event_v1(module, integration_key, event_type, desc, incident_key, client, client_url)
     else:
         changed = True
-        if event_type == 'trigger' and not payload['source']:
+        if event_type == "trigger" and not payload["source"]:
             module.fail_json(msg='"service" is a required variable for v2 api endpoint.')
         out, changed = send_event_v2(
             module,
@@ -414,5 +388,5 @@ def main():
     module.exit_json(result=out, changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

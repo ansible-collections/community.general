@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Peter Oliver <ansible@mavit.org.uk>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: pkg5
@@ -90,12 +88,16 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', elements='str', required=True),
-            state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed', 'uninstalled']),
-            accept_licenses=dict(type='bool', default=False, aliases=['accept', 'accept_licences']),
-            be_name=dict(type='str'),
-            refresh=dict(type='bool', default=True),
-            verbose=dict(type='bool', default=False),
+            name=dict(type="list", elements="str", required=True),
+            state=dict(
+                type="str",
+                default="present",
+                choices=["absent", "installed", "latest", "present", "removed", "uninstalled"],
+            ),
+            accept_licenses=dict(type="bool", default=False, aliases=["accept", "accept_licences"]),
+            be_name=dict(type="str"),
+            refresh=dict(type="bool", default=True),
+            verbose=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
     )
@@ -106,78 +108,84 @@ def main():
     # pkg(5) FRMIs include a comma before the release number, but
     # AnsibleModule will have split this into multiple items for us.
     # Try to spot where this has happened and fix it.
-    for fragment in params['name']:
-        if re.search(r'^\d+(?:\.\d+)*', fragment) and packages and re.search(r'@[^,]*$', packages[-1]):
-            packages[-1] += ',' + fragment
+    for fragment in params["name"]:
+        if re.search(r"^\d+(?:\.\d+)*", fragment) and packages and re.search(r"@[^,]*$", packages[-1]):
+            packages[-1] += f",{fragment}"
         else:
             packages.append(fragment)
 
-    if params['state'] in ['present', 'installed']:
-        ensure(module, 'present', packages, params)
-    elif params['state'] in ['latest']:
-        ensure(module, 'latest', packages, params)
-    elif params['state'] in ['absent', 'uninstalled', 'removed']:
-        ensure(module, 'absent', packages, params)
+    if params["state"] in ["present", "installed"]:
+        ensure(module, "present", packages, params)
+    elif params["state"] in ["latest"]:
+        ensure(module, "latest", packages, params)
+    elif params["state"] in ["absent", "uninstalled", "removed"]:
+        ensure(module, "absent", packages, params)
 
 
 def ensure(module, state, packages, params):
     response = {
-        'results': [],
-        'msg': '',
+        "results": [],
+        "msg": "",
     }
     behaviour = {
-        'present': {
-            'filter': lambda p: not is_installed(module, p),
-            'subcommand': 'install',
+        "present": {
+            "filter": lambda p: not is_installed(module, p),
+            "subcommand": "install",
         },
-        'latest': {
-            'filter': lambda p: (
-                not is_installed(module, p) or not is_latest(module, p)
-            ),
-            'subcommand': 'install',
+        "latest": {
+            "filter": lambda p: (not is_installed(module, p) or not is_latest(module, p)),
+            "subcommand": "install",
         },
-        'absent': {
-            'filter': lambda p: is_installed(module, p),
-            'subcommand': 'uninstall',
+        "absent": {
+            "filter": lambda p: is_installed(module, p),
+            "subcommand": "uninstall",
         },
     }
 
     if module.check_mode:
-        dry_run = ['-n']
+        dry_run = ["-n"]
     else:
         dry_run = []
 
-    if params['accept_licenses']:
-        accept_licenses = ['--accept']
+    if params["accept_licenses"]:
+        accept_licenses = ["--accept"]
     else:
         accept_licenses = []
 
-    if params['be_name']:
-        beadm = ['--be-name=' + module.params['be_name']]
+    if params["be_name"]:
+        beadm = [f"--be-name={module.params['be_name']}"]
     else:
         beadm = []
 
-    if params['refresh']:
+    if params["refresh"]:
         no_refresh = []
     else:
-        no_refresh = ['--no-refresh']
+        no_refresh = ["--no-refresh"]
 
-    if params['verbose']:
+    if params["verbose"]:
         verbosity = []
     else:
-        verbosity = ['-q']
+        verbosity = ["-q"]
 
-    to_modify = list(filter(behaviour[state]['filter'], packages))
+    to_modify = list(filter(behaviour[state]["filter"], packages))
     if to_modify:
         rc, out, err = module.run_command(
-            ['pkg', behaviour[state]['subcommand']] + dry_run + accept_licenses + beadm + no_refresh + verbosity + ['--'] + to_modify)
-        response['rc'] = rc
-        response['results'].append(out)
-        response['msg'] += err
-        response['changed'] = True
+            ["pkg", behaviour[state]["subcommand"]]
+            + dry_run
+            + accept_licenses
+            + beadm
+            + no_refresh
+            + verbosity
+            + ["--"]
+            + to_modify
+        )
+        response["rc"] = rc
+        response["results"].append(out)
+        response["msg"] += err
+        response["changed"] = True
         if rc == 4:
-            response['changed'] = False
-            response['failed'] = False
+            response["changed"] = False
+            response["failed"] = False
         elif rc != 0:
             module.fail_json(**response)
 
@@ -185,14 +193,14 @@ def ensure(module, state, packages, params):
 
 
 def is_installed(module, package):
-    rc, out, err = module.run_command(['pkg', 'list', '--', package])
+    rc, out, err = module.run_command(["pkg", "list", "--", package])
     return not bool(int(rc))
 
 
 def is_latest(module, package):
-    rc, out, err = module.run_command(['pkg', 'list', '-u', '--', package])
+    rc, out, err = module.run_command(["pkg", "list", "-u", "--", package])
     return bool(int(rc))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

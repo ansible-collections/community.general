@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2013, Jan-Piet Mens <jpmens(at)gmail.com>
 # (m) 2016, Mihai Moldovanu <mihaim@tfm.ro>
 # (m) 2017, Juan Manuel Parrilla <jparrill@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 author:
@@ -104,7 +102,7 @@ class Etcd:
     def __init__(self, url, version, validate_certs):
         self.url = url
         self.version = version
-        self.baseurl = f'{self.url}/{self.version}/keys'
+        self.baseurl = f"{self.url}/{self.version}/keys"
         self.validate_certs = validate_certs
 
     def _parse_node(self, node):
@@ -115,12 +113,12 @@ class Etcd:
         # the function will create a key-value at this level and
         # undoing the loop.
         path = {}
-        if node.get('dir', False):
-            for n in node.get('nodes', []):
-                path[n['key'].split('/')[-1]] = self._parse_node(n)
+        if node.get("dir", False):
+            for n in node.get("nodes", []):
+                path[n["key"].split("/")[-1]] = self._parse_node(n)
 
         else:
-            path = node['value']
+            path = node["value"]
 
         return path
 
@@ -137,16 +135,16 @@ class Etcd:
         try:
             # I will not support Version 1 of etcd for folder parsing
             item = json.loads(data)
-            if self.version == 'v1':
+            if self.version == "v1":
                 # When ETCD are working with just v1
-                if 'value' in item:
-                    value = item['value']
+                if "value" in item:
+                    value = item["value"]
             else:
-                if 'node' in item:
+                if "node" in item:
                     # When a usual result from ETCD
-                    value = self._parse_node(item['node'])
+                    value = self._parse_node(item["node"])
 
-            if 'errorCode' in item:
+            if "errorCode" in item:
                 # Here return an error when an unknown entry responds
                 value = "ENOENT"
         except Exception:
@@ -156,14 +154,12 @@ class Etcd:
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables, **kwargs):
-
         self.set_options(var_options=variables, direct=kwargs)
 
-        validate_certs = self.get_option('validate_certs')
-        url = self.get_option('url')
-        version = self.get_option('version')
+        validate_certs = self.get_option("validate_certs")
+        url = self.get_option("url")
+        version = self.get_option("version")
 
         etcd = Etcd(url=url, version=version, validate_certs=validate_certs)
 

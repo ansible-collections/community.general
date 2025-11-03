@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Simon Weald <ansible@simonweald.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: memset_dns_reload
@@ -89,25 +87,25 @@ from ansible_collections.community.general.plugins.module_utils.memset import me
 
 
 def poll_reload_status(api_key=None, job_id=None, payload=None):
-    '''
+    """
     We poll the `job.status` endpoint every 5 seconds up to a
     maximum of 6 times. This is a relatively arbitrary choice of
     timeout, however requests rarely take longer than 15 seconds
     to complete.
-    '''
+    """
     memset_api, stderr, msg = None, None, None
-    payload['id'] = job_id
+    payload["id"] = job_id
 
-    api_method = 'job.status'
+    api_method = "job.status"
     _has_failed, _msg, response = memset_api_call(api_key=api_key, api_method=api_method, payload=payload)
 
-    while not response.json()['finished']:
+    while not response.json()["finished"]:
         counter = 0
         while counter < 6:
             sleep(5)
             _has_failed, msg, response = memset_api_call(api_key=api_key, api_method=api_method, payload=payload)
             counter += 1
-    if response.json()['error']:
+    if response.json()["error"]:
         # the reload job was submitted but polling failed. Don't return this as an overall task failure.
         stderr = "Reload submitted successfully, but the Memset API returned a job error when attempting to poll the reload status."
     else:
@@ -118,27 +116,27 @@ def poll_reload_status(api_key=None, job_id=None, payload=None):
 
 
 def reload_dns(args=None):
-    '''
+    """
     DNS reloads are a single API call and therefore there's not much
     which can go wrong outside of auth errors.
-    '''
+    """
     retvals, payload = dict(), dict()
     has_changed, has_failed = False, False
     memset_api, msg, stderr = None, None, None
 
-    api_method = 'dns.reload'
-    has_failed, msg, response = memset_api_call(api_key=args['api_key'], api_method=api_method)
+    api_method = "dns.reload"
+    has_failed, msg, response = memset_api_call(api_key=args["api_key"], api_method=api_method)
 
     if has_failed:
         # this is the first time the API is called; incorrect credentials will
         # manifest themselves at this point so we need to ensure the user is
         # informed of the reason.
-        retvals['failed'] = has_failed
+        retvals["failed"] = has_failed
         if response.status_code is not None:
-            retvals['memset_api'] = response.json()
+            retvals["memset_api"] = response.json()
         else:
-            retvals['stderr'] = response.stderr
-        retvals['msg'] = msg
+            retvals["stderr"] = response.stderr
+        retvals["msg"] = msg
         return retvals
 
     # set changed to true if the reload request was accepted.
@@ -147,15 +145,15 @@ def reload_dns(args=None):
     # empty msg var as we don't want to return the API's json response twice.
     msg = None
 
-    if args['poll']:
+    if args["poll"]:
         # hand off to the poll function.
-        job_id = response.json()['id']
-        memset_api, msg, stderr = poll_reload_status(api_key=args['api_key'], job_id=job_id, payload=payload)
+        job_id = response.json()["id"]
+        memset_api, msg, stderr = poll_reload_status(api_key=args["api_key"], job_id=job_id, payload=payload)
 
     # assemble return variables.
-    retvals['failed'] = has_failed
-    retvals['changed'] = has_changed
-    for val in ['msg', 'stderr', 'memset_api']:
+    retvals["failed"] = has_failed
+    retvals["changed"] = has_changed
+    for val in ["msg", "stderr", "memset_api"]:
         if val is not None:
             retvals[val] = eval(val)
 
@@ -165,11 +163,8 @@ def reload_dns(args=None):
 def main():
     global module
     module = AnsibleModule(
-        argument_spec=dict(
-            api_key=dict(required=True, type='str', no_log=True),
-            poll=dict(default=False, type='bool')
-        ),
-        supports_check_mode=False
+        argument_spec=dict(api_key=dict(required=True, type="str", no_log=True), poll=dict(default=False, type="bool")),
+        supports_check_mode=False,
     )
 
     # populate the dict with the user-provided vars.
@@ -177,11 +172,11 @@ def main():
 
     retvals = reload_dns(args)
 
-    if retvals['failed']:
+    if retvals["failed"]:
         module.fail_json(**retvals)
     else:
         module.exit_json(**retvals)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

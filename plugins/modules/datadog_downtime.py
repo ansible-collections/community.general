@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2020, Datadog, Inc
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: datadog_downtime
@@ -196,14 +194,11 @@ def main():
 
     configuration = Configuration(
         host=module.params["api_host"],
-        api_key={
-            "apiKeyAuth": module.params["api_key"],
-            "appKeyAuth": module.params["app_key"]
-        }
+        api_key={"apiKeyAuth": module.params["api_key"], "appKeyAuth": module.params["app_key"]},
     )
     with ApiClient(configuration) as api_client:
-        api_client.user_agent = "ansible_collection/community_general (module_name datadog_downtime) {0}".format(
-            api_client.user_agent
+        api_client.user_agent = (
+            f"ansible_collection/community_general (module_name datadog_downtime) {api_client.user_agent}"
         )
         api_instance = DowntimesApi(api_client)
 
@@ -211,7 +206,7 @@ def main():
         try:
             api_instance.list_downtimes(current_only=True)
         except ApiException as e:
-            module.fail_json(msg="Failed to connect Datadog server using given app_key and api_key: {0}".format(e))
+            module.fail_json(msg=f"Failed to connect Datadog server using given app_key and api_key: {e}")
 
         if module.params["state"] == "present":
             schedule_downtime(module, api_client)
@@ -226,7 +221,7 @@ def _get_downtime(module, api_client):
         try:
             downtime = api.get_downtime(module.params["id"])
         except ApiException as e:
-            module.fail_json(msg="Failed to retrieve downtime with id {0}: {1}".format(module.params["id"], e))
+            module.fail_json(msg=f"Failed to retrieve downtime with id {module.params['id']}: {e}")
     return downtime
 
 
@@ -262,7 +257,7 @@ def _post_downtime(module, api_client):
         module.params["id"] = resp.id
         module.exit_json(changed=True, downtime=resp.to_dict())
     except ApiException as e:
-        module.fail_json(msg="Failed to create downtime: {0}".format(e))
+        module.fail_json(msg=f"Failed to create downtime: {e}")
 
 
 def _equal_dicts(a, b, ignore_keys):
@@ -279,16 +274,12 @@ def _update_downtime(module, current_downtime, api_client):
             resp = api.create_downtime(downtime)
         else:
             resp = api.update_downtime(module.params["id"], downtime)
-        if _equal_dicts(
-                resp.to_dict(),
-                current_downtime.to_dict(),
-                ["active", "creator_id", "updater_id"]
-        ):
+        if _equal_dicts(resp.to_dict(), current_downtime.to_dict(), ["active", "creator_id", "updater_id"]):
             module.exit_json(changed=False, downtime=resp.to_dict())
         else:
             module.exit_json(changed=True, downtime=resp.to_dict())
     except ApiException as e:
-        module.fail_json(msg="Failed to update downtime: {0}".format(e))
+        module.fail_json(msg=f"Failed to update downtime: {e}")
 
 
 def schedule_downtime(module, api_client):
@@ -307,7 +298,7 @@ def cancel_downtime(module, api_client):
     try:
         api.cancel_downtime(downtime["id"])
     except ApiException as e:
-        module.fail_json(msg="Failed to create downtime: {0}".format(e))
+        module.fail_json(msg=f"Failed to create downtime: {e}")
 
     module.exit_json(changed=True)
 

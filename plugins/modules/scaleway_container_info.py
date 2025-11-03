@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Scaleway Serverless container info module
 #
@@ -7,9 +6,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: scaleway_container_info
@@ -94,7 +92,9 @@ container:
 """
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
+    SCALEWAY_REGIONS,
+    scaleway_argument_spec,
+    Scaleway,
 )
 from ansible.module_utils.basic import AnsibleModule
 
@@ -104,18 +104,15 @@ def info_strategy(api, wished_cn):
     cn_lookup = {cn["name"]: cn for cn in cn_list}
 
     if wished_cn["name"] not in cn_lookup:
-        msg = "Error during container lookup: Unable to find container named '%s' in namespace '%s'" % (wished_cn["name"],
-                                                                                                        wished_cn["namespace_id"])
+        msg = f"Error during container lookup: Unable to find container named '{wished_cn['name']}' in namespace '{wished_cn['namespace_id']}'"
 
         api.module.fail_json(msg=msg)
 
     target_cn = cn_lookup[wished_cn["name"]]
 
-    response = api.get(path=api.api_path + "/%s" % target_cn["id"])
+    response = api.get(path=f"{api.api_path}/{target_cn['id']}")
     if not response.ok:
-        msg = "Error during container lookup: %s: '%s' (%s)" % (response.info['msg'],
-                                                                response.json['message'],
-                                                                response.json)
+        msg = f"Error during container lookup: {response.info['msg']}: '{response.json['message']}' ({response.json})"
         api.module.fail_json(msg=msg)
 
     return response.json
@@ -123,13 +120,10 @@ def info_strategy(api, wished_cn):
 
 def core(module):
     region = module.params["region"]
-    wished_container = {
-        "namespace_id": module.params["namespace_id"],
-        "name": module.params["name"]
-    }
+    wished_container = {"namespace_id": module.params["namespace_id"], "name": module.params["name"]}
 
     api = Scaleway(module=module)
-    api.api_path = "containers/v1beta1/regions/%s/containers" % region
+    api.api_path = f"containers/v1beta1/regions/{region}/containers"
 
     summary = info_strategy(api=api, wished_cn=wished_container)
 
@@ -138,11 +132,13 @@ def core(module):
 
 def main():
     argument_spec = scaleway_argument_spec()
-    argument_spec.update(dict(
-        namespace_id=dict(type='str', required=True),
-        region=dict(type='str', required=True, choices=SCALEWAY_REGIONS),
-        name=dict(type='str', required=True)
-    ))
+    argument_spec.update(
+        dict(
+            namespace_id=dict(type="str", required=True),
+            region=dict(type="str", required=True, choices=SCALEWAY_REGIONS),
+            name=dict(type="str", required=True),
+        )
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -151,5 +147,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

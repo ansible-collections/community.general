@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018, Mikhail Gordeev
 
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: apt_repo
@@ -87,61 +85,61 @@ def apt_repo(module, *args):
     rc, out, err = module.run_command([APT_REPO_PATH] + args)
 
     if rc != 0:
-        module.fail_json(msg="'%s' failed: %s" % (' '.join(['apt-repo'] + args), err))
+        module.fail_json(msg=f"'{' '.join(['apt-repo'] + args)}' failed: {err}")
 
     return out
 
 
 def add_repo(module, repo):
     """add a repository"""
-    apt_repo(module, 'add', repo)
+    apt_repo(module, "add", repo)
 
 
 def rm_repo(module, repo):
     """remove a repository"""
-    apt_repo(module, 'rm', repo)
+    apt_repo(module, "rm", repo)
 
 
 def set_repo(module, repo):
     """add a repository and remove other repositories"""
     # first add to validate repository
-    apt_repo(module, 'add', repo)
-    apt_repo(module, 'rm', 'all')
-    apt_repo(module, 'add', repo)
+    apt_repo(module, "add", repo)
+    apt_repo(module, "rm", "all")
+    apt_repo(module, "add", repo)
 
 
 def update(module):
     """update package cache"""
-    apt_repo(module, 'update')
+    apt_repo(module, "update")
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            repo=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
-            remove_others=dict(type='bool', default=False),
-            update=dict(type='bool', default=False),
+            repo=dict(type="str", required=True),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            remove_others=dict(type="bool", default=False),
+            update=dict(type="bool", default=False),
         ),
     )
 
     if not os.path.exists(APT_REPO_PATH):
-        module.fail_json(msg='cannot find /usr/bin/apt-repo')
+        module.fail_json(msg="cannot find /usr/bin/apt-repo")
 
     params = module.params
-    repo = params['repo']
-    state = params['state']
+    repo = params["repo"]
+    state = params["state"]
     old_repositories = apt_repo(module)
 
-    if state == 'present':
-        if params['remove_others']:
+    if state == "present":
+        if params["remove_others"]:
             set_repo(module, repo)
         else:
             add_repo(module, repo)
-    elif state == 'absent':
+    elif state == "absent":
         rm_repo(module, repo)
 
-    if params['update']:
+    if params["update"]:
         update(module)
 
     new_repositories = apt_repo(module)
@@ -149,5 +147,5 @@ def main():
     module.exit_json(changed=changed, repo=repo, state=state)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

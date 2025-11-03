@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """short_description: Check or wait for migrations between nodes"""
 
 # Copyright (c) 2018, Albert Autin
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: aerospike_migrations
@@ -179,53 +177,45 @@ else:
 def run_module():
     """run ansible module"""
     module_args = dict(
-        host=dict(type='str', default='localhost'),
-        port=dict(type='int', default=3000),
-        connect_timeout=dict(type='int', default=1000),
-        consecutive_good_checks=dict(type='int', default=3),
-        sleep_between_checks=dict(type='int', default=60),
-        tries_limit=dict(type='int', default=300),
-        local_only=dict(type='bool', required=True),
-        min_cluster_size=dict(type='int', default=1),
-        target_cluster_size=dict(type='int'),
-        fail_on_cluster_change=dict(type='bool', default=True),
-        migrate_tx_key=dict(type='str', no_log=False,
-                            default="migrate_tx_partitions_remaining"),
-        migrate_rx_key=dict(type='str', no_log=False,
-                            default="migrate_rx_partitions_remaining")
+        host=dict(type="str", default="localhost"),
+        port=dict(type="int", default=3000),
+        connect_timeout=dict(type="int", default=1000),
+        consecutive_good_checks=dict(type="int", default=3),
+        sleep_between_checks=dict(type="int", default=60),
+        tries_limit=dict(type="int", default=300),
+        local_only=dict(type="bool", required=True),
+        min_cluster_size=dict(type="int", default=1),
+        target_cluster_size=dict(type="int"),
+        fail_on_cluster_change=dict(type="bool", default=True),
+        migrate_tx_key=dict(type="str", no_log=False, default="migrate_tx_partitions_remaining"),
+        migrate_rx_key=dict(type="str", no_log=False, default="migrate_rx_partitions_remaining"),
     )
 
     result = dict(
         changed=False,
     )
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     if not LIB_FOUND:
-        module.fail_json(msg=missing_required_lib('aerospike'),
-                         exception=LIB_FOUND_ERR)
+        module.fail_json(msg=missing_required_lib("aerospike"), exception=LIB_FOUND_ERR)
 
     try:
         if module.check_mode:
             has_migrations, skip_reason = False, None
         else:
             migrations = Migrations(module)
-            has_migrations, skip_reason = migrations.has_migs(
-                module.params['local_only']
-            )
+            has_migrations, skip_reason = migrations.has_migs(module.params["local_only"])
 
         if has_migrations:
             module.fail_json(msg="Failed.", skip_reason=skip_reason)
     except Exception as e:
-        module.fail_json(msg="Error: {0}".format(e))
+        module.fail_json(msg=f"Error: {e}")
 
     module.exit_json(**result)
 
 
 class Migrations:
-    """ Check or wait for migrations between nodes """
+    """Check or wait for migrations between nodes"""
 
     def __init__(self, module):
         self.module = module
@@ -238,25 +228,20 @@ class Migrations:
         self._update_cluster_namespace_list()
         self._build_list = set()
         self._update_build_list()
-        self._start_cluster_key = \
-            self._cluster_statistics[self._nodes[0]]['cluster_key']
+        self._start_cluster_key = self._cluster_statistics[self._nodes[0]]["cluster_key"]
 
     def _create_client(self):
-        """ TODO: add support for auth, tls, and other special features
-         I won't use those features, so I'll wait until somebody complains
-         or does it for me (Cross fingers)
-         create the client object"""
+        """TODO: add support for auth, tls, and other special features
+        I won't use those features, so I'll wait until somebody complains
+        or does it for me (Cross fingers)
+        create the client object"""
         config = {
-            'hosts': [
-                (self.module.params['host'], self.module.params['port'])
-            ],
-            'policies': {
-                'timeout': self.module.params['connect_timeout']
-            }
+            "hosts": [(self.module.params["host"], self.module.params["port"])],
+            "policies": {"timeout": self.module.params["connect_timeout"]},
         }
         return aerospike.client(config)
 
-    def _info_cmd_helper(self, cmd, node=None, delimiter=';'):
+    def _info_cmd_helper(self, cmd, node=None, delimiter=";"):
         """delimiter is for separate stats that come back, NOT for kv
         separation which is ="""
         if node is None:  # If no node passed, use the first one (local)
@@ -264,10 +249,7 @@ class Migrations:
         data = self._client.info_node(cmd, node)
         data = data.split("\t")
         if len(data) != 1 and len(data) != 2:
-            self.module.fail_json(
-                msg="Unexpected number of values returned in info command: " +
-                str(len(data))
-            )
+            self.module.fail_json(msg=f"Unexpected number of values returned in info command: {len(data)}")
         # data will be in format 'command\touput'
         data = data[-1]
         data = data.rstrip("\n\r")
@@ -275,10 +257,8 @@ class Migrations:
 
         # some commands don't return in kv format
         # so we dont want a dict from those.
-        if '=' in data:
-            retval = dict(
-                metric.split("=", 1) for metric in data_arr
-            )
+        if "=" in data:
+            retval = dict(metric.split("=", 1) for metric in data_arr)
         else:
             # if only 1 element found, and not kv, return just the value.
             if len(data_arr) == 1:
@@ -292,7 +272,7 @@ class Migrations:
         of build versions."""
         self._build_list = set()
         for node in self._nodes:
-            build = self._info_cmd_helper('build', node)
+            build = self._info_cmd_helper("build", node)
             self._build_list.add(build)
 
     # just checks to see if the version is 4.3 or greater
@@ -300,26 +280,25 @@ class Migrations:
         # if version <4.3 we can't use cluster-stable info cmd
         # regex hack to check for versions beginning with 0-3 or
         # beginning with 4.0,4.1,4.2
-        if re.search(R'^([0-3]\.|4\.[0-2])', min(self._build_list)):
+        if re.search(R"^([0-3]\.|4\.[0-2])", min(self._build_list)):
             return False
         return True
 
     def _update_cluster_namespace_list(self):
-        """ make a unique list of namespaces
+        """make a unique list of namespaces
         TODO: does this work on a rolling namespace add/deletion?
         thankfully if it doesn't, we dont need this on builds >=4.3"""
         self._namespaces = set()
         for node in self._nodes:
-            namespaces = self._info_cmd_helper('namespaces', node)
+            namespaces = self._info_cmd_helper("namespaces", node)
             for namespace in namespaces:
                 self._namespaces.add(namespace)
 
     def _update_cluster_statistics(self):
-        """create a dict of nodes with their related stats """
+        """create a dict of nodes with their related stats"""
         self._cluster_statistics = {}
         for node in self._nodes:
-            self._cluster_statistics[node] = \
-                self._info_cmd_helper('statistics', node)
+            self._cluster_statistics[node] = self._info_cmd_helper("statistics", node)
 
     def _update_nodes_list(self):
         """get a fresh list of all the nodes"""
@@ -331,26 +310,19 @@ class Migrations:
         """returns a True or False.
         Does the namespace have migrations for the node passed?
         If no node passed, uses the local node or the first one in the list"""
-        namespace_stats = self._info_cmd_helper("namespace/" + namespace, node)
+        namespace_stats = self._info_cmd_helper(f"namespace/{namespace}", node)
         try:
-            namespace_tx = \
-                int(namespace_stats[self.module.params['migrate_tx_key']])
-            namespace_rx = \
-                int(namespace_stats[self.module.params['migrate_rx_key']])
+            namespace_tx = int(namespace_stats[self.module.params["migrate_tx_key"]])
+            namespace_rx = int(namespace_stats[self.module.params["migrate_rx_key"]])
         except KeyError:
             self.module.fail_json(
-                msg="Did not find partition remaining key:" +
-                self.module.params['migrate_tx_key'] +
-                " or key:" +
-                self.module.params['migrate_rx_key'] +
-                " in 'namespace/" +
-                namespace +
-                "' output."
+                msg=(
+                    f"Did not find partition remaining key:{self.module.params['migrate_tx_key']} "
+                    f"or key:{self.module.params['migrate_rx_key']} in 'namespace/{namespace}' output."
+                )
             )
         except TypeError:
-            self.module.fail_json(
-                msg="namespace stat returned was not numerical"
-            )
+            self.module.fail_json(msg="namespace stat returned was not numerical")
         return namespace_tx != 0 or namespace_rx != 0
 
     def _node_has_migs(self, node=None):
@@ -369,22 +341,20 @@ class Migrations:
         with the key being the cluster key."""
         cluster_keys = {}
         for node in self._nodes:
-            cluster_key = self._cluster_statistics[node][
-                'cluster_key']
+            cluster_key = self._cluster_statistics[node]["cluster_key"]
             if cluster_key not in cluster_keys:
                 cluster_keys[cluster_key] = 1
             else:
                 cluster_keys[cluster_key] += 1
-        if len(cluster_keys.keys()) == 1 and \
-                self._start_cluster_key in cluster_keys:
+        if len(cluster_keys.keys()) == 1 and self._start_cluster_key in cluster_keys:
             return True
         return False
 
     def _cluster_migrates_allowed(self):
         """ensure all nodes have 'migrate_allowed' in their stats output"""
         for node in self._nodes:
-            node_stats = self._info_cmd_helper('statistics', node)
-            allowed = node_stats['migrate_allowed']
+            node_stats = self._info_cmd_helper("statistics", node)
+            allowed = node_stats["migrate_allowed"]
             if allowed == "false":
                 return False
         return True
@@ -412,11 +382,11 @@ class Migrations:
         minimum cluster size specified in their statistics output"""
         sizes = set()
         for node in self._cluster_statistics:
-            sizes.add(int(self._cluster_statistics[node]['cluster_size']))
+            sizes.add(int(self._cluster_statistics[node]["cluster_size"]))
 
         if (len(sizes)) > 1:  # if we are getting more than 1 size, lets say no
             return False
-        if (min(sizes)) >= self.module.params['min_cluster_size']:
+        if (min(sizes)) >= self.module.params["min_cluster_size"]:
             return True
         return False
 
@@ -431,16 +401,16 @@ class Migrations:
          the target node's migrations counts must be zero for the provided
          'namespace' or all namespaces if 'namespace' is not provided."""
         cluster_key = set()
-        cluster_key.add(self._info_cmd_helper('statistics')['cluster_key'])
+        cluster_key.add(self._info_cmd_helper("statistics")["cluster_key"])
         cmd = "cluster-stable:"
-        target_cluster_size = self.module.params['target_cluster_size']
+        target_cluster_size = self.module.params["target_cluster_size"]
         if target_cluster_size is not None:
-            cmd = cmd + "size=" + str(target_cluster_size) + ";"
+            cmd = f"{cmd}size={target_cluster_size};"
         for node in self._nodes:
             try:
                 cluster_key.add(self._info_cmd_helper(cmd, node))
             except aerospike.exception.ServerError as e:  # unstable-cluster is returned in form of Exception
-                if 'unstable-cluster' in e.msg:
+                if "unstable-cluster" in e.msg:
                     return False
                 raise e
         if len(cluster_key) == 1:
@@ -464,11 +434,9 @@ class Migrations:
         consecutive_good = 0
         try_num = 0
         skip_reason = list()
-        while \
-            try_num < int(self.module.params['tries_limit']) and \
-                consecutive_good < \
-                int(self.module.params['consecutive_good_checks']):
-
+        while try_num < int(self.module.params["tries_limit"]) and consecutive_good < int(
+            self.module.params["consecutive_good_checks"]
+        ):
             self._update_nodes_list()
             self._update_cluster_statistics()
 
@@ -476,36 +444,26 @@ class Migrations:
             # we probably want to skip & sleep instead of failing entirely
             stable, reason = self._cluster_good_state()
             if stable is not True:
-                skip_reason.append(
-                    "Skipping on try#" + str(try_num) +
-                    " for reason:" + reason
-                )
+                skip_reason.append(f"Skipping on try#{try_num} for reason:{reason}")
             else:
                 if self._can_use_cluster_stable():
                     if self._cluster_stable():
                         consecutive_good += 1
                     else:
                         consecutive_good = 0
-                        skip_reason.append(
-                            "Skipping on try#" + str(try_num) +
-                            " for reason:" + " cluster_stable"
-                        )
+                        skip_reason.append(f"Skipping on try#{try_num} for reason: cluster_stable")
                 elif self._has_migs(local):
                     # print("_has_migs")
-                    skip_reason.append(
-                        "Skipping on try#" + str(try_num) +
-                        " for reason:" + " migrations"
-                    )
+                    skip_reason.append(f"Skipping on try#{try_num} for reason: migrations")
                     consecutive_good = 0
                 else:
                     consecutive_good += 1
-                    if consecutive_good == self.module.params[
-                            'consecutive_good_checks']:
+                    if consecutive_good == self.module.params["consecutive_good_checks"]:
                         break
             try_num += 1
-            sleep(self.module.params['sleep_between_checks'])
+            sleep(self.module.params["sleep_between_checks"])
             # print(skip_reason)
-        if consecutive_good == self.module.params['consecutive_good_checks']:
+        if consecutive_good == self.module.params["consecutive_good_checks"]:
             return False, None
         return True, skip_reason
 
@@ -515,5 +473,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2012, Michael DeHaan, <michael.dehaan@gmail.com>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -26,13 +25,14 @@ class CallbackModule(CallbackBase):
     This is a very trivial example of how any callback function can get at play and task objects.
     play will be 'None' for runner invocations, and task will be None for 'setup' invocations.
     """
+
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'community.general.context_demo'
+    CALLBACK_TYPE = "aggregate"
+    CALLBACK_NAME = "community.general.context_demo"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, *args, **kwargs):
-        super(CallbackModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.task = None
         self.play = None
 
@@ -41,11 +41,11 @@ class CallbackModule(CallbackBase):
 
         self._display.display("     --- ARGS ")
         for i, a in enumerate(args):
-            self._display.display(f'     {i}: {a}')
+            self._display.display(f"     {i}: {a}")
 
         self._display.display("      --- KWARGS ")
         for k in kwargs:
-            self._display.display(f'     {k}: {kwargs[k]}')
+            self._display.display(f"     {k}: {kwargs[k]}")
 
     def v2_playbook_on_play_start(self, play):
         self.play = play

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Hewlett-Packard Development Company, L.P.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: puppet
@@ -198,79 +196,71 @@ from ansible.module_utils.basic import AnsibleModule
 def _write_structured_data(basedir, basename, data):
     if not os.path.exists(basedir):
         os.makedirs(basedir)
-    file_path = os.path.join(basedir, "{0}.json".format(basename))
+    file_path = os.path.join(basedir, f"{basename}.json")
     # This is more complex than you might normally expect because we want to
     # open the file with only u+rw set. Also, we use the stat constants
     # because ansible still supports python 2.4 and the octal syntax changed
-    out_file = os.fdopen(
-        os.open(
-            file_path, os.O_CREAT | os.O_WRONLY,
-            stat.S_IRUSR | stat.S_IWUSR), 'w')
-    out_file.write(json.dumps(data).encode('utf8'))
+    out_file = os.fdopen(os.open(file_path, os.O_CREAT | os.O_WRONLY, stat.S_IRUSR | stat.S_IWUSR), "w")
+    out_file.write(json.dumps(data).encode("utf8"))
     out_file.close()
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            timeout=dict(type='str', default='30m'),
-            puppetmaster=dict(type='str'),
-            modulepath=dict(type='str'),
-            manifest=dict(type='str'),
-            confdir=dict(type='str'),
-            noop=dict(type='bool'),
-            logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
+            timeout=dict(type="str", default="30m"),
+            puppetmaster=dict(type="str"),
+            modulepath=dict(type="str"),
+            manifest=dict(type="str"),
+            confdir=dict(type="str"),
+            noop=dict(type="bool"),
+            logdest=dict(type="str", default="stdout", choices=["all", "stdout", "syslog"]),
             # The following is not related to Ansible's diff; see https://github.com/ansible-collections/community.general/pull/3980#issuecomment-1005666154
-            show_diff=dict(type='bool', default=False),
-            facts=dict(type='dict'),
-            facter_basename=dict(type='str', default='ansible'),
-            environment=dict(type='str'),
-            certname=dict(type='str'),
-            tags=dict(type='list', elements='str'),
-            skip_tags=dict(type='list', elements='str'),
-            execute=dict(type='str'),
-            summarize=dict(type='bool', default=False),
-            waitforlock=dict(type='str'),
-            debug=dict(type='bool', default=False),
-            verbose=dict(type='bool', default=False),
-            use_srv_records=dict(type='bool'),
-            environment_lang=dict(type='str', default='C'),
+            show_diff=dict(type="bool", default=False),
+            facts=dict(type="dict"),
+            facter_basename=dict(type="str", default="ansible"),
+            environment=dict(type="str"),
+            certname=dict(type="str"),
+            tags=dict(type="list", elements="str"),
+            skip_tags=dict(type="list", elements="str"),
+            execute=dict(type="str"),
+            summarize=dict(type="bool", default=False),
+            waitforlock=dict(type="str"),
+            debug=dict(type="bool", default=False),
+            verbose=dict(type="bool", default=False),
+            use_srv_records=dict(type="bool"),
+            environment_lang=dict(type="str", default="C"),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
-            ('puppetmaster', 'manifest'),
-            ('puppetmaster', 'manifest', 'execute'),
-            ('puppetmaster', 'modulepath'),
+            ("puppetmaster", "manifest"),
+            ("puppetmaster", "manifest", "execute"),
+            ("puppetmaster", "modulepath"),
         ],
     )
     p = module.params
 
-    if p['manifest']:
-        if not os.path.exists(p['manifest']):
-            module.fail_json(
-                msg="Manifest file %(manifest)s not found." % dict(
-                    manifest=p['manifest']))
+    if p["manifest"]:
+        if not os.path.exists(p["manifest"]):
+            module.fail_json(msg=f"Manifest file {dict(manifest=p['manifest'])['manifest']} not found.")
 
     # Check if puppet is disabled here
-    if not p['manifest']:
+    if not p["manifest"]:
         puppet_utils.ensure_agent_enabled(module)
 
-    if module.params['facts'] and not module.check_mode:
-        _write_structured_data(
-            puppet_utils.get_facter_dir(),
-            module.params['facter_basename'],
-            module.params['facts'])
+    if module.params["facts"] and not module.check_mode:
+        _write_structured_data(puppet_utils.get_facter_dir(), module.params["facter_basename"], module.params["facts"])
 
     runner = puppet_utils.puppet_runner(module)
 
-    if not p['manifest'] and not p['execute']:
+    if not p["manifest"] and not p["execute"]:
         args_order = "_agent_fixed puppetmaster show_diff confdir environment tags skip_tags certname noop use_srv_records waitforlock"
         with runner(args_order) as ctx:
             rc, stdout, stderr = ctx.run()
     else:
         args_order = "_apply_fixed logdest modulepath environment certname tags skip_tags noop _execute summarize debug verbose waitforlock"
         with runner(args_order) as ctx:
-            rc, stdout, stderr = ctx.run(_execute=[p['execute'], p['manifest']])
+            rc, stdout, stderr = ctx.run(_execute=[p["execute"], p["manifest"]])
 
     if rc == 0:
         # success
@@ -283,22 +273,17 @@ def main():
             msg = "puppet is disabled"
         else:
             msg = "puppet did not run"
-        module.exit_json(
-            rc=rc, disabled=disabled, msg=msg,
-            error=True, stdout=stdout, stderr=stderr)
+        module.exit_json(rc=rc, disabled=disabled, msg=msg, error=True, stdout=stdout, stderr=stderr)
     elif rc == 2:
         # success with changes
         module.exit_json(rc=0, changed=True, stdout=stdout, stderr=stderr)
     elif rc == 124:
         # timeout
-        module.exit_json(
-            rc=rc, msg="%s timed out" % ctx.cmd, stdout=stdout, stderr=stderr)
+        module.exit_json(rc=rc, msg=f"{ctx.cmd} timed out", stdout=stdout, stderr=stderr)
     else:
         # failure
-        module.fail_json(
-            rc=rc, msg="%s failed with return code: %d" % (ctx.cmd, rc),
-            stdout=stdout, stderr=stderr)
+        module.fail_json(rc=rc, msg=f"{ctx.cmd} failed with return code: {rc}", stdout=stdout, stderr=stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

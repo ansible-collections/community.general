@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017 Marc Sensenich <hello@marc-sensenich.com>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: office_365_connector_card
@@ -174,126 +172,110 @@ def build_sections(sections):
 def build_section(section):
     section_payload = dict()
 
-    if 'title' in section:
-        section_payload['title'] = section['title']
+    if "title" in section:
+        section_payload["title"] = section["title"]
 
-    if 'start_group' in section:
-        section_payload['startGroup'] = section['start_group']
+    if "start_group" in section:
+        section_payload["startGroup"] = section["start_group"]
 
-    if 'activity_image' in section:
-        section_payload['activityImage'] = section['activity_image']
+    if "activity_image" in section:
+        section_payload["activityImage"] = section["activity_image"]
 
-    if 'activity_title' in section:
-        section_payload['activityTitle'] = section['activity_title']
+    if "activity_title" in section:
+        section_payload["activityTitle"] = section["activity_title"]
 
-    if 'activity_subtitle' in section:
-        section_payload['activitySubtitle'] = section['activity_subtitle']
+    if "activity_subtitle" in section:
+        section_payload["activitySubtitle"] = section["activity_subtitle"]
 
-    if 'activity_text' in section:
-        section_payload['activityText'] = section['activity_text']
+    if "activity_text" in section:
+        section_payload["activityText"] = section["activity_text"]
 
-    if 'hero_image' in section:
-        section_payload['heroImage'] = section['hero_image']
+    if "hero_image" in section:
+        section_payload["heroImage"] = section["hero_image"]
 
-    if 'text' in section:
-        section_payload['text'] = section['text']
+    if "text" in section:
+        section_payload["text"] = section["text"]
 
-    if 'facts' in section:
-        section_payload['facts'] = section['facts']
+    if "facts" in section:
+        section_payload["facts"] = section["facts"]
 
-    if 'images' in section:
-        section_payload['images'] = section['images']
+    if "images" in section:
+        section_payload["images"] = section["images"]
 
-    if 'actions' in section:
-        section_payload['potentialAction'] = build_actions(section['actions'])
+    if "actions" in section:
+        section_payload["potentialAction"] = build_actions(section["actions"])
 
     return section_payload
 
 
-def build_payload_for_connector_card(module, summary=None, color=None, title=None, text=None, actions=None, sections=None):
+def build_payload_for_connector_card(
+    module, summary=None, color=None, title=None, text=None, actions=None, sections=None
+):
     payload = dict()
-    payload['@context'] = OFFICE_365_CARD_CONTEXT
-    payload['@type'] = OFFICE_365_CARD_TYPE
+    payload["@context"] = OFFICE_365_CARD_CONTEXT
+    payload["@type"] = OFFICE_365_CARD_TYPE
 
     if summary is not None:
-        payload['summary'] = summary
+        payload["summary"] = summary
 
     if color is not None:
-        payload['themeColor'] = color
+        payload["themeColor"] = color
 
     if title is not None:
-        payload['title'] = title
+        payload["title"] = title
 
     if text is not None:
-        payload['text'] = text
+        payload["text"] = text
 
     if actions:
-        payload['potentialAction'] = build_actions(actions)
+        payload["potentialAction"] = build_actions(actions)
 
     if sections:
-        payload['sections'] = build_sections(sections)
+        payload["sections"] = build_sections(sections)
 
     payload = module.jsonify(payload)
     return payload
 
 
 def do_notify_connector_card_webhook(module, webhook, payload):
-    headers = {
-        'Content-Type': 'application/json'
-    }
+    headers = {"Content-Type": "application/json"}
 
-    response, info = fetch_url(
-        module=module,
-        url=webhook,
-        headers=headers,
-        method='POST',
-        data=payload
-    )
+    response, info = fetch_url(module=module, url=webhook, headers=headers, method="POST", data=payload)
 
-    if info['status'] == 200:
+    if info["status"] == 200:
         module.exit_json(changed=True)
-    elif info['status'] == 400 and module.check_mode:
-        if info['body'] == OFFICE_365_CARD_EMPTY_PAYLOAD_MSG:
+    elif info["status"] == 400 and module.check_mode:
+        if info["body"] == OFFICE_365_CARD_EMPTY_PAYLOAD_MSG:
             module.exit_json(changed=True)
         else:
             module.fail_json(msg=OFFICE_365_INVALID_WEBHOOK_MSG)
     else:
-        module.fail_json(
-            msg="failed to send %s as a connector card to Incoming Webhook: %s"
-                % (payload, info['msg'])
-        )
+        module.fail_json(msg=f"failed to send {payload} as a connector card to Incoming Webhook: {info['msg']}")
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             webhook=dict(required=True, no_log=True),
-            summary=dict(type='str'),
-            color=dict(type='str'),
-            title=dict(type='str'),
-            text=dict(type='str'),
-            actions=dict(type='list', elements='dict'),
-            sections=dict(type='list', elements='dict')
+            summary=dict(type="str"),
+            color=dict(type="str"),
+            title=dict(type="str"),
+            text=dict(type="str"),
+            actions=dict(type="list", elements="dict"),
+            sections=dict(type="list", elements="dict"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    webhook = module.params['webhook']
-    summary = module.params['summary']
-    color = module.params['color']
-    title = module.params['title']
-    text = module.params['text']
-    actions = module.params['actions']
-    sections = module.params['sections']
+    webhook = module.params["webhook"]
+    summary = module.params["summary"]
+    color = module.params["color"]
+    title = module.params["title"]
+    text = module.params["text"]
+    actions = module.params["actions"]
+    sections = module.params["sections"]
 
-    payload = build_payload_for_connector_card(
-        module,
-        summary,
-        color,
-        title,
-        text,
-        actions,
-        sections)
+    payload = build_payload_for_connector_card(module, summary, color, title, text, actions, sections)
 
     if module.check_mode:
         # In check mode, send an empty payload to validate connection
@@ -303,5 +285,5 @@ def main():
     do_notify_connector_card_webhook(module, webhook, payload)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

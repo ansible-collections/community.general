@@ -1,23 +1,26 @@
-# -*- coding: utf-8 -*-
 # (c) 2020, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2020, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
+
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException as _MHE
 from ansible_collections.community.general.plugins.module_utils.mh.deco import module_fails_on_exception
 
 
-class ModuleHelperBase(object):
-    module = None
+class ModuleHelperBase:
+    module: dict[str, t.Any] | None = None  # TODO: better spec using t.TypedDict
     ModuleHelperException = _MHE
-    # in 12.0.0 add 'debug' to the tuple
-    _delegated_to_module = (
-        'check_mode', 'get_bin_path', 'warn', 'deprecate',
+    _delegated_to_module: tuple[str, ...] = (
+        "check_mode",
+        "get_bin_path",
+        "warn",
+        "deprecate",
+        "debug",
     )
 
     def __init__(self, module=None):
@@ -28,18 +31,6 @@ class ModuleHelperBase(object):
 
         if not isinstance(self.module, AnsibleModule):
             self.module = AnsibleModule(**self.module)
-
-        # in 12.0.0 remove this if statement entirely
-        if hasattr(self, 'debug'):
-            msg = (
-                "This class ({cls}) has an attribute 'debug' defined and that is deprecated. "
-                "Method 'debug' will be an integral part of ModuleHelper in community.general "
-                "12.0.0, delegated to the underlying AnsibleModule object. "
-                "Please rename the existing attribute to prevent this message from showing.".format(cls=self.__class__.__name__)
-            )
-            self.deprecate(msg, version="12.0.0", collection_name="community.general")
-        else:
-            self._delegated_to_module = self._delegated_to_module + ('debug',)
 
     @property
     def diff_mode(self):
@@ -55,7 +46,7 @@ class ModuleHelperBase(object):
     def __getattr__(self, attr):
         if attr in self._delegated_to_module:
             return getattr(self.module, attr)
-        raise AttributeError("ModuleHelperBase has no attribute '%s'" % (attr, ))
+        raise AttributeError(f"ModuleHelperBase has no attribute '{attr}'")
 
     def __init_module__(self):
         pass
@@ -93,8 +84,8 @@ class ModuleHelperBase(object):
         self.__run__()
         self.__quit_module__()
         output = self.output
-        if 'failed' not in output:
-            output['failed'] = False
+        if "failed" not in output:
+            output["failed"] = False
         self.module.exit_json(changed=self.has_changed(), **output)
 
     @classmethod

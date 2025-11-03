@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Peter Sagerson <psagers@ignorare.net>
 # Copyright (c) 2020, Sebastian Pfahl <eryx@gmx.net>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ldap_search
@@ -110,8 +108,11 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.six import binary_type, string_types, text_type
-from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
+from ansible_collections.community.general.plugins.module_utils.ldap import (
+    LdapGeneric,
+    gen_specs,
+    ldap_required_together,
+)
 
 LDAP_IMP_ERR = None
 try:
@@ -126,21 +127,20 @@ except ImportError:
 def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
-            dn=dict(type='str', required=True),
-            scope=dict(type='str', default='base', choices=['base', 'onelevel', 'subordinate', 'children']),
-            filter=dict(type='str', default='(objectClass=*)'),
-            attrs=dict(type='list', elements='str'),
-            schema=dict(type='bool', default=False),
-            page_size=dict(type='int', default=0),
-            base64_attributes=dict(type='list', elements='str'),
+            dn=dict(type="str", required=True),
+            scope=dict(type="str", default="base", choices=["base", "onelevel", "subordinate", "children"]),
+            filter=dict(type="str", default="(objectClass=*)"),
+            attrs=dict(type="list", elements="str"),
+            schema=dict(type="bool", default=False),
+            page_size=dict(type="int", default=0),
+            base64_attributes=dict(type="list", elements="str"),
         ),
         supports_check_mode=True,
         required_together=ldap_required_together(),
     )
 
     if not HAS_LDAP:
-        module.fail_json(msg=missing_required_lib('python-ldap'),
-                         exception=LDAP_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("python-ldap"), exception=LDAP_IMP_ERR)
 
     try:
         LdapSearch(module).main()
@@ -149,24 +149,24 @@ def main():
 
 
 def _normalize_string(val, convert_to_base64):
-    if isinstance(val, (string_types, binary_type)):
-        if isinstance(val, text_type):
-            val = to_bytes(val, encoding='utf-8')
+    if isinstance(val, (str, bytes)):
+        if isinstance(val, str):
+            val = to_bytes(val, encoding="utf-8")
         if convert_to_base64:
             val = to_text(base64.b64encode(val))
         else:
             # See https://github.com/ansible/ansible/issues/80258#issuecomment-1477038952 for details.
             # We want to make sure that all strings are properly UTF-8 encoded, even if they were not,
             # or happened to be byte strings.
-            val = to_text(val, 'utf-8', errors='replace')
+            val = to_text(val, "utf-8", errors="replace")
             # See also https://github.com/ansible-collections/community.general/issues/5704.
     return val
 
 
 def _extract_entry(dn, attrs, base64_attributes):
-    extracted = {'dn': dn}
+    extracted = {"dn": dn}
     for attr, val in list(attrs.items()):
-        convert_to_base64 = '*' in base64_attributes or attr in base64_attributes
+        convert_to_base64 = "*" in base64_attributes or attr in base64_attributes
         if len(val) == 1:
             extracted[attr] = _normalize_string(val[0], convert_to_base64)
         else:
@@ -178,16 +178,16 @@ class LdapSearch(LdapGeneric):
     def __init__(self, module):
         LdapGeneric.__init__(self, module)
 
-        self.filterstr = self.module.params['filter']
+        self.filterstr = self.module.params["filter"]
         self.attrlist = []
-        self.page_size = self.module.params['page_size']
+        self.page_size = self.module.params["page_size"]
         self._load_scope()
         self._load_attrs()
         self._load_schema()
-        self._base64_attributes = set(self.module.params['base64_attributes'] or [])
+        self._base64_attributes = set(self.module.params["base64_attributes"] or [])
 
     def _load_schema(self):
-        self.schema = self.module.params['schema']
+        self.schema = self.module.params["schema"]
         if self.schema:
             self.attrsonly = 1
         else:
@@ -200,10 +200,10 @@ class LdapSearch(LdapGeneric):
             subordinate=ldap.SCOPE_SUBORDINATE,
             children=ldap.SCOPE_SUBTREE,
         )
-        self.scope = spec[self.module.params['scope']]
+        self.scope = spec[self.module.params["scope"]]
 
     def _load_attrs(self):
-        self.attrlist = self.module.params['attrs'] or None
+        self.attrlist = self.module.params["attrs"] or None
 
     def main(self):
         results = self.perform_search()
@@ -213,7 +213,7 @@ class LdapSearch(LdapGeneric):
         ldap_entries = []
         controls = []
         if self.page_size > 0:
-            controls.append(ldap.controls.libldap.SimplePagedResultsControl(True, size=self.page_size, cookie=''))
+            controls.append(ldap.controls.libldap.SimplePagedResultsControl(True, size=self.page_size, cookie=""))
         try:
             while True:
                 response = self.connection.search_ext(
@@ -231,14 +231,18 @@ class LdapSearch(LdapGeneric):
                             ldap_entries.append(dict(dn=result[0], attrs=list(result[1].keys())))
                         else:
                             ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
-                cookies = [c.cookie for c in serverctrls if c.controlType == ldap.controls.libldap.SimplePagedResultsControl.controlType]
+                cookies = [
+                    c.cookie
+                    for c in serverctrls
+                    if c.controlType == ldap.controls.libldap.SimplePagedResultsControl.controlType
+                ]
                 if self.page_size > 0 and cookies and cookies[0]:
                     controls[0].cookie = cookies[0]
                 else:
                     return ldap_entries
         except ldap.NO_SUCH_OBJECT:
-            self.module.fail_json(msg="Base not found: {0}".format(self.dn))
+            self.module.fail_json(msg=f"Base not found: {self.dn}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

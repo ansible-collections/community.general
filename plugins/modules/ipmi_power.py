@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -172,40 +170,39 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            port=dict(default=623, type='int'),
-            state=dict(choices=['on', 'off', 'shutdown', 'reset', 'boot']),
+            port=dict(default=623, type="int"),
+            state=dict(choices=["on", "off", "shutdown", "reset", "boot"]),
             user=dict(required=True, no_log=True),
             password=dict(required=True, no_log=True),
-            key=dict(type='str', no_log=True),
-            timeout=dict(default=300, type='int'),
+            key=dict(type="str", no_log=True),
+            timeout=dict(default=300, type="int"),
             machine=dict(
-                type='list', elements='dict',
+                type="list",
+                elements="dict",
                 options=dict(
-                    targetAddress=dict(required=True, type='int'),
-                    state=dict(type='str', choices=['on', 'off', 'shutdown', 'reset', 'boot']),
+                    targetAddress=dict(required=True, type="int"),
+                    state=dict(type="str", choices=["on", "off", "shutdown", "reset", "boot"]),
                 ),
             ),
         ),
         supports_check_mode=True,
-        required_one_of=(
-            ['state', 'machine'],
-        ),
+        required_one_of=(["state", "machine"],),
     )
 
     if command is None:
-        module.fail_json(msg=missing_required_lib('pyghmi'), exception=PYGHMI_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pyghmi"), exception=PYGHMI_IMP_ERR)
 
-    name = module.params['name']
-    port = module.params['port']
-    user = module.params['user']
-    password = module.params['password']
-    state = module.params['state']
-    timeout = module.params['timeout']
-    machine = module.params['machine']
+    name = module.params["name"]
+    port = module.params["port"]
+    user = module.params["user"]
+    password = module.params["password"]
+    state = module.params["state"]
+    timeout = module.params["timeout"]
+    machine = module.params["machine"]
 
     try:
-        if module.params['key']:
-            key = binascii.unhexlify(module.params['key'])
+        if module.params["key"]:
+            key = binascii.unhexlify(module.params["key"])
         else:
             key = None
     except Exception:
@@ -213,29 +210,26 @@ def main():
 
     # --- run command ---
     try:
-        ipmi_cmd = command.Command(
-            bmc=name, userid=user, password=password, port=port, kg=key
-        )
-        module.debug('ipmi instantiated - name: "%s"' % name)
+        ipmi_cmd = command.Command(bmc=name, userid=user, password=password, port=port, kg=key)
+        module.debug(f'ipmi instantiated - name: "{name}"')
 
         changed = False
         if machine is None:
             current = ipmi_cmd.get_power()
-            if current['powerstate'] != state:
-                response = {'powerstate': state} if module.check_mode \
-                    else ipmi_cmd.set_power(state, wait=timeout)
+            if current["powerstate"] != state:
+                response = {"powerstate": state} if module.check_mode else ipmi_cmd.set_power(state, wait=timeout)
                 changed = True
             else:
                 response = current
 
-            if 'error' in response:
-                module.fail_json(msg=response['error'])
+            if "error" in response:
+                module.fail_json(msg=response["error"])
 
             module.exit_json(changed=changed, **response)
         else:
             response = []
             for entry in machine:
-                taddr = entry['targetAddress']
+                taddr = entry["targetAddress"]
                 if taddr >= INVALID_TARGET_ADDRESS:
                     module.fail_json(msg="targetAddress should be set between 0 to 255.")
 
@@ -243,33 +237,31 @@ def main():
                     # bridge_request is supported on pyghmi 1.5.30 and later
                     current = ipmi_cmd.get_power(bridge_request={"addr": taddr})
                 except TypeError:
-                    module.fail_json(
-                        msg="targetAddress isn't supported on the installed pyghmi.")
+                    module.fail_json(msg="targetAddress isn't supported on the installed pyghmi.")
 
-                if entry['state']:
-                    tstate = entry['state']
+                if entry["state"]:
+                    tstate = entry["state"]
                 elif state:
                     tstate = state
                 else:
                     module.fail_json(msg="Either state or suboption of machine state should be set.")
 
-                if current['powerstate'] != tstate:
+                if current["powerstate"] != tstate:
                     changed = True
                     if not module.check_mode:
                         new = ipmi_cmd.set_power(tstate, wait=timeout, bridge_request={"addr": taddr})
-                        if 'error' in new:
-                            module.fail_json(msg=new['error'])
+                        if "error" in new:
+                            module.fail_json(msg=new["error"])
 
-                        response.append(
-                            {'targetAddress:': taddr, 'powerstate': new['powerstate']})
+                        response.append({"targetAddress:": taddr, "powerstate": new["powerstate"]})
 
-                if current['powerstate'] == tstate or module.check_mode:
-                    response.append({'targetAddress:': taddr, 'powerstate': tstate})
+                if current["powerstate"] == tstate or module.check_mode:
+                    response.append({"targetAddress:": taddr, "powerstate": tstate})
 
             module.exit_json(changed=changed, status=response)
     except Exception as e:
         module.fail_json(msg=str(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

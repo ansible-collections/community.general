@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2022, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 import traceback
@@ -18,7 +16,7 @@ from ansible.module_utils.basic import missing_required_lib
 _deps = dict()
 
 
-class _Dependency(object):
+class _Dependency:
     _states = ["pending", "failure", "success"]
 
     def __init__(self, name, reason=None, url=None, msg=None):
@@ -55,7 +53,7 @@ class _Dependency(object):
             module.fail_json(msg=self.message, exception=self.trace)
 
     def __str__(self):
-        return "<dependency: {0} [{1}]>".format(self.name, self._states[self.state])
+        return f"<dependency: {self.name} [{self._states[self.state]}]>"
 
 
 @contextmanager

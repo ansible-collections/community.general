@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, 2018, Oracle and/or its affiliates.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: oci_vcn
@@ -161,9 +159,7 @@ def create_vcn(virtual_network_client, module):
 
 
 def main():
-    module_args = oci_utils.get_taggable_arg_spec(
-        supports_create=True, supports_wait=True
-    )
+    module_args = oci_utils.get_taggable_arg_spec(supports_create=True, supports_wait=True)
     module_args.update(
         dict(
             cidr_block=dict(type="str"),
@@ -184,9 +180,7 @@ def main():
     if not HAS_OCI_PY_SDK:
         module.fail_json(msg=missing_required_lib("oci"))
 
-    virtual_network_client = oci_utils.create_service_client(
-        module, VirtualNetworkClient
-    )
+    virtual_network_client = oci_utils.create_service_client(module, VirtualNetworkClient)
 
     exclude_attributes = {"display_name": True, "dns_label": True}
     state = module.params["state"]
@@ -196,9 +190,7 @@ def main():
         if vcn_id is not None:
             result = delete_vcn(virtual_network_client, module)
         else:
-            module.fail_json(
-                msg="Specify vcn_id with state as 'absent' to delete a VCN."
-            )
+            module.fail_json(msg="Specify vcn_id with state as 'absent' to delete a VCN.")
 
     else:
         if vcn_id is not None:

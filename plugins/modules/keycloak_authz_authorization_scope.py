@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 # Copyright (c) 2021, Christophe Gilles <christophe.gilles54@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_authz_authorization_scope
@@ -125,8 +123,12 @@ end_state:
       sample: http://localhost/icon.png
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -139,26 +141,27 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        state=dict(type='str', default='present',
-                   choices=['present', 'absent']),
-        name=dict(type='str', required=True),
-        display_name=dict(type='str'),
-        icon_uri=dict(type='str'),
-        client_id=dict(type='str', required=True),
-        realm=dict(type='str', required=True)
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        name=dict(type="str", required=True),
+        display_name=dict(type="str"),
+        icon_uri=dict(type="str"),
+        client_id=dict(type="str", required=True),
+        realm=dict(type="str", required=True),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=(
-                               [['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
+    result = dict(changed=False, msg="", end_state={}, diff=dict(before={}, after={}))
 
     # Obtain access token, initialize API
     try:
@@ -169,50 +172,48 @@ def main():
     kc = KeycloakAPI(module, connection_header)
 
     # Convenience variables
-    state = module.params.get('state')
-    name = module.params.get('name')
-    display_name = module.params.get('display_name')
-    icon_uri = module.params.get('icon_uri')
-    client_id = module.params.get('client_id')
-    realm = module.params.get('realm')
+    state = module.params.get("state")
+    name = module.params.get("name")
+    display_name = module.params.get("display_name")
+    icon_uri = module.params.get("icon_uri")
+    client_id = module.params.get("client_id")
+    realm = module.params.get("realm")
 
     # Get the "id" of the client based on the usually more human-readable
     # "clientId"
     cid = kc.get_client_id(client_id, realm=realm)
     if not cid:
-        module.fail_json(msg='Invalid client %s for realm %s' %
-                         (client_id, realm))
+        module.fail_json(msg=f"Invalid client {client_id} for realm {realm}")
 
     # Get current state of the Authorization Scope using its name as the search
     # filter. This returns False if it is not found.
-    before_authz_scope = kc.get_authz_authorization_scope_by_name(
-        name=name, client_id=cid, realm=realm)
+    before_authz_scope = kc.get_authz_authorization_scope_by_name(name=name, client_id=cid, realm=realm)
 
     # Generate a JSON payload for Keycloak Admin API. This is needed for
     # "create" and "update" operations.
     desired_authz_scope = {}
-    desired_authz_scope['name'] = name
-    desired_authz_scope['displayName'] = display_name
-    desired_authz_scope['iconUri'] = icon_uri
+    desired_authz_scope["name"] = name
+    desired_authz_scope["displayName"] = display_name
+    desired_authz_scope["iconUri"] = icon_uri
 
     # Add "id" to payload for modify operations
     if before_authz_scope:
-        desired_authz_scope['id'] = before_authz_scope['id']
+        desired_authz_scope["id"] = before_authz_scope["id"]
 
     # Ensure that undefined (null) optional parameters are presented as empty
     # strings in the desired state. This makes comparisons with current state
     # much easier.
     for k, v in desired_authz_scope.items():
         if not v:
-            desired_authz_scope[k] = ''
+            desired_authz_scope[k] = ""
 
     # Do the above for the current state
     if before_authz_scope:
-        for k in ['displayName', 'iconUri']:
+        for k in ["displayName", "iconUri"]:
             if k not in before_authz_scope:
-                before_authz_scope[k] = ''
+                before_authz_scope[k] = ""
 
-    if before_authz_scope and state == 'present':
+    if before_authz_scope and state == "present":
         changes = False
         for k, v in desired_authz_scope.items():
             if before_authz_scope[k] != v:
@@ -223,57 +224,57 @@ def main():
 
         if changes:
             if module._diff:
-                result['diff'] = dict(before=before_authz_scope, after=desired_authz_scope)
+                result["diff"] = dict(before=before_authz_scope, after=desired_authz_scope)
 
             if module.check_mode:
-                result['changed'] = True
-                result['msg'] = 'Authorization scope would be updated'
+                result["changed"] = True
+                result["msg"] = "Authorization scope would be updated"
                 module.exit_json(**result)
             else:
                 kc.update_authz_authorization_scope(
-                    payload=desired_authz_scope, id=before_authz_scope['id'], client_id=cid, realm=realm)
-                result['changed'] = True
-                result['msg'] = 'Authorization scope updated'
+                    payload=desired_authz_scope, id=before_authz_scope["id"], client_id=cid, realm=realm
+                )
+                result["changed"] = True
+                result["msg"] = "Authorization scope updated"
         else:
-            result['changed'] = False
-            result['msg'] = 'Authorization scope not updated'
+            result["changed"] = False
+            result["msg"] = "Authorization scope not updated"
 
-        result['end_state'] = desired_authz_scope
-    elif not before_authz_scope and state == 'present':
+        result["end_state"] = desired_authz_scope
+    elif not before_authz_scope and state == "present":
         if module._diff:
-            result['diff'] = dict(before={}, after=desired_authz_scope)
+            result["diff"] = dict(before={}, after=desired_authz_scope)
 
         if module.check_mode:
-            result['changed'] = True
-            result['msg'] = 'Authorization scope would be created'
+            result["changed"] = True
+            result["msg"] = "Authorization scope would be created"
             module.exit_json(**result)
         else:
-            kc.create_authz_authorization_scope(
-                payload=desired_authz_scope, client_id=cid, realm=realm)
-            result['changed'] = True
-            result['msg'] = 'Authorization scope created'
-            result['end_state'] = desired_authz_scope
-    elif before_authz_scope and state == 'absent':
+            kc.create_authz_authorization_scope(payload=desired_authz_scope, client_id=cid, realm=realm)
+            result["changed"] = True
+            result["msg"] = "Authorization scope created"
+            result["end_state"] = desired_authz_scope
+    elif before_authz_scope and state == "absent":
         if module._diff:
-            result['diff'] = dict(before=before_authz_scope, after={})
+            result["diff"] = dict(before=before_authz_scope, after={})
 
         if module.check_mode:
-            result['changed'] = True
-            result['msg'] = 'Authorization scope would be removed'
+            result["changed"] = True
+            result["msg"] = "Authorization scope would be removed"
             module.exit_json(**result)
         else:
-            kc.remove_authz_authorization_scope(
-                id=before_authz_scope['id'], client_id=cid, realm=realm)
-            result['changed'] = True
-            result['msg'] = 'Authorization scope removed'
-    elif not before_authz_scope and state == 'absent':
-        result['changed'] = False
+            kc.remove_authz_authorization_scope(id=before_authz_scope["id"], client_id=cid, realm=realm)
+            result["changed"] = True
+            result["msg"] = "Authorization scope removed"
+    elif not before_authz_scope and state == "absent":
+        result["changed"] = False
     else:
-        module.fail_json(msg='Unable to determine what to do with authorization scope %s of client %s in realm %s' % (
-            name, client_id, realm))
+        module.fail_json(
+            msg=f"Unable to determine what to do with authorization scope {name} of client {client_id} in realm {realm}"
+        )
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -80,34 +79,33 @@ from ansible.plugins.become import BecomeBase
 
 
 class BecomeModule(BecomeBase):
-
-    name = 'community.general.sudosu'
+    name = "community.general.sudosu"
 
     # messages for detecting prompted password issues
-    fail = ('Sorry, try again.',)
-    missing = ('Sorry, a password is required to run sudo', 'sudo: a password is required')
+    fail = ("Sorry, try again.",)
+    missing = ("Sorry, a password is required to run sudo", "sudo: a password is required")
 
     def build_become_command(self, cmd, shell):
-        super(BecomeModule, self).build_become_command(cmd, shell)
+        super().build_become_command(cmd, shell)
 
         if not cmd:
             return cmd
 
-        becomecmd = 'sudo'
+        becomecmd = "sudo"
 
-        flags = self.get_option('become_flags') or ''
-        prompt = ''
-        if self.get_option('become_pass'):
-            self.prompt = f'[sudo via ansible, key={self._id}] password:'
+        flags = self.get_option("become_flags") or ""
+        prompt = ""
+        if self.get_option("become_pass"):
+            self.prompt = f"[sudo via ansible, key={self._id}] password:"
             if flags:  # this could be simplified, but kept as is for now for backwards string matching
-                flags = flags.replace('-n', '')
+                flags = flags.replace("-n", "")
             prompt = f'-p "{self.prompt}"'
 
-        user = self.get_option('become_user') or ''
+        user = self.get_option("become_user") or ""
         if user:
-            user = f'{user}'
+            user = f"{user}"
 
-        if self.get_option('alt_method'):
+        if self.get_option("alt_method"):
             return f"{becomecmd} {flags} {prompt} su -l {user} -c {self._build_success_command(cmd, shell, True)}"
         else:
             return f"{becomecmd} {flags} {prompt} su -l {user} {self._build_success_command(cmd, shell)}"

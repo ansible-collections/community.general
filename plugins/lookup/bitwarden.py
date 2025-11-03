@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2022, Jonathan Lung <lungj@heresjono.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: bitwarden
@@ -132,9 +130,8 @@ class BitwardenException(AnsibleError):
     pass
 
 
-class Bitwarden(object):
-
-    def __init__(self, path='bw'):
+class Bitwarden:
+    def __init__(self, path="bw"):
         self._cli_path = path
         self._session = None
 
@@ -152,54 +149,56 @@ class Bitwarden(object):
 
     @property
     def unlocked(self):
-        out, err = self._run(['status'], stdin="")
+        out, err = self._run(["status"], stdin="")
         decoded = AnsibleJSONDecoder().raw_decode(out)[0]
-        return decoded['status'] == 'unlocked'
+        return decoded["status"] == "unlocked"
 
     def _run(self, args, stdin=None, expected_rc=0):
         if self.session:
-            args += ['--session', self.session]
+            args += ["--session", self.session]
 
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         out, err = p.communicate(to_bytes(stdin))
         rc = p.wait()
         if rc != expected_rc:
-            if len(args) > 2 and args[0] == 'get' and args[1] == 'item' and b'Not found.' in err:
-                return 'null', ''
+            if len(args) > 2 and args[0] == "get" and args[1] == "item" and b"Not found." in err:
+                return "null", ""
             raise BitwardenException(err)
-        return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
+        return to_text(out, errors="surrogate_or_strict"), to_text(err, errors="surrogate_or_strict")
 
     def _get_matches(self, search_value, search_field, collection_id=None, organization_id=None):
-        """Return matching records whose search_field is equal to key.
-        """
+        """Return matching records whose search_field is equal to key."""
 
         # Prepare set of params for Bitwarden CLI
-        if search_field == 'id':
-            params = ['get', 'item', search_value]
+        if search_field == "id":
+            params = ["get", "item", search_value]
         else:
-            params = ['list', 'items']
+            params = ["list", "items"]
             if search_value:
-                params.extend(['--search', search_value])
+                params.extend(["--search", search_value])
 
         if collection_id:
-            params.extend(['--collectionid', collection_id])
+            params.extend(["--collectionid", collection_id])
         if organization_id:
-            params.extend(['--organizationid', organization_id])
+            params.extend(["--organizationid", organization_id])
 
         out, err = self._run(params)
 
         # This includes things that matched in different fields.
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
 
-        if search_field == 'id':
+        if search_field == "id":
             if initial_matches is None:
                 initial_matches = []
             else:
                 initial_matches = [initial_matches]
 
         # Filter to only include results from the right field, if a search is requested by value or field
-        return [item for item in initial_matches
-                if not search_value or not search_field or item.get(search_field) == search_value]
+        return [
+            item
+            for item in initial_matches
+            if not search_value or not search_field or item.get(search_field) == search_value
+        ]
 
     def get_field(self, field, search_value, search_field="name", collection_id=None, organization_id=None):
         """Return a list of the specified field for records whose search_field match search_value
@@ -213,17 +212,17 @@ class Bitwarden(object):
         field_matches = []
         for match in matches:
             # if there are no custom fields, then `match` has no key 'fields'
-            if 'fields' in match:
+            if "fields" in match:
                 custom_field_found = False
-                for custom_field in match['fields']:
-                    if field == custom_field['name']:
-                        field_matches.append(custom_field['value'])
+                for custom_field in match["fields"]:
+                    if field == custom_field["name"]:
+                        field_matches.append(custom_field["value"])
                         custom_field_found = True
                         break
                 if custom_field_found:
                     continue
-            if 'login' in match and field in match['login']:
-                field_matches.append(match['login'][field])
+            if "login" in match and field in match["login"]:
+                field_matches.append(match["login"][field])
                 continue
             if field in match:
                 field_matches.append(match[field])
@@ -238,32 +237,30 @@ class Bitwarden(object):
         """Return matching IDs of collections whose name is equal to collection_name."""
 
         # Prepare set of params for Bitwarden CLI
-        params = ['list', 'collections', '--search', collection_name]
+        params = ["list", "collections", "--search", collection_name]
 
         if organization_id:
-            params.extend(['--organizationid', organization_id])
+            params.extend(["--organizationid", organization_id])
 
         out, err = self._run(params)
 
         # This includes things that matched in different fields.
-        initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
+        initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]  # type: ignore[operator]
 
         # Filter to only return the ID of a collections with exactly matching name
-        return [item['id'] for item in initial_matches
-                if str(item.get('name')).lower() == collection_name.lower()]
+        return [item["id"] for item in initial_matches if str(item.get("name")).lower() == collection_name.lower()]
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms=None, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
-        field = self.get_option('field')
-        search_field = self.get_option('search')
-        collection_id = self.get_option('collection_id')
-        collection_name = self.get_option('collection_name')
-        organization_id = self.get_option('organization_id')
-        result_count = self.get_option('result_count')
-        _bitwarden.session = self.get_option('bw_session')
+        field = self.get_option("field")
+        search_field = self.get_option("search")
+        collection_id = self.get_option("collection_id")
+        collection_name = self.get_option("collection_name")
+        organization_id = self.get_option("organization_id")
+        result_count = self.get_option("result_count")
+        _bitwarden.session = self.get_option("bw_session")
 
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
@@ -289,7 +286,8 @@ class LookupModule(LookupBase):
         for result in results:
             if result_count is not None and len(result) != result_count:
                 raise BitwardenException(
-                    f"Number of results doesn't match result_count! ({len(result)} != {result_count})")
+                    f"Number of results doesn't match result_count! ({len(result)} != {result_count})"
+                )
 
         return results
 

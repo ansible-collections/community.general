@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_userprofile
@@ -407,11 +405,16 @@ data:
   type: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from copy import deepcopy
+from urllib.parse import urlencode
 import json
 
 
@@ -443,105 +446,109 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        state=dict(type='str', choices=['present', 'absent'], default='present'),
-        parent_id=dict(type='str', aliases=['parentId', 'realm'], required=True),
-        provider_id=dict(type='str', aliases=['providerId'], default='declarative-user-profile', choices=['declarative-user-profile']),
+        state=dict(type="str", choices=["present", "absent"], default="present"),
+        parent_id=dict(type="str", aliases=["parentId", "realm"], required=True),
+        provider_id=dict(
+            type="str", aliases=["providerId"], default="declarative-user-profile", choices=["declarative-user-profile"]
+        ),
         provider_type=dict(
-            type='str',
-            aliases=['providerType'],
-            default='org.keycloak.userprofile.UserProfileProvider',
-            choices=['org.keycloak.userprofile.UserProfileProvider']
+            type="str",
+            aliases=["providerType"],
+            default="org.keycloak.userprofile.UserProfileProvider",
+            choices=["org.keycloak.userprofile.UserProfileProvider"],
         ),
         config=dict(
-            type='dict',
+            type="dict",
             options={
-                'kc_user_profile_config': dict(
-                    type='list',
-                    aliases=['kcUserProfileConfig'],
-                    elements='dict',
+                "kc_user_profile_config": dict(
+                    type="list",
+                    aliases=["kcUserProfileConfig"],
+                    elements="dict",
                     options={
-                        'attributes': dict(
-                            type='list',
-                            elements='dict',
+                        "attributes": dict(
+                            type="list",
+                            elements="dict",
                             options={
-                                'name': dict(type='str', required=True),
-                                'display_name': dict(type='str', aliases=['displayName'], required=True),
-                                'validations': dict(
-                                    type='dict',
+                                "name": dict(type="str", required=True),
+                                "display_name": dict(type="str", aliases=["displayName"], required=True),
+                                "validations": dict(
+                                    type="dict",
                                     options={
-                                        'length': dict(
-                                            type='dict',
-                                            options={
-                                                'min': dict(type='int'),
-                                                'max': dict(type='int', required=True)
-                                            }
+                                        "length": dict(
+                                            type="dict",
+                                            options={"min": dict(type="int"), "max": dict(type="int", required=True)},
                                         ),
-                                        'email': dict(type='dict'),
-                                        'username_prohibited_characters': dict(type='dict', aliases=['usernameProhibitedCharacters']),
-                                        'up_username_not_idn_homograph': dict(type='dict', aliases=['upUsernameNotIdnHomograph']),
-                                        'person_name_prohibited_characters': dict(type='dict', aliases=['personNameProhibitedCharacters']),
-                                        'uri': dict(type='dict'),
-                                        'pattern': dict(type='dict'),
-                                        'options': dict(type='dict')
-                                    }
+                                        "email": dict(type="dict"),
+                                        "username_prohibited_characters": dict(
+                                            type="dict", aliases=["usernameProhibitedCharacters"]
+                                        ),
+                                        "up_username_not_idn_homograph": dict(
+                                            type="dict", aliases=["upUsernameNotIdnHomograph"]
+                                        ),
+                                        "person_name_prohibited_characters": dict(
+                                            type="dict", aliases=["personNameProhibitedCharacters"]
+                                        ),
+                                        "uri": dict(type="dict"),
+                                        "pattern": dict(type="dict"),
+                                        "options": dict(type="dict"),
+                                    },
                                 ),
-                                'annotations': dict(type='dict'),
-                                'group': dict(type='str'),
-                                'permissions': dict(
-                                    type='dict',
+                                "annotations": dict(type="dict"),
+                                "group": dict(type="str"),
+                                "permissions": dict(
+                                    type="dict",
                                     options={
-                                        'view': dict(type='list', elements='str', default=['admin', 'user']),
-                                        'edit': dict(type='list', elements='str', default=['admin', 'user'])
-                                    }
+                                        "view": dict(type="list", elements="str", default=["admin", "user"]),
+                                        "edit": dict(type="list", elements="str", default=["admin", "user"]),
+                                    },
                                 ),
-                                'multivalued': dict(type='bool', default=False),
-                                'required': dict(
-                                    type='dict',
-                                    options={
-                                        'roles': dict(type='list', elements='str', default=['user'])
-                                    }
-                                )
-                            }
+                                "multivalued": dict(type="bool", default=False),
+                                "required": dict(
+                                    type="dict", options={"roles": dict(type="list", elements="str", default=["user"])}
+                                ),
+                            },
                         ),
-                        'groups': dict(
-                            type='list',
-                            elements='dict',
+                        "groups": dict(
+                            type="list",
+                            elements="dict",
                             options={
-                                'name': dict(type='str', required=True),
-                                'display_header': dict(type='str', aliases=['displayHeader'], required=True),
-                                'display_description': dict(type='str', aliases=['displayDescription']),
-                                'annotations': dict(type='dict')
-                            }
+                                "name": dict(type="str", required=True),
+                                "display_header": dict(type="str", aliases=["displayHeader"], required=True),
+                                "display_description": dict(type="str", aliases=["displayDescription"]),
+                                "annotations": dict(type="dict"),
+                            },
                         ),
-                        'unmanaged_attribute_policy': dict(
-                            type='str',
-                            aliases=['unmanagedAttributePolicy'],
-                            choices=['ENABLED', 'ADMIN_EDIT', 'ADMIN_VIEW'],
-
-                        )
-                    }
+                        "unmanaged_attribute_policy": dict(
+                            type="str",
+                            aliases=["unmanagedAttributePolicy"],
+                            choices=["ENABLED", "ADMIN_EDIT", "ADMIN_VIEW"],
+                        ),
+                    },
                 )
-            }
-        )
+            },
+        ),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
     # Initialize the result object. Only "changed" seems to have special
     # meaning for Ansible.
-    result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
+    result = dict(changed=False, msg="", end_state={}, diff=dict(before={}, after={}))
 
     # This will include the current state of the realm userprofile if it is already
     # present. This is only used for diff-mode.
     before_realm_userprofile = {}
-    before_realm_userprofile['config'] = {}
+    before_realm_userprofile["config"] = {}
 
     # Obtain access token, initialize API
     try:
@@ -554,18 +561,14 @@ def main():
     params_to_ignore = list(keycloak_argument_spec().keys()) + ["state"]
 
     # Filter and map the parameters names that apply to the role
-    component_params = [
-        x
-        for x in module.params
-        if x not in params_to_ignore and module.params.get(x) is not None
-    ]
+    component_params = [x for x in module.params if x not in params_to_ignore and module.params.get(x) is not None]
 
     # Build a proposed changeset from parameters given to this module
     changeset = {}
 
     # Build the changeset with proper JSON serialization for kc_user_profile_config
-    config = module.params.get('config')
-    changeset['config'] = {}
+    config = module.params.get("config")
+    changeset["config"] = {}
 
     # Generate a JSON payload for Keycloak Admin API from the module
     # parameters.  Parameters that do not belong to the JSON payload (e.g.
@@ -577,17 +580,17 @@ def main():
     # becomes providerId. It also handles some special cases, e.g. aliases.
     for component_param in component_params:
         # realm/parent_id parameter
-        if component_param == 'realm' or component_param == 'parent_id':
-            changeset['parent_id'] = module.params.get(component_param)
+        if component_param == "realm" or component_param == "parent_id":
+            changeset["parent_id"] = module.params.get(component_param)
             changeset.pop(component_param, None)
         # complex parameters in config suboptions
-        elif component_param == 'config':
+        elif component_param == "config":
             for config_param in config:
                 # special parameter kc_user_profile_config
-                if config_param in ('kcUserProfileConfig', 'kc_user_profile_config'):
+                if config_param in ("kcUserProfileConfig", "kc_user_profile_config"):
                     config_param_org = config_param
                     # rename parameter to be accepted by Keycloak API
-                    config_param = 'kc.user.profile.config'
+                    config_param = "kc.user.profile.config"
                     # make sure no null values are passed to Keycloak API
                     kc_user_profile_config = remove_null_values(config[config_param_org])
                     changeset[camel(component_param)][config_param] = []
@@ -595,21 +598,21 @@ def main():
                         # convert aliases to camelCase
                         kc_user_profile_config = camel_recursive(kc_user_profile_config)
                         # rename validations to be accepted by Keycloak API
-                        if 'attributes' in kc_user_profile_config[0]:
-                            for attribute in kc_user_profile_config[0]['attributes']:
-                                if 'validations' in attribute:
-                                    if 'usernameProhibitedCharacters' in attribute['validations']:
-                                        attribute['validations']['username-prohibited-characters'] = (
-                                            attribute['validations'].pop('usernameProhibitedCharacters')
-                                        )
-                                    if 'upUsernameNotIdnHomograph' in attribute['validations']:
-                                        attribute['validations']['up-username-not-idn-homograph'] = (
-                                            attribute['validations'].pop('upUsernameNotIdnHomograph')
-                                        )
-                                    if 'personNameProhibitedCharacters' in attribute['validations']:
-                                        attribute['validations']['person-name-prohibited-characters'] = (
-                                            attribute['validations'].pop('personNameProhibitedCharacters')
-                                        )
+                        if "attributes" in kc_user_profile_config[0]:
+                            for attribute in kc_user_profile_config[0]["attributes"]:
+                                if "validations" in attribute:
+                                    if "usernameProhibitedCharacters" in attribute["validations"]:
+                                        attribute["validations"]["username-prohibited-characters"] = attribute[
+                                            "validations"
+                                        ].pop("usernameProhibitedCharacters")
+                                    if "upUsernameNotIdnHomograph" in attribute["validations"]:
+                                        attribute["validations"]["up-username-not-idn-homograph"] = attribute[
+                                            "validations"
+                                        ].pop("upUsernameNotIdnHomograph")
+                                    if "personNameProhibitedCharacters" in attribute["validations"]:
+                                        attribute["validations"]["person-name-prohibited-characters"] = attribute[
+                                            "validations"
+                                        ].pop("personNameProhibitedCharacters")
                         changeset[camel(component_param)][config_param].append(kc_user_profile_config[0])
                 # usual camelCase parameters
                 else:
@@ -626,11 +629,11 @@ def main():
             changeset[camel(component_param)] = new_param_value
 
     # Make it easier to refer to current module parameters
-    state = module.params.get('state')
-    enabled = module.params.get('enabled')
-    parent_id = module.params.get('parent_id')
-    provider_type = module.params.get('provider_type')
-    provider_id = module.params.get('provider_id')
+    state = module.params.get("state")
+    enabled = module.params.get("enabled")
+    parent_id = module.params.get("parent_id")
+    provider_type = module.params.get("provider_type")
+    provider_id = module.params.get("provider_id")
 
     # Make a deep copy of the changeset. This is use when determining
     # changes to the current state.
@@ -647,90 +650,92 @@ def main():
     changes = ""
 
     # This tells Ansible whether the userprofile was changed (added, removed, modified)
-    result['changed'] = False
+    result["changed"] = False
 
     # Loop through the list of components. If we encounter a component whose
     # name matches the value of the name parameter then assume the userprofile is
     # already present.
     for userprofile in realm_userprofiles:
         if provider_id == "declarative-user-profile":
-            userprofile_id = userprofile['id']
-            changeset['id'] = userprofile_id
-            changeset_copy['id'] = userprofile_id
+            userprofile_id = userprofile["id"]
+            changeset["id"] = userprofile_id
+            changeset_copy["id"] = userprofile_id
 
             # keycloak returns kc.user.profile.config as a single JSON formatted string, so we have to deserialize it
-            if 'config' in userprofile and 'kc.user.profile.config' in userprofile['config']:
-                userprofile['config']['kc.user.profile.config'][0] = json.loads(userprofile['config']['kc.user.profile.config'][0])
+            if "config" in userprofile and "kc.user.profile.config" in userprofile["config"]:
+                userprofile["config"]["kc.user.profile.config"][0] = json.loads(
+                    userprofile["config"]["kc.user.profile.config"][0]
+                )
 
             # Compare top-level parameters
             for param, value in changeset.items():
                 before_realm_userprofile[param] = userprofile[param]
 
-                if changeset_copy[param] != userprofile[param] and param != 'config':
-                    changes += "%s: %s -> %s, " % (param, userprofile[param], changeset_copy[param])
-                    result['changed'] = True
+                if changeset_copy[param] != userprofile[param] and param != "config":
+                    changes += f"{param}: {userprofile[param]} -> {changeset_copy[param]}, "
+                    result["changed"] = True
 
             # Compare parameters under the "config" userprofile
-            for p, v in changeset_copy['config'].items():
-                before_realm_userprofile['config'][p] = userprofile['config'][p]
-                if changeset_copy['config'][p] != userprofile['config'][p]:
-                    changes += "config.%s: %s -> %s, " % (p, userprofile['config'][p], changeset_copy['config'][p])
-                    result['changed'] = True
+            for p, v in changeset_copy["config"].items():
+                before_realm_userprofile["config"][p] = userprofile["config"][p]
+                if changeset_copy["config"][p] != userprofile["config"][p]:
+                    changes += f"config.{p}: {userprofile['config'][p]} -> {changeset_copy['config'][p]}, "
+                    result["changed"] = True
 
     # Check all the possible states of the resource and do what is needed to
     # converge current state with desired state (create, update or delete
     # the userprofile).
 
     # keycloak expects kc.user.profile.config as a single JSON formatted string, so we have to serialize it
-    if 'config' in changeset and 'kc.user.profile.config' in changeset['config']:
-        changeset['config']['kc.user.profile.config'][0] = json.dumps(changeset['config']['kc.user.profile.config'][0])
-    if userprofile_id and state == 'present':
-        if result['changed']:
+    if "config" in changeset and "kc.user.profile.config" in changeset["config"]:
+        changeset["config"]["kc.user.profile.config"][0] = json.dumps(changeset["config"]["kc.user.profile.config"][0])
+    if userprofile_id and state == "present":
+        if result["changed"]:
             if module._diff:
-                result['diff'] = dict(before=before_realm_userprofile, after=changeset_copy)
+                result["diff"] = dict(before=before_realm_userprofile, after=changeset_copy)
 
             if module.check_mode:
-                result['msg'] = "Userprofile %s would be changed: %s" % (provider_id, changes.strip(", "))
+                result["msg"] = f"Userprofile {provider_id} would be changed: {changes.strip(', ')}"
             else:
                 kc.update_component(changeset, parent_id)
-                result['msg'] = "Userprofile %s changed: %s" % (provider_id, changes.strip(", "))
+                result["msg"] = f"Userprofile {provider_id} changed: {changes.strip(', ')}"
         else:
-            result['msg'] = "Userprofile %s was in sync" % (provider_id)
+            result["msg"] = f"Userprofile {provider_id} was in sync"
 
-        result['end_state'] = changeset_copy
-    elif userprofile_id and state == 'absent':
+        result["end_state"] = changeset_copy
+    elif userprofile_id and state == "absent":
         if module._diff:
-            result['diff'] = dict(before=before_realm_userprofile, after={})
+            result["diff"] = dict(before=before_realm_userprofile, after={})
 
         if module.check_mode:
-            result['changed'] = True
-            result['msg'] = "Userprofile %s would be deleted" % (provider_id)
+            result["changed"] = True
+            result["msg"] = f"Userprofile {provider_id} would be deleted"
         else:
             kc.delete_component(userprofile_id, parent_id)
-            result['changed'] = True
-            result['msg'] = "Userprofile %s deleted" % (provider_id)
+            result["changed"] = True
+            result["msg"] = f"Userprofile {provider_id} deleted"
 
-        result['end_state'] = {}
-    elif not userprofile_id and state == 'present':
+        result["end_state"] = {}
+    elif not userprofile_id and state == "present":
         if module._diff:
-            result['diff'] = dict(before={}, after=changeset_copy)
+            result["diff"] = dict(before={}, after=changeset_copy)
 
         if module.check_mode:
-            result['changed'] = True
-            result['msg'] = "Userprofile %s would be created" % (provider_id)
+            result["changed"] = True
+            result["msg"] = f"Userprofile {provider_id} would be created"
         else:
             kc.create_component(changeset, parent_id)
-            result['changed'] = True
-            result['msg'] = "Userprofile %s created" % (provider_id)
+            result["changed"] = True
+            result["msg"] = f"Userprofile {provider_id} created"
 
-        result['end_state'] = changeset_copy
-    elif not userprofile_id and state == 'absent':
-        result['changed'] = False
-        result['msg'] = "Userprofile %s not present" % (provider_id)
-        result['end_state'] = {}
+        result["end_state"] = changeset_copy
+    elif not userprofile_id and state == "absent":
+        result["changed"] = False
+        result["msg"] = f"Userprofile {provider_id} not present"
+        result["end_state"] = {}
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

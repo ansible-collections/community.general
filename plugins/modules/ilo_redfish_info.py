@@ -1,10 +1,8 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ilo_redfish_info
@@ -105,13 +103,9 @@ ilo_redfish_info:
   returned: always
 """
 
-CATEGORY_COMMANDS_ALL = {
-    "Sessions": ["GetiLOSessions"]
-}
+CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"]}
 
-CATEGORY_COMMANDS_DEFAULT = {
-    "Sessions": "GetiLOSessions"
-}
+CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
@@ -122,67 +116,65 @@ def main():
     result = {}
     category_list = []
     argument_spec = dict(
-        category=dict(required=True, type='list', elements='str'),
-        command=dict(required=True, type='list', elements='str'),
+        category=dict(required=True, type="list", elements="str"),
+        command=dict(required=True, type="list", elements="str"),
         baseuri=dict(required=True),
         username=dict(),
         password=dict(no_log=True),
         auth_token=dict(no_log=True),
-        timeout=dict(type='int', default=10)
+        timeout=dict(type="int", default=10),
     )
     argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
         argument_spec,
         required_together=[
-            ('username', 'password'),
+            ("username", "password"),
         ],
         required_one_of=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    creds = {"user": module.params['username'],
-             "pswd": module.params['password'],
-             "token": module.params['auth_token']}
+    creds = {"user": module.params["username"], "pswd": module.params["password"], "token": module.params["auth_token"]}
 
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
 
     # Build Category list
-    if "all" in module.params['category']:
+    if "all" in module.params["category"]:
         for entry in CATEGORY_COMMANDS_ALL:
             category_list.append(entry)
     else:
         # one or more categories specified
-        category_list = module.params['category']
+        category_list = module.params["category"]
 
     for category in category_list:
         command_list = []
         # Build Command list for each Category
         if category in CATEGORY_COMMANDS_ALL:
-            if not module.params['command']:
+            if not module.params["command"]:
                 # True if we don't specify a command --> use default
                 command_list.append(CATEGORY_COMMANDS_DEFAULT[category])
-            elif "all" in module.params['command']:
+            elif "all" in module.params["command"]:
                 for entry in CATEGORY_COMMANDS_ALL[category]:
                     command_list.append(entry)
             # one or more commands
             else:
-                command_list = module.params['command']
+                command_list = module.params["command"]
                 # Verify that all commands are valid
                 for cmd in command_list:
                     # Fail if even one command given is invalid
                     if cmd not in CATEGORY_COMMANDS_ALL[category]:
-                        module.fail_json(msg="Invalid Command: %s" % cmd)
+                        module.fail_json(msg=f"Invalid Command: {cmd}")
         else:
             # Fail if even one category given is invalid
-            module.fail_json(msg="Invalid Category: %s" % category)
+            module.fail_json(msg=f"Invalid Category: {category}")
 
         # Organize by Categories / Commands
         if category == "Sessions":
@@ -193,5 +185,5 @@ def main():
     module.exit_json(ilo_redfish_info=result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

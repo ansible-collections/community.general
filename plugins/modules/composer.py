@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Dimitrios Tydeas Mengidis <tydeas.dr@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -159,7 +157,7 @@ def has_changed(string):
     return True
 
 
-def get_available_options(module, command='install'):
+def get_available_options(module, command="install"):
     # get all available options from a composer command using composer help to json
     rc, out, err = composer_command(module, ["help", command], arguments=["--no-interaction", "--format=json"])
     if rc != 0:
@@ -167,7 +165,7 @@ def get_available_options(module, command='install'):
         module.fail_json(msg=output)
 
     command_help_json = module.from_json(out)
-    return command_help_json['definition']['options']
+    return command_help_json["definition"]["options"]
 
 
 def composer_command(module, command, arguments=None, options=None):
@@ -176,23 +174,23 @@ def composer_command(module, command, arguments=None, options=None):
     if arguments is None:
         arguments = []
 
-    global_command = module.params['global_command']
+    global_command = module.params["global_command"]
 
     if global_command:
         global_arg = ["global"]
     else:
         global_arg = []
-        options.extend(['--working-dir', module.params['working_dir']])
+        options.extend(["--working-dir", module.params["working_dir"]])
 
-    if module.params['executable'] is None:
+    if module.params["executable"] is None:
         php_path = module.get_bin_path("php", True, ["/usr/local/bin"])
     else:
-        php_path = module.params['executable']
+        php_path = module.params["executable"]
 
-    if module.params['composer_executable'] is None:
+    if module.params["composer_executable"] is None:
         composer_path = module.get_bin_path("composer", True, ["/usr/local/bin"])
     else:
-        composer_path = module.params['composer_executable']
+        composer_path = module.params["composer_executable"]
 
     cmd = [php_path, composer_path] + global_arg + command + options + arguments
     return module.run_command(cmd)
@@ -217,54 +215,54 @@ def main():
             ignore_platform_reqs=dict(default=False, type="bool"),
             composer_executable=dict(type="path"),
         ),
-        required_if=[('global_command', False, ['working_dir'])],
-        supports_check_mode=True
+        required_if=[("global_command", False, ["working_dir"])],
+        supports_check_mode=True,
     )
 
     # Get composer command with fallback to default
-    command = module.params['command']
+    command = module.params["command"]
     if re.search(r"\s", command):
         module.fail_json(msg="Use the 'arguments' param for passing arguments with the 'command'")
 
-    arguments = shlex.split(module.params['arguments'])
+    arguments = shlex.split(module.params["arguments"])
     available_options = get_available_options(module=module, command=command)
 
     options = []
 
     # Default options
     default_options = [
-        'no-ansi',
-        'no-interaction',
-        'no-progress',
+        "no-ansi",
+        "no-interaction",
+        "no-progress",
     ]
 
     for option in default_options:
         if option in available_options:
-            option = "--%s" % option
+            option = f"--{option}"
             options.append(option)
 
     option_params = {
-        'prefer_source': 'prefer-source',
-        'prefer_dist': 'prefer-dist',
-        'no_dev': 'no-dev',
-        'no_scripts': 'no-scripts',
-        'no_plugins': 'no-plugins',
-        'apcu_autoloader': 'acpu-autoloader',
-        'optimize_autoloader': 'optimize-autoloader',
-        'classmap_authoritative': 'classmap-authoritative',
-        'ignore_platform_reqs': 'ignore-platform-reqs',
+        "prefer_source": "prefer-source",
+        "prefer_dist": "prefer-dist",
+        "no_dev": "no-dev",
+        "no_scripts": "no-scripts",
+        "no_plugins": "no-plugins",
+        "apcu_autoloader": "acpu-autoloader",
+        "optimize_autoloader": "optimize-autoloader",
+        "classmap_authoritative": "classmap-authoritative",
+        "ignore_platform_reqs": "ignore-platform-reqs",
     }
 
     for param, option in option_params.items():
         if module.params.get(param) and option in available_options:
-            option = "--%s" % option
+            option = f"--{option}"
             options.append(option)
 
     if module.check_mode:
-        if 'dry-run' in available_options:
-            options.append('--dry-run')
+        if "dry-run" in available_options:
+            options.append("--dry-run")
         else:
-            module.exit_json(skipped=True, msg="command '%s' does not support check mode, skipping" % command)
+            module.exit_json(skipped=True, msg=f"command '{command}' does not support check mode, skipping")
 
     rc, out, err = composer_command(module, [command], arguments, options)
 
@@ -277,5 +275,5 @@ def main():
         module.exit_json(changed=has_changed(output), msg=output, stdout=out + err)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

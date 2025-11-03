@@ -1,2 +1,0 @@
-minor_changes:
-  - cloudflare_dns - adds support for PTR records (https://github.com/ansible-collections/community.general/pull/10267).

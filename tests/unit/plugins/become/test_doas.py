@@ -5,8 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import re
 
@@ -21,19 +20,18 @@ def test_doas_basic(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    doas_exe = 'doas'
-    doas_flags = '-n'
+    doas_exe = "doas"
+    doas_flags = "-n"
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_method': 'community.general.doas',
+        "become_method": "community.general.doas",
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s  %s  %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, default_exe, success,
-                                                          default_cmd), cmd) is not None)
+    assert re.match(f"""{doas_exe}  {doas_flags}  {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_doas(mocker, parser, reset_cli_args):
@@ -42,21 +40,26 @@ def test_doas(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    doas_exe = 'doas'
-    doas_flags = '-n'
+    doas_exe = "doas"
+    doas_flags = "-n"
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.doas',
-        'become_flags': doas_flags,
+        "become_user": "foo",
+        "become_method": "community.general.doas",
+        "become_flags": doas_flags,
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, task['become_user'], default_exe, success,
-                                                              default_cmd), cmd) is not None)
+    assert (
+        re.match(
+            f"""{doas_exe} {doas_flags} -u {task["become_user"]} {default_exe} -c 'echo {success}; {default_cmd}'""",
+            cmd,
+        )
+        is not None
+    )
 
 
 def test_doas_varoptions(mocker, parser, reset_cli_args):
@@ -65,21 +68,26 @@ def test_doas_varoptions(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    doas_exe = 'doas'
-    doas_flags = '-n'
+    doas_exe = "doas"
+    doas_flags = "-n"
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.doas',
-        'become_flags': 'xxx',
+        "become_user": "foo",
+        "become_method": "community.general.doas",
+        "become_flags": "xxx",
     }
     var_options = {
-        'ansible_become_user': 'bar',
-        'ansible_become_flags': doas_flags,
+        "ansible_become_user": "bar",
+        "ansible_become_flags": doas_flags,
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, var_options['ansible_become_user'], default_exe, success,
-                                                              default_cmd), cmd) is not None)
+    assert (
+        re.match(
+            f"""{doas_exe} {doas_flags} -u {var_options["ansible_become_user"]} {default_exe} -c 'echo {success}; {default_cmd}'""",
+            cmd,
+        )
+        is not None
+    )

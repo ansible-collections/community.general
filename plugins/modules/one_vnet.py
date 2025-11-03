@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2024, Alexander Bakanovskii <skottttt228@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: one_vnet
@@ -260,50 +258,47 @@ from ansible_collections.community.general.plugins.module_utils.opennebula impor
 
 
 class NetworksModule(OpenNebulaModule):
-
     def __init__(self):
         argument_spec = dict(
-            id=dict(type='int'),
-            name=dict(type='str'),
-            state=dict(type='str', choices=['present', 'absent'], default='present'),
-            template=dict(type='str'),
+            id=dict(type="int"),
+            name=dict(type="str"),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
+            template=dict(type="str"),
         )
 
-        mutually_exclusive = [
-            ['id', 'name']
-        ]
+        mutually_exclusive = [["id", "name"]]
 
-        required_one_of = [('id', 'name')]
+        required_one_of = [("id", "name")]
 
-        required_if = [
-            ['state', 'present', ['template']]
-        ]
+        required_if = [["state", "present", ["template"]]]
 
-        OpenNebulaModule.__init__(self,
-                                  argument_spec,
-                                  supports_check_mode=True,
-                                  mutually_exclusive=mutually_exclusive,
-                                  required_one_of=required_one_of,
-                                  required_if=required_if)
+        OpenNebulaModule.__init__(
+            self,
+            argument_spec,
+            supports_check_mode=True,
+            mutually_exclusive=mutually_exclusive,
+            required_one_of=required_one_of,
+            required_if=required_if,
+        )
 
     def run(self, one, module, result):
         params = module.params
-        id = params.get('id')
-        name = params.get('name')
-        desired_state = params.get('state')
-        template_data = params.get('template')
+        id = params.get("id")
+        name = params.get("name")
+        desired_state = params.get("state")
+        template_data = params.get("template")
 
         self.result = {}
 
         template = self.get_template_instance(id, name)
         needs_creation = False
-        if not template and desired_state != 'absent':
+        if not template and desired_state != "absent":
             if id:
-                module.fail_json(msg="There is no template with id=" + str(id))
+                module.fail_json(msg=f"There is no template with id={id}")
             else:
                 needs_creation = True
 
-        if desired_state == 'absent':
+        if desired_state == "absent":
             self.result = self.delete_template(template)
         else:
             if needs_creation:
@@ -341,54 +336,56 @@ class NetworksModule(OpenNebulaModule):
         template_pool = template.AR_POOL.AR
         for ar in range(len(template_pool)):
             template_param = template_pool[ar]
-            ar_pool.append({
-                # These params will always be present
-                'ar_id': template_param.AR_ID,
-                'mac': template_param.MAC,
-                'size': template_param.SIZE,
-                'type': template_param.TYPE,
-                # These are optional so firstly check for presence
-                # and if not present set value to Null
-                'allocated': getattr(template_param, 'ALLOCATED', 'Null'),
-                'ip': getattr(template_param, 'IP', 'Null'),
-                'global_prefix': getattr(template_param, 'GLOBAL_PREFIX', 'Null'),
-                'parent_network_ar_id': getattr(template_param, 'PARENT_NETWORK_AR_ID', 'Null'),
-                'ula_prefix': getattr(template_param, 'ULA_PREFIX', 'Null'),
-                'vn_mad': getattr(template_param, 'VN_MAD', 'Null'),
-            })
+            ar_pool.append(
+                {
+                    # These params will always be present
+                    "ar_id": template_param.AR_ID,
+                    "mac": template_param.MAC,
+                    "size": template_param.SIZE,
+                    "type": template_param.TYPE,
+                    # These are optional so firstly check for presence
+                    # and if not present set value to Null
+                    "allocated": getattr(template_param, "ALLOCATED", "Null"),
+                    "ip": getattr(template_param, "IP", "Null"),
+                    "global_prefix": getattr(template_param, "GLOBAL_PREFIX", "Null"),
+                    "parent_network_ar_id": getattr(template_param, "PARENT_NETWORK_AR_ID", "Null"),
+                    "ula_prefix": getattr(template_param, "ULA_PREFIX", "Null"),
+                    "vn_mad": getattr(template_param, "VN_MAD", "Null"),
+                }
+            )
         return ar_pool
 
     def get_template_info(self, template):
         info = {
-            'id': template.ID,
-            'name': template.NAME,
-            'template': template.TEMPLATE,
-            'user_name': template.UNAME,
-            'user_id': template.UID,
-            'group_name': template.GNAME,
-            'group_id': template.GID,
-            'permissions': {
-                'owner_u': template.PERMISSIONS.OWNER_U,
-                'owner_m': template.PERMISSIONS.OWNER_M,
-                'owner_a': template.PERMISSIONS.OWNER_A,
-                'group_u': template.PERMISSIONS.GROUP_U,
-                'group_m': template.PERMISSIONS.GROUP_M,
-                'group_a': template.PERMISSIONS.GROUP_A,
-                'other_u': template.PERMISSIONS.OTHER_U,
-                'other_m': template.PERMISSIONS.OTHER_M,
-                'other_a': template.PERMISSIONS.OTHER_A
+            "id": template.ID,
+            "name": template.NAME,
+            "template": template.TEMPLATE,
+            "user_name": template.UNAME,
+            "user_id": template.UID,
+            "group_name": template.GNAME,
+            "group_id": template.GID,
+            "permissions": {
+                "owner_u": template.PERMISSIONS.OWNER_U,
+                "owner_m": template.PERMISSIONS.OWNER_M,
+                "owner_a": template.PERMISSIONS.OWNER_A,
+                "group_u": template.PERMISSIONS.GROUP_U,
+                "group_m": template.PERMISSIONS.GROUP_M,
+                "group_a": template.PERMISSIONS.GROUP_A,
+                "other_u": template.PERMISSIONS.OTHER_U,
+                "other_m": template.PERMISSIONS.OTHER_M,
+                "other_a": template.PERMISSIONS.OTHER_A,
             },
-            'clusters': template.CLUSTERS.ID,
-            'bridge': template.BRIDGE,
-            'bride_type': template.BRIDGE_TYPE,
-            'parent_network_id': template.PARENT_NETWORK_ID,
-            'vn_mad': template.VN_MAD,
-            'phydev': template.PHYDEV,
-            'vlan_id': template.VLAN_ID,
-            'outer_vlan_id': template.OUTER_VLAN_ID,
-            'used_leases': template.USED_LEASES,
-            'vrouters': template.VROUTERS.ID,
-            'ar_pool': self.get_networks_ar_pool(template)
+            "clusters": template.CLUSTERS.ID,
+            "bridge": template.BRIDGE,
+            "bride_type": template.BRIDGE_TYPE,
+            "parent_network_id": template.PARENT_NETWORK_ID,
+            "vn_mad": template.VN_MAD,
+            "phydev": template.PHYDEV,
+            "vlan_id": template.VLAN_ID,
+            "outer_vlan_id": template.OUTER_VLAN_ID,
+            "used_leases": template.USED_LEASES,
+            "vrouters": template.VROUTERS.ID,
+            "ar_pool": self.get_networks_ar_pool(template),
         }
 
         return info
@@ -396,10 +393,10 @@ class NetworksModule(OpenNebulaModule):
     def create_template(self, name, template_data):
         if not self.module.check_mode:
             # -1 means that network won't be added to any cluster which happens by default
-            self.one.vn.allocate("NAME = \"" + name + "\"\n" + template_data, -1)
+            self.one.vn.allocate(f'NAME = "{name}"\n{template_data}', -1)
 
         result = self.get_template_info(self.get_template_by_name(name))
-        result['changed'] = True
+        result["changed"] = True
 
         return result
 
@@ -411,26 +408,26 @@ class NetworksModule(OpenNebulaModule):
         result = self.get_template_info(self.get_template_by_id(template.ID))
         if self.module.check_mode:
             # Unfortunately it is not easy to detect if the template would have changed, therefore always report a change here.
-            result['changed'] = True
+            result["changed"] = True
         else:
             # if the previous parsed template data is not equal to the updated one, this has changed
-            result['changed'] = template.TEMPLATE != result['template']
+            result["changed"] = template.TEMPLATE != result["template"]
 
         return result
 
     def delete_template(self, template):
         if not template:
-            return {'changed': False}
+            return {"changed": False}
 
         if not self.module.check_mode:
             self.one.vn.delete(template.ID)
 
-        return {'changed': True}
+        return {"changed": True}
 
 
 def main():
     NetworksModule().run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

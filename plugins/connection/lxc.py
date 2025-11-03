@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # (c) 2015, Joerg Thalheim <joerg@higgsboson.tk>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -42,6 +41,7 @@ import errno
 HAS_LIBLXC = False
 try:
     import lxc as _lxc
+
     HAS_LIBLXC = True
 except ImportError:
     pass
@@ -52,27 +52,27 @@ from ansible.plugins.connection import ConnectionBase
 
 
 class Connection(ConnectionBase):
-    """ Local lxc based connections """
+    """Local lxc based connections"""
 
-    transport = 'community.general.lxc'
+    transport = "community.general.lxc"
     has_pipelining = True
-    default_user = 'root'
+    default_user = "root"
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
-        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+        super().__init__(play_context, new_stdin, *args, **kwargs)
 
         self.container_name = None
         self.container = None
 
     def _connect(self):
-        """ connect to the lxc; nothing to do here """
-        super(Connection, self)._connect()
+        """connect to the lxc; nothing to do here"""
+        super()._connect()
 
         if not HAS_LIBLXC:
             msg = "lxc python bindings are not installed"
             raise errors.AnsibleError(msg)
 
-        container_name = self.get_option('remote_addr')
+        container_name = self.get_option("remote_addr")
         if self.container and self.container_name == container_name:
             return
 
@@ -99,7 +99,7 @@ class Connection(ConnectionBase):
                     continue
                 raise
             for fd in ready_writes:
-                in_data = in_data[os.write(fd, in_data):]
+                in_data = in_data[os.write(fd, in_data) :]
                 if len(in_data) == 0:
                     write_fds.remove(fd)
             for fd in ready_reads:
@@ -118,12 +118,12 @@ class Connection(ConnectionBase):
         return fd
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        """ run a command on the chroot """
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        """run a command on the chroot"""
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         # python2-lxc needs bytes. python3-lxc needs text.
-        executable = to_native(self.get_option('executable'), errors='surrogate_or_strict')
-        local_cmd = [executable, '-c', to_native(cmd, errors='surrogate_or_strict')]
+        executable = to_native(self.get_option("executable"), errors="surrogate_or_strict")
+        local_cmd = [executable, "-c", to_native(cmd, errors="surrogate_or_strict")]
 
         read_stdout, write_stdout = None, None
         read_stderr, write_stderr = None, None
@@ -134,14 +134,14 @@ class Connection(ConnectionBase):
             read_stderr, write_stderr = os.pipe()
 
             kwargs = {
-                'stdout': self._set_nonblocking(write_stdout),
-                'stderr': self._set_nonblocking(write_stderr),
-                'env_policy': _lxc.LXC_ATTACH_CLEAR_ENV
+                "stdout": self._set_nonblocking(write_stdout),
+                "stderr": self._set_nonblocking(write_stderr),
+                "env_policy": _lxc.LXC_ATTACH_CLEAR_ENV,
             }
 
             if in_data:
                 read_stdin, write_stdin = os.pipe()
-                kwargs['stdin'] = self._set_nonblocking(read_stdin)
+                kwargs["stdin"] = self._set_nonblocking(read_stdin)
 
             self._display.vvv(f"EXEC {local_cmd}", host=self.container_name)
             pid = self.container.attach(_lxc.attach_run_command, local_cmd, **kwargs)
@@ -154,28 +154,19 @@ class Connection(ConnectionBase):
             if read_stdin:
                 read_stdin = os.close(read_stdin)
 
-            return self._communicate(pid,
-                                     in_data,
-                                     write_stdin,
-                                     read_stdout,
-                                     read_stderr)
+            return self._communicate(pid, in_data, write_stdin, read_stdout, read_stderr)
         finally:
-            fds = [read_stdout,
-                   write_stdout,
-                   read_stderr,
-                   write_stderr,
-                   read_stdin,
-                   write_stdin]
+            fds = [read_stdout, write_stdout, read_stderr, write_stderr, read_stdin, write_stdin]
             for fd in fds:
                 if fd:
                     os.close(fd)
 
     def put_file(self, in_path, out_path):
-        ''' transfer a file from local to lxc '''
-        super(Connection, self).put_file(in_path, out_path)
+        """transfer a file from local to lxc"""
+        super().put_file(in_path, out_path)
         self._display.vvv(f"PUT {in_path} TO {out_path}", host=self.container_name)
-        in_path = to_bytes(in_path, errors='surrogate_or_strict')
-        out_path = to_bytes(out_path, errors='surrogate_or_strict')
+        in_path = to_bytes(in_path, errors="surrogate_or_strict")
+        out_path = to_bytes(out_path, errors="surrogate_or_strict")
 
         if not os.path.exists(in_path):
             msg = f"file or module does not exist: {in_path}"
@@ -186,9 +177,11 @@ class Connection(ConnectionBase):
             traceback.print_exc()
             raise errors.AnsibleError(f"failed to open input file to {in_path}")
         try:
+
             def write_file(args):
-                with open(out_path, 'wb+') as dst_file:
+                with open(out_path, "wb+") as dst_file:
                     shutil.copyfileobj(src_file, dst_file)
+
             try:
                 self.container.attach_wait(write_file, None)
             except IOError:
@@ -199,11 +192,11 @@ class Connection(ConnectionBase):
             src_file.close()
 
     def fetch_file(self, in_path, out_path):
-        ''' fetch a file from lxc to local '''
-        super(Connection, self).fetch_file(in_path, out_path)
+        """fetch a file from lxc to local"""
+        super().fetch_file(in_path, out_path)
         self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self.container_name)
-        in_path = to_bytes(in_path, errors='surrogate_or_strict')
-        out_path = to_bytes(out_path, errors='surrogate_or_strict')
+        in_path = to_bytes(in_path, errors="surrogate_or_strict")
+        out_path = to_bytes(out_path, errors="surrogate_or_strict")
 
         try:
             dst_file = open(out_path, "wb")
@@ -212,14 +205,16 @@ class Connection(ConnectionBase):
             msg = f"failed to open output file {out_path}"
             raise errors.AnsibleError(msg)
         try:
+
             def write_file(args):
                 try:
-                    with open(in_path, 'rb') as src_file:
+                    with open(in_path, "rb") as src_file:
                         shutil.copyfileobj(src_file, dst_file)
                 finally:
                     # this is needed in the lxc child process
                     # to flush internal python buffers
                     dst_file.close()
+
             try:
                 self.container.attach_wait(write_file, None)
             except IOError:
@@ -230,6 +225,6 @@ class Connection(ConnectionBase):
             dst_file.close()
 
     def close(self):
-        ''' terminate the connection; nothing to do here '''
-        super(Connection, self).close()
+        """terminate the connection; nothing to do here"""
+        super().close()
         self._connected = False

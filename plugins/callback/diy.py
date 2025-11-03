@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2019, Trevor Highfill <trevor.highfill@outlook.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -787,12 +785,13 @@ from ansible.module_utils.common.text.converters import to_text
 
 try:
     from ansible.template import trust_as_template  # noqa: F401, pylint: disable=unused-import
+
     SUPPORTS_DATA_TAGGING = True
 except ImportError:
     SUPPORTS_DATA_TAGGING = False
 
 
-class DummyStdout(object):
+class DummyStdout:
     def flush(self):
         pass
 
@@ -807,11 +806,12 @@ class CallbackModule(Default):
     """
     Callback plugin that allows you to supply your own custom callback templates to be output.
     """
-    CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'stdout'
-    CALLBACK_NAME = 'community.general.diy'
 
-    DIY_NS = 'ansible_callback_diy'
+    CALLBACK_VERSION = 2.0
+    CALLBACK_TYPE = "stdout"
+    CALLBACK_NAME = "community.general.diy"
+
+    DIY_NS = "ansible_callback_diy"
 
     @contextmanager
     def _suppress_stdout(self, enabled):
@@ -824,50 +824,48 @@ class CallbackModule(Default):
     def _get_output_specification(self, loader, variables):
         _ret = {}
         _calling_method = sys._getframe(1).f_code.co_name
-        _callback_type = (_calling_method[3:] if _calling_method[:3] == "v2_" else _calling_method)
-        _callback_options = ['msg', 'msg_color']
+        _callback_type = _calling_method[3:] if _calling_method[:3] == "v2_" else _calling_method
+        _callback_options = ["msg", "msg_color"]
 
         for option in _callback_options:
-            _option_name = f'{_callback_type}_{option}'
-            _option_template = variables.get(
-                f"{self.DIY_NS}_{_option_name}",
-                self.get_option(_option_name)
-            )
-            _ret.update({option: self._template(
-                loader=loader,
-                template=_option_template,
-                variables=variables
-            )})
+            _option_name = f"{_callback_type}_{option}"
+            _option_template = variables.get(f"{self.DIY_NS}_{_option_name}", self.get_option(_option_name))
+            _ret.update({option: self._template(loader=loader, template=_option_template, variables=variables)})
 
-        _ret.update({'vars': variables})
+        _ret.update({"vars": variables})
 
         return _ret
 
     def _using_diy(self, spec):
         sentinel = object()
-        omit = spec['vars'].get('omit', sentinel)
+        omit = spec["vars"].get("omit", sentinel)
         # With Data Tagging, omit is sentinel
-        return (spec['msg'] is not None) and (spec['msg'] != omit or omit is sentinel)
+        return (spec["msg"] is not None) and (spec["msg"] != omit or omit is sentinel)
 
     def _parent_has_callback(self):
-        return hasattr(super(CallbackModule, self), sys._getframe(1).f_code.co_name)
+        return hasattr(super(), sys._getframe(1).f_code.co_name)
 
     def _template(self, loader, template, variables):
         _templar = Templar(loader=loader, variables=variables)
-        return _templar.template(
-            template,
-            preserve_trailing_newlines=True,
-            convert_data=False,
-            escape_backslashes=True
-        )
+        return _templar.template(template, preserve_trailing_newlines=True, convert_data=False, escape_backslashes=True)
 
     def _output(self, spec, stderr=False):
-        _msg = to_text(spec['msg'])
+        _msg = to_text(spec["msg"])
         if len(_msg) > 0:
-            self._display.display(msg=_msg, color=spec['msg_color'], stderr=stderr)
+            self._display.display(msg=_msg, color=spec["msg_color"], stderr=stderr)
 
-    def _get_vars(self, playbook, play=None, host=None, task=None, included_file=None,
-                  handler=None, result=None, stats=None, remove_attr_ref_loop=True):
+    def _get_vars(
+        self,
+        playbook,
+        play=None,
+        host=None,
+        task=None,
+        included_file=None,
+        handler=None,
+        result=None,
+        stats=None,
+        remove_attr_ref_loop=True,
+    ):
         def _get_value(obj, attr=None, method=None):
             if attr:
                 return getattr(obj, attr, getattr(obj, f"_{attr}", None))
@@ -877,8 +875,8 @@ class CallbackModule(Default):
                 return _method()
 
         def _remove_attr_ref_loop(obj, attributes):
-            _loop_var = getattr(obj, 'loop_control', None)
-            _loop_var = (_loop_var or 'item')
+            _loop_var = getattr(obj, "loop_control", None)
+            _loop_var = _loop_var or "item"
 
             for attr in attributes:
                 if str(_loop_var) in str(_get_value(obj=obj, attr=attr)):
@@ -897,56 +895,128 @@ class CallbackModule(Default):
         _all = _variable_manager.get_vars()
         if play:
             _all = play.get_variable_manager().get_vars(
-                play=play,
-                host=(host if host else getattr(result, '_host', None)),
-                task=(handler if handler else task)
+                play=play, host=(host if host else getattr(result, "_host", None)), task=(handler if handler else task)
             )
         _ret.update(_all)
 
         _ret.update(_ret.get(self.DIY_NS, {self.DIY_NS: {} if SUPPORTS_DATA_TAGGING else CallbackDIYDict()}))
 
-        _ret[self.DIY_NS].update({'playbook': {}})
-        _playbook_attributes = ['entries', 'file_name', 'basedir']
+        _ret[self.DIY_NS].update({"playbook": {}})
+        _playbook_attributes = ["entries", "file_name", "basedir"]
 
         for attr in _playbook_attributes:
-            _ret[self.DIY_NS]['playbook'].update({attr: _get_value(obj=playbook, attr=attr)})
+            _ret[self.DIY_NS]["playbook"].update({attr: _get_value(obj=playbook, attr=attr)})
 
         if play:
-            _ret[self.DIY_NS].update({'play': {}})
-            _play_attributes = ['any_errors_fatal', 'become', 'become_flags', 'become_method',
-                                'become_user', 'check_mode', 'collections', 'connection',
-                                'debugger', 'diff', 'environment', 'fact_path', 'finalized',
-                                'force_handlers', 'gather_facts', 'gather_subset',
-                                'gather_timeout', 'handlers', 'hosts', 'ignore_errors',
-                                'ignore_unreachable', 'included_conditional', 'included_path',
-                                'max_fail_percentage', 'module_defaults', 'name', 'no_log',
-                                'only_tags', 'order', 'port', 'post_tasks', 'pre_tasks',
-                                'remote_user', 'removed_hosts', 'roles', 'run_once', 'serial',
-                                'skip_tags', 'squashed', 'strategy', 'tags', 'tasks', 'uuid',
-                                'validated', 'vars_files', 'vars_prompt']
+            _ret[self.DIY_NS].update({"play": {}})
+            _play_attributes = [
+                "any_errors_fatal",
+                "become",
+                "become_flags",
+                "become_method",
+                "become_user",
+                "check_mode",
+                "collections",
+                "connection",
+                "debugger",
+                "diff",
+                "environment",
+                "fact_path",
+                "finalized",
+                "force_handlers",
+                "gather_facts",
+                "gather_subset",
+                "gather_timeout",
+                "handlers",
+                "hosts",
+                "ignore_errors",
+                "ignore_unreachable",
+                "included_conditional",
+                "included_path",
+                "max_fail_percentage",
+                "module_defaults",
+                "name",
+                "no_log",
+                "only_tags",
+                "order",
+                "port",
+                "post_tasks",
+                "pre_tasks",
+                "remote_user",
+                "removed_hosts",
+                "roles",
+                "run_once",
+                "serial",
+                "skip_tags",
+                "squashed",
+                "strategy",
+                "tags",
+                "tasks",
+                "uuid",
+                "validated",
+                "vars_files",
+                "vars_prompt",
+            ]
 
             for attr in _play_attributes:
-                _ret[self.DIY_NS]['play'].update({attr: _get_value(obj=play, attr=attr)})
+                _ret[self.DIY_NS]["play"].update({attr: _get_value(obj=play, attr=attr)})
 
         if host:
-            _ret[self.DIY_NS].update({'host': {}})
-            _host_attributes = ['name', 'uuid', 'address', 'implicit']
+            _ret[self.DIY_NS].update({"host": {}})
+            _host_attributes = ["name", "uuid", "address", "implicit"]
 
             for attr in _host_attributes:
-                _ret[self.DIY_NS]['host'].update({attr: _get_value(obj=host, attr=attr)})
+                _ret[self.DIY_NS]["host"].update({attr: _get_value(obj=host, attr=attr)})
 
         if task:
-            _ret[self.DIY_NS].update({'task': {}})
-            _task_attributes = ['action', 'any_errors_fatal', 'args', 'async', 'async_val',
-                                'become', 'become_flags', 'become_method', 'become_user',
-                                'changed_when', 'check_mode', 'collections', 'connection',
-                                'debugger', 'delay', 'delegate_facts', 'delegate_to', 'diff',
-                                'environment', 'failed_when', 'finalized', 'ignore_errors',
-                                'ignore_unreachable', 'loop', 'loop_control', 'loop_with',
-                                'module_defaults', 'name', 'no_log', 'notify', 'parent', 'poll',
-                                'port', 'register', 'remote_user', 'retries', 'role', 'run_once',
-                                'squashed', 'tags', 'untagged', 'until', 'uuid', 'validated',
-                                'when']
+            _ret[self.DIY_NS].update({"task": {}})
+            _task_attributes = [
+                "action",
+                "any_errors_fatal",
+                "args",
+                "async",
+                "async_val",
+                "become",
+                "become_flags",
+                "become_method",
+                "become_user",
+                "changed_when",
+                "check_mode",
+                "collections",
+                "connection",
+                "debugger",
+                "delay",
+                "delegate_facts",
+                "delegate_to",
+                "diff",
+                "environment",
+                "failed_when",
+                "finalized",
+                "ignore_errors",
+                "ignore_unreachable",
+                "loop",
+                "loop_control",
+                "loop_with",
+                "module_defaults",
+                "name",
+                "no_log",
+                "notify",
+                "parent",
+                "poll",
+                "port",
+                "register",
+                "remote_user",
+                "retries",
+                "role",
+                "run_once",
+                "squashed",
+                "tags",
+                "untagged",
+                "until",
+                "uuid",
+                "validated",
+                "when",
+            ]
 
             # remove arguments that reference a loop var because they cause templating issues in
             # callbacks that do not have the loop context(e.g. playbook_on_task_start)
@@ -954,91 +1024,128 @@ class CallbackModule(Default):
                 _task_attributes = _remove_attr_ref_loop(obj=task, attributes=_task_attributes)
 
             for attr in _task_attributes:
-                _ret[self.DIY_NS]['task'].update({attr: _get_value(obj=task, attr=attr)})
+                _ret[self.DIY_NS]["task"].update({attr: _get_value(obj=task, attr=attr)})
 
         if included_file:
-            _ret[self.DIY_NS].update({'included_file': {}})
-            _included_file_attributes = ['args', 'filename', 'hosts', 'is_role', 'task']
+            _ret[self.DIY_NS].update({"included_file": {}})
+            _included_file_attributes = ["args", "filename", "hosts", "is_role", "task"]
 
             for attr in _included_file_attributes:
-                _ret[self.DIY_NS]['included_file'].update({attr: _get_value(
-                    obj=included_file,
-                    attr=attr
-                )})
+                _ret[self.DIY_NS]["included_file"].update({attr: _get_value(obj=included_file, attr=attr)})
 
         if handler:
-            _ret[self.DIY_NS].update({'handler': {}})
-            _handler_attributes = ['action', 'any_errors_fatal', 'args', 'async', 'async_val',
-                                   'become', 'become_flags', 'become_method', 'become_user',
-                                   'changed_when', 'check_mode', 'collections', 'connection',
-                                   'debugger', 'delay', 'delegate_facts', 'delegate_to', 'diff',
-                                   'environment', 'failed_when', 'finalized', 'ignore_errors',
-                                   'ignore_unreachable', 'listen', 'loop', 'loop_control',
-                                   'loop_with', 'module_defaults', 'name', 'no_log',
-                                   'notified_hosts', 'notify', 'parent', 'poll', 'port',
-                                   'register', 'remote_user', 'retries', 'role', 'run_once',
-                                   'squashed', 'tags', 'untagged', 'until', 'uuid', 'validated',
-                                   'when']
+            _ret[self.DIY_NS].update({"handler": {}})
+            _handler_attributes = [
+                "action",
+                "any_errors_fatal",
+                "args",
+                "async",
+                "async_val",
+                "become",
+                "become_flags",
+                "become_method",
+                "become_user",
+                "changed_when",
+                "check_mode",
+                "collections",
+                "connection",
+                "debugger",
+                "delay",
+                "delegate_facts",
+                "delegate_to",
+                "diff",
+                "environment",
+                "failed_when",
+                "finalized",
+                "ignore_errors",
+                "ignore_unreachable",
+                "listen",
+                "loop",
+                "loop_control",
+                "loop_with",
+                "module_defaults",
+                "name",
+                "no_log",
+                "notified_hosts",
+                "notify",
+                "parent",
+                "poll",
+                "port",
+                "register",
+                "remote_user",
+                "retries",
+                "role",
+                "run_once",
+                "squashed",
+                "tags",
+                "untagged",
+                "until",
+                "uuid",
+                "validated",
+                "when",
+            ]
 
             if handler.loop and remove_attr_ref_loop:
-                _handler_attributes = _remove_attr_ref_loop(obj=handler,
-                                                            attributes=_handler_attributes)
+                _handler_attributes = _remove_attr_ref_loop(obj=handler, attributes=_handler_attributes)
 
             for attr in _handler_attributes:
-                _ret[self.DIY_NS]['handler'].update({attr: _get_value(obj=handler, attr=attr)})
+                _ret[self.DIY_NS]["handler"].update({attr: _get_value(obj=handler, attr=attr)})
 
-            _ret[self.DIY_NS]['handler'].update({'is_host_notified': handler.is_host_notified(host)})
+            _ret[self.DIY_NS]["handler"].update({"is_host_notified": handler.is_host_notified(host)})
 
         if result:
-            _ret[self.DIY_NS].update({'result': {}})
-            _result_attributes = ['host', 'task', 'task_name']
+            _ret[self.DIY_NS].update({"result": {}})
+            _result_attributes = ["host", "task", "task_name"]
 
             for attr in _result_attributes:
-                _ret[self.DIY_NS]['result'].update({attr: _get_value(obj=result, attr=attr)})
+                _ret[self.DIY_NS]["result"].update({attr: _get_value(obj=result, attr=attr)})
 
-            _result_methods = ['is_changed', 'is_failed', 'is_skipped', 'is_unreachable']
+            _result_methods = ["is_changed", "is_failed", "is_skipped", "is_unreachable"]
 
             for method in _result_methods:
-                _ret[self.DIY_NS]['result'].update({method: _get_value(obj=result, method=method)})
+                _ret[self.DIY_NS]["result"].update({method: _get_value(obj=result, method=method)})
 
-            _ret[self.DIY_NS]['result'].update({'output': getattr(result, '_result', None)})
+            _ret[self.DIY_NS]["result"].update({"output": getattr(result, "_result", None)})
 
             _ret.update(result._result)
 
         if stats:
-            _ret[self.DIY_NS].update({'stats': {}})
-            _stats_attributes = ['changed', 'custom', 'dark', 'failures', 'ignored',
-                                 'ok', 'processed', 'rescued', 'skipped']
+            _ret[self.DIY_NS].update({"stats": {}})
+            _stats_attributes = [
+                "changed",
+                "custom",
+                "dark",
+                "failures",
+                "ignored",
+                "ok",
+                "processed",
+                "rescued",
+                "skipped",
+            ]
 
             for attr in _stats_attributes:
-                _ret[self.DIY_NS]['stats'].update({attr: _get_value(obj=stats, attr=attr)})
+                _ret[self.DIY_NS]["stats"].update({attr: _get_value(obj=stats, attr=attr)})
 
-        _ret[self.DIY_NS].update({'top_level_var_names': list(_ret.keys())})
+        _ret[self.DIY_NS].update({"top_level_var_names": list(_ret.keys())})
 
         return _ret
 
     def v2_on_any(self, *args, **kwargs):
-        self._diy_spec = self._get_output_specification(
-            loader=self._diy_loader,
-            variables=self._diy_spec['vars']
-        )
+        self._diy_spec = self._get_output_specification(loader=self._diy_loader, variables=self._diy_spec["vars"])
 
         if self._using_diy(spec=self._diy_spec):
             self._output(spec=self._diy_spec)
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_on_any(*args, **kwargs)
+                super().v2_on_any(*args, **kwargs)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task,
-                result=result
-            )
+                playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task, result=result
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1046,17 +1153,14 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_failed(result, ignore_errors)
+                super().v2_runner_on_failed(result, ignore_errors)
 
     def v2_runner_on_ok(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task,
-                result=result
-            )
+                playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task, result=result
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1064,17 +1168,14 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_ok(result)
+                super().v2_runner_on_ok(result)
 
     def v2_runner_on_skipped(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task,
-                result=result
-            )
+                playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task, result=result
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1082,17 +1183,14 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_skipped(result)
+                super().v2_runner_on_skipped(result)
 
     def v2_runner_on_unreachable(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task,
-                result=result
-            )
+                playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task, result=result
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1100,7 +1198,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_unreachable(result)
+                super().v2_runner_on_unreachable(result)
 
     # not implemented as the call to this is not implemented yet
     def v2_runner_on_async_poll(self, result):
@@ -1122,8 +1220,8 @@ class CallbackModule(Default):
                 play=self._diy_play,
                 task=self._diy_task,
                 result=result,
-                remove_attr_ref_loop=False
-            )
+                remove_attr_ref_loop=False,
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1131,7 +1229,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_item_on_ok(result)
+                super().v2_runner_item_on_ok(result)
 
     def v2_runner_item_on_failed(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1141,8 +1239,8 @@ class CallbackModule(Default):
                 play=self._diy_play,
                 task=self._diy_task,
                 result=result,
-                remove_attr_ref_loop=False
-            )
+                remove_attr_ref_loop=False,
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1150,7 +1248,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_item_on_failed(result)
+                super().v2_runner_item_on_failed(result)
 
     def v2_runner_item_on_skipped(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1160,8 +1258,8 @@ class CallbackModule(Default):
                 play=self._diy_play,
                 task=self._diy_task,
                 result=result,
-                remove_attr_ref_loop=False
-            )
+                remove_attr_ref_loop=False,
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1169,17 +1267,14 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_item_on_skipped(result)
+                super().v2_runner_item_on_skipped(result)
 
     def v2_runner_retry(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task,
-                result=result
-            )
+                playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task, result=result
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1187,7 +1282,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_retry(result)
+                super().v2_runner_retry(result)
 
     def v2_runner_on_start(self, host, task):
         self._diy_host = host
@@ -1196,11 +1291,8 @@ class CallbackModule(Default):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                host=self._diy_host,
-                task=self._diy_task
-            )
+                playbook=self._diy_playbook, play=self._diy_play, host=self._diy_host, task=self._diy_task
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1208,17 +1300,14 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_runner_on_start(host, task)
+                super().v2_runner_on_start(host, task)
 
     def v2_playbook_on_start(self, playbook):
         self._diy_playbook = playbook
         self._diy_loader = self._diy_playbook.get_loader()
 
         self._diy_spec = self._get_output_specification(
-            loader=self._diy_loader,
-            variables=self._get_vars(
-                playbook=self._diy_playbook
-            )
+            loader=self._diy_loader, variables=self._get_vars(playbook=self._diy_playbook)
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1226,7 +1315,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_start(playbook)
+                super().v2_playbook_on_start(playbook)
 
     def v2_playbook_on_notify(self, handler, host):
         self._diy_handler = handler
@@ -1235,11 +1324,8 @@ class CallbackModule(Default):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                host=self._diy_host,
-                handler=self._diy_handler
-            )
+                playbook=self._diy_playbook, play=self._diy_play, host=self._diy_host, handler=self._diy_handler
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1247,44 +1333,34 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_notify(handler, host)
+                super().v2_playbook_on_notify(handler, host)
 
     def v2_playbook_on_no_hosts_matched(self):
-        self._diy_spec = self._get_output_specification(
-            loader=self._diy_loader,
-            variables=self._diy_spec['vars']
-        )
+        self._diy_spec = self._get_output_specification(loader=self._diy_loader, variables=self._diy_spec["vars"])
 
         if self._using_diy(spec=self._diy_spec):
             self._output(spec=self._diy_spec)
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_no_hosts_matched()
+                super().v2_playbook_on_no_hosts_matched()
 
     def v2_playbook_on_no_hosts_remaining(self):
-        self._diy_spec = self._get_output_specification(
-            loader=self._diy_loader,
-            variables=self._diy_spec['vars']
-        )
+        self._diy_spec = self._get_output_specification(loader=self._diy_loader, variables=self._diy_spec["vars"])
 
         if self._using_diy(spec=self._diy_spec):
             self._output(spec=self._diy_spec)
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_no_hosts_remaining()
+                super().v2_playbook_on_no_hosts_remaining()
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._diy_task = task
 
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
-            variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task
-            )
+            variables=self._get_vars(playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1292,7 +1368,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_task_start(task, is_conditional)
+                super().v2_playbook_on_task_start(task, is_conditional)
 
     # not implemented as the call to this is not implemented yet
     def v2_playbook_on_cleanup_task_start(self, task):
@@ -1303,11 +1379,7 @@ class CallbackModule(Default):
 
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
-            variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task
-            )
+            variables=self._get_vars(playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1315,25 +1387,29 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_handler_task_start(task)
+                super().v2_playbook_on_handler_task_start(task)
 
-    def v2_playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None,
-                                   confirm=False, salt_size=None, salt=None, default=None,
-                                   unsafe=None):
-        self._diy_spec = self._get_output_specification(
-            loader=self._diy_loader,
-            variables=self._diy_spec['vars']
-        )
+    def v2_playbook_on_vars_prompt(
+        self,
+        varname,
+        private=True,
+        prompt=None,
+        encrypt=None,
+        confirm=False,
+        salt_size=None,
+        salt=None,
+        default=None,
+        unsafe=None,
+    ):
+        self._diy_spec = self._get_output_specification(loader=self._diy_loader, variables=self._diy_spec["vars"])
 
         if self._using_diy(spec=self._diy_spec):
             self._output(spec=self._diy_spec)
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_vars_prompt(
-                    varname, private, prompt, encrypt,
-                    confirm, salt_size, salt, default,
-                    unsafe
+                super().v2_playbook_on_vars_prompt(
+                    varname, private, prompt, encrypt, confirm, salt_size, salt, default, unsafe
                 )
 
     # not implemented as the call to this is not implemented yet
@@ -1348,11 +1424,7 @@ class CallbackModule(Default):
         self._diy_play = play
 
         self._diy_spec = self._get_output_specification(
-            loader=self._diy_loader,
-            variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play
-            )
+            loader=self._diy_loader, variables=self._get_vars(playbook=self._diy_playbook, play=self._diy_play)
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1360,18 +1432,14 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_play_start(play)
+                super().v2_playbook_on_play_start(play)
 
     def v2_playbook_on_stats(self, stats):
         self._diy_stats = stats
 
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
-            variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                stats=self._diy_stats
-            )
+            variables=self._get_vars(playbook=self._diy_playbook, play=self._diy_play, stats=self._diy_stats),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1379,7 +1447,7 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_stats(stats)
+                super().v2_playbook_on_stats(stats)
 
     def v2_playbook_on_include(self, included_file):
         self._diy_included_file = included_file
@@ -1390,8 +1458,8 @@ class CallbackModule(Default):
                 playbook=self._diy_playbook,
                 play=self._diy_play,
                 task=self._diy_included_file._task,
-                included_file=self._diy_included_file
-            )
+                included_file=self._diy_included_file,
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1399,17 +1467,14 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_include(included_file)
+                super().v2_playbook_on_include(included_file)
 
     def v2_on_file_diff(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._get_vars(
-                playbook=self._diy_playbook,
-                play=self._diy_play,
-                task=self._diy_task,
-                result=result
-            )
+                playbook=self._diy_playbook, play=self._diy_play, task=self._diy_task, result=result
+            ),
         )
 
         if self._using_diy(spec=self._diy_spec):
@@ -1417,4 +1482,4 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_on_file_diff(result)
+                super().v2_on_file_diff(result)

@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016-2017 Hewlett Packard Enterprise Development LP
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: oneview_fcoe_network_info
@@ -85,19 +83,18 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class FcoeNetworkInfoModule(OneViewModuleBase):
     def __init__(self):
         argument_spec = dict(
-            name=dict(type='str'),
-            params=dict(type='dict'),
+            name=dict(type="str"),
+            params=dict(type="dict"),
         )
 
-        super(FcoeNetworkInfoModule, self).__init__(
+        super().__init__(
             additional_arg_spec=argument_spec,
             supports_check_mode=True,
         )
 
     def execute_module(self):
-
-        if self.module.params['name']:
-            fcoe_networks = self.oneview_client.fcoe_networks.get_by('name', self.module.params['name'])
+        if self.module.params["name"]:
+            fcoe_networks = self.oneview_client.fcoe_networks.get_by("name", self.module.params["name"])
         else:
             fcoe_networks = self.oneview_client.fcoe_networks.get_all(**self.facts_params)
 
@@ -108,5 +105,5 @@ def main():
     FcoeNetworkInfoModule().run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

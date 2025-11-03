@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2024, Florian Apolloner (@apollo13)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: consul_token
@@ -238,7 +236,7 @@ class ConsulTokenModule(_ConsulModule):
         # if `accessor_id` is not supplied we can only create objects and are not idempotent
         if not self.id_from_obj(self.params):
             return None
-        return super(ConsulTokenModule, self).read_object()
+        return super().read_object()
 
     def needs_update(self, api_obj, module_obj):
         # SecretID is usually not supplied
@@ -250,7 +248,7 @@ class ConsulTokenModule(_ConsulModule):
         # it writes to ExpirationTime, so we need to remove that as well
         if "ExpirationTTL" in module_obj:
             del module_obj["ExpirationTTL"]
-        return super(ConsulTokenModule, self).needs_update(api_obj, module_obj)
+        return super().needs_update(api_obj, module_obj)
 
 
 NAME_ID_SPEC = dict(

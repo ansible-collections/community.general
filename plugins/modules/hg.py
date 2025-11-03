@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Yeukhon Wong <yeukhon@acm.org>
 # Copyright (c) 2014, Nate Coraor <nate@bx.psu.edu>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: hg
@@ -95,7 +93,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
-class Hg(object):
+class Hg:
     def __init__(self, module, dest, repo, revision, hg_path):
         self.module = module
         self.dest = dest
@@ -108,7 +106,7 @@ class Hg(object):
         return (rc, out, err)
 
     def _list_untracked(self):
-        args = ['purge', '--config', 'extensions.purge=', '-R', self.dest, '--print']
+        args = ["purge", "--config", "extensions.purge=", "-R", self.dest, "--print"]
         return self._command(args)
 
     def get_revision(self):
@@ -121,22 +119,22 @@ class Hg(object):
 
         Read the full description via hg id --help
         """
-        (rc, out, err) = self._command(['id', '-b', '-i', '-t', '-R', self.dest])
+        (rc, out, err) = self._command(["id", "-b", "-i", "-t", "-R", self.dest])
         if rc != 0:
             self.module.fail_json(msg=err)
         else:
-            return to_native(out).strip('\n')
+            return to_native(out).strip("\n")
 
     def get_remote_revision(self):
-        (rc, out, err) = self._command(['id', self.repo])
+        (rc, out, err) = self._command(["id", self.repo])
         if rc != 0:
             self.module.fail_json(msg=err)
         else:
-            return to_native(out).strip('\n')
+            return to_native(out).strip("\n")
 
     def has_local_mods(self):
         now = self.get_revision()
-        if '+' in now:
+        if "+" in now:
             return True
         else:
             return False
@@ -146,7 +144,7 @@ class Hg(object):
         if not before:
             return False
 
-        args = ['update', '-C', '-R', self.dest, '-r', '.']
+        args = ["update", "-C", "-R", self.dest, "-r", "."]
         (rc, out, err) = self._command(args)
         if rc != 0:
             self.module.fail_json(msg=err)
@@ -162,8 +160,8 @@ class Hg(object):
             self.module.fail_json(msg=err1)
 
         # there are some untrackd files
-        if out1 != '':
-            args = ['purge', '--config', 'extensions.purge=', '-R', self.dest]
+        if out1 != "":
+            args = ["purge", "--config", "extensions.purge=", "-R", self.dest]
             (rc2, out2, err2) = self._command(args)
             if rc2 != 0:
                 self.module.fail_json(msg=err2)
@@ -185,18 +183,17 @@ class Hg(object):
             return False
 
     def pull(self):
-        return self._command(
-            ['pull', '-R', self.dest, self.repo])
+        return self._command(["pull", "-R", self.dest, self.repo])
 
     def update(self):
         if self.revision is not None:
-            return self._command(['update', '-r', self.revision, '-R', self.dest])
-        return self._command(['update', '-R', self.dest])
+            return self._command(["update", "-r", self.revision, "-R", self.dest])
+        return self._command(["update", "-R", self.dest])
 
     def clone(self):
         if self.revision is not None:
-            return self._command(['clone', self.repo, self.dest, '-r', self.revision])
-        return self._command(['clone', self.repo, self.dest])
+            return self._command(["clone", self.repo, self.dest, "-r", self.revision])
+        return self._command(["clone", self.repo, self.dest])
 
     @property
     def at_revision(self):
@@ -207,7 +204,7 @@ class Hg(object):
         if self.revision is None or len(self.revision) < 7:
             # Assume it is a rev number, tag, or branch
             return False
-        (rc, out, err) = self._command(['--debug', 'id', '-i', '-R', self.dest])
+        (rc, out, err) = self._command(["--debug", "id", "-i", "-R", self.dest])
         if rc != 0:
             self.module.fail_json(msg=err)
         if out.startswith(self.revision):
@@ -217,32 +214,33 @@ class Hg(object):
 
 # ===========================================
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            repo=dict(type='str', required=True, aliases=['name']),
-            dest=dict(type='path'),
-            revision=dict(type='str', aliases=['version']),
-            force=dict(type='bool', default=False),
-            purge=dict(type='bool', default=False),
-            update=dict(type='bool', default=True),
-            clone=dict(type='bool', default=True),
-            executable=dict(type='str'),
+            repo=dict(type="str", required=True, aliases=["name"]),
+            dest=dict(type="path"),
+            revision=dict(type="str", aliases=["version"]),
+            force=dict(type="bool", default=False),
+            purge=dict(type="bool", default=False),
+            update=dict(type="bool", default=True),
+            clone=dict(type="bool", default=True),
+            executable=dict(type="str"),
         ),
     )
-    repo = module.params['repo']
-    dest = module.params['dest']
-    revision = module.params['revision']
-    force = module.params['force']
-    purge = module.params['purge']
-    update = module.params['update']
-    clone = module.params['clone']
-    hg_path = module.params['executable'] or module.get_bin_path('hg', True)
+    repo = module.params["repo"]
+    dest = module.params["dest"]
+    revision = module.params["revision"]
+    force = module.params["force"]
+    purge = module.params["purge"]
+    update = module.params["update"]
+    clone = module.params["clone"]
+    hg_path = module.params["executable"] or module.get_bin_path("hg", True)
     if dest is not None:
-        hgrc = os.path.join(dest, '.hg/hgrc')
+        hgrc = os.path.join(dest, ".hg/hgrc")
 
     # initial states
-    before = ''
+    before = ""
     changed = False
     cleaned = False
 
@@ -294,5 +292,5 @@ def main():
     module.exit_json(before=before, after=after, changed=changed, cleaned=cleaned)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

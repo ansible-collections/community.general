@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2012, Boyd Adamson <boyd () boydadamson.com>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -116,9 +114,9 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def package_installed(module, name, category):
-    cmd = [module.get_bin_path('pkginfo', True), '-q']
+    cmd = [module.get_bin_path("pkginfo", True), "-q"]
     if category:
-        cmd.append('-c')
+        cmd.append("-c")
     cmd.append(name)
     rc, out, err = module.run_command(cmd)
     if rc == 0:
@@ -128,8 +126,8 @@ def package_installed(module, name, category):
 
 
 def create_admin_file():
-    (desc, filename) = tempfile.mkstemp(prefix='ansible_svr4pkg', text=True)
-    fullauto = b'''
+    (desc, filename) = tempfile.mkstemp(prefix="ansible_svr4pkg", text=True)
+    fullauto = b"""
 mail=
 instance=unique
 partial=nocheck
@@ -146,7 +144,7 @@ authentication=quit
 keystore=/var/sadm/security
 proxy=
 basedir=default
-'''
+"""
     os.write(desc, fullauto)
     os.close(desc)
     return filename
@@ -160,16 +158,16 @@ def run_command(module, cmd):
 
 def package_install(module, name, src, proxy, response_file, zone, category):
     adminfile = create_admin_file()
-    cmd = ['pkgadd', '-n']
-    if zone == 'current':
-        cmd += ['-G']
-    cmd += ['-a', adminfile, '-d', src]
+    cmd = ["pkgadd", "-n"]
+    if zone == "current":
+        cmd += ["-G"]
+    cmd += ["-a", adminfile, "-d", src]
     if proxy is not None:
-        cmd += ['-x', proxy]
+        cmd += ["-x", proxy]
     if response_file is not None:
-        cmd += ['-r', response_file]
+        cmd += ["-r", response_file]
     if category:
-        cmd += ['-Y']
+        cmd += ["-Y"]
     cmd.append(name)
     (rc, out, err) = run_command(module, cmd)
     os.unlink(adminfile)
@@ -179,9 +177,9 @@ def package_install(module, name, src, proxy, response_file, zone, category):
 def package_uninstall(module, name, src, category):
     adminfile = create_admin_file()
     if category:
-        cmd = ['pkgrm', '-na', adminfile, '-Y', name]
+        cmd = ["pkgrm", "-na", adminfile, "-Y", name]
     else:
-        cmd = ['pkgrm', '-na', adminfile, name]
+        cmd = ["pkgrm", "-na", adminfile, name]
     (rc, out, err) = run_command(module, cmd)
     os.unlink(adminfile)
     return (rc, out, err)
@@ -191,33 +189,32 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(required=True, choices=['present', 'absent']),
+            state=dict(required=True, choices=["present", "absent"]),
             src=dict(),
             proxy=dict(),
             response_file=dict(),
-            zone=dict(default='all', choices=['current', 'all']),
-            category=dict(default=False, type='bool')
+            zone=dict(default="all", choices=["current", "all"]),
+            category=dict(default=False, type="bool"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
-    state = module.params['state']
-    name = module.params['name']
-    src = module.params['src']
-    proxy = module.params['proxy']
-    response_file = module.params['response_file']
-    zone = module.params['zone']
-    category = module.params['category']
+    state = module.params["state"]
+    name = module.params["name"]
+    src = module.params["src"]
+    proxy = module.params["proxy"]
+    response_file = module.params["response_file"]
+    zone = module.params["zone"]
+    category = module.params["category"]
     rc = None
-    out = ''
-    err = ''
+    out = ""
+    err = ""
     result = {}
-    result['name'] = name
-    result['state'] = state
+    result["name"] = name
+    result["state"] = state
 
-    if state == 'present':
+    if state == "present":
         if src is None:
-            module.fail_json(name=name,
-                             msg="src is required when state=present")
+            module.fail_json(name=name, msg="src is required when state=present")
         if not package_installed(module, name, category):
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -225,9 +222,9 @@ def main():
             # Stdout is normally empty but for some packages can be
             # very long and is not often useful
             if len(out) > 75:
-                out = out[:75] + '...'
+                out = f"{out[:75]}..."
 
-    elif state == 'absent':
+    elif state == "absent":
         if package_installed(module, name, category):
             if module.check_mode:
                 module.exit_json(changed=True)
@@ -245,26 +242,26 @@ def main():
     #   20 Reboot after installation of this package.
     #   99 (observed) pkgadd: ERROR: could not process datastream from </tmp/pkgutil.pkg>
     if rc in (0, 2, 3, 10, 20):
-        result['changed'] = True
+        result["changed"] = True
     # no install nor uninstall, or failed
     else:
-        result['changed'] = False
+        result["changed"] = False
 
     # rc will be none when the package already was installed and no action took place
     # Only return failed=False when the returncode is known to be good as there may be more
     # undocumented failure return codes
     if rc not in (None, 0, 2, 10, 20):
-        result['failed'] = True
+        result["failed"] = True
     else:
-        result['failed'] = False
+        result["failed"] = False
 
     if out:
-        result['stdout'] = out
+        result["stdout"] = out
     if err:
-        result['stderr'] = err
+        result["stderr"] = err
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016 Dimension Data
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -7,8 +6,7 @@
 # Authors:
 #   - Adam Friedman  <tintoy@tintoy.io>
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: dimensiondata_vlan
@@ -20,6 +18,10 @@ extends_documentation_fragment:
 
 description:
   - Manage VLANs in Cloud Control network domains.
+deprecated:
+  removed_in: 13.0.0
+  why: Service and its endpoints are no longer available.
+  alternative: There is none.
 author: 'Adam Friedman (@tintoy)'
 attributes:
   check_mode:
@@ -155,7 +157,10 @@ vlan:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.dimensiondata import DimensionDataModule, UnknownNetworkError
+from ansible_collections.community.general.plugins.module_utils.dimensiondata import (
+    DimensionDataModule,
+    UnknownNetworkError,
+)
 
 try:
     from libcloud.common.dimensiondata import DimensionDataVlan, DimensionDataAPIException
@@ -178,33 +183,31 @@ class DimensionDataVlanModule(DimensionDataModule):
         Create a new Dimension Data VLAN module.
         """
 
-        super(DimensionDataVlanModule, self).__init__(
+        super().__init__(
             module=AnsibleModule(
                 argument_spec=DimensionDataModule.argument_spec_with_wait(
-                    name=dict(required=True, type='str'),
-                    description=dict(default='', type='str'),
-                    network_domain=dict(required=True, type='str'),
-                    private_ipv4_base_address=dict(default='', type='str'),
-                    private_ipv4_prefix_size=dict(default=0, type='int'),
-                    allow_expand=dict(default=False, type='bool'),
-                    state=dict(default='present', choices=['present', 'absent', 'readonly'])
+                    name=dict(required=True, type="str"),
+                    description=dict(default="", type="str"),
+                    network_domain=dict(required=True, type="str"),
+                    private_ipv4_base_address=dict(default="", type="str"),
+                    private_ipv4_prefix_size=dict(default=0, type="int"),
+                    allow_expand=dict(default=False, type="bool"),
+                    state=dict(default="present", choices=["present", "absent", "readonly"]),
                 ),
-                required_together=DimensionDataModule.required_together()
+                required_together=DimensionDataModule.required_together(),
             )
         )
 
-        self.name = self.module.params['name']
-        self.description = self.module.params['description']
-        self.network_domain_selector = self.module.params['network_domain']
-        self.private_ipv4_base_address = self.module.params['private_ipv4_base_address']
-        self.private_ipv4_prefix_size = self.module.params['private_ipv4_prefix_size']
-        self.state = self.module.params['state']
-        self.allow_expand = self.module.params['allow_expand']
+        self.name = self.module.params["name"]
+        self.description = self.module.params["description"]
+        self.network_domain_selector = self.module.params["network_domain"]
+        self.private_ipv4_base_address = self.module.params["private_ipv4_base_address"]
+        self.private_ipv4_prefix_size = self.module.params["private_ipv4_prefix_size"]
+        self.state = self.module.params["state"]
+        self.allow_expand = self.module.params["allow_expand"]
 
-        if self.wait and self.state != 'present':
-            self.module.fail_json(
-                msg='The wait parameter is only supported when state is "present".'
-            )
+        if self.wait and self.state != "present":
+            self.module.fail_json(msg='The wait parameter is only supported when state is "present".')
 
     def state_present(self):
         """
@@ -217,29 +220,23 @@ class DimensionDataVlanModule(DimensionDataModule):
         if not vlan:
             if self.module.check_mode:
                 self.module.exit_json(
-                    msg='VLAN "{0}" is absent from network domain "{1}" (should be present).'.format(
-                        self.name, self.network_domain_selector
-                    ),
-                    changed=True
+                    msg=f'VLAN "{self.name}" is absent from network domain "{self.network_domain_selector}" (should be present).',
+                    changed=True,
                 )
 
             vlan = self._create_vlan(network_domain)
             self.module.exit_json(
-                msg='Created VLAN "{0}" in network domain "{1}".'.format(
-                    self.name, self.network_domain_selector
-                ),
+                msg=f'Created VLAN "{self.name}" in network domain "{self.network_domain_selector}".',
                 vlan=vlan_to_dict(vlan),
-                changed=True
+                changed=True,
             )
         else:
             diff = VlanDiff(vlan, self.module.params)
             if not diff.has_changes():
                 self.module.exit_json(
-                    msg='VLAN "{0}" is present in network domain "{1}" (no changes detected).'.format(
-                        self.name, self.network_domain_selector
-                    ),
+                    msg=f'VLAN "{self.name}" is present in network domain "{self.network_domain_selector}" (no changes detected).',
                     vlan=vlan_to_dict(vlan),
-                    changed=False
+                    changed=False,
                 )
 
                 return
@@ -248,27 +245,21 @@ class DimensionDataVlanModule(DimensionDataModule):
                 diff.ensure_legal_change()
             except InvalidVlanChangeError as invalid_vlan_change:
                 self.module.fail_json(
-                    msg='Unable to update VLAN "{0}" in network domain "{1}": {2}'.format(
-                        self.name, self.network_domain_selector, invalid_vlan_change
-                    )
+                    msg=f'Unable to update VLAN "{self.name}" in network domain "{self.network_domain_selector}": {invalid_vlan_change}'
                 )
 
             if diff.needs_expand() and not self.allow_expand:
                 self.module.fail_json(
-                    msg='The configured private IPv4 network size ({0}-bit prefix) for '.format(
-                        self.private_ipv4_prefix_size
-                    ) + 'the VLAN differs from its current network size ({0}-bit prefix) '.format(
-                        vlan.private_ipv4_range_size
-                    ) + 'and needs to be expanded. Use allow_expand=true if this is what you want.'
+                    msg=f"The configured private IPv4 network size ({self.private_ipv4_prefix_size}-bit prefix) for "
+                    f"the VLAN differs from its current network size ({vlan.private_ipv4_range_size}-bit prefix) "
+                    "and needs to be expanded. Use allow_expand=true if this is what you want."
                 )
 
             if self.module.check_mode:
                 self.module.exit_json(
-                    msg='VLAN "{0}" is present in network domain "{1}" (changes detected).'.format(
-                        self.name, self.network_domain_selector
-                    ),
+                    msg=f'VLAN "{self.name}" is present in network domain "{self.network_domain_selector}" (changes detected).',
                     vlan=vlan_to_dict(vlan),
-                    changed=True
+                    changed=True,
                 )
 
             if diff.needs_edit():
@@ -282,11 +273,9 @@ class DimensionDataVlanModule(DimensionDataModule):
                 self.driver.ex_expand_vlan(vlan)
 
             self.module.exit_json(
-                msg='Updated VLAN "{0}" in network domain "{1}".'.format(
-                    self.name, self.network_domain_selector
-                ),
+                msg=f'Updated VLAN "{self.name}" in network domain "{self.network_domain_selector}".',
                 vlan=vlan_to_dict(vlan),
-                changed=True
+                changed=True,
             )
 
     def state_readonly(self):
@@ -298,15 +287,10 @@ class DimensionDataVlanModule(DimensionDataModule):
 
         vlan = self._get_vlan(network_domain)
         if vlan:
-            self.module.exit_json(
-                vlan=vlan_to_dict(vlan),
-                changed=False
-            )
+            self.module.exit_json(vlan=vlan_to_dict(vlan), changed=False)
         else:
             self.module.fail_json(
-                msg='VLAN "{0}" does not exist in network domain "{1}".'.format(
-                    self.name, self.network_domain_selector
-                )
+                msg=f'VLAN "{self.name}" does not exist in network domain "{self.network_domain_selector}".'
             )
 
     def state_absent(self):
@@ -319,30 +303,22 @@ class DimensionDataVlanModule(DimensionDataModule):
         vlan = self._get_vlan(network_domain)
         if not vlan:
             self.module.exit_json(
-                msg='VLAN "{0}" is absent from network domain "{1}".'.format(
-                    self.name, self.network_domain_selector
-                ),
-                changed=False
+                msg=f'VLAN "{self.name}" is absent from network domain "{self.network_domain_selector}".', changed=False
             )
 
             return
 
         if self.module.check_mode:
             self.module.exit_json(
-                msg='VLAN "{0}" is present in network domain "{1}" (should be absent).'.format(
-                    self.name, self.network_domain_selector
-                ),
+                msg=f'VLAN "{self.name}" is present in network domain "{self.network_domain_selector}" (should be absent).',
                 vlan=vlan_to_dict(vlan),
-                changed=True
+                changed=True,
             )
 
         self._delete_vlan(vlan)
 
         self.module.exit_json(
-            msg='Deleted VLAN "{0}" from network domain "{1}".'.format(
-                self.name, self.network_domain_selector
-            ),
-            changed=True
+            msg=f'Deleted VLAN "{self.name}" from network domain "{self.network_domain_selector}".', changed=True
         )
 
     def _get_vlan(self, network_domain):
@@ -354,10 +330,7 @@ class DimensionDataVlanModule(DimensionDataModule):
         :rtype: DimensionDataVlan
         """
 
-        vlans = self.driver.ex_list_vlans(
-            location=self.location,
-            network_domain=network_domain
-        )
+        vlans = self.driver.ex_list_vlans(location=self.location, network_domain=network_domain)
         matching_vlans = [vlan for vlan in vlans if vlan.name == self.name]
         if matching_vlans:
             return matching_vlans[0]
@@ -366,15 +339,11 @@ class DimensionDataVlanModule(DimensionDataModule):
 
     def _create_vlan(self, network_domain):
         vlan = self.driver.ex_create_vlan(
-            network_domain,
-            self.name,
-            self.private_ipv4_base_address,
-            self.description,
-            self.private_ipv4_prefix_size
+            network_domain, self.name, self.private_ipv4_base_address, self.description, self.private_ipv4_prefix_size
         )
 
         if self.wait:
-            vlan = self._wait_for_vlan_state(vlan.id, 'NORMAL')
+            vlan = self._wait_for_vlan_state(vlan.id, "NORMAL")
 
         return vlan
 
@@ -384,49 +353,43 @@ class DimensionDataVlanModule(DimensionDataModule):
 
             # Not currently supported for deletes due to a bug in libcloud (module will error out if "wait" is specified when "state" is not "present").
             if self.wait:
-                self._wait_for_vlan_state(vlan, 'NOT_FOUND')
+                self._wait_for_vlan_state(vlan, "NOT_FOUND")
 
         except DimensionDataAPIException as api_exception:
             self.module.fail_json(
-                msg='Failed to delete VLAN "{0}" due to unexpected error from the CloudControl API: {1}'.format(
-                    vlan.id, api_exception.msg
-                )
+                msg=f'Failed to delete VLAN "{vlan.id}" due to unexpected error from the CloudControl API: {api_exception.msg}'
             )
 
     def _wait_for_vlan_state(self, vlan, state_to_wait_for):
         network_domain = self._get_network_domain()
 
-        wait_poll_interval = self.module.params['wait_poll_interval']
-        wait_time = self.module.params['wait_time']
+        wait_poll_interval = self.module.params["wait_poll_interval"]
+        wait_time = self.module.params["wait_time"]
 
         # Bizarre bug in libcloud when checking status after delete; socket.error is too generic to catch in this context so for now we don't even try.
 
         try:
             return self.driver.connection.wait_for_state(
-                state_to_wait_for,
-                self.driver.ex_get_vlan,
-                wait_poll_interval,
-                wait_time,
-                vlan
+                state_to_wait_for, self.driver.ex_get_vlan, wait_poll_interval, wait_time, vlan
             )
 
         except DimensionDataAPIException as api_exception:
-            if api_exception.code != 'RESOURCE_NOT_FOUND':
+            if api_exception.code != "RESOURCE_NOT_FOUND":
                 raise
 
             return DimensionDataVlan(
                 id=vlan.id,
-                status='NOT_FOUND',
-                name='',
-                description='',
-                private_ipv4_range_address='',
+                status="NOT_FOUND",
+                name="",
+                description="",
+                private_ipv4_range_address="",
                 private_ipv4_range_size=0,
-                ipv4_gateway='',
-                ipv6_range_address='',
+                ipv4_gateway="",
+                ipv6_range_address="",
                 ipv6_range_size=0,
-                ipv6_gateway='',
+                ipv6_gateway="",
                 location=self.location,
-                network_domain=network_domain
+                network_domain=network_domain,
             )
 
     def _get_network_domain(self):
@@ -437,14 +400,10 @@ class DimensionDataVlanModule(DimensionDataModule):
         """
 
         try:
-            return self.get_network_domain(
-                self.network_domain_selector, self.location
-            )
+            return self.get_network_domain(self.network_domain_selector, self.location)
         except UnknownNetworkError:
             self.module.fail_json(
-                msg='Cannot find network domain "{0}" in datacenter "{1}".'.format(
-                    self.network_domain_selector, self.location
-                )
+                msg=f'Cannot find network domain "{self.network_domain_selector}" in datacenter "{self.location}".'
             )
 
             return None
@@ -458,7 +417,7 @@ class InvalidVlanChangeError(Exception):
     pass
 
 
-class VlanDiff(object):
+class VlanDiff:
     """
     Represents differences between VLAN information (from CloudControl) and module parameters.
     """
@@ -475,13 +434,17 @@ class VlanDiff(object):
         self.vlan = vlan
         self.module_params = module_params
 
-        self.name_changed = module_params['name'] != vlan.name
-        self.description_changed = module_params['description'] != vlan.description
-        self.private_ipv4_base_address_changed = module_params['private_ipv4_base_address'] != vlan.private_ipv4_range_address
-        self.private_ipv4_prefix_size_changed = module_params['private_ipv4_prefix_size'] != vlan.private_ipv4_range_size
+        self.name_changed = module_params["name"] != vlan.name
+        self.description_changed = module_params["description"] != vlan.description
+        self.private_ipv4_base_address_changed = (
+            module_params["private_ipv4_base_address"] != vlan.private_ipv4_range_address
+        )
+        self.private_ipv4_prefix_size_changed = (
+            module_params["private_ipv4_prefix_size"] != vlan.private_ipv4_range_size
+        )
 
         # Is configured prefix size greater than or less than the actual prefix size?
-        private_ipv4_prefix_size_difference = module_params['private_ipv4_prefix_size'] - vlan.private_ipv4_range_size
+        private_ipv4_prefix_size_difference = module_params["private_ipv4_prefix_size"] - vlan.private_ipv4_range_size
         self.private_ipv4_prefix_size_increased = private_ipv4_prefix_size_difference > 0
         self.private_ipv4_prefix_size_decreased = private_ipv4_prefix_size_difference < 0
 
@@ -506,11 +469,13 @@ class VlanDiff(object):
 
         # Cannot change base address for private IPv4 network.
         if self.private_ipv4_base_address_changed:
-            raise InvalidVlanChangeError('Cannot change the private IPV4 base address for an existing VLAN.')
+            raise InvalidVlanChangeError("Cannot change the private IPV4 base address for an existing VLAN.")
 
         # Cannot shrink private IPv4 network (by increasing prefix size).
         if self.private_ipv4_prefix_size_increased:
-            raise InvalidVlanChangeError('Cannot shrink the private IPV4 network for an existing VLAN (only expand is supported).')
+            raise InvalidVlanChangeError(
+                "Cannot shrink the private IPV4 network for an existing VLAN (only expand is supported)."
+            )
 
     def needs_edit(self):
         """
@@ -535,30 +500,30 @@ class VlanDiff(object):
 
 def vlan_to_dict(vlan):
     return {
-        'id': vlan.id,
-        'name': vlan.name,
-        'description': vlan.description,
-        'location': vlan.location.id,
-        'private_ipv4_base_address': vlan.private_ipv4_range_address,
-        'private_ipv4_prefix_size': vlan.private_ipv4_range_size,
-        'private_ipv4_gateway_address': vlan.ipv4_gateway,
-        'ipv6_base_address': vlan.ipv6_range_address,
-        'ipv6_prefix_size': vlan.ipv6_range_size,
-        'ipv6_gateway_address': vlan.ipv6_gateway,
-        'status': vlan.status
+        "id": vlan.id,
+        "name": vlan.name,
+        "description": vlan.description,
+        "location": vlan.location.id,
+        "private_ipv4_base_address": vlan.private_ipv4_range_address,
+        "private_ipv4_prefix_size": vlan.private_ipv4_range_size,
+        "private_ipv4_gateway_address": vlan.ipv4_gateway,
+        "ipv6_base_address": vlan.ipv6_range_address,
+        "ipv6_prefix_size": vlan.ipv6_range_size,
+        "ipv6_gateway_address": vlan.ipv6_gateway,
+        "status": vlan.status,
     }
 
 
 def main():
     module = DimensionDataVlanModule()
 
-    if module.state == 'present':
+    if module.state == "present":
         module.state_present()
-    elif module.state == 'readonly':
+    elif module.state == "readonly":
         module.state_readonly()
-    elif module.state == 'absent':
+    elif module.state == "absent":
         module.state_absent()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

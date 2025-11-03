@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Peter Sagerson <psagers@ignorare.net>
 # Copyright (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
@@ -7,8 +6,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -135,7 +133,11 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes
-from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
+from ansible_collections.community.general.plugins.module_utils.ldap import (
+    LdapGeneric,
+    gen_specs,
+    ldap_required_together,
+)
 
 LDAP_IMP_ERR = None
 try:
@@ -153,22 +155,21 @@ class LdapEntry(LdapGeneric):
         LdapGeneric.__init__(self, module)
 
         # Shortcuts
-        self.state = self.module.params['state']
-        self.recursive = self.module.params['recursive']
+        self.state = self.module.params["state"]
+        self.recursive = self.module.params["recursive"]
 
         # Add the objectClass into the list of attributes
-        self.module.params['attributes']['objectClass'] = (
-            self.module.params['objectClass'])
+        self.module.params["attributes"]["objectClass"] = self.module.params["objectClass"]
 
         # Load attributes
-        if self.state == 'present':
+        if self.state == "present":
             self.attrs = self._load_attrs()
 
     def _load_attrs(self):
-        """ Turn attribute's value to array. """
+        """Turn attribute's value to array."""
         attrs = {}
 
-        for name, value in self.module.params['attributes'].items():
+        for name, value in self.module.params["attributes"].items():
             if isinstance(value, list):
                 attrs[name] = list(map(to_bytes, value))
             else:
@@ -177,7 +178,8 @@ class LdapEntry(LdapGeneric):
         return attrs
 
     def add(self):
-        """ If self.dn does not exist, returns a callable that will add it. """
+        """If self.dn does not exist, returns a callable that will add it."""
+
         def _add():
             self.connection.add_s(self.dn, modlist)
 
@@ -190,20 +192,21 @@ class LdapEntry(LdapGeneric):
         return action
 
     def delete(self):
-        """ If self.dn exists, returns a callable that will delete either
+        """If self.dn exists, returns a callable that will delete either
         the item itself if the recursive option is not set or the whole branch
-        if it is. """
+        if it is."""
+
         def _delete():
             self.connection.delete_s(self.dn)
 
         def _delete_recursive():
-            """ Attempt recursive deletion using the subtree-delete control.
-            If that fails, do it manually. """
+            """Attempt recursive deletion using the subtree-delete control.
+            If that fails, do it manually."""
             try:
-                subtree_delete = ldap.controls.ValueLessRequestControl('1.2.840.113556.1.4.805')
+                subtree_delete = ldap.controls.ValueLessRequestControl("1.2.840.113556.1.4.805")
                 self.connection.delete_ext_s(self.dn, serverctrls=[subtree_delete])
             except ldap.NOT_ALLOWED_ON_NONLEAF:
-                search = self.connection.search_s(self.dn, ldap.SCOPE_SUBTREE, attrlist=('dn',))
+                search = self.connection.search_s(self.dn, ldap.SCOPE_SUBTREE, attrlist=("dn",))
                 search.reverse()
                 for entry in search:
                     self.connection.delete_s(entry[0])
@@ -232,29 +235,28 @@ class LdapEntry(LdapGeneric):
 def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
-            attributes=dict(default={}, type='dict'),
-            objectClass=dict(type='list', elements='str'),
-            state=dict(default='present', choices=['present', 'absent']),
-            recursive=dict(default=False, type='bool'),
+            attributes=dict(default={}, type="dict"),
+            objectClass=dict(type="list", elements="str"),
+            state=dict(default="present", choices=["present", "absent"]),
+            recursive=dict(default=False, type="bool"),
         ),
-        required_if=[('state', 'present', ['objectClass'])],
+        required_if=[("state", "present", ["objectClass"])],
         supports_check_mode=True,
         required_together=ldap_required_together(),
     )
 
     if not HAS_LDAP:
-        module.fail_json(msg=missing_required_lib('python-ldap'),
-                         exception=LDAP_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("python-ldap"), exception=LDAP_IMP_ERR)
 
-    state = module.params['state']
+    state = module.params["state"]
 
     # Instantiate the LdapEntry object
     ldap = LdapEntry(module)
 
     # Get the action function
-    if state == 'present':
+    if state == "present":
         action = ldap.add()
-    elif state == 'absent':
+    elif state == "absent":
         action = ldap.delete()
 
     # Perform the action
@@ -267,5 +269,5 @@ def main():
     module.exit_json(changed=(action is not None))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Jimmy Tang <jcftang@gmail.com>
 # Based on okpg (Patrick Pelletier <pp.pelletier@gmail.com>), pacman
@@ -8,8 +7,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -109,15 +107,15 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def selfupdate(module, port_path):
-    """ Update Macports and the ports tree. """
+    """Update Macports and the ports tree."""
 
     rc, out, err = module.run_command([port_path, "-v", "selfupdate"])
 
     if rc == 0:
         updated = any(
-            re.search(r'Total number of ports parsed:\s+[^0]', s.strip()) or
-            re.search(r'Installing new Macports release', s.strip())
-            for s in out.split('\n')
+            re.search(r"Total number of ports parsed:\s+[^0]", s.strip())
+            or re.search(r"Installing new Macports release", s.strip())
+            for s in out.split("\n")
             if s
         )
         if updated:
@@ -133,7 +131,7 @@ def selfupdate(module, port_path):
 
 
 def upgrade(module, port_path):
-    """ Upgrade outdated ports. """
+    """Upgrade outdated ports."""
 
     rc, out, err = module.run_command([port_path, "upgrade", "outdated"])
 
@@ -151,19 +149,17 @@ def upgrade(module, port_path):
 
 
 def query_port(module, port_path, name, state="present"):
-    """ Returns whether a port is installed or not. """
+    """Returns whether a port is installed or not."""
 
     if state == "present":
-
         rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
-        if rc == 0 and out.strip().startswith(name + " "):
+        if rc == 0 and out.strip().startswith(f"{name} "):
             return True
 
         return False
 
     elif state == "active":
-
         rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
         if rc == 0 and "(active)" in out:
@@ -173,7 +169,7 @@ def query_port(module, port_path, name, state="present"):
 
 
 def remove_ports(module, port_path, ports, stdout, stderr):
-    """ Uninstalls one or more ports if installed. """
+    """Uninstalls one or more ports if installed."""
 
     remove_c = 0
     # Using a for loop in case of error, we can report the port that failed
@@ -186,19 +182,18 @@ def remove_ports(module, port_path, ports, stdout, stderr):
         stdout += out
         stderr += err
         if query_port(module, port_path, port):
-            module.fail_json(msg="Failed to remove %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to remove {port}: {err}", stdout=stdout, stderr=stderr)
 
         remove_c += 1
 
     if remove_c > 0:
-
-        module.exit_json(changed=True, msg="Removed %s port(s)" % remove_c, stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Removed {remove_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already absent", stdout=stdout, stderr=stderr)
 
 
 def install_ports(module, port_path, ports, variant, stdout, stderr):
-    """ Installs one or more ports if not already installed. """
+    """Installs one or more ports if not already installed."""
 
     install_c = 0
 
@@ -210,24 +205,24 @@ def install_ports(module, port_path, ports, variant, stdout, stderr):
         stdout += out
         stderr += err
         if not query_port(module, port_path, port):
-            module.fail_json(msg="Failed to install %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to install {port}: {err}", stdout=stdout, stderr=stderr)
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="Installed %s port(s)" % (install_c), stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Installed {install_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already present", stdout=stdout, stderr=stderr)
 
 
 def activate_ports(module, port_path, ports, stdout, stderr):
-    """ Activate a port if it is inactive. """
+    """Activate a port if it is inactive."""
 
     activate_c = 0
 
     for port in ports:
         if not query_port(module, port_path, port):
-            module.fail_json(msg="Failed to activate %s, port(s) not present" % (port), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to activate {port}, port(s) not present", stdout=stdout, stderr=stderr)
 
         if query_port(module, port_path, port, state="active"):
             continue
@@ -237,24 +232,24 @@ def activate_ports(module, port_path, ports, stdout, stderr):
         stderr += err
 
         if not query_port(module, port_path, port, state="active"):
-            module.fail_json(msg="Failed to activate %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to activate {port}: {err}", stdout=stdout, stderr=stderr)
 
         activate_c += 1
 
     if activate_c > 0:
-        module.exit_json(changed=True, msg="Activated %s port(s)" % (activate_c), stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Activated {activate_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already active", stdout=stdout, stderr=stderr)
 
 
 def deactivate_ports(module, port_path, ports, stdout, stderr):
-    """ Deactivate a port if it is active. """
+    """Deactivate a port if it is active."""
 
     deactivated_c = 0
 
     for port in ports:
         if not query_port(module, port_path, port):
-            module.fail_json(msg="Failed to deactivate %s, port(s) not present" % (port), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to deactivate {port}, port(s) not present", stdout=stdout, stderr=stderr)
 
         if not query_port(module, port_path, port, state="active"):
             continue
@@ -263,12 +258,12 @@ def deactivate_ports(module, port_path, ports, stdout, stderr):
         stdout += out
         stderr += err
         if query_port(module, port_path, port, state="active"):
-            module.fail_json(msg="Failed to deactivate %s: %s" % (port, err), stdout=stdout, stderr=stderr)
+            module.fail_json(msg=f"Failed to deactivate {port}: {err}", stdout=stdout, stderr=stderr)
 
         deactivated_c += 1
 
     if deactivated_c > 0:
-        module.exit_json(changed=True, msg="Deactivated %s port(s)" % (deactivated_c), stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg=f"Deactivated {deactivated_c} port(s)", stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="Port(s) already inactive", stdout=stdout, stderr=stderr)
 
@@ -276,18 +271,18 @@ def deactivate_ports(module, port_path, ports, stdout, stderr):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', elements='str', aliases=["port"]),
-            selfupdate=dict(aliases=["update_cache", "update_ports"], default=False, type='bool'),
+            name=dict(type="list", elements="str", aliases=["port"]),
+            selfupdate=dict(aliases=["update_cache", "update_ports"], default=False, type="bool"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed", "active", "inactive"]),
-            upgrade=dict(default=False, type='bool'),
-            variant=dict(aliases=["variants"], type='str')
+            upgrade=dict(default=False, type="bool"),
+            variant=dict(aliases=["variants"], type="str"),
         )
     )
 
     stdout = ""
     stderr = ""
 
-    port_path = module.get_bin_path('port', True, ['/opt/local/bin'])
+    port_path = module.get_bin_path("port", True, ["/opt/local/bin"])
 
     p = module.params
 
@@ -322,5 +317,5 @@ def main():
         deactivate_ports(module, port_path, pkgs, stdout, stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

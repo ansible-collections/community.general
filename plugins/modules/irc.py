@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Jan-Piet Mens <jpmens () gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -185,36 +183,50 @@ from ansible.module_utils.common.text.converters import to_native, to_bytes
 from ansible.module_utils.basic import AnsibleModule
 
 
-def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, key=None, topic=None,
-             nick="ansible", color='none', passwd=False, timeout=30, use_tls=False, validate_certs=True,
-             part=True, style=None):
-    '''send message to IRC'''
+def send_msg(
+    msg,
+    server="localhost",
+    port="6667",
+    channel=None,
+    nick_to=None,
+    key=None,
+    topic=None,
+    nick="ansible",
+    color="none",
+    passwd=False,
+    timeout=30,
+    use_tls=False,
+    validate_certs=True,
+    part=True,
+    style=None,
+):
+    """send message to IRC"""
     nick_to = [] if nick_to is None else nick_to
 
     colornumbers = {
-        'white': "00",
-        'black': "01",
-        'blue': "02",
-        'green': "03",
-        'red': "04",
-        'brown': "05",
-        'purple': "06",
-        'orange': "07",
-        'yellow': "08",
-        'light_green': "09",
-        'teal': "10",
-        'light_cyan': "11",
-        'light_blue': "12",
-        'pink': "13",
-        'gray': "14",
-        'light_gray': "15",
+        "white": "00",
+        "black": "01",
+        "blue": "02",
+        "green": "03",
+        "red": "04",
+        "brown": "05",
+        "purple": "06",
+        "orange": "07",
+        "yellow": "08",
+        "light_green": "09",
+        "teal": "10",
+        "light_cyan": "11",
+        "light_blue": "12",
+        "pink": "13",
+        "gray": "14",
+        "light_gray": "15",
     }
 
     stylechoices = {
-        'bold': "\x02",
-        'underline': "\x1F",
-        'reverse': "\x16",
-        'italic': "\x1D",
+        "bold": "\x02",
+        "underline": "\x1f",
+        "reverse": "\x16",
+        "italic": "\x1d",
     }
 
     try:
@@ -224,7 +236,7 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 
     try:
         colornumber = colornumbers[color]
-        colortext = "\x03" + colornumber
+        colortext = f"\x03{colornumber}"
     except Exception:
         colortext = ""
 
@@ -234,71 +246,65 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
     if use_tls:
         kwargs = {}
         if validate_certs:
-            try:
-                context = ssl.create_default_context()
-                kwargs["server_hostname"] = server
-            except AttributeError:
-                raise Exception('Need at least Python 2.7.9 for SSL certificate validation')
+            context = ssl.create_default_context()
+            kwargs["server_hostname"] = server
         else:
-            if getattr(ssl, 'PROTOCOL_TLS', None) is not None:
-                # Supported since Python 2.7.13
-                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-            else:
-                context = ssl.SSLContext()
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS)
             context.verify_mode = ssl.CERT_NONE
         irc = context.wrap_socket(irc, **kwargs)
     irc.connect((server, int(port)))
 
     if passwd:
-        irc.send(to_bytes('PASS %s\r\n' % passwd))
-    irc.send(to_bytes('NICK %s\r\n' % nick))
-    irc.send(to_bytes('USER %s %s %s :ansible IRC\r\n' % (nick, nick, nick)))
-    motd = ''
+        irc.send(to_bytes(f"PASS {passwd}\r\n"))
+    irc.send(to_bytes(f"NICK {nick}\r\n"))
+    irc.send(to_bytes(f"USER {nick} {nick} {nick} :ansible IRC\r\n"))
+    motd = ""
     start = time.time()
     while 1:
         motd += to_native(irc.recv(1024))
         # The server might send back a shorter nick than we specified (due to NICKLEN),
         #  so grab that and use it from now on (assuming we find the 00[1-4] response).
-        match = re.search(r'^:\S+ 00[1-4] (?P<nick>\S+) :', motd, flags=re.M)
+        match = re.search(r"^:\S+ 00[1-4] (?P<nick>\S+) :", motd, flags=re.M)
         if match:
-            nick = match.group('nick')
+            nick = match.group("nick")
             break
         elif time.time() - start > timeout:
-            raise Exception('Timeout waiting for IRC server welcome response')
+            raise Exception("Timeout waiting for IRC server welcome response")
         time.sleep(0.5)
 
     if channel:
         if key:
-            irc.send(to_bytes('JOIN %s %s\r\n' % (channel, key)))
+            irc.send(to_bytes(f"JOIN {channel} {key}\r\n"))
         else:
-            irc.send(to_bytes('JOIN %s\r\n' % channel))
+            irc.send(to_bytes(f"JOIN {channel}\r\n"))
 
-        join = ''
+        join = ""
         start = time.time()
         while 1:
             join += to_native(irc.recv(1024))
-            if re.search(r'^:\S+ 366 %s %s :' % (nick, channel), join, flags=re.M | re.I):
+            if re.search(rf"^:\S+ 366 {nick} {channel} :", join, flags=re.M | re.I):
                 break
             elif time.time() - start > timeout:
-                raise Exception('Timeout waiting for IRC JOIN response')
+                raise Exception("Timeout waiting for IRC JOIN response")
             time.sleep(0.5)
 
         if topic is not None:
-            irc.send(to_bytes('TOPIC %s :%s\r\n' % (channel, topic)))
+            irc.send(to_bytes(f"TOPIC {channel} :{topic}\r\n"))
             time.sleep(1)
 
     if nick_to:
         for nick in nick_to:
-            irc.send(to_bytes('PRIVMSG %s :%s\r\n' % (nick, message)))
+            irc.send(to_bytes(f"PRIVMSG {nick} :{message}\r\n"))
     if channel:
-        irc.send(to_bytes('PRIVMSG %s :%s\r\n' % (channel, message)))
+        irc.send(to_bytes(f"PRIVMSG {channel} :{message}\r\n"))
     time.sleep(1)
     if part:
         if channel:
-            irc.send(to_bytes('PART %s\r\n' % channel))
-        irc.send(to_bytes('QUIT\r\n'))
+            irc.send(to_bytes(f"PART {channel}\r\n"))
+        irc.send(to_bytes("QUIT\r\n"))
         time.sleep(1)
     irc.close()
+
 
 # ===========================================
 # Main
@@ -308,29 +314,46 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            server=dict(default='localhost'),
-            port=dict(type='int', default=6667),
-            nick=dict(default='ansible'),
-            nick_to=dict(type='list', elements='str'),
+            server=dict(default="localhost"),
+            port=dict(type="int", default=6667),
+            nick=dict(default="ansible"),
+            nick_to=dict(type="list", elements="str"),
             msg=dict(required=True),
-            color=dict(default="none", aliases=['colour'], choices=["white", "black", "blue",
-                                                                    "green", "red", "brown",
-                                                                    "purple", "orange", "yellow",
-                                                                    "light_green", "teal", "light_cyan",
-                                                                    "light_blue", "pink", "gray",
-                                                                    "light_gray", "none"]),
+            color=dict(
+                default="none",
+                aliases=["colour"],
+                choices=[
+                    "white",
+                    "black",
+                    "blue",
+                    "green",
+                    "red",
+                    "brown",
+                    "purple",
+                    "orange",
+                    "yellow",
+                    "light_green",
+                    "teal",
+                    "light_cyan",
+                    "light_blue",
+                    "pink",
+                    "gray",
+                    "light_gray",
+                    "none",
+                ],
+            ),
             style=dict(default="none", choices=["underline", "reverse", "bold", "italic", "none"]),
             channel=dict(),
             key=dict(no_log=True),
             topic=dict(),
             passwd=dict(no_log=True),
-            timeout=dict(type='int', default=30),
-            part=dict(type='bool', default=True),
-            use_tls=dict(type='bool', default=True, aliases=['use_ssl']),
-            validate_certs=dict(type='bool', default=True),
+            timeout=dict(type="int", default=30),
+            part=dict(type="bool", default=True),
+            use_tls=dict(type="bool", default=True, aliases=["use_ssl"]),
+            validate_certs=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
-        required_one_of=[['channel', 'nick_to']]
+        required_one_of=[["channel", "nick_to"]],
     )
 
     server = module.params["server"]
@@ -352,13 +375,28 @@ def main():
     validate_certs = module.params["validate_certs"]
 
     try:
-        send_msg(msg, server, port, channel, nick_to, key, topic, nick, color, passwd, timeout, use_tls, validate_certs, part, style)
+        send_msg(
+            msg,
+            server,
+            port,
+            channel,
+            nick_to,
+            key,
+            topic,
+            nick,
+            color,
+            passwd,
+            timeout,
+            use_tls,
+            validate_certs,
+            part,
+            style,
+        )
     except Exception as e:
-        module.fail_json(msg="unable to send to IRC: %s" % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"unable to send to IRC: {e}", exception=traceback.format_exc())
 
-    module.exit_json(changed=False, channel=channel, nick=nick,
-                     msg=msg)
+    module.exit_json(changed=False, channel=channel, nick=nick, msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

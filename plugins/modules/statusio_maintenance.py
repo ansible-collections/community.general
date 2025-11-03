@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -189,20 +187,13 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 
 
 def get_api_auth_headers(api_id, api_key, url, statuspage):
-
-    headers = {
-        "x-api-id": api_id,
-        "x-api-key": api_key,
-        "Content-Type": "application/json"
-    }
+    headers = {"x-api-id": api_id, "x-api-key": api_key, "Content-Type": "application/json"}
 
     try:
-        response = open_url(
-            url + "/v2/component/list/" + statuspage, headers=headers)
+        response = open_url(f"{url}/v2/component/list/{statuspage}", headers=headers)
         data = json.loads(response.read())
-        if data['status']['message'] == 'Authentication failed':
-            return 1, None, None, "Authentication failed: " \
-                                  "Check api_id/api_key and statuspage id."
+        if data["status"]["message"] == "Authentication failed":
+            return 1, None, None, "Authentication failed: Check api_id/api_key and statuspage id."
         else:
             auth_headers = headers
             auth_content = data
@@ -215,13 +206,10 @@ def get_component_ids(auth_content, components):
     host_ids = []
     lower_components = [x.lower() for x in components]
     for result in auth_content["result"]:
-        if result['name'].lower() in lower_components:
-            data = {
-                "component_id": result["_id"],
-                "container_id": result["containers"][0]["_id"]
-            }
+        if result["name"].lower() in lower_components:
+            data = {"component_id": result["_id"], "container_id": result["containers"][0]["_id"]}
             host_ids.append(data)
-            lower_components.remove(result['name'].lower())
+            lower_components.remove(result["name"].lower())
     if len(lower_components):
         # items not found in the api
         return 1, None, lower_components
@@ -233,10 +221,7 @@ def get_container_ids(auth_content, containers):
     lower_containers = [x.lower() for x in containers]
     for result in auth_content["result"]:
         if result["containers"][0]["name"].lower() in lower_containers:
-            data = {
-                "component_id": result["_id"],
-                "container_id": result["containers"][0]["_id"]
-            }
+            data = {"component_id": result["_id"], "container_id": result["containers"][0]["_id"]}
             host_ids.append(data)
             lower_containers.remove(result["containers"][0]["name"].lower())
 
@@ -250,19 +235,18 @@ def get_date_time(start_date, start_time, minutes):
     returned_date = []
     if start_date and start_time:
         try:
-            datetime.datetime.strptime(start_date, '%m/%d/%Y')
+            datetime.datetime.strptime(start_date, "%m/%d/%Y")
             returned_date.append(start_date)
         except (NameError, ValueError):
             return 1, None, "Not a valid start_date format."
         try:
-            datetime.datetime.strptime(start_time, '%H:%M')
+            datetime.datetime.strptime(start_time, "%H:%M")
             returned_date.append(start_time)
         except (NameError, ValueError):
             return 1, None, "Not a valid start_time format."
         try:
             # Work out end date/time based on minutes
-            date_time_start = datetime.datetime.strptime(
-                start_time + start_date, '%H:%M%m/%d/%Y')
+            date_time_start = datetime.datetime.strptime(start_time + start_date, "%H:%M%m/%d/%Y")
             delta = date_time_start + datetime.timedelta(minutes=minutes)
             returned_date.append(delta.strftime("%m/%d/%Y"))
             returned_date.append(delta.strftime("%H:%M"))
@@ -280,37 +264,47 @@ def get_date_time(start_date, start_time, minutes):
     return 0, returned_date, None
 
 
-def create_maintenance(auth_headers, url, statuspage, host_ids,
-                       all_infrastructure_affected, automation, title, desc,
-                       returned_date, maintenance_notify_now,
-                       maintenance_notify_72_hr, maintenance_notify_24_hr,
-                       maintenance_notify_1_hr):
+def create_maintenance(
+    auth_headers,
+    url,
+    statuspage,
+    host_ids,
+    all_infrastructure_affected,
+    automation,
+    title,
+    desc,
+    returned_date,
+    maintenance_notify_now,
+    maintenance_notify_72_hr,
+    maintenance_notify_24_hr,
+    maintenance_notify_1_hr,
+):
     component_id = []
     container_id = []
     for val in host_ids:
-        component_id.append(val['component_id'])
-        container_id.append(val['container_id'])
-    infrastructure_id = [i + '-' + j for i, j in zip(component_id, container_id)]
+        component_id.append(val["component_id"])
+        container_id.append(val["container_id"])
+    infrastructure_id = [f"{i}-{j}" for i, j in zip(component_id, container_id)]
     try:
-        values = json.dumps({
-            "statuspage_id": statuspage,
-            "all_infrastructure_affected": str(int(all_infrastructure_affected)),
-            "infrastructure_affected": infrastructure_id,
-            "automation": str(int(automation)),
-            "maintenance_name": title,
-            "maintenance_details": desc,
-            "date_planned_start": returned_date[0],
-            "time_planned_start": returned_date[1],
-            "date_planned_end": returned_date[2],
-            "time_planned_end": returned_date[3],
-            "maintenance_notify_now": str(int(maintenance_notify_now)),
-            "maintenance_notify_72_hr": str(int(maintenance_notify_72_hr)),
-            "maintenance_notify_24_hr": str(int(maintenance_notify_24_hr)),
-            "maintenance_notify_1_hr": str(int(maintenance_notify_1_hr))
-        })
-        response = open_url(
-            url + "/v2/maintenance/schedule", data=values,
-            headers=auth_headers)
+        values = json.dumps(
+            {
+                "statuspage_id": statuspage,
+                "all_infrastructure_affected": str(int(all_infrastructure_affected)),
+                "infrastructure_affected": infrastructure_id,
+                "automation": str(int(automation)),
+                "maintenance_name": title,
+                "maintenance_details": desc,
+                "date_planned_start": returned_date[0],
+                "time_planned_start": returned_date[1],
+                "date_planned_end": returned_date[2],
+                "time_planned_end": returned_date[3],
+                "maintenance_notify_now": str(int(maintenance_notify_now)),
+                "maintenance_notify_72_hr": str(int(maintenance_notify_72_hr)),
+                "maintenance_notify_24_hr": str(int(maintenance_notify_24_hr)),
+                "maintenance_notify_1_hr": str(int(maintenance_notify_1_hr)),
+            }
+        )
+        response = open_url(f"{url}/v2/maintenance/schedule", data=values, headers=auth_headers)
         data = json.loads(response.read())
 
         if data["status"]["error"] == "yes":
@@ -322,14 +316,13 @@ def create_maintenance(auth_headers, url, statuspage, host_ids,
 
 def delete_maintenance(auth_headers, url, statuspage, maintenance_id):
     try:
-        values = json.dumps({
-            "statuspage_id": statuspage,
-            "maintenance_id": maintenance_id,
-        })
-        response = open_url(
-            url=url + "/v2/maintenance/delete",
-            data=values,
-            headers=auth_headers)
+        values = json.dumps(
+            {
+                "statuspage_id": statuspage,
+                "maintenance_id": maintenance_id,
+            }
+        )
+        response = open_url(url=f"{url}/v2/maintenance/delete", data=values, headers=auth_headers)
         data = json.loads(response.read())
         if data["status"]["error"] == "yes":
             return 1, None, "Invalid maintenance_id"
@@ -344,122 +337,115 @@ def main():
             api_id=dict(required=True),
             api_key=dict(required=True, no_log=True),
             statuspage=dict(required=True),
-            state=dict(default='present', choices=['present', 'absent']),
-            url=dict(default='https://api.status.io'),
-            components=dict(type='list', elements='str', aliases=['component']),
-            containers=dict(type='list', elements='str', aliases=['container']),
-            all_infrastructure_affected=dict(type='bool', default=False),
-            automation=dict(type='bool', default=False),
-            title=dict(default='A new maintenance window'),
-            desc=dict(default='Created by Ansible'),
-            minutes=dict(type='int', default=10),
-            maintenance_notify_now=dict(type='bool', default=False),
-            maintenance_notify_72_hr=dict(type='bool', default=False),
-            maintenance_notify_24_hr=dict(type='bool', default=False),
-            maintenance_notify_1_hr=dict(type='bool', default=False),
+            state=dict(default="present", choices=["present", "absent"]),
+            url=dict(default="https://api.status.io"),
+            components=dict(type="list", elements="str", aliases=["component"]),
+            containers=dict(type="list", elements="str", aliases=["container"]),
+            all_infrastructure_affected=dict(type="bool", default=False),
+            automation=dict(type="bool", default=False),
+            title=dict(default="A new maintenance window"),
+            desc=dict(default="Created by Ansible"),
+            minutes=dict(type="int", default=10),
+            maintenance_notify_now=dict(type="bool", default=False),
+            maintenance_notify_72_hr=dict(type="bool", default=False),
+            maintenance_notify_24_hr=dict(type="bool", default=False),
+            maintenance_notify_1_hr=dict(type="bool", default=False),
             maintenance_id=dict(),
             start_date=dict(),
-            start_time=dict()
+            start_time=dict(),
         ),
         supports_check_mode=True,
     )
 
-    api_id = module.params['api_id']
-    api_key = module.params['api_key']
-    statuspage = module.params['statuspage']
-    state = module.params['state']
-    url = module.params['url']
-    components = module.params['components']
-    containers = module.params['containers']
-    all_infrastructure_affected = module.params['all_infrastructure_affected']
-    automation = module.params['automation']
-    title = module.params['title']
-    desc = module.params['desc']
-    minutes = module.params['minutes']
-    maintenance_notify_now = module.params['maintenance_notify_now']
-    maintenance_notify_72_hr = module.params['maintenance_notify_72_hr']
-    maintenance_notify_24_hr = module.params['maintenance_notify_24_hr']
-    maintenance_notify_1_hr = module.params['maintenance_notify_1_hr']
-    maintenance_id = module.params['maintenance_id']
-    start_date = module.params['start_date']
-    start_time = module.params['start_time']
+    api_id = module.params["api_id"]
+    api_key = module.params["api_key"]
+    statuspage = module.params["statuspage"]
+    state = module.params["state"]
+    url = module.params["url"]
+    components = module.params["components"]
+    containers = module.params["containers"]
+    all_infrastructure_affected = module.params["all_infrastructure_affected"]
+    automation = module.params["automation"]
+    title = module.params["title"]
+    desc = module.params["desc"]
+    minutes = module.params["minutes"]
+    maintenance_notify_now = module.params["maintenance_notify_now"]
+    maintenance_notify_72_hr = module.params["maintenance_notify_72_hr"]
+    maintenance_notify_24_hr = module.params["maintenance_notify_24_hr"]
+    maintenance_notify_1_hr = module.params["maintenance_notify_1_hr"]
+    maintenance_id = module.params["maintenance_id"]
+    start_date = module.params["start_date"]
+    start_time = module.params["start_time"]
 
     if state == "present":
-
         if api_id and api_key:
-            (rc, auth_headers, auth_content, error) = \
-                get_api_auth_headers(api_id, api_key, url, statuspage)
+            (rc, auth_headers, auth_content, error) = get_api_auth_headers(api_id, api_key, url, statuspage)
             if rc != 0:
-                module.fail_json(msg="Failed to get auth keys: %s" % error)
+                module.fail_json(msg=f"Failed to get auth keys: {error}")
         else:
             auth_headers = {}
             auth_content = {}
 
         if minutes or start_time and start_date:
-            (rc, returned_date, error) = get_date_time(
-                start_date, start_time, minutes)
+            (rc, returned_date, error) = get_date_time(start_date, start_time, minutes)
             if rc != 0:
-                module.fail_json(msg="Failed to set date/time: %s" % error)
+                module.fail_json(msg=f"Failed to set date/time: {error}")
 
         if not components and not containers:
-            return module.fail_json(msg="A Component or Container must be "
-                                        "defined")
+            return module.fail_json(msg="A Component or Container must be defined")
         elif components and containers:
-            return module.fail_json(msg="Components and containers cannot "
-                                        "be used together")
+            return module.fail_json(msg="Components and containers cannot be used together")
         else:
             if components:
-                (rc, host_ids, error) = get_component_ids(auth_content,
-                                                          components)
+                (rc, host_ids, error) = get_component_ids(auth_content, components)
                 if rc != 0:
-                    module.fail_json(msg="Failed to find component %s" % error)
+                    module.fail_json(msg=f"Failed to find component {error}")
 
             if containers:
-                (rc, host_ids, error) = get_container_ids(auth_content,
-                                                          containers)
+                (rc, host_ids, error) = get_container_ids(auth_content, containers)
                 if rc != 0:
-                    module.fail_json(msg="Failed to find container %s" % error)
+                    module.fail_json(msg=f"Failed to find container {error}")
 
         if module.check_mode:
             module.exit_json(changed=True)
         else:
             (rc, dummy, error) = create_maintenance(
-                auth_headers, url, statuspage, host_ids,
-                all_infrastructure_affected, automation,
-                title, desc, returned_date, maintenance_notify_now,
-                maintenance_notify_72_hr, maintenance_notify_24_hr,
-                maintenance_notify_1_hr)
+                auth_headers,
+                url,
+                statuspage,
+                host_ids,
+                all_infrastructure_affected,
+                automation,
+                title,
+                desc,
+                returned_date,
+                maintenance_notify_now,
+                maintenance_notify_72_hr,
+                maintenance_notify_24_hr,
+                maintenance_notify_1_hr,
+            )
             if rc == 0:
-                module.exit_json(changed=True, result="Successfully created "
-                                                      "maintenance")
+                module.exit_json(changed=True, result="Successfully created maintenance")
             else:
-                module.fail_json(msg="Failed to create maintenance: %s"
-                                 % error)
+                module.fail_json(msg=f"Failed to create maintenance: {error}")
 
     if state == "absent":
-
         if api_id and api_key:
-            (rc, auth_headers, auth_content, error) = \
-                get_api_auth_headers(api_id, api_key, url, statuspage)
+            (rc, auth_headers, auth_content, error) = get_api_auth_headers(api_id, api_key, url, statuspage)
             if rc != 0:
-                module.fail_json(msg="Failed to get auth keys: %s" % error)
+                module.fail_json(msg=f"Failed to get auth keys: {error}")
         else:
             auth_headers = {}
 
         if module.check_mode:
             module.exit_json(changed=True)
         else:
-            (rc, dummy, error) = delete_maintenance(
-                auth_headers, url, statuspage, maintenance_id)
+            (rc, dummy, error) = delete_maintenance(auth_headers, url, statuspage, maintenance_id)
             if rc == 0:
-                module.exit_json(
-                    changed=True,
-                    result="Successfully deleted maintenance"
-                )
+                module.exit_json(changed=True, result="Successfully deleted maintenance")
             else:
-                module.fail_json(
-                    msg="Failed to delete maintenance: %s" % error)
+                module.fail_json(msg=f"Failed to delete maintenance: {error}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 author:
@@ -144,6 +142,7 @@ from ansible.utils.display import Display
 
 try:
     import etcd3
+
     HAS_ETCD = True
 except ImportError:
     HAS_ETCD = False
@@ -151,14 +150,14 @@ except ImportError:
 display = Display()
 
 etcd3_cnx_opts = (
-    'host',
-    'port',
-    'ca_cert',
-    'cert_key',
-    'cert_cert',
-    'timeout',
-    'user',
-    'password',
+    "host",
+    "port",
+    "ca_cert",
+    "cert_key",
+    "cert_cert",
+    "timeout",
+    "user",
+    "password",
     # 'grpc_options' Etcd3Client() option currently not supported by lookup module (maybe in future ?)
 )
 
@@ -168,18 +167,16 @@ def etcd3_client(client_params):
         etcd = etcd3.client(**client_params)
         etcd.status()
     except Exception as exp:
-        raise AnsibleLookupError(f'Cannot connect to etcd cluster: {exp}')
+        raise AnsibleLookupError(f"Cannot connect to etcd cluster: {exp}")
     return etcd
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables, **kwargs):
-
         self.set_options(var_options=variables, direct=kwargs)
 
         if not HAS_ETCD:
-            display.error(missing_required_lib('etcd3'))
+            display.error(missing_required_lib("etcd3"))
             return None
 
         # create the etcd3 connection parameters dict to pass to etcd3 class
@@ -189,21 +186,21 @@ class LookupModule(LookupBase):
         # must be mangled a bit to fit in this scheme.
         # so here we use a regex to extract server and port
         match = re.compile(
-            r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([-_\d\w\.]+))(:(?P<port>\d{1,5}))?/?$'
-        ).match(self.get_option('endpoints'))
+            r"^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([-_\d\w\.]+))(:(?P<port>\d{1,5}))?/?$"
+        ).match(self.get_option("endpoints"))
         if match:
-            if match.group('host'):
-                client_params['host'] = match.group('host')
-            if match.group('port'):
-                client_params['port'] = match.group('port')
+            if match.group("host"):
+                client_params["host"] = match.group("host")
+            if match.group("port"):
+                client_params["port"] = match.group("port")
 
         for opt in etcd3_cnx_opts:
             if self.get_option(opt):
                 client_params[opt] = self.get_option(opt)
 
         cnx_log = dict(client_params)
-        if 'password' in cnx_log:
-            cnx_log['password'] = '<redacted>'
+        if "password" in cnx_log:
+            cnx_log["password"] = "<redacted>"
         display.verbose(f"etcd3 connection parameters: {cnx_log}")
 
         # connect to etcd3 server
@@ -212,18 +209,18 @@ class LookupModule(LookupBase):
         ret = []
         # we can pass many keys to lookup
         for term in terms:
-            if self.get_option('prefix'):
+            if self.get_option("prefix"):
                 try:
                     for val, meta in etcd.get_prefix(term):
                         if val and meta:
-                            ret.append({'key': to_native(meta.key), 'value': to_native(val)})
+                            ret.append({"key": to_native(meta.key), "value": to_native(val)})
                 except Exception as exp:
-                    display.warning(f'Caught except during etcd3.get_prefix: {exp}')
+                    display.warning(f"Caught except during etcd3.get_prefix: {exp}")
             else:
                 try:
                     val, meta = etcd.get(term)
                     if val and meta:
-                        ret.append({'key': to_native(meta.key), 'value': to_native(val)})
+                        ret.append({"key": to_native(meta.key), "value": to_native(val)})
                 except Exception as exp:
-                    display.warning(f'Caught except during etcd3.get: {exp}')
+                    display.warning(f"Caught except during etcd3.get: {exp}")
         return ret

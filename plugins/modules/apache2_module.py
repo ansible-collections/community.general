@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013-2014, Christian Berendt <berendt@b1-systems.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -120,7 +118,7 @@ import re
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
 
-_re_threaded = re.compile(r'threaded: *yes')
+_re_threaded = re.compile(r"threaded: *yes")
 
 
 def _run_threaded(module):
@@ -131,7 +129,7 @@ def _run_threaded(module):
 
 
 def _get_ctl_binary(module):
-    for command in ['apache2ctl', 'apachectl']:
+    for command in ["apache2ctl", "apachectl"]:
         ctl_binary = module.get_bin_path(command)
         if ctl_binary is not None:
             return ctl_binary
@@ -144,10 +142,10 @@ def _module_is_enabled(module):
     result, stdout, stderr = module.run_command([control_binary, "-M"])
 
     if result != 0:
-        error_msg = "Error executing %s: %s" % (control_binary, stderr)
-        if module.params['ignore_configcheck']:
-            if 'AH00534' in stderr and 'mpm_' in module.params['name']:
-                if module.params['warn_mpm_absent']:
+        error_msg = f"Error executing {control_binary}: {stderr}"
+        if module.params["ignore_configcheck"]:
+            if "AH00534" in stderr and "mpm_" in module.params["name"]:
+                if module.params["warn_mpm_absent"]:
                     module.warn(
                         "No MPM module loaded! apache2 reload AND other module actions"
                         " will fail if no MPM module is loaded immediately."
@@ -158,7 +156,7 @@ def _module_is_enabled(module):
         else:
             module.fail_json(msg=error_msg)
 
-    searchstring = ' ' + module.params['identifier']
+    searchstring = f" {module.params['identifier']}"
     return searchstring in stdout
 
 
@@ -171,15 +169,15 @@ def create_apache_identifier(name):
 
     # a2enmod name replacement to apache2ctl -M names
     text_workarounds = [
-        ('shib', 'mod_shib'),
-        ('shib2', 'mod_shib'),
-        ('evasive', 'evasive20_module'),
+        ("shib", "mod_shib"),
+        ("shib2", "mod_shib"),
+        ("evasive", "evasive20_module"),
     ]
 
     # re expressions to extract subparts of names
     re_workarounds = [
-        ('php8', re.compile(r'^(php)[\d\.]+')),
-        ('php', re.compile(r'^(php\d)\.')),
+        ("php8", re.compile(r"^(php)[\d\.]+")),
+        ("php", re.compile(r"^(php\d)\.")),
     ]
 
     for a2enmod_spelling, module_name in text_workarounds:
@@ -190,21 +188,21 @@ def create_apache_identifier(name):
         if search in name:
             try:
                 rematch = reexpr.search(name)
-                return rematch.group(1) + '_module'
+                return f"{rematch.group(1)}_module"
             except AttributeError:
                 pass
 
-    return name + '_module'
+    return f"{name}_module"
 
 
 def _set_state(module, state):
-    name = module.params['name']
-    force = module.params['force']
+    name = module.params["name"]
+    force = module.params["force"]
 
-    want_enabled = state == 'present'
-    state_string = {'present': 'enabled', 'absent': 'disabled'}[state]
-    a2mod_binary = {'present': 'a2enmod', 'absent': 'a2dismod'}[state]
-    success_msg = "Module %s %s" % (name, state_string)
+    want_enabled = state == "present"
+    state_string = {"present": "enabled", "absent": "disabled"}[state]
+    a2mod_binary = {"present": "a2enmod", "absent": "a2dismod"}[state]
+    success_msg = f"Module {name} {state_string}"
 
     if _module_is_enabled(module) != want_enabled:
         if module.check_mode:
@@ -212,13 +210,15 @@ def _set_state(module, state):
 
         a2mod_binary_path = module.get_bin_path(a2mod_binary)
         if a2mod_binary_path is None:
-            module.fail_json(msg="%s not found. Perhaps this system does not use %s to manage apache" % (a2mod_binary, a2mod_binary))
+            module.fail_json(
+                msg=f"{a2mod_binary} not found. Perhaps this system does not use {a2mod_binary} to manage apache"
+            )
 
         a2mod_binary_cmd = [a2mod_binary_path]
 
         if not want_enabled and force:
             # force exists only for a2dismod on debian
-            a2mod_binary_cmd.append('-f')
+            a2mod_binary_cmd.append("-f")
 
         result, stdout, stderr = module.run_command(a2mod_binary_cmd + [name])
 
@@ -226,20 +226,12 @@ def _set_state(module, state):
             module.exit_json(changed=True, result=success_msg)
         else:
             msg = (
-                'Failed to set module {name} to {state}:\n'
-                '{stdout}\n'
-                'Maybe the module identifier ({identifier}) was guessed incorrectly.'
+                f"Failed to set module {name} to {state_string}:\n"
+                f"{stdout}\n"
+                f"Maybe the module identifier ({module.params['identifier']}) was guessed incorrectly."
                 'Consider setting the "identifier" option.'
-            ).format(
-                name=name,
-                state=state_string,
-                stdout=stdout,
-                identifier=module.params['identifier']
             )
-            module.fail_json(msg=msg,
-                             rc=result,
-                             stdout=stdout,
-                             stderr=stderr)
+            module.fail_json(msg=msg, rc=result, stdout=stdout, stderr=stderr)
     else:
         module.exit_json(changed=False, result=success_msg)
 
@@ -248,25 +240,25 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            identifier=dict(type='str'),
-            force=dict(type='bool', default=False),
-            state=dict(default='present', choices=['absent', 'present']),
-            ignore_configcheck=dict(type='bool', default=False),
-            warn_mpm_absent=dict(type='bool', default=True),
+            identifier=dict(type="str"),
+            force=dict(type="bool", default=False),
+            state=dict(default="present", choices=["absent", "present"]),
+            ignore_configcheck=dict(type="bool", default=False),
+            warn_mpm_absent=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
     )
 
-    name = module.params['name']
-    if name == 'cgi' and module.params['state'] == 'present' and _run_threaded(module):
+    name = module.params["name"]
+    if name == "cgi" and module.params["state"] == "present" and _run_threaded(module):
         module.fail_json(msg="Your MPM seems to be threaded, therefore enabling cgi module is not allowed.")
 
-    if not module.params['identifier']:
-        module.params['identifier'] = create_apache_identifier(module.params['name'])
+    if not module.params["identifier"]:
+        module.params["identifier"] = create_apache_identifier(module.params["name"])
 
-    if module.params['state'] in ['present', 'absent']:
-        _set_state(module, module.params['state'])
+    if module.params["state"] in ["present", "absent"]:
+        _set_state(module, module.params["state"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

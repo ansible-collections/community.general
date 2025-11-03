@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Steve <yo@groks.org>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: crypttab
@@ -87,104 +85,99 @@ import os
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            state=dict(type='str', required=True, choices=['absent', 'opts_absent', 'opts_present', 'present']),
-            backing_device=dict(type='str'),
-            password=dict(type='path'),
-            opts=dict(type='str'),
-            path=dict(type='path', default='/etc/crypttab')
+            name=dict(type="str", required=True),
+            state=dict(type="str", required=True, choices=["absent", "opts_absent", "opts_present", "present"]),
+            backing_device=dict(type="str"),
+            password=dict(type="path"),
+            opts=dict(type="str"),
+            path=dict(type="path", default="/etc/crypttab"),
         ),
         supports_check_mode=True,
     )
 
-    backing_device = module.params['backing_device']
-    password = module.params['password']
-    opts = module.params['opts']
-    state = module.params['state']
-    path = module.params['path']
-    name = module.params['name']
-    if name.startswith('/dev/mapper/'):
-        name = name[len('/dev/mapper/'):]
+    backing_device = module.params["backing_device"]
+    password = module.params["password"]
+    opts = module.params["opts"]
+    state = module.params["state"]
+    path = module.params["path"]
+    name = module.params["name"]
+    if name.startswith("/dev/mapper/"):
+        name = name[len("/dev/mapper/") :]
 
-    if state != 'absent' and backing_device is None and password is None and opts is None:
-        module.fail_json(msg="expected one or more of 'backing_device', 'password' or 'opts'",
-                         **module.params)
+    if state != "absent" and backing_device is None and password is None and opts is None:
+        module.fail_json(msg="expected one or more of 'backing_device', 'password' or 'opts'", **module.params)
 
-    if 'opts' in state and (backing_device is not None or password is not None):
-        module.fail_json(msg="cannot update 'backing_device' or 'password' when state=%s" % state,
-                         **module.params)
+    if "opts" in state and (backing_device is not None or password is not None):
+        module.fail_json(msg=f"cannot update 'backing_device' or 'password' when state={state}", **module.params)
 
-    for arg_name, arg in (('name', name),
-                          ('backing_device', backing_device),
-                          ('password', password),
-                          ('opts', opts)):
-        if arg is not None and (' ' in arg or '\t' in arg or arg == ''):
-            module.fail_json(msg="invalid '%s': contains white space or is empty" % arg_name,
-                             **module.params)
+    for arg_name, arg in (("name", name), ("backing_device", backing_device), ("password", password), ("opts", opts)):
+        if arg is not None and (" " in arg or "\t" in arg or arg == ""):
+            module.fail_json(msg=f"invalid '{arg_name}': contains white space or is empty", **module.params)
 
     try:
         crypttab = Crypttab(path)
         existing_line = crypttab.match(name)
     except Exception as e:
-        module.fail_json(msg="failed to open and parse crypttab file: %s" % to_native(e),
-                         exception=traceback.format_exc(), **module.params)
+        module.fail_json(
+            msg=f"failed to open and parse crypttab file: {e}", exception=traceback.format_exc(), **module.params
+        )
 
-    if 'present' in state and existing_line is None and backing_device is None:
-        module.fail_json(msg="'backing_device' required to add a new entry",
-                         **module.params)
+    if "present" in state and existing_line is None and backing_device is None:
+        module.fail_json(msg="'backing_device' required to add a new entry", **module.params)
 
-    changed, reason = False, '?'
+    changed, reason = False, "?"
 
-    if state == 'absent':
+    if state == "absent":
         if existing_line is not None:
             changed, reason = existing_line.remove()
 
-    elif state == 'present':
+    elif state == "present":
         if existing_line is not None:
             changed, reason = existing_line.set(backing_device, password, opts)
         else:
             changed, reason = crypttab.add(Line(None, name, backing_device, password, opts))
 
-    elif state == 'opts_present':
+    elif state == "opts_present":
         if existing_line is not None:
             changed, reason = existing_line.opts.add(opts)
         else:
             changed, reason = crypttab.add(Line(None, name, backing_device, password, opts))
 
-    elif state == 'opts_absent':
+    elif state == "opts_absent":
         if existing_line is not None:
             changed, reason = existing_line.opts.remove(opts)
 
     if changed and not module.check_mode:
-        with open(path, 'wb') as f:
-            f.write(to_bytes(crypttab, errors='surrogate_or_strict'))
+        with open(path, "wb") as f:
+            f.write(to_bytes(crypttab, errors="surrogate_or_strict"))
 
     module.exit_json(changed=changed, msg=reason, **module.params)
 
 
-class Crypttab(object):
-    _lines = []
+class Crypttab:
+    _lines: list[str]
 
     def __init__(self, path):
         self.path = path
+        self._lines = []
         if not os.path.exists(path):
             if not os.path.exists(os.path.dirname(path)):
                 os.makedirs(os.path.dirname(path))
-            open(path, 'a').close()
+            open(path, "a").close()
 
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             for line in f.readlines():
                 self._lines.append(Line(line))
 
     def add(self, line):
         self._lines.append(line)
-        return True, 'added line'
+        return True, "added line"
 
     def lines(self):
         for line in self._lines:
@@ -201,15 +194,15 @@ class Crypttab(object):
         lines = []
         for line in self._lines:
             lines.append(str(line))
-        crypttab = '\n'.join(lines)
+        crypttab = "\n".join(lines)
         if len(crypttab) == 0:
-            crypttab += '\n'
-        if crypttab[-1] != '\n':
-            crypttab += '\n'
+            crypttab += "\n"
+        if crypttab[-1] != "\n":
+            crypttab += "\n"
         return crypttab
 
 
-class Line(object):
+class Line:
     def __init__(self, line=None, name=None, backing_device=None, password=None, opts=None):
         self.line = line
         self.name = name
@@ -218,7 +211,7 @@ class Line(object):
         self.opts = Options(opts)
 
         if line is not None:
-            self.line = self.line.rstrip('\n')
+            self.line = self.line.rstrip("\n")
             if self._line_valid(line):
                 self.name, backing_device, password, opts = self._split_line(line)
 
@@ -241,10 +234,10 @@ class Line(object):
                 self.opts = opts
                 changed = True
 
-        return changed, 'updated line'
+        return changed, "updated line"
 
     def _line_valid(self, line):
-        if not line.strip() or line.startswith('#') or len(line.split()) not in (2, 3, 4):
+        if not line.strip() or line.startswith("#") or len(line.split()) not in (2, 3, 4):
             return False
         return True
 
@@ -259,14 +252,11 @@ class Line(object):
         except IndexError:
             field3 = None
 
-        return (fields[0],
-                fields[1],
-                field2,
-                field3)
+        return (fields[0], fields[1], field2, field3)
 
     def remove(self):
-        self.line, self.name, self.backing_device = '', None, None
-        return True, 'removed line'
+        self.line, self.name, self.backing_device = "", None, None
+        return True, "removed line"
 
     def valid(self):
         if self.name is not None and self.backing_device is not None:
@@ -280,22 +270,22 @@ class Line(object):
                 if self.password is not None:
                     fields.append(self.password)
                 else:
-                    fields.append('none')
+                    fields.append("none")
             if self.opts:
                 fields.append(str(self.opts))
-            return ' '.join(fields)
+            return " ".join(fields)
         return self.line
 
 
 class Options(dict):
-    """opts_string looks like: 'discard,foo=bar,baz=greeble' """
+    """opts_string looks like: 'discard,foo=bar,baz=greeble'"""
 
     def __init__(self, opts_string):
-        super(Options, self).__init__()
+        super().__init__()
         self.itemlist = []
         if opts_string is not None:
-            for opt in opts_string.split(','):
-                kv = opt.split('=')
+            for opt in opts_string.split(","):
+                kv = opt.split("=")
                 if len(kv) > 1:
                     k, v = (kv[0], kv[1])
                 else:
@@ -311,7 +301,7 @@ class Options(dict):
             else:
                 changed = True
             self[k] = v
-        return changed, 'updated options'
+        return changed, "updated options"
 
     def remove(self, opts_string):
         changed = False
@@ -319,7 +309,7 @@ class Options(dict):
             if k in self:
                 del self[k]
                 changed = True
-        return changed, 'removed options'
+        return changed, "removed options"
 
     def keys(self):
         return self.itemlist
@@ -336,11 +326,11 @@ class Options(dict):
     def __setitem__(self, key, value):
         if key not in self:
             self.itemlist.append(key)
-        super(Options, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def __delitem__(self, key):
         self.itemlist.remove(key)
-        super(Options, self).__delitem__(key)
+        super().__delitem__(key)
 
     def __ne__(self, obj):
         return not (isinstance(obj, Options) and sorted(self.items()) == sorted(obj.items()))
@@ -351,9 +341,9 @@ class Options(dict):
             if v is None:
                 ret.append(k)
             else:
-                ret.append('%s=%s' % (k, v))
-        return ','.join(ret)
+                ret.append(f"{k}={v}")
+        return ",".join(ret)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

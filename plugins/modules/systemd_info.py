@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2025, Marco Noce <nce.marco@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: systemd_info
@@ -260,16 +258,16 @@ def get_unit_properties(runner, prop_list, unit):
 
 
 def determine_category(unit):
-    if unit.endswith('.service'):
-        return 'service'
-    elif unit.endswith('.target'):
-        return 'target'
-    elif unit.endswith('.socket'):
-        return 'socket'
-    elif unit.endswith('.mount'):
-        return 'mount'
-    elif unit.endswith('.timer'):
-        return 'timer'
+    if unit.endswith(".service"):
+        return "service"
+    elif unit.endswith(".target"):
+        return "target"
+    elif unit.endswith(".socket"):
+        return "socket"
+    elif unit.endswith(".mount"):
+        return "mount"
+    elif unit.endswith(".timer"):
+        return "timer"
     else:
         return None
 
@@ -287,25 +285,25 @@ def unit_exists(unit, units_info):
 
 def get_category_base_props(category):
     base_props = {
-        'service': ['FragmentPath', 'UnitFileState', 'UnitFilePreset', 'MainPID', 'ExecMainPID'],
-        'target': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
-        'socket': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
-        'mount': ['Where', 'What', 'Options', 'Type'],
-        'timer': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
+        "service": ["FragmentPath", "UnitFileState", "UnitFilePreset", "MainPID", "ExecMainPID"],
+        "target": ["FragmentPath", "UnitFileState", "UnitFilePreset"],
+        "socket": ["FragmentPath", "UnitFileState", "UnitFilePreset"],
+        "mount": ["Where", "What", "Options", "Type"],
+        "timer": ["FragmentPath", "UnitFileState", "UnitFilePreset"],
     }
     return base_props.get(category, [])
 
 
 def validate_unit_and_properties(runner, unit, extra_properties, units_info, property_cache):
     if not unit_exists(unit, units_info):
-        module.fail_json(msg="Unit '{0}' does not exist or is inaccessible.".format(unit))
+        module.fail_json(msg=f"Unit '{unit}' does not exist or is inaccessible.")
 
     category = determine_category(unit)
 
     if not category:
-        module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
+        module.fail_json(msg=f"Could not determine the category for unit '{unit}'.")
 
-    state_props = ['LoadState', 'ActiveState', 'SubState']
+    state_props = ["LoadState", "ActiveState", "SubState"]
     props = get_category_base_props(category)
     full_props = set(props + state_props + extra_properties)
 
@@ -317,7 +315,7 @@ def validate_unit_and_properties(runner, unit, extra_properties, units_info, pro
     if extra_properties:
         missing_props = [prop for prop in extra_properties if prop.lower() not in unit_data]
         if missing_props:
-            module.fail_json(msg="The following properties do not exist for unit '{0}': {1}".format(unit, ", ".join(missing_props)))
+            module.fail_json(msg=f"The following properties do not exist for unit '{unit}': {', '.join(missing_props)}")
 
     return True
 
@@ -335,7 +333,7 @@ def process_wildcards(selected_units, all_units, module):
                 resolved_units[match] = True
 
     if not resolved_units:
-        module.fail_json(msg="No units match any of the provided patterns: {}".format(", ".join(non_matching_patterns)))
+        module.fail_json(msg=f"No units match any of the provided patterns: {', '.join(non_matching_patterns)}")
 
     return resolved_units, non_matching_patterns
 
@@ -348,7 +346,7 @@ def process_unit(runner, unit, extra_properties, units_info, property_cache, sta
     category = determine_category(unit)
 
     if not category:
-        module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
+        module.fail_json(msg=f"Could not determine the category for unit '{unit}'.")
 
     props = get_category_base_props(category)
     full_props = set(props + state_props + extra_properties)
@@ -367,17 +365,17 @@ def process_unit(runner, unit, extra_properties, units_info, property_cache, sta
 def main():
     global module
     module_args = dict(
-        unitname=dict(type='list', elements='str', default=[]),
-        extra_properties=dict(type='list', elements='str', default=[])
+        unitname=dict(type="list", elements="str", default=[]),
+        extra_properties=dict(type="list", elements="str", default=[]),
     )
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
-    systemctl_bin = module.get_bin_path('systemctl', required=True)
+    systemctl_bin = module.get_bin_path("systemctl", required=True)
 
     base_runner = systemd_runner(module, systemctl_bin)
 
     get_version(base_runner)
 
-    state_props = ['LoadState', 'ActiveState', 'SubState']
+    state_props = ["LoadState", "ActiveState", "SubState"]
     results = {}
 
     unit_types = ["service", "target", "socket", "mount", "timer"]
@@ -400,10 +398,10 @@ def main():
         }
 
     property_cache = {}
-    extra_properties = module.params['extra_properties']
+    extra_properties = module.params["extra_properties"]
 
-    if module.params['unitname']:
-        selected_units = module.params['unitname']
+    if module.params["unitname"]:
+        selected_units = module.params["unitname"]
         all_units = list(units_info)
         resolved_units, non_matching = process_wildcards(selected_units, all_units, module)
         units_to_process = sorted(resolved_units)
@@ -415,5 +413,5 @@ def main():
     module.exit_json(changed=False, units=results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

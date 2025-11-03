@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2025, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -77,11 +76,7 @@ class LookupModule(LookupBase):
             raise AnsibleLookupError(f"No private key found for item {item_id}.")
 
         if ssh_format:
-            return (
-                private_key_field.get("ssh_formats", {})
-                .get("openssh", {})
-                .get("value", "")
-            )
+            return private_key_field.get("ssh_formats", {}).get("openssh", {}).get("value", "")
         return private_key_field.get("value", "")
 
     def run(self, terms, variables=None, **kwargs):
@@ -113,7 +108,4 @@ class LookupModule(LookupBase):
         )
         op.assert_logged_in()
 
-        return [
-            self.get_ssh_key(op.get_raw(term, vault), term, ssh_format=ssh_format)
-            for term in terms
-        ]
+        return [self.get_ssh_key(op.get_raw(term, vault), term, ssh_format=ssh_format) for term in terms]

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Gabe Mulley <gabe.mulley@gmail.com>
 # Copyright (c) 2015, David Wittman <dwittman@gmail.com>
@@ -7,8 +6,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -160,43 +158,55 @@ class AlternativeState:
         return [cls.PRESENT, cls.SELECTED, cls.ABSENT, cls.AUTO]
 
 
-class AlternativesModule(object):
+class AlternativesModule:
     _UPDATE_ALTERNATIVES = None
 
     def __init__(self, module):
         self.module = module
         self.result = dict(changed=False, diff=dict(before=dict(), after=dict()))
-        self.module.run_command_environ_update = {'LC_ALL': 'C'}
+        self.module.run_command_environ_update = {"LC_ALL": "C"}
         self.messages = []
         self.run()
 
     @property
     def mode_present(self):
-        return self.module.params.get('state') in [AlternativeState.PRESENT, AlternativeState.SELECTED, AlternativeState.AUTO]
+        return self.module.params.get("state") in [
+            AlternativeState.PRESENT,
+            AlternativeState.SELECTED,
+            AlternativeState.AUTO,
+        ]
 
     @property
     def mode_selected(self):
-        return self.module.params.get('state') == AlternativeState.SELECTED
+        return self.module.params.get("state") == AlternativeState.SELECTED
 
     @property
     def mode_auto(self):
-        return self.module.params.get('state') == AlternativeState.AUTO
+        return self.module.params.get("state") == AlternativeState.AUTO
 
     def run(self):
         self.parse()
 
         if self.mode_present:
             # Check if we need to (re)install
-            subcommands_parameter = self.module.params['subcommands']
-            priority_parameter = self.module.params['priority']
-            if (
-                self.path is not None and (
-                    self.path not in self.current_alternatives or
-                    (priority_parameter is not None and self.current_alternatives[self.path].get('priority') != priority_parameter) or
-                    (subcommands_parameter is not None and (
-                        not all(s in subcommands_parameter for s in self.current_alternatives[self.path].get('subcommands')) or
-                        not all(s in self.current_alternatives[self.path].get('subcommands') for s in subcommands_parameter)
-                    ))
+            subcommands_parameter = self.module.params["subcommands"]
+            priority_parameter = self.module.params["priority"]
+            if self.path is not None and (
+                self.path not in self.current_alternatives
+                or (
+                    priority_parameter is not None
+                    and self.current_alternatives[self.path].get("priority") != priority_parameter
+                )
+                or (
+                    subcommands_parameter is not None
+                    and (
+                        not all(
+                            s in subcommands_parameter for s in self.current_alternatives[self.path].get("subcommands")
+                        )
+                        or not all(
+                            s in self.current_alternatives[self.path].get("subcommands") for s in subcommands_parameter
+                        )
+                    )
                 )
             ):
                 self.install()
@@ -206,44 +216,46 @@ class AlternativesModule(object):
             is_same_family = False
             if self.current_path is not None and self.current_path in self.current_alternatives:
                 current_alternative = self.current_alternatives[self.current_path]
-                is_same_family = current_alternative.get('family') == self.family
+                is_same_family = current_alternative.get("family") == self.family
 
             if self.mode_selected and not (is_same_path or is_same_family):
                 self.set()
 
             # Check if we need to reset to auto
-            if self.mode_auto and self.current_mode == 'manual':
+            if self.mode_auto and self.current_mode == "manual":
                 self.auto()
         else:
             # Check if we need to uninstall
             if self.path in self.current_alternatives:
                 self.remove()
 
-        self.result['msg'] = ' '.join(self.messages)
+        self.result["msg"] = " ".join(self.messages)
         self.module.exit_json(**self.result)
 
     def install(self):
         if not os.path.exists(self.path):
-            self.module.fail_json(msg="Specified path %s does not exist" % self.path)
+            self.module.fail_json(msg=f"Specified path {self.path} does not exist")
         if not self.link:
-            self.module.fail_json(msg='Needed to install the alternative, but unable to do so as we are missing the link')
+            self.module.fail_json(
+                msg="Needed to install the alternative, but unable to do so as we are missing the link"
+            )
 
-        cmd = [self.UPDATE_ALTERNATIVES, '--install', self.link, self.name, self.path, str(self.priority)]
+        cmd = [self.UPDATE_ALTERNATIVES, "--install", self.link, self.name, self.path, str(self.priority)]
         if self.family is not None:
             cmd.extend(["--family", self.family])
 
-        if self.module.params['subcommands'] is not None:
-            subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.subcommands]
+        if self.module.params["subcommands"] is not None:
+            subcommands = [["--slave", subcmd["link"], subcmd["name"], subcmd["path"]] for subcmd in self.subcommands]
             cmd += [item for sublist in subcommands for item in sublist]
 
-        self.result['changed'] = True
-        self.messages.append("Install alternative '%s' for '%s'." % (self.path, self.name))
+        self.result["changed"] = True
+        self.messages.append(f"Install alternative '{self.path}' for '{self.name}'.")
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
-            self.result['diff']['after'] = dict(
+            self.result["diff"]["after"] = dict(
                 state=AlternativeState.PRESENT,
                 path=self.path,
                 family=self.family,
@@ -251,20 +263,18 @@ class AlternativesModule(object):
                 link=self.link,
             )
             if self.subcommands:
-                self.result['diff']['after'].update(dict(
-                    subcommands=self.subcommands
-                ))
+                self.result["diff"]["after"].update(dict(subcommands=self.subcommands))
 
     def remove(self):
-        cmd = [self.UPDATE_ALTERNATIVES, '--remove', self.name, self.path]
-        self.result['changed'] = True
-        self.messages.append("Remove alternative '%s' from '%s'." % (self.path, self.name))
+        cmd = [self.UPDATE_ALTERNATIVES, "--remove", self.name, self.path]
+        self.result["changed"] = True
+        self.messages.append(f"Remove alternative '{self.path}' from '{self.name}'.")
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
-            self.result['diff']['after'] = dict(state=AlternativeState.ABSENT)
+            self.result["diff"]["after"] = dict(state=AlternativeState.ABSENT)
 
     def set(self):
         # Path takes precedence over family as it is more specific
@@ -273,61 +283,61 @@ class AlternativesModule(object):
         else:
             arg = self.path
 
-        cmd = [self.UPDATE_ALTERNATIVES, '--set', self.name, arg]
-        self.result['changed'] = True
-        self.messages.append("Set alternative '%s' for '%s'." % (arg, self.name))
+        cmd = [self.UPDATE_ALTERNATIVES, "--set", self.name, arg]
+        self.result["changed"] = True
+        self.messages.append(f"Set alternative '{arg}' for '{self.name}'.")
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
-            self.result['diff']['after']['state'] = AlternativeState.SELECTED
+            self.result["diff"]["after"]["state"] = AlternativeState.SELECTED
 
     def auto(self):
-        cmd = [self.UPDATE_ALTERNATIVES, '--auto', self.name]
-        self.messages.append("Set alternative to auto for '%s'." % (self.name))
-        self.result['changed'] = True
+        cmd = [self.UPDATE_ALTERNATIVES, "--auto", self.name]
+        self.messages.append(f"Set alternative to auto for '{self.name}'.")
+        self.result["changed"] = True
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
-            self.result['diff']['after']['state'] = AlternativeState.PRESENT
+            self.result["diff"]["after"]["state"] = AlternativeState.PRESENT
 
     @property
     def name(self):
-        return self.module.params.get('name')
+        return self.module.params.get("name")
 
     @property
     def path(self):
-        return self.module.params.get('path')
+        return self.module.params.get("path")
 
     @property
     def family(self):
-        return self.module.params.get('family')
+        return self.module.params.get("family")
 
     @property
     def link(self):
-        return self.module.params.get('link') or self.current_link
+        return self.module.params.get("link") or self.current_link
 
     @property
     def priority(self):
-        if self.module.params.get('priority') is not None:
-            return self.module.params.get('priority')
-        return self.current_alternatives.get(self.path, {}).get('priority', 50)
+        if self.module.params.get("priority") is not None:
+            return self.module.params.get("priority")
+        return self.current_alternatives.get(self.path, {}).get("priority", 50)
 
     @property
     def subcommands(self):
-        if self.module.params.get('subcommands') is not None:
-            return self.module.params.get('subcommands')
-        elif self.path in self.current_alternatives and self.current_alternatives[self.path].get('subcommands'):
-            return self.current_alternatives[self.path].get('subcommands')
+        if self.module.params.get("subcommands") is not None:
+            return self.module.params.get("subcommands")
+        elif self.path in self.current_alternatives and self.current_alternatives[self.path].get("subcommands"):
+            return self.current_alternatives[self.path].get("subcommands")
         return None
 
     @property
     def UPDATE_ALTERNATIVES(self):
         if self._UPDATE_ALTERNATIVES is None:
-            self._UPDATE_ALTERNATIVES = self.module.get_bin_path('update-alternatives', True)
+            self._UPDATE_ALTERNATIVES = self.module.get_bin_path("update-alternatives", True)
         return self._UPDATE_ALTERNATIVES
 
     def parse(self):
@@ -337,21 +347,21 @@ class AlternativesModule(object):
         self.current_alternatives = {}
 
         # Run `update-alternatives --display <name>` to find existing alternatives
-        (rc, display_output, dummy) = self.module.run_command(
-            [self.UPDATE_ALTERNATIVES, '--display', self.name]
-        )
+        (rc, display_output, dummy) = self.module.run_command([self.UPDATE_ALTERNATIVES, "--display", self.name])
 
         if rc != 0:
-            self.module.debug("No current alternative found. '%s' exited with %s" % (self.UPDATE_ALTERNATIVES, rc))
+            self.module.debug(f"No current alternative found. '{self.UPDATE_ALTERNATIVES}' exited with {rc}")
             return
 
-        current_mode_regex = re.compile(r'\s-\s(?:status\sis\s)?(\w*)(?:\smode|.)$', re.MULTILINE)
-        current_path_regex = re.compile(r'^\s*link currently points to (.*)$', re.MULTILINE)
-        current_link_regex = re.compile(r'^\s*link \w+ is (.*)$', re.MULTILINE)
-        subcmd_path_link_regex = re.compile(r'^\s*(?:slave|follower) (\S+) is (.*)$', re.MULTILINE)
+        current_mode_regex = re.compile(r"\s-\s(?:status\sis\s)?(\w*)(?:\smode|.)$", re.MULTILINE)
+        current_path_regex = re.compile(r"^\s*link currently points to (.*)$", re.MULTILINE)
+        current_link_regex = re.compile(r"^\s*link \w+ is (.*)$", re.MULTILINE)
+        subcmd_path_link_regex = re.compile(r"^\s*(?:slave|follower) (\S+) is (.*)$", re.MULTILINE)
 
-        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s(\S+)\s)?priority\s(\d+)((?:\s+(?:slave|follower).*)*)', re.MULTILINE)
-        subcmd_regex = re.compile(r'^\s+(?:slave|follower) (.*): (.*)$', re.MULTILINE)
+        alternative_regex = re.compile(
+            r"^(\/.*)\s-\s(?:family\s(\S+)\s)?priority\s(\d+)((?:\s+(?:slave|follower).*)*)", re.MULTILINE
+        )
+        subcmd_regex = re.compile(r"^\s+(?:slave|follower) (.*): (.*)$", re.MULTILINE)
 
         match = current_mode_regex.search(display_output)
         if not match:
@@ -373,67 +383,69 @@ class AlternativesModule(object):
 
         subcmd_path_map = dict(subcmd_path_link_regex.findall(display_output))
         if not subcmd_path_map and self.subcommands:
-            subcmd_path_map = {s['name']: s['link'] for s in self.subcommands}
+            subcmd_path_map = {s["name"]: s["link"] for s in self.subcommands}
 
         for path, family, prio, subcmd in alternative_regex.findall(display_output):
             self.current_alternatives[path] = dict(
                 priority=int(prio),
                 family=family,
-                subcommands=[dict(
-                    name=name,
-                    path=spath,
-                    link=subcmd_path_map.get(name)
-                ) for name, spath in subcmd_regex.findall(subcmd) if spath != '(null)']
+                subcommands=[
+                    dict(name=name, path=spath, link=subcmd_path_map.get(name))
+                    for name, spath in subcmd_regex.findall(subcmd)
+                    if spath != "(null)"
+                ],
             )
 
         if self.module._diff:
             if self.path in self.current_alternatives:
-                self.result['diff']['before'].update(dict(
-                    state=AlternativeState.PRESENT,
-                    path=self.path,
-                    priority=self.current_alternatives[self.path].get('priority'),
-                    link=self.current_link,
-                ))
-                if self.current_alternatives[self.path].get('subcommands'):
-                    self.result['diff']['before'].update(dict(
-                        subcommands=self.current_alternatives[self.path].get('subcommands')
-                    ))
-                if self.current_mode == 'manual' and self.current_path != self.path:
-                    self.result['diff']['before'].update(dict(
-                        state=AlternativeState.SELECTED
-                    ))
+                self.result["diff"]["before"].update(
+                    dict(
+                        state=AlternativeState.PRESENT,
+                        path=self.path,
+                        priority=self.current_alternatives[self.path].get("priority"),
+                        link=self.current_link,
+                    )
+                )
+                if self.current_alternatives[self.path].get("subcommands"):
+                    self.result["diff"]["before"].update(
+                        dict(subcommands=self.current_alternatives[self.path].get("subcommands"))
+                    )
+                if self.current_mode == "manual" and self.current_path != self.path:
+                    self.result["diff"]["before"].update(dict(state=AlternativeState.SELECTED))
             else:
-                self.result['diff']['before'].update(dict(
-                    state=AlternativeState.ABSENT
-                ))
+                self.result["diff"]["before"].update(dict(state=AlternativeState.ABSENT))
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            path=dict(type='path'),
-            family=dict(type='str'),
-            link=dict(type='path'),
-            priority=dict(type='int'),
+            name=dict(type="str", required=True),
+            path=dict(type="path"),
+            family=dict(type="str"),
+            link=dict(type="path"),
+            priority=dict(type="int"),
             state=dict(
-                type='str',
+                type="str",
                 choices=AlternativeState.to_list(),
                 default=AlternativeState.SELECTED,
             ),
-            subcommands=dict(type='list', elements='dict', aliases=['slaves'], options=dict(
-                name=dict(type='str', required=True),
-                path=dict(type='path', required=True),
-                link=dict(type='path', required=True),
-            )),
+            subcommands=dict(
+                type="list",
+                elements="dict",
+                aliases=["slaves"],
+                options=dict(
+                    name=dict(type="str", required=True),
+                    path=dict(type="path", required=True),
+                    link=dict(type="path", required=True),
+                ),
+            ),
         ),
         supports_check_mode=True,
-        required_one_of=[('path', 'family')]
+        required_one_of=[("path", "family")],
     )
 
     AlternativesModule(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

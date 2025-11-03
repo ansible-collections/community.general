@@ -2,8 +2,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: collection_version
@@ -67,35 +66,35 @@ from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 
 
-FQCN_RE = re.compile(r'^[A-Za-z0-9_]+\.[A-Za-z0-9_]+$')
+FQCN_RE = re.compile(r"^[A-Za-z0-9_]+\.[A-Za-z0-9_]+$")
 
 
 def load_collection_meta_manifest(manifest_path):
-    with open(manifest_path, 'rb') as f:
+    with open(manifest_path, "rb") as f:
         meta = json.load(f)
     return {
-        'version': meta['collection_info']['version'],
+        "version": meta["collection_info"]["version"],
     }
 
 
-def load_collection_meta_galaxy(galaxy_path, no_version='*'):
-    with open(galaxy_path, 'rb') as f:
+def load_collection_meta_galaxy(galaxy_path, no_version="*"):
+    with open(galaxy_path, "rb") as f:
         meta = yaml.safe_load(f)
     return {
-        'version': meta.get('version') or no_version,
+        "version": meta.get("version") or no_version,
     }
 
 
-def load_collection_meta(collection_pkg, no_version='*'):
+def load_collection_meta(collection_pkg, no_version="*"):
     path = os.path.dirname(collection_pkg.__file__)
 
     # Try to load MANIFEST.json
-    manifest_path = os.path.join(path, 'MANIFEST.json')
+    manifest_path = os.path.join(path, "MANIFEST.json")
     if os.path.exists(manifest_path):
         return load_collection_meta_manifest(manifest_path)
 
     # Try to load galaxy.yml
-    galaxy_path = os.path.join(path, 'galaxy.yml')
+    galaxy_path = os.path.join(path, "galaxy.yml")
     if os.path.exists(galaxy_path):
         return load_collection_meta_galaxy(galaxy_path, no_version=no_version)
 
@@ -106,15 +105,15 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         result = []
         self.set_options(var_options=variables, direct=kwargs)
-        not_found = self.get_option('result_not_found')
-        no_version = self.get_option('result_no_version')
+        not_found = self.get_option("result_not_found")
+        no_version = self.get_option("result_no_version")
 
         for term in terms:
             if not FQCN_RE.match(term):
                 raise AnsibleLookupError(f'"{term}" is not a FQCN')
 
             try:
-                collection_pkg = import_module(f'ansible_collections.{term}')
+                collection_pkg = import_module(f"ansible_collections.{term}")
             except ImportError:
                 # Collection not found
                 result.append(not_found)
@@ -123,8 +122,8 @@ class LookupModule(LookupBase):
             try:
                 data = load_collection_meta(collection_pkg, no_version=no_version)
             except Exception as exc:
-                raise AnsibleLookupError(f'Error while loading metadata for {term}: {exc}')
+                raise AnsibleLookupError(f"Error while loading metadata for {term}: {exc}")
 
-            result.append(data.get('version', no_version))
+            result.append(data.get("version", no_version))
 
         return result

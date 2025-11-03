@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Kevin Brebanov <https://github.com/kbrebanov>
 # Based on pacman (Afterburn <https://github.com/afterburn>, Aaron Bull Schaefer <aaron@elasticdog.com>)
@@ -8,8 +7,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -168,14 +166,15 @@ packages:
 """
 
 import re
+
 # Import module snippets.
 from ansible.module_utils.basic import AnsibleModule
 
 
 def parse_for_packages(stdout):
     packages = []
-    data = stdout.split('\n')
-    regex = re.compile(r'^\(\d+/\d+\)\s+\S+\s+(\S+)')
+    data = stdout.split("\n")
+    regex = re.compile(r"^\(\d+/\d+\)\s+\S+\s+(\S+)")
     for l in data:
         p = regex.search(l)
         if p:
@@ -189,7 +188,7 @@ def update_package_db(module, exit):
     if rc != 0:
         module.fail_json(msg="could not update package db", stdout=stdout, stderr=stderr)
     elif exit:
-        module.exit_json(changed=True, msg='updated repository indexes', stdout=stdout, stderr=stderr)
+        module.exit_json(changed=True, msg="updated repository indexes", stdout=stdout, stderr=stderr)
     else:
         return True
 
@@ -197,7 +196,7 @@ def update_package_db(module, exit):
 def query_toplevel(module, name, world):
     # world contains a list of top-level packages separated by ' ' or \n
     # packages may contain repository (@) or version (=<>~) separator characters or start with negation !
-    regex = re.compile(r'^' + re.escape(name) + r'([@=<>~].+)?$')
+    regex = re.compile(rf"^{re.escape(name)}([@=<>~].+)?$")
     with open(world) as f:
         content = f.read().split()
         for p in content:
@@ -218,7 +217,7 @@ def query_package(module, name):
 def query_latest(module, name):
     cmd = APK_PATH + ["version", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-    search_pattern = r"(%s)-[\d\.\w]+-[\d\w]+\s+(.)\s+[\d\.\w]+-[\d\w]+\s+" % (re.escape(name))
+    search_pattern = rf"({re.escape(name)})-[\d\.\w]+-[\d\w]+\s+(.)\s+[\d\.\w]+-[\d\w]+\s+"
     match = re.search(search_pattern, stdout)
     if match and match.group(2) == "<":
         return False
@@ -228,7 +227,7 @@ def query_latest(module, name):
 def query_virtual(module, name):
     cmd = APK_PATH + ["-v", "info", "--description", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-    search_pattern = r"^%s: virtual meta package" % (re.escape(name))
+    search_pattern = rf"^{re.escape(name)}: virtual meta package"
     if re.search(search_pattern, stdout):
         return True
     return False
@@ -255,8 +254,10 @@ def upgrade_packages(module, available):
     packagelist = parse_for_packages(stdout)
     if rc != 0:
         module.fail_json(msg="failed to upgrade packages", stdout=stdout, stderr=stderr, packages=packagelist)
-    if re.search(r'^OK', stdout):
-        module.exit_json(changed=False, msg="packages already upgraded", stdout=stdout, stderr=stderr, packages=packagelist)
+    if re.search(r"^OK", stdout):
+        module.exit_json(
+            changed=False, msg="packages already upgraded", stdout=stdout, stderr=stderr, packages=packagelist
+        )
     module.exit_json(changed=True, msg="upgraded packages", stdout=stdout, stderr=stderr, packages=packagelist)
 
 
@@ -270,12 +271,12 @@ def install_packages(module, names, state, world):
             # Get virtual package dependencies
             dependencies = get_dependencies(module, name)
             for dependency in dependencies:
-                if state == 'latest' and not query_latest(module, dependency):
+                if state == "latest" and not query_latest(module, dependency):
                     to_upgrade.append(dependency)
         else:
             if not query_toplevel(module, name, world):
                 to_install.append(name)
-            elif state == 'latest' and not query_latest(module, name):
+            elif state == "latest" and not query_latest(module, name):
                 to_upgrade.append(name)
     if to_upgrade:
         upgrade = True
@@ -295,8 +296,10 @@ def install_packages(module, names, state, world):
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     packagelist = parse_for_packages(stdout)
     if rc != 0:
-        module.fail_json(msg="failed to install %s" % (packages), stdout=stdout, stderr=stderr, packages=packagelist)
-    module.exit_json(changed=True, msg="installed %s package(s)" % (packages), stdout=stdout, stderr=stderr, packages=packagelist)
+        module.fail_json(msg=f"failed to install {packages}", stdout=stdout, stderr=stderr, packages=packagelist)
+    module.exit_json(
+        changed=True, msg=f"installed {packages} package(s)", stdout=stdout, stderr=stderr, packages=packagelist
+    )
 
 
 def remove_packages(module, names):
@@ -319,8 +322,11 @@ def remove_packages(module, names):
             rc = 1
             break
     if rc != 0:
-        module.fail_json(msg="failed to remove %s package(s)" % (names), stdout=stdout, stderr=stderr, packages=packagelist)
-    module.exit_json(changed=True, msg="removed %s package(s)" % (names), stdout=stdout, stderr=stderr, packages=packagelist)
+        module.fail_json(msg=f"failed to remove {names} package(s)", stdout=stdout, stderr=stderr, packages=packagelist)
+    module.exit_json(
+        changed=True, msg=f"removed {names} package(s)", stdout=stdout, stderr=stderr, packages=packagelist
+    )
+
 
 # ==========================================
 # Main control flow.
@@ -329,56 +335,56 @@ def remove_packages(module, names):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'installed', 'absent', 'removed', 'latest']),
-            name=dict(type='list', elements='str'),
-            no_cache=dict(default=False, type='bool'),
-            repository=dict(type='list', elements='str'),
-            update_cache=dict(default=False, type='bool'),
-            upgrade=dict(default=False, type='bool'),
-            available=dict(default=False, type='bool'),
-            world=dict(default='/etc/apk/world', type='str'),
+            state=dict(default="present", choices=["present", "installed", "absent", "removed", "latest"]),
+            name=dict(type="list", elements="str"),
+            no_cache=dict(default=False, type="bool"),
+            repository=dict(type="list", elements="str"),
+            update_cache=dict(default=False, type="bool"),
+            upgrade=dict(default=False, type="bool"),
+            available=dict(default=False, type="bool"),
+            world=dict(default="/etc/apk/world", type="str"),
         ),
-        required_one_of=[['name', 'update_cache', 'upgrade']],
-        mutually_exclusive=[['name', 'upgrade']],
-        supports_check_mode=True
+        required_one_of=[["name", "update_cache", "upgrade"]],
+        mutually_exclusive=[["name", "upgrade"]],
+        supports_check_mode=True,
     )
 
     # Set LANG env since we parse stdout
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     global APK_PATH
-    APK_PATH = [module.get_bin_path('apk', required=True)]
+    APK_PATH = [module.get_bin_path("apk", required=True)]
 
     p = module.params
 
-    if p['name'] and any(not name.strip() for name in p['name']):
+    if p["name"] and any(not name.strip() for name in p["name"]):
         module.fail_json(msg="Package name(s) cannot be empty or whitespace-only")
 
-    if p['no_cache']:
+    if p["no_cache"]:
         APK_PATH.append("--no-cache")
 
     # add repositories to the APK_PATH
-    if p['repository']:
-        for r in p['repository']:
+    if p["repository"]:
+        for r in p["repository"]:
             APK_PATH.extend(["--repository", r, "--repositories-file", "/dev/null"])
 
     # normalize the state parameter
-    if p['state'] in ['present', 'installed']:
-        p['state'] = 'present'
-    if p['state'] in ['absent', 'removed']:
-        p['state'] = 'absent'
+    if p["state"] in ["present", "installed"]:
+        p["state"] = "present"
+    if p["state"] in ["absent", "removed"]:
+        p["state"] = "absent"
 
-    if p['update_cache']:
-        update_package_db(module, not p['name'] and not p['upgrade'])
+    if p["update_cache"]:
+        update_package_db(module, not p["name"] and not p["upgrade"])
 
-    if p['upgrade']:
-        upgrade_packages(module, p['available'])
+    if p["upgrade"]:
+        upgrade_packages(module, p["available"])
 
-    if p['state'] in ['present', 'latest']:
-        install_packages(module, p['name'], p['state'], p['world'])
-    elif p['state'] == 'absent':
-        remove_packages(module, p['name'])
+    if p["state"] in ["present", "latest"]:
+        install_packages(module, p["name"], p["state"], p["world"])
+    elif p["state"] == "absent":
+        remove_packages(module, p["name"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

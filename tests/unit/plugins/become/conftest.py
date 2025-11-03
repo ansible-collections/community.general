@@ -5,8 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import pytest
 
@@ -16,7 +15,7 @@ from ansible.utils import context_objects as co
 
 @pytest.fixture
 def parser():
-    parser = opt_help.create_base_parser('testparser')
+    parser = opt_help.create_base_parser("testparser")
 
     opt_help.add_runas_options(parser)
     opt_help.add_meta_options(parser)

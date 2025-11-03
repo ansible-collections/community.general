@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017-2018, Jan-Piet Mens <jpmens(at)gmail.com>
 # Copyright (c) 2018 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: lmdb_kv
@@ -72,9 +70,8 @@ except ImportError:
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
-        '''
+        """
         terms contain any number of keys to be retrieved.
         If terms is None, all keys from the database are returned
         with their values, and if term ends in an asterisk, we
@@ -85,13 +82,13 @@ class LookupModule(LookupBase):
 
               vars:
                 - lmdb_kv_db: "jp.mdb"
-        '''
+        """
         if HAVE_LMDB is False:
             raise AnsibleError("Can't LOOKUP(lmdb_kv): this module requires lmdb to be installed")
 
         self.set_options(var_options=variables, direct=kwargs)
 
-        db = self.get_option('db')
+        db = self.get_option("db")
 
         try:
             env = lmdb.open(str(db), readonly=True)
@@ -109,7 +106,7 @@ class LookupModule(LookupBase):
         else:
             for term in terms:
                 with env.begin() as txn:
-                    if term.endswith('*'):
+                    if term.endswith("*"):
                         cursor = txn.cursor()
                         prefix = term[:-1]  # strip asterisk
                         cursor.set_range(to_text(term).encode())

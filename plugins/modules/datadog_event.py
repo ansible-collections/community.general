@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Author: Artūras 'arturaz' Šlajus <x11@arturaz.net>
 # Author: Naoya Nakazawa <naoya.n@gmail.com>
@@ -10,8 +9,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -132,6 +130,7 @@ import traceback
 DATADOG_IMP_ERR = None
 try:
     from datadog import initialize, api
+
     HAS_DATADOG = True
 except Exception:
     DATADOG_IMP_ERR = traceback.format_exc()
@@ -146,29 +145,29 @@ def main():
         argument_spec=dict(
             api_key=dict(required=True, no_log=True),
             app_key=dict(required=True, no_log=True),
-            api_host=dict(type='str'),
+            api_host=dict(type="str"),
             title=dict(required=True),
             text=dict(required=True),
-            date_happened=dict(type='int'),
-            priority=dict(default='normal', choices=['normal', 'low']),
+            date_happened=dict(type="int"),
+            priority=dict(default="normal", choices=["normal", "low"]),
             host=dict(),
-            tags=dict(type='list', elements='str'),
-            alert_type=dict(default='info', choices=['error', 'warning', 'info', 'success']),
+            tags=dict(type="list", elements="str"),
+            alert_type=dict(default="info", choices=["error", "warning", "info", "success"]),
             aggregation_key=dict(no_log=False),
-            validate_certs=dict(default=True, type='bool'),
+            validate_certs=dict(default=True, type="bool"),
         )
     )
 
     # Prepare Datadog
     if not HAS_DATADOG:
-        module.fail_json(msg=missing_required_lib('datadogpy'), exception=DATADOG_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("datadogpy"), exception=DATADOG_IMP_ERR)
 
     options = {
-        'api_key': module.params['api_key'],
-        'app_key': module.params['app_key'],
+        "api_key": module.params["api_key"],
+        "app_key": module.params["app_key"],
     }
-    if module.params['api_host'] is not None:
-        options['api_host'] = module.params['api_host']
+    if module.params["api_host"] is not None:
+        options["api_host"] = module.params["api_host"]
 
     initialize(**options)
 
@@ -177,17 +176,19 @@ def main():
 
 def _post_event(module):
     try:
-        if module.params['host'] is None:
-            module.params['host'] = platform.node().split('.')[0]
-        msg = api.Event.create(title=module.params['title'],
-                               text=module.params['text'],
-                               host=module.params['host'],
-                               tags=module.params['tags'],
-                               priority=module.params['priority'],
-                               alert_type=module.params['alert_type'],
-                               aggregation_key=module.params['aggregation_key'],
-                               source_type_name='ansible')
-        if msg['status'] != 'ok':
+        if module.params["host"] is None:
+            module.params["host"] = platform.node().split(".")[0]
+        msg = api.Event.create(
+            title=module.params["title"],
+            text=module.params["text"],
+            host=module.params["host"],
+            tags=module.params["tags"],
+            priority=module.params["priority"],
+            alert_type=module.params["alert_type"],
+            aggregation_key=module.params["aggregation_key"],
+            source_type_name="ansible",
+        )
+        if msg["status"] != "ok":
             module.fail_json(msg=msg)
 
         module.exit_json(changed=True, msg=msg)
@@ -195,5 +196,5 @@ def _post_event(module):
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

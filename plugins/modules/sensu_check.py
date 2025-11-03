@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Anders Ingemann <aim@secoya.dk>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -189,137 +187,143 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
-def sensu_check(module, path, name, state='present', backup=False):
+def sensu_check(module, path, name, state="present", backup=False):
     changed = False
     reasons = []
 
     stream = None
     try:
         try:
-            stream = open(path, 'r')
+            stream = open(path, "r")
             config = json.load(stream)
         except IOError as e:
             if e.errno == 2:  # File not found, non-fatal
-                if state == 'absent':
-                    reasons.append('file did not exist and state is `absent\'')
+                if state == "absent":
+                    reasons.append("file did not exist and state is `absent'")
                     return changed, reasons
                 config = {}
             else:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
         except ValueError:
-            msg = '{path} contains invalid JSON'.format(path=path)
+            msg = f"{path} contains invalid JSON"
             module.fail_json(msg=msg)
     finally:
         if stream:
             stream.close()
 
-    if 'checks' not in config:
-        if state == 'absent':
-            reasons.append('`checks\' section did not exist and state is `absent\'')
+    if "checks" not in config:
+        if state == "absent":
+            reasons.append("`checks' section did not exist and state is `absent'")
             return changed, reasons
-        config['checks'] = {}
+        config["checks"] = {}
         changed = True
-        reasons.append('`checks\' section did not exist')
+        reasons.append("`checks' section did not exist")
 
-    if state == 'absent':
-        if name in config['checks']:
-            del config['checks'][name]
+    if state == "absent":
+        if name in config["checks"]:
+            del config["checks"][name]
             changed = True
-            reasons.append('check was present and state is `absent\'')
+            reasons.append("check was present and state is `absent'")
 
-    if state == 'present':
-        if name not in config['checks']:
+    if state == "present":
+        if name not in config["checks"]:
             check = {}
-            config['checks'][name] = check
+            config["checks"][name] = check
             changed = True
-            reasons.append('check was absent and state is `present\'')
+            reasons.append("check was absent and state is `present'")
         else:
-            check = config['checks'][name]
-        simple_opts = ['command',
-                       'handlers',
-                       'subscribers',
-                       'interval',
-                       'timeout',
-                       'ttl',
-                       'handle',
-                       'dependencies',
-                       'standalone',
-                       'publish',
-                       'occurrences',
-                       'refresh',
-                       'aggregate',
-                       'low_flap_threshold',
-                       'high_flap_threshold',
-                       'source',
-                       ]
+            check = config["checks"][name]
+        simple_opts = [
+            "command",
+            "handlers",
+            "subscribers",
+            "interval",
+            "timeout",
+            "ttl",
+            "handle",
+            "dependencies",
+            "standalone",
+            "publish",
+            "occurrences",
+            "refresh",
+            "aggregate",
+            "low_flap_threshold",
+            "high_flap_threshold",
+            "source",
+        ]
         for opt in simple_opts:
             if module.params[opt] is not None:
                 if opt not in check or check[opt] != module.params[opt]:
                     check[opt] = module.params[opt]
                     changed = True
-                    reasons.append('`{opt}\' did not exist or was different'.format(opt=opt))
+                    reasons.append(f"`{opt}' did not exist or was different")
             else:
                 if opt in check:
                     del check[opt]
                     changed = True
-                    reasons.append('`{opt}\' was removed'.format(opt=opt))
+                    reasons.append(f"`{opt}' was removed")
 
-        if module.params['custom']:
+        if module.params["custom"]:
             # Convert to json
-            custom_params = module.params['custom']
-            overwrited_fields = set(custom_params.keys()) & set(simple_opts + ['type', 'subdue', 'subdue_begin', 'subdue_end'])
+            custom_params = module.params["custom"]
+            overwrited_fields = set(custom_params.keys()) & set(
+                simple_opts + ["type", "subdue", "subdue_begin", "subdue_end"]
+            )
             if overwrited_fields:
-                msg = 'You can\'t overwriting standard module parameters via "custom". You are trying overwrite: {opt}'.format(opt=list(overwrited_fields))
+                msg = f'You can\'t overwriting standard module parameters via "custom". You are trying overwrite: {list(overwrited_fields)}'
                 module.fail_json(msg=msg)
 
             for k, v in custom_params.items():
-                if k in config['checks'][name]:
-                    if not config['checks'][name][k] == v:
+                if k in config["checks"][name]:
+                    if not config["checks"][name][k] == v:
                         changed = True
-                        reasons.append('`custom param {opt}\' was changed'.format(opt=k))
+                        reasons.append(f"`custom param {k}' was changed")
                 else:
                     changed = True
-                    reasons.append('`custom param {opt}\' was added'.format(opt=k))
+                    reasons.append(f"`custom param {k}' was added")
                 check[k] = v
             simple_opts += custom_params.keys()
 
         # Remove obsolete custom params
-        for opt in set(config['checks'][name].keys()) - set(simple_opts + ['type', 'subdue', 'subdue_begin', 'subdue_end']):
+        for opt in set(config["checks"][name].keys()) - set(
+            simple_opts + ["type", "subdue", "subdue_begin", "subdue_end"]
+        ):
             changed = True
-            reasons.append('`custom param {opt}\' was deleted'.format(opt=opt))
+            reasons.append(f"`custom param {opt}' was deleted")
             del check[opt]
 
-        if module.params['metric']:
-            if 'type' not in check or check['type'] != 'metric':
-                check['type'] = 'metric'
+        if module.params["metric"]:
+            if "type" not in check or check["type"] != "metric":
+                check["type"] = "metric"
                 changed = True
-                reasons.append('`type\' was not defined or not `metric\'')
-        if not module.params['metric'] and 'type' in check:
-            del check['type']
+                reasons.append("`type' was not defined or not `metric'")
+        if not module.params["metric"] and "type" in check:
+            del check["type"]
             changed = True
-            reasons.append('`type\' was defined')
+            reasons.append("`type' was defined")
 
-        if module.params['subdue_begin'] is not None and module.params['subdue_end'] is not None:
-            subdue = {'begin': module.params['subdue_begin'],
-                      'end': module.params['subdue_end'],
-                      }
-            if 'subdue' not in check or check['subdue'] != subdue:
-                check['subdue'] = subdue
+        if module.params["subdue_begin"] is not None and module.params["subdue_end"] is not None:
+            subdue = {
+                "begin": module.params["subdue_begin"],
+                "end": module.params["subdue_end"],
+            }
+            if "subdue" not in check or check["subdue"] != subdue:
+                check["subdue"] = subdue
                 changed = True
-                reasons.append('`subdue\' did not exist or was different')
+                reasons.append("`subdue' did not exist or was different")
         else:
-            if 'subdue' in check:
-                del check['subdue']
+            if "subdue" in check:
+                del check["subdue"]
                 changed = True
-                reasons.append('`subdue\' was removed')
+                reasons.append("`subdue' was removed")
 
     if changed and not module.check_mode:
         if backup:
             module.backup_local(path)
         try:
             try:
-                stream = open(path, 'w')
-                stream.write(json.dumps(config, indent=2) + '\n')
+                stream = open(path, "w")
+                stream.write(json.dumps(config, indent=2) + "\n")
             except IOError as e:
                 module.fail_json(msg=to_native(e), exception=traceback.format_exc())
         finally:
@@ -330,50 +334,48 @@ def sensu_check(module, path, name, state='present', backup=False):
 
 
 def main():
+    arg_spec = {
+        "name": {"type": "str", "required": True},
+        "path": {"type": "str", "default": "/etc/sensu/conf.d/checks.json"},
+        "state": {"type": "str", "default": "present", "choices": ["present", "absent"]},
+        "backup": {"type": "bool", "default": False},
+        "command": {"type": "str"},
+        "handlers": {"type": "list", "elements": "str"},
+        "subscribers": {"type": "list", "elements": "str"},
+        "interval": {"type": "int"},
+        "timeout": {"type": "int"},
+        "ttl": {"type": "int"},
+        "handle": {"type": "bool"},
+        "subdue_begin": {"type": "str"},
+        "subdue_end": {"type": "str"},
+        "dependencies": {"type": "list", "elements": "str"},
+        "metric": {"type": "bool", "default": False},
+        "standalone": {"type": "bool"},
+        "publish": {"type": "bool"},
+        "occurrences": {"type": "int"},
+        "refresh": {"type": "int"},
+        "aggregate": {"type": "bool"},
+        "low_flap_threshold": {"type": "int"},
+        "high_flap_threshold": {"type": "int"},
+        "custom": {"type": "dict"},
+        "source": {"type": "str"},
+    }
 
-    arg_spec = {'name': {'type': 'str', 'required': True},
-                'path': {'type': 'str', 'default': '/etc/sensu/conf.d/checks.json'},
-                'state': {'type': 'str', 'default': 'present', 'choices': ['present', 'absent']},
-                'backup': {'type': 'bool', 'default': False},
-                'command': {'type': 'str'},
-                'handlers': {'type': 'list', 'elements': 'str'},
-                'subscribers': {'type': 'list', 'elements': 'str'},
-                'interval': {'type': 'int'},
-                'timeout': {'type': 'int'},
-                'ttl': {'type': 'int'},
-                'handle': {'type': 'bool'},
-                'subdue_begin': {'type': 'str'},
-                'subdue_end': {'type': 'str'},
-                'dependencies': {'type': 'list', 'elements': 'str'},
-                'metric': {'type': 'bool', 'default': False},
-                'standalone': {'type': 'bool'},
-                'publish': {'type': 'bool'},
-                'occurrences': {'type': 'int'},
-                'refresh': {'type': 'int'},
-                'aggregate': {'type': 'bool'},
-                'low_flap_threshold': {'type': 'int'},
-                'high_flap_threshold': {'type': 'int'},
-                'custom': {'type': 'dict'},
-                'source': {'type': 'str'},
-                }
+    required_together = [["subdue_begin", "subdue_end"]]
 
-    required_together = [['subdue_begin', 'subdue_end']]
+    module = AnsibleModule(argument_spec=arg_spec, required_together=required_together, supports_check_mode=True)
+    if module.params["state"] != "absent" and module.params["command"] is None:
+        module.fail_json(msg="missing required arguments: %s" % ",".join(["command"]))
 
-    module = AnsibleModule(argument_spec=arg_spec,
-                           required_together=required_together,
-                           supports_check_mode=True)
-    if module.params['state'] != 'absent' and module.params['command'] is None:
-        module.fail_json(msg="missing required arguments: %s" % ",".join(['command']))
-
-    path = module.params['path']
-    name = module.params['name']
-    state = module.params['state']
-    backup = module.params['backup']
+    path = module.params["path"]
+    name = module.params["name"]
+    state = module.params["state"]
+    backup = module.params["backup"]
 
     changed, reasons = sensu_check(module, path, name, state, backup)
 
-    module.exit_json(path=path, changed=changed, msg='OK', name=name, reasons=reasons)
+    module.exit_json(path=path, changed=changed, msg="OK", name=name, reasons=reasons)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

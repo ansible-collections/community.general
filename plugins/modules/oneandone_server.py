@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: oneandone_server
@@ -13,6 +11,10 @@ short_description: Create, destroy, start, stop, and reboot a 1&1 Host server
 description:
   - Create, destroy, update, start, stop, and reboot a 1&1 Host server. When the server is created it can optionally wait
     for it to be 'running' before returning.
+deprecated:
+  removed_in: 13.0.0
+  why: DNS fails to resolve the API endpoint used by the module.
+  alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -202,7 +204,6 @@ servers:
 
 import os
 import time
-from ansible.module_utils.six.moves import xrange
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
     get_datacenter,
@@ -215,7 +216,7 @@ from ansible_collections.community.general.plugins.module_utils.oneandone import
     get_server,
     OneAndOneResources,
     wait_for_resource_creation_completion,
-    wait_for_resource_deletion_completion
+    wait_for_resource_deletion_completion,
 )
 
 HAS_ONEANDONE_SDK = True
@@ -225,31 +226,44 @@ try:
 except ImportError:
     HAS_ONEANDONE_SDK = False
 
-DATACENTERS = ['US', 'ES', 'DE', 'GB']
+DATACENTERS = ["US", "ES", "DE", "GB"]
 
 ONEANDONE_SERVER_STATES = (
-    'DEPLOYING',
-    'POWERED_OFF',
-    'POWERED_ON',
-    'POWERING_ON',
-    'POWERING_OFF',
+    "DEPLOYING",
+    "POWERED_OFF",
+    "POWERED_ON",
+    "POWERING_ON",
+    "POWERING_OFF",
 )
 
 
 def _check_mode(module, result):
     if module.check_mode:
-        module.exit_json(
-            changed=result
-        )
+        module.exit_json(changed=result)
 
 
-def _create_server(module, oneandone_conn, hostname, description,
-                   fixed_instance_size_id, vcore, cores_per_processor, ram,
-                   hdds, datacenter_id, appliance_id, ssh_key,
-                   private_network_id, firewall_policy_id, load_balancer_id,
-                   monitoring_policy_id, server_type, wait, wait_timeout,
-                   wait_interval):
-
+def _create_server(
+    module,
+    oneandone_conn,
+    hostname,
+    description,
+    fixed_instance_size_id,
+    vcore,
+    cores_per_processor,
+    ram,
+    hdds,
+    datacenter_id,
+    appliance_id,
+    ssh_key,
+    private_network_id,
+    firewall_policy_id,
+    load_balancer_id,
+    monitoring_policy_id,
+    server_type,
+    wait,
+    wait_timeout,
+    wait_interval,
+):
     try:
         existing_server = get_server(oneandone_conn, hostname)
 
@@ -276,16 +290,16 @@ def _create_server(module, oneandone_conn, hostname, description,
                 firewall_policy_id=firewall_policy_id,
                 load_balancer_id=load_balancer_id,
                 monitoring_policy_id=monitoring_policy_id,
-                server_type=server_type,), hdds)
+                server_type=server_type,
+            ),
+            hdds,
+        )
 
         if wait:
             wait_for_resource_creation_completion(
-                oneandone_conn,
-                OneAndOneResources.server,
-                server['id'],
-                wait_timeout,
-                wait_interval)
-            server = oneandone_conn.get_server(server['id'])  # refresh
+                oneandone_conn, OneAndOneResources.server, server["id"], wait_timeout, wait_interval
+            )
+            server = oneandone_conn.get_server(server["id"])  # refresh
 
         return server
     except Exception as ex:
@@ -293,11 +307,11 @@ def _create_server(module, oneandone_conn, hostname, description,
 
 
 def _insert_network_data(server):
-    for addr_data in server['ips']:
-        if addr_data['type'] == 'IPV6':
-            server['public_ipv6'] = addr_data['ip']
-        elif addr_data['type'] == 'IPV4':
-            server['public_ipv4'] = addr_data['ip']
+    for addr_data in server["ips"]:
+        if addr_data["type"] == "IPV6":
+            server["public_ipv6"] = addr_data["ip"]
+        elif addr_data["type"] == "IPV4":
+            server["public_ipv4"] = addr_data["ip"]
     return server
 
 
@@ -312,88 +326,71 @@ def create_server(module, oneandone_conn):
     any server was added, and a 'servers' attribute with the list of the
     created servers' hostname, id and ip addresses.
     """
-    hostname = module.params.get('hostname')
-    description = module.params.get('description')
-    auto_increment = module.params.get('auto_increment')
-    count = module.params.get('count')
-    fixed_instance_size = module.params.get('fixed_instance_size')
-    vcore = module.params.get('vcore')
-    cores_per_processor = module.params.get('cores_per_processor')
-    ram = module.params.get('ram')
-    hdds = module.params.get('hdds')
-    datacenter = module.params.get('datacenter')
-    appliance = module.params.get('appliance')
-    ssh_key = module.params.get('ssh_key')
-    private_network = module.params.get('private_network')
-    monitoring_policy = module.params.get('monitoring_policy')
-    firewall_policy = module.params.get('firewall_policy')
-    load_balancer = module.params.get('load_balancer')
-    server_type = module.params.get('server_type')
-    wait = module.params.get('wait')
-    wait_timeout = module.params.get('wait_timeout')
-    wait_interval = module.params.get('wait_interval')
+    hostname = module.params.get("hostname")
+    description = module.params.get("description")
+    auto_increment = module.params.get("auto_increment")
+    count = module.params.get("count")
+    fixed_instance_size = module.params.get("fixed_instance_size")
+    vcore = module.params.get("vcore")
+    cores_per_processor = module.params.get("cores_per_processor")
+    ram = module.params.get("ram")
+    hdds = module.params.get("hdds")
+    datacenter = module.params.get("datacenter")
+    appliance = module.params.get("appliance")
+    ssh_key = module.params.get("ssh_key")
+    private_network = module.params.get("private_network")
+    monitoring_policy = module.params.get("monitoring_policy")
+    firewall_policy = module.params.get("firewall_policy")
+    load_balancer = module.params.get("load_balancer")
+    server_type = module.params.get("server_type")
+    wait = module.params.get("wait")
+    wait_timeout = module.params.get("wait_timeout")
+    wait_interval = module.params.get("wait_interval")
 
     datacenter_id = get_datacenter(oneandone_conn, datacenter)
     if datacenter_id is None:
         _check_mode(module, False)
-        module.fail_json(
-            msg='datacenter %s not found.' % datacenter)
+        module.fail_json(msg=f"datacenter {datacenter} not found.")
 
     fixed_instance_size_id = None
     if fixed_instance_size:
-        fixed_instance_size_id = get_fixed_instance_size(
-            oneandone_conn,
-            fixed_instance_size)
+        fixed_instance_size_id = get_fixed_instance_size(oneandone_conn, fixed_instance_size)
         if fixed_instance_size_id is None:
             _check_mode(module, False)
-            module.fail_json(
-                msg='fixed_instance_size %s not found.' % fixed_instance_size)
+            module.fail_json(msg=f"fixed_instance_size {fixed_instance_size} not found.")
 
     appliance_id = get_appliance(oneandone_conn, appliance)
     if appliance_id is None:
         _check_mode(module, False)
-        module.fail_json(
-            msg='appliance %s not found.' % appliance)
+        module.fail_json(msg=f"appliance {appliance} not found.")
 
     private_network_id = None
     if private_network:
-        private_network_id = get_private_network(
-            oneandone_conn,
-            private_network)
+        private_network_id = get_private_network(oneandone_conn, private_network)
         if private_network_id is None:
             _check_mode(module, False)
-            module.fail_json(
-                msg='private network %s not found.' % private_network)
+            module.fail_json(msg=f"private network {private_network} not found.")
 
     monitoring_policy_id = None
     if monitoring_policy:
-        monitoring_policy_id = get_monitoring_policy(
-            oneandone_conn,
-            monitoring_policy)
+        monitoring_policy_id = get_monitoring_policy(oneandone_conn, monitoring_policy)
         if monitoring_policy_id is None:
             _check_mode(module, False)
-            module.fail_json(
-                msg='monitoring policy %s not found.' % monitoring_policy)
+            module.fail_json(msg=f"monitoring policy {monitoring_policy} not found.")
 
     firewall_policy_id = None
     if firewall_policy:
-        firewall_policy_id = get_firewall_policy(
-            oneandone_conn,
-            firewall_policy)
+        firewall_policy_id = get_firewall_policy(oneandone_conn, firewall_policy)
         if firewall_policy_id is None:
             _check_mode(module, False)
-            module.fail_json(
-                msg='firewall policy %s not found.' % firewall_policy)
+            module.fail_json(msg=f"firewall policy {firewall_policy} not found.")
 
     load_balancer_id = None
     if load_balancer:
-        load_balancer_id = get_load_balancer(
-            oneandone_conn,
-            load_balancer)
+        load_balancer_id = get_load_balancer(oneandone_conn, load_balancer)
         if load_balancer_id is None:
             _check_mode(module, False)
-            module.fail_json(
-                msg='load balancer %s not found.' % load_balancer)
+            module.fail_json(msg=f"load balancer {load_balancer} not found.")
 
     if auto_increment:
         hostnames = _auto_increment_hostname(count, hostname)
@@ -405,10 +402,7 @@ def create_server(module, oneandone_conn):
     hdd_objs = []
     if hdds:
         for hdd in hdds:
-            hdd_objs.append(oneandone.client.Hdd(
-                size=hdd['size'],
-                is_main=hdd['is_main']
-            ))
+            hdd_objs.append(oneandone.client.Hdd(size=hdd["size"], is_main=hdd["is_main"]))
 
     servers = []
     for index, name in enumerate(hostnames):
@@ -432,7 +426,8 @@ def create_server(module, oneandone_conn):
             server_type=server_type,
             wait=wait,
             wait_timeout=wait_timeout,
-            wait_interval=wait_interval)
+            wait_interval=wait_interval,
+        )
         if server:
             servers.append(server)
 
@@ -462,10 +457,10 @@ def remove_server(module, oneandone_conn):
     the server was removed, and a 'removed_server' attribute with
     the removed server's hostname and id.
     """
-    server_id = module.params.get('server')
-    wait = module.params.get('wait')
-    wait_timeout = module.params.get('wait_timeout')
-    wait_interval = module.params.get('wait_interval')
+    server_id = module.params.get("server")
+    wait = module.params.get("wait")
+    wait_timeout = module.params.get("wait_timeout")
+    wait_interval = module.params.get("wait_interval")
 
     changed = False
     removed_server = None
@@ -474,22 +469,16 @@ def remove_server(module, oneandone_conn):
     if server:
         _check_mode(module, True)
         try:
-            oneandone_conn.delete_server(server_id=server['id'])
+            oneandone_conn.delete_server(server_id=server["id"])
             if wait:
-                wait_for_resource_deletion_completion(oneandone_conn,
-                                                      OneAndOneResources.server,
-                                                      server['id'],
-                                                      wait_timeout,
-                                                      wait_interval)
+                wait_for_resource_deletion_completion(
+                    oneandone_conn, OneAndOneResources.server, server["id"], wait_timeout, wait_interval
+                )
             changed = True
         except Exception as ex:
-            module.fail_json(
-                msg="failed to terminate the server: %s" % str(ex))
+            module.fail_json(msg=f"failed to terminate the server: {ex}")
 
-        removed_server = {
-            'id': server['id'],
-            'hostname': server['name']
-        }
+        removed_server = {"id": server["id"], "hostname": server["name"]}
     _check_mode(module, False)
 
     return (changed, removed_server)
@@ -507,11 +496,11 @@ def startstop_server(module, oneandone_conn):
     being run, and a 'server' attribute with basic information for
     the server.
     """
-    state = module.params.get('state')
-    server_id = module.params.get('server')
-    wait = module.params.get('wait')
-    wait_timeout = module.params.get('wait_timeout')
-    wait_interval = module.params.get('wait_interval')
+    state = module.params.get("state")
+    server_id = module.params.get("server")
+    wait = module.params.get("wait")
+    wait_timeout = module.params.get("wait_timeout")
+    wait_interval = module.params.get("wait_interval")
 
     changed = False
 
@@ -521,22 +510,14 @@ def startstop_server(module, oneandone_conn):
         # Attempt to change the server state, only if it is not already there
         # or on its way.
         try:
-            if state == 'stopped' and server['status']['state'] == 'POWERED_ON':
+            if state == "stopped" and server["status"]["state"] == "POWERED_ON":
                 _check_mode(module, True)
-                oneandone_conn.modify_server_status(
-                    server_id=server['id'],
-                    action='POWER_OFF',
-                    method='SOFTWARE')
-            elif state == 'running' and server['status']['state'] == 'POWERED_OFF':
+                oneandone_conn.modify_server_status(server_id=server["id"], action="POWER_OFF", method="SOFTWARE")
+            elif state == "running" and server["status"]["state"] == "POWERED_OFF":
                 _check_mode(module, True)
-                oneandone_conn.modify_server_status(
-                    server_id=server['id'],
-                    action='POWER_ON',
-                    method='SOFTWARE')
+                oneandone_conn.modify_server_status(server_id=server["id"], action="POWER_ON", method="SOFTWARE")
         except Exception as ex:
-            module.fail_json(
-                msg="failed to set server %s to state %s: %s" % (
-                    server_id, state, str(ex)))
+            module.fail_json(msg=f"failed to set server {server_id} to state {state}: {ex}")
 
         _check_mode(module, False)
 
@@ -546,18 +527,16 @@ def startstop_server(module, oneandone_conn):
             wait_timeout = time.time() + wait_timeout
             while wait_timeout > time.time():
                 time.sleep(wait_interval)
-                server = oneandone_conn.get_server(server['id'])  # refresh
-                server_state = server['status']['state']
-                if state == 'stopped' and server_state == 'POWERED_OFF':
+                server = oneandone_conn.get_server(server["id"])  # refresh
+                server_state = server["status"]["state"]
+                if state == "stopped" and server_state == "POWERED_OFF":
                     operation_completed = True
                     break
-                if state == 'running' and server_state == 'POWERED_ON':
+                if state == "running" and server_state == "POWERED_ON":
                     operation_completed = True
                     break
             if not operation_completed:
-                module.fail_json(
-                    msg="Timeout waiting for server %s to get to state %s" % (
-                        server_id, state))
+                module.fail_json(msg=f"Timeout waiting for server {server_id} to get to state {state}")
 
         changed = True
         server = _insert_network_data(server)
@@ -573,13 +552,10 @@ def _auto_increment_hostname(count, hostname):
     string formatting (%) operator. Otherwise, increment using name-01,
     name-02, name-03, and so forth.
     """
-    if '%' not in hostname:
+    if "%" not in hostname:
         hostname = "%s-%%01d" % hostname
 
-    return [
-        hostname % i
-        for i in xrange(1, count + 1)
-    ]
+    return [hostname % i for i in range(1, count + 1)]
 
 
 def _auto_increment_description(count, description):
@@ -587,11 +563,8 @@ def _auto_increment_description(count, description):
     Allow the incremental count in the description when defined with the
     string formatting (%) operator. Otherwise, repeat the same description.
     """
-    if '%' in description:
-        return [
-            description % i
-            for i in xrange(1, count + 1)
-        ]
+    if "%" in description:
+        return [description % i for i in range(1, count + 1)]
     else:
         return [description] * count
 
@@ -599,86 +572,76 @@ def _auto_increment_description(count, description):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            auth_token=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_AUTH_TOKEN'),
-                no_log=True),
-            api_url=dict(
-                type='str',
-                default=os.environ.get('ONEANDONE_API_URL')),
-            hostname=dict(type='str'),
-            description=dict(type='str'),
-            appliance=dict(type='str'),
-            fixed_instance_size=dict(type='str'),
-            vcore=dict(type='int'),
-            cores_per_processor=dict(type='int'),
-            ram=dict(type='float'),
-            hdds=dict(type='list', elements='dict'),
-            count=dict(type='int', default=1),
-            ssh_key=dict(type='raw', no_log=False),
-            auto_increment=dict(type='bool', default=True),
-            server=dict(type='str'),
-            datacenter=dict(
-                choices=DATACENTERS,
-                default='US'),
-            private_network=dict(type='str'),
-            firewall_policy=dict(type='str'),
-            load_balancer=dict(type='str'),
-            monitoring_policy=dict(type='str'),
-            server_type=dict(type='str', default='cloud', choices=['cloud', 'baremetal', 'k8s_node']),
-            wait=dict(type='bool', default=True),
-            wait_timeout=dict(type='int', default=600),
-            wait_interval=dict(type='int', default=5),
-            state=dict(type='str', default='present', choices=['present', 'absent', 'running', 'stopped']),
+            auth_token=dict(type="str", default=os.environ.get("ONEANDONE_AUTH_TOKEN"), no_log=True),
+            api_url=dict(type="str", default=os.environ.get("ONEANDONE_API_URL")),
+            hostname=dict(type="str"),
+            description=dict(type="str"),
+            appliance=dict(type="str"),
+            fixed_instance_size=dict(type="str"),
+            vcore=dict(type="int"),
+            cores_per_processor=dict(type="int"),
+            ram=dict(type="float"),
+            hdds=dict(type="list", elements="dict"),
+            count=dict(type="int", default=1),
+            ssh_key=dict(type="raw", no_log=False),
+            auto_increment=dict(type="bool", default=True),
+            server=dict(type="str"),
+            datacenter=dict(choices=DATACENTERS, default="US"),
+            private_network=dict(type="str"),
+            firewall_policy=dict(type="str"),
+            load_balancer=dict(type="str"),
+            monitoring_policy=dict(type="str"),
+            server_type=dict(type="str", default="cloud", choices=["cloud", "baremetal", "k8s_node"]),
+            wait=dict(type="bool", default=True),
+            wait_timeout=dict(type="int", default=600),
+            wait_interval=dict(type="int", default=5),
+            state=dict(type="str", default="present", choices=["present", "absent", "running", "stopped"]),
         ),
         supports_check_mode=True,
-        mutually_exclusive=(['fixed_instance_size', 'vcore'], ['fixed_instance_size', 'cores_per_processor'],
-                            ['fixed_instance_size', 'ram'], ['fixed_instance_size', 'hdds'],),
-        required_together=(['vcore', 'cores_per_processor', 'ram', 'hdds'],)
+        mutually_exclusive=(
+            ["fixed_instance_size", "vcore"],
+            ["fixed_instance_size", "cores_per_processor"],
+            ["fixed_instance_size", "ram"],
+            ["fixed_instance_size", "hdds"],
+        ),
+        required_together=(["vcore", "cores_per_processor", "ram", "hdds"],),
     )
 
     if not HAS_ONEANDONE_SDK:
-        module.fail_json(msg='1and1 required for this module')
+        module.fail_json(msg="1and1 required for this module")
 
-    if not module.params.get('auth_token'):
-        module.fail_json(
-            msg='The "auth_token" parameter or ' +
-            'ONEANDONE_AUTH_TOKEN environment variable is required.')
+    if not module.params.get("auth_token"):
+        module.fail_json(msg='The "auth_token" parameter or ONEANDONE_AUTH_TOKEN environment variable is required.')
 
-    if not module.params.get('api_url'):
-        oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'))
+    if not module.params.get("api_url"):
+        oneandone_conn = oneandone.client.OneAndOneService(api_token=module.params.get("auth_token"))
     else:
         oneandone_conn = oneandone.client.OneAndOneService(
-            api_token=module.params.get('auth_token'), api_url=module.params.get('api_url'))
+            api_token=module.params.get("auth_token"), api_url=module.params.get("api_url")
+        )
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
-    if state == 'absent':
-        if not module.params.get('server'):
-            module.fail_json(
-                msg="'server' parameter is required for deleting a server.")
+    if state == "absent":
+        if not module.params.get("server"):
+            module.fail_json(msg="'server' parameter is required for deleting a server.")
         try:
             (changed, servers) = remove_server(module, oneandone_conn)
         except Exception as ex:
             module.fail_json(msg=str(ex))
 
-    elif state in ('running', 'stopped'):
-        if not module.params.get('server'):
-            module.fail_json(
-                msg="'server' parameter is required for starting/stopping a server.")
+    elif state in ("running", "stopped"):
+        if not module.params.get("server"):
+            module.fail_json(msg="'server' parameter is required for starting/stopping a server.")
         try:
             (changed, servers) = startstop_server(module, oneandone_conn)
         except Exception as ex:
             module.fail_json(msg=str(ex))
 
-    elif state == 'present':
-        for param in ('hostname',
-                      'appliance',
-                      'datacenter'):
+    elif state == "present":
+        for param in ("hostname", "appliance", "datacenter"):
             if not module.params.get(param):
-                module.fail_json(
-                    msg="%s parameter is required for new server." % param)
+                module.fail_json(msg=f"{param} parameter is required for new server.")
         try:
             (changed, servers) = create_server(module, oneandone_conn)
         except Exception as ex:
@@ -687,5 +650,5 @@ def main():
     module.exit_json(changed=changed, servers=servers)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2024, kurokobo <kurokobo@protonmail.com>
 # Copyright (c) 2014, Michael DeHaan <michael.dehaan@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -105,13 +103,13 @@ class CallbackModule(Default):
     CALLBACK_NAME = "community.general.timestamp"
 
     def __init__(self):
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         # Replace the banner method of the display object with the custom one
         self._display.banner = types.MethodType(banner, self._display)
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         # Store zoneinfo for specified timezone if available
         tzinfo = None

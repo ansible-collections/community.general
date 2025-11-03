@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import pytest
 
@@ -20,10 +17,14 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from .gitlab import (GitlabModuleTestCase,
-                         python_version_match_requirement,
-                         resp_get_project, resp_find_project_hook,
-                         resp_create_project_hook, resp_delete_project_hook)
+    from .gitlab import (
+        GitlabModuleTestCase,
+        python_version_match_requirement,
+        resp_get_project,
+        resp_find_project_hook,
+        resp_create_project_hook,
+        resp_delete_project_hook,
+    )
 
     # GitLab module requirements
     if python_version_match_requirement():
@@ -31,7 +32,7 @@ try:
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing
-    GitlabModuleTestCase = object
+    GitlabModuleTestCase = object  # type: ignore
     resp_get_project = _dummy
     resp_find_project_hook = _dummy
     resp_create_project_hook = _dummy
@@ -47,7 +48,7 @@ except ImportError:
 
 class TestGitlabHook(GitlabModuleTestCase):
     def setUp(self):
-        super(TestGitlabHook, self).setUp()
+        super().setUp()
 
         self.moduleUtil = GitLabHook(module=self.mock_module, gitlab_instance=self.gitlab_instance)
 

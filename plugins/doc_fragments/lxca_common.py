@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2017 Lenovo, Inc.
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     # Standard Pylxca documentation fragment
     DOCUMENTATION = r"""
 author:

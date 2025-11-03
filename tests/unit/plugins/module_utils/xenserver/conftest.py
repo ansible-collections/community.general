@@ -1,28 +1,26 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2019, Bojan Vitnik <bvitnik@mainstream.rs>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 import sys
 import importlib
 import os
 import json
+from unittest.mock import MagicMock
+
 import pytest
 
 from .FakeAnsibleModule import FakeAnsibleModule
-from ansible.module_utils import six
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
 
 
 @pytest.fixture
 def fake_ansible_module(request):
     """Returns fake AnsibleModule with fake module params."""
-    if hasattr(request, 'param'):
+    if hasattr(request, "param"):
         return FakeAnsibleModule(request.param)
     else:
         params = {
@@ -44,12 +42,14 @@ def XenAPI():
 
     # First we use importlib.import_module() to import the module and assign
     # it to a local symbol.
-    fake_xenapi = importlib.import_module('ansible_collections.community.general.tests.unit.plugins.module_utils.xenserver.FakeXenAPI')
+    fake_xenapi = importlib.import_module(
+        "ansible_collections.community.general.tests.unit.plugins.module_utils.xenserver.FakeXenAPI"
+    )
 
     # Now we populate Python module cache with imported fake module using the
     # original module name (XenAPI). That way, any 'import XenAPI' statement
     # will just load already imported fake module from the cache.
-    sys.modules['XenAPI'] = fake_xenapi
+    sys.modules["XenAPI"] = fake_xenapi
 
     return fake_xenapi
 
@@ -81,11 +81,11 @@ def mock_xenapi_failure(XenAPI, mocker):
     # same side_effect as its parent mock object.
     class MagicMockSideEffect(MagicMock):
         def _get_child_mock(self, **kw):
-            child_mock = super(MagicMockSideEffect, self)._get_child_mock(**kw)
+            child_mock = super()._get_child_mock(**kw)
             child_mock.side_effect = self.side_effect
             return child_mock
 
-    mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', new=MagicMockSideEffect(), create=True)
+    mocked_xenapi = mocker.patch.object(XenAPI.Session, "xenapi", new=MagicMockSideEffect(), create=True)
     mocked_xenapi.side_effect = XenAPI.Failure(fake_error_msg)
 
     return mocked_xenapi, fake_error_msg
@@ -94,13 +94,13 @@ def mock_xenapi_failure(XenAPI, mocker):
 @pytest.fixture
 def fixture_data_from_file(request):
     """Loads fixture data from files."""
-    if not hasattr(request, 'param'):
+    if not hasattr(request, "param"):
         return {}
 
-    fixture_path = os.path.join(os.path.dirname(__file__), 'fixtures')
+    fixture_path = os.path.join(os.path.dirname(__file__), "fixtures")
     fixture_data = {}
 
-    if isinstance(request.param, six.string_types):
+    if isinstance(request.param, str):
         request.param = [request.param]
 
     for fixture_name in request.param:

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2019 Huawei
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 ###############################################################################
 # Documentation
@@ -103,10 +101,16 @@ update_time:
 # Imports
 ###############################################################################
 
-from ansible_collections.community.general.plugins.module_utils.hwc_utils import (Config, HwcClientException,
-                                                                                  HwcModule, navigate_value,
-                                                                                  are_different_dicts, is_empty_value,
-                                                                                  build_path, get_region)
+from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
+    Config,
+    HwcClientException,
+    HwcModule,
+    navigate_value,
+    are_different_dicts,
+    is_empty_value,
+    build_path,
+    get_region,
+)
 import re
 
 ###############################################################################
@@ -119,34 +123,33 @@ def main():
 
     module = HwcModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent'],
-                       type='str'),
-            display_name=dict(type='str'),
-            name=dict(required=True, type='str')
+            state=dict(default="present", choices=["present", "absent"], type="str"),
+            display_name=dict(type="str"),
+            name=dict(required=True, type="str"),
         ),
         supports_check_mode=True,
     )
 
     config = Config(module, "smn")
 
-    state = module.params['state']
+    state = module.params["state"]
 
     if not module.params.get("id"):
-        module.params['id'] = get_resource_id(config)
+        module.params["id"] = get_resource_id(config)
 
     fetch = None
     link = self_link(module)
     # the link will include Nones if required format parameters are missed
-    if not re.search('/None/|/None$', link):
+    if not re.search("/None/|/None$", link):
         client = config.client(get_region(module), "smn", "project")
         fetch = fetch_resource(module, client, link)
     changed = False
 
     if fetch:
-        if state == 'present':
+        if state == "present":
             expect = _get_resource_editable_properties(module)
             current_state = response_to_hash(module, fetch)
-            current = {'display_name': current_state['display_name']}
+            current = {"display_name": current_state["display_name"]}
             if are_different_dicts(expect, current):
                 if not module.check_mode:
                     fetch = update(config)
@@ -160,7 +163,7 @@ def main():
                 fetch = {}
             changed = True
     else:
-        if state == 'present':
+        if state == "present":
             if not module.check_mode:
                 fetch = create(config)
                 fetch = response_to_hash(module, fetch)
@@ -168,7 +171,7 @@ def main():
         else:
             fetch = {}
 
-    fetch.update({'changed': changed})
+    fetch.update({"changed": changed})
 
     module.exit_json(**fetch)
 
@@ -182,8 +185,7 @@ def create(config):
     try:
         r = client.post(link, create_resource_opts(module))
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error creating "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error creating resource, error: {ex}"
         module.fail_json(msg=msg)
 
     return get_resource(config, r)
@@ -197,8 +199,7 @@ def update(config):
     try:
         client.put(link, update_resource_opts(module))
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error updating "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error updating resource, error: {ex}"
         module.fail_json(msg=msg)
 
     return fetch_resource(module, client, link)
@@ -212,8 +213,7 @@ def delete(config):
     try:
         client.delete(link)
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error deleting "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error deleting resource, error: {ex}"
         module.fail_json(msg=msg)
 
 
@@ -221,8 +221,7 @@ def fetch_resource(module, client, link):
     try:
         return client.get(link)
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error fetching "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error fetching resource, error: {ex}"
         module.fail_json(msg=msg)
 
 
@@ -232,12 +231,12 @@ def get_resource(config, result):
 
     v = ""
     try:
-        v = navigate_value(result, ['topic_urn'])
+        v = navigate_value(result, ["topic_urn"])
     except Exception as ex:
         module.fail_json(msg=str(ex))
 
-    d = {'topic_urn': v}
-    url = build_path(module, 'notifications/topics/{topic_urn}', d)
+    d = {"topic_urn": v}
+    url = build_path(module, "notifications/topics/{topic_urn}", d)
 
     return fetch_resource(module, client, url)
 
@@ -250,8 +249,8 @@ def get_resource_id(config):
     query_link = "?offset={offset}&limit=10"
     link += query_link
 
-    p = {'offset': 0}
-    v = module.params.get('name')
+    p = {"offset": 0}
+    v = module.params.get("name")
     ids = set()
     while True:
         r = None
@@ -261,16 +260,16 @@ def get_resource_id(config):
             pass
         if r is None:
             break
-        r = r.get('topics', [])
+        r = r.get("topics", [])
         if r == []:
             break
         for i in r:
-            if i.get('name') == v:
-                ids.add(i.get('topic_urn'))
+            if i.get("name") == v:
+                ids.add(i.get("topic_urn"))
         if len(ids) >= 2:
             module.fail_json(msg="Multiple resources are found")
 
-        p['offset'] += 1
+        p["offset"] += 1
 
     return ids.pop() if ids else None
 
@@ -282,11 +281,11 @@ def self_link(module):
 def create_resource_opts(module):
     params = dict()
 
-    v = module.params.get('display_name')
+    v = module.params.get("display_name")
     if not is_empty_value(v):
         params["display_name"] = v
 
-    v = module.params.get('name')
+    v = module.params.get("name")
     if not is_empty_value(v):
         params["name"] = v
 
@@ -296,7 +295,7 @@ def create_resource_opts(module):
 def update_resource_opts(module):
     params = dict()
 
-    v = module.params.get('display_name')
+    v = module.params.get("display_name")
     if not is_empty_value(v):
         params["display_name"] = v
 
@@ -311,16 +310,15 @@ def _get_resource_editable_properties(module):
 
 def response_to_hash(module, response):
     """Remove unnecessary properties from the response.
-       This is for doing comparisons with Ansible's current parameters.
+    This is for doing comparisons with Ansible's current parameters.
     """
     return {
-        u'create_time': response.get(u'create_time'),
-        u'display_name': response.get(u'display_name'),
-        u'name': response.get(u'name'),
-        u'push_policy': _push_policy_convert_from_response(
-            response.get('push_policy')),
-        u'topic_urn': response.get(u'topic_urn'),
-        u'update_time': response.get(u'update_time')
+        "create_time": response.get("create_time"),
+        "display_name": response.get("display_name"),
+        "name": response.get("name"),
+        "push_policy": _push_policy_convert_from_response(response.get("push_policy")),
+        "topic_urn": response.get("topic_urn"),
+        "update_time": response.get("update_time"),
     }
 
 
@@ -331,5 +329,5 @@ def _push_policy_convert_from_response(value):
     }.get(int(value))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

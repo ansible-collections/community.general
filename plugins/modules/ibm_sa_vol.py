@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (C) 2018 IBM CORPORATION
 # Author(s): Tzur Eliyahu <tzure@il.ibm.com>
@@ -7,8 +6,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ibm_sa_vol
@@ -76,18 +74,22 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import execute_pyxcli_command, \
-    connect_ssl, spectrum_accelerate_spec, is_pyxcli_installed
+from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (
+    execute_pyxcli_command,
+    connect_ssl,
+    spectrum_accelerate_spec,
+    is_pyxcli_installed,
+)
 
 
 def main():
     argument_spec = spectrum_accelerate_spec()
     argument_spec.update(
         dict(
-            state=dict(default='present', choices=['present', 'absent']),
+            state=dict(default="present", choices=["present", "absent"]),
             vol=dict(required=True),
             pool=dict(),
-            size=dict()
+            size=dict(),
         )
     )
 
@@ -97,20 +99,17 @@ def main():
 
     xcli_client = connect_ssl(module)
     # required args
-    volume = xcli_client.cmd.vol_list(
-        vol=module.params.get('vol')).as_single_element
-    state = module.params['state']
+    volume = xcli_client.cmd.vol_list(vol=module.params.get("vol")).as_single_element
+    state = module.params["state"]
 
     state_changed = False
-    if state == 'present' and not volume:
-        state_changed = execute_pyxcli_command(
-            module, 'vol_create', xcli_client)
-    elif state == 'absent' and volume:
-        state_changed = execute_pyxcli_command(
-            module, 'vol_delete', xcli_client)
+    if state == "present" and not volume:
+        state_changed = execute_pyxcli_command(module, "vol_create", xcli_client)
+    elif state == "absent" and volume:
+        state_changed = execute_pyxcli_command(module, "vol_delete", xcli_client)
 
     module.exit_json(changed=state_changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, Max Maxopoly <max@dermax.org>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -76,37 +74,29 @@ from ansible.module_utils.basic import AnsibleModule
 
 def parse_lsusb(module, lsusb_path):
     rc, stdout, stderr = module.run_command(lsusb_path, check_rc=True)
-    regex = re.compile(r'^Bus (\d{3}) Device (\d{3}): ID ([0-9a-f]{4}:[0-9a-f]{4}) (.*)$')
+    regex = re.compile(r"^Bus (\d{3}) Device (\d{3}): ID ([0-9a-f]{4}:[0-9a-f]{4}) (.*)$")
     usb_devices = []
     for line in stdout.splitlines():
         match = re.match(regex, line)
         if not match:
-            module.fail_json(msg="failed to parse unknown lsusb output %s" % (line), stdout=stdout, stderr=stderr)
-        current_device = {
-            'bus': match.group(1),
-            'device': match.group(2),
-            'id': match.group(3),
-            'name': match.group(4)
-        }
+            module.fail_json(msg=f"failed to parse unknown lsusb output {line}", stdout=stdout, stderr=stderr)
+        current_device = {"bus": match.group(1), "device": match.group(2), "id": match.group(3), "name": match.group(4)}
         usb_devices.append(current_device)
-    return_value = {
-        "usb_devices": usb_devices
-    }
-    module.exit_json(msg="parsed %s USB devices" % (len(usb_devices)), stdout=stdout, stderr=stderr, ansible_facts=return_value)
+    return_value = {"usb_devices": usb_devices}
+    module.exit_json(
+        msg=f"parsed {len(usb_devices)} USB devices", stdout=stdout, stderr=stderr, ansible_facts=return_value
+    )
 
 
 def main():
-    module = AnsibleModule(
-        {},
-        supports_check_mode=True
-    )
+    module = AnsibleModule({}, supports_check_mode=True)
 
     # Set LANG env since we parse stdout
-    module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
-    lsusb_path = module.get_bin_path('lsusb', required=True)
+    lsusb_path = module.get_bin_path("lsusb", required=True)
     parse_lsusb(module, lsusb_path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

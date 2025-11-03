@@ -1,17 +1,19 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2020, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
+import unittest
 from contextlib import contextmanager
+from unittest.mock import call, patch
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import call, patch
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
+    ModuleTestCase,
+    set_module_args,
+)
 
 from ansible_collections.community.general.plugins.modules import ipa_otpconfig
 
@@ -32,14 +34,14 @@ def patch_ipa(**kwargs):
             ...
     """
     obj = ipa_otpconfig.OTPConfigIPAClient
-    with patch.object(obj, 'login') as mock_login:
-        with patch.object(obj, '_post_json', **kwargs) as mock_post:
+    with patch.object(obj, "login") as mock_login:
+        with patch.object(obj, "_post_json", **kwargs) as mock_post:
             yield mock_login, mock_post
 
 
 class TestIPAOTPConfig(ModuleTestCase):
     def setUp(self):
-        super(TestIPAOTPConfig, self).setUp()
+        super().setUp()
         self.module = ipa_otpconfig
 
     def _test_base(self, module_args, return_value, mock_calls, changed):
@@ -84,182 +86,110 @@ class TestIPAOTPConfig(ModuleTestCase):
             mock_post.assert_not_called()
 
         # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+        self.assertIs(exec_info.exception.args[0]["changed"], changed)
 
     def test_set_all_no_adjustment(self):
         """Set values requiring no adjustment"""
         module_args = {
-            'ipatokentotpauthwindow': 11,
-            'ipatokentotpsyncwindow': 12,
-            'ipatokenhotpauthwindow': 13,
-            'ipatokenhotpsyncwindow': 14
+            "ipatokentotpauthwindow": 11,
+            "ipatokentotpsyncwindow": 12,
+            "ipatokenhotpauthwindow": 13,
+            "ipatokenhotpsyncwindow": 14,
         }
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
-        mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
-        )
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
+        mock_calls = ({"method": "otpconfig_show", "name": None}, {"method": "otpconfig_show", "name": None})
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_set_all_aliases_no_adjustment(self):
         """Set values requiring no adjustment on all using aliases values"""
-        module_args = {
-            'totpauthwindow': 11,
-            'totpsyncwindow': 12,
-            'hotpauthwindow': 13,
-            'hotpsyncwindow': 14
-        }
+        module_args = {"totpauthwindow": 11, "totpsyncwindow": 12, "hotpauthwindow": 13, "hotpsyncwindow": 14}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
-        mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
-        )
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
+        mock_calls = ({"method": "otpconfig_show", "name": None}, {"method": "otpconfig_show", "name": None})
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_set_totp_auth_window_no_adjustment(self):
         """Set values requiring no adjustment on totpauthwindow"""
-        module_args = {
-            'totpauthwindow': 11
-        }
+        module_args = {"totpauthwindow": 11}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
-        mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
-        )
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
+        mock_calls = ({"method": "otpconfig_show", "name": None}, {"method": "otpconfig_show", "name": None})
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_set_totp_sync_window_no_adjustment(self):
         """Set values requiring no adjustment on totpsyncwindow"""
-        module_args = {
-            'totpsyncwindow': 12
-        }
+        module_args = {"totpsyncwindow": 12}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
-        mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
-        )
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
+        mock_calls = ({"method": "otpconfig_show", "name": None}, {"method": "otpconfig_show", "name": None})
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_set_hotp_auth_window_no_adjustment(self):
         """Set values requiring no adjustment on hotpauthwindow"""
-        module_args = {
-            'hotpauthwindow': 13
-        }
+        module_args = {"hotpauthwindow": 13}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
-        mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
-        )
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
+        mock_calls = ({"method": "otpconfig_show", "name": None}, {"method": "otpconfig_show", "name": None})
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_set_hotp_sync_window_no_adjustment(self):
         """Set values requiring no adjustment on hotpsyncwindow"""
-        module_args = {
-            'hotpsyncwindow': 14
-        }
+        module_args = {"hotpsyncwindow": 14}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
-        mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
-        )
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
+        mock_calls = ({"method": "otpconfig_show", "name": None}, {"method": "otpconfig_show", "name": None})
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_set_totp_auth_window(self):
         """Set values requiring adjustment on totpauthwindow"""
-        module_args = {
-            'totpauthwindow': 10
-        }
+        module_args = {"totpauthwindow": 10}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
         mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_mod',
-                'name': None,
-                'item': {'ipatokentotpauthwindow': '10'}
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
+            {"method": "otpconfig_show", "name": None},
+            {"method": "otpconfig_mod", "name": None, "item": {"ipatokentotpauthwindow": "10"}},
+            {"method": "otpconfig_show", "name": None},
         )
         changed = True
 
@@ -267,28 +197,17 @@ class TestIPAOTPConfig(ModuleTestCase):
 
     def test_set_totp_sync_window(self):
         """Set values requiring adjustment on totpsyncwindow"""
-        module_args = {
-            'totpsyncwindow': 10
-        }
+        module_args = {"totpsyncwindow": 10}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
         mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_mod',
-                'name': None,
-                'item': {'ipatokentotpsyncwindow': '10'}
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
+            {"method": "otpconfig_show", "name": None},
+            {"method": "otpconfig_mod", "name": None, "item": {"ipatokentotpsyncwindow": "10"}},
+            {"method": "otpconfig_show", "name": None},
         )
         changed = True
 
@@ -296,28 +215,17 @@ class TestIPAOTPConfig(ModuleTestCase):
 
     def test_set_hotp_auth_window(self):
         """Set values requiring adjustment on hotpauthwindow"""
-        module_args = {
-            'hotpauthwindow': 10
-        }
+        module_args = {"hotpauthwindow": 10}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
         mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_mod',
-                'name': None,
-                'item': {'ipatokenhotpauthwindow': '10'}
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
+            {"method": "otpconfig_show", "name": None},
+            {"method": "otpconfig_mod", "name": None, "item": {"ipatokenhotpauthwindow": "10"}},
+            {"method": "otpconfig_show", "name": None},
         )
         changed = True
 
@@ -325,28 +233,17 @@ class TestIPAOTPConfig(ModuleTestCase):
 
     def test_set_hotp_sync_window(self):
         """Set values requiring adjustment on hotpsyncwindow"""
-        module_args = {
-            'hotpsyncwindow': 10
-        }
+        module_args = {"hotpsyncwindow": 10}
         return_value = {
-            'ipatokentotpauthwindow': ['11'],
-            'ipatokentotpsyncwindow': ['12'],
-            'ipatokenhotpauthwindow': ['13'],
-            'ipatokenhotpsyncwindow': ['14']}
+            "ipatokentotpauthwindow": ["11"],
+            "ipatokentotpsyncwindow": ["12"],
+            "ipatokenhotpauthwindow": ["13"],
+            "ipatokenhotpsyncwindow": ["14"],
+        }
         mock_calls = (
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            },
-            {
-                'method': 'otpconfig_mod',
-                'name': None,
-                'item': {'ipatokenhotpsyncwindow': '10'}
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
+            {"method": "otpconfig_show", "name": None},
+            {"method": "otpconfig_mod", "name": None, "item": {"ipatokenhotpsyncwindow": "10"}},
+            {"method": "otpconfig_show", "name": None},
         )
         changed = True
 
@@ -355,33 +252,30 @@ class TestIPAOTPConfig(ModuleTestCase):
     def test_set_all(self):
         """Set values requiring adjustment on all"""
         module_args = {
-            'ipatokentotpauthwindow': 11,
-            'ipatokentotpsyncwindow': 12,
-            'ipatokenhotpauthwindow': 13,
-            'ipatokenhotpsyncwindow': 14
+            "ipatokentotpauthwindow": 11,
+            "ipatokentotpsyncwindow": 12,
+            "ipatokenhotpauthwindow": 13,
+            "ipatokenhotpsyncwindow": 14,
         }
         return_value = {
-            'ipatokentotpauthwindow': ['1'],
-            'ipatokentotpsyncwindow': ['2'],
-            'ipatokenhotpauthwindow': ['3'],
-            'ipatokenhotpsyncwindow': ['4']}
+            "ipatokentotpauthwindow": ["1"],
+            "ipatokentotpsyncwindow": ["2"],
+            "ipatokenhotpauthwindow": ["3"],
+            "ipatokenhotpsyncwindow": ["4"],
+        }
         mock_calls = (
+            {"method": "otpconfig_show", "name": None},
             {
-                'method': 'otpconfig_show',
-                'name': None
+                "method": "otpconfig_mod",
+                "name": None,
+                "item": {
+                    "ipatokentotpauthwindow": "11",
+                    "ipatokentotpsyncwindow": "12",
+                    "ipatokenhotpauthwindow": "13",
+                    "ipatokenhotpsyncwindow": "14",
+                },
             },
-            {
-                'method': 'otpconfig_mod',
-                'name': None,
-                'item': {'ipatokentotpauthwindow': '11',
-                         'ipatokentotpsyncwindow': '12',
-                         'ipatokenhotpauthwindow': '13',
-                         'ipatokenhotpsyncwindow': '14'}
-            },
-            {
-                'method': 'otpconfig_show',
-                'name': None
-            }
+            {"method": "otpconfig_show", "name": None},
         )
         changed = True
 
@@ -389,18 +283,20 @@ class TestIPAOTPConfig(ModuleTestCase):
 
     def test_fail_post(self):
         """Fail due to an exception raised from _post_json"""
-        with set_module_args({
-            'ipatokentotpauthwindow': 11,
-            'ipatokentotpsyncwindow': 12,
-            'ipatokenhotpauthwindow': 13,
-            'ipatokenhotpsyncwindow': 14
-        }):
-            with patch_ipa(side_effect=Exception('ERROR MESSAGE')) as (mock_login, mock_post):
+        with set_module_args(
+            {
+                "ipatokentotpauthwindow": 11,
+                "ipatokentotpsyncwindow": 12,
+                "ipatokenhotpauthwindow": 13,
+                "ipatokenhotpsyncwindow": 14,
+            }
+        ):
+            with patch_ipa(side_effect=Exception("ERROR MESSAGE")) as (mock_login, mock_post):
                 with self.assertRaises(AnsibleFailJson) as exec_info:
                     self.module.main()
 
-        self.assertEqual(exec_info.exception.args[0]['msg'], 'ERROR MESSAGE')
+        self.assertEqual(exec_info.exception.args[0]["msg"], "ERROR MESSAGE")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

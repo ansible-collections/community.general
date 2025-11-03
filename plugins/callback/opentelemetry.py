@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Victor Martinez <VictorMartinezRubio@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -97,7 +96,7 @@ options:
   otel_exporter_otlp_traces_protocol:
     type: str
     description:
-      - E(OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) represents the the transport protocol for spans.
+      - E(OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) represents the transport protocol for spans.
       - See
         U(https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html#envvar-OTEL_EXPORTER_OTLP_TRACES_PROTOCOL).
     default: grpc
@@ -137,17 +136,16 @@ import json
 import os
 import socket
 import uuid
-from time import time_ns
-
 from collections import OrderedDict
 from os.path import basename
+from time import time_ns
+from urllib.parse import urlparse
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
-from ansible.module_utils.six import raise_from
-from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.plugins.callback import CallbackBase
 
+OTEL_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from opentelemetry import trace
     from opentelemetry.trace import SpanKind
@@ -157,13 +155,8 @@ try:
     from opentelemetry.trace.status import Status, StatusCode
     from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
     from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import (
-        BatchSpanProcessor,
-        SimpleSpanProcessor
-    )
-    from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
-        InMemorySpanExporter
-    )
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 except ImportError as imp_exc:
     OTEL_LIBRARY_IMPORT_ERROR = imp_exc
 else:
@@ -188,9 +181,9 @@ class TaskData:
 
     def add_host(self, host):
         if host.uuid in self.host_data:
-            if host.status == 'included':
+            if host.status == "included":
                 # concatenate task include output from multiple items
-                host.result = f'{self.host_data[host.uuid].result}\n{host.result}'
+                host.result = f"{self.host_data[host.uuid].result}\n{host.result}"
             else:
                 return
 
@@ -210,7 +203,7 @@ class HostData:
         self.finish = time_ns()
 
 
-class OpenTelemetrySource(object):
+class OpenTelemetrySource:
     def __init__(self, display):
         self.ansible_playbook = ""
         self.session = str(uuid.uuid4())
@@ -225,11 +218,11 @@ class OpenTelemetrySource(object):
 
     def traceparent_context(self, traceparent):
         carrier = dict()
-        carrier['traceparent'] = traceparent
+        carrier["traceparent"] = traceparent
         return TraceContextTextMapPropagator().extract(carrier=carrier)
 
     def start_task(self, tasks_data, hide_task_arguments, play_name, task):
-        """ record the start of a task for one or more hosts """
+        """record the start of a task for one or more hosts"""
 
         uuid = task._uuid
 
@@ -247,33 +240,35 @@ class OpenTelemetrySource(object):
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
     def finish_task(self, tasks_data, status, result, dump):
-        """ record the results of a task for a single host """
+        """record the results of a task for a single host"""
 
         task_uuid = result._task._uuid
 
-        if hasattr(result, '_host') and result._host is not None:
+        if hasattr(result, "_host") and result._host is not None:
             host_uuid = result._host._uuid
             host_name = result._host.name
         else:
-            host_uuid = 'include'
-            host_name = 'include'
+            host_uuid = "include"
+            host_name = "include"
 
         task = tasks_data[task_uuid]
 
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self,
-                                    otel_service_name,
-                                    ansible_playbook,
-                                    tasks_data,
-                                    status,
-                                    traceparent,
-                                    disable_logs,
-                                    disable_attributes_in_logs,
-                                    otel_exporter_otlp_traces_protocol,
-                                    store_spans_in_file):
-        """ generate distributed traces from the collected TaskData and HostData """
+    def generate_distributed_traces(
+        self,
+        otel_service_name,
+        ansible_playbook,
+        tasks_data,
+        status,
+        traceparent,
+        disable_logs,
+        disable_attributes_in_logs,
+        otel_exporter_otlp_traces_protocol,
+        store_spans_in_file,
+    ):
+        """generate distributed traces from the collected TaskData and HostData"""
 
         tasks = []
         parent_start_time = None
@@ -282,18 +277,14 @@ class OpenTelemetrySource(object):
                 parent_start_time = task.start
             tasks.append(task)
 
-        trace.set_tracer_provider(
-            TracerProvider(
-                resource=Resource.create({SERVICE_NAME: otel_service_name})
-            )
-        )
+        trace.set_tracer_provider(TracerProvider(resource=Resource.create({SERVICE_NAME: otel_service_name})))
 
         otel_exporter = None
         if store_spans_in_file:
             otel_exporter = InMemorySpanExporter()
             processor = SimpleSpanProcessor(otel_exporter)
         else:
-            if otel_exporter_otlp_traces_protocol == 'grpc':
+            if otel_exporter_otlp_traces_protocol == "grpc":
                 otel_exporter = GRPCOTLPSpanExporter()
             else:
                 otel_exporter = HTTPOTLPSpanExporter()
@@ -303,8 +294,12 @@ class OpenTelemetrySource(object):
 
         tracer = trace.get_tracer(__name__)
 
-        with tracer.start_as_current_span(ansible_playbook, context=self.traceparent_context(traceparent),
-                                          start_time=parent_start_time, kind=SpanKind.SERVER) as parent:
+        with tracer.start_as_current_span(
+            ansible_playbook,
+            context=self.traceparent_context(traceparent),
+            start_time=parent_start_time,
+            kind=SpanKind.SERVER,
+        ) as parent:
             parent.set_status(status)
             # Populate trace metadata attributes
             parent.set_attribute("ansible.version", ansible_version)
@@ -321,36 +316,38 @@ class OpenTelemetrySource(object):
         return otel_exporter
 
     def update_span_data(self, task_data, host_data, span, disable_logs, disable_attributes_in_logs):
-        """ update the span with the given TaskData and HostData """
+        """update the span with the given TaskData and HostData"""
 
-        name = f'[{host_data.name}] {task_data.play}: {task_data.name}'
+        name = f"[{host_data.name}] {task_data.play}: {task_data.name}"
 
-        message = 'success'
+        message = "success"
         res = {}
         rc = 0
         status = Status(status_code=StatusCode.OK)
-        if host_data.status != 'included':
+        if host_data.status != "included":
             # Support loops
             enriched_error_message = None
-            if 'results' in host_data.result._result:
-                if host_data.status == 'failed':
-                    message = self.get_error_message_from_results(host_data.result._result['results'], task_data.action)
-                    enriched_error_message = self.enrich_error_message_from_results(host_data.result._result['results'], task_data.action)
+            if "results" in host_data.result._result:
+                if host_data.status == "failed":
+                    message = self.get_error_message_from_results(host_data.result._result["results"], task_data.action)
+                    enriched_error_message = self.enrich_error_message_from_results(
+                        host_data.result._result["results"], task_data.action
+                    )
             else:
                 res = host_data.result._result
-                rc = res.get('rc', 0)
-                if host_data.status == 'failed':
+                rc = res.get("rc", 0)
+                if host_data.status == "failed":
                     message = self.get_error_message(res)
                     enriched_error_message = self.enrich_error_message(res)
 
-            if host_data.status == 'failed':
+            if host_data.status == "failed":
                 status = Status(status_code=StatusCode.ERROR, description=message)
                 # Record an exception with the task message
                 span.record_exception(BaseException(enriched_error_message))
-            elif host_data.status == 'skipped':
-                message = res['skip_reason'] if 'skip_reason' in res else 'skipped'
+            elif host_data.status == "skipped":
+                message = res["skip_reason"] if "skip_reason" in res else "skipped"
                 status = Status(status_code=StatusCode.UNSET)
-            elif host_data.status == 'ignored':
+            elif host_data.status == "ignored":
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
@@ -362,7 +359,7 @@ class OpenTelemetrySource(object):
             "ansible.task.name": name,
             "ansible.task.result": rc,
             "ansible.task.host.name": host_data.name,
-            "ansible.task.host.status": host_data.status
+            "ansible.task.host.status": host_data.status,
         }
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
             names = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.keys())
@@ -382,10 +379,10 @@ class OpenTelemetrySource(object):
         span.end(end_time=host_data.finish)
 
     def set_span_attributes(self, span, attributes):
-        """ update the span attributes with the given attributes if not None """
+        """update the span attributes with the given attributes if not None"""
 
         if span is None and self._display is not None:
-            self._display.warning('span object is None. Please double check if that is expected.')
+            self._display.warning("span object is None. Please double check if that is expected.")
         else:
             if attributes is not None:
                 span.set_attributes(attributes)
@@ -413,7 +410,18 @@ class OpenTelemetrySource(object):
     @staticmethod
     def url_from_args(args):
         # the order matters
-        url_args = ("url", "api_url", "baseurl", "repo", "server_url", "chart_repo_url", "registry_url", "endpoint", "uri", "updates_url")
+        url_args = (
+            "url",
+            "api_url",
+            "baseurl",
+            "repo",
+            "server_url",
+            "chart_repo_url",
+            "registry_url",
+            "endpoint",
+            "uri",
+            "updates_url",
+        )
         for arg in url_args:
             if args is not None and args.get(arg):
                 return args.get(arg)
@@ -438,33 +446,33 @@ class OpenTelemetrySource(object):
 
     @staticmethod
     def get_error_message(result):
-        if result.get('exception') is not None:
-            return OpenTelemetrySource._last_line(result['exception'])
-        return result.get('msg', 'failed')
+        if result.get("exception") is not None:
+            return OpenTelemetrySource._last_line(result["exception"])
+        return result.get("msg", "failed")
 
     @staticmethod
     def get_error_message_from_results(results, action):
         for result in results:
-            if result.get('failed', False):
+            if result.get("failed", False):
                 return f"{action}({result.get('item', 'none')}) - {OpenTelemetrySource.get_error_message(result)}"
 
     @staticmethod
     def _last_line(text):
-        lines = text.strip().split('\n')
+        lines = text.strip().split("\n")
         return lines[-1]
 
     @staticmethod
     def enrich_error_message(result):
-        message = result.get('msg', 'failed')
-        exception = result.get('exception')
-        stderr = result.get('stderr')
-        return f"message: \"{message}\"\nexception: \"{exception}\"\nstderr: \"{stderr}\""
+        message = result.get("msg", "failed")
+        exception = result.get("exception")
+        stderr = result.get("stderr")
+        return f'message: "{message}"\nexception: "{exception}"\nstderr: "{stderr}"'
 
     @staticmethod
     def enrich_error_message_from_results(results, action):
         message = ""
         for result in results:
-            if result.get('failed', False):
+            if result.get("failed", False):
                 message = f"{action}({result.get('item', 'none')}) - {OpenTelemetrySource.enrich_error_message(result)}\n{message}"
         return message
 
@@ -475,12 +483,12 @@ class CallbackModule(CallbackBase):
     """
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'community.general.opentelemetry'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "community.general.opentelemetry"
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self, display=None):
-        super(CallbackModule, self).__init__(display=display)
+        super().__init__(display=display)
         self.hide_task_arguments = None
         self.disable_attributes_in_logs = None
         self.disable_logs = None
@@ -495,46 +503,44 @@ class CallbackModule(CallbackBase):
         self.otel_exporter_otlp_traces_protocol = None
 
         if OTEL_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin'),
-                OTEL_LIBRARY_IMPORT_ERROR)
+            raise AnsibleError(
+                "The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin"
+            ) from OTEL_LIBRARY_IMPORT_ERROR
 
         self.tasks_data = OrderedDict()
 
         self.opentelemetry = OpenTelemetrySource(display=self._display)
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys,
-                                                var_options=var_options,
-                                                direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        environment_variable = self.get_option('enable_from_environment')
-        if environment_variable is not None and os.environ.get(environment_variable, 'false').lower() != 'true':
+        environment_variable = self.get_option("enable_from_environment")
+        if environment_variable is not None and os.environ.get(environment_variable, "false").lower() != "true":
             self.disabled = True
             self._display.warning(
                 f"The `enable_from_environment` option has been set and {environment_variable} is not enabled. Disabling the `opentelemetry` callback plugin."
             )
 
-        self.hide_task_arguments = self.get_option('hide_task_arguments')
+        self.hide_task_arguments = self.get_option("hide_task_arguments")
 
-        self.disable_attributes_in_logs = self.get_option('disable_attributes_in_logs')
+        self.disable_attributes_in_logs = self.get_option("disable_attributes_in_logs")
 
-        self.disable_logs = self.get_option('disable_logs')
+        self.disable_logs = self.get_option("disable_logs")
 
-        self.store_spans_in_file = self.get_option('store_spans_in_file')
+        self.store_spans_in_file = self.get_option("store_spans_in_file")
 
-        self.otel_service_name = self.get_option('otel_service_name')
+        self.otel_service_name = self.get_option("otel_service_name")
 
         if not self.otel_service_name:
-            self.otel_service_name = 'ansible'
+            self.otel_service_name = "ansible"
 
         # See https://github.com/open-telemetry/opentelemetry-specification/issues/740
-        self.traceparent = self.get_option('traceparent')
+        self.traceparent = self.get_option("traceparent")
 
-        self.otel_exporter_otlp_traces_protocol = self.get_option('otel_exporter_otlp_traces_protocol')
+        self.otel_exporter_otlp_traces_protocol = self.get_option("otel_exporter_otlp_traces_protocol")
 
     def dump_results(self, task, result):
-        """ dump the results if disable_logs is not enabled """
+        """dump the results if disable_logs is not enabled"""
         if self.disable_logs:
             return ""
         # ansible.builtin.uri contains the response in the json field
@@ -554,74 +560,40 @@ class CallbackModule(CallbackBase):
         self.play_name = play.get_name()
 
     def v2_runner_on_no_hosts(self, task):
-        self.opentelemetry.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self.opentelemetry.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_playbook_on_cleanup_task_start(self, task):
-        self.opentelemetry.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_playbook_on_handler_task_start(self, task):
-        self.opentelemetry.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if ignore_errors:
-            status = 'ignored'
+            status = "ignored"
         else:
-            status = 'failed'
+            status = "failed"
             self.errors += 1
 
         self.opentelemetry.finish_task(
-            self.tasks_data,
-            status,
-            result,
-            self.dump_results(self.tasks_data[result._task._uuid], result)
+            self.tasks_data, status, result, self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_runner_on_ok(self, result):
         self.opentelemetry.finish_task(
-            self.tasks_data,
-            'ok',
-            result,
-            self.dump_results(self.tasks_data[result._task._uuid], result)
+            self.tasks_data, "ok", result, self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_runner_on_skipped(self, result):
         self.opentelemetry.finish_task(
-            self.tasks_data,
-            'skipped',
-            result,
-            self.dump_results(self.tasks_data[result._task._uuid], result)
+            self.tasks_data, "skipped", result, self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_playbook_on_include(self, included_file):
-        self.opentelemetry.finish_task(
-            self.tasks_data,
-            'included',
-            included_file,
-            ""
-        )
+        self.opentelemetry.finish_task(self.tasks_data, "included", included_file, "")
 
     def v2_playbook_on_stats(self, stats):
         if self.errors == 0:
@@ -637,7 +609,7 @@ class CallbackModule(CallbackBase):
             self.disable_logs,
             self.disable_attributes_in_logs,
             self.otel_exporter_otlp_traces_protocol,
-            self.store_spans_in_file
+            self.store_spans_in_file,
         )
 
         if self.store_spans_in_file:

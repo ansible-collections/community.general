@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Vedit Firat Arig <firatarig@gmail.com>
 # Outline and parts are reused from Mark Theunissen's mysql_db module
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -118,29 +116,29 @@ def db_exists(conn, cursor, db):
 
 
 def db_create(conn, cursor, db):
-    cursor.execute("CREATE DATABASE [%s]" % db)
+    cursor.execute(f"CREATE DATABASE [{db}]")
     return db_exists(conn, cursor, db)
 
 
 def db_delete(conn, cursor, db):
     try:
-        cursor.execute("ALTER DATABASE [%s] SET single_user WITH ROLLBACK IMMEDIATE" % db)
+        cursor.execute(f"ALTER DATABASE [{db}] SET single_user WITH ROLLBACK IMMEDIATE")
     except Exception:
         pass
-    cursor.execute("DROP DATABASE [%s]" % db)
+    cursor.execute(f"DROP DATABASE [{db}]")
     return not db_exists(conn, cursor, db)
 
 
 def db_import(conn, cursor, module, db, target):
     if os.path.isfile(target):
-        with open(target, 'r') as backup:
-            sqlQuery = "USE [%s]\n" % db
+        with open(target, "r") as backup:
+            sqlQuery = f"USE [{db}]\n"
             for line in backup:
                 if line is None:
                     break
-                elif line.startswith('GO'):
+                elif line.startswith("GO"):
                     cursor.execute(sqlQuery)
-                    sqlQuery = "USE [%s]\n" % db
+                    sqlQuery = f"USE [{db}]\n"
                 else:
                     sqlQuery += line
             cursor.execute(sqlQuery)
@@ -153,48 +151,49 @@ def db_import(conn, cursor, module, db, target):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=['db']),
-            login_user=dict(default=''),
-            login_password=dict(default='', no_log=True),
+            name=dict(required=True, aliases=["db"]),
+            login_user=dict(default=""),
+            login_password=dict(default="", no_log=True),
             login_host=dict(required=True),
-            login_port=dict(default='1433'),
+            login_port=dict(default="1433"),
             target=dict(),
-            autocommit=dict(type='bool', default=False),
-            state=dict(
-                default='present', choices=['present', 'absent', 'import'])
+            autocommit=dict(type="bool", default=False),
+            state=dict(default="present", choices=["present", "absent", "import"]),
         )
     )
 
     if not mssql_found:
-        module.fail_json(msg=missing_required_lib('pymssql'), exception=PYMSSQL_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("pymssql"), exception=PYMSSQL_IMP_ERR)
 
-    db = module.params['name']
-    state = module.params['state']
-    autocommit = module.params['autocommit']
+    db = module.params["name"]
+    state = module.params["state"]
+    autocommit = module.params["autocommit"]
     target = module.params["target"]
 
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    login_host = module.params['login_host']
-    login_port = module.params['login_port']
+    login_user = module.params["login_user"]
+    login_password = module.params["login_password"]
+    login_host = module.params["login_host"]
+    login_port = module.params["login_port"]
 
     login_querystring = login_host
     if login_port != "1433":
-        login_querystring = "%s:%s" % (login_host, login_port)
+        login_querystring = f"{login_host}:{login_port}"
 
     if login_user != "" and login_password == "":
         module.fail_json(msg="when supplying login_user arguments login_password must be provided")
 
     try:
-        conn = pymssql.connect(user=login_user, password=login_password, host=login_querystring, database='master')
+        conn = pymssql.connect(user=login_user, password=login_password, host=login_querystring, database="master")
         cursor = conn.cursor()
     except Exception as e:
         if "Unknown database" in str(e):
             errno, errstr = e.args
-            module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
+            module.fail_json(msg=f"ERROR: {errno} {errstr}")
         else:
-            module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
-                                 "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+            module.fail_json(
+                msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
+                "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf"
+            )
 
     conn.autocommit(True)
     changed = False
@@ -204,13 +203,13 @@ def main():
             try:
                 changed = db_delete(conn, cursor, db)
             except Exception as e:
-                module.fail_json(msg="error deleting database: " + str(e))
+                module.fail_json(msg=f"error deleting database: {e}")
         elif state == "import":
             conn.autocommit(autocommit)
             rc, stdout, stderr = db_import(conn, cursor, module, db, target)
 
             if rc != 0:
-                module.fail_json(msg="%s" % stderr)
+                module.fail_json(msg=stderr)
             else:
                 module.exit_json(changed=True, db=db, msg=stdout)
     else:
@@ -218,23 +217,23 @@ def main():
             try:
                 changed = db_create(conn, cursor, db)
             except Exception as e:
-                module.fail_json(msg="error creating database: " + str(e))
+                module.fail_json(msg=f"error creating database: {e}")
         elif state == "import":
             try:
                 changed = db_create(conn, cursor, db)
             except Exception as e:
-                module.fail_json(msg="error creating database: " + str(e))
+                module.fail_json(msg=f"error creating database: {e}")
 
             conn.autocommit(autocommit)
             rc, stdout, stderr = db_import(conn, cursor, module, db, target)
 
             if rc != 0:
-                module.fail_json(msg="%s" % stderr)
+                module.fail_json(msg=stderr)
             else:
                 module.exit_json(changed=True, db=db, msg=stdout)
 
     module.exit_json(changed=changed, db=db)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

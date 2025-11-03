@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022 Western Digital Corporation
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: wdc_redfish_info
@@ -127,89 +125,81 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 
-CATEGORY_COMMANDS_ALL = {
-    "Update": ["SimpleUpdateStatus"]
-}
+CATEGORY_COMMANDS_ALL = {"Update": ["SimpleUpdateStatus"]}
 
 
 def main():
     result = {}
     argument_spec = dict(
         category=dict(required=True),
-        command=dict(required=True, type='list', elements='str'),
-        ioms=dict(type='list', elements='str'),
+        command=dict(required=True, type="list", elements="str"),
+        ioms=dict(type="list", elements="str"),
         baseuri=dict(),
         username=dict(),
         password=dict(no_log=True),
         auth_token=dict(no_log=True),
-        timeout=dict(type='int', default=10)
+        timeout=dict(type="int", default=10),
     )
     argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
         argument_spec,
         required_together=[
-            ('username', 'password'),
+            ("username", "password"),
         ],
-        required_one_of=[
-            ('username', 'auth_token'),
-            ('baseuri', 'ioms')
-        ],
+        required_one_of=[("username", "auth_token"), ("baseuri", "ioms")],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    category = module.params['category']
-    command_list = module.params['command']
+    category = module.params["category"]
+    command_list = module.params["command"]
 
     # admin credentials used for authentication
-    creds = {'user': module.params['username'],
-             'pswd': module.params['password'],
-             'token': module.params['auth_token']}
+    creds = {"user": module.params["username"], "pswd": module.params["password"], "token": module.params["auth_token"]}
 
     # timeout
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, sorted(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(
+            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {sorted(CATEGORY_COMMANDS_ALL.keys())}")
+        )
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(
+                msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
+            )
 
     # Build root URI(s)
     if module.params.get("baseuri") is not None:
-        root_uris = ["https://" + module.params['baseuri']]
+        root_uris = [f"https://{module.params['baseuri']}"]
     else:
-        root_uris = [
-            "https://" + iom for iom in module.params['ioms']
-        ]
-    rf_utils = WdcRedfishUtils(creds, root_uris, timeout, module,
-                               resource_id=None,
-                               data_modification=False
-                               )
+        root_uris = [f"https://{iom}" for iom in module.params["ioms"]]
+    rf_utils = WdcRedfishUtils(creds, root_uris, timeout, module, resource_id=None, data_modification=False)
 
     # Organize by Categories / Commands
 
     if category == "Update":
         # execute only if we find UpdateService resources
         resource = rf_utils._find_updateservice_resource()
-        if resource['ret'] is False:
-            module.fail_json(msg=resource['msg'])
+        if resource["ret"] is False:
+            module.fail_json(msg=resource["msg"])
         for command in command_list:
             if command == "SimpleUpdateStatus":
                 simple_update_status_result = rf_utils.get_simple_update_status()
-                if simple_update_status_result['ret'] is False:
-                    module.fail_json(msg=to_native(result['msg']))
+                if simple_update_status_result["ret"] is False:
+                    module.fail_json(msg=to_native(result["msg"]))
                 else:
-                    del simple_update_status_result['ret']
+                    del simple_update_status_result["ret"]
                     result["simple_update_status"] = simple_update_status_result
                     module.exit_json(changed=False, redfish_facts=result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

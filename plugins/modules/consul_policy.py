@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022, Håkon Lerring
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: consul_policy
@@ -148,7 +146,7 @@ class ConsulPolicyModule(_ConsulModule):
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
             return [self.api_endpoint, "name", self.params["name"]]
-        return super(ConsulPolicyModule, self).endpoint_url(operation, identifier)
+        return super().endpoint_url(operation, identifier)
 
 
 def main():

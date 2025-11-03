@@ -1,0 +1,103 @@
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2025 Felix Fontein <felix@fontein.de>
+
+line-length = 120
+
+[lint]
+# https://docs.astral.sh/ruff/rules/
+
+select = ["A", "B", "E", "F", "FA", "FLY", "UP", "SIM"]
+ignore = [
+    # Better keep ignored (for now)
+    "F811",  # Redefinition of unused `xxx` (happens a lot for fixtures in unit tests)
+    "E402",  # Module level import not at top of file
+    "E741",  # Ambiguous variable name
+    "UP012",  # unnecessary-encode-utf8
+    "UP015",  # Unnecessary mode argument
+    "SIM105",  # suppressible-exception
+    "SIM108",  # if-else-block-instead-of-if-exp
+    # To fix later:
+    "B905",  # zip-without-explicit-strict - needs Python 3.10+
+    # To fix:
+    "F401",  # Unused import
+    "E721",  # Type comparison
+    "E713",  # "not in" test
+    "E714",  # "not is" test
+    "F841",  # Unused variable
+    "UP006",  # Use `dict` instead of `t.Dict` for type annotation
+    "UP007",  # Use `X | Y` for type annotations
+    "UP009",  # UTF-8 encoding declaration is unnecessary
+    "UP014",  # Convert `xxx` from `NamedTuple` functional to class syntax
+    "UP018",  # Unnecessary `str` call (rewrite as a literal)
+    "UP020",  # Use builtin `open`
+    "UP024",  # Replace aliased errors with `OSError`
+    "UP028",  # Replace `yield` over `for` loop with `yield from`
+    "UP029",  # Unnecessary builtin import: `open`
+    "UP030",  # Use implicit references for positional format fields
+    "UP031",  # Use format specifiers instead of percent format
+    "UP034",  # Avoid extraneous parentheses
+    "UP035",  # Import from `collections.abc` instead: `Callable`
+    "UP036",  # Version block is outdated for minimum Python version
+    "UP039",  # Unnecessary parentheses after class definition
+    "UP041",  # Replace aliased errors with `TimeoutError`
+    "UP045",  # Use `X | None` for type annotations
+    "B007",  # unused-loop-control-variable
+    "B009",  # get-attr-with-constant
+    "B010",  # set-attr-with-constant
+    "B015",  # useless-comparison
+    "B017",  # assert-raises-exception
+    "B020",  # loop-variable-overrides-iterator
+    "B026",  # star-arg-unpacking-after-keyword-arg
+    "B034",  # re-sub-positional-args
+    "B904",  # raise-without-from-inside-except
+    "SIM102",  # collapsible-if
+    "SIM103",  # needless-bool
+    "SIM110",  # reimplemented-builtin
+    "SIM112",  # uncapitalized-environment-variables
+    "SIM113",  # enumerate-for-loop
+    "SIM114",  # if-with-same-arms
+    "SIM115",  # open-file-with-context-handler
+    "SIM116",  # if-else-block-instead-of-dict-lookup
+    "SIM117",  # multiple-with-statements
+    "SIM118",  # in-dict-keys
+    "SIM201",  # negate-equal-op
+    "SIM210",  # if-expr-with-true-false
+    "SIM211",  # if-expr-with-false-true
+    "SIM212",  # if-expr-with-twisted-arms
+    "SIM300",  # yoda-conditions
+    "SIM401",  # if-else-block-instead-of-dict-get
+    "SIM910",  # dict-get-with-none-default
+    "A001",  # builtin-variable-shadowing
+    "A002",  # builtin-argument-shadowing
+    "A004",  # builtin-import-shadowing
+    "FLY002",  # static-join-to-f-string
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed or starting with dummy
+dummy-variable-rgx = "^(_|dummy).*$"
+
+[lint.pycodestyle]
+max-line-length = 160
+
+[format]
+# https://docs.astral.sh/ruff/formatter/#configuration
+
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+line-ending = "lf"
+
+# Disable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+docstring-code-format = false

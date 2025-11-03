@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is based on
 # Lib/posixpath.py of cpython
@@ -8,9 +7,8 @@
 # (See LICENSES/PSF-2.0.txt in this collection)
 # SPDX-License-Identifier: PSF-2.0
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 import os
 
@@ -34,9 +32,9 @@ def ismount(path):
             return False
 
     if isinstance(path, bytes):
-        parent = os.path.join(path, b'..')
+        parent = os.path.join(path, b"..")
     else:
-        parent = os.path.join(path, '..')
+        parent = os.path.join(path, "..")
     parent = os.path.realpath(parent)
     try:
         s2 = os.lstat(parent)
@@ -46,9 +44,9 @@ def ismount(path):
     dev1 = s1.st_dev
     dev2 = s2.st_dev
     if dev1 != dev2:
-        return True     # path/.. on a different device as path
+        return True  # path/.. on a different device as path
     ino1 = s1.st_ino
     ino2 = s2.st_ino
     if ino1 == ino2:
-        return True     # path/.. is the same i-node as path
+        return True  # path/.. is the same i-node as path
     return False

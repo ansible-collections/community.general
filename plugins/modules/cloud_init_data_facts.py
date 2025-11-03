@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, René Moser <mail@renemoser.net>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -97,29 +95,27 @@ CLOUD_INIT_PATH = "/var/lib/cloud/data"
 
 
 def gather_cloud_init_data_facts(module):
-    res = {
-        'cloud_init_data_facts': dict()
-    }
+    res = {"cloud_init_data_facts": dict()}
 
-    for i in ['result', 'status']:
-        filter = module.params.get('filter')
+    for i in ["result", "status"]:
+        filter = module.params.get("filter")
         if filter is None or filter == i:
-            res['cloud_init_data_facts'][i] = dict()
-            json_file = os.path.join(CLOUD_INIT_PATH, i + '.json')
+            res["cloud_init_data_facts"][i] = dict()
+            json_file = os.path.join(CLOUD_INIT_PATH, f"{i}.json")
 
             if os.path.exists(json_file):
-                with open(json_file, 'rb') as f:
-                    contents = to_text(f.read(), errors='surrogate_or_strict')
+                with open(json_file, "rb") as f:
+                    contents = to_text(f.read(), errors="surrogate_or_strict")
 
                 if contents:
-                    res['cloud_init_data_facts'][i] = module.from_json(contents)
+                    res["cloud_init_data_facts"][i] = module.from_json(contents)
     return res
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            filter=dict(choices=['result', 'status']),
+            filter=dict(choices=["result", "status"]),
         ),
         supports_check_mode=True,
     )
@@ -129,5 +125,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2023, jantari (https://github.com/jantari)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 name: bitwarden_secrets_manager
@@ -84,8 +82,8 @@ class BitwardenSecretsManagerException(AnsibleLookupError):
     pass
 
 
-class BitwardenSecretsManager(object):
-    def __init__(self, path='bws'):
+class BitwardenSecretsManager:
+    def __init__(self, path="bws"):
         self._cli_path = path
         self._max_retries = 3
         self._retry_delay = 1
@@ -102,7 +100,7 @@ class BitwardenSecretsManager(object):
                 raise BitwardenSecretsManagerException("Max retries exceeded. Unable to retrieve secret.")
 
             if "Too many requests" in err:
-                delay = self._retry_delay * (2 ** retries)
+                delay = self._retry_delay * (2**retries)
                 sleep(delay)
                 return self._run_with_retry(args, stdin, retries + 1)
             else:
@@ -114,36 +112,31 @@ class BitwardenSecretsManager(object):
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         out, err = p.communicate(stdin)
         rc = p.wait()
-        return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict'), rc
+        return to_text(out, errors="surrogate_or_strict"), to_text(err, errors="surrogate_or_strict"), rc
 
     def get_bws_version(self):
-        """Get the version of the Bitwarden Secrets Manager CLI.
-        """
-        out, err, rc = self._run(['--version'])
+        """Get the version of the Bitwarden Secrets Manager CLI."""
+        out, err, rc = self._run(["--version"])
         if rc != 0:
             raise BitwardenSecretsManagerException(to_text(err))
         # strip the prefix and grab the last segment, the version number
         return out.split()[-1]
 
     def get_secret(self, secret_id, bws_access_token):
-        """Get and return the secret with the given secret_id.
-        """
+        """Get and return the secret with the given secret_id."""
 
         # Prepare set of params for Bitwarden Secrets Manager CLI
         # Color output was not always disabled correctly with the default 'auto' setting so explicitly disable it.
-        params = [
-            '--color', 'no',
-            '--access-token', bws_access_token
-        ]
+        params = ["--color", "no", "--access-token", bws_access_token]
 
         # bws version 0.3.0 introduced a breaking change in the command line syntax:
         # pre-0.3.0: verb noun
         # 0.3.0 and later: noun verb
         bws_version = self.get_bws_version()
-        if LooseVersion(bws_version) < LooseVersion('0.3.0'):
-            params.extend(['get', 'secret', secret_id])
+        if LooseVersion(bws_version) < LooseVersion("0.3.0"):
+            params.extend(["get", "secret", secret_id])
         else:
-            params.extend(['secret', 'get', secret_id])
+            params.extend(["secret", "get", secret_id])
 
         out, err, rc = self._run_with_retry(params)
         if rc != 0:
@@ -155,7 +148,7 @@ class BitwardenSecretsManager(object):
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
-        bws_access_token = self.get_option('bws_access_token')
+        bws_access_token = self.get_option("bws_access_token")
 
         return [_bitwarden_secrets_manager.get_secret(term, bws_access_token) for term in terms]
 

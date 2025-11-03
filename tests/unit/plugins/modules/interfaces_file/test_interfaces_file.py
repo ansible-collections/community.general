@@ -5,10 +5,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import interfaces_file
 from shutil import copyfile, move
 import difflib
@@ -19,6 +17,7 @@ import os
 import re
 import shutil
 import tempfile
+import unittest
 
 
 class AnsibleFailJson(Exception):
@@ -30,7 +29,7 @@ class ModuleMocked:
         move(src, dst)
 
     def backup_local(self, path):
-        backupp = os.path.join("/tmp", os.path.basename(path) + ".bak")
+        backupp = os.path.join("/tmp", f"{os.path.basename(path)}.bak")
         copyfile(path, backupp)
         return backupp
 
@@ -39,8 +38,8 @@ class ModuleMocked:
 
 
 module = ModuleMocked()
-fixture_path = os.path.join(os.path.dirname(__file__), 'interfaces_file_fixtures', 'input')
-golden_output_path = os.path.join(os.path.dirname(__file__), 'interfaces_file_fixtures', 'golden_output')
+fixture_path = os.path.join(os.path.dirname(__file__), "interfaces_file_fixtures", "input")
+golden_output_path = os.path.join(os.path.dirname(__file__), "interfaces_file_fixtures", "golden_output")
 
 
 class TestInterfacesFileModule(unittest.TestCase):
@@ -48,7 +47,7 @@ class TestInterfacesFileModule(unittest.TestCase):
 
     def getTestFiles(self, include_filter=None, exclude_filter=None):
         flist = next(os.walk(fixture_path))[2]
-        flist = [file for file in flist if not file.endswith('.license')]
+        flist = [file for file in flist if not file.endswith(".license")]
         if include_filter:
             flist = filter(lambda x: re.match(include_filter, x), flist)
         if exclude_filter:
@@ -58,10 +57,9 @@ class TestInterfacesFileModule(unittest.TestCase):
     def compareFileToBackup(self, path, backup):
         with open(path) as f1:
             with open(backup) as f2:
-                diffs = difflib.context_diff(f1.readlines(),
-                                             f2.readlines(),
-                                             fromfile=os.path.basename(path),
-                                             tofile=os.path.basename(backup))
+                diffs = difflib.context_diff(
+                    f1.readlines(), f2.readlines(), fromfile=os.path.basename(path), tofile=os.path.basename(backup)
+                )
         # Restore backup
         move(backup, path)
         deltas = list(diffs)
@@ -69,38 +67,38 @@ class TestInterfacesFileModule(unittest.TestCase):
 
     def compareInterfacesLinesToFile(self, interfaces_lines, path, testname=None):
         if not testname:
-            testname = "%s.%s" % (path, inspect.stack()[1][3])
-        self.compareStringWithFile("".join([d['line'] for d in interfaces_lines if 'line' in d]), testname)
+            testname = f"{path}.{inspect.stack()[1][3]}"
+        self.compareStringWithFile("".join([d["line"] for d in interfaces_lines if "line" in d]), testname)
 
     def compareInterfacesToFile(self, ifaces, path, testname=None):
         if not testname:
-            testname = "%s.%s.json" % (path, inspect.stack()[1][3])
+            testname = f"{path}.{inspect.stack()[1][3]}.json"
 
         testfilepath = os.path.join(golden_output_path, testname)
-        string = json.dumps(ifaces, sort_keys=True, indent=4, separators=(',', ': '))
-        if string and not string.endswith('\n'):
-            string += '\n'
+        string = json.dumps(ifaces, sort_keys=True, indent=4, separators=(",", ": "))
+        if string and not string.endswith("\n"):
+            string += "\n"
         goldenstring = string
         goldenData = ifaces
         if not os.path.isfile(testfilepath):
-            with io.open(testfilepath, 'wb') as f:
+            with io.open(testfilepath, "wb") as f:
                 f.write(string.encode())
         else:
-            with open(testfilepath, 'r') as goldenfile:
+            with open(testfilepath, "r") as goldenfile:
                 goldenData = json.load(goldenfile)
         self.assertEqual(goldenData, ifaces)
 
     def compareStringWithFile(self, string, path):
         testfilepath = os.path.join(golden_output_path, path)
-        if string and not string.endswith('\n'):
-            string += '\n'
+        if string and not string.endswith("\n"):
+            string += "\n"
         goldenstring = string
         if not os.path.isfile(testfilepath):
-            f = io.open(testfilepath, 'wb')
+            f = io.open(testfilepath, "wb")
             f.write(string.encode())
             f.close()
         else:
-            with open(testfilepath, 'r') as goldenfile:
+            with open(testfilepath, "r") as goldenfile:
                 goldenstring = goldenfile.read()
                 goldenfile.close()
         self.assertEqual(goldenstring, string)
@@ -116,74 +114,74 @@ class TestInterfacesFileModule(unittest.TestCase):
         testcases = {
             "add_aggi_up": [
                 {
-                    'iface': 'aggi',
-                    'option': 'up',
-                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
-                    'state': 'present',
+                    "iface": "aggi",
+                    "option": "up",
+                    "value": "route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi",
+                    "state": "present",
                 }
             ],
             "add_and_delete_aggi_up": [
                 {
-                    'iface': 'aggi',
-                    'option': 'up',
-                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
-                    'state': 'present',
+                    "iface": "aggi",
+                    "option": "up",
+                    "value": "route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi",
+                    "state": "present",
                 },
                 {
-                    'iface': 'aggi',
-                    'option': 'up',
-                    'value': None,
-                    'state': 'absent',
+                    "iface": "aggi",
+                    "option": "up",
+                    "value": None,
+                    "state": "absent",
                 },
             ],
             "add_aggi_up_twice": [
                 {
-                    'iface': 'aggi',
-                    'option': 'up',
-                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
-                    'state': 'present',
+                    "iface": "aggi",
+                    "option": "up",
+                    "value": "route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi",
+                    "state": "present",
                 },
                 {
-                    'iface': 'aggi',
-                    'option': 'up',
-                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
-                    'state': 'present',
+                    "iface": "aggi",
+                    "option": "up",
+                    "value": "route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi",
+                    "state": "present",
                 },
             ],
             "aggi_remove_dup": [
                 {
-                    'iface': 'aggi',
-                    'option': 'up',
-                    'value': None,
-                    'state': 'absent',
+                    "iface": "aggi",
+                    "option": "up",
+                    "value": None,
+                    "state": "absent",
                 },
                 {
-                    'iface': 'aggi',
-                    'option': 'up',
-                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
-                    'state': 'present',
+                    "iface": "aggi",
+                    "option": "up",
+                    "value": "route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi",
+                    "state": "present",
                 },
             ],
             "set_aggi_slaves": [
                 {
-                    'iface': 'aggi',
-                    'option': 'slaves',
-                    'value': 'int1  int3',
-                    'state': 'present',
+                    "iface": "aggi",
+                    "option": "slaves",
+                    "value": "int1  int3",
+                    "state": "present",
                 },
             ],
             "set_aggi_and_eth0_mtu": [
                 {
-                    'iface': 'aggi',
-                    'option': 'mtu',
-                    'value': '1350',
-                    'state': 'present',
+                    "iface": "aggi",
+                    "option": "mtu",
+                    "value": "1350",
+                    "state": "present",
                 },
                 {
-                    'iface': 'eth0',
-                    'option': 'mtu',
-                    'value': '1350',
-                    'state': 'present',
+                    "iface": "eth0",
+                    "option": "mtu",
+                    "value": "1350",
+                    "state": "present",
                 },
             ],
         }
@@ -194,23 +192,27 @@ class TestInterfacesFileModule(unittest.TestCase):
                 fail_json_iterations = []
                 for i, options in enumerate(options_list):
                     try:
-                        dummy, lines = interfaces_file.set_interface_option(module, lines, options['iface'], options['option'],
-                                                                            options['value'], options['state'])
+                        dummy, lines = interfaces_file.set_interface_option(
+                            module, lines, options["iface"], options["option"], options["value"], options["state"]
+                        )
                     except AnsibleFailJson as e:
-                        fail_json_iterations.append("[%d] fail_json message: %s\noptions:\n%s" %
-                                                    (i, str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
-                self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                        fail_json_iterations.append(
+                            f"[{i}] fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}"
+                        )
+                self.compareStringWithFile(
+                    "\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt"
+                )
 
-                self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
 
     def test_revert(self):
         testcases = {
             "revert": [
                 {
-                    'iface': 'eth0',
-                    'option': 'mtu',
-                    'value': '1350',
+                    "iface": "eth0",
+                    "option": "mtu",
+                    "value": "1350",
                 }
             ],
         }
@@ -223,21 +225,25 @@ class TestInterfacesFileModule(unittest.TestCase):
                     lines, ifaces = interfaces_file.read_interfaces_file(module, path)
                     backupp = module.backup_local(path)
                     options = options_list[0]
-                    for state in ['present', 'absent']:
+                    for state in ["present", "absent"]:
                         fail_json_iterations = []
-                        options['state'] = state
+                        options["state"] = state
                         try:
-                            dummy, lines = interfaces_file.set_interface_option(module, lines,
-                                                                                options['iface'], options['option'], options['value'], options['state'])
+                            dummy, lines = interfaces_file.set_interface_option(
+                                module, lines, options["iface"], options["option"], options["value"], options["state"]
+                            )
                         except AnsibleFailJson as e:
-                            fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
-                                                        (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
-                        interfaces_file.write_changes(module, [d['line'] for d in lines if 'line' in d], path)
+                            fail_json_iterations.append(
+                                f"fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}"
+                            )
+                        interfaces_file.write_changes(module, [d["line"] for d in lines if "line" in d], path)
 
-                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                    self.compareStringWithFile(
+                        "\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt"
+                    )
 
-                    self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                    self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                    self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                    self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
                     if testfile not in ["no_leading_spaces"]:
                         # skip if eth0 has MTU value
                         self.compareFileToBackup(path, backupp)
@@ -246,10 +252,10 @@ class TestInterfacesFileModule(unittest.TestCase):
         testcases = {
             "change_method": [
                 {
-                    'iface': 'eth1',
-                    'option': 'method',
-                    'value': 'dhcp',
-                    'state': 'present',
+                    "iface": "eth1",
+                    "option": "method",
+                    "value": "dhcp",
+                    "state": "present",
                 }
             ],
         }
@@ -264,24 +270,30 @@ class TestInterfacesFileModule(unittest.TestCase):
                     options = options_list[0]
                     fail_json_iterations = []
                     try:
-                        changed, lines = interfaces_file.set_interface_option(module, lines, options['iface'], options['option'],
-                                                                              options['value'], options['state'])
+                        changed, lines = interfaces_file.set_interface_option(
+                            module, lines, options["iface"], options["option"], options["value"], options["state"]
+                        )
                         # When a changed is made try running it again for proper idempotency
                         if changed:
-                            changed_again, lines = interfaces_file.set_interface_option(module, lines, options['iface'],
-                                                                                        options['option'], options['value'], options['state'])
-                            self.assertFalse(changed_again,
-                                             msg='Second request for change should return false for {0} running on {1}'.format(testname,
-                                                                                                                               testfile))
+                            changed_again, lines = interfaces_file.set_interface_option(
+                                module, lines, options["iface"], options["option"], options["value"], options["state"]
+                            )
+                            self.assertFalse(
+                                changed_again,
+                                msg=f"Second request for change should return false for {testname} running on {testfile}",
+                            )
                     except AnsibleFailJson as e:
-                        fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
-                                                    (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
-                    interfaces_file.write_changes(module, [d['line'] for d in lines if 'line' in d], path)
+                        fail_json_iterations.append(
+                            f"fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}"
+                        )
+                    interfaces_file.write_changes(module, [d["line"] for d in lines if "line" in d], path)
 
-                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                    self.compareStringWithFile(
+                        "\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt"
+                    )
 
-                    self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                    self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                    self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                    self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
                     # Restore backup
                     move(backupp, path)
 
@@ -314,8 +326,8 @@ class TestInterfacesFileModule(unittest.TestCase):
                             "netmask": "",
                             "post-up": [],
                             "pre-up": [],
-                            "up": []
-                        }
+                            "up": [],
+                        },
                     },
                     {
                         "address_family": "inet",
@@ -323,7 +335,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  address   1.2.3.5",
                         "line_type": "option",
                         "option": "address",
-                        "value": "1.2.3.5"
+                        "value": "1.2.3.5",
                     },
                     {
                         "address_family": "inet",
@@ -331,7 +343,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  netmask   255.255.255.0",
                         "line_type": "option",
                         "option": "netmask",
-                        "value": "255.255.255.0"
+                        "value": "255.255.255.0",
                     },
                     {
                         "address_family": "inet",
@@ -339,8 +351,8 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  gateway   1.2.3.1",
                         "line_type": "option",
                         "option": "gateway",
-                        "value": "1.2.3.1"
-                    }
+                        "value": "1.2.3.1",
+                    },
                 ],
                 "iface_options": [
                     {
@@ -349,7 +361,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  address   1.2.3.5",
                         "line_type": "option",
                         "option": "address",
-                        "value": "1.2.3.5"
+                        "value": "1.2.3.5",
                     },
                     {
                         "address_family": "inet",
@@ -357,7 +369,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  netmask   255.255.255.0",
                         "line_type": "option",
                         "option": "netmask",
-                        "value": "255.255.255.0"
+                        "value": "255.255.255.0",
                     },
                     {
                         "address_family": "inet",
@@ -365,9 +377,9 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  gateway   1.2.3.1",
                         "line_type": "option",
                         "option": "gateway",
-                        "value": "1.2.3.1"
-                    }
-                ]
+                        "value": "1.2.3.1",
+                    },
+                ],
             },
         }
 
@@ -375,7 +387,7 @@ class TestInterfacesFileModule(unittest.TestCase):
             iface_options = interfaces_file.get_interface_options(testcases[testname]["iface_lines"])
             self.assertEqual(testcases[testname]["iface_options"], iface_options)
 
-    def test_get_interface_options(self):
+    def test_get_interface_options_2(self):
         testcases = {
             "select address": {
                 "iface_options": [
@@ -385,7 +397,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  address   1.2.3.5",
                         "line_type": "option",
                         "option": "address",
-                        "value": "1.2.3.5"
+                        "value": "1.2.3.5",
                     },
                     {
                         "address_family": "inet",
@@ -393,7 +405,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  netmask   255.255.255.0",
                         "line_type": "option",
                         "option": "netmask",
-                        "value": "255.255.255.0"
+                        "value": "255.255.255.0",
                     },
                     {
                         "address_family": "inet",
@@ -401,8 +413,8 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  gateway   1.2.3.1",
                         "line_type": "option",
                         "option": "gateway",
-                        "value": "1.2.3.1"
-                    }
+                        "value": "1.2.3.1",
+                    },
                 ],
                 "target_options": [
                     {
@@ -411,15 +423,17 @@ class TestInterfacesFileModule(unittest.TestCase):
                         "line": "  address   1.2.3.5",
                         "line_type": "option",
                         "option": "address",
-                        "value": "1.2.3.5"
+                        "value": "1.2.3.5",
                     }
                 ],
-                "option": "address"
+                "option": "address",
             },
         }
 
         for testname in testcases.keys():
-            target_options = interfaces_file.get_target_options(testcases[testname]["iface_options"], testcases[testname]["option"])
+            target_options = interfaces_file.get_target_options(
+                testcases[testname]["iface_options"], testcases[testname]["option"]
+            )
             self.assertEqual(testcases[testname]["target_options"], target_options)
 
     def test_update_existing_option_line(self):
@@ -431,7 +445,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                     "line": "  address   1.2.3.5",
                     "line_type": "option",
                     "option": "address",
-                    "value": "1.2.3.5"
+                    "value": "1.2.3.5",
                 },
                 "value": "1.2.3.4",
                 "result": "  address   1.2.3.4",
@@ -439,7 +453,9 @@ class TestInterfacesFileModule(unittest.TestCase):
         }
 
         for testname in testcases.keys():
-            updated = interfaces_file.update_existing_option_line(testcases[testname]["target_option"], testcases[testname]["value"])
+            updated = interfaces_file.update_existing_option_line(
+                testcases[testname]["target_option"], testcases[testname]["value"]
+            )
             self.assertEqual(testcases[testname]["result"], updated)
 
     def test_predefined(self):
@@ -455,7 +471,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                     "iface": "eno1",
                     "option": "address",
                     "value": "1.2.3.5",
-                    'state': 'present',
+                    "state": "present",
                 },
                 "result_lines": [
                     "iface eno1 inet static",
@@ -469,65 +485,71 @@ class TestInterfacesFileModule(unittest.TestCase):
 
         for testname in testcases.keys():
             lines, ifaces = interfaces_file.read_interfaces_lines(module, testcases[testname]["source_lines"])
-            changed, lines = interfaces_file.set_interface_option(module, lines, testcases[testname]["input"]['iface'], testcases[testname]["input"]['option'],
-                                                                  testcases[testname]["input"]['value'], testcases[testname]["input"]['state'])
-            self.assertEqual(testcases[testname]["result_lines"], [d['line'] for d in lines if 'line' in d])
-            assert testcases[testname]['changed'] == changed
+            changed, lines = interfaces_file.set_interface_option(
+                module,
+                lines,
+                testcases[testname]["input"]["iface"],
+                testcases[testname]["input"]["option"],
+                testcases[testname]["input"]["value"],
+                testcases[testname]["input"]["state"],
+            )
+            self.assertEqual(testcases[testname]["result_lines"], [d["line"] for d in lines if "line" in d])
+            assert testcases[testname]["changed"] == changed
 
     def test_inet_inet6(self):
         testcases = {
             "change_ipv4": [
                 {
-                    'iface': 'eth0',
-                    'address_family': 'inet',
-                    'option': 'address',
-                    'value': '192.168.0.42',
-                    'state': 'present',
+                    "iface": "eth0",
+                    "address_family": "inet",
+                    "option": "address",
+                    "value": "192.168.0.42",
+                    "state": "present",
                 }
             ],
             "change_ipv6": [
                 {
-                    'iface': 'eth0',
-                    'address_family': 'inet6',
-                    'option': 'address',
-                    'value': 'fc00::42',
-                    'state': 'present',
+                    "iface": "eth0",
+                    "address_family": "inet6",
+                    "option": "address",
+                    "value": "fc00::42",
+                    "state": "present",
                 }
             ],
             "change_ipv4_pre_up": [
                 {
-                    'iface': 'eth0',
-                    'address_family': 'inet',
-                    'option': 'pre-up',
-                    'value': 'XXXX_ipv4',
-                    'state': 'present',
+                    "iface": "eth0",
+                    "address_family": "inet",
+                    "option": "pre-up",
+                    "value": "XXXX_ipv4",
+                    "state": "present",
                 }
             ],
             "change_ipv6_pre_up": [
                 {
-                    'iface': 'eth0',
-                    'address_family': 'inet6',
-                    'option': 'pre-up',
-                    'value': 'XXXX_ipv6',
-                    'state': 'present',
+                    "iface": "eth0",
+                    "address_family": "inet6",
+                    "option": "pre-up",
+                    "value": "XXXX_ipv6",
+                    "state": "present",
                 }
             ],
             "change_ipv4_post_up": [
                 {
-                    'iface': 'eth0',
-                    'address_family': 'inet',
-                    'option': 'post-up',
-                    'value': 'XXXX_ipv4',
-                    'state': 'present',
+                    "iface": "eth0",
+                    "address_family": "inet",
+                    "option": "post-up",
+                    "value": "XXXX_ipv4",
+                    "state": "present",
                 }
             ],
             "change_ipv6_post_up": [
                 {
-                    'iface': 'eth0',
-                    'address_family': 'inet6',
-                    'option': 'post-up',
-                    'value': 'XXXX_ipv6',
-                    'state': 'present',
+                    "iface": "eth0",
+                    "address_family": "inet6",
+                    "option": "post-up",
+                    "value": "XXXX_ipv6",
+                    "state": "present",
                 }
             ],
         }
@@ -542,16 +564,26 @@ class TestInterfacesFileModule(unittest.TestCase):
                     options = options_list[0]
                     fail_json_iterations = []
                     try:
-                        dummy, lines = interfaces_file.set_interface_option(module, lines, options['iface'], options['option'],
-                                                                            options['value'], options['state'], options['address_family'])
+                        dummy, lines = interfaces_file.set_interface_option(
+                            module,
+                            lines,
+                            options["iface"],
+                            options["option"],
+                            options["value"],
+                            options["state"],
+                            options["address_family"],
+                        )
                     except AnsibleFailJson as e:
-                        fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
-                                                    (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
-                    interfaces_file.write_changes(module, [d['line'] for d in lines if 'line' in d], path)
+                        fail_json_iterations.append(
+                            f"fail_json message: {e!s}\noptions:\n{json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))}"
+                        )
+                    interfaces_file.write_changes(module, [d["line"] for d in lines if "line" in d], path)
 
-                    self.compareStringWithFile("\n=====\n".join(fail_json_iterations), "%s_%s.exceptions.txt" % (testfile, testname))
+                    self.compareStringWithFile(
+                        "\n=====\n".join(fail_json_iterations), f"{testfile}_{testname}.exceptions.txt"
+                    )
 
-                    self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
-                    self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
+                    self.compareInterfacesLinesToFile(lines, testfile, f"{testfile}_{testname}")
+                    self.compareInterfacesToFile(ifaces, testfile, f"{testfile}_{testname}.json")
                     # Restore backup
                     move(backupp, path)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -59,22 +58,21 @@ notes:
   - This plugin ignores the C(become_user) supplied and uses C(pmrun)'s own configuration to select the user.
 """
 
+from shlex import quote as shlex_quote
 from ansible.plugins.become import BecomeBase
-from ansible.module_utils.six.moves import shlex_quote
 
 
 class BecomeModule(BecomeBase):
-
-    name = 'community.general.pmrun'
-    prompt = 'Enter UPM user password:'
+    name = "community.general.pmrun"
+    prompt = "Enter UPM user password:"
 
     def build_become_command(self, cmd, shell):
-        super(BecomeModule, self).build_become_command(cmd, shell)
+        super().build_become_command(cmd, shell)
 
         if not cmd:
             return cmd
 
-        become = self.get_option('become_exe')
+        become = self.get_option("become_exe")
 
-        flags = self.get_option('become_flags')
-        return f'{become} {flags} {shlex_quote(self._build_success_command(cmd, shell))}'
+        flags = self.get_option("become_flags")
+        return f"{become} {flags} {shlex_quote(self._build_success_command(cmd, shell))}"

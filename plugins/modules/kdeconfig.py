@@ -3,8 +3,7 @@
 # Copyright (c) 2023, Salvatore Mesoraca <s.mesoraca16@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -107,7 +106,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 
-class TemporaryDirectory(object):
+class TemporaryDirectory:
     """Basic backport of tempfile.TemporaryDirectory"""
 
     def __init__(self, suffix="", prefix="tmp", dir=None):
@@ -131,70 +130,70 @@ class TemporaryDirectory(object):
 
 def run_kwriteconfig(module, cmd, path, groups, key, value):
     """Invoke kwriteconfig with arguments"""
-    args = [cmd, '--file', path, '--key', key]
+    args = [cmd, "--file", path, "--key", key]
     for group in groups:
-        args.extend(['--group', group])
+        args.extend(["--group", group])
     if isinstance(value, bool):
-        args.extend(['--type', 'bool'])
+        args.extend(["--type", "bool"])
         if value:
-            args.append('true')
+            args.append("true")
         else:
-            args.append('false')
+            args.append("false")
     else:
-        args.extend(['--', value])
+        args.extend(["--", value])
     module.run_command(args, check_rc=True)
 
 
 def run_module(module, tmpdir, kwriteconfig):
-    result = dict(changed=False, msg='OK', path=module.params['path'])
-    b_path = to_bytes(module.params['path'])
-    tmpfile = os.path.join(tmpdir, 'file')
+    result = dict(changed=False, msg="OK", path=module.params["path"])
+    b_path = to_bytes(module.params["path"])
+    tmpfile = os.path.join(tmpdir, "file")
     b_tmpfile = to_bytes(tmpfile)
     diff = dict(
-        before='',
-        after='',
-        before_header=result['path'],
-        after_header=result['path'],
+        before="",
+        after="",
+        before_header=result["path"],
+        after_header=result["path"],
     )
     try:
-        with open(b_tmpfile, 'wb') as dst:
+        with open(b_tmpfile, "wb") as dst:
             try:
-                with open(b_path, 'rb') as src:
+                with open(b_path, "rb") as src:
                     b_data = src.read()
             except IOError:
-                result['changed'] = True
+                result["changed"] = True
             else:
                 dst.write(b_data)
                 try:
-                    diff['before'] = to_text(b_data)
+                    diff["before"] = to_text(b_data)
                 except UnicodeError:
-                    diff['before'] = repr(b_data)
+                    diff["before"] = repr(b_data)
     except IOError:
-        module.fail_json(msg='Unable to create temporary file', traceback=traceback.format_exc())
+        module.fail_json(msg="Unable to create temporary file", traceback=traceback.format_exc())
 
-    for row in module.params['values']:
-        groups = row['groups']
+    for row in module.params["values"]:
+        groups = row["groups"]
         if groups is None:
-            groups = [row['group']]
-        key = row['key']
-        value = row['bool_value']
+            groups = [row["group"]]
+        key = row["key"]
+        value = row["bool_value"]
         if value is None:
-            value = row['value']
+            value = row["value"]
         run_kwriteconfig(module, kwriteconfig, tmpfile, groups, key, value)
 
-    with open(b_tmpfile, 'rb') as tmpf:
+    with open(b_tmpfile, "rb") as tmpf:
         b_data = tmpf.read()
         try:
-            diff['after'] = to_text(b_data)
+            diff["after"] = to_text(b_data)
         except UnicodeError:
-            diff['after'] = repr(b_data)
+            diff["after"] = repr(b_data)
 
-    result['changed'] = result['changed'] or diff['after'] != diff['before']
+    result["changed"] = result["changed"] or diff["after"] != diff["before"]
 
     file_args = module.load_file_common_arguments(module.params)
 
     if module.check_mode:
-        if not result['changed']:
+        if not result["changed"]:
             shutil.copystat(b_path, b_tmpfile)
             uid, gid = module.user_and_group(b_path)
             os.chown(b_tmpfile, uid, gid)
@@ -202,49 +201,56 @@ def run_module(module, tmpdir, kwriteconfig):
                 diff = {}
             else:
                 diff = None
-            result['changed'] = module.set_fs_attributes_if_different(file_args, result['changed'], diff=diff)
+            result["changed"] = module.set_fs_attributes_if_different(file_args, result["changed"], diff=diff)
         if module._diff:
-            result['diff'] = diff
+            result["diff"] = diff
         module.exit_json(**result)
 
-    if result['changed']:
-        if module.params['backup'] and os.path.exists(b_path):
-            result['backup_file'] = module.backup_local(result['path'])
+    if result["changed"]:
+        if module.params["backup"] and os.path.exists(b_path):
+            result["backup_file"] = module.backup_local(result["path"])
         try:
             module.atomic_move(b_tmpfile, os.path.abspath(b_path))
         except IOError:
-            module.ansible.fail_json(msg='Unable to move temporary file %s to %s, IOError' % (tmpfile, result['path']), traceback=traceback.format_exc())
+            module.ansible.fail_json(
+                msg=f"Unable to move temporary file {tmpfile} to {result['path']}, IOError",
+                traceback=traceback.format_exc(),
+            )
 
-    if result['changed']:
-        module.set_fs_attributes_if_different(file_args, result['changed'])
+    if result["changed"]:
+        module.set_fs_attributes_if_different(file_args, result["changed"])
     else:
         if module._diff:
             diff = {}
         else:
             diff = None
-        result['changed'] = module.set_fs_attributes_if_different(file_args, result['changed'], diff=diff)
+        result["changed"] = module.set_fs_attributes_if_different(file_args, result["changed"], diff=diff)
     if module._diff:
-        result['diff'] = diff
+        result["diff"] = diff
     module.exit_json(**result)
 
 
 def main():
-    single_value_arg = dict(group=dict(type='str'),
-                            groups=dict(type='list', elements='str'),
-                            key=dict(type='str', required=True, no_log=False),
-                            value=dict(type='str'),
-                            bool_value=dict(type='bool'))
-    required_alternatives = [('group', 'groups'), ('value', 'bool_value')]
+    single_value_arg = dict(
+        group=dict(type="str"),
+        groups=dict(type="list", elements="str"),
+        key=dict(type="str", required=True, no_log=False),
+        value=dict(type="str"),
+        bool_value=dict(type="bool"),
+    )
+    required_alternatives = [("group", "groups"), ("value", "bool_value")]
     module_args = dict(
-        values=dict(type='list',
-                    elements='dict',
-                    options=single_value_arg,
-                    mutually_exclusive=required_alternatives,
-                    required_one_of=required_alternatives,
-                    required=True),
-        path=dict(type='path', required=True),
-        kwriteconfig_path=dict(type='path'),
-        backup=dict(type='bool', default=False),
+        values=dict(
+            type="list",
+            elements="dict",
+            options=single_value_arg,
+            mutually_exclusive=required_alternatives,
+            required_one_of=required_alternatives,
+            required=True,
+        ),
+        path=dict(type="path", required=True),
+        kwriteconfig_path=dict(type="path"),
+        backup=dict(type="bool", default=False),
     )
 
     module = AnsibleModule(
@@ -254,21 +260,21 @@ def main():
     )
 
     kwriteconfig = None
-    if module.params['kwriteconfig_path'] is not None:
-        kwriteconfig = module.get_bin_path(module.params['kwriteconfig_path'], required=True)
+    if module.params["kwriteconfig_path"] is not None:
+        kwriteconfig = module.get_bin_path(module.params["kwriteconfig_path"], required=True)
     else:
-        for progname in ('kwriteconfig6', 'kwriteconfig5', 'kwriteconfig', 'kwriteconfig4'):
+        for progname in ("kwriteconfig6", "kwriteconfig5", "kwriteconfig", "kwriteconfig4"):
             kwriteconfig = module.get_bin_path(progname)
             if kwriteconfig is not None:
                 break
         if kwriteconfig is None:
-            module.fail_json(msg='kwriteconfig is not installed')
-    for v in module.params['values']:
-        if not v['key']:
+            module.fail_json(msg="kwriteconfig is not installed")
+    for v in module.params["values"]:
+        if not v["key"]:
             module.fail_json(msg="'key' cannot be empty")
     with TemporaryDirectory(dir=module.tmpdir) as tmpdir:
         run_module(module, tmpdir, kwriteconfig)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

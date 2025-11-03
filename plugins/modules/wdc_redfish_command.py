@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022 Western Digital Corporation
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: wdc_redfish_command
@@ -207,125 +205,106 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 CATEGORY_COMMANDS_ALL = {
-    "Update": [
-        "FWActivate",
-        "UpdateAndActivate"
-    ],
+    "Update": ["FWActivate", "UpdateAndActivate"],
     "Chassis": [
         "IndicatorLedOn",
         "IndicatorLedOff",
         "PowerModeLow",
         "PowerModeNormal",
-    ]
+    ],
 }
 
 
 def main():
     argument_spec = dict(
         category=dict(required=True),
-        command=dict(required=True, type='list', elements='str'),
-        ioms=dict(type='list', elements='str'),
+        command=dict(required=True, type="list", elements="str"),
+        ioms=dict(type="list", elements="str"),
         baseuri=dict(),
         username=dict(),
         password=dict(no_log=True),
         auth_token=dict(no_log=True),
-        update_creds=dict(
-            type='dict',
-            options=dict(
-                username=dict(),
-                password=dict(no_log=True)
-            )
-        ),
+        update_creds=dict(type="dict", options=dict(username=dict(), password=dict(no_log=True))),
         resource_id=dict(),
         update_image_uri=dict(),
-        timeout=dict(type='int', default=10)
+        timeout=dict(type="int", default=10),
     )
     argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
         argument_spec,
         required_together=[
-            ('username', 'password'),
+            ("username", "password"),
         ],
-        required_one_of=[
-            ('username', 'auth_token'),
-            ('baseuri', 'ioms')
-        ],
+        required_one_of=[("username", "auth_token"), ("baseuri", "ioms")],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    category = module.params['category']
-    command_list = module.params['command']
+    category = module.params["category"]
+    command_list = module.params["command"]
 
     # admin credentials used for authentication
-    creds = {'user': module.params['username'],
-             'pswd': module.params['password'],
-             'token': module.params['auth_token']}
+    creds = {"user": module.params["username"], "pswd": module.params["password"], "token": module.params["auth_token"]}
 
     # timeout
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
     # Resource to modify
-    resource_id = module.params['resource_id']
+    resource_id = module.params["resource_id"]
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, sorted(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(
+            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {sorted(CATEGORY_COMMANDS_ALL.keys())}")
+        )
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(
+                msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
+            )
 
     # Build root URI(s)
     if module.params.get("baseuri") is not None:
-        root_uris = ["https://" + module.params['baseuri']]
+        root_uris = [f"https://{module.params['baseuri']}"]
     else:
-        root_uris = [
-            "https://" + iom for iom in module.params['ioms']
-        ]
-    rf_utils = WdcRedfishUtils(creds, root_uris, timeout, module,
-                               resource_id=resource_id, data_modification=True)
+        root_uris = [f"https://{iom}" for iom in module.params["ioms"]]
+    rf_utils = WdcRedfishUtils(creds, root_uris, timeout, module, resource_id=resource_id, data_modification=True)
 
     # Organize by Categories / Commands
 
     if category == "Update":
         # execute only if we find UpdateService resources
         resource = rf_utils._find_updateservice_resource()
-        if resource['ret'] is False:
-            module.fail_json(msg=resource['msg'])
+        if resource["ret"] is False:
+            module.fail_json(msg=resource["msg"])
         # update options
-        update_opts = {
-            'update_creds': module.params['update_creds']
-        }
+        update_opts = {"update_creds": module.params["update_creds"]}
         for command in command_list:
             if command == "FWActivate":
                 if module.check_mode:
-                    result = {
-                        'ret': True,
-                        'changed': True,
-                        'msg': 'FWActivate not performed in check mode.'
-                    }
+                    result = {"ret": True, "changed": True, "msg": "FWActivate not performed in check mode."}
                 else:
                     result = rf_utils.firmware_activate(update_opts)
             elif command == "UpdateAndActivate":
-                update_opts["update_image_uri"] = module.params['update_image_uri']
+                update_opts["update_image_uri"] = module.params["update_image_uri"]
                 result = rf_utils.update_and_activate(update_opts)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         led_commands = ["IndicatorLedOn", "IndicatorLedOff"]
 
         # Check if more than one led_command is present
         num_led_commands = sum([command in led_commands for command in command_list])
         if num_led_commands > 1:
-            result = {'ret': False, 'msg': "Only one IndicatorLed command should be sent at a time."}
+            result = {"ret": False, "msg": "Only one IndicatorLed command should be sent at a time."}
         else:
             for command in command_list:
                 if command.startswith("IndicatorLed"):
@@ -333,18 +312,20 @@ def main():
                 elif command.startswith("PowerMode"):
                     result = rf_utils.manage_chassis_power_mode(command)
 
-    if result['ret'] is False:
-        module.fail_json(msg=to_native(result['msg']))
+    if result["ret"] is False:
+        module.fail_json(msg=to_native(result["msg"]))
     else:
-        del result['ret']
-        changed = result.get('changed', True)
-        session = result.get('session', dict())
-        module.exit_json(changed=changed,
-                         session=session,
-                         msg='Action was successful' if not module.check_mode else result.get(
-                             'msg', "No action performed in check mode."
-                         ))
+        del result["ret"]
+        changed = result.get("changed", True)
+        session = result.get("session", dict())
+        module.exit_json(
+            changed=changed,
+            session=session,
+            msg="Action was successful"
+            if not module.check_mode
+            else result.get("msg", "No action performed in check mode."),
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

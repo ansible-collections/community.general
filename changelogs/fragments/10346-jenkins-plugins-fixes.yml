@@ -1,6 +1,0 @@
-bugfixes:
-  - "jenkins_plugin - install latest compatible version instead of latest (https://github.com/ansible-collections/community.general/issues/854, https://github.com/ansible-collections/community.general/pull/10346)."
-  - "jenkins_plugin - separate Jenkins and external URL credentials (https://github.com/ansible-collections/community.general/issues/4419, https://github.com/ansible-collections/community.general/pull/10346)."
-
-minor_changes:
-  - "jenkins_plugin - install dependencies for specific version (https://github.com/ansible-collections/community.general/issue/4995, https://github.com/ansible-collections/community.general/pull/10346)."

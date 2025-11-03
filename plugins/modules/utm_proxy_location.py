@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018, Johannes Brunswicker <johannes.brunswicker@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: utm_proxy_location
@@ -192,25 +190,37 @@ from ansible.module_utils.common.text.converters import to_native
 
 def main():
     endpoint = "reverse_proxy/location"
-    key_to_check_for_changes = ["access_control", "allowed_networks", "auth_profile", "backend", "be_path", "comment",
-                                "denied_networks", "hot_standby", "path", "status", "stickysession_id",
-                                "stickysession_status", "websocket_passthrough"]
+    key_to_check_for_changes = [
+        "access_control",
+        "allowed_networks",
+        "auth_profile",
+        "backend",
+        "be_path",
+        "comment",
+        "denied_networks",
+        "hot_standby",
+        "path",
+        "status",
+        "stickysession_id",
+        "stickysession_status",
+        "websocket_passthrough",
+    ]
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True),
-            access_control=dict(type='str', default="0", choices=['0', '1']),
-            allowed_networks=dict(type='list', elements='str', default=['REF_NetworkAny']),
-            auth_profile=dict(type='str', default=""),
-            backend=dict(type='list', elements='str', default=[]),
-            be_path=dict(type='str', default=""),
-            comment=dict(type='str', default=""),
-            denied_networks=dict(type='list', elements='str', default=[]),
-            hot_standby=dict(type='bool', default=False),
-            path=dict(type='str', default="/"),
-            status=dict(type='bool', default=True),
-            stickysession_id=dict(type='str', default='ROUTEID'),
-            stickysession_status=dict(type='bool', default=False),
-            websocket_passthrough=dict(type='bool', default=False),
+            name=dict(type="str", required=True),
+            access_control=dict(type="str", default="0", choices=["0", "1"]),
+            allowed_networks=dict(type="list", elements="str", default=["REF_NetworkAny"]),
+            auth_profile=dict(type="str", default=""),
+            backend=dict(type="list", elements="str", default=[]),
+            be_path=dict(type="str", default=""),
+            comment=dict(type="str", default=""),
+            denied_networks=dict(type="list", elements="str", default=[]),
+            hot_standby=dict(type="bool", default=False),
+            path=dict(type="str", default="/"),
+            status=dict(type="bool", default=True),
+            stickysession_id=dict(type="str", default="ROUTEID"),
+            stickysession_status=dict(type="bool", default=False),
+            websocket_passthrough=dict(type="bool", default=False),
         )
     )
     try:
@@ -219,5 +229,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

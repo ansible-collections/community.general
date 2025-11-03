@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: jenkins_build
@@ -152,38 +150,37 @@ from time import sleep
 JENKINS_IMP_ERR = None
 try:
     import jenkins
+
     python_jenkins_installed = True
 except ImportError:
     JENKINS_IMP_ERR = traceback.format_exc()
     python_jenkins_installed = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 class JenkinsBuild:
-
     def __init__(self, module):
         self.module = module
 
-        self.name = module.params.get('name')
-        self.password = module.params.get('password')
-        self.args = module.params.get('args')
-        self.state = module.params.get('state')
-        self.token = module.params.get('token')
-        self.user = module.params.get('user')
-        self.jenkins_url = module.params.get('url')
-        self.build_number = module.params.get('build_number')
-        self.detach = module.params.get('detach')
-        self.time_between_checks = module.params.get('time_between_checks')
+        self.name = module.params.get("name")
+        self.password = module.params.get("password")
+        self.args = module.params.get("args")
+        self.state = module.params.get("state")
+        self.token = module.params.get("token")
+        self.user = module.params.get("user")
+        self.jenkins_url = module.params.get("url")
+        self.build_number = module.params.get("build_number")
+        self.detach = module.params.get("detach")
+        self.time_between_checks = module.params.get("time_between_checks")
         self.server = self.get_jenkins_connection()
 
         self.result = {
-            'changed': False,
-            'url': self.jenkins_url,
-            'name': self.name,
-            'user': self.user,
-            'state': self.state,
+            "changed": False,
+            "url": self.jenkins_url,
+            "name": self.name,
+            "user": self.user,
+            "state": self.state,
         }
 
         self.EXCL_STATE = "excluded state"
@@ -199,14 +196,15 @@ class JenkinsBuild:
             else:
                 return jenkins.Jenkins(self.jenkins_url)
         except Exception as e:
-            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
+            self.module.fail_json(msg=f"Unable to connect to Jenkins server, {e}")
 
     def get_next_build(self):
         try:
-            build_number = self.server.get_job_info(self.name)['nextBuildNumber']
+            build_number = self.server.get_job_info(self.name)["nextBuildNumber"]
         except Exception as e:
-            self.module.fail_json(msg='Unable to get job info from Jenkins server, %s' % to_native(e),
-                                  exception=traceback.format_exc())
+            self.module.fail_json(
+                msg=f"Unable to get job info from Jenkins server, {e}", exception=traceback.format_exc()
+            )
 
         return build_number
 
@@ -219,8 +217,7 @@ class JenkinsBuild:
             response["result"] = "ABSENT"
             return response
         except Exception as e:
-            self.module.fail_json(msg='Unable to fetch build information, %s' % to_native(e),
-                                  exception=traceback.format_exc())
+            self.module.fail_json(msg=f"Unable to fetch build information, {e}", exception=traceback.format_exc())
 
     def present_build(self):
         self.build_number = self.get_next_build()
@@ -231,56 +228,59 @@ class JenkinsBuild:
             else:
                 self.server.build_job(self.name, self.args)
         except Exception as e:
-            self.module.fail_json(msg='Unable to create build for %s: %s' % (self.jenkins_url, to_native(e)),
-                                  exception=traceback.format_exc())
+            self.module.fail_json(
+                msg=f"Unable to create build for {self.jenkins_url}: {e}", exception=traceback.format_exc()
+            )
 
     def stopped_build(self):
         build_info = None
         try:
             build_info = self.server.get_build_info(self.name, self.build_number)
-            if build_info['building'] is True:
+            if build_info["building"] is True:
                 self.server.stop_build(self.name, self.build_number)
         except Exception as e:
-            self.module.fail_json(msg='Unable to stop build for %s: %s' % (self.jenkins_url, to_native(e)),
-                                  exception=traceback.format_exc())
+            self.module.fail_json(
+                msg=f"Unable to stop build for {self.jenkins_url}: {e}", exception=traceback.format_exc()
+            )
         else:
-            if build_info['building'] is False:
+            if build_info["building"] is False:
                 self.module.exit_json(**self.result)
 
     def absent_build(self):
         try:
             self.server.delete_build(self.name, self.build_number)
         except Exception as e:
-            self.module.fail_json(msg='Unable to delete build for %s: %s' % (self.jenkins_url, to_native(e)),
-                                  exception=traceback.format_exc())
+            self.module.fail_json(
+                msg=f"Unable to delete build for {self.jenkins_url}: {e}", exception=traceback.format_exc()
+            )
 
     def get_result(self):
         result = self.result
         build_status = self.get_build_status()
 
-        if build_status['result'] is None:
+        if build_status["result"] is None:
             # If detached mode is active mark as success, we wouldn't be able to get here if it didn't exist
             if self.detach:
-                result['changed'] = True
-                result['build_info'] = build_status
+                result["changed"] = True
+                result["build_info"] = build_status
 
                 return result
 
             sleep(self.time_between_checks)
             self.get_result()
         else:
-            if self.state == "stopped" and build_status['result'] == "ABORTED":
-                result['changed'] = True
-                result['build_info'] = build_status
-            elif self.state == "absent" and build_status['result'] == "ABSENT":
-                result['changed'] = True
-                result['build_info'] = build_status
-            elif self.state != "absent" and build_status['result'] == "SUCCESS":
-                result['changed'] = True
-                result['build_info'] = build_status
+            if self.state == "stopped" and build_status["result"] == "ABORTED":
+                result["changed"] = True
+                result["build_info"] = build_status
+            elif self.state == "absent" and build_status["result"] == "ABSENT":
+                result["changed"] = True
+                result["build_info"] = build_status
+            elif self.state != "absent" and build_status["result"] == "SUCCESS":
+                result["changed"] = True
+                result["build_info"] = build_status
             else:
-                result['failed'] = True
-                result['build_info'] = build_status
+                result["failed"] = True
+                result["build_info"] = build_status
 
         return result
 
@@ -288,35 +288,37 @@ class JenkinsBuild:
 def test_dependencies(module):
     if not python_jenkins_installed:
         module.fail_json(
-            msg=missing_required_lib("python-jenkins",
-                                     url="https://python-jenkins.readthedocs.io/en/latest/install.html"),
-            exception=JENKINS_IMP_ERR)
+            msg=missing_required_lib(
+                "python-jenkins", url="https://python-jenkins.readthedocs.io/en/latest/install.html"
+            ),
+            exception=JENKINS_IMP_ERR,
+        )
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            args=dict(type='dict'),
-            build_number=dict(type='int'),
+            args=dict(type="dict"),
+            build_number=dict(type="int"),
             name=dict(required=True),
             password=dict(no_log=True),
-            state=dict(choices=['present', 'absent', 'stopped'], default="present"),
+            state=dict(choices=["present", "absent", "stopped"], default="present"),
             token=dict(no_log=True),
             url=dict(default="http://localhost:8080"),
             user=dict(),
-            detach=dict(type='bool', default=False),
-            time_between_checks=dict(type='int', default=10),
+            detach=dict(type="bool", default=False),
+            time_between_checks=dict(type="int", default=10),
         ),
-        mutually_exclusive=[['password', 'token']],
-        required_if=[['state', 'absent', ['build_number'], True], ['state', 'stopped', ['build_number'], True]],
+        mutually_exclusive=[["password", "token"]],
+        required_if=[["state", "absent", ["build_number"], True], ["state", "stopped", ["build_number"], True]],
     )
 
     test_dependencies(module)
     jenkins_build = JenkinsBuild(module)
 
-    if module.params.get('state') == "present":
+    if module.params.get("state") == "present":
         jenkins_build.present_build()
-    elif module.params.get('state') == "stopped":
+    elif module.params.get("state") == "stopped":
         jenkins_build.stopped_build()
     else:
         jenkins_build.absent_build()
@@ -326,5 +328,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -110,42 +108,39 @@ EXAMPLES = r"""
     consumer_key: yourconsumerkey
 """
 
-RETURN = r"""
-"""
 
 import time
+from urllib.parse import quote_plus
 
 try:
     import ovh
     import ovh.exceptions
     from ovh.exceptions import APIError
+
     HAS_OVH = True
 except ImportError:
     HAS_OVH = False
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import quote_plus
 
 
 def getOvhClient(ansibleModule):
-    endpoint = ansibleModule.params.get('endpoint')
-    application_key = ansibleModule.params.get('application_key')
-    application_secret = ansibleModule.params.get('application_secret')
-    consumer_key = ansibleModule.params.get('consumer_key')
+    endpoint = ansibleModule.params.get("endpoint")
+    application_key = ansibleModule.params.get("application_key")
+    application_secret = ansibleModule.params.get("application_secret")
+    consumer_key = ansibleModule.params.get("consumer_key")
 
     return ovh.Client(
         endpoint=endpoint,
         application_key=application_key,
         application_secret=application_secret,
-        consumer_key=consumer_key
+        consumer_key=consumer_key,
     )
 
 
 def waitForNoTask(client, name, timeout):
     currentTimeout = timeout
-    while client.get('/ip/{0}/task'.format(quote_plus(name)),
-                     function='genericMoveFloatingIp',
-                     status='todo'):
+    while client.get(f"/ip/{quote_plus(name)}/task", function="genericMoveFloatingIp", status="todo"):
         time.sleep(1)  # Delay for 1 sec
         currentTimeout -= 1
         if currentTimeout < 0:
@@ -156,8 +151,8 @@ def waitForNoTask(client, name, timeout):
 def waitForTaskDone(client, name, taskId, timeout):
     currentTimeout = timeout
     while True:
-        task = client.get('/ip/{0}/task/{1}'.format(quote_plus(name), taskId))
-        if task['status'] == 'done':
+        task = client.get(f"/ip/{quote_plus(name)}/task/{taskId}")
+        if task["status"] == "done":
             return True
         time.sleep(5)  # Delay for 5 sec to not harass the API
         currentTimeout -= 5
@@ -171,91 +166,87 @@ def main():
             name=dict(required=True),
             service=dict(required=True),
             endpoint=dict(required=True),
-            wait_completion=dict(default=True, type='bool'),
-            wait_task_completion=dict(default=0, type='int'),
+            wait_completion=dict(default=True, type="bool"),
+            wait_task_completion=dict(default=0, type="int"),
             application_key=dict(required=True, no_log=True),
             application_secret=dict(required=True, no_log=True),
             consumer_key=dict(required=True, no_log=True),
-            timeout=dict(default=120, type='int')
+            timeout=dict(default=120, type="int"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    result = dict(
-        changed=False
-    )
+    result = dict(changed=False)
 
     if not HAS_OVH:
-        module.fail_json(msg='ovh-api python module is required to run this module ')
+        module.fail_json(msg="ovh-api python module is required to run this module ")
 
     # Get parameters
-    name = module.params.get('name')
-    service = module.params.get('service')
-    timeout = module.params.get('timeout')
-    wait_completion = module.params.get('wait_completion')
-    wait_task_completion = module.params.get('wait_task_completion')
+    name = module.params.get("name")
+    service = module.params.get("service")
+    timeout = module.params.get("timeout")
+    wait_completion = module.params.get("wait_completion")
+    wait_task_completion = module.params.get("wait_task_completion")
 
     # Connect to OVH API
     client = getOvhClient(module)
 
     # Check that the load balancing exists
     try:
-        ips = client.get('/ip', ip=name, type='failover')
+        ips = client.get("/ip", ip=name, type="failover")
     except APIError as apiError:
         module.fail_json(
-            msg='Unable to call OVH api for getting the list of ips, '
-                'check application key, secret, consumerkey and parameters. '
-                'Error returned by OVH api was : {0}'.format(apiError))
+            msg=f"Unable to call OVH API for getting the list of ips, check application key, secret, consumerkey and parameters. "
+            f"Error returned by OVH API was : {apiError}"
+        )
 
-    if name not in ips and '{0}/32'.format(name) not in ips:
-        module.fail_json(msg='IP {0} does not exist'.format(name))
+    if name not in ips and f"{name}/32" not in ips:
+        module.fail_json(msg=f"IP {name} does not exist")
 
     # Check that no task is pending before going on
     try:
         if not waitForNoTask(client, name, timeout):
             module.fail_json(
-                msg='Timeout of {0} seconds while waiting for no pending '
-                    'tasks before executing the module '.format(timeout))
+                msg=f"Timeout of {timeout} seconds while waiting for no pending tasks before executing the module "
+            )
     except APIError as apiError:
         module.fail_json(
-            msg='Unable to call OVH api for getting the list of pending tasks '
-                'of the ip, check application key, secret, consumerkey '
-                'and parameters. Error returned by OVH api was : {0}'
-                .format(apiError))
+            msg=f"Unable to call OVH API for getting the list of pending tasks of the ip, check application key, secret, consumerkey and parameters. "
+            f"Error returned by OVH API was : {apiError}"
+        )
 
     try:
-        ipproperties = client.get('/ip/{0}'.format(quote_plus(name)))
+        ipproperties = client.get(f"/ip/{quote_plus(name)}")
     except APIError as apiError:
         module.fail_json(
-            msg='Unable to call OVH api for getting the properties '
-                'of the ip, check application key, secret, consumerkey '
-                'and parameters. Error returned by OVH api was : {0}'
-            .format(apiError))
+            msg=f"Unable to call OVH API for getting the properties of the ip, check application key, secret, consumerkey and parameters. "
+            f"Error returned by OVH API was : {apiError}"
+        )
 
-    if ipproperties['routedTo']['serviceName'] != service:
+    if ipproperties["routedTo"]["serviceName"] != service:
         if not module.check_mode:
             if wait_task_completion == 0:
                 # Move the IP and get the created taskId
-                task = client.post('/ip/{0}/move'.format(quote_plus(name)), to=service)
-                taskId = task['taskId']
-                result['moved'] = True
+                task = client.post(f"/ip/{quote_plus(name)}/move", to=service)
+                taskId = task["taskId"]
+                result["moved"] = True
             else:
                 # Just wait for the given taskId to be completed
                 taskId = wait_task_completion
-                result['moved'] = False
-            result['taskId'] = taskId
+                result["moved"] = False
+            result["taskId"] = taskId
             if wait_completion or wait_task_completion != 0:
                 if not waitForTaskDone(client, name, taskId, timeout):
                     module.fail_json(
-                        msg='Timeout of {0} seconds while waiting for completion '
-                            'of move ip to service'.format(timeout))
-                result['waited'] = True
+                        msg=f"Timeout of {timeout} seconds while waiting for completion of move ip to service"
+                    )
+                result["waited"] = True
             else:
-                result['waited'] = False
-        result['changed'] = True
+                result["waited"] = False
+        result["changed"] = True
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

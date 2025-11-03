@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022, Guillaume MARTINEZ (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: gitlab_project_badge
@@ -96,7 +94,10 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, find_project, list_all_kwargs
+    auth_argument_spec,
+    gitlab_authentication,
+    find_project,
+    list_all_kwargs,
 )
 
 
@@ -151,23 +152,20 @@ def absent_strategy(module, gl, project, wished_badge):
     return changed, None
 
 
-state_strategy = {
-    "present": present_strategy,
-    "absent": absent_strategy
-}
+state_strategy = {"present": present_strategy, "absent": absent_strategy}
 
 
 def core(module):
     # check prerequisites and connect to gitlab server
     gl = gitlab_authentication(module)
 
-    gitlab_project = module.params['project']
-    state = module.params['state']
+    gitlab_project = module.params["project"]
+    state = module.params["state"]
 
     project = find_project(gl, gitlab_project)
     # project doesn't exist
     if not project:
-        module.fail_json(msg="project '%s' not found." % gitlab_project)
+        module.fail_json(msg=f"project '{gitlab_project}' not found.")
 
     wished_badge = {
         "link_url": module.params["link_url"],
@@ -182,27 +180,29 @@ def core(module):
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
-    argument_spec.update(dict(
-        project=dict(type='str', required=True),
-        state=dict(type='str', default='present', choices=['present', 'absent']),
-        link_url=dict(type='str', required=True),
-        image_url=dict(type='str', required=True),
-    ))
+    argument_spec.update(
+        dict(
+            project=dict(type="str", required=True),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            link_url=dict(type="str", required=True),
+            image_url=dict(type="str", required=True),
+        )
+    )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
         required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token'],
+            ["api_username", "api_token", "api_oauth_token", "api_job_token"],
         ],
         supports_check_mode=True,
     )
@@ -210,5 +210,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

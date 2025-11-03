@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2012, Afterburn <https://github.com/afterburn>
 # Copyright (c) 2013, Aaron Bull Schaefer <aaron@elasticdog.com>
@@ -8,9 +7,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: pacman
@@ -128,7 +126,8 @@ notes:
   - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand. For example, a dedicated
     build user with permissions to install packages could be necessary.
   - 'In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages with the error:
-    C(error: target not found: <pkg>).'
+    C(error: target not found: <pkg>). This is caused by an incompatibility of yay with the arguments passed by this module.
+    See L(yay bug #1744 report for details, https://github.com/Jguer/yay/issues/1744).'
   - The common return values `stdout` and `stderr` are returned upon success, when needed, since community.general 4.1.0.
 """
 
@@ -249,7 +248,7 @@ from ansible.module_utils.basic import AnsibleModule
 from collections import defaultdict, namedtuple
 
 
-class Package(object):
+class Package:
     def __init__(self, name, source, source_is_URL=False):
         self.name = name
         self.source = source
@@ -262,13 +261,13 @@ class Package(object):
         return self.name < o.name
 
     def __repr__(self):
-        return 'Package("%s", "%s", %s)' % (self.name, self.source, self.source_is_URL)
+        return f'Package("{self.name}", "{self.source}", {self.source_is_URL})'
 
 
 VersionTuple = namedtuple("VersionTuple", ["current", "latest"])
 
 
-class Pacman(object):
+class Pacman:
     def __init__(self, module):
         self.m = module
 
@@ -345,7 +344,7 @@ class Pacman(object):
                 self.success()
 
         # This happens if an empty list has been provided for name
-        self.add_exit_infos(msg='Nothing to do')
+        self.add_exit_infos(msg="Nothing to do")
         self.success()
 
     def install_packages(self, pkgs):
@@ -400,17 +399,19 @@ class Pacman(object):
             for p in name_ver:
                 # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that.
                 # When installing from URLs, pacman can also output a 'nothing to do' message. strip that too.
-                if "loading packages" in p or "there is nothing to do" in p or 'Avoid running' in p:
+                if "loading packages" in p or "there is nothing to do" in p or "Avoid running" in p:
                     continue
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
-                    before.append("%s-%s-%s" % (name, self.inventory["installed_pkgs"][name], self.inventory["pkg_reasons"][name]))
+                    before.append(
+                        f"{name}-{self.inventory['installed_pkgs'][name]}-{self.inventory['pkg_reasons'][name]}"
+                    )
                 if name in pkgs_to_set_reason:
-                    after.append("%s-%s-%s" % (name, version, self.m.params["reason"]))
+                    after.append(f"{name}-{version}-{self.m.params['reason']}")
                 elif name in self.inventory["pkg_reasons"]:
-                    after.append("%s-%s-%s" % (name, version, self.inventory["pkg_reasons"][name]))
+                    after.append(f"{name}-{version}-{self.inventory['pkg_reasons'][name]}")
                 else:
-                    after.append("%s-%s" % (name, version))
+                    after.append(f"{name}-{version}")
                 to_be_installed.append(name)
 
             return (to_be_installed, before, after)
@@ -438,15 +439,17 @@ class Pacman(object):
 
         self.changed = True
 
+        _before_joined = "\n".join(sorted(before))
+        _after_joined = "\n".join(sorted(after))
         self.exit_params["diff"] = {
-            "before": "\n".join(sorted(before)) + "\n" if before else "",
-            "after": "\n".join(sorted(after)) + "\n" if after else "",
+            "before": f"{_before_joined}\n" if before else "",
+            "after": f"{_after_joined}\n" if after else "",
         }
 
         changed_reason_pkgs = [p for p in pkgs_to_set_reason if p not in installed_pkgs]
 
         if self.m.check_mode:
-            self.add_exit_infos("Would have installed %d packages" % (len(installed_pkgs) + len(changed_reason_pkgs)))
+            self.add_exit_infos(f"Would have installed {len(installed_pkgs) + len(changed_reason_pkgs)} packages")
             self.exit_params["packages"] = sorted(installed_pkgs + changed_reason_pkgs)
             return
 
@@ -479,7 +482,7 @@ class Pacman(object):
             self.add_exit_infos(stdout=stdout, stderr=stderr)
 
         self.exit_params["packages"] = sorted(installed_pkgs + changed_reason_pkgs)
-        self.add_exit_infos("Installed %d package(s)" % (len(installed_pkgs) + len(changed_reason_pkgs)))
+        self.add_exit_infos(f"Installed {len(installed_pkgs) + len(changed_reason_pkgs)} package(s)")
 
     def remove_packages(self, pkgs):
         # filter out pkgs that are already absent
@@ -510,14 +513,15 @@ class Pacman(object):
 
         removed_pkgs = stdout.split()
         self.exit_params["packages"] = removed_pkgs
+        _remove_pkgs_joined = "\n".join(removed_pkgs)
         self.exit_params["diff"] = {
-            "before": "\n".join(removed_pkgs) + "\n",  # trailing \n to avoid diff complaints
+            "before": f"{_remove_pkgs_joined}\n",  # trailing \n to avoid diff complaints
             "after": "",
         }
 
         if self.m.check_mode:
             self.exit_params["packages"] = removed_pkgs
-            self.add_exit_infos("Would have removed %d packages" % len(removed_pkgs))
+            self.add_exit_infos(f"Would have removed {len(removed_pkgs)} packages")
             return
 
         nosave_args = ["--nosave"] if self.m.params["remove_nosave"] else []
@@ -528,7 +532,7 @@ class Pacman(object):
             self.fail("failed to remove package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
         self._invalidate_database()
         self.exit_params["packages"] = removed_pkgs
-        self.add_exit_infos("Removed %d package(s)" % len(removed_pkgs), stdout=stdout, stderr=stderr)
+        self.add_exit_infos(f"Removed {len(removed_pkgs)} package(s)", stdout=stdout, stderr=stderr)
 
     def upgrade(self):
         """Runs pacman --sync --sysupgrade if there are upgradable packages"""
@@ -542,15 +546,13 @@ class Pacman(object):
         # Build diff based on inventory first.
         diff = {"before": "", "after": ""}
         for pkg, versions in self.inventory["upgradable_pkgs"].items():
-            diff["before"] += "%s-%s\n" % (pkg, versions.current)
-            diff["after"] += "%s-%s\n" % (pkg, versions.latest)
+            diff["before"] += f"{pkg}-{versions.current}\n"
+            diff["after"] += f"{pkg}-{versions.latest}\n"
         self.exit_params["diff"] = diff
         self.exit_params["packages"] = self.inventory["upgradable_pkgs"].keys()
 
         if self.m.check_mode:
-            self.add_exit_infos(
-                "%d packages would have been upgraded" % (len(self.inventory["upgradable_pkgs"]))
-            )
+            self.add_exit_infos(f"{len(self.inventory['upgradable_pkgs'])} packages would have been upgraded")
         else:
             cmd = [
                 self.pacman_path,
@@ -571,7 +573,7 @@ class Pacman(object):
     def _list_database(self):
         """runs pacman --sync --list with some caching"""
         if self._cached_database is None:
-            dummy, packages, dummy = self.m.run_command([self.pacman_path, '--sync', '--list'], check_rc=True)
+            dummy, packages, dummy = self.m.run_command([self.pacman_path, "--sync", "--list"], check_rc=True)
             self._cached_database = packages.splitlines()
         return self._cached_database
 
@@ -655,7 +657,7 @@ class Pacman(object):
                             continue  # Don't bark for unavailable packages when trying to remove them
                         else:
                             self.fail(
-                                msg="Failed to list package %s" % (pkg),
+                                msg=f"Failed to list package {pkg}",
                                 cmd=cmd,
                                 stdout=stdout,
                                 stderr=stderr,
@@ -688,7 +690,7 @@ class Pacman(object):
         installed_pkgs = {}
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query"], check_rc=True)
         # Format of a line: "pacman 6.0.1-2"
-        query_re = re.compile(r'^\s*(?P<pkg>\S+)\s+(?P<ver>\S+)\s*$')
+        query_re = re.compile(r"^\s*(?P<pkg>\S+)\s+(?P<ver>\S+)\s*$")
         for l in stdout.splitlines():
             query_match = query_re.match(l)
             if not query_match:
@@ -697,14 +699,12 @@ class Pacman(object):
             installed_pkgs[pkg] = ver
 
         installed_groups = defaultdict(set)
-        dummy, stdout, dummy = self.m.run_command(
-            [self.pacman_path, "--query", "--groups"], check_rc=True
-        )
+        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query", "--groups"], check_rc=True)
         # Format of lines:
         #     base-devel file
         #     base-devel findutils
         #     ...
-        query_groups_re = re.compile(r'^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
+        query_groups_re = re.compile(r"^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$")
         for l in stdout.splitlines():
             query_groups_match = query_groups_re.match(l)
             if not query_groups_match:
@@ -723,15 +723,13 @@ class Pacman(object):
             available_pkgs[pkg] = ver
 
         available_groups = defaultdict(set)
-        dummy, stdout, dummy = self.m.run_command(
-            [self.pacman_path, "--sync", "--groups", "--groups"], check_rc=True
-        )
+        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--sync", "--groups", "--groups"], check_rc=True)
         # Format of lines:
         #     vim-plugins vim-airline
         #     vim-plugins vim-airline-themes
         #     vim-plugins vim-ale
         #     ...
-        sync_groups_re = re.compile(r'^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
+        sync_groups_re = re.compile(r"^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$")
         for l in stdout.splitlines():
             sync_groups_match = sync_groups_re.match(l)
             if not sync_groups_match:
@@ -740,9 +738,7 @@ class Pacman(object):
             available_groups[group].add(pkg)
 
         upgradable_pkgs = {}
-        rc, stdout, stderr = self.m.run_command(
-            [self.pacman_path, "--query", "--upgrades"], check_rc=False
-        )
+        rc, stdout, stderr = self.m.run_command([self.pacman_path, "--query", "--upgrades"], check_rc=False)
 
         stdout = stdout.splitlines()
         if stdout and "Avoid running" in stdout[0]:
@@ -765,7 +761,7 @@ class Pacman(object):
                     continue
                 s = l.split()
                 if len(s) != 4:
-                    self.fail(msg="Invalid line: %s" % l)
+                    self.fail(msg=f"Invalid line: {l}")
 
                 pkg = s[0]
                 current = s[1]
@@ -841,7 +837,6 @@ def setup_module():
 
 
 def main():
-
     Pacman(setup_module()).run()
 
 

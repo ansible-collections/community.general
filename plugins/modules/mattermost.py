@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Benjamin Jolivot <bjolivot@gmail.com>
 # Inspired by slack module :
@@ -11,8 +10,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -134,42 +132,42 @@ def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec=dict(
-            url=dict(type='str', required=True),
-            api_key=dict(type='str', required=True, no_log=True),
-            text=dict(type='str'),
-            channel=dict(type='str'),
-            username=dict(type='str', default='Ansible'),
-            icon_url=dict(type='str', default='https://docs.ansible.com/favicon.ico'),
-            priority=dict(type='str', choices=['important', 'urgent']),
-            validate_certs=dict(default=True, type='bool'),
-            attachments=dict(type='list', elements='dict'),
+            url=dict(type="str", required=True),
+            api_key=dict(type="str", required=True, no_log=True),
+            text=dict(type="str"),
+            channel=dict(type="str"),
+            username=dict(type="str", default="Ansible"),
+            icon_url=dict(type="str", default="https://docs.ansible.com/favicon.ico"),
+            priority=dict(type="str", choices=["important", "urgent"]),
+            validate_certs=dict(default=True, type="bool"),
+            attachments=dict(type="list", elements="dict"),
         ),
         required_one_of=[
-            ('text', 'attachments'),
+            ("text", "attachments"),
         ],
     )
     # init return dict
     result = dict(changed=False, msg="OK")
 
     # define webhook
-    webhook_url = "{0}/hooks/{1}".format(module.params['url'], module.params['api_key'])
-    result['webhook_url'] = webhook_url
+    webhook_url = f"{module.params['url']}/hooks/{module.params['api_key']}"
+    result["webhook_url"] = webhook_url
 
     # define payload
     payload = {}
-    for param in ['text', 'channel', 'username', 'icon_url', 'attachments']:
+    for param in ["text", "channel", "username", "icon_url", "attachments"]:
         if module.params[param] is not None:
             payload[param] = module.params[param]
-    if module.params['priority'] is not None:
-        payload['priority'] = {'priority': module.params['priority']}
+    if module.params["priority"] is not None:
+        payload["priority"] = {"priority": module.params["priority"]}
 
     payload = module.jsonify(payload)
-    result['payload'] = payload
+    result["payload"] = payload
 
     # http headers
     headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        "Accept": "application/json",
     }
 
     # notes:
@@ -179,17 +177,17 @@ def main():
 
     # send request if not in test mode
     if module.check_mode is False:
-        response, info = fetch_url(module=module, url=webhook_url, headers=headers, method='POST', data=payload)
+        response, info = fetch_url(module=module, url=webhook_url, headers=headers, method="POST", data=payload)
 
         # something's wrong
-        if info['status'] != 200:
+        if info["status"] != 200:
             # some problem
-            result['msg'] = "Failed to send mattermost message, the error was: {0}".format(info['msg'])
+            result["msg"] = f"Failed to send mattermost message, the error was: {info['msg']}"
             module.fail_json(**result)
 
     # Looks good
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

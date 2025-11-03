@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Matt Makai <matthew.makai@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -127,43 +125,57 @@ EXAMPLES = r"""
 #
 import os
 import traceback
+from urllib.parse import urlencode
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 SENDGRID_IMP_ERR = None
 try:
     import sendgrid
+
     HAS_SENDGRID = True
 except ImportError:
     SENDGRID_IMP_ERR = traceback.format_exc()
     HAS_SENDGRID = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.urls import fetch_url
 
 
-def post_sendgrid_api(module, username, password, from_address, to_addresses,
-                      subject, body, api_key=None, cc=None, bcc=None, attachments=None,
-                      html_body=False, from_name=None, headers=None):
-
+def post_sendgrid_api(
+    module,
+    username,
+    password,
+    from_address,
+    to_addresses,
+    subject,
+    body,
+    api_key=None,
+    cc=None,
+    bcc=None,
+    attachments=None,
+    html_body=False,
+    from_name=None,
+    headers=None,
+):
     if not HAS_SENDGRID:
         SENDGRID_URI = "https://api.sendgrid.com/api/mail.send.json"
         AGENT = "Ansible"
-        data = {'api_user': username, 'api_key': password,
-                'from': from_address, 'subject': subject, 'text': body}
+        data = {"api_user": username, "api_key": password, "from": from_address, "subject": subject, "text": body}
         encoded_data = urlencode(data)
-        to_addresses_api = ''
+        to_addresses_api = ""
         for recipient in to_addresses:
-            recipient = to_bytes(recipient, errors='surrogate_or_strict')
-            to_addresses_api += '&to[]=%s' % recipient
+            recipient = to_bytes(recipient, errors="surrogate_or_strict")
+            to_addresses_api += f"&to[]={recipient}"
         encoded_data += to_addresses_api
 
-        headers = {'User-Agent': AGENT,
-                   'Content-type': 'application/x-www-form-urlencoded',
-                   'Accept': 'application/json'}
-        return fetch_url(module, SENDGRID_URI, data=encoded_data, headers=headers, method='POST')
+        headers = {
+            "User-Agent": AGENT,
+            "Content-type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
+        }
+        return fetch_url(module, SENDGRID_URI, data=encoded_data, headers=headers, method="POST")
     else:
         # Remove this check when adding Sendgrid API v3 support
         if LooseVersion(sendgrid.version.__version__) > LooseVersion("1.6.22"):
@@ -196,7 +208,7 @@ def post_sendgrid_api(module, username, password, from_address, to_addresses,
                 message.add_attachment(name, f)
 
         if from_name:
-            message.set_from('%s <%s.' % (from_name, from_address))
+            message.set_from(f"{from_name} <{from_address}.")
         else:
             message.set_from(from_address)
 
@@ -206,6 +218,8 @@ def post_sendgrid_api(module, username, password, from_address, to_addresses,
             message.set_text(body)
 
         return sg.send(message)
+
+
 # =======================================
 # Main
 #
@@ -217,60 +231,69 @@ def main():
             username=dict(),
             password=dict(no_log=True),
             api_key=dict(no_log=True),
-            bcc=dict(type='list', elements='str'),
-            cc=dict(type='list', elements='str'),
-            headers=dict(type='dict'),
+            bcc=dict(type="list", elements="str"),
+            cc=dict(type="list", elements="str"),
+            headers=dict(type="dict"),
             from_address=dict(required=True),
             from_name=dict(),
-            to_addresses=dict(required=True, type='list', elements='str'),
+            to_addresses=dict(required=True, type="list", elements="str"),
             subject=dict(required=True),
             body=dict(required=True),
-            html_body=dict(default=False, type='bool'),
-            attachments=dict(type='list', elements='path')
+            html_body=dict(default=False, type="bool"),
+            attachments=dict(type="list", elements="path"),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[
-            ['api_key', 'password'],
-            ['api_key', 'username']
-        ],
-        required_together=[['username', 'password']],
+        mutually_exclusive=[["api_key", "password"], ["api_key", "username"]],
+        required_together=[["username", "password"]],
     )
 
-    username = module.params['username']
-    password = module.params['password']
-    api_key = module.params['api_key']
-    bcc = module.params['bcc']
-    cc = module.params['cc']
-    headers = module.params['headers']
-    from_name = module.params['from_name']
-    from_address = module.params['from_address']
-    to_addresses = module.params['to_addresses']
-    subject = module.params['subject']
-    body = module.params['body']
-    html_body = module.params['html_body']
-    attachments = module.params['attachments']
+    username = module.params["username"]
+    password = module.params["password"]
+    api_key = module.params["api_key"]
+    bcc = module.params["bcc"]
+    cc = module.params["cc"]
+    headers = module.params["headers"]
+    from_name = module.params["from_name"]
+    from_address = module.params["from_address"]
+    to_addresses = module.params["to_addresses"]
+    subject = module.params["subject"]
+    body = module.params["body"]
+    html_body = module.params["html_body"]
+    attachments = module.params["attachments"]
 
     sendgrid_lib_args = [api_key, bcc, cc, headers, from_name, html_body, attachments]
 
     if any(lib_arg is not None for lib_arg in sendgrid_lib_args) and not HAS_SENDGRID:
-        reason = 'when using any of the following arguments: ' \
-                 'api_key, bcc, cc, headers, from_name, html_body, attachments'
-        module.fail_json(msg=missing_required_lib('sendgrid', reason=reason),
-                         exception=SENDGRID_IMP_ERR)
+        reason = (
+            "when using any of the following arguments: api_key, bcc, cc, headers, from_name, html_body, attachments"
+        )
+        module.fail_json(msg=missing_required_lib("sendgrid", reason=reason), exception=SENDGRID_IMP_ERR)
 
-    response, info = post_sendgrid_api(module, username, password,
-                                       from_address, to_addresses, subject, body, attachments=attachments,
-                                       bcc=bcc, cc=cc, headers=headers, html_body=html_body, api_key=api_key)
+    response, info = post_sendgrid_api(
+        module,
+        username,
+        password,
+        from_address,
+        to_addresses,
+        subject,
+        body,
+        attachments=attachments,
+        bcc=bcc,
+        cc=cc,
+        headers=headers,
+        html_body=html_body,
+        api_key=api_key,
+    )
 
     if not HAS_SENDGRID:
-        if info['status'] != 200:
-            module.fail_json(msg="unable to send email through SendGrid API: %s" % info['msg'])
+        if info["status"] != 200:
+            module.fail_json(msg=f"unable to send email through SendGrid API: {info['msg']}")
     else:
         if response != 200:
-            module.fail_json(msg="unable to send email through SendGrid API: %s" % info['message'])
+            module.fail_json(msg=f"unable to send email through SendGrid API: {info['message']}")
 
     module.exit_json(msg=subject, changed=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

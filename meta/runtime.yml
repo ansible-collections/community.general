@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-requires_ansible: '>=2.16.0'
+requires_ansible: '>=2.17.0'
 action_groups:
   consul:
     - consul_agent_check
@@ -46,6 +46,7 @@ action_groups:
     - keycloak_user_federation
     - keycloak_user_rolemapping
     - keycloak_userprofile
+    - keycloak_user_execute_actions_email
   scaleway:
     - scaleway_compute
     - scaleway_compute_private_network
@@ -100,10 +101,10 @@ plugin_routing:
         warning_text: Use the 'default' callback plugin with 'display_failed_stderr
           = yes' option.
     yaml:
-      deprecation:
+      tombstone:
         removal_version: 12.0.0
         warning_text: >-
-          The plugin has been superseded by the the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
+          The plugin has been superseded by the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
   connection:
     docker:
       redirect: community.docker.docker
@@ -119,6 +120,12 @@ plugin_routing:
       redirect: community.google.gcp_storage_file
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
+    hiera:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: >-
+          Hiera has been deprecated a long time ago.
+          If you disagree with this deprecation, please create an issue in the community.general repository.
     manifold:
       tombstone:
         removal_version: 11.0.0
@@ -147,7 +154,7 @@ plugin_routing:
         removal_version: 13.0.0
         warning_text: Project Atomic was sunset by the end of 2019.
     bearychat:
-      deprecation:
+      tombstone:
         removal_version: 12.0.0
         warning_text: Chat service is no longer available.
     catapult:
@@ -196,6 +203,14 @@ plugin_routing:
       tombstone:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
+    dimensiondata_network:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
+    dimensiondata_vlan:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
     docker_compose:
       redirect: community.docker.docker_compose
     docker_config:
@@ -251,7 +266,7 @@ plugin_routing:
     docker_volume_info:
       redirect: community.docker.docker_volume_info
     facter:
-      deprecation:
+      tombstone:
         removal_version: 12.0.0
         warning_text: Use community.general.facter_facts instead.
     flowdock:
@@ -487,6 +502,30 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.one_image_info instead.
+    oneandone_firewall_policy:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
+    oneandone_load_balancer:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
+    oneandone_monitoring_policy:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
+    oneandone_private_network:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
+    oneandone_public_ip:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
+    oneandone_server:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     onepassword_facts:
       tombstone:
         removal_version: 3.0.0
@@ -1036,6 +1075,14 @@ plugin_routing:
   doc_fragments:
     _gcp:
       redirect: community.google._gcp
+    dimensiondata:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
+    dimensiondata_wait:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
     docker:
       redirect: community.docker.docker
     hetzner:
@@ -1078,7 +1125,7 @@ plugin_routing:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
     purestorage:
-      deprecation:
+      tombstone:
         removal_version: 12.0.0
         warning_text: The modules for purestorage were removed in community.general 3.0.0, this document fragment was left behind.
     rackspace:
@@ -1087,6 +1134,10 @@ plugin_routing:
         warning_text: This doc fragment was used by rax modules, that relied on the deprecated
           package pyrax.
   module_utils:
+    dimensiondata:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
     docker.common:
       redirect: community.docker.common
     docker.swarm:
@@ -1107,6 +1158,10 @@ plugin_routing:
       deprecation:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oneandone:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     postgresql:
       redirect: community.postgresql.postgresql
     proxmox:
@@ -1115,7 +1170,7 @@ plugin_routing:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
     pure:
-      deprecation:
+      tombstone:
         removal_version: 12.0.0
         warning_text: The modules for purestorage were removed in community.general 3.0.0, this module util was left behind.
     rax:

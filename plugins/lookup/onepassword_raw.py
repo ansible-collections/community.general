@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Scott Buchanan <sbuchanan@ri.pn>
 # Copyright (c) 2016, Andrew Zenk <azenk@umn.edu> (lastpass.py used as starting point)
 # Copyright (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: onepassword_raw
@@ -61,7 +59,6 @@ from ansible.plugins.lookup import LookupBase
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 

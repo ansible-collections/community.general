@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Juan Manuel Parrilla <jparrill@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_vault
@@ -145,34 +143,34 @@ from ansible.module_utils.common.text.converters import to_native
 
 class VaultIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(VaultIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def vault_find(self, name):
-        return self._post_json(method='vault_find', name=None, item={'all': True, 'cn': name})
+        return self._post_json(method="vault_find", name=None, item={"all": True, "cn": name})
 
     def vault_add_internal(self, name, item):
-        return self._post_json(method='vault_add_internal', name=name, item=item)
+        return self._post_json(method="vault_add_internal", name=name, item=item)
 
     def vault_mod_internal(self, name, item):
-        return self._post_json(method='vault_mod_internal', name=name, item=item)
+        return self._post_json(method="vault_mod_internal", name=name, item=item)
 
     def vault_del(self, name):
-        return self._post_json(method='vault_del', name=name)
+        return self._post_json(method="vault_del", name=name)
 
 
 def get_vault_dict(description=None, vault_type=None, vault_salt=None, vault_public_key=None, service=None):
     vault = {}
 
     if description is not None:
-        vault['description'] = description
+        vault["description"] = description
     if vault_type is not None:
-        vault['ipavaulttype'] = vault_type
+        vault["ipavaulttype"] = vault_type
     if vault_salt is not None:
-        vault['ipavaultsalt'] = vault_salt
+        vault["ipavaultsalt"] = vault_salt
     if vault_public_key is not None:
-        vault['ipavaultpublickey'] = vault_public_key
+        vault["ipavaultpublickey"] = vault_public_key
     if service is not None:
-        vault['service'] = service
+        vault["service"] = service
     return vault
 
 
@@ -181,19 +179,22 @@ def get_vault_diff(client, ipa_vault, module_vault, module):
 
 
 def ensure(module, client):
-    state = module.params['state']
-    name = module.params['cn']
-    user = module.params['username']
-    replace = module.params['replace']
+    state = module.params["state"]
+    name = module.params["cn"]
+    user = module.params["username"]
+    replace = module.params["replace"]
 
-    module_vault = get_vault_dict(description=module.params['description'], vault_type=module.params['ipavaulttype'],
-                                  vault_salt=module.params['ipavaultsalt'],
-                                  vault_public_key=module.params['ipavaultpublickey'],
-                                  service=module.params['service'])
+    module_vault = get_vault_dict(
+        description=module.params["description"],
+        vault_type=module.params["ipavaulttype"],
+        vault_salt=module.params["ipavaultsalt"],
+        vault_public_key=module.params["ipavaultpublickey"],
+        service=module.params["service"],
+    )
     ipa_vault = client.vault_find(name=name)
 
     changed = False
-    if state == 'present':
+    if state == "present":
         if not ipa_vault:
             # New vault
             changed = True
@@ -222,33 +223,37 @@ def ensure(module, client):
 
 def main():
     argument_spec = ipa_argument_spec()
-    argument_spec.update(cn=dict(type='str', required=True, aliases=['name']),
-                         description=dict(type='str'),
-                         ipavaulttype=dict(type='str', default='symmetric',
-                                           choices=['standard', 'symmetric', 'asymmetric'], aliases=['vault_type']),
-                         ipavaultsalt=dict(type='str', aliases=['vault_salt']),
-                         ipavaultpublickey=dict(type='str', aliases=['vault_public_key']),
-                         service=dict(type='str'),
-                         replace=dict(type='bool', default=False, choices=[True, False]),
-                         state=dict(type='str', default='present', choices=['present', 'absent']),
-                         username=dict(type='list', elements='str', aliases=['user']))
+    argument_spec.update(
+        cn=dict(type="str", required=True, aliases=["name"]),
+        description=dict(type="str"),
+        ipavaulttype=dict(
+            type="str", default="symmetric", choices=["standard", "symmetric", "asymmetric"], aliases=["vault_type"]
+        ),
+        ipavaultsalt=dict(type="str", aliases=["vault_salt"]),
+        ipavaultpublickey=dict(type="str", aliases=["vault_public_key"]),
+        service=dict(type="str"),
+        replace=dict(type="bool", default=False, choices=[True, False]),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        username=dict(type="list", elements="str", aliases=["user"]),
+    )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           mutually_exclusive=[['username', 'service']])
+    module = AnsibleModule(
+        argument_spec=argument_spec, supports_check_mode=True, mutually_exclusive=[["username", "service"]]
+    )
 
-    client = VaultIPAClient(module=module,
-                            host=module.params['ipa_host'],
-                            port=module.params['ipa_port'],
-                            protocol=module.params['ipa_prot'])
+    client = VaultIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, vault = ensure(module, client)
         module.exit_json(changed=changed, vault=vault)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

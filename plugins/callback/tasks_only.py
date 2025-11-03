@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2025, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -52,8 +50,8 @@ from ansible.plugins.callback.default import CallbackModule as Default
 
 class CallbackModule(Default):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'stdout'
-    CALLBACK_NAME = 'community.general.tasks_only'
+    CALLBACK_TYPE = "stdout"
+    CALLBACK_NAME = "community.general.tasks_only"
 
     def v2_playbook_on_play_start(self, play):
         pass
@@ -62,7 +60,7 @@ class CallbackModule(Default):
         pass
 
     def set_options(self, *args, **kwargs):
-        result = super(CallbackModule, self).set_options(*args, **kwargs)
+        result = super().set_options(*args, **kwargs)
         self.number_of_columns = self.get_option("number_of_columns")
         if self.number_of_columns is not None:
             self._display.columns = self.number_of_columns

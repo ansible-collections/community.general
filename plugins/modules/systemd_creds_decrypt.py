@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: systemd_creds_decrypt
@@ -121,16 +119,16 @@ def main():
 
     decrypt_cmd = [cmd, "decrypt"]
     if name:
-        decrypt_cmd.append("--name=" + name)
+        decrypt_cmd.append(f"--name={name}")
     else:
         decrypt_cmd.append("--name=")
-    decrypt_cmd.append("--newline=" + ("yes" if newline else "no"))
+    decrypt_cmd.append(f"--newline={'yes' if newline else 'no'}")
     if timestamp:
-        decrypt_cmd.append("--timestamp=" + timestamp)
+        decrypt_cmd.append(f"--timestamp={timestamp}")
     if transcode:
-        decrypt_cmd.append("--transcode=" + transcode)
+        decrypt_cmd.append(f"--transcode={transcode}")
     if user:
-        decrypt_cmd.append("--uid=" + user)
+        decrypt_cmd.append(f"--uid={user}")
     decrypt_cmd.extend(["-", "-"])
 
     rc, stdout, stderr = module.run_command(decrypt_cmd, data=secret, binary_data=True)

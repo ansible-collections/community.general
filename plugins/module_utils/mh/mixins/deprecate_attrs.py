@@ -1,30 +1,29 @@
-# -*- coding: utf-8 -*-
 # (c) 2020, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2020, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 from ansible.module_utils.basic import AnsibleModule
 
 
-class DeprecateAttrsMixin(object):
-
+class DeprecateAttrsMixin:
     def _deprecate_setup(self, attr, target, module):
         if target is None:
             target = self
         if not hasattr(target, attr):
-            raise ValueError("Target {0} has no attribute {1}".format(target, attr))
+            raise ValueError(f"Target {target} has no attribute {attr}")
         if module is None:
             if isinstance(target, AnsibleModule):
                 module = target
             elif hasattr(target, "module") and isinstance(target.module, AnsibleModule):
                 module = target.module
             else:
-                raise ValueError("Failed to automatically discover the AnsibleModule instance. Pass 'module' parameter explicitly.")
+                raise ValueError(
+                    "Failed to automatically discover the AnsibleModule instance. Pass 'module' parameter explicitly."
+                )
 
         # setup internal state dicts
         value_attr = "__deprecated_attr_value"
@@ -37,7 +36,9 @@ class DeprecateAttrsMixin(object):
         trigger_dict = getattr(target, trigger_attr)
         return target, module, value_dict, trigger_dict
 
-    def _deprecate_attr(self, attr, msg, version=None, date=None, collection_name=None, target=None, value=None, module=None):
+    def _deprecate_attr(
+        self, attr, msg, version=None, date=None, collection_name=None, target=None, value=None, module=None
+    ):
         target, module, value_dict, trigger_dict = self._deprecate_setup(attr, target, module)
 
         value_dict[attr] = getattr(target, attr, value)
@@ -59,4 +60,4 @@ class DeprecateAttrsMixin(object):
         # override attribute
         prop = property(_getter)
         setattr(target, attr, prop)
-        setattr(target, "_{0}_setter".format(attr), prop.setter(_setter))
+        setattr(target, f"_{attr}_setter", prop.setter(_setter))

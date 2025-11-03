@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Adam Vaughan (@adamvaughan) avaughan@pagerduty.com
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -119,83 +117,76 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            integration_key=dict(required=True, type='str', no_log=True),
-            summary=dict(required=True, type='str'),
-            source=dict(default='Ansible', type='str'),
-            user=dict(type='str'),
-            repo=dict(type='str'),
-            revision=dict(type='str'),
-            environment=dict(type='str'),
-            link_url=dict(type='str'),
-            link_text=dict(type='str'),
-            url=dict(default='https://events.pagerduty.com/v2/change/enqueue', type='str'),
-            validate_certs=dict(default=True, type='bool')
+            integration_key=dict(required=True, type="str", no_log=True),
+            summary=dict(required=True, type="str"),
+            source=dict(default="Ansible", type="str"),
+            user=dict(type="str"),
+            repo=dict(type="str"),
+            revision=dict(type="str"),
+            environment=dict(type="str"),
+            link_url=dict(type="str"),
+            link_text=dict(type="str"),
+            url=dict(default="https://events.pagerduty.com/v2/change/enqueue", type="str"),
+            validate_certs=dict(default=True, type="bool"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     # API documented at https://developer.pagerduty.com/docs/events-api-v2/send-change-events/
 
-    url = module.params['url']
-    headers = {'Content-Type': 'application/json'}
+    url = module.params["url"]
+    headers = {"Content-Type": "application/json"}
 
     if module.check_mode:
-        _response, info = fetch_url(
-            module, url, headers=headers, method='POST')
+        _response, info = fetch_url(module, url, headers=headers, method="POST")
 
-        if info['status'] == 400:
+        if info["status"] == 400:
             module.exit_json(changed=True)
         else:
             module.fail_json(
-                msg='Checking the PagerDuty change event API returned an unexpected response: %d' % (info['status']))
+                msg=f"Checking the PagerDuty change event API returned an unexpected response: {info['status']}"
+            )
 
     custom_details = {}
 
-    if module.params['user']:
-        custom_details['user'] = module.params['user']
+    if module.params["user"]:
+        custom_details["user"] = module.params["user"]
 
-    if module.params['repo']:
-        custom_details['repo'] = module.params['repo']
+    if module.params["repo"]:
+        custom_details["repo"] = module.params["repo"]
 
-    if module.params['revision']:
-        custom_details['revision'] = module.params['revision']
+    if module.params["revision"]:
+        custom_details["revision"] = module.params["revision"]
 
-    if module.params['environment']:
-        custom_details['environment'] = module.params['environment']
+    if module.params["environment"]:
+        custom_details["environment"] = module.params["environment"]
 
     timestamp = now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     payload = {
-        'summary': module.params['summary'],
-        'source': module.params['source'],
-        'timestamp': timestamp,
-        'custom_details': custom_details
+        "summary": module.params["summary"],
+        "source": module.params["source"],
+        "timestamp": timestamp,
+        "custom_details": custom_details,
     }
 
-    event = {
-        'routing_key': module.params['integration_key'],
-        'payload': payload
-    }
+    event = {"routing_key": module.params["integration_key"], "payload": payload}
 
-    if module.params['link_url']:
-        link = {
-            'href': module.params['link_url']
-        }
+    if module.params["link_url"]:
+        link = {"href": module.params["link_url"]}
 
-        if module.params['link_text']:
-            link['text'] = module.params['link_text']
+        if module.params["link_text"]:
+            link["text"] = module.params["link_text"]
 
-        event['links'] = [link]
+        event["links"] = [link]
 
-    _response, info = fetch_url(
-        module, url, data=module.jsonify(event), headers=headers, method='POST')
+    _response, info = fetch_url(module, url, data=module.jsonify(event), headers=headers, method="POST")
 
-    if info['status'] == 202:
+    if info["status"] == 202:
         module.exit_json(changed=True)
     else:
-        module.fail_json(
-            msg='Creating PagerDuty change event failed with %d' % (info['status']))
+        module.fail_json(msg=f"Creating PagerDuty change event failed with {info['status']}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

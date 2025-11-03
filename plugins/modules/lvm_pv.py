@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2025, Klention Mali <klention@gmail.com>
 # Based on lvol module by Jeroen Hoekx <jeroen.hoekx@dsquare.be>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -78,13 +76,13 @@ from ansible.module_utils.basic import AnsibleModule
 
 def get_pv_status(module, device):
     """Check if the device is already a PV."""
-    cmd = ['pvs', '--noheadings', '--readonly', device]
+    cmd = ["pvs", "--noheadings", "--readonly", device]
     return module.run_command(cmd)[0] == 0
 
 
 def get_pv_size(module, device):
     """Get current PV size in bytes."""
-    cmd = ['pvs', '--noheadings', '--nosuffix', '--units', 'b', '-o', 'pv_size', device]
+    cmd = ["pvs", "--noheadings", "--nosuffix", "--units", "b", "-o", "pv_size", device]
     rc, out, err = module.run_command(cmd, check_rc=True)
     return int(out.strip())
 
@@ -92,72 +90,70 @@ def get_pv_size(module, device):
 def rescan_device(module, device):
     """Perform storage rescan for the device."""
     base_device = os.path.basename(device)
-    is_partition = "/sys/class/block/{0}/partition".format(base_device)
+    is_partition = f"/sys/class/block/{base_device}/partition"
 
     # Determine parent device if partition exists
     parent_device = base_device
     if os.path.exists(is_partition):
         parent_device = (
-            base_device.rpartition('p')[0] if base_device.startswith('nvme')
-            else base_device.rstrip('0123456789')
+            base_device.rpartition("p")[0] if base_device.startswith("nvme") else base_device.rstrip("0123456789")
         )
 
     # Determine rescan path
-    rescan_path = "/sys/block/{0}/device/{1}".format(
-        parent_device,
-        "rescan_controller" if base_device.startswith('nvme') else "rescan"
+    rescan_path = (
+        f"/sys/block/{parent_device}/device/{'rescan_controller' if base_device.startswith('nvme') else 'rescan'}"
     )
 
     if os.path.exists(rescan_path):
         try:
-            with open(rescan_path, 'w') as f:
-                f.write('1')
+            with open(rescan_path, "w") as f:
+                f.write("1")
             return True
         except IOError as e:
-            module.warn("Failed to rescan device {0}: {1}".format(device, str(e)))
+            module.warn(f"Failed to rescan device {device}: {e!s}")
     else:
-        module.warn("Rescan path does not exist for device {0}".format(device))
+        module.warn(f"Rescan path does not exist for device {device}")
         return False
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            device=dict(type='path', required=True),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            force=dict(type='bool', default=False),
-            resize=dict(type='bool', default=False),
+            device=dict(type="path", required=True),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            force=dict(type="bool", default=False),
+            resize=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
     )
 
-    device = module.params['device']
-    state = module.params['state']
-    force = module.params['force']
-    resize = module.params['resize']
+    device = module.params["device"]
+    state = module.params["state"]
+    force = module.params["force"]
+    resize = module.params["resize"]
     changed = False
     actions = []
 
     # Validate device existence for present state
-    if state == 'present' and not os.path.exists(device):
-        module.fail_json(msg="Device %s not found" % device)
+    if state == "present" and not os.path.exists(device):
+        module.fail_json(msg=f"Device {device} not found")
 
     is_pv = get_pv_status(module, device)
 
-    if state == 'present':
+    if state == "present":
         # Create PV if needed
         if not is_pv:
             if module.check_mode:
                 changed = True
-                actions.append('would be created')
+                actions.append("would be created")
             else:
-                cmd = ['pvcreate']
+                cmd = ["pvcreate"]
                 if force:
-                    cmd.append('-f')
+                    cmd.append("-f")
                 cmd.append(device)
                 rc, out, err = module.run_command(cmd, check_rc=True)
                 changed = True
-                actions.append('created')
+                actions.append("created")
             is_pv = True
 
         # Handle resizing
@@ -165,39 +161,39 @@ def main():
             if module.check_mode:
                 # In check mode, assume resize would change
                 changed = True
-                actions.append('would be resized')
+                actions.append("would be resized")
             else:
                 # Perform device rescan if each time
                 if rescan_device(module, device):
-                    actions.append('rescanned')
+                    actions.append("rescanned")
                 original_size = get_pv_size(module, device)
-                rc, out, err = module.run_command(['pvresize', device], check_rc=True)
+                rc, out, err = module.run_command(["pvresize", device], check_rc=True)
                 new_size = get_pv_size(module, device)
                 if new_size != original_size:
                     changed = True
-                    actions.append('resized')
+                    actions.append("resized")
 
-    elif state == 'absent':
+    elif state == "absent":
         if is_pv:
             if module.check_mode:
                 changed = True
-                actions.append('would be removed')
+                actions.append("would be removed")
             else:
-                cmd = ['pvremove', '-y']
+                cmd = ["pvremove", "-y"]
                 if force:
-                    cmd.append('-ff')
+                    cmd.append("-ff")
                 changed = True
                 cmd.append(device)
                 rc, out, err = module.run_command(cmd, check_rc=True)
-                actions.append('removed')
+                actions.append("removed")
 
     # Generate final message
     if actions:
-        msg = "PV %s: %s" % (device, ', '.join(actions))
+        msg = f"PV {device}: {', '.join(actions)}"
     else:
-        msg = "No changes needed for PV %s" % device
+        msg = f"No changes needed for PV {device}"
     module.exit_json(changed=changed, msg=msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

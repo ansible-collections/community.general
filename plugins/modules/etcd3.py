@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Jean-Philippe Evrard <jean-philippe@evrard.me>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -132,6 +130,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 try:
     import etcd3
+
     HAS_ETCD = True
     ETCD_IMP_ERR = None
 except ImportError:
@@ -143,17 +142,17 @@ def run_module():
     # define the available arguments/parameters that a user can pass to
     # the module
     module_args = dict(
-        key=dict(type='str', required=True, no_log=False),
-        value=dict(type='str', required=True),
-        host=dict(type='str', default='localhost'),
-        port=dict(type='int', default=2379),
-        state=dict(type='str', required=True, choices=['present', 'absent']),
-        user=dict(type='str'),
-        password=dict(type='str', no_log=True),
-        ca_cert=dict(type='path'),
-        client_cert=dict(type='path'),
-        client_key=dict(type='path'),
-        timeout=dict(type='int'),
+        key=dict(type="str", required=True, no_log=False),
+        value=dict(type="str", required=True),
+        host=dict(type="str", default="localhost"),
+        port=dict(type="int", default=2379),
+        state=dict(type="str", required=True, choices=["present", "absent"]),
+        user=dict(type="str"),
+        password=dict(type="str", no_log=True),
+        ca_cert=dict(type="path"),
+        client_cert=dict(type="path"),
+        client_key=dict(type="path"),
+        timeout=dict(type="int"),
     )
 
     # seed the result dict in the object
@@ -172,7 +171,7 @@ def run_module():
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_together=[['client_cert', 'client_key'], ['user', 'password']],
+        required_together=[["client_cert", "client_key"], ["user", "password"]],
     )
 
     # It is possible to set `ca_cert` to verify the server identity without
@@ -180,58 +179,57 @@ def run_module():
     # so required_together is enough
     # Due to `required_together=[['client_cert', 'client_key']]`, checking the presence
     # of either `client_cert` or `client_key` is enough
-    if module.params['ca_cert'] is None and module.params['client_cert'] is not None:
+    if module.params["ca_cert"] is None and module.params["client_cert"] is not None:
         module.fail_json(msg="The 'ca_cert' parameter must be defined when 'client_cert' and 'client_key' are present.")
 
-    result['key'] = module.params.get('key')
-    module.params['cert_cert'] = module.params.pop('client_cert')
-    module.params['cert_key'] = module.params.pop('client_key')
+    result["key"] = module.params.get("key")
+    module.params["cert_cert"] = module.params.pop("client_cert")
+    module.params["cert_key"] = module.params.pop("client_key")
 
     if not HAS_ETCD:
-        module.fail_json(msg=missing_required_lib('etcd3'), exception=ETCD_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("etcd3"), exception=ETCD_IMP_ERR)
 
-    allowed_keys = ['host', 'port', 'ca_cert', 'cert_cert', 'cert_key',
-                    'timeout', 'user', 'password']
+    allowed_keys = ["host", "port", "ca_cert", "cert_cert", "cert_key", "timeout", "user", "password"]
 
     client_params = {key: value for key, value in module.params.items() if key in allowed_keys}
     try:
         etcd = etcd3.client(**client_params)
     except Exception as exp:
-        module.fail_json(msg='Cannot connect to etcd cluster: %s' % (to_native(exp)),
-                         exception=traceback.format_exc())
+        module.fail_json(msg=f"Cannot connect to etcd cluster: {exp}", exception=traceback.format_exc())
     try:
-        cluster_value = etcd.get(module.params['key'])
+        cluster_value = etcd.get(module.params["key"])
     except Exception as exp:
-        module.fail_json(msg='Cannot reach data: %s' % (to_native(exp)),
-                         exception=traceback.format_exc())
+        module.fail_json(msg=f"Cannot reach data: {exp}", exception=traceback.format_exc())
 
     # Make the cluster_value[0] a string for string comparisons
-    result['old_value'] = to_native(cluster_value[0])
+    result["old_value"] = to_native(cluster_value[0])
 
-    if module.params['state'] == 'absent':
+    if module.params["state"] == "absent":
         if cluster_value[0] is not None:
             if module.check_mode:
-                result['changed'] = True
+                result["changed"] = True
             else:
                 try:
-                    etcd.delete(module.params['key'])
+                    etcd.delete(module.params["key"])
                 except Exception as exp:
-                    module.fail_json(msg='Cannot delete %s: %s' % (module.params['key'], to_native(exp)),
-                                     exception=traceback.format_exc())
+                    module.fail_json(
+                        msg=f"Cannot delete {module.params['key']}: {exp}", exception=traceback.format_exc()
+                    )
                 else:
-                    result['changed'] = True
-    elif module.params['state'] == 'present':
-        if result['old_value'] != module.params['value']:
+                    result["changed"] = True
+    elif module.params["state"] == "present":
+        if result["old_value"] != module.params["value"]:
             if module.check_mode:
-                result['changed'] = True
+                result["changed"] = True
             else:
                 try:
-                    etcd.put(module.params['key'], module.params['value'])
+                    etcd.put(module.params["key"], module.params["value"])
                 except Exception as exp:
-                    module.fail_json(msg='Cannot add or edit key %s: %s' % (module.params['key'], to_native(exp)),
-                                     exception=traceback.format_exc())
+                    module.fail_json(
+                        msg=f"Cannot add or edit key {module.params['key']}: {exp}", exception=traceback.format_exc()
+                    )
                 else:
-                    result['changed'] = True
+                    result["changed"] = True
     else:
         module.fail_json(msg="State not recognized")
 
@@ -251,5 +249,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

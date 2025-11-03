@@ -5,8 +5,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 author: "Jan Christian Grünhage (@jcgruenhage)"
@@ -95,45 +94,42 @@ else:
 
 def run_module():
     module_args = dict(
-        msg_plain=dict(type='str', required=True),
-        msg_html=dict(type='str', required=True),
-        room_id=dict(type='str', required=True),
-        hs_url=dict(type='str', required=True),
-        token=dict(type='str', no_log=True),
-        user_id=dict(type='str'),
-        password=dict(type='str', no_log=True),
+        msg_plain=dict(type="str", required=True),
+        msg_html=dict(type="str", required=True),
+        room_id=dict(type="str", required=True),
+        hs_url=dict(type="str", required=True),
+        token=dict(type="str", no_log=True),
+        user_id=dict(type="str"),
+        password=dict(type="str", no_log=True),
     )
 
-    result = dict(
-        changed=False,
-        message=''
-    )
+    result = dict(changed=False, message="")
 
     module = AnsibleModule(
         argument_spec=module_args,
-        mutually_exclusive=[['password', 'token']],
-        required_one_of=[['password', 'token']],
-        required_together=[['user_id', 'password']],
-        supports_check_mode=True
+        mutually_exclusive=[["password", "token"]],
+        required_one_of=[["password", "token"]],
+        required_together=[["user_id", "password"]],
+        supports_check_mode=True,
     )
 
     if not matrix_found:
-        module.fail_json(msg=missing_required_lib('matrix-client'), exception=MATRIX_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("matrix-client"), exception=MATRIX_IMP_ERR)
 
     if module.check_mode:
         return result
 
     # create a client object
-    client = MatrixClient(module.params['hs_url'])
-    if module.params['token'] is not None:
-        client.api.token = module.params['token']
+    client = MatrixClient(module.params["hs_url"])
+    if module.params["token"] is not None:
+        client.api.token = module.params["token"]
     else:
-        client.login(module.params['user_id'], module.params['password'], sync=False)
+        client.login(module.params["user_id"], module.params["password"], sync=False)
 
     # make sure we are in a given room and return a room object for it
-    room = client.join_room(module.params['room_id'])
+    room = client.join_room(module.params["room_id"])
     # send an html formatted messages
-    room.send_html(module.params['msg_html'], module.params['msg_plain'])
+    room.send_html(module.params["msg_html"], module.params["msg_plain"])
 
     module.exit_json(**result)
 
@@ -142,5 +138,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

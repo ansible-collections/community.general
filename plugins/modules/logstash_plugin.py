@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -80,10 +78,7 @@ EXAMPLES = r"""
 from ansible.module_utils.basic import AnsibleModule
 
 
-PACKAGE_STATE_MAP = dict(
-    present="install",
-    absent="remove"
-)
+PACKAGE_STATE_MAP = dict(present="install", absent="remove")
 
 
 def is_plugin_present(module, plugin_bin, plugin_name):
@@ -95,7 +90,7 @@ def is_plugin_present(module, plugin_bin, plugin_name):
 def parse_error(string):
     reason = "reason: "
     try:
-        return string[string.index(reason) + len(reason):].strip()
+        return string[string.index(reason) + len(reason) :].strip()
     except ValueError:
         return string
 
@@ -107,7 +102,7 @@ def install_plugin(module, plugin_bin, plugin_name, version, proxy_host, proxy_p
         cmd_args.extend(["--version", version])
 
     if proxy_host and proxy_port:
-        cmd_args.extend(["-DproxyHost=%s" % proxy_host, "-DproxyPort=%s" % proxy_port])
+        cmd_args.extend([f"-DproxyHost={proxy_host}", f"-DproxyPort={proxy_port}"])
 
     cmd = " ".join(cmd_args)
 
@@ -148,9 +143,9 @@ def main():
             plugin_bin=dict(default="/usr/share/logstash/bin/logstash-plugin", type="path"),
             proxy_host=dict(),
             proxy_port=dict(),
-            version=dict()
+            version=dict(),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     name = module.params["name"]
@@ -174,5 +169,5 @@ def main():
     module.exit_json(changed=changed, cmd=cmd, name=name, state=state, stdout=out, stderr=err)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, INSPQ (@elfelip)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -344,69 +342,84 @@ end_state:
   description: Representation of the user after module execution.
   returned: on success
   type: dict
+user_created:
+  description: Indicates whether a user was created.
+  returned: in success
+  type: bool
+  version_added: 12.0.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+    is_struct_included,
+)
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
 
 def main():
     argument_spec = keycloak_argument_spec()
-    argument_spec['auth_username']['aliases'] = []
+    argument_spec["auth_username"]["aliases"] = []
     credential_spec = dict(
-        type=dict(type='str', required=True),
-        value=dict(type='str', required=True),
-        temporary=dict(type='bool', default=False)
+        type=dict(type="str", required=True),
+        value=dict(type="str", required=True, no_log=True),
+        temporary=dict(type="bool", default=False),
     )
     client_consents_spec = dict(
-        client_id=dict(type='str', required=True, aliases=['clientId']),
-        roles=dict(type='list', elements='str', required=True)
+        client_id=dict(type="str", required=True, aliases=["clientId"]),
+        roles=dict(type="list", elements="str", required=True),
     )
     attributes_spec = dict(
-        name=dict(type='str'),
-        values=dict(type='list', elements='str'),
-        state=dict(type='str', choices=['present', 'absent'], default='present')
+        name=dict(type="str"),
+        values=dict(type="list", elements="str"),
+        state=dict(type="str", choices=["present", "absent"], default="present"),
     )
-    groups_spec = dict(
-        name=dict(type='str'),
-        state=dict(type='str', choices=['present', 'absent'], default='present')
-    )
+    groups_spec = dict(name=dict(type="str"), state=dict(type="str", choices=["present", "absent"], default="present"))
     meta_args = dict(
-        realm=dict(type='str', default='master'),
-        self=dict(type='str'),
-        id=dict(type='str'),
-        username=dict(type='str', required=True),
-        first_name=dict(type='str', aliases=['firstName']),
-        last_name=dict(type='str', aliases=['lastName']),
-        email=dict(type='str'),
-        enabled=dict(type='bool'),
-        email_verified=dict(type='bool', default=False, aliases=['emailVerified']),
-        federation_link=dict(type='str', aliases=['federationLink']),
-        service_account_client_id=dict(type='str', aliases=['serviceAccountClientId']),
-        attributes=dict(type='list', elements='dict', options=attributes_spec),
-        access=dict(type='dict'),
-        groups=dict(type='list', default=[], elements='dict', options=groups_spec),
-        disableable_credential_types=dict(type='list', default=[], aliases=['disableableCredentialTypes'], elements='str'),
-        required_actions=dict(type='list', default=[], aliases=['requiredActions'], elements='str'),
-        credentials=dict(type='list', default=[], elements='dict', options=credential_spec),
-        federated_identities=dict(type='list', default=[], aliases=['federatedIdentities'], elements='str'),
-        client_consents=dict(type='list', default=[], aliases=['clientConsents'], elements='dict', options=client_consents_spec),
-        origin=dict(type='str'),
-        state=dict(choices=["absent", "present"], default='present'),
-        force=dict(type='bool', default=False),
+        realm=dict(type="str", default="master"),
+        self=dict(type="str"),
+        id=dict(type="str"),
+        username=dict(type="str", required=True),
+        first_name=dict(type="str", aliases=["firstName"]),
+        last_name=dict(type="str", aliases=["lastName"]),
+        email=dict(type="str"),
+        enabled=dict(type="bool"),
+        email_verified=dict(type="bool", default=False, aliases=["emailVerified"]),
+        federation_link=dict(type="str", aliases=["federationLink"]),
+        service_account_client_id=dict(type="str", aliases=["serviceAccountClientId"]),
+        attributes=dict(type="list", elements="dict", options=attributes_spec),
+        access=dict(type="dict"),
+        groups=dict(type="list", default=[], elements="dict", options=groups_spec),
+        disableable_credential_types=dict(
+            type="list", default=[], aliases=["disableableCredentialTypes"], elements="str"
+        ),
+        required_actions=dict(type="list", default=[], aliases=["requiredActions"], elements="str"),
+        credentials=dict(type="list", default=[], elements="dict", options=credential_spec),
+        federated_identities=dict(type="list", default=[], aliases=["federatedIdentities"], elements="str"),
+        client_consents=dict(
+            type="list", default=[], aliases=["clientConsents"], elements="dict", options=client_consents_spec
+        ),
+        origin=dict(type="str"),
+        state=dict(choices=["absent", "present"], default="present"),
+        force=dict(type="bool", default=False),
     )
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"]]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -416,16 +429,19 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    state = module.params.get('state')
-    force = module.params.get('force')
-    username = module.params.get('username')
-    groups = module.params.get('groups')
+    realm = module.params.get("realm")
+    state = module.params.get("state")
+    force = module.params.get("force")
+    username = module.params.get("username")
+    groups = module.params.get("groups")
 
     # Filter and map the parameters names that apply to the user
-    user_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'force', 'groups'] and
-                   module.params.get(x) is not None]
+    user_params = [
+        x
+        for x in module.params
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups"]
+        and module.params.get(x) is not None
+    ]
 
     before_user = kc.get_user_by_username(username=username, realm=realm)
 
@@ -436,16 +452,16 @@ def main():
 
     for param in user_params:
         new_param_value = module.params.get(param)
-        if param == 'attributes' and param in before_user:
-            old_value = kc.convert_keycloak_user_attributes_dict_to_module_list(attributes=before_user['attributes'])
+        if param == "attributes" and param in before_user:
+            old_value = kc.convert_keycloak_user_attributes_dict_to_module_list(attributes=before_user["attributes"])
         else:
             old_value = before_user[param] if param in before_user else None
         if new_param_value != old_value:
-            if old_value is not None and param == 'attributes':
+            if old_value is not None and param == "attributes":
                 for old_attribute in old_value:
                     old_attribute_found = False
                     for new_attribute in new_param_value:
-                        if new_attribute['name'] == old_attribute['name']:
+                        if new_attribute["name"] == old_attribute["name"]:
                             old_attribute_found = True
                     if not old_attribute_found:
                         new_param_value.append(copy.deepcopy(old_attribute))
@@ -457,25 +473,26 @@ def main():
     desired_user = copy.deepcopy(before_user)
     desired_user.update(changeset)
 
-    result['proposed'] = changeset
-    result['existing'] = before_user
-
+    result["proposed"] = changeset
+    result["existing"] = before_user
+    # Default values for user_created
+    result["user_created"] = False
     changed = False
 
     # Cater for when it doesn't exist (an empty dict)
-    if state == 'absent':
+    if state == "absent":
         if not before_user:
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Role does not exist, doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "Role does not exist, doing nothing."
             module.exit_json(**result)
         else:
             # Delete user
-            kc.delete_user(user_id=before_user['id'], realm=realm)
-            result["msg"] = 'User %s deleted' % (before_user['username'])
+            kc.delete_user(user_id=before_user["id"], realm=realm)
+            result["msg"] = f"User {before_user['username']} deleted"
             changed = True
 
     else:
@@ -489,18 +506,24 @@ def main():
             changed = True
 
             if username is None:
-                module.fail_json(msg='username must be specified when creating a new user')
+                module.fail_json(msg="username must be specified when creating a new user")
 
             if module._diff:
-                result['diff'] = dict(before='', after=desired_user)
+                result["diff"] = dict(before="", after=desired_user)
 
             if module.check_mode:
+                # Set user_created flag explicit for check_mode
+                # create_user could have failed, but we don't know for sure until we try to create the user.'
+                result["user_created"] = True
                 module.exit_json(**result)
+
             # Create the user
             after_user = kc.create_user(userrep=desired_user, realm=realm)
-            result["msg"] = 'User %s created' % (desired_user['username'])
+            result["msg"] = f"User {desired_user['username']} created"
             # Add user ID to new representation
-            desired_user['id'] = after_user["id"]
+            desired_user["id"] = after_user["id"]
+            # Set user_created flag
+            result["user_created"] = True
         else:
             excludes = [
                 "access",
@@ -512,12 +535,15 @@ def main():
                 "groups",
                 "clientConsents",
                 "federatedIdentities",
-                "requiredActions"]
+                "requiredActions",
+            ]
             # Add user ID to new representation
-            desired_user['id'] = before_user["id"]
+            desired_user["id"] = before_user["id"]
 
             # Compare users
-            if not (is_struct_included(desired_user, before_user, excludes)):  # If the new user does not introduce a change to the existing user
+            if not (
+                is_struct_included(desired_user, before_user, excludes)
+            ):  # If the new user does not introduce a change to the existing user
                 # Update the user
                 after_user = kc.update_user(userrep=desired_user, realm=realm)
                 changed = True
@@ -529,13 +555,13 @@ def main():
         after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
         result["end_state"] = after_user
         if changed:
-            result["msg"] = 'User %s updated' % (desired_user['username'])
+            result["msg"] = f"User {desired_user['username']} updated"
         else:
-            result["msg"] = 'No changes made for user %s' % (desired_user['username'])
+            result["msg"] = f"No changes made for user {desired_user['username']}"
 
-    result['changed'] = changed
+    result["changed"] = changed
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

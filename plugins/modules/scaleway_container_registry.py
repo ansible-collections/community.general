@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Scaleway Container registry management module
 #
@@ -7,9 +6,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: scaleway_container_registry
@@ -121,20 +119,17 @@ container_registry:
 """
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    scaleway_waitable_resource_argument_spec, resource_attributes_should_be_changed
+    SCALEWAY_REGIONS,
+    scaleway_argument_spec,
+    Scaleway,
+    scaleway_waitable_resource_argument_spec,
+    resource_attributes_should_be_changed,
 )
 from ansible.module_utils.basic import AnsibleModule
 
-STABLE_STATES = (
-    "ready",
-    "absent"
-)
+STABLE_STATES = ("ready", "absent")
 
-MUTABLE_ATTRIBUTES = (
-    "description",
-    "is_public"
-)
+MUTABLE_ATTRIBUTES = ("description", "is_public")
 
 
 def payload_from_wished_cr(wished_cr):
@@ -142,7 +137,7 @@ def payload_from_wished_cr(wished_cr):
         "project_id": wished_cr["project_id"],
         "name": wished_cr["name"],
         "description": wished_cr["description"],
-        "is_public": wished_cr["privacy_policy"] == "public"
+        "is_public": wished_cr["privacy_policy"] == "public",
     }
 
     return payload
@@ -163,10 +158,9 @@ def absent_strategy(api, wished_cr):
         return changed, {"status": "Container registry would be destroyed"}
 
     api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES, force_wait=True)
-    response = api.delete(path=api.api_path + "/%s" % target_cr["id"])
+    response = api.delete(path=f"{api.api_path}/{target_cr['id']}")
     if not response.ok:
-        api.module.fail_json(msg='Error deleting container registry [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f"Error deleting container registry [{response.status_code}: {response.json}]")
 
     api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES)
     return changed, response.json
@@ -187,24 +181,23 @@ def present_strategy(api, wished_cr):
 
         # Create container registry
         api.warn(payload_cr)
-        creation_response = api.post(path=api.api_path,
-                                     data=payload_cr)
+        creation_response = api.post(path=api.api_path, data=payload_cr)
 
         if not creation_response.ok:
-            msg = "Error during container registry creation: %s: '%s' (%s)" % (creation_response.info['msg'],
-                                                                               creation_response.json['message'],
-                                                                               creation_response.json)
+            msg = f"Error during container registry creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
             api.module.fail_json(msg=msg)
 
         api.wait_to_complete_state_transition(resource=creation_response.json, stable_states=STABLE_STATES)
-        response = api.get(path=api.api_path + "/%s" % creation_response.json["id"])
+        response = api.get(path=f"{api.api_path}/{creation_response.json['id']}")
         return changed, response.json
 
     target_cr = cr_lookup[wished_cr["name"]]
-    patch_payload = resource_attributes_should_be_changed(target=target_cr,
-                                                          wished=payload_cr,
-                                                          verifiable_mutable_attributes=MUTABLE_ATTRIBUTES,
-                                                          mutable_attributes=MUTABLE_ATTRIBUTES)
+    patch_payload = resource_attributes_should_be_changed(
+        target=target_cr,
+        wished=payload_cr,
+        verifiable_mutable_attributes=MUTABLE_ATTRIBUTES,
+        mutable_attributes=MUTABLE_ATTRIBUTES,
+    )
 
     if not patch_payload:
         return changed, target_cr
@@ -213,22 +206,19 @@ def present_strategy(api, wished_cr):
     if api.module.check_mode:
         return changed, {"status": "Container registry attributes would be changed."}
 
-    cr_patch_response = api.patch(path=api.api_path + "/%s" % target_cr["id"],
-                                  data=patch_payload)
+    cr_patch_response = api.patch(path=f"{api.api_path}/{target_cr['id']}", data=patch_payload)
 
     if not cr_patch_response.ok:
-        api.module.fail_json(msg='Error during container registry attributes update: [{0}: {1}]'.format(
-            cr_patch_response.status_code, cr_patch_response.json['message']))
+        api.module.fail_json(
+            msg=f"Error during container registry attributes update: [{cr_patch_response.status_code}: {cr_patch_response.json['message']}]"
+        )
 
     api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES)
-    response = api.get(path=api.api_path + "/%s" % target_cr["id"])
+    response = api.get(path=f"{api.api_path}/{target_cr['id']}")
     return changed, response.json
 
 
-state_strategy = {
-    "present": present_strategy,
-    "absent": absent_strategy
-}
+state_strategy = {"present": present_strategy, "absent": absent_strategy}
 
 
 def core(module):
@@ -237,12 +227,12 @@ def core(module):
         "state": module.params["state"],
         "project_id": module.params["project_id"],
         "name": module.params["name"],
-        "description": module.params['description'],
-        "privacy_policy": module.params['privacy_policy']
+        "description": module.params["description"],
+        "privacy_policy": module.params["privacy_policy"],
     }
 
     api = Scaleway(module=module)
-    api.api_path = "registry/v1/regions/%s/namespaces" % region
+    api.api_path = f"registry/v1/regions/{region}/namespaces"
 
     changed, summary = state_strategy[wished_container_registry["state"]](api=api, wished_cr=wished_container_registry)
 
@@ -252,14 +242,16 @@ def core(module):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(scaleway_waitable_resource_argument_spec())
-    argument_spec.update(dict(
-        state=dict(type='str', default='present', choices=['absent', 'present']),
-        project_id=dict(type='str', required=True),
-        region=dict(type='str', required=True, choices=SCALEWAY_REGIONS),
-        name=dict(type='str', required=True),
-        description=dict(type='str', default=''),
-        privacy_policy=dict(type='str', default='private', choices=['public', 'private'])
-    ))
+    argument_spec.update(
+        dict(
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            project_id=dict(type="str", required=True),
+            region=dict(type="str", required=True, choices=SCALEWAY_REGIONS),
+            name=dict(type="str", required=True),
+            description=dict(type="str", default=""),
+            privacy_policy=dict(type="str", default="private", choices=["public", "private"]),
+        )
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -268,5 +260,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

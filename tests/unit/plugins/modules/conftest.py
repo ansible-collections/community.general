@@ -2,30 +2,29 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import contextlib as _contextlib
 import json
+from collections.abc import MutableMapping
 
 import pytest
 
-from ansible.module_utils.six import string_types
-from ansible.module_utils.six.moves.collections_abc import MutableMapping
-
 from ansible_collections.community.general.plugins.module_utils import deps
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args as _set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    set_module_args as _set_module_args,
+)
 
 
 def _fix_ansible_args(args):
-    if isinstance(args, string_types):
+    if isinstance(args, str):
         # This should be deprecated!
         return json.loads(args)
 
     if isinstance(args, MutableMapping):
         return args
 
-    raise Exception('Malformed data to the patch_ansible_module pytest fixture')
+    raise Exception("Malformed data to the patch_ansible_module pytest fixture")
 
 
 @pytest.fixture
@@ -42,6 +41,7 @@ def patch_ansible_module_uthelper(request):
         args = _fix_ansible_args(args)
         with _set_module_args(args):
             yield
+
     return _patch
 
 

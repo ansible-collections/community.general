@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Adam Migus <adam@migus.org>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 name: tss
@@ -258,19 +256,30 @@ EXAMPLES = r"""
 import abc
 import os
 from ansible.errors import AnsibleError, AnsibleOptionsError
-from ansible.module_utils import six
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
-    from delinea.secrets.server import SecretServer, SecretServerError, PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
+    from delinea.secrets.server import (
+        SecretServer,
+        SecretServerError,
+        PasswordGrantAuthorizer,
+        DomainPasswordGrantAuthorizer,
+        AccessTokenAuthorizer,
+    )
 
     HAS_TSS_SDK = True
     HAS_DELINEA_SS_SDK = True
     HAS_TSS_AUTHORIZER = True
 except ImportError:
     try:
-        from thycotic.secrets.server import SecretServer, SecretServerError, PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
+        from thycotic.secrets.server import (
+            SecretServer,
+            SecretServerError,
+            PasswordGrantAuthorizer,
+            DomainPasswordGrantAuthorizer,
+            AccessTokenAuthorizer,
+        )
 
         HAS_TSS_SDK = True
         HAS_DELINEA_SS_SDK = False
@@ -289,8 +298,7 @@ except ImportError:
 display = Display()
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TSSClient(object):
+class TSSClient(metaclass=abc.ABCMeta):  # noqa: B024
     def __init__(self):
         self._client = None
 
@@ -316,11 +324,11 @@ class TSSClient(object):
                 obj = self._client.get_secret_by_path(secret_path, fetch_file_attachments)
             else:
                 obj = self._client.get_secret(secret_id, fetch_file_attachments)
-            for i in obj['items']:
+            for i in obj["items"]:
                 if file_download_path and os.path.isdir(file_download_path):
-                    if i['isFile']:
+                    if i["isFile"]:
                         try:
-                            file_content = i['itemValue'].content
+                            file_content = i["itemValue"].content
                             with open(os.path.join(file_download_path, f"{obj['id']}_{i['slug']}"), "wb") as f:
                                 f.write(file_content)
                         except ValueError:
@@ -328,7 +336,7 @@ class TSSClient(object):
                         except AttributeError:
                             display.warning(f"Could not read file content for {i['slug']}")
                         finally:
-                            i['itemValue'] = "*** Not Valid For Display ***"
+                            i["itemValue"] = "*** Not Valid For Display ***"
                 else:
                     raise AnsibleOptionsError("File download path does not exist")
             return obj
@@ -362,7 +370,7 @@ class TSSClient(object):
 
 class TSSClientV0(TSSClient):
     def __init__(self, **server_parameters):
-        super(TSSClientV0, self).__init__()
+        super().__init__()
 
         if server_parameters.get("domain"):
             raise AnsibleError("The 'domain' option requires 'python-tss-sdk' version 1.0.0 or greater")
@@ -378,12 +386,10 @@ class TSSClientV0(TSSClient):
 
 class TSSClientV1(TSSClient):
     def __init__(self, **server_parameters):
-        super(TSSClientV1, self).__init__()
+        super().__init__()
 
         authorizer = self._get_authorizer(**server_parameters)
-        self._client = SecretServer(
-            server_parameters["base_url"], authorizer, server_parameters["api_path_uri"]
-        )
+        self._client = SecretServer(server_parameters["base_url"], authorizer, server_parameters["api_path_uri"])
 
     @staticmethod
     def _get_authorizer(**server_parameters):

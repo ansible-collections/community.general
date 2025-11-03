@@ -1,17 +1,19 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2020, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
+import unittest
 from contextlib import contextmanager
+from unittest.mock import call, patch
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import call, patch
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
+    ModuleTestCase,
+    set_module_args,
+)
 
 from ansible_collections.community.general.plugins.modules import ipa_pwpolicy
 
@@ -32,14 +34,14 @@ def patch_ipa(**kwargs):
             ...
     """
     obj = ipa_pwpolicy.PwPolicyIPAClient
-    with patch.object(obj, 'login') as mock_login:
-        with patch.object(obj, '_post_json', **kwargs) as mock_post:
+    with patch.object(obj, "login") as mock_login:
+        with patch.object(obj, "_post_json", **kwargs) as mock_post:
             yield mock_login, mock_post
 
 
 class TestIPAPwPolicy(ModuleTestCase):
     def setUp(self):
-        super(TestIPAPwPolicy, self).setUp()
+        super().setUp()
         self.module = ipa_pwpolicy
 
     def _test_base(self, module_args, return_value, mock_calls, changed):
@@ -84,58 +86,51 @@ class TestIPAPwPolicy(ModuleTestCase):
             mock_post.assert_not_called()
 
         # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+        self.assertIs(exec_info.exception.args[0]["changed"], changed)
 
     def test_add(self):
         """Add a new policy"""
         module_args = {
-            'group': 'admins',
-            'state': 'present',
-            'priority': '10',
-            'maxpwdlife': '90',
-            'minpwdlife': '1',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '16',
-            'maxfailcount': '6',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "group": "admins",
+            "state": "present",
+            "priority": "10",
+            "maxpwdlife": "90",
+            "minpwdlife": "1",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "16",
+            "maxfailcount": "6",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {}
         mock_calls = (
+            {"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "admins"}},
             {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'admins'
-                }
+                "method": "pwpolicy_add",
+                "name": "admins",
+                "item": {
+                    "cospriority": "10",
+                    "krbmaxpwdlife": "90",
+                    "krbminpwdlife": "1",
+                    "krbpwdhistorylength": "8",
+                    "krbpwdmindiffchars": "3",
+                    "krbpwdminlength": "16",
+                    "krbpwdmaxfailure": "6",
+                    "krbpwdfailurecountinterval": "60",
+                    "krbpwdlockoutduration": "600",
+                    "passwordgracelimit": "3",
+                    "ipapwdmaxrepeat": "3",
+                    "ipapwdmaxsequence": "3",
+                    "ipapwddictcheck": True,
+                    "ipapwdusercheck": True,
+                },
             },
-            {
-                'method': 'pwpolicy_add',
-                'name': 'admins',
-                'item': {
-                    'cospriority': '10',
-                    'krbmaxpwdlife': '90',
-                    'krbminpwdlife': '1',
-                    'krbpwdhistorylength': '8',
-                    'krbpwdmindiffchars': '3',
-                    'krbpwdminlength': '16',
-                    'krbpwdmaxfailure': '6',
-                    'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600',
-                    'passwordgracelimit': '3',
-                    'ipapwdmaxrepeat': '3',
-                    'ipapwdmaxsequence': '3',
-                    'ipapwddictcheck': True,
-                    'ipapwdusercheck': True,
-                }
-            }
         )
         changed = True
 
@@ -144,53 +139,46 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_aliases(self):
         """Same as test_add, but uses the `name` alias for the `group` option"""
         module_args = {
-            'name': 'admins',
-            'state': 'present',
-            'priority': '10',
-            'maxpwdlife': '90',
-            'minpwdlife': '1',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '16',
-            'maxfailcount': '6',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "name": "admins",
+            "state": "present",
+            "priority": "10",
+            "maxpwdlife": "90",
+            "minpwdlife": "1",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "16",
+            "maxfailcount": "6",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {}
         mock_calls = (
+            {"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "admins"}},
             {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'admins'
-                }
+                "method": "pwpolicy_add",
+                "name": "admins",
+                "item": {
+                    "cospriority": "10",
+                    "krbmaxpwdlife": "90",
+                    "krbminpwdlife": "1",
+                    "krbpwdhistorylength": "8",
+                    "krbpwdmindiffchars": "3",
+                    "krbpwdminlength": "16",
+                    "krbpwdmaxfailure": "6",
+                    "krbpwdfailurecountinterval": "60",
+                    "krbpwdlockoutduration": "600",
+                    "passwordgracelimit": "3",
+                    "ipapwdmaxrepeat": "3",
+                    "ipapwdmaxsequence": "3",
+                    "ipapwddictcheck": True,
+                    "ipapwdusercheck": True,
+                },
             },
-            {
-                'method': 'pwpolicy_add',
-                'name': 'admins',
-                'item': {
-                    'cospriority': '10',
-                    'krbmaxpwdlife': '90',
-                    'krbminpwdlife': '1',
-                    'krbpwdhistorylength': '8',
-                    'krbpwdmindiffchars': '3',
-                    'krbpwdminlength': '16',
-                    'krbpwdmaxfailure': '6',
-                    'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600',
-                    'passwordgracelimit': '3',
-                    'ipapwdmaxrepeat': '3',
-                    'ipapwdmaxsequence': '3',
-                    'ipapwddictcheck': True,
-                    'ipapwdusercheck': True,
-                }
-            }
         )
         changed = True
 
@@ -199,71 +187,64 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_mod_different_args(self):
         """Policy exists, but some of the args are different and need to be modified"""
         module_args = {
-            'group': 'sysops',
-            'state': 'present',
-            'priority': '10',
-            'maxpwdlife': '60',
-            'minpwdlife': '24',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '12',
-            'maxfailcount': '8',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "group": "sysops",
+            "state": "present",
+            "priority": "10",
+            "maxpwdlife": "60",
+            "minpwdlife": "24",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "12",
+            "maxfailcount": "8",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {
-            'cn': ['sysops'],
-            'cospriority': ['10'],
-            'krbmaxpwdlife': ['90'],
-            'krbminpwdlife': ['1'],
-            'krbpwdhistorylength': ['8'],
-            'krbpwdmindiffchars': ['3'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'krbpwdfailurecountinterval': ['60'],
-            'krbpwdlockoutduration': ['600'],
-            'passwordgracelimit': ['3'],
-            'ipapwdmaxrepeat': ['3'],
-            'ipapwdmaxsequence': ['3'],
-            'ipapwddictcheck': [True],
-            'ipapwdusercheck': [True],
-            'dn': 'cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["sysops"],
+            "cospriority": ["10"],
+            "krbmaxpwdlife": ["90"],
+            "krbminpwdlife": ["1"],
+            "krbpwdhistorylength": ["8"],
+            "krbpwdmindiffchars": ["3"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "krbpwdfailurecountinterval": ["60"],
+            "krbpwdlockoutduration": ["600"],
+            "passwordgracelimit": ["3"],
+            "ipapwdmaxrepeat": ["3"],
+            "ipapwdmaxsequence": ["3"],
+            "ipapwddictcheck": [True],
+            "ipapwdusercheck": [True],
+            "dn": "cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
         mock_calls = (
+            {"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "sysops"}},
             {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'sysops'
-                }
+                "method": "pwpolicy_mod",
+                "name": "sysops",
+                "item": {
+                    "cospriority": "10",
+                    "krbmaxpwdlife": "60",
+                    "krbminpwdlife": "24",
+                    "krbpwdhistorylength": "8",
+                    "krbpwdmindiffchars": "3",
+                    "krbpwdminlength": "12",
+                    "krbpwdmaxfailure": "8",
+                    "krbpwdfailurecountinterval": "60",
+                    "krbpwdlockoutduration": "600",
+                    "passwordgracelimit": "3",
+                    "ipapwdmaxrepeat": "3",
+                    "ipapwdmaxsequence": "3",
+                    "ipapwddictcheck": True,
+                    "ipapwdusercheck": True,
+                },
             },
-            {
-                'method': 'pwpolicy_mod',
-                'name': 'sysops',
-                'item': {
-                    'cospriority': '10',
-                    'krbmaxpwdlife': '60',
-                    'krbminpwdlife': '24',
-                    'krbpwdhistorylength': '8',
-                    'krbpwdmindiffchars': '3',
-                    'krbpwdminlength': '12',
-                    'krbpwdmaxfailure': '8',
-                    'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600',
-                    'passwordgracelimit': '3',
-                    'ipapwdmaxrepeat': '3',
-                    'ipapwdmaxsequence': '3',
-                    'ipapwddictcheck': True,
-                    'ipapwdusercheck': True,
-                }
-            }
         )
         changed = True
 
@@ -272,62 +253,55 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_mod_missing_args(self):
         """Policy exists, but some of the args aren't set, so need to be added"""
         module_args = {
-            'group': 'sysops',
-            'state': 'present',
-            'priority': '10',
-            'maxpwdlife': '90',
-            'minpwdlife': '1',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '16',
-            'maxfailcount': '6',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "group": "sysops",
+            "state": "present",
+            "priority": "10",
+            "maxpwdlife": "90",
+            "minpwdlife": "1",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "16",
+            "maxfailcount": "6",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {
-            'cn': ['sysops'],
-            'cospriority': ['10'],
-            'krbmaxpwdlife': ['90'],
-            'krbpwdhistorylength': ['8'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'dn': 'cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["sysops"],
+            "cospriority": ["10"],
+            "krbmaxpwdlife": ["90"],
+            "krbpwdhistorylength": ["8"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "dn": "cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
         mock_calls = (
+            {"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "sysops"}},
             {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'sysops'
-                }
+                "method": "pwpolicy_mod",
+                "name": "sysops",
+                "item": {
+                    "cospriority": "10",
+                    "krbmaxpwdlife": "90",
+                    "krbminpwdlife": "1",
+                    "krbpwdhistorylength": "8",
+                    "krbpwdmindiffchars": "3",
+                    "krbpwdminlength": "16",
+                    "krbpwdmaxfailure": "6",
+                    "krbpwdfailurecountinterval": "60",
+                    "krbpwdlockoutduration": "600",
+                    "passwordgracelimit": "3",
+                    "ipapwdmaxrepeat": "3",
+                    "ipapwdmaxsequence": "3",
+                    "ipapwddictcheck": True,
+                    "ipapwdusercheck": True,
+                },
             },
-            {
-                'method': 'pwpolicy_mod',
-                'name': 'sysops',
-                'item': {
-                    'cospriority': '10',
-                    'krbmaxpwdlife': '90',
-                    'krbminpwdlife': '1',
-                    'krbpwdhistorylength': '8',
-                    'krbpwdmindiffchars': '3',
-                    'krbpwdminlength': '16',
-                    'krbpwdmaxfailure': '6',
-                    'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600',
-                    'passwordgracelimit': '3',
-                    'ipapwdmaxrepeat': '3',
-                    'ipapwdmaxsequence': '3',
-                    'ipapwddictcheck': True,
-                    'ipapwdusercheck': True,
-                }
-            }
         )
         changed = True
 
@@ -336,38 +310,31 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_del(self):
         """Policy exists, and state is absent. Needs to be deleted"""
         module_args = {
-            'group': 'sysops',
-            'state': 'absent',
+            "group": "sysops",
+            "state": "absent",
             # other arguments are ignored when state is `absent`
-            'priority': '10',
-            'maxpwdlife': '90',
-            'historylength': '8',
-            'minlength': '16',
-            'maxfailcount': '6'
+            "priority": "10",
+            "maxpwdlife": "90",
+            "historylength": "8",
+            "minlength": "16",
+            "maxfailcount": "6",
         }
         return_value = {
-            'cn': ['sysops'],
-            'cospriority': ['10'],
-            'krbmaxpwdlife': ['90'],
-            'krbpwdhistorylength': ['8'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'dn': 'cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["sysops"],
+            "cospriority": ["10"],
+            "krbmaxpwdlife": ["90"],
+            "krbpwdhistorylength": ["8"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "dn": "cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
         mock_calls = (
+            {"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "sysops"}},
             {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'sysops'
-                }
+                "method": "pwpolicy_del",
+                "name": "sysops",
             },
-            {
-                'method': 'pwpolicy_del',
-                'name': 'sysops',
-            }
         )
         changed = True
 
@@ -376,52 +343,43 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_no_change(self):
         """Policy already exists. No changes needed"""
         module_args = {
-            'group': 'admins',
-            'state': 'present',
-            'priority': '10',
-            'maxpwdlife': '90',
-            'minpwdlife': '1',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '16',
-            'maxfailcount': '6',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "group": "admins",
+            "state": "present",
+            "priority": "10",
+            "maxpwdlife": "90",
+            "minpwdlife": "1",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "16",
+            "maxfailcount": "6",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {
-            'cn': ['admins'],
-            'cospriority': ['10'],
-            'krbmaxpwdlife': ['90'],
-            'krbminpwdlife': ['1'],
-            'krbpwdhistorylength': ['8'],
-            'krbpwdmindiffchars': ['3'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'krbpwdfailurecountinterval': ['60'],
-            'krbpwdlockoutduration': ['600'],
-            'passwordgracelimit': ['3'],
-            'ipapwdmaxrepeat': ['3'],
-            'ipapwdmaxsequence': ['3'],
-            'ipapwddictcheck': [True],
-            'ipapwdusercheck': [True],
-            'dn': 'cn=admins,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["admins"],
+            "cospriority": ["10"],
+            "krbmaxpwdlife": ["90"],
+            "krbminpwdlife": ["1"],
+            "krbpwdhistorylength": ["8"],
+            "krbpwdmindiffchars": ["3"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "krbpwdfailurecountinterval": ["60"],
+            "krbpwdlockoutduration": ["600"],
+            "passwordgracelimit": ["3"],
+            "ipapwdmaxrepeat": ["3"],
+            "ipapwdmaxsequence": ["3"],
+            "ipapwddictcheck": [True],
+            "ipapwdusercheck": [True],
+            "dn": "cn=admins,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
-        mock_calls = [
-            {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'admins'
-                }
-            }
-        ]
+        mock_calls = [{"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "admins"}}]
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
@@ -429,26 +387,17 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_del_no_change(self):
         """Policy doesn't exist, and state is absent. No change needed"""
         module_args = {
-            'group': 'sysops',
-            'state': 'absent',
+            "group": "sysops",
+            "state": "absent",
             # other arguments are ignored when state is `absent`
-            'priority': '10',
-            'maxpwdlife': '90',
-            'historylength': '8',
-            'minlength': '16',
-            'maxfailcount': '6'
+            "priority": "10",
+            "maxpwdlife": "90",
+            "historylength": "8",
+            "minlength": "16",
+            "maxfailcount": "6",
         }
         return_value = {}
-        mock_calls = [
-            {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'sysops'
-                }
-            }
-        ]
+        mock_calls = [{"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "sysops"}}]
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
@@ -456,65 +405,58 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_global(self):
         """Modify the global policy"""
         module_args = {
-            'maxpwdlife': '60',
-            'minpwdlife': '24',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '12',
-            'maxfailcount': '8',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "maxpwdlife": "60",
+            "minpwdlife": "24",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "12",
+            "maxfailcount": "8",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {
-            'cn': ['global_policy'],
-            'krbmaxpwdlife': ['90'],
-            'krbminpwdlife': ['1'],
-            'krbpwdmindiffchars': ['3'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'krbpwdfailurecountinterval': ['60'],
-            'krbpwdlockoutduration': ['600'],
-            'passwordgracelimit': ['3'],
-            'ipapwdmaxrepeat': ['3'],
-            'ipapwdmaxsequence': ['3'],
-            'ipapwddictcheck': [True],
-            'ipapwdusercheck': [True],
-            'dn': 'cn=global_policy,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["global_policy"],
+            "krbmaxpwdlife": ["90"],
+            "krbminpwdlife": ["1"],
+            "krbpwdmindiffchars": ["3"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "krbpwdfailurecountinterval": ["60"],
+            "krbpwdlockoutduration": ["600"],
+            "passwordgracelimit": ["3"],
+            "ipapwdmaxrepeat": ["3"],
+            "ipapwdmaxsequence": ["3"],
+            "ipapwddictcheck": [True],
+            "ipapwdusercheck": [True],
+            "dn": "cn=global_policy,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
         mock_calls = (
+            {"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "global_policy"}},
             {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'global_policy'
-                }
+                "method": "pwpolicy_mod",
+                "name": None,
+                "item": {
+                    "krbmaxpwdlife": "60",
+                    "krbminpwdlife": "24",
+                    "krbpwdhistorylength": "8",
+                    "krbpwdmindiffchars": "3",
+                    "krbpwdminlength": "12",
+                    "krbpwdmaxfailure": "8",
+                    "krbpwdfailurecountinterval": "60",
+                    "krbpwdlockoutduration": "600",
+                    "passwordgracelimit": "3",
+                    "ipapwdmaxrepeat": "3",
+                    "ipapwdmaxsequence": "3",
+                    "ipapwddictcheck": True,
+                    "ipapwdusercheck": True,
+                },
             },
-            {
-                'method': 'pwpolicy_mod',
-                'name': None,
-                'item': {
-                    'krbmaxpwdlife': '60',
-                    'krbminpwdlife': '24',
-                    'krbpwdhistorylength': '8',
-                    'krbpwdmindiffchars': '3',
-                    'krbpwdminlength': '12',
-                    'krbpwdmaxfailure': '8',
-                    'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600',
-                    'passwordgracelimit': '3',
-                    'ipapwdmaxrepeat': '3',
-                    'ipapwdmaxsequence': '3',
-                    'ipapwddictcheck': True,
-                    'ipapwdusercheck': True,
-                }
-            }
         )
         changed = True
 
@@ -523,48 +465,39 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_global_no_change(self):
         """Global policy already matches the given arguments. No change needed"""
         module_args = {
-            'maxpwdlife': '90',
-            'minpwdlife': '1',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '16',
-            'maxfailcount': '6',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "maxpwdlife": "90",
+            "minpwdlife": "1",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "16",
+            "maxfailcount": "6",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {
-            'cn': ['global_policy'],
-            'krbmaxpwdlife': ['90'],
-            'krbminpwdlife': ['1'],
-            'krbpwdhistorylength': ['8'],
-            'krbpwdmindiffchars': ['3'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'krbpwdfailurecountinterval': ['60'],
-            'krbpwdlockoutduration': ['600'],
-            'passwordgracelimit': ['3'],
-            'ipapwdmaxrepeat': ['3'],
-            'ipapwdmaxsequence': ['3'],
-            'ipapwddictcheck': [True],
-            'ipapwdusercheck': [True],
-            'dn': 'cn=global_policy,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["global_policy"],
+            "krbmaxpwdlife": ["90"],
+            "krbminpwdlife": ["1"],
+            "krbpwdhistorylength": ["8"],
+            "krbpwdmindiffchars": ["3"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "krbpwdfailurecountinterval": ["60"],
+            "krbpwdlockoutduration": ["600"],
+            "passwordgracelimit": ["3"],
+            "ipapwdmaxrepeat": ["3"],
+            "ipapwdmaxsequence": ["3"],
+            "ipapwddictcheck": [True],
+            "ipapwdusercheck": [True],
+            "dn": "cn=global_policy,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
-        mock_calls = [
-            {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'global_policy'
-                }
-            }
-        ]
+        mock_calls = [{"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "global_policy"}}]
         changed = False
 
         self._test_base(module_args, return_value, mock_calls, changed)
@@ -572,35 +505,26 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_check_add(self):
         """Add a new policy in check mode. pwpolicy_add shouldn't be called"""
         module_args = {
-            '_ansible_check_mode': True,
-            'group': 'admins',
-            'state': 'present',
-            'priority': '10',
-            'maxpwdlife': '90',
-            'minpwdlife': '1',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '16',
-            'maxfailcount': '6',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "_ansible_check_mode": True,
+            "group": "admins",
+            "state": "present",
+            "priority": "10",
+            "maxpwdlife": "90",
+            "minpwdlife": "1",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "16",
+            "maxfailcount": "6",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {}
-        mock_calls = [
-            {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'admins'
-                }
-            }
-        ]
+        mock_calls = [{"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "admins"}}]
         changed = True
 
         self._test_base(module_args, return_value, mock_calls, changed)
@@ -608,100 +532,75 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_check_mod(self):
         """Modify a policy in check mode. pwpolicy_mod shouldn't be called"""
         module_args = {
-            '_ansible_check_mode': True,
-            'group': 'sysops',
-            'state': 'present',
-            'priority': '10',
-            'maxpwdlife': '60',
-            'minpwdlife': '24',
-            'historylength': '8',
-            'minclasses': '3',
-            'minlength': '12',
-            'maxfailcount': '8',
-            'failinterval': '60',
-            'lockouttime': '600',
-            'gracelimit': 3,
-            'maxrepeat': 3,
-            'maxsequence': 3,
-            'dictcheck': True,
-            'usercheck': True,
+            "_ansible_check_mode": True,
+            "group": "sysops",
+            "state": "present",
+            "priority": "10",
+            "maxpwdlife": "60",
+            "minpwdlife": "24",
+            "historylength": "8",
+            "minclasses": "3",
+            "minlength": "12",
+            "maxfailcount": "8",
+            "failinterval": "60",
+            "lockouttime": "600",
+            "gracelimit": 3,
+            "maxrepeat": 3,
+            "maxsequence": 3,
+            "dictcheck": True,
+            "usercheck": True,
         }
         return_value = {
-            'cn': ['sysops'],
-            'cospriority': ['10'],
-            'krbmaxpwdlife': ['90'],
-            'krbminpwdlife': ['1'],
-            'krbpwdhistorylength': ['8'],
-            'krbpwdmindiffchars': ['3'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'krbpwdfailurecountinterval': ['60'],
-            'krbpwdlockoutduration': ['600'],
-            'passwordgracelimit': ['3'],
-            'ipapwdmaxrepeat': ['3'],
-            'ipapwdmaxsequence': ['3'],
-            'ipapwddictcheck': [True],
-            'ipapwdusercheck': [True],
-            'dn': 'cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["sysops"],
+            "cospriority": ["10"],
+            "krbmaxpwdlife": ["90"],
+            "krbminpwdlife": ["1"],
+            "krbpwdhistorylength": ["8"],
+            "krbpwdmindiffchars": ["3"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "krbpwdfailurecountinterval": ["60"],
+            "krbpwdlockoutduration": ["600"],
+            "passwordgracelimit": ["3"],
+            "ipapwdmaxrepeat": ["3"],
+            "ipapwdmaxsequence": ["3"],
+            "ipapwddictcheck": [True],
+            "ipapwdusercheck": [True],
+            "dn": "cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
-        mock_calls = [
-            {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'sysops'
-                }
-            }
-        ]
+        mock_calls = [{"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "sysops"}}]
         changed = True
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_check_del(self):
         """Delete a policy in check mode. pwpolicy_del shouldn't be called"""
-        module_args = {
-            '_ansible_check_mode': True,
-            'group': 'sysops',
-            'state': 'absent'
-        }
+        module_args = {"_ansible_check_mode": True, "group": "sysops", "state": "absent"}
         return_value = {
-            'cn': ['sysops'],
-            'cospriority': ['10'],
-            'krbmaxpwdlife': ['90'],
-            'krbpwdhistorylength': ['8'],
-            'krbpwdminlength': ['16'],
-            'krbpwdmaxfailure': ['6'],
-            'dn': 'cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
-            'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
+            "cn": ["sysops"],
+            "cospriority": ["10"],
+            "krbmaxpwdlife": ["90"],
+            "krbpwdhistorylength": ["8"],
+            "krbpwdminlength": ["16"],
+            "krbpwdmaxfailure": ["6"],
+            "dn": "cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com",
+            "objectclass": ["top", "nscontainer", "krbpwdpolicy"],
         }
-        mock_calls = [
-            {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'sysops'
-                }
-            }
-        ]
+        mock_calls = [{"method": "pwpolicy_find", "name": None, "item": {"all": True, "cn": "sysops"}}]
         changed = True
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_fail_post(self):
         """Fail due to an exception raised from _post_json"""
-        with set_module_args({
-            'group': 'admins',
-            'state': 'absent'
-        }):
-            with patch_ipa(side_effect=Exception('ERROR MESSAGE')) as (mock_login, mock_post):
+        with set_module_args({"group": "admins", "state": "absent"}):
+            with patch_ipa(side_effect=Exception("ERROR MESSAGE")) as (mock_login, mock_post):
                 with self.assertRaises(AnsibleFailJson) as exec_info:
                     self.module.main()
 
-        self.assertEqual(exec_info.exception.args[0]['msg'], 'ERROR MESSAGE')
+        self.assertEqual(exec_info.exception.args[0]["msg"], "ERROR MESSAGE")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

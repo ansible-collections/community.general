@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Philippe Makowski
 # Written by Philippe Makowski <philippem@mageia.org>
@@ -8,8 +7,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: urpmi
@@ -111,7 +109,6 @@ def query_package_provides(module, name, root):
 
 
 def update_package_db(module):
-
     urpmiupdate_path = module.get_bin_path("urpmi.update", True)
     cmd = [urpmiupdate_path, "-a", "-q"]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
@@ -120,7 +117,6 @@ def update_package_db(module):
 
 
 def remove_packages(module, packages, root):
-
     remove_c = 0
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
@@ -133,32 +129,30 @@ def remove_packages(module, packages, root):
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
-            module.fail_json(msg="failed to remove %s" % (package))
+            module.fail_json(msg=f"failed to remove {package}")
 
         remove_c += 1
 
     if remove_c > 0:
-
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
+        module.exit_json(changed=True, msg=f"removed {remove_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
 
 def install_packages(module, pkgspec, root, force=True, no_recommends=True):
-
     packages = ""
     for package in pkgspec:
         if not query_package_provides(module, package, root):
-            packages += "'%s' " % package
+            packages += f"'{package}' "
 
     if len(packages) != 0:
         if no_recommends:
-            no_recommends_yes = ['--no-recommends']
+            no_recommends_yes = ["--no-recommends"]
         else:
             no_recommends_yes = []
 
         if force:
-            force_yes = ['--force']
+            force_yes = ["--force"]
         else:
             force_yes = []
 
@@ -169,20 +163,20 @@ def install_packages(module, pkgspec, root, force=True, no_recommends=True):
 
         for package in pkgspec:
             if not query_package_provides(module, package, root):
-                module.fail_json(msg="'urpmi %s' failed: %s" % (package, err))
+                module.fail_json(msg=f"'urpmi {package}' failed: {err}")
 
         # urpmi always have 0 for exit code if --force is used
         if rc:
-            module.fail_json(msg="'urpmi %s' failed: %s" % (packages, err))
+            module.fail_json(msg=f"'urpmi {packages}' failed: {err}")
         else:
-            module.exit_json(changed=True, msg="%s present(s)" % packages)
+            module.exit_json(changed=True, msg=f"{packages} present(s)")
     else:
         module.exit_json(changed=False)
 
 
 def root_option(root):
     if root:
-        return ["--root=%s" % (root)]
+        return [f"--root={root}"]
     else:
         return []
 
@@ -190,27 +184,26 @@ def root_option(root):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present',
-                       choices=['absent', 'installed', 'present', 'removed']),
-            update_cache=dict(type='bool', default=False),
-            force=dict(type='bool', default=True),
-            no_recommends=dict(type='bool', default=True),
-            name=dict(type='list', elements='str', required=True, aliases=['package', 'pkg']),
-            root=dict(type='str', aliases=['installroot']),
+            state=dict(type="str", default="present", choices=["absent", "installed", "present", "removed"]),
+            update_cache=dict(type="bool", default=False),
+            force=dict(type="bool", default=True),
+            no_recommends=dict(type="bool", default=True),
+            name=dict(type="list", elements="str", required=True, aliases=["package", "pkg"]),
+            root=dict(type="str", aliases=["installroot"]),
         ),
     )
 
     p = module.params
 
-    if p['update_cache']:
+    if p["update_cache"]:
         update_package_db(module)
 
-    if p['state'] in ['installed', 'present']:
-        install_packages(module, p['name'], p['root'], p['force'], p['no_recommends'])
+    if p["state"] in ["installed", "present"]:
+        install_packages(module, p["name"], p["root"], p["force"], p["no_recommends"])
 
-    elif p['state'] in ['removed', 'absent']:
-        remove_packages(module, p['name'], p['root'])
+    elif p["state"] in ["removed", "absent"]:
+        remove_packages(module, p["name"], p["root"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

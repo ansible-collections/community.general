@@ -1,17 +1,14 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2019, Sandeep Kasargod <sandeep@vexata.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
-class ModuleDocFragment(object):
-
+class ModuleDocFragment:
     # Documentation fragment for Vexata VX100 series
-    VX100 = r'''
+    VX100 = r"""
 options:
   array:
     description:
@@ -43,4 +40,4 @@ requirements:
   - vexatapi >= 0.0.1
   - E(VEXATA_USER) and E(VEXATA_PASSWORD) environment variables must be set if
     user and password arguments are not passed to the module directly.
-'''
+"""

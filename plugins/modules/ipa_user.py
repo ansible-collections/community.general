@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_user
@@ -190,61 +188,74 @@ from ansible.module_utils.common.text.converters import to_native
 
 class UserIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(UserIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def user_find(self, name):
-        return self._post_json(method='user_find', name=None, item={'all': True, 'uid': name})
+        return self._post_json(method="user_find", name=None, item={"all": True, "uid": name})
 
     def user_add(self, name, item):
-        return self._post_json(method='user_add', name=name, item=item)
+        return self._post_json(method="user_add", name=name, item=item)
 
     def user_mod(self, name, item):
-        return self._post_json(method='user_mod', name=name, item=item)
+        return self._post_json(method="user_mod", name=name, item=item)
 
     def user_del(self, name):
-        return self._post_json(method='user_del', name=name)
+        return self._post_json(method="user_del", name=name)
 
     def user_disable(self, name):
-        return self._post_json(method='user_disable', name=name)
+        return self._post_json(method="user_disable", name=name)
 
     def user_enable(self, name):
-        return self._post_json(method='user_enable', name=name)
+        return self._post_json(method="user_enable", name=name)
 
 
-def get_user_dict(displayname=None, givenname=None, krbpasswordexpiration=None, loginshell=None,
-                  mail=None, nsaccountlock=False, sn=None, sshpubkey=None, telephonenumber=None,
-                  title=None, userpassword=None, gidnumber=None, uidnumber=None, homedirectory=None,
-                  userauthtype=None):
+def get_user_dict(
+    displayname=None,
+    givenname=None,
+    krbpasswordexpiration=None,
+    loginshell=None,
+    mail=None,
+    nsaccountlock=False,
+    sn=None,
+    sshpubkey=None,
+    telephonenumber=None,
+    title=None,
+    userpassword=None,
+    gidnumber=None,
+    uidnumber=None,
+    homedirectory=None,
+    userauthtype=None,
+):
     user = {}
     if displayname is not None:
-        user['displayname'] = displayname
+        user["displayname"] = displayname
     if krbpasswordexpiration is not None:
-        user['krbpasswordexpiration'] = krbpasswordexpiration + "Z"
+        user["krbpasswordexpiration"] = f"{krbpasswordexpiration}Z"
     if givenname is not None:
-        user['givenname'] = givenname
+        user["givenname"] = givenname
     if loginshell is not None:
-        user['loginshell'] = loginshell
+        user["loginshell"] = loginshell
     if mail is not None:
-        user['mail'] = mail
-    user['nsaccountlock'] = nsaccountlock
+        user["mail"] = mail
+    user["nsaccountlock"] = nsaccountlock
     if sn is not None:
-        user['sn'] = sn
+        user["sn"] = sn
     if sshpubkey is not None:
-        user['ipasshpubkey'] = sshpubkey
+        user["ipasshpubkey"] = sshpubkey
     if telephonenumber is not None:
-        user['telephonenumber'] = telephonenumber
+        user["telephonenumber"] = telephonenumber
     if title is not None:
-        user['title'] = title
+        user["title"] = title
     if userpassword is not None:
-        user['userpassword'] = userpassword
+        user["userpassword"] = userpassword
     if gidnumber is not None:
-        user['gidnumber'] = gidnumber
+        user["gidnumber"] = gidnumber
     if uidnumber is not None:
-        user['uidnumber'] = uidnumber
+        user["uidnumber"] = uidnumber
     if homedirectory is not None:
-        user['homedirectory'] = homedirectory
+        user["homedirectory"] = homedirectory
     if userauthtype is not None:
-        user['ipauserauthtype'] = userauthtype
+        user["ipauserauthtype"] = userauthtype
 
     return user
 
@@ -264,25 +275,27 @@ def get_user_diff(client, ipa_user, module_user):
     # sshpubkeyfp is the list of ssh key fingerprints. IPA doesn't return the keys itself but instead the fingerprints.
     # These are used for comparison.
     sshpubkey = None
-    if 'ipasshpubkey' in module_user:
-        hash_algo = 'md5'
-        if 'sshpubkeyfp' in ipa_user and ipa_user['sshpubkeyfp'][0][:7].upper() == 'SHA256:':
-            hash_algo = 'sha256'
-        module_user['sshpubkeyfp'] = [get_ssh_key_fingerprint(pubkey, hash_algo) for pubkey in module_user['ipasshpubkey']]
+    if "ipasshpubkey" in module_user:
+        hash_algo = "md5"
+        if "sshpubkeyfp" in ipa_user and ipa_user["sshpubkeyfp"][0][:7].upper() == "SHA256:":
+            hash_algo = "sha256"
+        module_user["sshpubkeyfp"] = [
+            get_ssh_key_fingerprint(pubkey, hash_algo) for pubkey in module_user["ipasshpubkey"]
+        ]
         # Remove the ipasshpubkey element as it is not returned from IPA but save its value to be used later on
-        sshpubkey = module_user['ipasshpubkey']
-        del module_user['ipasshpubkey']
+        sshpubkey = module_user["ipasshpubkey"]
+        del module_user["ipasshpubkey"]
 
     result = client.get_diff(ipa_data=ipa_user, module_data=module_user)
 
     # If there are public keys, remove the fingerprints and add them back to the dict
     if sshpubkey is not None:
-        del module_user['sshpubkeyfp']
-        module_user['ipasshpubkey'] = sshpubkey
+        del module_user["sshpubkeyfp"]
+        module_user["ipasshpubkey"] = sshpubkey
     return result
 
 
-def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
+def get_ssh_key_fingerprint(ssh_key, hash_algo="sha256"):
     """
     Return the public key fingerprint of a given public SSH key
     in format "[fp] [comment] (ssh-rsa)" where fp is of the format:
@@ -300,50 +313,56 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
     if len(parts) == 0:
         return None
     key_type = parts[0]
-    key = base64.b64decode(parts[1].encode('ascii'))
+    key = base64.b64decode(parts[1].encode("ascii"))
 
-    if hash_algo == 'md5':
+    if hash_algo == "md5":
         fp_plain = hashlib.md5(key).hexdigest()
-        key_fp = ':'.join(a + b for a, b in zip(fp_plain[::2], fp_plain[1::2])).upper()
-    elif hash_algo == 'sha256':
-        fp_plain = base64.b64encode(hashlib.sha256(key).digest()).decode('ascii').rstrip('=')
-        key_fp = 'SHA256:{fp}'.format(fp=fp_plain)
+        key_fp = ":".join(a + b for a, b in zip(fp_plain[::2], fp_plain[1::2])).upper()
+    elif hash_algo == "sha256":
+        fp_plain = base64.b64encode(hashlib.sha256(key).digest()).decode("ascii").rstrip("=")
+        key_fp = f"SHA256:{fp_plain}"
     if len(parts) < 3:
-        return "%s (%s)" % (key_fp, key_type)
+        return f"{key_fp} ({key_type})"
     else:
         comment = parts[2]
-        return "%s %s (%s)" % (key_fp, comment, key_type)
+        return f"{key_fp} {comment} ({key_type})"
 
 
 def ensure(module, client):
-    state = module.params['state']
-    name = module.params['uid']
-    nsaccountlock = state == 'disabled'
+    state = module.params["state"]
+    name = module.params["uid"]
+    nsaccountlock = state == "disabled"
 
-    module_user = get_user_dict(displayname=module.params.get('displayname'),
-                                krbpasswordexpiration=module.params.get('krbpasswordexpiration'),
-                                givenname=module.params.get('givenname'),
-                                loginshell=module.params['loginshell'],
-                                mail=module.params['mail'], sn=module.params['sn'],
-                                sshpubkey=module.params['sshpubkey'], nsaccountlock=nsaccountlock,
-                                telephonenumber=module.params['telephonenumber'], title=module.params['title'],
-                                userpassword=module.params['password'],
-                                gidnumber=module.params.get('gidnumber'), uidnumber=module.params.get('uidnumber'),
-                                homedirectory=module.params.get('homedirectory'),
-                                userauthtype=module.params.get('userauthtype'))
+    module_user = get_user_dict(
+        displayname=module.params.get("displayname"),
+        krbpasswordexpiration=module.params.get("krbpasswordexpiration"),
+        givenname=module.params.get("givenname"),
+        loginshell=module.params["loginshell"],
+        mail=module.params["mail"],
+        sn=module.params["sn"],
+        sshpubkey=module.params["sshpubkey"],
+        nsaccountlock=nsaccountlock,
+        telephonenumber=module.params["telephonenumber"],
+        title=module.params["title"],
+        userpassword=module.params["password"],
+        gidnumber=module.params.get("gidnumber"),
+        uidnumber=module.params.get("uidnumber"),
+        homedirectory=module.params.get("homedirectory"),
+        userauthtype=module.params.get("userauthtype"),
+    )
 
-    update_password = module.params.get('update_password')
+    update_password = module.params.get("update_password")
     ipa_user = client.user_find(name=name)
 
     changed = False
-    if state in ['present', 'enabled', 'disabled']:
+    if state in ["present", "enabled", "disabled"]:
         if not ipa_user:
             changed = True
             if not module.check_mode:
                 ipa_user = client.user_add(name=name, item=module_user)
         else:
-            if update_password == 'on_create':
-                module_user.pop('userpassword', None)
+            if update_password == "on_create":
+                module_user.pop("userpassword", None)
             diff = get_user_diff(client, ipa_user, module_user)
             if len(diff) > 0:
                 changed = True
@@ -360,51 +379,51 @@ def ensure(module, client):
 
 def main():
     argument_spec = ipa_argument_spec()
-    argument_spec.update(displayname=dict(type='str'),
-                         givenname=dict(type='str'),
-                         update_password=dict(type='str', default="always",
-                                              choices=['always', 'on_create'],
-                                              no_log=False),
-                         krbpasswordexpiration=dict(type='str', no_log=False),
-                         loginshell=dict(type='str'),
-                         mail=dict(type='list', elements='str'),
-                         sn=dict(type='str'),
-                         uid=dict(type='str', required=True, aliases=['name']),
-                         gidnumber=dict(type='str'),
-                         uidnumber=dict(type='str'),
-                         password=dict(type='str', no_log=True),
-                         sshpubkey=dict(type='list', elements='str'),
-                         state=dict(type='str', default='present',
-                                    choices=['present', 'absent', 'enabled', 'disabled']),
-                         telephonenumber=dict(type='list', elements='str'),
-                         title=dict(type='str'),
-                         homedirectory=dict(type='str'),
-                         userauthtype=dict(type='list', elements='str',
-                                           choices=['password', 'radius', 'otp', 'pkinit', 'hardened', 'idp', 'passkey']))
+    argument_spec.update(
+        displayname=dict(type="str"),
+        givenname=dict(type="str"),
+        update_password=dict(type="str", default="always", choices=["always", "on_create"], no_log=False),
+        krbpasswordexpiration=dict(type="str", no_log=False),
+        loginshell=dict(type="str"),
+        mail=dict(type="list", elements="str"),
+        sn=dict(type="str"),
+        uid=dict(type="str", required=True, aliases=["name"]),
+        gidnumber=dict(type="str"),
+        uidnumber=dict(type="str"),
+        password=dict(type="str", no_log=True),
+        sshpubkey=dict(type="list", elements="str"),
+        state=dict(type="str", default="present", choices=["present", "absent", "enabled", "disabled"]),
+        telephonenumber=dict(type="list", elements="str"),
+        title=dict(type="str"),
+        homedirectory=dict(type="str"),
+        userauthtype=dict(
+            type="list", elements="str", choices=["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey"]
+        ),
+    )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    client = UserIPAClient(module=module,
-                           host=module.params['ipa_host'],
-                           port=module.params['ipa_port'],
-                           protocol=module.params['ipa_prot'])
+    client = UserIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
 
     # If sshpubkey is defined as None than module.params['sshpubkey'] is [None]. IPA itself returns None (not a list).
     # Therefore a small check here to replace list(None) by None. Otherwise get_user_diff() would return sshpubkey
     # as different which should be avoided.
-    if module.params['sshpubkey'] is not None:
-        if len(module.params['sshpubkey']) == 1 and module.params['sshpubkey'][0] == "":
-            module.params['sshpubkey'] = None
+    if module.params["sshpubkey"] is not None:
+        if len(module.params["sshpubkey"]) == 1 and module.params["sshpubkey"][0] == "":
+            module.params["sshpubkey"] = None
 
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, user = ensure(module, client)
         module.exit_json(changed=changed, user=user)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

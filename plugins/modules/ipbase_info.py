@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2023, Dominik Kukacka <dominik.kukacka@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: "ipbase_info"
@@ -216,18 +214,15 @@ data:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible.module_utils.urls import fetch_url
-
-from ansible.module_utils.six.moves.urllib.parse import urlencode
-
-
-USER_AGENT = 'ansible-community.general.ipbase_info/0.1.0'
-BASE_URL = 'https://api.ipbase.com/v2/info'
+from urllib.parse import urlencode
 
 
-class IpbaseInfo(object):
+USER_AGENT = "ansible-community.general.ipbase_info/0.1.0"
+BASE_URL = "https://api.ipbase.com/v2/info"
 
+
+class IpbaseInfo:
     def __init__(self, module):
         self.module = module
 
@@ -238,57 +233,55 @@ class IpbaseInfo(object):
             force=True,
             timeout=10,
             headers={
-                'Accept': 'application/json',
-                'User-Agent': USER_AGENT,
-            })
+                "Accept": "application/json",
+                "User-Agent": USER_AGENT,
+            },
+        )
 
-        if info['status'] != 200:
-            self.module.fail_json(msg='The API request to ipbase.com returned an error status code {0}'.format(info['status']))
+        if info["status"] != 200:
+            self.module.fail_json(msg=f"The API request to ipbase.com returned an error status code {info['status']}")
         else:
             try:
                 content = response.read()
-                result = self.module.from_json(content.decode('utf8'))
+                result = self.module.from_json(content.decode("utf8"))
             except ValueError:
-                self.module.fail_json(
-                    msg='Failed to parse the ipbase.com response: '
-                    '{0} {1}'.format(url, content))
+                self.module.fail_json(msg=f"Failed to parse the ipbase.com response: {url} {content}")
             else:
                 return result
 
     def info(self):
-
-        ip = self.module.params['ip']
-        apikey = self.module.params['apikey']
-        hostname = self.module.params['hostname']
-        language = self.module.params['language']
+        ip = self.module.params["ip"]
+        apikey = self.module.params["apikey"]
+        hostname = self.module.params["hostname"]
+        language = self.module.params["language"]
 
         url = BASE_URL
 
         params = {}
         if ip:
-            params['ip'] = ip
+            params["ip"] = ip
 
         if apikey:
-            params['apikey'] = apikey
+            params["apikey"] = apikey
 
         if hostname:
-            params['hostname'] = 1
+            params["hostname"] = 1
 
         if language:
-            params['language'] = language
+            params["language"] = language
 
         if params:
-            url += '?' + urlencode(params)
+            url += f"?{urlencode(params)}"
 
         return self._get_url_data(url)
 
 
 def main():
     module_args = dict(
-        ip=dict(type='str', no_log=False),
-        apikey=dict(type='str', no_log=True),
-        hostname=dict(type='bool', no_log=False, default=False),
-        language=dict(type='str', no_log=False, default='en'),
+        ip=dict(type="str", no_log=False),
+        apikey=dict(type="str", no_log=True),
+        hostname=dict(type="bool", no_log=False, default=False),
+        language=dict(type="str", no_log=False, default="en"),
     )
 
     module = AnsibleModule(
@@ -300,5 +293,5 @@ def main():
     module.exit_json(**ipbase.info())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

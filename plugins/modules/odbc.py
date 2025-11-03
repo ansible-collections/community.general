@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, John Westcott <john.westcott.iv@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: odbc
@@ -85,11 +83,11 @@ row_count:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 HAS_PYODBC = None
 try:
     import pyodbc
+
     HAS_PYODBC = True
 except ImportError as e:
     HAS_PYODBC = False
@@ -98,27 +96,27 @@ except ImportError as e:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dsn=dict(type='str', required=True, no_log=True),
-            query=dict(type='str', required=True),
-            params=dict(type='list', elements='str'),
-            commit=dict(type='bool', default=True),
+            dsn=dict(type="str", required=True, no_log=True),
+            query=dict(type="str", required=True),
+            params=dict(type="list", elements="str"),
+            commit=dict(type="bool", default=True),
         ),
     )
 
-    dsn = module.params.get('dsn')
-    query = module.params.get('query')
-    params = module.params.get('params')
-    commit = module.params.get('commit')
+    dsn = module.params.get("dsn")
+    query = module.params.get("query")
+    params = module.params.get("params")
+    commit = module.params.get("commit")
 
     if not HAS_PYODBC:
-        module.fail_json(msg=missing_required_lib('pyodbc'))
+        module.fail_json(msg=missing_required_lib("pyodbc"))
 
     # Try to make a connection with the DSN
     connection = None
     try:
         connection = pyodbc.connect(dsn)
     except Exception as e:
-        module.fail_json(msg='Failed to connect to DSN: {0}'.format(to_native(e)))
+        module.fail_json(msg=f"Failed to connect to DSN: {e}")
 
     result = dict(
         changed=True,
@@ -139,37 +137,35 @@ def main():
         try:
             # Get the rows out into an 2d array
             for row in cursor.fetchall():
-                new_row = []
-                for column in row:
-                    new_row.append("{0}".format(column))
-                result['results'].append(new_row)
+                new_row = [f"{column}" for column in row]
+                result["results"].append(new_row)
 
             # Return additional information from the cursor
             for row_description in cursor.description:
                 description = {}
-                description['name'] = row_description[0]
-                description['type'] = row_description[1].__name__
-                description['display_size'] = row_description[2]
-                description['internal_size'] = row_description[3]
-                description['precision'] = row_description[4]
-                description['scale'] = row_description[5]
-                description['nullable'] = row_description[6]
-                result['description'].append(description)
+                description["name"] = row_description[0]
+                description["type"] = row_description[1].__name__
+                description["display_size"] = row_description[2]
+                description["internal_size"] = row_description[3]
+                description["precision"] = row_description[4]
+                description["scale"] = row_description[5]
+                description["nullable"] = row_description[6]
+                result["description"].append(description)
 
-            result['row_count'] = cursor.rowcount
+            result["row_count"] = cursor.rowcount
         except pyodbc.ProgrammingError as pe:
             pass
         except Exception as e:
-            module.fail_json(msg="Exception while reading rows: {0}".format(to_native(e)))
+            module.fail_json(msg=f"Exception while reading rows: {e}")
 
         cursor.close()
     except Exception as e:
-        module.fail_json(msg="Failed to execute query: {0}".format(to_native(e)))
+        module.fail_json(msg=f"Failed to execute query: {e}")
     finally:
         connection.close()
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

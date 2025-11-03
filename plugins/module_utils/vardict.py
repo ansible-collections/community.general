@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
 # (c) 2023, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2023, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 import copy
 
 
-class _Variable(object):
+class _Variable:
     NOTHING = object()
 
     def __init__(self, diff=False, output=True, change=None, fact=False, verbosity=0):
@@ -96,17 +94,30 @@ class _Variable(object):
     @property
     def diff_result(self):
         if self.diff and self.has_changed:
-            return {'before': self.initial_value, 'after': self.value}
+            return {"before": self.initial_value, "after": self.value}
         return
 
     def __str__(self):
-        return "<Variable: value={0!r}, initial={1!r}, diff={2}, output={3}, change={4}, verbosity={5}>".format(
-            self.value, self.initial_value, self.diff, self.output, self.change, self.verbosity
+        return (
+            f"<Variable: value={self.value!r}, initial={self.initial_value!r}, diff={self.diff}, "
+            f"output={self.output}, change={self.change}, verbosity={self.verbosity}>"
         )
 
 
-class VarDict(object):
-    reserved_names = ('__vars__', '_var', 'var', 'set_meta', 'get_meta', 'set', 'output', 'diff', 'facts', 'has_changed', 'as_dict')
+class VarDict:
+    reserved_names = (
+        "__vars__",
+        "_var",
+        "var",
+        "set_meta",
+        "get_meta",
+        "set",
+        "output",
+        "diff",
+        "facts",
+        "has_changed",
+        "as_dict",
+    )
 
     def __init__(self):
         self.__vars__ = dict()
@@ -121,11 +132,11 @@ class VarDict(object):
         try:
             return self.__vars__[item].value
         except KeyError:
-            return getattr(super(VarDict, self), item)
+            return getattr(super(), item)
 
     def __setattr__(self, key, value):
-        if key == '__vars__':
-            super(VarDict, self).__setattr__(key, value)
+        if key == "__vars__":
+            super().__setattr__(key, value)
         else:
             self.set(key, value)
 
@@ -165,7 +176,7 @@ class VarDict(object):
             ValueError: Raised if trying to set a variable with a reserved name.
         """
         if name in self.reserved_names:
-            raise ValueError("Name {0} is reserved".format(name))
+            raise ValueError(f"Name {name} is reserved")
         if name in self.__vars__:
             var = self._var(name)
             var.set_meta(**kwargs)
@@ -178,11 +189,13 @@ class VarDict(object):
         return {n: v.value for n, v in self.__vars__.items() if v.output and v.is_visible(verbosity)}
 
     def diff(self, verbosity=0):
-        diff_results = [(n, v.diff_result) for n, v in self.__vars__.items() if v.diff_result and v.is_visible(verbosity)]
+        diff_results = [
+            (n, v.diff_result) for n, v in self.__vars__.items() if v.diff_result and v.is_visible(verbosity)
+        ]
         if diff_results:
-            before = {n: dr['before'] for n, dr in diff_results}
-            after = {n: dr['after'] for n, dr in diff_results}
-            return {'before': before, 'after': after}
+            before = {n: dr["before"] for n, dr in diff_results}
+            after = {n: dr["after"] for n, dr in diff_results}
+            return {"before": before, "after": after}
         return None
 
     def facts(self, verbosity=0):

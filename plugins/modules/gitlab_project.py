@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # Copyright (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: gitlab_project
@@ -411,159 +409,170 @@ project:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab
+    auth_argument_spec,
+    find_group,
+    find_project,
+    gitlab_authentication,
+    gitlab,
 )
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
-class GitLabProject(object):
+class GitLabProject:
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
         self.project_object = None
 
-    '''
+    """
     @param project_name Name of the project
     @param namespace Namespace Object (User or Group)
     @param options Options of the project
-    '''
+    """
+
     def create_or_update_project(self, module, project_name, namespace, options):
         changed = False
         project_options = {
-            'allow_merge_on_skipped_pipeline': options['allow_merge_on_skipped_pipeline'],
-            'builds_access_level': options['builds_access_level'],
-            'build_timeout': options['build_timeout'],
-            'ci_config_path': options['ci_config_path'],
-            'container_expiration_policy': options['container_expiration_policy'],
-            'container_registry_access_level': options['container_registry_access_level'],
-            'description': options['description'],
-            'environments_access_level': options['environments_access_level'],
-            'feature_flags_access_level': options['feature_flags_access_level'],
-            'forking_access_level': options['forking_access_level'],
-            'infrastructure_access_level': options['infrastructure_access_level'],
-            'issues_access_level': options['issues_access_level'],
-            'issues_enabled': options['issues_enabled'],
-            'lfs_enabled': options['lfs_enabled'],
-            'merge_method': options['merge_method'],
-            'merge_requests_enabled': options['merge_requests_enabled'],
-            'model_registry_access_level': options['model_registry_access_level'],
-            'monitor_access_level': options['monitor_access_level'],
-            'name': project_name,
-            'only_allow_merge_if_all_discussions_are_resolved': options['only_allow_merge_if_all_discussions_are_resolved'],
-            'only_allow_merge_if_pipeline_succeeds': options['only_allow_merge_if_pipeline_succeeds'],
-            'packages_enabled': options['packages_enabled'],
-            'pages_access_level': options['pages_access_level'],
-            'releases_access_level': options['releases_access_level'],
-            'remove_source_branch_after_merge': options['remove_source_branch_after_merge'],
-            'repository_access_level': options['repository_access_level'],
-            'security_and_compliance_access_level': options['security_and_compliance_access_level'],
-            'service_desk_enabled': options['service_desk_enabled'],
-            'shared_runners_enabled': options['shared_runners_enabled'],
-            'snippets_enabled': options['snippets_enabled'],
-            'squash_option': options['squash_option'],
-            'visibility': options['visibility'],
-            'wiki_enabled': options['wiki_enabled'],
+            "allow_merge_on_skipped_pipeline": options["allow_merge_on_skipped_pipeline"],
+            "builds_access_level": options["builds_access_level"],
+            "build_timeout": options["build_timeout"],
+            "ci_config_path": options["ci_config_path"],
+            "container_expiration_policy": options["container_expiration_policy"],
+            "container_registry_access_level": options["container_registry_access_level"],
+            "description": options["description"],
+            "environments_access_level": options["environments_access_level"],
+            "feature_flags_access_level": options["feature_flags_access_level"],
+            "forking_access_level": options["forking_access_level"],
+            "infrastructure_access_level": options["infrastructure_access_level"],
+            "issues_access_level": options["issues_access_level"],
+            "issues_enabled": options["issues_enabled"],
+            "lfs_enabled": options["lfs_enabled"],
+            "merge_method": options["merge_method"],
+            "merge_requests_enabled": options["merge_requests_enabled"],
+            "model_registry_access_level": options["model_registry_access_level"],
+            "monitor_access_level": options["monitor_access_level"],
+            "name": project_name,
+            "only_allow_merge_if_all_discussions_are_resolved": options[
+                "only_allow_merge_if_all_discussions_are_resolved"
+            ],
+            "only_allow_merge_if_pipeline_succeeds": options["only_allow_merge_if_pipeline_succeeds"],
+            "packages_enabled": options["packages_enabled"],
+            "pages_access_level": options["pages_access_level"],
+            "releases_access_level": options["releases_access_level"],
+            "remove_source_branch_after_merge": options["remove_source_branch_after_merge"],
+            "repository_access_level": options["repository_access_level"],
+            "security_and_compliance_access_level": options["security_and_compliance_access_level"],
+            "service_desk_enabled": options["service_desk_enabled"],
+            "shared_runners_enabled": options["shared_runners_enabled"],
+            "snippets_enabled": options["snippets_enabled"],
+            "squash_option": options["squash_option"],
+            "visibility": options["visibility"],
+            "wiki_enabled": options["wiki_enabled"],
         }
 
         # topics was introduced on gitlab >=14 and replace tag_list. We get current gitlab version
         # and check if less than 14. If yes we use tag_list instead topics
         if LooseVersion(self._gitlab.version()[0]) < LooseVersion("14"):
-            project_options['tag_list'] = options['topics']
+            project_options["tag_list"] = options["topics"]
         else:
-            project_options['topics'] = options['topics']
+            project_options["topics"] = options["topics"]
 
         # Because we have already call userExists in main()
         if self.project_object is None:
-            if options['default_branch'] and not options['initialize_with_readme']:
+            if options["default_branch"] and not options["initialize_with_readme"]:
                 module.fail_json(msg="Param default_branch needs param initialize_with_readme set to true")
-            project_options.update({
-                'path': options['path'],
-                'import_url': options['import_url'],
-            })
-            if options['initialize_with_readme']:
-                project_options['initialize_with_readme'] = options['initialize_with_readme']
-                if options['default_branch']:
-                    project_options['default_branch'] = options['default_branch']
+            project_options.update(
+                {
+                    "path": options["path"],
+                    "import_url": options["import_url"],
+                }
+            )
+            if options["initialize_with_readme"]:
+                project_options["initialize_with_readme"] = options["initialize_with_readme"]
+                if options["default_branch"]:
+                    project_options["default_branch"] = options["default_branch"]
 
             project_options = self.get_options_with_value(project_options)
             project = self.create_project(namespace, project_options)
 
             # add avatar to project
-            if options['avatar_path']:
+            if options["avatar_path"]:
                 try:
-                    project.avatar = open(options['avatar_path'], 'rb')
+                    project.avatar = open(options["avatar_path"], "rb")
                 except IOError as e:
-                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+                    self._module.fail_json(msg=f"Cannot open {options['avatar_path']}: {e}")
 
             changed = True
         else:
-            if options['default_branch']:
-                project_options['default_branch'] = options['default_branch']
+            if options["default_branch"]:
+                project_options["default_branch"] = options["default_branch"]
             changed, project = self.update_project(self.project_object, project_options)
 
         self.project_object = project
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the project {project_name}")
 
             try:
                 project.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update project: %s " % e)
+                self._module.fail_json(msg=f"Failed to update project: {e} ")
             return True
         return False
 
-    '''
+    """
     @param namespace Namespace Object (User or Group)
     @param arguments Attributes of the project
-    '''
+    """
+
     def create_project(self, namespace, arguments):
         if self._module.check_mode:
             return True
 
-        arguments['namespace_id'] = namespace.id
-        if 'container_expiration_policy' in arguments:
-            arguments['container_expiration_policy_attributes'] = arguments['container_expiration_policy']
+        arguments["namespace_id"] = namespace.id
+        if "container_expiration_policy" in arguments:
+            arguments["container_expiration_policy_attributes"] = arguments["container_expiration_policy"]
         try:
             project = self._gitlab.projects.create(arguments)
-        except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create project: %s " % to_native(e))
+        except gitlab.exceptions.GitlabCreateError as e:
+            self._module.fail_json(msg=f"Failed to create project: {e} ")
 
         return project
 
-    '''
+    """
     @param arguments Attributes of the project
-    '''
+    """
+
     def get_options_with_value(self, arguments):
         ret_arguments = {k: v for k, v in arguments.items() if v is not None}
         return ret_arguments
 
-    '''
+    """
     @param project Project Object
     @param arguments Attributes of the project
-    '''
+    """
+
     def update_project(self, project, arguments):
         changed = False
 
         for arg_key, arg_value in arguments.items():
             if arg_value is not None:
                 if getattr(project, arg_key, None) != arg_value:
-                    if arg_key == 'container_expiration_policy':
+                    if arg_key == "container_expiration_policy":
                         old_val = getattr(project, arg_key, {})
                         final_val = {key: value for key, value in arg_value.items() if value is not None}
 
-                        if final_val.get('older_than') == '0d':
-                            final_val['older_than'] = None
-                        if final_val.get('keep_n') == 0:
-                            final_val['keep_n'] = None
+                        if final_val.get("older_than") == "0d":
+                            final_val["older_than"] = None
+                        if final_val.get("keep_n") == 0:
+                            final_val["keep_n"] = None
 
                         if all(old_val.get(key) == value for key, value in final_val.items()):
                             continue
-                        setattr(project, 'container_expiration_policy_attributes', final_val)
+                        setattr(project, "container_expiration_policy_attributes", final_val)
                     else:
                         setattr(project, arg_key, arg_value)
                     changed = True
@@ -578,13 +587,14 @@ class GitLabProject(object):
 
         return project.delete()
 
-    '''
+    """
     @param namespace User/Group object
     @param name Name of the project
-    '''
+    """
+
     def exists_project(self, namespace, path):
         # When project exists, object will be stored in self.project_object.
-        project = find_project(self._gitlab, namespace.full_path + '/' + path)
+        project = find_project(self._gitlab, f"{namespace.full_path}/{path}")
         if project:
             self.project_object = project
             return True
@@ -594,123 +604,128 @@ class GitLabProject(object):
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
-    argument_spec.update(dict(
-        allow_merge_on_skipped_pipeline=dict(type='bool'),
-        avatar_path=dict(type='path'),
-        builds_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        build_timeout=dict(type='int'),
-        ci_config_path=dict(type='str'),
-        container_expiration_policy=dict(type='dict', options=dict(
-            cadence=dict(type='str', choices=["1d", "7d", "14d", "1month", "3month"]),
-            enabled=dict(type='bool'),
-            keep_n=dict(type='int', choices=[0, 1, 5, 10, 25, 50, 100]),
-            older_than=dict(type='str', choices=["0d", "7d", "14d", "30d", "90d"]),
-            name_regex=dict(type='str'),
-            name_regex_keep=dict(type='str'),
-        )),
-        container_registry_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        default_branch=dict(type='str'),
-        description=dict(type='str'),
-        environments_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        feature_flags_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        forking_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        group=dict(type='str'),
-        import_url=dict(type='str'),
-        infrastructure_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        initialize_with_readme=dict(type='bool', default=False),
-        issues_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        issues_enabled=dict(type='bool', default=True),
-        lfs_enabled=dict(default=False, type='bool'),
-        merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
-        merge_requests_enabled=dict(type='bool', default=True),
-        model_registry_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        monitor_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        name=dict(type='str', required=True),
-        only_allow_merge_if_all_discussions_are_resolved=dict(type='bool'),
-        only_allow_merge_if_pipeline_succeeds=dict(type='bool'),
-        packages_enabled=dict(type='bool'),
-        pages_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        path=dict(type='str'),
-        releases_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        remove_source_branch_after_merge=dict(type='bool'),
-        repository_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        service_desk_enabled=dict(type='bool'),
-        shared_runners_enabled=dict(type='bool'),
-        snippets_enabled=dict(default=True, type='bool'),
-        squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
-        topics=dict(type='list', elements='str'),
-        username=dict(type='str'),
-        visibility=dict(type='str', default="private", choices=["internal", "private", "public"], aliases=["visibility_level"]),
-        wiki_enabled=dict(type='bool', default=True),
-    ))
+    argument_spec.update(
+        dict(
+            allow_merge_on_skipped_pipeline=dict(type="bool"),
+            avatar_path=dict(type="path"),
+            builds_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            build_timeout=dict(type="int"),
+            ci_config_path=dict(type="str"),
+            container_expiration_policy=dict(
+                type="dict",
+                options=dict(
+                    cadence=dict(type="str", choices=["1d", "7d", "14d", "1month", "3month"]),
+                    enabled=dict(type="bool"),
+                    keep_n=dict(type="int", choices=[0, 1, 5, 10, 25, 50, 100]),
+                    older_than=dict(type="str", choices=["0d", "7d", "14d", "30d", "90d"]),
+                    name_regex=dict(type="str"),
+                    name_regex_keep=dict(type="str"),
+                ),
+            ),
+            container_registry_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            default_branch=dict(type="str"),
+            description=dict(type="str"),
+            environments_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            feature_flags_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            forking_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            group=dict(type="str"),
+            import_url=dict(type="str"),
+            infrastructure_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            initialize_with_readme=dict(type="bool", default=False),
+            issues_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            issues_enabled=dict(type="bool", default=True),
+            lfs_enabled=dict(default=False, type="bool"),
+            merge_method=dict(type="str", default="merge", choices=["merge", "rebase_merge", "ff"]),
+            merge_requests_enabled=dict(type="bool", default=True),
+            model_registry_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            monitor_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            name=dict(type="str", required=True),
+            only_allow_merge_if_all_discussions_are_resolved=dict(type="bool"),
+            only_allow_merge_if_pipeline_succeeds=dict(type="bool"),
+            packages_enabled=dict(type="bool"),
+            pages_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            path=dict(type="str"),
+            releases_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            remove_source_branch_after_merge=dict(type="bool"),
+            repository_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            security_and_compliance_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
+            service_desk_enabled=dict(type="bool"),
+            shared_runners_enabled=dict(type="bool"),
+            snippets_enabled=dict(default=True, type="bool"),
+            squash_option=dict(type="str", choices=["never", "always", "default_off", "default_on"]),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            topics=dict(type="list", elements="str"),
+            username=dict(type="str"),
+            visibility=dict(
+                type="str", default="private", choices=["internal", "private", "public"], aliases=["visibility_level"]
+            ),
+            wiki_enabled=dict(type="bool", default=True),
+        )
+    )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
-            ['group', 'username'],
-            ['issues_access_level', 'issues_enabled'],
+            ["api_username", "api_token"],
+            ["api_username", "api_oauth_token"],
+            ["api_username", "api_job_token"],
+            ["api_token", "api_oauth_token"],
+            ["api_token", "api_job_token"],
+            ["group", "username"],
+            ["issues_access_level", "issues_enabled"],
         ],
         required_together=[
-            ['api_username', 'api_password'],
+            ["api_username", "api_password"],
         ],
-        required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
-        ],
+        required_one_of=[["api_username", "api_token", "api_oauth_token", "api_job_token"]],
         supports_check_mode=True,
     )
 
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
-    allow_merge_on_skipped_pipeline = module.params['allow_merge_on_skipped_pipeline']
-    avatar_path = module.params['avatar_path']
-    builds_access_level = module.params['builds_access_level']
-    build_timeout = module.params['build_timeout']
-    ci_config_path = module.params['ci_config_path']
-    container_expiration_policy = module.params['container_expiration_policy']
-    container_registry_access_level = module.params['container_registry_access_level']
-    default_branch = module.params['default_branch']
-    environments_access_level = module.params['environments_access_level']
-    feature_flags_access_level = module.params['feature_flags_access_level']
-    forking_access_level = module.params['forking_access_level']
-    group_identifier = module.params['group']
-    import_url = module.params['import_url']
-    infrastructure_access_level = module.params['infrastructure_access_level']
-    initialize_with_readme = module.params['initialize_with_readme']
-    issues_access_level = module.params['issues_access_level']
-    issues_enabled = module.params['issues_enabled']
-    lfs_enabled = module.params['lfs_enabled']
-    merge_method = module.params['merge_method']
-    merge_requests_enabled = module.params['merge_requests_enabled']
-    model_registry_access_level = module.params['model_registry_access_level']
-    monitor_access_level = module.params['monitor_access_level']
-    only_allow_merge_if_all_discussions_are_resolved = module.params['only_allow_merge_if_all_discussions_are_resolved']
-    only_allow_merge_if_pipeline_succeeds = module.params['only_allow_merge_if_pipeline_succeeds']
-    packages_enabled = module.params['packages_enabled']
-    pages_access_level = module.params['pages_access_level']
-    project_description = module.params['description']
-    project_name = module.params['name']
-    project_path = module.params['path']
-    releases_access_level = module.params['releases_access_level']
-    remove_source_branch_after_merge = module.params['remove_source_branch_after_merge']
-    repository_access_level = module.params['repository_access_level']
-    security_and_compliance_access_level = module.params['security_and_compliance_access_level']
-    service_desk_enabled = module.params['service_desk_enabled']
-    shared_runners_enabled = module.params['shared_runners_enabled']
-    snippets_enabled = module.params['snippets_enabled']
-    squash_option = module.params['squash_option']
-    state = module.params['state']
-    topics = module.params['topics']
-    username = module.params['username']
-    visibility = module.params['visibility']
-    wiki_enabled = module.params['wiki_enabled']
+    allow_merge_on_skipped_pipeline = module.params["allow_merge_on_skipped_pipeline"]
+    avatar_path = module.params["avatar_path"]
+    builds_access_level = module.params["builds_access_level"]
+    build_timeout = module.params["build_timeout"]
+    ci_config_path = module.params["ci_config_path"]
+    container_expiration_policy = module.params["container_expiration_policy"]
+    container_registry_access_level = module.params["container_registry_access_level"]
+    default_branch = module.params["default_branch"]
+    environments_access_level = module.params["environments_access_level"]
+    feature_flags_access_level = module.params["feature_flags_access_level"]
+    forking_access_level = module.params["forking_access_level"]
+    group_identifier = module.params["group"]
+    import_url = module.params["import_url"]
+    infrastructure_access_level = module.params["infrastructure_access_level"]
+    initialize_with_readme = module.params["initialize_with_readme"]
+    issues_access_level = module.params["issues_access_level"]
+    issues_enabled = module.params["issues_enabled"]
+    lfs_enabled = module.params["lfs_enabled"]
+    merge_method = module.params["merge_method"]
+    merge_requests_enabled = module.params["merge_requests_enabled"]
+    model_registry_access_level = module.params["model_registry_access_level"]
+    monitor_access_level = module.params["monitor_access_level"]
+    only_allow_merge_if_all_discussions_are_resolved = module.params["only_allow_merge_if_all_discussions_are_resolved"]
+    only_allow_merge_if_pipeline_succeeds = module.params["only_allow_merge_if_pipeline_succeeds"]
+    packages_enabled = module.params["packages_enabled"]
+    pages_access_level = module.params["pages_access_level"]
+    project_description = module.params["description"]
+    project_name = module.params["name"]
+    project_path = module.params["path"]
+    releases_access_level = module.params["releases_access_level"]
+    remove_source_branch_after_merge = module.params["remove_source_branch_after_merge"]
+    repository_access_level = module.params["repository_access_level"]
+    security_and_compliance_access_level = module.params["security_and_compliance_access_level"]
+    service_desk_enabled = module.params["service_desk_enabled"]
+    shared_runners_enabled = module.params["shared_runners_enabled"]
+    snippets_enabled = module.params["snippets_enabled"]
+    squash_option = module.params["squash_option"]
+    state = module.params["state"]
+    topics = module.params["topics"]
+    username = module.params["username"]
+    visibility = module.params["visibility"]
+    wiki_enabled = module.params["wiki_enabled"]
 
     # Set project_path to project_name if it is empty.
     if project_path is None:
@@ -723,7 +738,7 @@ def main():
     if group_identifier:
         group = find_group(gitlab_instance, group_identifier)
         if group is None:
-            module.fail_json(msg="Failed to create project: group %s doesn't exist" % group_identifier)
+            module.fail_json(msg=f"Failed to create project: group {group_identifier} doesn't exist")
 
         namespace_id = group.id
     else:
@@ -739,64 +754,75 @@ def main():
     try:
         namespace = gitlab_instance.namespaces.get(namespace_id)
     except gitlab.exceptions.GitlabGetError as e:
-        module.fail_json(msg="Failed to find the namespace for the given user: %s" % to_native(e))
+        module.fail_json(msg=f"Failed to find the namespace for the given user: {e}")
 
     if not namespace:
         module.fail_json(msg="Failed to find the namespace for the project")
     project_exists = gitlab_project.exists_project(namespace, project_path)
 
-    if state == 'absent':
+    if state == "absent":
         if project_exists:
             gitlab_project.delete_project()
-            module.exit_json(changed=True, msg="Successfully deleted project %s" % project_name)
+            module.exit_json(changed=True, msg=f"Successfully deleted project {project_name}")
         module.exit_json(changed=False, msg="Project deleted or does not exist")
 
-    if state == 'present':
+    if state == "present":
+        if gitlab_project.create_or_update_project(
+            module,
+            project_name,
+            namespace,
+            {
+                "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
+                "avatar_path": avatar_path,
+                "builds_access_level": builds_access_level,
+                "build_timeout": build_timeout,
+                "ci_config_path": ci_config_path,
+                "container_expiration_policy": container_expiration_policy,
+                "container_registry_access_level": container_registry_access_level,
+                "default_branch": default_branch,
+                "description": project_description,
+                "environments_access_level": environments_access_level,
+                "feature_flags_access_level": feature_flags_access_level,
+                "forking_access_level": forking_access_level,
+                "import_url": import_url,
+                "infrastructure_access_level": infrastructure_access_level,
+                "initialize_with_readme": initialize_with_readme,
+                "issues_access_level": issues_access_level,
+                "issues_enabled": issues_enabled,
+                "lfs_enabled": lfs_enabled,
+                "merge_method": merge_method,
+                "merge_requests_enabled": merge_requests_enabled,
+                "model_registry_access_level": model_registry_access_level,
+                "monitor_access_level": monitor_access_level,
+                "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
+                "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
+                "packages_enabled": packages_enabled,
+                "pages_access_level": pages_access_level,
+                "path": project_path,
+                "releases_access_level": releases_access_level,
+                "remove_source_branch_after_merge": remove_source_branch_after_merge,
+                "repository_access_level": repository_access_level,
+                "security_and_compliance_access_level": security_and_compliance_access_level,
+                "service_desk_enabled": service_desk_enabled,
+                "shared_runners_enabled": shared_runners_enabled,
+                "snippets_enabled": snippets_enabled,
+                "squash_option": squash_option,
+                "topics": topics,
+                "visibility": visibility,
+                "wiki_enabled": wiki_enabled,
+            },
+        ):
+            module.exit_json(
+                changed=True,
+                msg=f"Successfully created or updated the project {project_name}",
+                project=gitlab_project.project_object._attrs,
+            )
+        module.exit_json(
+            changed=False,
+            msg=f"No need to update the project {project_name}",
+            project=gitlab_project.project_object._attrs,
+        )
 
-        if gitlab_project.create_or_update_project(module, project_name, namespace, {
-            "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
-            "avatar_path": avatar_path,
-            "builds_access_level": builds_access_level,
-            "build_timeout": build_timeout,
-            "ci_config_path": ci_config_path,
-            "container_expiration_policy": container_expiration_policy,
-            "container_registry_access_level": container_registry_access_level,
-            "default_branch": default_branch,
-            "description": project_description,
-            "environments_access_level": environments_access_level,
-            "feature_flags_access_level": feature_flags_access_level,
-            "forking_access_level": forking_access_level,
-            "import_url": import_url,
-            "infrastructure_access_level": infrastructure_access_level,
-            "initialize_with_readme": initialize_with_readme,
-            "issues_access_level": issues_access_level,
-            "issues_enabled": issues_enabled,
-            "lfs_enabled": lfs_enabled,
-            "merge_method": merge_method,
-            "merge_requests_enabled": merge_requests_enabled,
-            "model_registry_access_level": model_registry_access_level,
-            "monitor_access_level": monitor_access_level,
-            "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
-            "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
-            "packages_enabled": packages_enabled,
-            "pages_access_level": pages_access_level,
-            "path": project_path,
-            "releases_access_level": releases_access_level,
-            "remove_source_branch_after_merge": remove_source_branch_after_merge,
-            "repository_access_level": repository_access_level,
-            "security_and_compliance_access_level": security_and_compliance_access_level,
-            "service_desk_enabled": service_desk_enabled,
-            "shared_runners_enabled": shared_runners_enabled,
-            "snippets_enabled": snippets_enabled,
-            "squash_option": squash_option,
-            "topics": topics,
-            "visibility": visibility,
-            "wiki_enabled": wiki_enabled,
-        }):
 
-            module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
-        module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.project_object._attrs)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

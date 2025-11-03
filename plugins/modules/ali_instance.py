@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017-present Alibaba Group Holding Limited. He Guimin <heguimin36@163.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -20,9 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible. If not, see http://www.gnu.org/licenses/.
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: ali_instance
@@ -620,7 +618,10 @@ import re
 import time
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
-    ecs_argument_spec, ecs_connect, FOOTMARK_IMP_ERR, HAS_FOOTMARK
+    ecs_argument_spec,
+    ecs_connect,
+    FOOTMARK_IMP_ERR,
+    HAS_FOOTMARK,
 )
 
 
@@ -630,8 +631,8 @@ def get_instances_info(connection, ids):
     if len(instances) > 0:
         for inst in instances:
             volumes = connection.describe_disks(instance_id=inst.id)
-            setattr(inst, 'block_device_mappings', volumes)
-            setattr(inst, 'user_data', inst.describe_user_data())
+            setattr(inst, "block_device_mappings", volumes)
+            setattr(inst, "user_data", inst.describe_user_data())
             result.append(inst.read())
     return result
 
@@ -639,61 +640,84 @@ def get_instances_info(connection, ids):
 def run_instance(module, ecs, exact_count):
     if exact_count <= 0:
         return None
-    zone_id = module.params['availability_zone']
-    image_id = module.params['image_id']
-    instance_type = module.params['instance_type']
-    security_groups = module.params['security_groups']
-    vswitch_id = module.params['vswitch_id']
-    instance_name = module.params['instance_name']
-    description = module.params['description']
-    internet_charge_type = module.params['internet_charge_type']
-    max_bandwidth_out = module.params['max_bandwidth_out']
-    max_bandwidth_in = module.params['max_bandwidth_in']
-    host_name = module.params['host_name']
-    password = module.params['password']
-    system_disk_category = module.params['system_disk_category']
-    system_disk_size = module.params['system_disk_size']
-    system_disk_name = module.params['system_disk_name']
-    system_disk_description = module.params['system_disk_description']
-    allocate_public_ip = module.params['allocate_public_ip']
-    period = module.params['period']
-    auto_renew = module.params['auto_renew']
-    instance_charge_type = module.params['instance_charge_type']
-    auto_renew_period = module.params['auto_renew_period']
-    user_data = module.params['user_data']
-    key_name = module.params['key_name']
-    ram_role_name = module.params['ram_role_name']
-    spot_price_limit = module.params['spot_price_limit']
-    spot_strategy = module.params['spot_strategy']
-    unique_suffix = module.params['unique_suffix']
+    zone_id = module.params["availability_zone"]
+    image_id = module.params["image_id"]
+    instance_type = module.params["instance_type"]
+    security_groups = module.params["security_groups"]
+    vswitch_id = module.params["vswitch_id"]
+    instance_name = module.params["instance_name"]
+    description = module.params["description"]
+    internet_charge_type = module.params["internet_charge_type"]
+    max_bandwidth_out = module.params["max_bandwidth_out"]
+    max_bandwidth_in = module.params["max_bandwidth_in"]
+    host_name = module.params["host_name"]
+    password = module.params["password"]
+    system_disk_category = module.params["system_disk_category"]
+    system_disk_size = module.params["system_disk_size"]
+    system_disk_name = module.params["system_disk_name"]
+    system_disk_description = module.params["system_disk_description"]
+    allocate_public_ip = module.params["allocate_public_ip"]
+    period = module.params["period"]
+    auto_renew = module.params["auto_renew"]
+    instance_charge_type = module.params["instance_charge_type"]
+    auto_renew_period = module.params["auto_renew_period"]
+    user_data = module.params["user_data"]
+    key_name = module.params["key_name"]
+    ram_role_name = module.params["ram_role_name"]
+    spot_price_limit = module.params["spot_price_limit"]
+    spot_strategy = module.params["spot_strategy"]
+    unique_suffix = module.params["unique_suffix"]
     # check whether the required parameter passed or not
     if not image_id:
-        module.fail_json(msg='image_id is required for new instance')
+        module.fail_json(msg="image_id is required for new instance")
     if not instance_type:
-        module.fail_json(msg='instance_type is required for new instance')
+        module.fail_json(msg="instance_type is required for new instance")
     if not isinstance(security_groups, list):
-        module.fail_json(msg='The parameter security_groups should be a list, aborting')
+        module.fail_json(msg="The parameter security_groups should be a list, aborting")
     if len(security_groups) <= 0:
-        module.fail_json(msg='Expected the parameter security_groups is non-empty when create new ECS instances, aborting')
+        module.fail_json(
+            msg="Expected the parameter security_groups is non-empty when create new ECS instances, aborting"
+        )
 
-    client_token = "Ansible-Alicloud-{0}-{1}".format(hash(str(module.params)), str(time.time()))
+    client_token = f"Ansible-Alicloud-{hash(str(module.params))}-{time.time()}"
 
     try:
         # call to create_instance method from footmark
-        instances = ecs.run_instances(image_id=image_id, instance_type=instance_type, security_group_id=security_groups[0],
-                                      zone_id=zone_id, instance_name=instance_name, description=description,
-                                      internet_charge_type=internet_charge_type, internet_max_bandwidth_out=max_bandwidth_out,
-                                      internet_max_bandwidth_in=max_bandwidth_in, host_name=host_name, password=password,
-                                      io_optimized='optimized', system_disk_category=system_disk_category,
-                                      system_disk_size=system_disk_size, system_disk_disk_name=system_disk_name,
-                                      system_disk_description=system_disk_description, vswitch_id=vswitch_id,
-                                      amount=exact_count, instance_charge_type=instance_charge_type, period=period, period_unit="Month",
-                                      auto_renew=auto_renew, auto_renew_period=auto_renew_period, key_pair_name=key_name,
-                                      user_data=user_data, client_token=client_token, ram_role_name=ram_role_name,
-                                      spot_price_limit=spot_price_limit, spot_strategy=spot_strategy, unique_suffix=unique_suffix)
+        instances = ecs.run_instances(
+            image_id=image_id,
+            instance_type=instance_type,
+            security_group_id=security_groups[0],
+            zone_id=zone_id,
+            instance_name=instance_name,
+            description=description,
+            internet_charge_type=internet_charge_type,
+            internet_max_bandwidth_out=max_bandwidth_out,
+            internet_max_bandwidth_in=max_bandwidth_in,
+            host_name=host_name,
+            password=password,
+            io_optimized="optimized",
+            system_disk_category=system_disk_category,
+            system_disk_size=system_disk_size,
+            system_disk_disk_name=system_disk_name,
+            system_disk_description=system_disk_description,
+            vswitch_id=vswitch_id,
+            amount=exact_count,
+            instance_charge_type=instance_charge_type,
+            period=period,
+            period_unit="Month",
+            auto_renew=auto_renew,
+            auto_renew_period=auto_renew_period,
+            key_pair_name=key_name,
+            user_data=user_data,
+            client_token=client_token,
+            ram_role_name=ram_role_name,
+            spot_price_limit=spot_price_limit,
+            spot_strategy=spot_strategy,
+            unique_suffix=unique_suffix,
+        )
 
     except Exception as e:
-        module.fail_json(msg='Unable to create instance, error: {0}'.format(e))
+        module.fail_json(msg=f"Unable to create instance, error: {e}")
 
     return instances
 
@@ -701,16 +725,16 @@ def run_instance(module, ecs, exact_count):
 def modify_instance(module, instance):
     # According to state to modify instance's some special attribute
     state = module.params["state"]
-    name = module.params['instance_name']
-    unique_suffix = module.params['unique_suffix']
+    name = module.params["instance_name"]
+    unique_suffix = module.params["unique_suffix"]
     if not name:
         name = instance.name
 
-    description = module.params['description']
+    description = module.params["description"]
     if not description:
         description = instance.description
 
-    host_name = module.params['host_name']
+    host_name = module.params["host_name"]
     if unique_suffix and host_name:
         suffix = instance.host_name[-3:]
         host_name = host_name + suffix
@@ -721,18 +745,20 @@ def modify_instance(module, instance):
     # password can be modified only when restart instance
     password = ""
     if state == "restarted":
-        password = module.params['password']
+        password = module.params["password"]
 
     # userdata can be modified only when instance is stopped
     setattr(instance, "user_data", instance.describe_user_data())
     user_data = instance.user_data
     if state == "stopped":
-        user_data = module.params['user_data'].encode()
+        user_data = module.params["user_data"].encode()
 
     try:
-        return instance.modify(name=name, description=description, host_name=host_name, password=password, user_data=user_data)
+        return instance.modify(
+            name=name, description=description, host_name=host_name, password=password, user_data=user_data
+        )
     except Exception as e:
-        module.fail_json(msg="Modify instance {0} attribute got an error: {1}".format(instance.id, e))
+        module.fail_json(msg=f"Modify instance {instance.id} attribute got an error: {e}")
 
 
 def wait_for_instance_modify_charge(ecs, instance_ids, charge_type, delay=10, timeout=300):
@@ -751,97 +777,103 @@ def wait_for_instance_modify_charge(ecs, instance_ids, charge_type, delay=10, ti
             timeout -= delay
             time.sleep(delay)
             if timeout <= 0:
-                raise Exception("Timeout Error: Waiting for instance to {0}. ".format(charge_type))
+                raise Exception(f"Timeout Error: Waiting for instance to {charge_type}. ")
     except Exception as e:
         raise e
 
 
 def main():
     argument_spec = ecs_argument_spec()
-    argument_spec.update(dict(
-        security_groups=dict(type='list', elements='str', aliases=['group_ids']),
-        availability_zone=dict(type='str', aliases=['alicloud_zone', 'zone_id']),
-        instance_type=dict(type='str', aliases=['type']),
-        image_id=dict(type='str', aliases=['image']),
-        count=dict(type='int', default=1),
-        count_tag=dict(type='str'),
-        vswitch_id=dict(type='str', aliases=['subnet_id']),
-        instance_name=dict(type='str', aliases=['name']),
-        host_name=dict(type='str'),
-        password=dict(type='str', no_log=True),
-        internet_charge_type=dict(type='str', default='PayByBandwidth', choices=['PayByBandwidth', 'PayByTraffic']),
-        max_bandwidth_in=dict(type='int', default=200),
-        max_bandwidth_out=dict(type='int', default=0),
-        system_disk_category=dict(type='str', default='cloud_efficiency', choices=['cloud_efficiency', 'cloud_ssd']),
-        system_disk_size=dict(type='int', default=40),
-        system_disk_name=dict(type='str'),
-        system_disk_description=dict(type='str'),
-        force=dict(type='bool', default=False),
-        tags=dict(type='dict', aliases=['instance_tags']),
-        purge_tags=dict(type='bool', default=False),
-        state=dict(default='present', choices=['present', 'running', 'stopped', 'restarted', 'absent']),
-        description=dict(type='str'),
-        allocate_public_ip=dict(type='bool', aliases=['assign_public_ip'], default=False),
-        instance_charge_type=dict(type='str', default='PostPaid', choices=['PrePaid', 'PostPaid']),
-        period=dict(type='int', default=1),
-        auto_renew=dict(type='bool', default=False),
-        instance_ids=dict(type='list', elements='str'),
-        auto_renew_period=dict(type='int', choices=[1, 2, 3, 6, 12]),
-        key_name=dict(type='str', aliases=['keypair']),
-        user_data=dict(type='str'),
-        ram_role_name=dict(type='str'),
-        spot_price_limit=dict(type='float'),
-        spot_strategy=dict(type='str', default='NoSpot', choices=['NoSpot', 'SpotWithPriceLimit', 'SpotAsPriceGo']),
-        unique_suffix=dict(type='bool', default=False),
-        period_unit=dict(type='str', default='Month', choices=['Month', 'Week']),
-        dry_run=dict(type='bool', default=False),
-        include_data_disks=dict(type='bool', default=True)
-    )
+    argument_spec.update(
+        dict(
+            security_groups=dict(type="list", elements="str", aliases=["group_ids"]),
+            availability_zone=dict(type="str", aliases=["alicloud_zone", "zone_id"]),
+            instance_type=dict(type="str", aliases=["type"]),
+            image_id=dict(type="str", aliases=["image"]),
+            count=dict(type="int", default=1),
+            count_tag=dict(type="str"),
+            vswitch_id=dict(type="str", aliases=["subnet_id"]),
+            instance_name=dict(type="str", aliases=["name"]),
+            host_name=dict(type="str"),
+            password=dict(type="str", no_log=True),
+            internet_charge_type=dict(type="str", default="PayByBandwidth", choices=["PayByBandwidth", "PayByTraffic"]),
+            max_bandwidth_in=dict(type="int", default=200),
+            max_bandwidth_out=dict(type="int", default=0),
+            system_disk_category=dict(
+                type="str", default="cloud_efficiency", choices=["cloud_efficiency", "cloud_ssd"]
+            ),
+            system_disk_size=dict(type="int", default=40),
+            system_disk_name=dict(type="str"),
+            system_disk_description=dict(type="str"),
+            force=dict(type="bool", default=False),
+            tags=dict(type="dict", aliases=["instance_tags"]),
+            purge_tags=dict(type="bool", default=False),
+            state=dict(default="present", choices=["present", "running", "stopped", "restarted", "absent"]),
+            description=dict(type="str"),
+            allocate_public_ip=dict(type="bool", aliases=["assign_public_ip"], default=False),
+            instance_charge_type=dict(type="str", default="PostPaid", choices=["PrePaid", "PostPaid"]),
+            period=dict(type="int", default=1),
+            auto_renew=dict(type="bool", default=False),
+            instance_ids=dict(type="list", elements="str"),
+            auto_renew_period=dict(type="int", choices=[1, 2, 3, 6, 12]),
+            key_name=dict(type="str", aliases=["keypair"]),
+            user_data=dict(type="str"),
+            ram_role_name=dict(type="str"),
+            spot_price_limit=dict(type="float"),
+            spot_strategy=dict(type="str", default="NoSpot", choices=["NoSpot", "SpotWithPriceLimit", "SpotAsPriceGo"]),
+            unique_suffix=dict(type="bool", default=False),
+            period_unit=dict(type="str", default="Month", choices=["Month", "Week"]),
+            dry_run=dict(type="bool", default=False),
+            include_data_disks=dict(type="bool", default=True),
+        )
     )
     module = AnsibleModule(argument_spec=argument_spec)
 
     if HAS_FOOTMARK is False:
-        module.fail_json(msg=missing_required_lib('footmark'), exception=FOOTMARK_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("footmark"), exception=FOOTMARK_IMP_ERR)
 
     ecs = ecs_connect(module)
-    host_name = module.params['host_name']
-    state = module.params['state']
-    instance_ids = module.params['instance_ids']
-    count_tag = module.params['count_tag']
-    count = module.params['count']
-    instance_name = module.params['instance_name']
-    force = module.params['force']
-    zone_id = module.params['availability_zone']
-    key_name = module.params['key_name']
-    tags = module.params['tags']
-    max_bandwidth_out = module.params['max_bandwidth_out']
-    instance_charge_type = module.params['instance_charge_type']
+    host_name = module.params["host_name"]
+    state = module.params["state"]
+    instance_ids = module.params["instance_ids"]
+    count_tag = module.params["count_tag"]
+    count = module.params["count"]
+    instance_name = module.params["instance_name"]
+    force = module.params["force"]
+    zone_id = module.params["availability_zone"]
+    key_name = module.params["key_name"]
+    tags = module.params["tags"]
+    max_bandwidth_out = module.params["max_bandwidth_out"]
+    instance_charge_type = module.params["instance_charge_type"]
     if instance_charge_type == "PrePaid":
-        module.params['spot_strategy'] = ''
+        module.params["spot_strategy"] = ""
     changed = False
 
     instances = []
     if instance_ids:
         if not isinstance(instance_ids, list):
-            module.fail_json(msg='The parameter instance_ids should be a list, aborting')
+            module.fail_json(msg="The parameter instance_ids should be a list, aborting")
         instances = ecs.describe_instances(zone_id=zone_id, instance_ids=instance_ids)
         if not instances:
-            module.fail_json(msg="There are no instances in our record based on instance_ids {0}. "
-                                 "Please check it and try again.".format(instance_ids))
+            module.fail_json(
+                msg=f"There are no instances in our record based on instance_ids {instance_ids}. Please check it and try again."
+            )
     elif count_tag:
         instances = ecs.describe_instances(zone_id=zone_id, tags=eval(count_tag))
     elif instance_name:
         instances = ecs.describe_instances(zone_id=zone_id, instance_name=instance_name)
 
     ids = []
-    if state == 'absent':
+    if state == "absent":
         if len(instances) < 1:
-            module.fail_json(msg='Please specify ECS instances that you want to operate by using '
-                                 'parameters instance_ids, tags or instance_name, aborting')
+            module.fail_json(
+                msg="Please specify ECS instances that you want to operate by using "
+                "parameters instance_ids, tags or instance_name, aborting"
+            )
         try:
             targets = []
             for inst in instances:
-                if inst.status != 'stopped' and not force:
+                if inst.status != "stopped" and not force:
                     module.fail_json(msg="Instance is running, and please stop it or set 'force' as True.")
                 targets.append(inst.id)
             if ecs.delete_instances(instance_ids=targets, force=force):
@@ -850,46 +882,50 @@ def main():
 
             module.exit_json(changed=changed, ids=ids, instances=[])
         except Exception as e:
-            module.fail_json(msg='Delete instance got an error: {0}'.format(e))
+            module.fail_json(msg=f"Delete instance got an error: {e}")
 
-    if module.params['allocate_public_ip'] and max_bandwidth_out < 0:
+    if module.params["allocate_public_ip"] and max_bandwidth_out < 0:
         module.fail_json(msg="'max_bandwidth_out' should be greater than 0 when 'allocate_public_ip' is True.")
-    if not module.params['allocate_public_ip']:
-        module.params['max_bandwidth_out'] = 0
+    if not module.params["allocate_public_ip"]:
+        module.params["max_bandwidth_out"] = 0
 
-    if state == 'present':
+    if state == "present":
         if not instance_ids:
             if len(instances) > count:
                 for i in range(0, len(instances) - count):
                     inst = instances[len(instances) - 1]
-                    if inst.status != 'stopped' and not force:
-                        module.fail_json(msg="That to delete instance {0} is failed results from it is running, "
-                                             "and please stop it or set 'force' as True.".format(inst.id))
+                    if inst.status != "stopped" and not force:
+                        module.fail_json(
+                            msg=f"That to delete instance {inst.id} is failed results from it is running, "
+                            "and please stop it or set 'force' as True."
+                        )
                     try:
                         if inst.terminate(force=force):
                             changed = True
                     except Exception as e:
-                        module.fail_json(msg="Delete instance {0} got an error: {1}".format(inst.id, e))
+                        module.fail_json(msg=f"Delete instance {inst.id} got an error: {e}")
                     instances.pop(len(instances) - 1)
             else:
                 try:
                     if re.search(r"-\[\d+,\d+\]-", host_name):
-                        module.fail_json(msg='Ordered hostname is not supported, If you want to add an ordered '
-                                             'suffix to the hostname, you can set unique_suffix to True')
+                        module.fail_json(
+                            msg="Ordered hostname is not supported, If you want to add an ordered "
+                            "suffix to the hostname, you can set unique_suffix to True"
+                        )
                     new_instances = run_instance(module, ecs, count - len(instances))
                     if new_instances:
                         changed = True
                         instances.extend(new_instances)
                 except Exception as e:
-                    module.fail_json(msg="Create new instances got an error: {0}".format(e))
+                    module.fail_json(msg=f"Create new instances got an error: {e}")
 
         # Security Group join/leave begin
-        security_groups = module.params['security_groups']
+        security_groups = module.params["security_groups"]
         if security_groups:
             if not isinstance(security_groups, list):
-                module.fail_json(msg='The parameter security_groups should be a list, aborting')
+                module.fail_json(msg="The parameter security_groups should be a list, aborting")
             for inst in instances:
-                existing = inst.security_group_ids['security_group_id']
+                existing = inst.security_group_ids["security_group_id"]
                 remove = list(set(existing).difference(set(security_groups)))
                 add = list(set(security_groups).difference(set(existing)))
                 for sg in remove:
@@ -925,12 +961,16 @@ def main():
             if inst.instance_charge_type != instance_charge_type:
                 ids.append(inst.id)
         if ids:
-            params = {"instance_ids": ids, "instance_charge_type": instance_charge_type,
-                      "include_data_disks": module.params['include_data_disks'], "dry_run": module.params['dry_run'],
-                      "auto_pay": True}
-            if instance_charge_type == 'PrePaid':
-                params['period'] = module.params['period']
-                params['period_unit'] = module.params['period_unit']
+            params = {
+                "instance_ids": ids,
+                "instance_charge_type": instance_charge_type,
+                "include_data_disks": module.params["include_data_disks"],
+                "dry_run": module.params["dry_run"],
+                "auto_pay": True,
+            }
+            if instance_charge_type == "PrePaid":
+                params["period"] = module.params["period"]
+                params["period_unit"] = module.params["period_unit"]
 
             if ecs.modify_instance_charge_type(**params):
                 changed = True
@@ -938,9 +978,11 @@ def main():
 
     else:
         if len(instances) < 1:
-            module.fail_json(msg='Please specify ECS instances that you want to operate by using '
-                                 'parameters instance_ids, tags or instance_name, aborting')
-        if state == 'running':
+            module.fail_json(
+                msg="Please specify ECS instances that you want to operate by using "
+                "parameters instance_ids, tags or instance_name, aborting"
+            )
+        if state == "running":
             try:
                 targets = []
                 for inst in instances:
@@ -953,8 +995,8 @@ def main():
                     changed = True
                     ids.extend(targets)
             except Exception as e:
-                module.fail_json(msg='Start instances got an error: {0}'.format(e))
-        elif state == 'stopped':
+                module.fail_json(msg=f"Start instances got an error: {e}")
+        elif state == "stopped":
             try:
                 targets = []
                 for inst in instances:
@@ -967,22 +1009,22 @@ def main():
                     if modify_instance(module, inst):
                         changed = True
             except Exception as e:
-                module.fail_json(msg='Stop instances got an error: {0}'.format(e))
-        elif state == 'restarted':
+                module.fail_json(msg=f"Stop instances got an error: {e}")
+        elif state == "restarted":
             try:
                 targets = []
                 for inst in instances:
                     if modify_instance(module, inst):
                         changed = True
                         targets.append(inst.id)
-                if ecs.reboot_instances(instance_ids=targets, force_stop=module.params['force']):
+                if ecs.reboot_instances(instance_ids=targets, force_stop=module.params["force"]):
                     changed = True
                     ids.extend(targets)
             except Exception as e:
-                module.fail_json(msg='Reboot instances got an error: {0}'.format(e))
+                module.fail_json(msg=f"Reboot instances got an error: {e}")
 
-    tags = module.params['tags']
-    if module.params['purge_tags']:
+    tags = module.params["tags"]
+    if module.params["purge_tags"]:
         for inst in instances:
             if not tags:
                 tags = inst.tags
@@ -990,7 +1032,7 @@ def main():
                 if inst.remove_tags(tags):
                     changed = True
             except Exception as e:
-                module.fail_json(msg="{0}".format(e))
+                module.fail_json(msg=f"{e}")
         module.exit_json(changed=changed, instances=get_instances_info(ecs, ids))
 
     if tags:
@@ -999,9 +1041,9 @@ def main():
                 if inst.add_tags(tags):
                     changed = True
             except Exception as e:
-                module.fail_json(msg="{0}".format(e))
+                module.fail_json(msg=f"{e}")
     module.exit_json(changed=changed, instances=get_instances_info(ecs, ids))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

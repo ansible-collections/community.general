@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -53,7 +51,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def gather_lldp(module):
-    cmd = [module.get_bin_path('lldpctl'), '-f', 'keyvalue']
+    cmd = [module.get_bin_path("lldpctl"), "-f", "keyvalue"]
     rc, output, err = module.run_command(cmd)
     if output:
         output_dict = {}
@@ -62,15 +60,15 @@ def gather_lldp(module):
 
         final = ""
         for entry in lldp_entries:
-            if entry.startswith('lldp'):
+            if entry.startswith("lldp"):
                 path, value = entry.strip().split("=", 1)
                 path = path.split(".")
                 path_components, final = path[:-1], path[-1]
             elif final in current_dict and isinstance(current_dict[final], str):
-                current_dict[final] += '\n' + entry
+                current_dict[final] += f"\n{entry}"
                 continue
             elif final in current_dict and isinstance(current_dict[final], list):
-                current_dict[final][-1] += '\n' + entry
+                current_dict[final][-1] += f"\n{entry}"
                 continue
             else:
                 continue
@@ -79,14 +77,14 @@ def gather_lldp(module):
             for path_component in path_components:
                 current_dict[path_component] = current_dict.get(path_component, {})
                 if not isinstance(current_dict[path_component], dict):
-                    current_dict[path_component] = {'value': current_dict[path_component]}
+                    current_dict[path_component] = {"value": current_dict[path_component]}
                 current_dict = current_dict[path_component]
 
-            if final in current_dict and isinstance(current_dict[final], dict) and module.params['multivalues']:
+            if final in current_dict and isinstance(current_dict[final], dict) and module.params["multivalues"]:
                 current_dict = current_dict[final]
-                final = 'value'
+                final = "value"
 
-            if final not in current_dict or not module.params['multivalues']:
+            if final not in current_dict or not module.params["multivalues"]:
                 current_dict[final] = value
             elif isinstance(current_dict[final], str):
                 current_dict[final] = [current_dict[final], value]
@@ -97,18 +95,16 @@ def gather_lldp(module):
 
 
 def main():
-    module_args = dict(
-        multivalues=dict(type='bool', default=False)
-    )
+    module_args = dict(multivalues=dict(type="bool", default=False))
     module = AnsibleModule(module_args)
 
     lldp_output = gather_lldp(module)
     try:
-        data = {'lldp': lldp_output['lldp']}
+        data = {"lldp": lldp_output["lldp"]}
         module.exit_json(ansible_facts=data)
     except TypeError:
         module.fail_json(msg="lldpctl command failed. is lldpd running?")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

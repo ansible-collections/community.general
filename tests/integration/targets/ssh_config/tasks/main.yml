@@ -3,13 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Install required libs
-  pip:
-    name:
-      - paramiko
-    state: present
-    extra_args: "-c {{ remote_constraints }}"
-
 - set_fact:
     output_test_dir: '{{ remote_tmp_dir }}/test_ssh_config'
 

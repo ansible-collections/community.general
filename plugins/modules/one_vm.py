@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Milan Ilic <milani@nordeus.com>
 # Copyright (c) 2019, Jan Meerkamp <meerkamp@dvv.de>
 # Copyright (c) 2025, Tom Paine <github@aioue.net>
@@ -7,8 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: one_vm
@@ -679,6 +677,7 @@ tagged_instances:
 
 try:
     import pyone
+
     HAS_PYONE = True
 except ImportError:
     HAS_PYONE = False
@@ -696,7 +695,17 @@ from ansible_collections.community.general.plugins.module_utils.opennebula impor
 UPDATECONF_ATTRIBUTES = {
     "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID", "FIRMWARE"],
     "CPU_MODEL": ["MODEL", "FEATURES"],
-    "FEATURES": ["ACPI", "PAE", "APIC", "LOCALTIME", "HYPERV", "GUEST_AGENT", "VIRTIO_BLK_QUEUES", "VIRTIO_SCSI_QUEUES", "IOTHREADS"],
+    "FEATURES": [
+        "ACPI",
+        "PAE",
+        "APIC",
+        "LOCALTIME",
+        "HYPERV",
+        "GUEST_AGENT",
+        "VIRTIO_BLK_QUEUES",
+        "VIRTIO_SCSI_QUEUES",
+        "IOTHREADS",
+    ],
     "INPUT": ["TYPE", "BUS"],
     "GRAPHICS": ["TYPE", "LISTEN", "PORT", "PASSWD", "KEYMAP", "COMMAND"],
     "VIDEO": ["ATS", "IOMMU", "RESOLUTION", "TYPE", "VRAM"],
@@ -707,19 +716,19 @@ UPDATECONF_ATTRIBUTES = {
 
 
 def check_updateconf(module, to_check):
-    '''Checks if attributes are compatible with one.vm.updateconf API call.'''
+    """Checks if attributes are compatible with one.vm.updateconf API call."""
     for attr, subattributes in to_check.items():
         if attr not in UPDATECONF_ATTRIBUTES:
-            module.fail_json(msg="'{0:}' is not a valid VM attribute.".format(attr))
+            module.fail_json(msg=f"'{attr}' is not a valid VM attribute.")
         if not UPDATECONF_ATTRIBUTES[attr]:
             continue
         for subattr in subattributes:
             if subattr not in UPDATECONF_ATTRIBUTES[attr]:
-                module.fail_json(msg="'{0:}' is not a valid VM subattribute of '{1:}'".format(subattr, attr))
+                module.fail_json(msg=f"'{subattr}' is not a valid VM subattribute of '{attr}'")
 
 
 def parse_updateconf(vm_template):
-    '''Extracts 'updateconf' attributes from a VM template.'''
+    """Extracts 'updateconf' attributes from a VM template."""
     updateconf = {}
     for attr, subattributes in vm_template.items():
         if attr not in UPDATECONF_ATTRIBUTES:
@@ -735,12 +744,11 @@ def parse_updateconf(vm_template):
 
 
 def get_template(module, client, predicate):
-
     pool = client.templatepool.info(-2, -1, -1, -1)
     # Filter -2 means fetch all templates user can Use
     found = 0
     found_template = None
-    template_name = ''
+    template_name = ""
 
     for template in pool.VMTEMPLATE:
         if predicate(template):
@@ -751,7 +759,7 @@ def get_template(module, client, predicate):
     if found == 0:
         return None
     elif found > 1:
-        module.fail_json(msg='There are more templates with name: ' + template_name)
+        module.fail_json(msg=f"There are more templates with name: {template_name}")
     return found_template
 
 
@@ -764,7 +772,11 @@ def get_template_by_id(module, client, template_id):
 
 
 def get_template_id(module, client, requested_id, requested_name):
-    template = get_template_by_id(module, client, requested_id) if requested_id is not None else get_template_by_name(module, client, requested_name)
+    template = (
+        get_template_by_id(module, client, requested_id)
+        if requested_id is not None
+        else get_template_by_name(module, client, requested_name)
+    )
     if template:
         return template.ID
     else:
@@ -775,7 +787,7 @@ def get_datastore(module, client, predicate):
     pool = client.datastorepool.info()
     found = 0
     found_datastore = None
-    datastore_name = ''
+    datastore_name = ""
 
     for datastore in pool.DATASTORE:
         if predicate(datastore):
@@ -786,7 +798,7 @@ def get_datastore(module, client, predicate):
     if found == 0:
         return None
     elif found > 1:
-        module.fail_json(msg='There are more datastores with name: ' + datastore_name)
+        module.fail_json(msg=f"There are more datastores with name: {datastore_name}")
     return found_datastore
 
 
@@ -799,7 +811,11 @@ def get_datastore_by_id(module, client, datastore_id):
 
 
 def get_datastore_id(module, client, requested_id, requested_name):
-    datastore = get_datastore_by_id(module, client, requested_id) if requested_id else get_datastore_by_name(module, client, requested_name)
+    datastore = (
+        get_datastore_by_id(module, client, requested_id)
+        if requested_id
+        else get_datastore_by_name(module, client, requested_name)
+    )
     if datastore:
         return datastore.ID
     else:
@@ -819,57 +835,59 @@ def get_vms_by_ids(module, client, state, ids):
 
     for vm_id in ids:
         vm = get_vm_by_id(client, vm_id)
-        if vm is None and state != 'absent':
-            module.fail_json(msg='There is no VM with id=' + str(vm_id))
+        if vm is None and state != "absent":
+            module.fail_json(msg=f"There is no VM with id={vm_id}")
         vms.append(vm)
 
     return vms
 
 
 def get_vm_info(client, vm):
-
     vm = client.vm.info(vm.ID)
 
     networks_info = []
 
     disk_size = []
-    if 'DISK' in vm.TEMPLATE:
-        if isinstance(vm.TEMPLATE['DISK'], list):
-            for disk in vm.TEMPLATE['DISK']:
-                disk_size.append(disk['SIZE'] + ' MB')
+    if "DISK" in vm.TEMPLATE:
+        if isinstance(vm.TEMPLATE["DISK"], list):
+            for disk in vm.TEMPLATE["DISK"]:
+                disk_size.append(f"{disk['SIZE']} MB")
         else:
-            disk_size.append(vm.TEMPLATE['DISK']['SIZE'] + ' MB')
+            disk_size.append(f"{vm.TEMPLATE['DISK']['SIZE']} MB")
 
-    if 'NIC' in vm.TEMPLATE:
-        if isinstance(vm.TEMPLATE['NIC'], list):
-            for nic in vm.TEMPLATE['NIC']:
-                networks_info.append({
-                    'ip': nic.get('IP', ''),
-                    'mac': nic.get('MAC', ''),
-                    'name': nic.get('NETWORK', ''),
-                    'security_groups': nic.get('SECURITY_GROUPS', '')
-                })
+    if "NIC" in vm.TEMPLATE:
+        if isinstance(vm.TEMPLATE["NIC"], list):
+            for nic in vm.TEMPLATE["NIC"]:
+                networks_info.append(
+                    {
+                        "ip": nic.get("IP", ""),
+                        "mac": nic.get("MAC", ""),
+                        "name": nic.get("NETWORK", ""),
+                        "security_groups": nic.get("SECURITY_GROUPS", ""),
+                    }
+                )
         else:
-            networks_info.append({
-                'ip': vm.TEMPLATE['NIC'].get('IP', ''),
-                'mac': vm.TEMPLATE['NIC'].get('MAC', ''),
-                'name': vm.TEMPLATE['NIC'].get('NETWORK', ''),
-                'security_groups':
-                    vm.TEMPLATE['NIC'].get('SECURITY_GROUPS', '')
-            })
+            networks_info.append(
+                {
+                    "ip": vm.TEMPLATE["NIC"].get("IP", ""),
+                    "mac": vm.TEMPLATE["NIC"].get("MAC", ""),
+                    "name": vm.TEMPLATE["NIC"].get("NETWORK", ""),
+                    "security_groups": vm.TEMPLATE["NIC"].get("SECURITY_GROUPS", ""),
+                }
+            )
     import time
 
     current_time = time.localtime()
     vm_start_time = time.localtime(vm.STIME)
 
     vm_uptime = time.mktime(current_time) - time.mktime(vm_start_time)
-    vm_uptime /= (60 * 60)
+    vm_uptime /= 60 * 60
 
     permissions_str = parse_vm_permissions(client, vm)
 
     # LCM_STATE is VM's sub-state that is relevant only when STATE is ACTIVE
     vm_lcm_state = None
-    if vm.STATE == VM_STATES.index('ACTIVE'):
+    if vm.STATE == VM_STATES.index("ACTIVE"):
         vm_lcm_state = LCM_STATES[vm.LCM_STATE]
 
     vm_labels, vm_attributes = get_vm_labels_and_attributes_dict(client, vm.ID)
@@ -877,25 +895,25 @@ def get_vm_info(client, vm):
     updateconf = parse_updateconf(vm.TEMPLATE)
 
     info = {
-        'template_id': int(vm.TEMPLATE['TEMPLATE_ID']),
-        'vm_id': vm.ID,
-        'vm_name': vm.NAME,
-        'state': VM_STATES[vm.STATE],
-        'lcm_state': vm_lcm_state,
-        'owner_name': vm.UNAME,
-        'owner_id': vm.UID,
-        'networks': networks_info,
-        'disk_size': disk_size,
-        'memory': vm.TEMPLATE['MEMORY'] + ' MB',
-        'vcpu': vm.TEMPLATE['VCPU'],
-        'cpu': vm.TEMPLATE['CPU'],
-        'group_name': vm.GNAME,
-        'group_id': vm.GID,
-        'uptime_h': int(vm_uptime),
-        'attributes': vm_attributes,
-        'mode': permissions_str,
-        'labels': vm_labels,
-        'updateconf': updateconf,
+        "template_id": int(vm.TEMPLATE["TEMPLATE_ID"]),
+        "vm_id": vm.ID,
+        "vm_name": vm.NAME,
+        "state": VM_STATES[vm.STATE],
+        "lcm_state": vm_lcm_state,
+        "owner_name": vm.UNAME,
+        "owner_id": vm.UID,
+        "networks": networks_info,
+        "disk_size": disk_size,
+        "memory": f"{vm.TEMPLATE['MEMORY']} MB",
+        "vcpu": vm.TEMPLATE["VCPU"],
+        "cpu": vm.TEMPLATE["CPU"],
+        "group_name": vm.GNAME,
+        "group_id": vm.GID,
+        "uptime_h": int(vm_uptime),
+        "attributes": vm_attributes,
+        "mode": permissions_str,
+        "labels": vm_labels,
+        "updateconf": updateconf,
     }
 
     return info
@@ -926,9 +944,21 @@ def set_vm_permissions(module, client, vms, permissions):
             mode_bits = [int(d) for d in permissions_str]
             try:
                 client.vm.chmod(
-                    vm.ID, mode_bits[0], mode_bits[1], mode_bits[2], mode_bits[3], mode_bits[4], mode_bits[5], mode_bits[6], mode_bits[7], mode_bits[8])
+                    vm.ID,
+                    mode_bits[0],
+                    mode_bits[1],
+                    mode_bits[2],
+                    mode_bits[3],
+                    mode_bits[4],
+                    mode_bits[5],
+                    mode_bits[6],
+                    mode_bits[7],
+                    mode_bits[8],
+                )
             except pyone.OneAuthorizationException:
-                module.fail_json(msg="Permissions changing is unsuccessful, but instances are present if you deployed them.")
+                module.fail_json(
+                    msg="Permissions changing is unsuccessful, but instances are present if you deployed them."
+                )
 
     return changed
 
@@ -949,7 +979,9 @@ def set_vm_ownership(module, client, vms, owner_id, group_id):
             try:
                 client.vm.chown(vm.ID, owner_id, group_id)
             except pyone.OneAuthorizationException:
-                module.fail_json(msg="Ownership changing is unsuccessful, but instances are present if you deployed them.")
+                module.fail_json(
+                    msg="Ownership changing is unsuccessful, but instances are present if you deployed them."
+                )
 
     return changed
 
@@ -977,22 +1009,21 @@ def update_vms(module, client, vms, *args):
 
 
 def get_size_in_MB(module, size_str):
-
-    SYMBOLS = ['B', 'KB', 'MB', 'GB', 'TB']
+    SYMBOLS = ["B", "KB", "MB", "GB", "TB"]
 
     s = size_str
     init = size_str
     num = ""
-    while s and s[0:1].isdigit() or s[0:1] == '.':
+    while s and s[0:1].isdigit() or s[0:1] == ".":
         num += s[0]
         s = s[1:]
     num = float(num)
     symbol = s.strip()
 
     if symbol not in SYMBOLS:
-        module.fail_json(msg="Cannot interpret %r %r %d" % (init, symbol, num))
+        module.fail_json(msg=f"Cannot interpret {init!r} {symbol!r} {num}")
 
-    prefix = {'B': 1}
+    prefix = {"B": 1}
 
     for i, s in enumerate(SYMBOLS[1:]):
         prefix[s] = 1 << (i + 1) * 10
@@ -1003,42 +1034,62 @@ def get_size_in_MB(module, size_str):
     return size_in_MB
 
 
-def create_vm(module, client, template_id, attributes_dict, labels_list, disk_size, network_attrs_list, vm_start_on_hold, vm_persistent, updateconf_dict):
+def create_vm(
+    module,
+    client,
+    template_id,
+    attributes_dict,
+    labels_list,
+    disk_size,
+    network_attrs_list,
+    vm_start_on_hold,
+    vm_persistent,
+    updateconf_dict,
+):
     if attributes_dict:
-        vm_name = attributes_dict.get('NAME', '')
+        vm_name = attributes_dict.get("NAME", "")
 
     template = client.template.info(template_id).TEMPLATE
 
-    disk_count = len(flatten(template.get('DISK', [])))
+    disk_count = len(flatten(template.get("DISK", [])))
     if disk_size:
         size_count = len(flatten(disk_size))
         # check if the number of disks is correct
         if disk_count != size_count:
-            module.fail_json(msg='This template has ' + str(disk_count) + ' disks but you defined ' + str(size_count))
+            module.fail_json(msg=f"This template has {disk_count} disks but you defined {size_count}")
 
     vm_extra_template = dict_merge(template or {}, attributes_dict or {})
-    vm_extra_template = dict_merge(vm_extra_template, {
-        'LABELS': ','.join(labels_list),
-        'NIC': flatten(network_attrs_list, extract=True),
-        'DISK': flatten([
-            disk if not size else dict_merge(disk, {
-                'SIZE': str(int(get_size_in_MB(module, size))),
-            })
-            for disk, size in zip(
-                flatten(template.get('DISK', [])),
-                flatten(disk_size or [None] * disk_count),
-            )
-            if disk is not None
-        ], extract=True)
-    })
+    vm_extra_template = dict_merge(
+        vm_extra_template,
+        {
+            "LABELS": ",".join(labels_list),
+            "NIC": flatten(network_attrs_list, extract=True),
+            "DISK": flatten(
+                [
+                    disk
+                    if not size
+                    else dict_merge(
+                        disk,
+                        {
+                            "SIZE": str(int(get_size_in_MB(module, size))),
+                        },
+                    )
+                    for disk, size in zip(
+                        flatten(template.get("DISK", [])),
+                        flatten(disk_size or [None] * disk_count),
+                    )
+                    if disk is not None
+                ],
+                extract=True,
+            ),
+        },
+    )
     vm_extra_template = dict_merge(vm_extra_template, updateconf_dict or {})
 
     try:
-        vm_id = client.template.instantiate(template_id,
-                                            vm_name,
-                                            vm_start_on_hold,
-                                            render(vm_extra_template),
-                                            vm_persistent)
+        vm_id = client.template.instantiate(
+            template_id, vm_name, vm_start_on_hold, render(vm_extra_template), vm_persistent
+        )
     except pyone.OneException as e:
         module.fail_json(msg=str(e))
 
@@ -1064,11 +1115,11 @@ def get_vm_labels_and_attributes_dict(client, vm_id):
     labels_list = []
 
     for key, value in vm_USER_TEMPLATE.items():
-        if key != 'LABELS':
+        if key != "LABELS":
             attrs_dict[key] = value
         else:
             if key is not None and value is not None:
-                labels_list = value.split(',')
+                labels_list = value.split(",")
 
     return labels_list, attrs_dict
 
@@ -1076,18 +1127,18 @@ def get_vm_labels_and_attributes_dict(client, vm_id):
 def get_all_vms_by_attributes(client, attributes_dict, labels_list):
     pool = client.vmpool.info(-2, -1, -1, -1).VM
     vm_list = []
-    name = ''
+    name = ""
     if attributes_dict:
-        name = attributes_dict.pop('NAME', '')
+        name = attributes_dict.pop("NAME", "")
 
-    if name != '':
-        base_name = name[:len(name) - name.count('#')]
+    if name != "":
+        base_name = name[: len(name) - name.count("#")]
         # Check does the name have indexed format
-        with_hash = name.endswith('#')
+        with_hash = name.endswith("#")
 
         for vm in pool:
             if vm.NAME.startswith(base_name):
-                if with_hash and vm.NAME[len(base_name):].isdigit():
+                if with_hash and vm.NAME[len(base_name) :].isdigit():
                     # If the name has indexed format and after base_name it has only digits it'll be matched
                     vm_list.append(vm)
                 elif not with_hash and vm.NAME == name:
@@ -1125,28 +1176,39 @@ def get_all_vms_by_attributes(client, attributes_dict, labels_list):
     return vm_list
 
 
-def create_count_of_vms(module, client,
-                        template_id, count,
-                        attributes_dict, labels_list, disk_size, network_attrs_list,
-                        wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
+def create_count_of_vms(
+    module,
+    client,
+    template_id,
+    count,
+    attributes_dict,
+    labels_list,
+    disk_size,
+    network_attrs_list,
+    wait,
+    wait_timeout,
+    vm_start_on_hold,
+    vm_persistent,
+    updateconf_dict,
+):
     new_vms_list = []
 
-    vm_name = ''
+    vm_name = ""
     if attributes_dict:
-        vm_name = attributes_dict.get('NAME', '')
+        vm_name = attributes_dict.get("NAME", "")
 
     if module.check_mode:
         return True, [], []
 
     # Create list of used indexes
     vm_filled_indexes_list = None
-    num_sign_cnt = vm_name.count('#')
-    if vm_name != '' and num_sign_cnt > 0:
-        vm_list = get_all_vms_by_attributes(client, {'NAME': vm_name}, None)
-        base_name = vm_name[:len(vm_name) - num_sign_cnt]
+    num_sign_cnt = vm_name.count("#")
+    if vm_name != "" and num_sign_cnt > 0:
+        vm_list = get_all_vms_by_attributes(client, {"NAME": vm_name}, None)
+        base_name = vm_name[: len(vm_name) - num_sign_cnt]
         vm_name = base_name
         # Make list which contains used indexes in format ['000', '001',...]
-        vm_filled_indexes_list = [vm.NAME[len(base_name):].zfill(num_sign_cnt) for vm in vm_list]
+        vm_filled_indexes_list = [vm.NAME[len(base_name) :].zfill(num_sign_cnt) for vm in vm_list]
 
     while count > 0:
         new_vm_name = vm_name
@@ -1156,11 +1218,20 @@ def create_count_of_vms(module, client,
             vm_filled_indexes_list.append(next_index)
             new_vm_name += next_index
         # Update NAME value in the attributes in case there is index
-        attributes_dict['NAME'] = new_vm_name
-        new_vm_dict = create_vm(module, client,
-                                template_id, attributes_dict, labels_list, disk_size, network_attrs_list,
-                                vm_start_on_hold, vm_persistent, updateconf_dict)
-        new_vm_id = new_vm_dict.get('vm_id')
+        attributes_dict["NAME"] = new_vm_name
+        new_vm_dict = create_vm(
+            module,
+            client,
+            template_id,
+            attributes_dict,
+            labels_list,
+            disk_size,
+            network_attrs_list,
+            vm_start_on_hold,
+            vm_persistent,
+            updateconf_dict,
+        )
+        new_vm_id = new_vm_dict.get("vm_id")
         new_vm = get_vm_by_id(client, new_vm_id)
         new_vms_list.append(new_vm)
         count -= 1
@@ -1177,10 +1248,24 @@ def create_count_of_vms(module, client,
     return True, new_vms_list, []
 
 
-def create_exact_count_of_vms(module, client,
-                              template_id, exact_count, attributes_dict, count_attributes_dict,
-                              labels_list, count_labels_list, disk_size, network_attrs_list,
-                              hard, wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
+def create_exact_count_of_vms(
+    module,
+    client,
+    template_id,
+    exact_count,
+    attributes_dict,
+    count_attributes_dict,
+    labels_list,
+    count_labels_list,
+    disk_size,
+    network_attrs_list,
+    hard,
+    wait,
+    wait_timeout,
+    vm_start_on_hold,
+    vm_persistent,
+    updateconf_dict,
+):
     vm_list = get_all_vms_by_attributes(client, count_attributes_dict, count_labels_list)
 
     vm_count_diff = exact_count - len(vm_list)
@@ -1195,9 +1280,21 @@ def create_exact_count_of_vms(module, client,
 
     if vm_count_diff > 0:
         # Add more VMs
-        changed, instances_list, tagged_instances = create_count_of_vms(module, client, template_id, vm_count_diff, attributes_dict,
-                                                                        labels_list, disk_size, network_attrs_list, wait, wait_timeout,
-                                                                        vm_start_on_hold, vm_persistent, updateconf_dict)
+        changed, instances_list, tagged_instances = create_count_of_vms(
+            module,
+            client,
+            template_id,
+            vm_count_diff,
+            attributes_dict,
+            labels_list,
+            disk_size,
+            network_attrs_list,
+            wait,
+            wait_timeout,
+            vm_start_on_hold,
+            vm_persistent,
+            updateconf_dict,
+        )
 
         tagged_instances_list += instances_list
     elif vm_count_diff < 0:
@@ -1222,16 +1319,57 @@ def create_exact_count_of_vms(module, client,
     return changed, instances_list, tagged_instances_list
 
 
-VM_STATES = ['INIT', 'PENDING', 'HOLD', 'ACTIVE', 'STOPPED', 'SUSPENDED', 'DONE', '', 'POWEROFF', 'UNDEPLOYED', 'CLONING', 'CLONING_FAILURE']
-LCM_STATES = ['LCM_INIT', 'PROLOG', 'BOOT', 'RUNNING', 'MIGRATE', 'SAVE_STOP',
-              'SAVE_SUSPEND', 'SAVE_MIGRATE', 'PROLOG_MIGRATE', 'PROLOG_RESUME',
-              'EPILOG_STOP', 'EPILOG', 'SHUTDOWN', 'STATE13', 'STATE14', 'CLEANUP_RESUBMIT', 'UNKNOWN', 'HOTPLUG', 'SHUTDOWN_POWEROFF',
-              'BOOT_UNKNOWN', 'BOOT_POWEROFF', 'BOOT_SUSPENDED', 'BOOT_STOPPED', 'CLEANUP_DELETE', 'HOTPLUG_SNAPSHOT', 'HOTPLUG_NIC',
-              'HOTPLUG_SAVEAS', 'HOTPLUG_SAVEAS_POWEROFF', 'HOTPULG_SAVEAS_SUSPENDED', 'SHUTDOWN_UNDEPLOY']
+VM_STATES = [
+    "INIT",
+    "PENDING",
+    "HOLD",
+    "ACTIVE",
+    "STOPPED",
+    "SUSPENDED",
+    "DONE",
+    "",
+    "POWEROFF",
+    "UNDEPLOYED",
+    "CLONING",
+    "CLONING_FAILURE",
+]
+LCM_STATES = [
+    "LCM_INIT",
+    "PROLOG",
+    "BOOT",
+    "RUNNING",
+    "MIGRATE",
+    "SAVE_STOP",
+    "SAVE_SUSPEND",
+    "SAVE_MIGRATE",
+    "PROLOG_MIGRATE",
+    "PROLOG_RESUME",
+    "EPILOG_STOP",
+    "EPILOG",
+    "SHUTDOWN",
+    "STATE13",
+    "STATE14",
+    "CLEANUP_RESUBMIT",
+    "UNKNOWN",
+    "HOTPLUG",
+    "SHUTDOWN_POWEROFF",
+    "BOOT_UNKNOWN",
+    "BOOT_POWEROFF",
+    "BOOT_SUSPENDED",
+    "BOOT_STOPPED",
+    "CLEANUP_DELETE",
+    "HOTPLUG_SNAPSHOT",
+    "HOTPLUG_NIC",
+    "HOTPLUG_SAVEAS",
+    "HOTPLUG_SAVEAS_POWEROFF",
+    "HOTPULG_SAVEAS_SUSPENDED",
+    "SHUTDOWN_UNDEPLOY",
+]
 
 
 def wait_for_state(module, client, vm, wait_timeout, state_predicate):
     import time
+
     start_time = time.time()
 
     while (time.time() - start_time) < wait_timeout:
@@ -1241,9 +1379,15 @@ def wait_for_state(module, client, vm, wait_timeout, state_predicate):
 
         if state_predicate(state, lcm_state):
             return vm
-        elif state not in [VM_STATES.index('INIT'), VM_STATES.index('PENDING'), VM_STATES.index('HOLD'),
-                           VM_STATES.index('ACTIVE'), VM_STATES.index('CLONING'), VM_STATES.index('POWEROFF')]:
-            module.fail_json(msg='Action is unsuccessful. VM state: ' + VM_STATES[state])
+        elif state not in [
+            VM_STATES.index("INIT"),
+            VM_STATES.index("PENDING"),
+            VM_STATES.index("HOLD"),
+            VM_STATES.index("ACTIVE"),
+            VM_STATES.index("CLONING"),
+            VM_STATES.index("POWEROFF"),
+        ]:
+            module.fail_json(msg=f"Action is unsuccessful. VM state: {VM_STATES[state]}")
 
         time.sleep(1)
 
@@ -1251,20 +1395,31 @@ def wait_for_state(module, client, vm, wait_timeout, state_predicate):
 
 
 def wait_for_running(module, client, vm, wait_timeout):
-    return wait_for_state(module, client, vm, wait_timeout, lambda state,
-                          lcm_state: (state in [VM_STATES.index('ACTIVE')] and lcm_state in [LCM_STATES.index('RUNNING')]))
+    return wait_for_state(
+        module,
+        client,
+        vm,
+        wait_timeout,
+        lambda state, lcm_state: (state in [VM_STATES.index("ACTIVE")] and lcm_state in [LCM_STATES.index("RUNNING")]),
+    )
 
 
 def wait_for_done(module, client, vm, wait_timeout):
-    return wait_for_state(module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index('DONE')]))
+    return wait_for_state(
+        module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index("DONE")])
+    )
 
 
 def wait_for_hold(module, client, vm, wait_timeout):
-    return wait_for_state(module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index('HOLD')]))
+    return wait_for_state(
+        module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index("HOLD")])
+    )
 
 
 def wait_for_poweroff(module, client, vm, wait_timeout):
-    return wait_for_state(module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index('POWEROFF')]))
+    return wait_for_state(
+        module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index("POWEROFF")])
+    )
 
 
 def terminate_vm(module, client, vm, hard=False):
@@ -1277,9 +1432,9 @@ def terminate_vm(module, client, vm, hard=False):
 
     if not module.check_mode:
         if hard:
-            client.vm.action('terminate-hard', vm.ID)
+            client.vm.action("terminate-hard", vm.ID)
         else:
-            client.vm.action('terminate', vm.ID)
+            client.vm.action("terminate", vm.ID)
 
     return changed
 
@@ -1300,14 +1455,16 @@ def poweroff_vm(module, client, vm, hard):
     lcm_state = vm.LCM_STATE
     state = vm.STATE
 
-    if lcm_state not in [LCM_STATES.index('SHUTDOWN'), LCM_STATES.index('SHUTDOWN_POWEROFF')] and state not in [VM_STATES.index('POWEROFF')]:
+    if lcm_state not in [LCM_STATES.index("SHUTDOWN"), LCM_STATES.index("SHUTDOWN_POWEROFF")] and state not in [
+        VM_STATES.index("POWEROFF")
+    ]:
         changed = True
 
     if changed and not module.check_mode:
         if not hard:
-            client.vm.action('poweroff', vm.ID)
+            client.vm.action("poweroff", vm.ID)
         else:
-            client.vm.action('poweroff-hard', vm.ID)
+            client.vm.action("poweroff-hard", vm.ID)
 
     return changed
 
@@ -1322,14 +1479,13 @@ def poweroff_vms(module, client, vms, hard):
 
 
 def reboot_vms(module, client, vms, wait_timeout, hard):
-
     if not module.check_mode:
         # Firstly, power-off all instances
         for vm in vms:
             vm = client.vm.info(vm.ID)
             lcm_state = vm.LCM_STATE
             state = vm.STATE
-            if lcm_state not in [LCM_STATES.index('SHUTDOWN_POWEROFF')] and state not in [VM_STATES.index('POWEROFF')]:
+            if lcm_state not in [LCM_STATES.index("SHUTDOWN_POWEROFF")] and state not in [VM_STATES.index("POWEROFF")]:
                 poweroff_vm(module, client, vm, hard)
 
         # Wait for all to be power-off
@@ -1347,19 +1503,21 @@ def resume_vm(module, client, vm):
     changed = False
 
     state = vm.STATE
-    if state in [VM_STATES.index('HOLD')]:
+    if state in [VM_STATES.index("HOLD")]:
         changed = release_vm(module, client, vm)
         return changed
 
     lcm_state = vm.LCM_STATE
-    if lcm_state == LCM_STATES.index('SHUTDOWN_POWEROFF'):
-        module.fail_json(msg="Cannot perform action 'resume' because this action is not available " +
-                         "for LCM_STATE: 'SHUTDOWN_POWEROFF'. Wait for the VM to shutdown properly")
-    if lcm_state not in [LCM_STATES.index('RUNNING')]:
+    if lcm_state == LCM_STATES.index("SHUTDOWN_POWEROFF"):
+        module.fail_json(
+            msg="Cannot perform action 'resume' because this action is not available "
+            "for LCM_STATE: 'SHUTDOWN_POWEROFF'. Wait for the VM to shutdown properly"
+        )
+    if lcm_state not in [LCM_STATES.index("RUNNING")]:
         changed = True
 
     if changed and not module.check_mode:
-        client.vm.action('resume', vm.ID)
+        client.vm.action("resume", vm.ID)
 
     return changed
 
@@ -1378,14 +1536,16 @@ def release_vm(module, client, vm):
     changed = False
 
     state = vm.STATE
-    if state != VM_STATES.index('HOLD'):
-        module.fail_json(msg="Cannot perform action 'release' because this action is not available " +
-                         "because VM is not in state 'HOLD'.")
+    if state != VM_STATES.index("HOLD"):
+        module.fail_json(
+            msg="Cannot perform action 'release' because this action is not available "
+            "because VM is not in state 'HOLD'."
+        )
     else:
         changed = True
 
     if changed and not module.check_mode:
-        client.vm.action('release', vm.ID)
+        client.vm.action("release", vm.ID)
 
     return changed
 
@@ -1393,59 +1553,79 @@ def release_vm(module, client, vm):
 def check_name_attribute(module, attributes):
     if attributes.get("NAME"):
         import re
-        if re.match(r'^[^#]+#*$', attributes.get("NAME")) is None:
-            module.fail_json(msg="Illegal 'NAME' attribute: '" + attributes.get("NAME") +
-                             "' .Signs '#' are allowed only at the end of the name and the name cannot contain only '#'.")
+
+        if re.match(r"^[^#]+#*$", attributes.get("NAME")) is None:
+            module.fail_json(
+                msg=f"Illegal 'NAME' attribute: '{attributes.get('NAME')}"
+                "' .Signs '#' are allowed only at the end of the name and the name cannot contain only '#'."
+            )
 
 
-TEMPLATE_RESTRICTED_ATTRIBUTES = ["CPU", "VCPU", "OS", "FEATURES", "MEMORY", "DISK", "NIC", "INPUT", "GRAPHICS",
-                                  "CONTEXT", "CREATED_BY", "CPU_COST", "DISK_COST", "MEMORY_COST",
-                                  "TEMPLATE_ID", "VMID", "AUTOMATIC_DS_REQUIREMENTS", "DEPLOY_FOLDER", "LABELS"]
+TEMPLATE_RESTRICTED_ATTRIBUTES = [
+    "CPU",
+    "VCPU",
+    "OS",
+    "FEATURES",
+    "MEMORY",
+    "DISK",
+    "NIC",
+    "INPUT",
+    "GRAPHICS",
+    "CONTEXT",
+    "CREATED_BY",
+    "CPU_COST",
+    "DISK_COST",
+    "MEMORY_COST",
+    "TEMPLATE_ID",
+    "VMID",
+    "AUTOMATIC_DS_REQUIREMENTS",
+    "DEPLOY_FOLDER",
+    "LABELS",
+]
 
 
 def check_attributes(module, attributes):
     for key in attributes.keys():
         if key in TEMPLATE_RESTRICTED_ATTRIBUTES:
-            module.fail_json(msg='Restricted attribute `' + key + '` cannot be used when filtering VMs.')
+            module.fail_json(msg=f"Restricted attribute `{key}` cannot be used when filtering VMs.")
     # Check the format of the name attribute
     check_name_attribute(module, attributes)
 
 
 def disk_save_as(module, client, vm, disk_saveas, wait_timeout):
-    if not disk_saveas.get('name'):
+    if not disk_saveas.get("name"):
         module.fail_json(msg="Key 'name' is required for 'disk_saveas' option")
 
-    image_name = disk_saveas.get('name')
-    disk_id = disk_saveas.get('disk_id', 0)
+    image_name = disk_saveas.get("name")
+    disk_id = disk_saveas.get("disk_id", 0)
 
     if not module.check_mode:
-        if vm.STATE != VM_STATES.index('POWEROFF'):
+        if vm.STATE != VM_STATES.index("POWEROFF"):
             module.fail_json(msg="'disksaveas' option can be used only when the VM is in 'POWEROFF' state")
         try:
-            client.vm.disksaveas(vm.ID, disk_id, image_name, 'OS', -1)
+            client.vm.disksaveas(vm.ID, disk_id, image_name, "OS", -1)
         except pyone.OneException as e:
             module.fail_json(msg=str(e))
         wait_for_poweroff(module, client, vm, wait_timeout)  # wait for VM to leave the hotplug_saveas_poweroff state
 
 
 def get_connection_info(module):
-
-    url = module.params.get('api_url')
-    username = module.params.get('api_username')
-    password = module.params.get('api_password')
+    url = module.params.get("api_url")
+    username = module.params.get("api_username")
+    password = module.params.get("api_password")
 
     if not url:
-        url = os.environ.get('ONE_URL')
+        url = os.environ.get("ONE_URL")
 
     if not username:
-        username = os.environ.get('ONE_USERNAME')
+        username = os.environ.get("ONE_USERNAME")
 
     if not password:
-        password = os.environ.get('ONE_PASSWORD')
+        password = os.environ.get("ONE_PASSWORD")
 
     if not username:
         if not password:
-            authfile = os.environ.get('ONE_AUTH')
+            authfile = os.environ.get("ONE_AUTH")
             if authfile is None:
                 authfile = os.path.join(os.environ.get("HOME"), ".one", "one_auth")
             try:
@@ -1454,14 +1634,14 @@ def get_connection_info(module):
                 username = authstring.split(":")[0]
                 password = authstring.split(":")[1]
             except (OSError, IOError):
-                module.fail_json(msg=("Could not find or read ONE_AUTH file at '%s'" % authfile))
+                module.fail_json(msg=f"Could not find or read ONE_AUTH file at '{authfile}'")
             except Exception:
-                module.fail_json(msg=("Error occurs when read ONE_AUTH file at '%s'" % authfile))
+                module.fail_json(msg=f"Error occurs when read ONE_AUTH file at '{authfile}'")
     if not url:
         module.fail_json(msg="Opennebula API url (api_url) is not specified")
     from collections import namedtuple
 
-    auth_params = namedtuple('auth', ('url', 'username', 'password'))
+    auth_params = namedtuple("auth", ("url", "username", "password"))
 
     return auth_params(url=url, username=username, password=password)
 
@@ -1471,14 +1651,14 @@ def main():
         "api_url": {"required": False, "type": "str"},
         "api_username": {"required": False, "type": "str"},
         "api_password": {"required": False, "type": "str", "no_log": True},
-        "instance_ids": {"required": False, "aliases": ['ids'], "type": "list", "elements": "int"},
+        "instance_ids": {"required": False, "aliases": ["ids"], "type": "list", "elements": "int"},
         "template_name": {"required": False, "type": "str"},
         "template_id": {"required": False, "type": "int"},
         "vm_start_on_hold": {"default": False, "type": "bool"},
         "state": {
             "default": "present",
-            "choices": ['present', 'absent', 'rebooted', 'poweredoff', 'running'],
-            "type": "str"
+            "choices": ["present", "absent", "rebooted", "poweredoff", "running"],
+            "type": "str",
         },
         "mode": {"required": False, "type": "str"},
         "owner_id": {"required": False, "type": "int"},
@@ -1504,63 +1684,67 @@ def main():
         "updateconf": {"type": "dict"},
     }
 
-    module = AnsibleModule(argument_spec=fields,
-                           mutually_exclusive=[
-                               ['template_id', 'template_name', 'instance_ids'],
-                               ['template_id', 'template_name', 'disk_saveas'],
-                               ['instance_ids', 'count_attributes', 'count'],
-                               ['instance_ids', 'count_labels', 'count'],
-                               ['instance_ids', 'exact_count'],
-                               ['instance_ids', 'attributes'],
-                               ['instance_ids', 'labels'],
-                               ['disk_saveas', 'attributes'],
-                               ['disk_saveas', 'labels'],
-                               ['exact_count', 'count'],
-                               ['count', 'hard'],
-                               ['instance_ids', 'cpu'], ['instance_ids', 'vcpu'],
-                               ['instance_ids', 'memory'], ['instance_ids', 'disk_size'],
-                               ['instance_ids', 'networks'],
-                               ['persistent', 'disk_size']
-                           ],
-                           supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=fields,
+        mutually_exclusive=[
+            ["template_id", "template_name", "instance_ids"],
+            ["template_id", "template_name", "disk_saveas"],
+            ["instance_ids", "count_attributes", "count"],
+            ["instance_ids", "count_labels", "count"],
+            ["instance_ids", "exact_count"],
+            ["instance_ids", "attributes"],
+            ["instance_ids", "labels"],
+            ["disk_saveas", "attributes"],
+            ["disk_saveas", "labels"],
+            ["exact_count", "count"],
+            ["count", "hard"],
+            ["instance_ids", "cpu"],
+            ["instance_ids", "vcpu"],
+            ["instance_ids", "memory"],
+            ["instance_ids", "disk_size"],
+            ["instance_ids", "networks"],
+            ["persistent", "disk_size"],
+        ],
+        supports_check_mode=True,
+    )
 
     if not HAS_PYONE:
-        module.fail_json(msg='This module requires pyone to work!')
+        module.fail_json(msg="This module requires pyone to work!")
 
     auth = get_connection_info(module)
     params = module.params
-    instance_ids = params.get('instance_ids')
-    requested_template_name = params.get('template_name')
-    requested_template_id = params.get('template_id')
-    put_vm_on_hold = params.get('vm_start_on_hold')
-    state = params.get('state')
-    permissions = params.get('mode')
-    owner_id = params.get('owner_id')
-    group_id = params.get('group_id')
-    wait = params.get('wait')
-    wait_timeout = params.get('wait_timeout')
-    hard = params.get('hard')
-    memory = params.get('memory')
-    cpu = params.get('cpu')
-    vcpu = params.get('vcpu')
-    disk_size = params.get('disk_size')
-    requested_datastore_id = params.get('datastore_id')
-    requested_datastore_name = params.get('datastore_name')
-    networks = params.get('networks')
-    count = params.get('count')
-    exact_count = params.get('exact_count')
-    attributes = params.get('attributes')
-    count_attributes = params.get('count_attributes')
-    labels = params.get('labels')
-    count_labels = params.get('count_labels')
-    disk_saveas = params.get('disk_saveas')
-    persistent = params.get('persistent')
-    updateconf = params.get('updateconf')
+    instance_ids = params.get("instance_ids")
+    requested_template_name = params.get("template_name")
+    requested_template_id = params.get("template_id")
+    put_vm_on_hold = params.get("vm_start_on_hold")
+    state = params.get("state")
+    permissions = params.get("mode")
+    owner_id = params.get("owner_id")
+    group_id = params.get("group_id")
+    wait = params.get("wait")
+    wait_timeout = params.get("wait_timeout")
+    hard = params.get("hard")
+    memory = params.get("memory")
+    cpu = params.get("cpu")
+    vcpu = params.get("vcpu")
+    disk_size = params.get("disk_size")
+    requested_datastore_id = params.get("datastore_id")
+    requested_datastore_name = params.get("datastore_name")
+    networks = params.get("networks")
+    count = params.get("count")
+    exact_count = params.get("exact_count")
+    attributes = params.get("attributes")
+    count_attributes = params.get("count_attributes")
+    labels = params.get("labels")
+    count_labels = params.get("count_labels")
+    disk_saveas = params.get("disk_saveas")
+    persistent = params.get("persistent")
+    updateconf = params.get("updateconf")
 
     if not (auth.username and auth.password):
         module.warn("Credentials missing")
     else:
-        one_client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
+        one_client = pyone.OneServer(auth.url, session=f"{auth.username}:{auth.password}")
 
     if attributes:
         attributes = {key.upper(): value for key, value in attributes.items()}
@@ -1570,7 +1754,10 @@ def main():
         count_attributes = {key.upper(): value for key, value in count_attributes.items()}
         if not attributes:
             import copy
-            module.warn('When you pass `count_attributes` without `attributes` option when deploying, `attributes` option will have same values implicitly.')
+
+            module.warn(
+                "When you pass `count_attributes` without `attributes` option when deploying, `attributes` option will have same values implicitly."
+            )
             attributes = copy.copy(count_attributes)
         check_attributes(module, count_attributes)
 
@@ -1578,7 +1765,9 @@ def main():
         check_updateconf(module, updateconf)
 
     if count_labels and not labels:
-        module.warn('When you pass `count_labels` without `labels` option when deploying, `labels` option will have same values implicitly.')
+        module.warn(
+            "When you pass `count_labels` without `labels` option when deploying, `labels` option will have same values implicitly."
+        )
         labels = count_labels
 
     # Fetch template
@@ -1587,9 +1776,9 @@ def main():
         template_id = get_template_id(module, one_client, requested_template_id, requested_template_name)
         if template_id is None:
             if requested_template_id is not None:
-                module.fail_json(msg='There is no template with template_id: ' + str(requested_template_id))
+                module.fail_json(msg=f"There is no template with template_id: {requested_template_id}")
             elif requested_template_name:
-                module.fail_json(msg="There is no template with name: " + requested_template_name)
+                module.fail_json(msg=f"There is no template with name: {requested_template_name}")
 
     # Fetch datastore
     datastore_id = None
@@ -1597,52 +1786,84 @@ def main():
         datastore_id = get_datastore_id(module, one_client, requested_datastore_id, requested_datastore_name)
         if datastore_id is None:
             if requested_datastore_id:
-                module.fail_json(msg='There is no datastore with datastore_id: ' + str(requested_datastore_id))
+                module.fail_json(msg=f"There is no datastore with datastore_id: {requested_datastore_id}")
             elif requested_datastore_name:
-                module.fail_json(msg="There is no datastore with name: " + requested_datastore_name)
+                module.fail_json(msg=f"There is no datastore with name: {requested_datastore_name}")
         else:
-            attributes['SCHED_DS_REQUIREMENTS'] = 'ID=' + str(datastore_id)
+            attributes["SCHED_DS_REQUIREMENTS"] = f"ID={datastore_id}"
 
     if exact_count and template_id is None:
-        module.fail_json(msg='Option `exact_count` needs template_id or template_name')
+        module.fail_json(msg="Option `exact_count` needs template_id or template_name")
 
     if exact_count is not None and not (count_attributes or count_labels):
-        module.fail_json(msg='Either `count_attributes` or `count_labels` has to be specified with option `exact_count`.')
+        module.fail_json(
+            msg="Either `count_attributes` or `count_labels` has to be specified with option `exact_count`."
+        )
     if (count_attributes or count_labels) and exact_count is None:
-        module.fail_json(msg='Option `exact_count` has to be specified when either `count_attributes` or `count_labels` is used.')
-    if template_id is not None and state != 'present':
+        module.fail_json(
+            msg="Option `exact_count` has to be specified when either `count_attributes` or `count_labels` is used."
+        )
+    if template_id is not None and state != "present":
         module.fail_json(msg="Only state 'present' is valid for the template")
 
     if memory:
-        attributes['MEMORY'] = str(int(get_size_in_MB(module, memory)))
+        attributes["MEMORY"] = str(int(get_size_in_MB(module, memory)))
     if cpu:
-        attributes['CPU'] = str(cpu)
+        attributes["CPU"] = str(cpu)
     if vcpu:
-        attributes['VCPU'] = str(vcpu)
+        attributes["VCPU"] = str(vcpu)
 
-    if exact_count is not None and state != 'present':
-        module.fail_json(msg='The `exact_count` option is valid only for the `present` state')
+    if exact_count is not None and state != "present":
+        module.fail_json(msg="The `exact_count` option is valid only for the `present` state")
     if exact_count is not None and exact_count < 0:
-        module.fail_json(msg='`exact_count` cannot be less than 0')
+        module.fail_json(msg="`exact_count` cannot be less than 0")
     if count <= 0:
-        module.fail_json(msg='`count` has to be greater than 0')
+        module.fail_json(msg="`count` has to be greater than 0")
 
     if permissions is not None:
         import re
+
         if re.match("^[0-7]{3}$", permissions) is None:
             module.fail_json(msg="Option `mode` has to have exactly 3 digits and be in the octet format e.g. 600")
 
     if exact_count is not None:
         # Deploy an exact count of VMs
-        changed, instances_list, tagged_instances_list = create_exact_count_of_vms(module, one_client, template_id, exact_count, attributes,
-                                                                                   count_attributes, labels, count_labels, disk_size,
-                                                                                   networks, hard, wait, wait_timeout, put_vm_on_hold, persistent, updateconf)
+        changed, instances_list, tagged_instances_list = create_exact_count_of_vms(
+            module,
+            one_client,
+            template_id,
+            exact_count,
+            attributes,
+            count_attributes,
+            labels,
+            count_labels,
+            disk_size,
+            networks,
+            hard,
+            wait,
+            wait_timeout,
+            put_vm_on_hold,
+            persistent,
+            updateconf,
+        )
         vms = tagged_instances_list
-    elif template_id is not None and state == 'present':
+    elif template_id is not None and state == "present":
         # Deploy count VMs
-        changed, instances_list, tagged_instances_list = create_count_of_vms(module, one_client, template_id, count,
-                                                                             attributes, labels, disk_size, networks, wait, wait_timeout,
-                                                                             put_vm_on_hold, persistent, updateconf)
+        changed, instances_list, tagged_instances_list = create_count_of_vms(
+            module,
+            one_client,
+            template_id,
+            count,
+            attributes,
+            labels,
+            disk_size,
+            networks,
+            wait,
+            wait_timeout,
+            put_vm_on_hold,
+            persistent,
+            updateconf,
+        )
         # instances_list - new instances
         # tagged_instances_list - all instances with specified `count_attributes` and `count_labels`
         vms = instances_list
@@ -1652,10 +1873,14 @@ def main():
             module.fail_json(msg="At least one of `instance_ids`,`attributes`,`labels` must be passed!")
 
         if memory or cpu or vcpu or disk_size or networks:
-            module.fail_json(msg="Parameters as `memory`, `cpu`, `vcpu`, `disk_size` and `networks` you can only set when deploying a VM!")
+            module.fail_json(
+                msg="Parameters as `memory`, `cpu`, `vcpu`, `disk_size` and `networks` you can only set when deploying a VM!"
+            )
 
-        if hard and state not in ['rebooted', 'poweredoff', 'absent', 'present']:
-            module.fail_json(msg="The 'hard' option can be used only for one of these states: 'rebooted', 'poweredoff', 'absent' and 'present'")
+        if hard and state not in ["rebooted", "poweredoff", "absent", "present"]:
+            module.fail_json(
+                msg="The 'hard' option can be used only for one of these states: 'rebooted', 'poweredoff', 'absent' and 'present'"
+            )
 
         vms = []
         tagged = False
@@ -1667,22 +1892,22 @@ def main():
             tagged = True
             vms = get_all_vms_by_attributes(one_client, attributes, labels)
 
-        if len(vms) == 0 and state != 'absent' and state != 'present':
-            module.fail_json(msg='There are no instances with specified `instance_ids`, `attributes` and/or `labels`')
+        if len(vms) == 0 and state != "absent" and state != "present":
+            module.fail_json(msg="There are no instances with specified `instance_ids`, `attributes` and/or `labels`")
 
-        if len(vms) == 0 and state == 'present' and not tagged:
-            module.fail_json(msg='There are no instances with specified `instance_ids`.')
+        if len(vms) == 0 and state == "present" and not tagged:
+            module.fail_json(msg="There are no instances with specified `instance_ids`.")
 
-        if tagged and state == 'absent':
-            module.fail_json(msg='Option `instance_ids` is required when state is `absent`.')
+        if tagged and state == "absent":
+            module.fail_json(msg="Option `instance_ids` is required when state is `absent`.")
 
-        if state == 'absent':
+        if state == "absent":
             changed = terminate_vms(module, one_client, vms, hard)
-        elif state == 'rebooted':
+        elif state == "rebooted":
             changed = reboot_vms(module, one_client, vms, wait_timeout, hard)
-        elif state == 'poweredoff':
+        elif state == "poweredoff":
             changed = poweroff_vms(module, one_client, vms, hard)
-        elif state == 'running':
+        elif state == "running":
             changed = resume_vms(module, one_client, vms)
 
         instances_list = vms
@@ -1697,12 +1922,12 @@ def main():
     if template_id is None and updateconf is not None:
         changed = update_vms(module, one_client, vms, updateconf) or changed
 
-    if wait and not module.check_mode and state != 'present':
+    if wait and not module.check_mode and state != "present":
         wait_for = {
-            'absent': wait_for_done,
-            'rebooted': wait_for_running,
-            'poweredoff': wait_for_poweroff,
-            'running': wait_for_running
+            "absent": wait_for_done,
+            "rebooted": wait_for_running,
+            "poweredoff": wait_for_poweroff,
+            "running": wait_for_running,
         }
         for vm in vms:
             if vm is not None:
@@ -1720,10 +1945,15 @@ def main():
     # tagged_instances - A list of instances info based on a specific attributes and/or labels that are specified with C(count_attributes) and C(count_labels)
     tagged_instances = list(get_vm_info(one_client, vm) for vm in tagged_instances_list if vm is not None)
 
-    result = {'changed': changed, 'instances': instances, 'instances_ids': instances_ids, 'tagged_instances': tagged_instances}
+    result = {
+        "changed": changed,
+        "instances": instances,
+        "instances_ids": instances_ids,
+        "tagged_instances": tagged_instances,
+    }
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

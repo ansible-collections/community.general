@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Kim Nørgaard
 # Written by Kim Nørgaard <jasen@jasen.dk>
@@ -11,8 +10,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -76,17 +74,16 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def query_package(module, slackpkg_path, name):
-
     import platform
     import os
     import re
 
     machine = platform.machine()
     # Exception for kernel-headers package on x86_64
-    if name == 'kernel-headers' and machine == 'x86_64':
-        machine = 'x86'
-    pattern = re.compile('^%s-[^-]+-(%s|noarch|fw)-[^-]+$' % (re.escape(name), re.escape(machine)))
-    packages = [f for f in os.listdir('/var/log/packages') if pattern.match(f)]
+    if name == "kernel-headers" and machine == "x86_64":
+        machine = "x86"
+    pattern = re.compile(f"^{re.escape(name)}-[^-]+-({re.escape(machine)}|noarch|fw)-[^-]+$")
+    packages = [f for f in os.listdir("/var/log/packages") if pattern.match(f)]
 
     if len(packages) > 0:
         return True
@@ -95,7 +92,6 @@ def query_package(module, slackpkg_path, name):
 
 
 def remove_packages(module, slackpkg_path, packages):
-
     remove_c = 0
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
@@ -104,24 +100,20 @@ def remove_packages(module, slackpkg_path, packages):
             continue
 
         if not module.check_mode:
-            rc, out, err = module.run_command(
-                [slackpkg_path, "-default_answer=y", "-batch=on", "remove", package])
+            rc, out, err = module.run_command([slackpkg_path, "-default_answer=y", "-batch=on", "remove", package])
 
-        if not module.check_mode and query_package(module, slackpkg_path,
-                                                   package):
-            module.fail_json(msg="failed to remove %s: %s" % (package, out))
+        if not module.check_mode and query_package(module, slackpkg_path, package):
+            module.fail_json(msg=f"failed to remove {package}: {out}")
 
         remove_c += 1
 
     if remove_c > 0:
-
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
+        module.exit_json(changed=True, msg=f"removed {remove_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
 
 def install_packages(module, slackpkg_path, packages):
-
     install_c = 0
 
     for package in packages:
@@ -129,19 +121,15 @@ def install_packages(module, slackpkg_path, packages):
             continue
 
         if not module.check_mode:
-            rc, out, err = module.run_command(
-                [slackpkg_path, "-default_answer=y", "-batch=on", "install", package])
+            rc, out, err = module.run_command([slackpkg_path, "-default_answer=y", "-batch=on", "install", package])
 
-        if not module.check_mode and not query_package(module, slackpkg_path,
-                                                       package):
-            module.fail_json(msg="failed to install %s: %s" % (package, out),
-                             stderr=err)
+        if not module.check_mode and not query_package(module, slackpkg_path, package):
+            module.fail_json(msg=f"failed to install {package}: {out}", stderr=err)
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="present %s package(s)"
-                         % (install_c))
+        module.exit_json(changed=True, msg=f"present {install_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already present")
 
@@ -151,26 +139,21 @@ def upgrade_packages(module, slackpkg_path, packages):
 
     for package in packages:
         if not module.check_mode:
-            rc, out, err = module.run_command(
-                [slackpkg_path, "-default_answer=y", "-batch=on", "upgrade", package])
+            rc, out, err = module.run_command([slackpkg_path, "-default_answer=y", "-batch=on", "upgrade", package])
 
-        if not module.check_mode and not query_package(module, slackpkg_path,
-                                                       package):
-            module.fail_json(msg="failed to install %s: %s" % (package, out),
-                             stderr=err)
+        if not module.check_mode and not query_package(module, slackpkg_path, package):
+            module.fail_json(msg=f"failed to install {package}: {out}", stderr=err)
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="present %s package(s)"
-                         % (install_c))
+        module.exit_json(changed=True, msg=f"present {install_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already present")
 
 
 def update_cache(module, slackpkg_path):
-    rc, out, err = module.run_command(
-        [slackpkg_path, "-batch=on", "update"])
+    rc, out, err = module.run_command([slackpkg_path, "-batch=on", "update"])
     if rc != 0:
         module.fail_json(msg="Could not update package cache")
 
@@ -178,30 +161,31 @@ def update_cache(module, slackpkg_path):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default="present", choices=['installed', 'removed', 'absent', 'present', 'latest']),
-            name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
-            update_cache=dict(default=False, type='bool'),
+            state=dict(default="present", choices=["installed", "removed", "absent", "present", "latest"]),
+            name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
+            update_cache=dict(default=False, type="bool"),
         ),
-        supports_check_mode=True)
+        supports_check_mode=True,
+    )
 
-    slackpkg_path = module.get_bin_path('slackpkg', True)
+    slackpkg_path = module.get_bin_path("slackpkg", True)
 
     p = module.params
 
-    pkgs = p['name']
+    pkgs = p["name"]
 
     if p["update_cache"]:
         update_cache(module, slackpkg_path)
 
-    if p['state'] == 'latest':
+    if p["state"] == "latest":
         upgrade_packages(module, slackpkg_path, pkgs)
 
-    elif p['state'] in ['present', 'installed']:
+    elif p["state"] in ["present", "installed"]:
         install_packages(module, slackpkg_path, pkgs)
 
-    elif p["state"] in ['removed', 'absent']:
+    elif p["state"] in ["removed", "absent"]:
         remove_packages(module, slackpkg_path, pkgs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

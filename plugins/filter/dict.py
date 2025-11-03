@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2021, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -62,17 +60,17 @@ _value:
 
 
 def dict_filter(sequence):
-    '''Convert a list of tuples to a dictionary.
+    """Convert a list of tuples to a dictionary.
 
     Example: ``[[1, 2], ['a', 'b']] | community.general.dict`` results in ``{1: 2, 'a': 'b'}``
-    '''
+    """
     return dict(sequence)
 
 
-class FilterModule(object):
-    '''Ansible jinja2 filters'''
+class FilterModule:
+    """Ansible jinja2 filters"""
 
     def filters(self):
         return {
-            'dict': dict_filter,
+            "dict": dict_filter,
         }

@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, George Rawlinson <george@rawlinson.net.nz>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: pacman_key
@@ -135,11 +133,11 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_native
 
 
-class GpgListResult(object):
+class GpgListResult:
     """Wraps gpg --list-* output."""
 
     def __init__(self, line):
-        self._parts = line.split(':')
+        self._parts = line.split(":")
 
     @property
     def kind(self):
@@ -151,7 +149,7 @@ class GpgListResult(object):
 
     @property
     def is_fully_valid(self):
-        return self.valid == 'f'
+        return self.valid == "f"
 
     @property
     def key(self):
@@ -178,24 +176,24 @@ def gpg_get_all_attrs_of_kind(lines, kind, attr):
     return result
 
 
-class PacmanKey(object):
+class PacmanKey:
     def __init__(self, module):
         self.module = module
         # obtain binary paths for gpg & pacman-key
-        self.gpg_binary = module.get_bin_path('gpg', required=True)
-        self.pacman_key_binary = module.get_bin_path('pacman-key', required=True)
+        self.gpg_binary = module.get_bin_path("gpg", required=True)
+        self.pacman_key_binary = module.get_bin_path("pacman-key", required=True)
 
         # obtain module parameters
-        keyid = module.params['id']
-        url = module.params['url']
-        data = module.params['data']
-        file = module.params['file']
-        keyserver = module.params['keyserver']
-        verify = module.params['verify']
-        force_update = module.params['force_update']
-        keyring = module.params['keyring']
-        state = module.params['state']
-        ensure_trusted = module.params['ensure_trusted']
+        keyid = module.params["id"]
+        url = module.params["url"]
+        data = module.params["data"]
+        file = module.params["file"]
+        keyserver = module.params["keyserver"]
+        verify = module.params["verify"]
+        force_update = module.params["force_update"]
+        keyring = module.params["keyring"]
+        state = module.params["state"]
+        ensure_trusted = module.params["ensure_trusted"]
         self.keylength = 40
 
         # sanitise key ID & check if key exists in the keyring
@@ -206,15 +204,15 @@ class PacmanKey(object):
 
         # check mode
         if module.check_mode:
-            if state == 'present':
+            if state == "present":
                 changed = (key_present and force_update) or not key_present
                 if not changed and ensure_trusted:
                     changed = not (key_valid and self.key_is_trusted(keyring, keyid))
                 module.exit_json(changed=changed)
-            if state == 'absent':
+            if state == "absent":
                 module.exit_json(changed=key_present)
 
-        if state == 'present':
+        if state == "present":
             trusted = key_valid and self.key_is_trusted(keyring, keyid)
             if not force_update and key_present and (not ensure_trusted or trusted):
                 module.exit_json(changed=False)
@@ -238,7 +236,7 @@ class PacmanKey(object):
                 self.lsign_key(keyring=keyring, keyid=keyid)
                 changed = True
             module.exit_json(changed=changed)
-        elif state == 'absent':
+        elif state == "absent":
             if key_present:
                 self.remove_key(keyring, keyid)
                 module.exit_json(changed=True)
@@ -247,18 +245,16 @@ class PacmanKey(object):
     def gpg(self, args, keyring=None, **kwargs):
         cmd = [self.gpg_binary]
         if keyring:
-            cmd.append('--homedir={keyring}'.format(keyring=keyring))
-        cmd.extend(['--no-permission-warning', '--with-colons', '--quiet', '--batch', '--no-tty'])
+            cmd.append(f"--homedir={keyring}")
+        cmd.extend(["--no-permission-warning", "--with-colons", "--quiet", "--batch", "--no-tty"])
         return self.module.run_command(cmd + args, **kwargs)
 
     def pacman_key(self, args, keyring, **kwargs):
-        return self.module.run_command(
-            [self.pacman_key_binary, '--gpgdir', keyring] + args,
-            **kwargs)
+        return self.module.run_command([self.pacman_key_binary, "--gpgdir", keyring] + args, **kwargs)
 
     def pacman_machine_key(self, keyring):
-        unused_rc, stdout, unused_stderr = self.gpg(['--list-secret-key'], keyring=keyring)
-        return gpg_get_first_attr_of_kind(stdout.splitlines(), 'sec', 'key')
+        unused_rc, stdout, unused_stderr = self.gpg(["--list-secret-key"], keyring=keyring)
+        return gpg_get_first_attr_of_kind(stdout.splitlines(), "sec", "key")
 
     def is_hexadecimal(self, string):
         """Check if a given string is valid hexadecimal"""
@@ -273,27 +269,27 @@ class PacmanKey(object):
 
         Strips whitespace, uppercases all characters, and strips leading `0X`.
         """
-        sanitised_keyid = keyid.strip().upper().replace(' ', '').replace('0X', '')
+        sanitised_keyid = keyid.strip().upper().replace(" ", "").replace("0X", "")
         if len(sanitised_keyid) != self.keylength:
-            self.module.fail_json(msg="key ID is not full-length: %s" % sanitised_keyid)
+            self.module.fail_json(msg=f"key ID is not full-length: {sanitised_keyid}")
         if not self.is_hexadecimal(sanitised_keyid):
-            self.module.fail_json(msg="key ID is not hexadecimal: %s" % sanitised_keyid)
+            self.module.fail_json(msg=f"key ID is not hexadecimal: {sanitised_keyid}")
         return sanitised_keyid
 
     def fetch_key(self, url):
         """Downloads a key from url"""
         response, info = fetch_url(self.module, url)
-        if info['status'] != 200:
-            self.module.fail_json(msg="failed to fetch key at %s, error was %s" % (url, info['msg']))
+        if info["status"] != 200:
+            self.module.fail_json(msg=f"failed to fetch key at {url}, error was {info['msg']}")
         return to_native(response.read())
 
     def recv_key(self, keyring, keyid, keyserver):
         """Receives key via keyserver"""
-        self.pacman_key(['--keyserver', keyserver, '--recv-keys', keyid], keyring=keyring, check_rc=True)
+        self.pacman_key(["--keyserver", keyserver, "--recv-keys", keyid], keyring=keyring, check_rc=True)
 
     def lsign_key(self, keyring, keyid):
         """Locally sign key"""
-        self.pacman_key(['--lsign-key', keyid], keyring=keyring, check_rc=True)
+        self.pacman_key(["--lsign-key", keyid], keyring=keyring, check_rc=True)
 
     def save_key(self, data):
         "Saves key data to a temporary file"
@@ -308,11 +304,11 @@ class PacmanKey(object):
         """Add key to pacman's keyring"""
         if verify:
             self.verify_keyfile(keyfile, keyid)
-        self.pacman_key(['--add', keyfile], keyring=keyring, check_rc=True)
+        self.pacman_key(["--add", keyfile], keyring=keyring, check_rc=True)
 
     def remove_key(self, keyring, keyid):
         """Remove key from pacman's keyring"""
-        self.pacman_key(['--delete', keyid], keyring=keyring, check_rc=True)
+        self.pacman_key(["--delete", keyid], keyring=keyring, check_rc=True)
 
     def verify_keyfile(self, keyfile, keyid):
         """Verify that keyfile matches the specified key ID"""
@@ -322,50 +318,50 @@ class PacmanKey(object):
             self.module.fail_json(msg="expected a key ID, got none")
 
         rc, stdout, stderr = self.gpg(
-            ['--with-fingerprint', '--show-keys', keyfile],
+            ["--with-fingerprint", "--show-keys", keyfile],
             check_rc=True,
         )
 
-        extracted_keyid = gpg_get_first_attr_of_kind(stdout.splitlines(), 'fpr', 'user_id')
+        extracted_keyid = gpg_get_first_attr_of_kind(stdout.splitlines(), "fpr", "user_id")
         if extracted_keyid != keyid:
-            self.module.fail_json(msg="key ID does not match. expected %s, got %s" % (keyid, extracted_keyid))
+            self.module.fail_json(msg=f"key ID does not match. expected {keyid}, got {extracted_keyid}")
 
     def key_validity(self, keyring, keyid):
         "Check if the key ID is in pacman's keyring and not expired"
-        rc, stdout, stderr = self.gpg(['--no-default-keyring', '--list-keys', keyid], keyring=keyring, check_rc=False)
+        rc, stdout, stderr = self.gpg(["--no-default-keyring", "--list-keys", keyid], keyring=keyring, check_rc=False)
         if rc != 0:
             if stderr.find("No public key") >= 0:
                 return []
             else:
-                self.module.fail_json(msg="gpg returned an error: %s" % stderr)
-        return gpg_get_all_attrs_of_kind(stdout.splitlines(), 'uid', 'is_fully_valid')
+                self.module.fail_json(msg=f"gpg returned an error: {stderr}")
+        return gpg_get_all_attrs_of_kind(stdout.splitlines(), "uid", "is_fully_valid")
 
     def key_is_trusted(self, keyring, keyid):
         """Check if key is signed and not expired."""
-        unused_rc, stdout, unused_stderr = self.gpg(['--check-signatures', keyid], keyring=keyring)
-        return self.pacman_machine_key(keyring) in gpg_get_all_attrs_of_kind(stdout.splitlines(), 'sig', 'key')
+        unused_rc, stdout, unused_stderr = self.gpg(["--check-signatures", keyid], keyring=keyring)
+        return self.pacman_machine_key(keyring) in gpg_get_all_attrs_of_kind(stdout.splitlines(), "sig", "key")
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            id=dict(type='str', required=True),
-            data=dict(type='str'),
-            file=dict(type='path'),
-            url=dict(type='str'),
-            keyserver=dict(type='str'),
-            verify=dict(type='bool', default=True),
-            force_update=dict(type='bool', default=False),
-            keyring=dict(type='path', default='/etc/pacman.d/gnupg'),
-            ensure_trusted=dict(type='bool', default=False),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
+            id=dict(type="str", required=True),
+            data=dict(type="str"),
+            file=dict(type="path"),
+            url=dict(type="str"),
+            keyserver=dict(type="str"),
+            verify=dict(type="bool", default=True),
+            force_update=dict(type="bool", default=False),
+            keyring=dict(type="path", default="/etc/pacman.d/gnupg"),
+            ensure_trusted=dict(type="bool", default=False),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
         ),
         supports_check_mode=True,
-        mutually_exclusive=(('data', 'file', 'url', 'keyserver'),),
-        required_if=[('state', 'present', ('data', 'file', 'url', 'keyserver'), True)],
+        mutually_exclusive=(("data", "file", "url", "keyserver"),),
+        required_if=[("state", "present", ("data", "file", "url", "keyserver"), True)],
     )
     PacmanKey(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

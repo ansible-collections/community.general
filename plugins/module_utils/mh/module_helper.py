@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 # (c) 2020-2024, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2020-2024, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
+import typing as t
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
@@ -15,21 +14,25 @@ from ansible_collections.community.general.plugins.module_utils.mh.base import M
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
+if t.TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
-    facts_name = None
-    output_params = ()
-    diff_params = ()
-    change_params = ()
-    facts_params = ()
+    facts_name: str | None = None
+    output_params: Sequence[str] = ()
+    diff_params: Sequence[str] = ()
+    change_params: Sequence[str] = ()
+    facts_params: Sequence[str] = ()
 
     def __init__(self, module=None):
-        super(ModuleHelper, self).__init__(module)
+        super().__init__(module)
 
         self.vars = VarDict()
         for name, value in self.module.params.items():
             self.vars.set(
-                name, value,
+                name,
+                value,
                 diff=name in self.diff_params,
                 output=name in self.output_params,
                 change=None if not self.change_params else name in self.change_params,
@@ -60,11 +63,11 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
         if self.facts_name:
             facts = self.vars.facts()
             if facts is not None:
-                result['ansible_facts'] = {self.facts_name: facts}
+                result["ansible_facts"] = {self.facts_name: facts}
         if self.diff_mode:
-            diff = result.get('diff', {})
+            diff = result.get("diff", {})
             vars_diff = self.vars.diff() or {}
-            result['diff'] = dict_merge(dict(diff), vars_diff)
+            result["diff"] = dict_merge(dict(diff), vars_diff)
 
         return result
 

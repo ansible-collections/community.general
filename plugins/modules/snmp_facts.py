@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # This file is part of Networklore's snmp library for Ansible
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: snmp_facts
@@ -197,8 +195,7 @@ with deps.declare("pysnmp"):
     from pysnmp.proto.rfc1905 import EndOfMibView
 
 
-class DefineOid(object):
-
+class DefineOid:
     def __init__(self, dotprefix=False):
         if dotprefix:
             dp = "."
@@ -206,31 +203,30 @@ class DefineOid(object):
             dp = ""
 
         # From SNMPv2-MIB
-        self.sysDescr = dp + "1.3.6.1.2.1.1.1.0"
-        self.sysObjectId = dp + "1.3.6.1.2.1.1.2.0"
-        self.sysUpTime = dp + "1.3.6.1.2.1.1.3.0"
-        self.sysContact = dp + "1.3.6.1.2.1.1.4.0"
-        self.sysName = dp + "1.3.6.1.2.1.1.5.0"
-        self.sysLocation = dp + "1.3.6.1.2.1.1.6.0"
+        self.sysDescr = f"{dp}1.3.6.1.2.1.1.1.0"
+        self.sysObjectId = f"{dp}1.3.6.1.2.1.1.2.0"
+        self.sysUpTime = f"{dp}1.3.6.1.2.1.1.3.0"
+        self.sysContact = f"{dp}1.3.6.1.2.1.1.4.0"
+        self.sysName = f"{dp}1.3.6.1.2.1.1.5.0"
+        self.sysLocation = f"{dp}1.3.6.1.2.1.1.6.0"
 
         # From IF-MIB
-        self.ifIndex = dp + "1.3.6.1.2.1.2.2.1.1"
-        self.ifDescr = dp + "1.3.6.1.2.1.2.2.1.2"
-        self.ifMtu = dp + "1.3.6.1.2.1.2.2.1.4"
-        self.ifSpeed = dp + "1.3.6.1.2.1.2.2.1.5"
-        self.ifPhysAddress = dp + "1.3.6.1.2.1.2.2.1.6"
-        self.ifAdminStatus = dp + "1.3.6.1.2.1.2.2.1.7"
-        self.ifOperStatus = dp + "1.3.6.1.2.1.2.2.1.8"
-        self.ifAlias = dp + "1.3.6.1.2.1.31.1.1.1.18"
+        self.ifIndex = f"{dp}1.3.6.1.2.1.2.2.1.1"
+        self.ifDescr = f"{dp}1.3.6.1.2.1.2.2.1.2"
+        self.ifMtu = f"{dp}1.3.6.1.2.1.2.2.1.4"
+        self.ifSpeed = f"{dp}1.3.6.1.2.1.2.2.1.5"
+        self.ifPhysAddress = f"{dp}1.3.6.1.2.1.2.2.1.6"
+        self.ifAdminStatus = f"{dp}1.3.6.1.2.1.2.2.1.7"
+        self.ifOperStatus = f"{dp}1.3.6.1.2.1.2.2.1.8"
+        self.ifAlias = f"{dp}1.3.6.1.2.1.31.1.1.1.18"
 
         # From IP-MIB
-        self.ipAdEntAddr = dp + "1.3.6.1.2.1.4.20.1.1"
-        self.ipAdEntIfIndex = dp + "1.3.6.1.2.1.4.20.1.2"
-        self.ipAdEntNetMask = dp + "1.3.6.1.2.1.4.20.1.3"
+        self.ipAdEntAddr = f"{dp}1.3.6.1.2.1.4.20.1.1"
+        self.ipAdEntIfIndex = f"{dp}1.3.6.1.2.1.4.20.1.2"
+        self.ipAdEntNetMask = f"{dp}1.3.6.1.2.1.4.20.1.3"
 
 
 def decode_hex(hexstring):
-
     if len(hexstring) < 3:
         return hexstring
     if hexstring[:2] == "0x":
@@ -239,7 +235,6 @@ def decode_hex(hexstring):
 
 
 def decode_mac(hexstring):
-
     if len(hexstring) != 14:
         return hexstring
     if hexstring[:2] == "0x":
@@ -248,11 +243,7 @@ def decode_mac(hexstring):
 
 
 def lookup_adminstatus(int_adminstatus):
-    adminstatus_options = {
-        1: 'up',
-        2: 'down',
-        3: 'testing'
-    }
+    adminstatus_options = {1: "up", 2: "down", 3: "testing"}
     if int_adminstatus in adminstatus_options:
         return adminstatus_options[int_adminstatus]
     return ""
@@ -260,13 +251,13 @@ def lookup_adminstatus(int_adminstatus):
 
 def lookup_operstatus(int_operstatus):
     operstatus_options = {
-        1: 'up',
-        2: 'down',
-        3: 'testing',
-        4: 'unknown',
-        5: 'dormant',
-        6: 'notPresent',
-        7: 'lowerLayerDown'
+        1: "up",
+        2: "down",
+        3: "testing",
+        4: "unknown",
+        5: "dormant",
+        6: "notPresent",
+        7: "lowerLayerDown",
     }
     if int_operstatus in operstatus_options:
         return operstatus_options[int_operstatus]
@@ -276,21 +267,21 @@ def lookup_operstatus(int_operstatus):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(type='str', required=True),
-            version=dict(type='str', required=True, choices=['v2', 'v2c', 'v3']),
-            community=dict(type='str'),
-            username=dict(type='str'),
-            level=dict(type='str', choices=['authNoPriv', 'authPriv']),
-            integrity=dict(type='str', choices=['md5', 'sha']),
-            privacy=dict(type='str', choices=['aes', 'des']),
-            authkey=dict(type='str', no_log=True),
-            privkey=dict(type='str', no_log=True),
-            timeout=dict(type='int'),
-            retries=dict(type='int'),
+            host=dict(type="str", required=True),
+            version=dict(type="str", required=True, choices=["v2", "v2c", "v3"]),
+            community=dict(type="str"),
+            username=dict(type="str"),
+            level=dict(type="str", choices=["authNoPriv", "authPriv"]),
+            integrity=dict(type="str", choices=["md5", "sha"]),
+            privacy=dict(type="str", choices=["aes", "des"]),
+            authkey=dict(type="str", no_log=True),
+            privkey=dict(type="str", no_log=True),
+            timeout=dict(type="int"),
+            retries=dict(type="int"),
         ),
         required_together=(
-            ['username', 'level', 'integrity', 'authkey'],
-            ['privacy', 'privkey'],
+            ["username", "level", "integrity", "authkey"],
+            ["privacy", "privkey"],
         ),
         supports_check_mode=True,
     )
@@ -300,48 +291,49 @@ def main():
     deps.validate(module)
 
     cmdGen = cmdgen.CommandGenerator()
-    transport_opts = {
-        k: m_args[k]
-        for k in ('timeout', 'retries')
-        if m_args[k] is not None
-    }
+    transport_opts = {k: m_args[k] for k in ("timeout", "retries") if m_args[k] is not None}
 
     # Verify that we receive a community when using snmp v2
-    if m_args['version'] in ("v2", "v2c"):
-        if m_args['community'] is None:
-            module.fail_json(msg='Community not set when using snmp version 2')
+    if m_args["version"] in ("v2", "v2c"):
+        if m_args["community"] is None:
+            module.fail_json(msg="Community not set when using snmp version 2")
 
     integrity_proto = None
     privacy_proto = None
-    if m_args['version'] == "v3":
-        if m_args['username'] is None:
-            module.fail_json(msg='Username not set when using snmp version 3')
+    if m_args["version"] == "v3":
+        if m_args["username"] is None:
+            module.fail_json(msg="Username not set when using snmp version 3")
 
-        if m_args['level'] == "authPriv" and m_args['privacy'] is None:
-            module.fail_json(msg='Privacy algorithm not set when using authPriv')
+        if m_args["level"] == "authPriv" and m_args["privacy"] is None:
+            module.fail_json(msg="Privacy algorithm not set when using authPriv")
 
-        if m_args['integrity'] == "sha":
+        if m_args["integrity"] == "sha":
             integrity_proto = cmdgen.usmHMACSHAAuthProtocol
-        elif m_args['integrity'] == "md5":
+        elif m_args["integrity"] == "md5":
             integrity_proto = cmdgen.usmHMACMD5AuthProtocol
 
-        if m_args['privacy'] == "aes":
+        if m_args["privacy"] == "aes":
             privacy_proto = cmdgen.usmAesCfb128Protocol
-        elif m_args['privacy'] == "des":
+        elif m_args["privacy"] == "des":
             privacy_proto = cmdgen.usmDESPrivProtocol
 
     # Use SNMP Version 2
-    if m_args['version'] in ("v2", "v2c"):
-        snmp_auth = cmdgen.CommunityData(m_args['community'])
+    if m_args["version"] in ("v2", "v2c"):
+        snmp_auth = cmdgen.CommunityData(m_args["community"])
 
     # Use SNMP Version 3 with authNoPriv
-    elif m_args['level'] == "authNoPriv":
-        snmp_auth = cmdgen.UsmUserData(m_args['username'], authKey=m_args['authkey'], authProtocol=integrity_proto)
+    elif m_args["level"] == "authNoPriv":
+        snmp_auth = cmdgen.UsmUserData(m_args["username"], authKey=m_args["authkey"], authProtocol=integrity_proto)
 
     # Use SNMP Version 3 with authPriv
     else:
-        snmp_auth = cmdgen.UsmUserData(m_args['username'], authKey=m_args['authkey'], privKey=m_args['privkey'], authProtocol=integrity_proto,
-                                       privProtocol=privacy_proto)
+        snmp_auth = cmdgen.UsmUserData(
+            m_args["username"],
+            authKey=m_args["authkey"],
+            privKey=m_args["privkey"],
+            authProtocol=integrity_proto,
+            privProtocol=privacy_proto,
+        )
 
     # Use p to prefix OIDs with a dot for polling
     p = DefineOid(dotprefix=True)
@@ -355,14 +347,26 @@ def main():
 
     errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         snmp_auth,
-        cmdgen.UdpTransportTarget((m_args['host'], 161), **transport_opts),
-        cmdgen.MibVariable(p.sysDescr,),
-        cmdgen.MibVariable(p.sysObjectId,),
-        cmdgen.MibVariable(p.sysUpTime,),
-        cmdgen.MibVariable(p.sysContact,),
-        cmdgen.MibVariable(p.sysName,),
-        cmdgen.MibVariable(p.sysLocation,),
-        lookupMib=False
+        cmdgen.UdpTransportTarget((m_args["host"], 161), **transport_opts),
+        cmdgen.MibVariable(
+            p.sysDescr,
+        ),
+        cmdgen.MibVariable(
+            p.sysObjectId,
+        ),
+        cmdgen.MibVariable(
+            p.sysUpTime,
+        ),
+        cmdgen.MibVariable(
+            p.sysContact,
+        ),
+        cmdgen.MibVariable(
+            p.sysName,
+        ),
+        cmdgen.MibVariable(
+            p.sysLocation,
+        ),
+        lookupMib=False,
     )
 
     if errorIndication:
@@ -372,34 +376,55 @@ def main():
         current_oid = oid.prettyPrint()
         current_val = val.prettyPrint()
         if current_oid == v.sysDescr:
-            results['ansible_sysdescr'] = decode_hex(current_val)
+            results["ansible_sysdescr"] = decode_hex(current_val)
         elif current_oid == v.sysObjectId:
-            results['ansible_sysobjectid'] = current_val
+            results["ansible_sysobjectid"] = current_val
         elif current_oid == v.sysUpTime:
-            results['ansible_sysuptime'] = current_val
+            results["ansible_sysuptime"] = current_val
         elif current_oid == v.sysContact:
-            results['ansible_syscontact'] = current_val
+            results["ansible_syscontact"] = current_val
         elif current_oid == v.sysName:
-            results['ansible_sysname'] = current_val
+            results["ansible_sysname"] = current_val
         elif current_oid == v.sysLocation:
-            results['ansible_syslocation'] = current_val
+            results["ansible_syslocation"] = current_val
 
     errorIndication, errorStatus, errorIndex, varTable = cmdGen.nextCmd(
         snmp_auth,
-        cmdgen.UdpTransportTarget((m_args['host'], 161), **transport_opts),
-        cmdgen.MibVariable(p.ifIndex,),
-        cmdgen.MibVariable(p.ifDescr,),
-        cmdgen.MibVariable(p.ifMtu,),
-        cmdgen.MibVariable(p.ifSpeed,),
-        cmdgen.MibVariable(p.ifPhysAddress,),
-        cmdgen.MibVariable(p.ifAdminStatus,),
-        cmdgen.MibVariable(p.ifOperStatus,),
-        cmdgen.MibVariable(p.ipAdEntAddr,),
-        cmdgen.MibVariable(p.ipAdEntIfIndex,),
-        cmdgen.MibVariable(p.ipAdEntNetMask,),
-
-        cmdgen.MibVariable(p.ifAlias,),
-        lookupMib=False
+        cmdgen.UdpTransportTarget((m_args["host"], 161), **transport_opts),
+        cmdgen.MibVariable(
+            p.ifIndex,
+        ),
+        cmdgen.MibVariable(
+            p.ifDescr,
+        ),
+        cmdgen.MibVariable(
+            p.ifMtu,
+        ),
+        cmdgen.MibVariable(
+            p.ifSpeed,
+        ),
+        cmdgen.MibVariable(
+            p.ifPhysAddress,
+        ),
+        cmdgen.MibVariable(
+            p.ifAdminStatus,
+        ),
+        cmdgen.MibVariable(
+            p.ifOperStatus,
+        ),
+        cmdgen.MibVariable(
+            p.ipAdEntAddr,
+        ),
+        cmdgen.MibVariable(
+            p.ipAdEntIfIndex,
+        ),
+        cmdgen.MibVariable(
+            p.ipAdEntNetMask,
+        ),
+        cmdgen.MibVariable(
+            p.ifAlias,
+        ),
+        lookupMib=False,
     )
 
     if errorIndication:
@@ -417,51 +442,51 @@ def main():
             current_oid = oid.prettyPrint()
             current_val = val.prettyPrint()
             if v.ifIndex in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['ifindex'] = current_val
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["ifindex"] = current_val
                 interface_indexes.append(ifIndex)
             if v.ifDescr in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['name'] = current_val
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["name"] = current_val
             if v.ifMtu in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['mtu'] = current_val
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["mtu"] = current_val
             if v.ifSpeed in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['speed'] = current_val
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["speed"] = current_val
             if v.ifPhysAddress in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['mac'] = decode_mac(current_val)
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["mac"] = decode_mac(current_val)
             if v.ifAdminStatus in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['adminstatus'] = lookup_adminstatus(int(current_val))
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["adminstatus"] = lookup_adminstatus(int(current_val))
             if v.ifOperStatus in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['operstatus'] = lookup_operstatus(int(current_val))
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["operstatus"] = lookup_operstatus(int(current_val))
             if v.ipAdEntAddr in current_oid:
-                curIPList = current_oid.rsplit('.', 4)[-4:]
+                curIPList = current_oid.rsplit(".", 4)[-4:]
                 curIP = ".".join(curIPList)
-                ipv4_networks[curIP]['address'] = current_val
+                ipv4_networks[curIP]["address"] = current_val
                 all_ipv4_addresses.append(current_val)
             if v.ipAdEntIfIndex in current_oid:
-                curIPList = current_oid.rsplit('.', 4)[-4:]
+                curIPList = current_oid.rsplit(".", 4)[-4:]
                 curIP = ".".join(curIPList)
-                ipv4_networks[curIP]['interface'] = current_val
+                ipv4_networks[curIP]["interface"] = current_val
             if v.ipAdEntNetMask in current_oid:
-                curIPList = current_oid.rsplit('.', 4)[-4:]
+                curIPList = current_oid.rsplit(".", 4)[-4:]
                 curIP = ".".join(curIPList)
-                ipv4_networks[curIP]['netmask'] = current_val
+                ipv4_networks[curIP]["netmask"] = current_val
 
             if v.ifAlias in current_oid:
-                ifIndex = int(current_oid.rsplit('.', 1)[-1])
-                results['ansible_interfaces'][ifIndex]['description'] = current_val
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["description"] = current_val
 
     interface_to_ipv4 = {}
     for ipv4_network in ipv4_networks:
-        current_interface = ipv4_networks[ipv4_network]['interface']
+        current_interface = ipv4_networks[ipv4_network]["interface"]
         current_network = {
-            'address': ipv4_networks[ipv4_network]['address'],
-            'netmask': ipv4_networks[ipv4_network]['netmask']
+            "address": ipv4_networks[ipv4_network]["address"],
+            "netmask": ipv4_networks[ipv4_network]["netmask"],
         }
         if current_interface not in interface_to_ipv4:
             interface_to_ipv4[current_interface] = []
@@ -470,12 +495,12 @@ def main():
             interface_to_ipv4[current_interface].append(current_network)
 
     for interface in interface_to_ipv4:
-        results['ansible_interfaces'][int(interface)]['ipv4'] = interface_to_ipv4[interface]
+        results["ansible_interfaces"][int(interface)]["ipv4"] = interface_to_ipv4[interface]
 
-    results['ansible_all_ipv4_addresses'] = all_ipv4_addresses
+    results["ansible_all_ipv4_addresses"] = all_ipv4_addresses
 
     module.exit_json(ansible_facts=results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

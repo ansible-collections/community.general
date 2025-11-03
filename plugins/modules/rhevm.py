@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Timothy Vandenbrande <timothy.vandenbrande@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: rhevm
@@ -335,6 +333,7 @@ import time
 try:
     from ovirtsdk.api import API
     from ovirtsdk.xml import params
+
     HAS_SDK = True
 except ImportError:
     HAS_SDK = False
@@ -346,27 +345,27 @@ RHEV_FAILED = 1
 RHEV_SUCCESS = 0
 RHEV_UNAVAILABLE = 2
 
-RHEV_TYPE_OPTS = ['desktop', 'host', 'server']
-STATE_OPTS = ['absent', 'cd', 'down', 'info', 'ping', 'present', 'restart', 'up']
+RHEV_TYPE_OPTS = ["desktop", "host", "server"]
+STATE_OPTS = ["absent", "cd", "down", "info", "ping", "present", "restart", "up"]
 
-msg = []
+msg: list[str] = []
 changed = False
 failed = False
 
 
-class RHEVConn(object):
-    'Connection to RHEV-M'
+class RHEVConn:
+    "Connection to RHEV-M"
 
     def __init__(self, module):
         self.module = module
 
-        user = module.params.get('user')
-        password = module.params.get('password')
-        server = module.params.get('server')
-        port = module.params.get('port')
-        insecure_api = module.params.get('insecure_api')
+        user = module.params.get("user")
+        password = module.params.get("password")
+        server = module.params.get("server")
+        port = module.params.get("port")
+        insecure_api = module.params.get("insecure_api")
 
-        url = "https://%s:%s" % (server, port)
+        url = f"https://{server}:{port}"
 
         try:
             api = API(url=url, username=user, password=password, insecure=str(insecure_api))
@@ -384,7 +383,7 @@ class RHEVConn(object):
                 name=name,
                 cluster=self.conn.clusters.get(name=cluster),
                 template=self.conn.templates.get(name=template),
-                disks=params.Disks(clone=True)
+                disks=params.Disks(clone=True),
             )
             self.conn.vms.add(vmparams)
             setMsg("VM is created")
@@ -403,7 +402,7 @@ class RHEVConn(object):
                 cluster=self.conn.clusters.get(name=cluster),
                 os=params.OperatingSystem(type_=os),
                 template=self.conn.templates.get(name="Blank"),
-                type_=actiontype
+                type_=actiontype,
             )
             self.conn.vms.add(vmparams)
             setMsg("VM is created")
@@ -415,7 +414,9 @@ class RHEVConn(object):
             setFailed()
             return False
 
-    def createDisk(self, vmname, diskname, disksize, diskdomain, diskinterface, diskformat, diskallocationtype, diskboot):
+    def createDisk(
+        self, vmname, diskname, disksize, diskdomain, diskinterface, diskformat, diskallocationtype, diskboot
+    ):
         VM = self.get_VM(vmname)
 
         newdisk = params.Disk(
@@ -426,37 +427,35 @@ class RHEVConn(object):
             interface=diskinterface,
             format=diskformat,
             bootable=diskboot,
-            storage_domains=params.StorageDomains(
-                storage_domain=[self.get_domain(diskdomain)]
-            )
+            storage_domains=params.StorageDomains(storage_domain=[self.get_domain(diskdomain)]),
         )
 
         try:
             VM.disks.add(newdisk)
             VM.update()
-            setMsg("Successfully added disk " + diskname)
+            setMsg(f"Successfully added disk {diskname}")
             setChanged()
         except Exception as e:
             setFailed()
-            setMsg("Error attaching " + diskname + "disk, please recheck and remove any leftover configuration.")
+            setMsg(f"Error attaching {diskname}disk, please recheck and remove any leftover configuration.")
             setMsg(str(e))
             return False
 
         try:
             currentdisk = VM.disks.get(name=diskname)
             attempt = 1
-            while currentdisk.status.state != 'ok':
+            while currentdisk.status.state != "ok":
                 currentdisk = VM.disks.get(name=diskname)
                 if attempt == 100:
-                    setMsg("Error, disk %s, state %s" % (diskname, str(currentdisk.status.state)))
+                    setMsg(f"Error, disk {diskname}, state {currentdisk.status.state}")
                     raise Exception()
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg("The disk  " + diskname + " is ready.")
+            setMsg(f"The disk  {diskname} is ready.")
         except Exception as e:
             setFailed()
-            setMsg("Error getting the state of " + diskname + ".")
+            setMsg(f"Error getting the state of {diskname}.")
             setMsg(str(e))
             return False
         return True
@@ -465,20 +464,16 @@ class RHEVConn(object):
         VM = self.get_VM(vmname)
         CLUSTER = self.get_cluster_byid(VM.cluster.id)
         DC = self.get_DC_byid(CLUSTER.data_center.id)
-        newnic = params.NIC(
-            name=nicname,
-            network=DC.networks.get(name=vlan),
-            interface=interface
-        )
+        newnic = params.NIC(name=nicname, network=DC.networks.get(name=vlan), interface=interface)
 
         try:
             VM.nics.add(newnic)
             VM.update()
-            setMsg("Successfully added iface " + nicname)
+            setMsg(f"Successfully added iface {nicname}")
             setChanged()
         except Exception as e:
             setFailed()
-            setMsg("Error attaching " + nicname + " iface, please recheck and remove any leftover configuration.")
+            setMsg(f"Error attaching {nicname} iface, please recheck and remove any leftover configuration.")
             setMsg(str(e))
             return False
 
@@ -488,15 +483,15 @@ class RHEVConn(object):
             while currentnic.active is not True:
                 currentnic = VM.nics.get(name=nicname)
                 if attempt == 100:
-                    setMsg("Error, iface %s, state %s" % (nicname, str(currentnic.active)))
+                    setMsg(f"Error, iface {nicname}, state {currentnic.active}")
                     raise Exception()
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg("The iface  " + nicname + " is ready.")
+            setMsg(f"The iface  {nicname} is ready.")
         except Exception as e:
             setFailed()
-            setMsg("Error getting the state of " + nicname + ".")
+            setMsg(f"Error getting the state of {nicname}.")
             setMsg(str(e))
             return False
         return True
@@ -598,7 +593,7 @@ class RHEVConn(object):
 
     def set_Disk(self, diskname, disksize, diskinterface, diskboot):
         DISK = self.get_disk(diskname)
-        setMsg("Checking disk " + diskname)
+        setMsg(f"Checking disk {diskname}")
         if DISK.get_bootable() != diskboot:
             try:
                 DISK.set_bootable(diskboot)
@@ -613,7 +608,7 @@ class RHEVConn(object):
             setMsg("The boot option of the disk is correct")
         if int(DISK.size) < (1024 * 1024 * 1024 * int(disksize)):
             try:
-                DISK.size = (1024 * 1024 * 1024 * int(disksize))
+                DISK.size = 1024 * 1024 * 1024 * int(disksize)
                 setMsg("Updated the size of the disk.")
                 setChanged()
             except Exception as e:
@@ -650,19 +645,19 @@ class RHEVConn(object):
         checkFail()
         if NIC.name != newname:
             NIC.name = newname
-            setMsg('Updating iface name to ' + newname)
+            setMsg(f"Updating iface name to {newname}")
             setChanged()
         if str(NIC.network.id) != str(NETWORK.id):
             NIC.set_network(NETWORK)
-            setMsg('Updating iface network to ' + vlan)
+            setMsg(f"Updating iface network to {vlan}")
             setChanged()
         if NIC.interface != interface:
             NIC.interface = interface
-            setMsg('Updating iface interface to ' + interface)
+            setMsg(f"Updating iface interface to {interface}")
             setChanged()
         try:
             NIC.update()
-            setMsg('iface has successfully been updated.')
+            setMsg("iface has successfully been updated.")
         except Exception as e:
             setMsg("Failed to update the iface.")
             setMsg(str(e))
@@ -708,155 +703,152 @@ class RHEVConn(object):
             setMsg("Host does not exist.")
             ifacelist = dict()
             networklist = []
-            manageip = ''
+            manageip = ""
 
             try:
                 for iface in ifaces:
                     try:
-                        setMsg('creating host interface ' + iface['name'])
-                        if 'management' in iface:
-                            manageip = iface['ip']
-                        if 'boot_protocol' not in iface:
-                            if 'ip' in iface:
-                                iface['boot_protocol'] = 'static'
+                        setMsg(f"creating host interface {iface['name']}")
+                        if "management" in iface:
+                            manageip = iface["ip"]
+                        if "boot_protocol" not in iface:
+                            if "ip" in iface:
+                                iface["boot_protocol"] = "static"
                             else:
-                                iface['boot_protocol'] = 'none'
-                        if 'ip' not in iface:
-                            iface['ip'] = ''
-                        if 'netmask' not in iface:
-                            iface['netmask'] = ''
-                        if 'gateway' not in iface:
-                            iface['gateway'] = ''
+                                iface["boot_protocol"] = "none"
+                        if "ip" not in iface:
+                            iface["ip"] = ""
+                        if "netmask" not in iface:
+                            iface["netmask"] = ""
+                        if "gateway" not in iface:
+                            iface["gateway"] = ""
 
-                        if 'network' in iface:
-                            if 'bond' in iface:
+                        if "network" in iface:
+                            if "bond" in iface:
                                 bond = []
-                                for slave in iface['bond']:
+                                for slave in iface["bond"]:
                                     bond.append(ifacelist[slave])
                                 try:
                                     tmpiface = params.Bonding(
                                         slaves=params.Slaves(host_nic=bond),
                                         options=params.Options(
                                             option=[
-                                                params.Option(name='miimon', value='100'),
-                                                params.Option(name='mode', value='4')
+                                                params.Option(name="miimon", value="100"),
+                                                params.Option(name="mode", value="4"),
                                             ]
-                                        )
+                                        ),
                                     )
                                 except Exception as e:
-                                    setMsg('Failed to create the bond for  ' + iface['name'])
+                                    setMsg(f"Failed to create the bond for  {iface['name']}")
                                     setFailed()
                                     setMsg(str(e))
                                     return False
                                 try:
                                     tmpnetwork = params.HostNIC(
-                                        network=params.Network(name=iface['network']),
-                                        name=iface['name'],
-                                        boot_protocol=iface['boot_protocol'],
+                                        network=params.Network(name=iface["network"]),
+                                        name=iface["name"],
+                                        boot_protocol=iface["boot_protocol"],
                                         ip=params.IP(
-                                            address=iface['ip'],
-                                            netmask=iface['netmask'],
-                                            gateway=iface['gateway']
+                                            address=iface["ip"], netmask=iface["netmask"], gateway=iface["gateway"]
                                         ),
                                         override_configuration=True,
-                                        bonding=tmpiface)
+                                        bonding=tmpiface,
+                                    )
                                     networklist.append(tmpnetwork)
-                                    setMsg('Applying network ' + iface['name'])
+                                    setMsg(f"Applying network {iface['name']}")
                                 except Exception as e:
-                                    setMsg('Failed to set' + iface['name'] + ' as network interface')
+                                    setMsg(f"Failed to set{iface['name']} as network interface")
                                     setFailed()
                                     setMsg(str(e))
                                     return False
                             else:
                                 tmpnetwork = params.HostNIC(
-                                    network=params.Network(name=iface['network']),
-                                    name=iface['name'],
-                                    boot_protocol=iface['boot_protocol'],
+                                    network=params.Network(name=iface["network"]),
+                                    name=iface["name"],
+                                    boot_protocol=iface["boot_protocol"],
                                     ip=params.IP(
-                                        address=iface['ip'],
-                                        netmask=iface['netmask'],
-                                        gateway=iface['gateway']
-                                    ))
+                                        address=iface["ip"], netmask=iface["netmask"], gateway=iface["gateway"]
+                                    ),
+                                )
                                 networklist.append(tmpnetwork)
-                                setMsg('Applying network ' + iface['name'])
+                                setMsg(f"Applying network {iface['name']}")
                         else:
                             tmpiface = params.HostNIC(
-                                name=iface['name'],
+                                name=iface["name"],
                                 network=params.Network(),
-                                boot_protocol=iface['boot_protocol'],
-                                ip=params.IP(
-                                    address=iface['ip'],
-                                    netmask=iface['netmask'],
-                                    gateway=iface['gateway']
-                                ))
-                        ifacelist[iface['name']] = tmpiface
+                                boot_protocol=iface["boot_protocol"],
+                                ip=params.IP(address=iface["ip"], netmask=iface["netmask"], gateway=iface["gateway"]),
+                            )
+                        ifacelist[iface["name"]] = tmpiface
                     except Exception as e:
-                        setMsg('Failed to set ' + iface['name'])
+                        setMsg(f"Failed to set {iface['name']}")
                         setFailed()
                         setMsg(str(e))
                         return False
             except Exception as e:
-                setMsg('Failed to set networks')
+                setMsg("Failed to set networks")
                 setMsg(str(e))
                 setFailed()
                 return False
 
-            if manageip == '':
-                setMsg('No management network is defined')
+            if manageip == "":
+                setMsg("No management network is defined")
                 setFailed()
                 return False
 
             try:
-                HOST = params.Host(name=host_name, address=manageip, cluster=CLUSTER, ssh=params.SSH(authentication_method='publickey'))
+                HOST = params.Host(
+                    name=host_name, address=manageip, cluster=CLUSTER, ssh=params.SSH(authentication_method="publickey")
+                )
                 if self.conn.hosts.add(HOST):
                     setChanged()
                     HOST = self.get_Host(host_name)
                     state = HOST.status.state
-                    while state != 'non_operational' and state != 'up':
+                    while state != "non_operational" and state != "up":
                         HOST = self.get_Host(host_name)
                         state = HOST.status.state
                         time.sleep(1)
-                        if state == 'non_responsive':
-                            setMsg('Failed to add host to RHEVM')
+                        if state == "non_responsive":
+                            setMsg("Failed to add host to RHEVM")
                             setFailed()
                             return False
 
-                    setMsg('status host: up')
+                    setMsg("status host: up")
                     time.sleep(5)
 
                     HOST = self.get_Host(host_name)
                     state = HOST.status.state
-                    setMsg('State before setting to maintenance: ' + str(state))
+                    setMsg(f"State before setting to maintenance: {state}")
                     HOST.deactivate()
-                    while state != 'maintenance':
+                    while state != "maintenance":
                         HOST = self.get_Host(host_name)
                         state = HOST.status.state
                         time.sleep(1)
-                    setMsg('status host: maintenance')
+                    setMsg("status host: maintenance")
 
                     try:
-                        HOST.nics.setupnetworks(params.Action(
-                            force=True,
-                            check_connectivity=False,
-                            host_nics=params.HostNics(host_nic=networklist)
-                        ))
-                        setMsg('nics are set')
+                        HOST.nics.setupnetworks(
+                            params.Action(
+                                force=True, check_connectivity=False, host_nics=params.HostNics(host_nic=networklist)
+                            )
+                        )
+                        setMsg("nics are set")
                     except Exception as e:
-                        setMsg('Failed to apply networkconfig')
+                        setMsg("Failed to apply networkconfig")
                         setFailed()
                         setMsg(str(e))
                         return False
 
                     try:
                         HOST.commitnetconfig()
-                        setMsg('Network config is saved')
+                        setMsg("Network config is saved")
                     except Exception as e:
-                        setMsg('Failed to save networkconfig')
+                        setMsg("Failed to save networkconfig")
                         setFailed()
                         setMsg(str(e))
                         return False
             except Exception as e:
-                if 'The Host name is already in use' in str(e):
+                if "The Host name is already in use" in str(e):
                     setMsg("Host already exists")
                 else:
                     setMsg("Failed to add host")
@@ -865,15 +857,15 @@ class RHEVConn(object):
                 return False
 
             HOST.activate()
-            while state != 'up':
+            while state != "up":
                 HOST = self.get_Host(host_name)
                 state = HOST.status.state
                 time.sleep(1)
-                if state == 'non_responsive':
-                    setMsg('Failed to apply networkconfig.')
+                if state == "non_responsive":
+                    setMsg("Failed to apply networkconfig.")
                     setFailed()
                     return False
-            setMsg('status host: up')
+            setMsg("status host: up")
         else:
             setMsg("Host exists.")
 
@@ -931,7 +923,7 @@ class RHEVConn(object):
     def set_CD(self, vmname, cd_drive):
         VM = self.get_VM(vmname)
         try:
-            if str(VM.status.state) == 'down':
+            if str(VM.status.state) == "down":
                 cdrom = params.CdRom(file=cd_drive)
                 VM.cdroms.add(cdrom)
                 setMsg("Attached the image.")
@@ -955,7 +947,7 @@ class RHEVConn(object):
         try:
             VM.placement_policy.host = HOST
             VM.update()
-            setMsg("Set startup host to " + vmhost)
+            setMsg(f"Set startup host to {vmhost}")
             setChanged()
         except Exception as e:
             setMsg("Failed to set startup host.")
@@ -978,7 +970,7 @@ class RHEVConn(object):
                     ),
                 )
                 setChanged()
-                setMsg("VM migrated to " + vmhost)
+                setMsg(f"VM migrated to {vmhost}")
             except Exception as e:
                 setMsg("Failed to set startup host.")
                 setMsg(str(e))
@@ -1000,7 +992,7 @@ class RHEVConn(object):
         return True
 
 
-class RHEV(object):
+class RHEV:
     def __init__(self, module):
         self.module = module
 
@@ -1017,43 +1009,45 @@ class RHEV(object):
         VM = self.conn.get_VM(name)
         if VM:
             vminfo = dict()
-            vminfo['uuid'] = VM.id
-            vminfo['name'] = VM.name
-            vminfo['status'] = VM.status.state
-            vminfo['cpu_cores'] = VM.cpu.topology.cores
-            vminfo['cpu_sockets'] = VM.cpu.topology.sockets
-            vminfo['cpu_shares'] = VM.cpu_shares
-            vminfo['memory'] = (int(VM.memory) // 1024 // 1024 // 1024)
-            vminfo['mem_pol'] = (int(VM.memory_policy.guaranteed) // 1024 // 1024 // 1024)
-            vminfo['os'] = VM.get_os().type_
-            vminfo['del_prot'] = VM.delete_protected
+            vminfo["uuid"] = VM.id
+            vminfo["name"] = VM.name
+            vminfo["status"] = VM.status.state
+            vminfo["cpu_cores"] = VM.cpu.topology.cores
+            vminfo["cpu_sockets"] = VM.cpu.topology.sockets
+            vminfo["cpu_shares"] = VM.cpu_shares
+            vminfo["memory"] = int(VM.memory) // 1024 // 1024 // 1024
+            vminfo["mem_pol"] = int(VM.memory_policy.guaranteed) // 1024 // 1024 // 1024
+            vminfo["os"] = VM.get_os().type_
+            vminfo["del_prot"] = VM.delete_protected
             try:
-                vminfo['host'] = str(self.conn.get_Host_byid(str(VM.host.id)).name)
+                vminfo["host"] = str(self.conn.get_Host_byid(str(VM.host.id)).name)
             except Exception:
-                vminfo['host'] = None
-            vminfo['boot_order'] = []
+                vminfo["host"] = None
+            vminfo["boot_order"] = []
             for boot_dev in VM.os.get_boot():
-                vminfo['boot_order'].append(str(boot_dev.dev))
-            vminfo['disks'] = []
+                vminfo["boot_order"].append(str(boot_dev.dev))
+            vminfo["disks"] = []
             for DISK in VM.disks.list():
                 disk = dict()
-                disk['name'] = DISK.name
-                disk['size'] = (int(DISK.size) // 1024 // 1024 // 1024)
-                disk['domain'] = str((self.conn.get_domain_byid(DISK.get_storage_domains().get_storage_domain()[0].id)).name)
-                disk['interface'] = DISK.interface
-                vminfo['disks'].append(disk)
-            vminfo['ifaces'] = []
+                disk["name"] = DISK.name
+                disk["size"] = int(DISK.size) // 1024 // 1024 // 1024
+                disk["domain"] = str(
+                    (self.conn.get_domain_byid(DISK.get_storage_domains().get_storage_domain()[0].id)).name
+                )
+                disk["interface"] = DISK.interface
+                vminfo["disks"].append(disk)
+            vminfo["ifaces"] = []
             for NIC in VM.nics.list():
                 iface = dict()
-                iface['name'] = str(NIC.name)
-                iface['vlan'] = str(self.conn.get_network_byid(NIC.get_network().id).name)
-                iface['interface'] = NIC.interface
-                iface['mac'] = NIC.mac.address
-                vminfo['ifaces'].append(iface)
+                iface["name"] = str(NIC.name)
+                iface["vlan"] = str(self.conn.get_network_byid(NIC.get_network().id).name)
+                iface["interface"] = NIC.interface
+                iface["mac"] = NIC.mac.address
+                vminfo["ifaces"].append(iface)
                 vminfo[str(NIC.name)] = NIC.mac.address
             CLUSTER = self.conn.get_cluster_byid(VM.cluster.id)
             if CLUSTER:
-                vminfo['cluster'] = CLUSTER.name
+                vminfo["cluster"] = CLUSTER.name
         else:
             vminfo = False
         return vminfo
@@ -1087,22 +1081,22 @@ class RHEV(object):
         counter = 0
         bootselect = False
         for disk in disks:
-            if 'bootable' in disk:
-                if disk['bootable'] is True:
+            if "bootable" in disk:
+                if disk["bootable"] is True:
                     bootselect = True
 
         for disk in disks:
-            diskname = name + "_Disk" + str(counter) + "_" + disk.get('name', '').replace('/', '_')
-            disksize = disk.get('size', 1)
-            diskdomain = disk.get('domain', None)
+            diskname = f"{name}_Disk{counter}_{disk.get('name', '').replace('/', '_')}"
+            disksize = disk.get("size", 1)
+            diskdomain = disk.get("domain", None)
             if diskdomain is None:
                 setMsg("`domain` is a required disk key.")
                 setFailed()
                 return False
-            diskinterface = disk.get('interface', 'virtio')
-            diskformat = disk.get('format', 'raw')
-            diskallocationtype = disk.get('thin', False)
-            diskboot = disk.get('bootable', False)
+            diskinterface = disk.get("interface", "virtio")
+            diskformat = disk.get("format", "raw")
+            diskallocationtype = disk.get("thin", False)
+            diskboot = disk.get("bootable", False)
 
             if bootselect is False and counter == 0:
                 diskboot = True
@@ -1110,7 +1104,9 @@ class RHEV(object):
             DISK = self.conn.get_disk(diskname)
 
             if DISK is None:
-                self.conn.createDisk(name, diskname, disksize, diskdomain, diskinterface, diskformat, diskallocationtype, diskboot)
+                self.conn.createDisk(
+                    name, diskname, disksize, diskdomain, diskinterface, diskformat, diskallocationtype, diskboot
+                )
             else:
                 self.conn.set_Disk(diskname, disksize, diskinterface, diskboot)
             checkFail()
@@ -1128,7 +1124,7 @@ class RHEV(object):
         for NIC in VM.nics.list():
             if counter < length:
                 iface = ifaces[counter]
-                name = iface.get('name', None)
+                name = iface.get("name", None)
                 if name is None:
                     setMsg("`name` is a required iface key.")
                     setFailed()
@@ -1139,12 +1135,12 @@ class RHEV(object):
                     self.setNetworks(vmname, ifaces)
                     checkFail()
                     return True
-                vlan = iface.get('vlan', None)
+                vlan = iface.get("vlan", None)
                 if vlan is None:
                     setMsg("`vlan` is a required iface key.")
                     setFailed()
                 checkFail()
-                interface = iface.get('interface', 'virtio')
+                interface = iface.get("interface", "virtio")
                 self.conn.set_NIC(vmname, str(NIC.name), name, vlan, interface)
             else:
                 self.conn.del_NIC(vmname, NIC.name)
@@ -1153,17 +1149,17 @@ class RHEV(object):
 
         while counter < length:
             iface = ifaces[counter]
-            name = iface.get('name', None)
+            name = iface.get("name", None)
             if name is None:
                 setMsg("`name` is a required iface key.")
                 setFailed()
-            vlan = iface.get('vlan', None)
+            vlan = iface.get("vlan", None)
             if vlan is None:
                 setMsg("`vlan` is a required iface key.")
                 setFailed()
             if failed is True:
                 return False
-            interface = iface.get('interface', 'virtio')
+            interface = iface.get("interface", "virtio")
             self.conn.createNIC(vmname, name, vlan, interface)
 
             counter += 1
@@ -1190,9 +1186,9 @@ class RHEV(object):
 
         if boot_order != bootorder:
             self.conn.set_BootOrder(vmname, boot_order)
-            setMsg('The boot order has been set')
+            setMsg("The boot order has been set")
         else:
-            setMsg('The boot order has already been set')
+            setMsg("The boot order has already been set")
         return True
 
     def removeVM(self, vmname):
@@ -1209,7 +1205,7 @@ class RHEV(object):
             return False
 
         if state == VM.status.state:
-            setMsg("VM state was already " + state)
+            setMsg(f"VM state was already {state}")
         else:
             if state == "up":
                 setMsg("VM is going to start")
@@ -1224,7 +1220,7 @@ class RHEV(object):
                 checkFail()
                 self.setPower(vmname, "up", timeout)
             checkFail()
-            setMsg("the vm state is set to " + state)
+            setMsg(f"the vm state is set to {state}")
         return True
 
     def setCD(self, vmname, cd_drive):
@@ -1260,46 +1256,45 @@ def setChanged():
     changed = True
 
 
-def setMsg(message):
+def setMsg(message: str) -> None:
     msg.append(message)
 
 
 def core(module):
-
     r = RHEV(module)
 
-    state = module.params.get('state')
+    state = module.params.get("state")
 
-    if state == 'ping':
+    if state == "ping":
         r.test()
         return RHEV_SUCCESS, {"ping": "pong"}
-    elif state == 'info':
-        name = module.params.get('name')
+    elif state == "info":
+        name = module.params.get("name")
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
         vminfo = r.getVM(name)
-        return RHEV_SUCCESS, {'changed': changed, 'msg': msg, 'vm': vminfo}
-    elif state == 'present':
+        return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
+    elif state == "present":
         created = False
-        name = module.params.get('name')
+        name = module.params.get("name")
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
-        actiontype = module.params.get('type')
-        if actiontype == 'server' or actiontype == 'desktop':
+        actiontype = module.params.get("type")
+        if actiontype == "server" or actiontype == "desktop":
             vminfo = r.getVM(name)
             if vminfo:
-                setMsg('VM exists')
+                setMsg("VM exists")
             else:
                 # Create VM
-                cluster = module.params.get('cluster')
+                cluster = module.params.get("cluster")
                 if cluster is None:
                     setMsg("cluster is a required argument.")
                     setFailed()
-                template = module.params.get('image')
+                template = module.params.get("image")
                 if template:
-                    disks = module.params.get('disks')
+                    disks = module.params.get("disks")
                     if disks is None:
                         setMsg("disks is a required argument.")
                         setFailed()
@@ -1307,7 +1302,7 @@ def core(module):
                     if r.createVMimage(name, cluster, template, disks) is False:
                         return RHEV_FAILED, vminfo
                 else:
-                    os = module.params.get('osver')
+                    os = module.params.get("osver")
                     if os is None:
                         setMsg("osver is a required argument.")
                         setFailed()
@@ -1318,172 +1313,176 @@ def core(module):
 
             # Set MEMORY and MEMORY POLICY
             vminfo = r.getVM(name)
-            memory = module.params.get('vmmem')
+            memory = module.params.get("vmmem")
             if memory is not None:
-                memory_policy = module.params.get('mempol')
+                memory_policy = module.params.get("mempol")
                 if memory_policy == 0:
                     memory_policy = memory
                 mem_pol_nok = True
-                if int(vminfo['mem_pol']) == memory_policy:
+                if int(vminfo["mem_pol"]) == memory_policy:
                     setMsg("Memory is correct")
                     mem_pol_nok = False
 
                 mem_nok = True
-                if int(vminfo['memory']) == memory:
+                if int(vminfo["memory"]) == memory:
                     setMsg("Memory is correct")
                     mem_nok = False
 
                 if memory_policy > memory:
-                    setMsg('memory_policy cannot have a higher value than memory.')
+                    setMsg("memory_policy cannot have a higher value than memory.")
                     return RHEV_FAILED, msg
 
                 if mem_nok and mem_pol_nok:
-                    if memory_policy > int(vminfo['memory']):
-                        r.setMemory(vminfo['name'], memory)
-                        r.setMemoryPolicy(vminfo['name'], memory_policy)
+                    if memory_policy > int(vminfo["memory"]):
+                        r.setMemory(vminfo["name"], memory)
+                        r.setMemoryPolicy(vminfo["name"], memory_policy)
                     else:
-                        r.setMemoryPolicy(vminfo['name'], memory_policy)
-                        r.setMemory(vminfo['name'], memory)
+                        r.setMemoryPolicy(vminfo["name"], memory_policy)
+                        r.setMemory(vminfo["name"], memory)
                 elif mem_nok:
-                    r.setMemory(vminfo['name'], memory)
+                    r.setMemory(vminfo["name"], memory)
                 elif mem_pol_nok:
-                    r.setMemoryPolicy(vminfo['name'], memory_policy)
+                    r.setMemoryPolicy(vminfo["name"], memory_policy)
                 checkFail()
 
             # Set CPU
-            cpu = module.params.get('vmcpu')
-            if int(vminfo['cpu_cores']) == cpu:
+            cpu = module.params.get("vmcpu")
+            if int(vminfo["cpu_cores"]) == cpu:
                 setMsg("Number of CPUs is correct")
             else:
-                if r.setCPU(vminfo['name'], cpu) is False:
+                if r.setCPU(vminfo["name"], cpu) is False:
                     return RHEV_FAILED, msg
 
             # Set CPU SHARE
-            cpu_share = module.params.get('cpu_share')
+            cpu_share = module.params.get("cpu_share")
             if cpu_share is not None:
-                if int(vminfo['cpu_shares']) == cpu_share:
+                if int(vminfo["cpu_shares"]) == cpu_share:
                     setMsg("CPU share is correct.")
                 else:
-                    if r.setCPUShare(vminfo['name'], cpu_share) is False:
+                    if r.setCPUShare(vminfo["name"], cpu_share) is False:
                         return RHEV_FAILED, msg
 
             # Set DISKS
-            disks = module.params.get('disks')
+            disks = module.params.get("disks")
             if disks is not None:
-                if r.setDisks(vminfo['name'], disks) is False:
+                if r.setDisks(vminfo["name"], disks) is False:
                     return RHEV_FAILED, msg
 
             # Set NETWORKS
-            ifaces = module.params.get('ifaces', None)
+            ifaces = module.params.get("ifaces", None)
             if ifaces is not None:
-                if r.setNetworks(vminfo['name'], ifaces) is False:
+                if r.setNetworks(vminfo["name"], ifaces) is False:
                     return RHEV_FAILED, msg
 
             # Set Delete Protection
-            del_prot = module.params.get('del_prot')
-            if r.setDeleteProtection(vminfo['name'], del_prot) is False:
+            del_prot = module.params.get("del_prot")
+            if r.setDeleteProtection(vminfo["name"], del_prot) is False:
                 return RHEV_FAILED, msg
 
             # Set Boot Order
-            boot_order = module.params.get('boot_order')
-            if r.setBootOrder(vminfo['name'], boot_order) is False:
+            boot_order = module.params.get("boot_order")
+            if r.setBootOrder(vminfo["name"], boot_order) is False:
                 return RHEV_FAILED, msg
 
             # Set VM Host
-            vmhost = module.params.get('vmhost')
+            vmhost = module.params.get("vmhost")
             if vmhost:
-                if r.setVMHost(vminfo['name'], vmhost) is False:
+                if r.setVMHost(vminfo["name"], vmhost) is False:
                     return RHEV_FAILED, msg
 
             vminfo = r.getVM(name)
-            vminfo['created'] = created
-            return RHEV_SUCCESS, {'changed': changed, 'msg': msg, 'vm': vminfo}
+            vminfo["created"] = created
+            return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
 
-        if actiontype == 'host':
-            cluster = module.params.get('cluster')
+        if actiontype == "host":
+            cluster = module.params.get("cluster")
             if cluster is None:
                 setMsg("cluster is a required argument.")
                 setFailed()
-            ifaces = module.params.get('ifaces')
+            ifaces = module.params.get("ifaces")
             if ifaces is None:
                 setMsg("ifaces is a required argument.")
                 setFailed()
             if r.setHost(name, cluster, ifaces) is False:
                 return RHEV_FAILED, msg
-            return RHEV_SUCCESS, {'changed': changed, 'msg': msg}
+            return RHEV_SUCCESS, {"changed": changed, "msg": msg}
 
-    elif state == 'absent':
-        name = module.params.get('name')
+    elif state == "absent":
+        name = module.params.get("name")
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
-        actiontype = module.params.get('type')
-        if actiontype == 'server' or actiontype == 'desktop':
+        actiontype = module.params.get("type")
+        if actiontype == "server" or actiontype == "desktop":
             vminfo = r.getVM(name)
             if vminfo:
-                setMsg('VM exists')
+                setMsg("VM exists")
 
                 # Set Delete Protection
-                del_prot = module.params.get('del_prot')
-                if r.setDeleteProtection(vminfo['name'], del_prot) is False:
+                del_prot = module.params.get("del_prot")
+                if r.setDeleteProtection(vminfo["name"], del_prot) is False:
                     return RHEV_FAILED, msg
 
                 # Remove VM
-                if r.removeVM(vminfo['name']) is False:
+                if r.removeVM(vminfo["name"]) is False:
                     return RHEV_FAILED, msg
-                setMsg('VM has been removed.')
-                vminfo['state'] = 'DELETED'
+                setMsg("VM has been removed.")
+                vminfo["state"] = "DELETED"
             else:
-                setMsg('VM was already removed.')
-            return RHEV_SUCCESS, {'changed': changed, 'msg': msg, 'vm': vminfo}
+                setMsg("VM was already removed.")
+            return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
 
-    elif state == 'up' or state == 'down' or state == 'restarted':
-        name = module.params.get('name')
+    elif state == "up" or state == "down" or state == "restarted":
+        name = module.params.get("name")
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
-        timeout = module.params.get('timeout')
+        timeout = module.params.get("timeout")
         if r.setPower(name, state, timeout) is False:
             return RHEV_FAILED, msg
         vminfo = r.getVM(name)
-        return RHEV_SUCCESS, {'changed': changed, 'msg': msg, 'vm': vminfo}
+        return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
 
-    elif state == 'cd':
-        name = module.params.get('name')
-        cd_drive = module.params.get('cd_drive')
+    elif state == "cd":
+        name = module.params.get("name")
+        cd_drive = module.params.get("cd_drive")
         if r.setCD(name, cd_drive) is False:
             return RHEV_FAILED, msg
-        return RHEV_SUCCESS, {'changed': changed, 'msg': msg}
+        return RHEV_SUCCESS, {"changed": changed, "msg": msg}
 
 
 def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['absent', 'cd', 'down', 'info', 'ping', 'present', 'restarted', 'up']),
-            user=dict(type='str', default='admin@internal'),
-            password=dict(type='str', required=True, no_log=True),
-            server=dict(type='str', default='127.0.0.1'),
-            port=dict(type='int', default=443),
-            insecure_api=dict(type='bool', default=False),
-            name=dict(type='str'),
-            image=dict(type='str'),
-            datacenter=dict(type='str', default="Default"),
-            type=dict(type='str', default='server', choices=['desktop', 'host', 'server']),
-            cluster=dict(type='str', default=''),
-            vmhost=dict(type='str'),
-            vmcpu=dict(type='int', default=2),
-            vmmem=dict(type='int', default=1),
-            disks=dict(type='list', elements='str'),
-            osver=dict(type='str', default="rhel_6x64"),
-            ifaces=dict(type='list', elements='str', aliases=['interfaces', 'nics']),
-            timeout=dict(type='int'),
-            mempol=dict(type='int', default=1),
-            vm_ha=dict(type='bool', default=True),
-            cpu_share=dict(type='int', default=0),
-            boot_order=dict(type='list', elements='str', default=['hd', 'network']),
-            del_prot=dict(type='bool', default=True),
-            cd_drive=dict(type='str'),
+            state=dict(
+                type="str",
+                default="present",
+                choices=["absent", "cd", "down", "info", "ping", "present", "restarted", "up"],
+            ),
+            user=dict(type="str", default="admin@internal"),
+            password=dict(type="str", required=True, no_log=True),
+            server=dict(type="str", default="127.0.0.1"),
+            port=dict(type="int", default=443),
+            insecure_api=dict(type="bool", default=False),
+            name=dict(type="str"),
+            image=dict(type="str"),
+            datacenter=dict(type="str", default="Default"),
+            type=dict(type="str", default="server", choices=["desktop", "host", "server"]),
+            cluster=dict(type="str", default=""),
+            vmhost=dict(type="str"),
+            vmcpu=dict(type="int", default=2),
+            vmmem=dict(type="int", default=1),
+            disks=dict(type="list", elements="str"),
+            osver=dict(type="str", default="rhel_6x64"),
+            ifaces=dict(type="list", elements="str", aliases=["interfaces", "nics"]),
+            timeout=dict(type="int"),
+            mempol=dict(type="int", default=1),
+            vm_ha=dict(type="bool", default=True),
+            cpu_share=dict(type="int", default=0),
+            boot_order=dict(type="list", elements="str", default=["hd", "network"]),
+            del_prot=dict(type="bool", default=True),
+            cd_drive=dict(type="str"),
         ),
     )
 
@@ -1502,5 +1501,5 @@ def main():
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

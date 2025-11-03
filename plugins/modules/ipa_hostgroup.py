@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ipa_hostgroup
@@ -106,43 +104,43 @@ from ansible.module_utils.common.text.converters import to_native
 
 class HostGroupIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
-        super(HostGroupIPAClient, self).__init__(module, host, port, protocol)
+        super().__init__(module, host, port, protocol)
 
     def hostgroup_find(self, name):
-        return self._post_json(method='hostgroup_find', name=None, item={'all': True, 'cn': name})
+        return self._post_json(method="hostgroup_find", name=None, item={"all": True, "cn": name})
 
     def hostgroup_add(self, name, item):
-        return self._post_json(method='hostgroup_add', name=name, item=item)
+        return self._post_json(method="hostgroup_add", name=name, item=item)
 
     def hostgroup_mod(self, name, item):
-        return self._post_json(method='hostgroup_mod', name=name, item=item)
+        return self._post_json(method="hostgroup_mod", name=name, item=item)
 
     def hostgroup_del(self, name):
-        return self._post_json(method='hostgroup_del', name=name)
+        return self._post_json(method="hostgroup_del", name=name)
 
     def hostgroup_add_member(self, name, item):
-        return self._post_json(method='hostgroup_add_member', name=name, item=item)
+        return self._post_json(method="hostgroup_add_member", name=name, item=item)
 
     def hostgroup_add_host(self, name, item):
-        return self.hostgroup_add_member(name=name, item={'host': item})
+        return self.hostgroup_add_member(name=name, item={"host": item})
 
     def hostgroup_add_hostgroup(self, name, item):
-        return self.hostgroup_add_member(name=name, item={'hostgroup': item})
+        return self.hostgroup_add_member(name=name, item={"hostgroup": item})
 
     def hostgroup_remove_member(self, name, item):
-        return self._post_json(method='hostgroup_remove_member', name=name, item=item)
+        return self._post_json(method="hostgroup_remove_member", name=name, item=item)
 
     def hostgroup_remove_host(self, name, item):
-        return self.hostgroup_remove_member(name=name, item={'host': item})
+        return self.hostgroup_remove_member(name=name, item={"host": item})
 
     def hostgroup_remove_hostgroup(self, name, item):
-        return self.hostgroup_remove_member(name=name, item={'hostgroup': item})
+        return self.hostgroup_remove_member(name=name, item={"hostgroup": item})
 
 
 def get_hostgroup_dict(description=None):
     data = {}
     if description is not None:
-        data['description'] = description
+        data["description"] = description
     return data
 
 
@@ -151,17 +149,17 @@ def get_hostgroup_diff(client, ipa_hostgroup, module_hostgroup):
 
 
 def ensure(module, client):
-    name = module.params['cn']
-    state = module.params['state']
-    host = module.params['host']
-    hostgroup = module.params['hostgroup']
-    append = module.params['append']
+    name = module.params["cn"]
+    state = module.params["state"]
+    host = module.params["host"]
+    hostgroup = module.params["hostgroup"]
+    append = module.params["append"]
 
     ipa_hostgroup = client.hostgroup_find(name=name)
-    module_hostgroup = get_hostgroup_dict(description=module.params['description'])
+    module_hostgroup = get_hostgroup_dict(description=module.params["description"])
 
     changed = False
-    if state in ['present', 'enabled']:
+    if state in ["present", "enabled"]:
         if not ipa_hostgroup:
             changed = True
             if not module.check_mode:
@@ -177,18 +175,30 @@ def ensure(module, client):
                     client.hostgroup_mod(name=name, item=data)
 
         if host is not None:
-            changed = client.modify_if_diff(name, ipa_hostgroup.get('member_host', []),
-                                            [item.lower() for item in host],
-                                            client.hostgroup_add_host,
-                                            client.hostgroup_remove_host,
-                                            append=append) or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hostgroup.get("member_host", []),
+                    [item.lower() for item in host],
+                    client.hostgroup_add_host,
+                    client.hostgroup_remove_host,
+                    append=append,
+                )
+                or changed
+            )
 
         if hostgroup is not None:
-            changed = client.modify_if_diff(name, ipa_hostgroup.get('member_hostgroup', []),
-                                            [item.lower() for item in hostgroup],
-                                            client.hostgroup_add_hostgroup,
-                                            client.hostgroup_remove_hostgroup,
-                                            append=append) or changed
+            changed = (
+                client.modify_if_diff(
+                    name,
+                    ipa_hostgroup.get("member_hostgroup", []),
+                    [item.lower() for item in hostgroup],
+                    client.hostgroup_add_hostgroup,
+                    client.hostgroup_remove_hostgroup,
+                    append=append,
+                )
+                or changed
+            )
 
     else:
         if ipa_hostgroup:
@@ -201,29 +211,31 @@ def ensure(module, client):
 
 def main():
     argument_spec = ipa_argument_spec()
-    argument_spec.update(cn=dict(type='str', required=True, aliases=['name']),
-                         description=dict(type='str'),
-                         host=dict(type='list', elements='str'),
-                         hostgroup=dict(type='list', elements='str'),
-                         state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
-                         append=dict(type='bool', default=False))
+    argument_spec.update(
+        cn=dict(type="str", required=True, aliases=["name"]),
+        description=dict(type="str"),
+        host=dict(type="list", elements="str"),
+        hostgroup=dict(type="list", elements="str"),
+        state=dict(type="str", default="present", choices=["present", "absent", "enabled", "disabled"]),
+        append=dict(type="bool", default=False),
+    )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    client = HostGroupIPAClient(module=module,
-                                host=module.params['ipa_host'],
-                                port=module.params['ipa_port'],
-                                protocol=module.params['ipa_prot'])
+    client = HostGroupIPAClient(
+        module=module,
+        host=module.params["ipa_host"],
+        port=module.params["ipa_port"],
+        protocol=module.params["ipa_prot"],
+    )
 
     try:
-        client.login(username=module.params['ipa_user'],
-                     password=module.params['ipa_pass'])
+        client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, hostgroup = ensure(module, client)
         module.exit_json(changed=changed, hostgroup=hostgroup)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

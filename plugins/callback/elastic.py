@@ -88,9 +88,9 @@ from os.path import basename
 
 from ansible.errors import AnsibleError, AnsibleRuntimeError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
-from ansible.module_utils.six import raise_from
 from ansible.plugins.callback import CallbackBase
 
+ELASTIC_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from elasticapm import Client, capture_span, trace_parent_from_string, instrument, label
 except ImportError as imp_exc:
@@ -116,9 +116,9 @@ class TaskData:
 
     def add_host(self, host):
         if host.uuid in self.host_data:
-            if host.status == 'included':
+            if host.status == "included":
                 # concatenate task include output from multiple items
-                host.result = f'{self.host_data[host.uuid].result}\n{host.result}'
+                host.result = f"{self.host_data[host.uuid].result}\n{host.result}"
             else:
                 return
 
@@ -138,7 +138,7 @@ class HostData:
         self.finish = time.time()
 
 
-class ElasticSource(object):
+class ElasticSource:
     def __init__(self, display):
         self.ansible_playbook = ""
         self.session = str(uuid.uuid4())
@@ -152,7 +152,7 @@ class ElasticSource(object):
         self._display = display
 
     def start_task(self, tasks_data, hide_task_arguments, play_name, task):
-        """ record the start of a task for one or more hosts """
+        """record the start of a task for one or more hosts"""
 
         uuid = task._uuid
 
@@ -165,29 +165,39 @@ class ElasticSource(object):
         args = None
 
         if not task.no_log and not hide_task_arguments:
-            args = ', '.join((f'{k}={v}' for k, v in task.args.items()))
+            args = ", ".join((f"{k}={v}" for k, v in task.args.items()))
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
     def finish_task(self, tasks_data, status, result):
-        """ record the results of a task for a single host """
+        """record the results of a task for a single host"""
 
         task_uuid = result._task._uuid
 
-        if hasattr(result, '_host') and result._host is not None:
+        if hasattr(result, "_host") and result._host is not None:
             host_uuid = result._host._uuid
             host_name = result._host.name
         else:
-            host_uuid = 'include'
-            host_name = 'include'
+            host_uuid = "include"
+            host_name = "include"
 
         task = tasks_data[task_uuid]
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, tasks_data, status, end_time, traceparent, apm_service_name,
-                                    apm_server_url, apm_verify_server_cert, apm_secret_token, apm_api_key):
-        """ generate distributed traces from the collected TaskData and HostData """
+    def generate_distributed_traces(
+        self,
+        tasks_data,
+        status,
+        end_time,
+        traceparent,
+        apm_service_name,
+        apm_server_url,
+        apm_verify_server_cert,
+        apm_secret_token,
+        apm_api_key,
+    ):
+        """generate distributed traces from the collected TaskData and HostData"""
 
         tasks = []
         parent_start_time = None
@@ -196,7 +206,9 @@ class ElasticSource(object):
                 parent_start_time = task.start
             tasks.append(task)
 
-        apm_cli = self.init_apm_client(apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key)
+        apm_cli = self.init_apm_client(
+            apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key
+        )
         if apm_cli:
             with closing(apm_cli):
                 instrument()  # Only call this once, as early as possible.
@@ -218,72 +230,80 @@ class ElasticSource(object):
                 apm_cli.end_transaction(name=__name__, result=status, duration=end_time - parent_start_time)
 
     def create_span_data(self, apm_cli, task_data, host_data):
-        """ create the span with the given TaskData and HostData """
+        """create the span with the given TaskData and HostData"""
 
-        name = f'[{host_data.name}] {task_data.play}: {task_data.name}'
+        name = f"[{host_data.name}] {task_data.play}: {task_data.name}"
 
         message = "success"
         status = "success"
         enriched_error_message = None
-        if host_data.status == 'included':
+        if host_data.status == "included":
             rc = 0
         else:
             res = host_data.result._result
-            rc = res.get('rc', 0)
-            if host_data.status == 'failed':
+            rc = res.get("rc", 0)
+            if host_data.status == "failed":
                 message = self.get_error_message(res)
                 enriched_error_message = self.enrich_error_message(res)
                 status = "failure"
-            elif host_data.status == 'skipped':
-                if 'skip_reason' in res:
-                    message = res['skip_reason']
+            elif host_data.status == "skipped":
+                if "skip_reason" in res:
+                    message = res["skip_reason"]
                 else:
-                    message = 'skipped'
+                    message = "skipped"
                 status = "unknown"
 
-        with capture_span(task_data.name,
-                          start=task_data.start,
-                          span_type="ansible.task.run",
-                          duration=host_data.finish - task_data.start,
-                          labels={"ansible.task.args": task_data.args,
-                                  "ansible.task.message": message,
-                                  "ansible.task.module": task_data.action,
-                                  "ansible.task.name": name,
-                                  "ansible.task.result": rc,
-                                  "ansible.task.host.name": host_data.name,
-                                  "ansible.task.host.status": host_data.status}) as span:
+        with capture_span(
+            task_data.name,
+            start=task_data.start,
+            span_type="ansible.task.run",
+            duration=host_data.finish - task_data.start,
+            labels={
+                "ansible.task.args": task_data.args,
+                "ansible.task.message": message,
+                "ansible.task.module": task_data.action,
+                "ansible.task.name": name,
+                "ansible.task.result": rc,
+                "ansible.task.host.name": host_data.name,
+                "ansible.task.host.status": host_data.status,
+            },
+        ) as span:
             span.outcome = status
-            if 'failure' in status:
-                exception = AnsibleRuntimeError(message=f"{task_data.action}: {name} failed with error message {enriched_error_message}")
+            if "failure" in status:
+                exception = AnsibleRuntimeError(
+                    message=f"{task_data.action}: {name} failed with error message {enriched_error_message}"
+                )
                 apm_cli.capture_exception(exc_info=(type(exception), exception, exception.__traceback__), handled=True)
 
     def init_apm_client(self, apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key):
         if apm_server_url:
-            return Client(service_name=apm_service_name,
-                          server_url=apm_server_url,
-                          verify_server_cert=False,
-                          secret_token=apm_secret_token,
-                          api_key=apm_api_key,
-                          use_elastic_traceparent_header=True,
-                          debug=True)
+            return Client(
+                service_name=apm_service_name,
+                server_url=apm_server_url,
+                verify_server_cert=False,
+                secret_token=apm_secret_token,
+                api_key=apm_api_key,
+                use_elastic_traceparent_header=True,
+                debug=True,
+            )
 
     @staticmethod
     def get_error_message(result):
-        if result.get('exception') is not None:
-            return ElasticSource._last_line(result['exception'])
-        return result.get('msg', 'failed')
+        if result.get("exception") is not None:
+            return ElasticSource._last_line(result["exception"])
+        return result.get("msg", "failed")
 
     @staticmethod
     def _last_line(text):
-        lines = text.strip().split('\n')
+        lines = text.strip().split("\n")
         return lines[-1]
 
     @staticmethod
     def enrich_error_message(result):
-        message = result.get('msg', 'failed')
-        exception = result.get('exception')
-        stderr = result.get('stderr')
-        return f"message: \"{message}\"\nexception: \"{exception}\"\nstderr: \"{stderr}\""
+        message = result.get("msg", "failed")
+        exception = result.get("exception")
+        stderr = result.get("stderr")
+        return f'message: "{message}"\nexception: "{exception}"\nstderr: "{stderr}"'
 
 
 class CallbackModule(CallbackBase):
@@ -292,12 +312,12 @@ class CallbackModule(CallbackBase):
     """
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'community.general.elastic'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "community.general.elastic"
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self, display=None):
-        super(CallbackModule, self).__init__(display=display)
+        super().__init__(display=display)
         self.hide_task_arguments = None
         self.apm_service_name = None
         self.ansible_playbook = None
@@ -308,30 +328,28 @@ class CallbackModule(CallbackBase):
         self.disabled = False
 
         if ELASTIC_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('The `elastic-apm` must be installed to use this plugin'),
-                ELASTIC_LIBRARY_IMPORT_ERROR)
+            raise AnsibleError(
+                "The `elastic-apm` must be installed to use this plugin"
+            ) from ELASTIC_LIBRARY_IMPORT_ERROR
 
         self.tasks_data = OrderedDict()
 
         self.elastic = ElasticSource(display=self._display)
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys,
-                                                var_options=var_options,
-                                                direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        self.hide_task_arguments = self.get_option('hide_task_arguments')
+        self.hide_task_arguments = self.get_option("hide_task_arguments")
 
-        self.apm_service_name = self.get_option('apm_service_name')
+        self.apm_service_name = self.get_option("apm_service_name")
         if not self.apm_service_name:
-            self.apm_service_name = 'ansible'
+            self.apm_service_name = "ansible"
 
-        self.apm_server_url = self.get_option('apm_server_url')
-        self.apm_secret_token = self.get_option('apm_secret_token')
-        self.apm_api_key = self.get_option('apm_api_key')
-        self.apm_verify_server_cert = self.get_option('apm_verify_server_cert')
-        self.traceparent = self.get_option('traceparent')
+        self.apm_server_url = self.get_option("apm_server_url")
+        self.apm_secret_token = self.get_option("apm_secret_token")
+        self.apm_api_key = self.get_option("apm_api_key")
+        self.apm_verify_server_cert = self.get_option("apm_verify_server_cert")
+        self.traceparent = self.get_option("traceparent")
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
@@ -340,65 +358,29 @@ class CallbackModule(CallbackBase):
         self.play_name = play.get_name()
 
     def v2_runner_on_no_hosts(self, task):
-        self.elastic.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.elastic.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self.elastic.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.elastic.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_playbook_on_cleanup_task_start(self, task):
-        self.elastic.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.elastic.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_playbook_on_handler_task_start(self, task):
-        self.elastic.start_task(
-            self.tasks_data,
-            self.hide_task_arguments,
-            self.play_name,
-            task
-        )
+        self.elastic.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self.errors += 1
-        self.elastic.finish_task(
-            self.tasks_data,
-            'failed',
-            result
-        )
+        self.elastic.finish_task(self.tasks_data, "failed", result)
 
     def v2_runner_on_ok(self, result):
-        self.elastic.finish_task(
-            self.tasks_data,
-            'ok',
-            result
-        )
+        self.elastic.finish_task(self.tasks_data, "ok", result)
 
     def v2_runner_on_skipped(self, result):
-        self.elastic.finish_task(
-            self.tasks_data,
-            'skipped',
-            result
-        )
+        self.elastic.finish_task(self.tasks_data, "skipped", result)
 
     def v2_playbook_on_include(self, included_file):
-        self.elastic.finish_task(
-            self.tasks_data,
-            'included',
-            included_file
-        )
+        self.elastic.finish_task(self.tasks_data, "included", included_file)
 
     def v2_playbook_on_stats(self, stats):
         if self.errors == 0:
@@ -414,7 +396,7 @@ class CallbackModule(CallbackBase):
             self.apm_server_url,
             self.apm_verify_server_cert,
             self.apm_secret_token,
-            self.apm_api_key
+            self.apm_api_key,
         )
 
     def v2_runner_on_async_failed(self, result, **kwargs):

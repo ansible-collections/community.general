@@ -1,2 +1,0 @@
-bugfixes:
-  - "dependent lookup plugin - avoid deprecated ansible-core 2.19 functionality (https://github.com/ansible-collections/community.general/pull/10359)."

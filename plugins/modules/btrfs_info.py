@@ -4,8 +4,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: btrfs_info
@@ -83,10 +82,7 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     module_args = dict()
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     provider = BtrfsFilesystemsProvider(module)
     filesystems = [x.get_summary() for x in provider.get_filesystems()]
@@ -100,5 +96,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

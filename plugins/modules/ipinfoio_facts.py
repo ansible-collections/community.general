@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Aleksei Kostiuk <unitoff@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -86,32 +84,32 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-USER_AGENT = 'ansible-ipinfoio-module/0.0.1'
+USER_AGENT = "ansible-ipinfoio-module/0.0.1"
 
 
-class IpinfoioFacts(object):
-
+class IpinfoioFacts:
     def __init__(self, module):
-        self.url = 'https://ipinfo.io/json'
-        self.timeout = module.params.get('timeout')
+        self.url = "https://ipinfo.io/json"
+        self.timeout = module.params.get("timeout")
         self.module = module
 
     def get_geo_data(self):
-        response, info = fetch_url(self.module, self.url, force=True,  # NOQA
-                                   timeout=self.timeout)
+        response, info = fetch_url(
+            self.module,
+            self.url,
+            force=True,  # NOQA
+            timeout=self.timeout,
+        )
         try:
-            info['status'] == 200
+            info["status"] == 200
         except AssertionError:
-            self.module.fail_json(msg='Could not get {0} page, '
-                                  'check for connectivity!'.format(self.url))
+            self.module.fail_json(msg=f"Could not get {self.url} page, check for connectivity!")
         else:
             try:
                 content = response.read()
-                result = self.module.from_json(content.decode('utf8'))
+                result = self.module.from_json(content.decode("utf8"))
             except ValueError:
-                self.module.fail_json(
-                    msg='Failed to parse the ipinfo.io response: '
-                    '{0} {1}'.format(self.url, content))
+                self.module.fail_json(msg=f"Failed to parse the ipinfo.io response: {self.url} {content}")
             else:
                 return result
 
@@ -120,16 +118,15 @@ def main():
     module = AnsibleModule(  # NOQA
         argument_spec=dict(
             http_agent=dict(default=USER_AGENT),
-            timeout=dict(type='int', default=10),
+            timeout=dict(type="int", default=10),
         ),
         supports_check_mode=True,
     )
 
     ipinfoio = IpinfoioFacts(module)
-    ipinfoio_result = dict(
-        changed=False, ansible_facts=ipinfoio.get_geo_data())
+    ipinfoio_result = dict(changed=False, ansible_facts=ipinfoio.get_geo_data())
     module.exit_json(**ipinfoio_result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

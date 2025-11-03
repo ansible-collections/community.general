@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2014-2015, Epic Games, Inc.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -16,7 +14,7 @@ description:
   - Create an annotation event with a given category, title and description. Optionally start, end or durations can be provided.
 author: "Nick Harring (@NickatEpic)"
 requirements:
-  - requests (either >= 2.0.0 for Python 3, or >= 1.0.0 for Python 2)
+  - requests >= 2.0.0
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -155,75 +153,79 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 REQUESTS_IMP_ERR = None
 try:
     import requests
+
     HAS_REQUESTS = True
 except ImportError:
     REQUESTS_IMP_ERR = traceback.format_exc()
     HAS_REQUESTS = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six import PY3
 from ansible.module_utils.common.text.converters import to_native
 
 
 def check_requests_dep(module):
     """Check if an adequate requests version is available"""
     if not HAS_REQUESTS:
-        module.fail_json(msg=missing_required_lib('requests'), exception=REQUESTS_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("requests"), exception=REQUESTS_IMP_ERR)
     else:
-        required_version = '2.0.0' if PY3 else '1.0.0'
+        required_version = "2.0.0"
         if LooseVersion(requests.__version__) < LooseVersion(required_version):
-            module.fail_json(msg="'requests' library version should be >= %s, found: %s." % (required_version, requests.__version__))
+            module.fail_json(
+                msg=f"'requests' library version should be >= {required_version}, found: {requests.__version__}."
+            )
 
 
 def post_annotation(annotation, api_key):
-    ''' Takes annotation dict and api_key string'''
-    base_url = 'https://api.circonus.com/v2'
-    anootate_post_endpoint = '/annotation'
-    resp = requests.post(base_url + anootate_post_endpoint,
-                         headers=build_headers(api_key), data=json.dumps(annotation))
+    """Takes annotation dict and api_key string"""
+    base_url = "https://api.circonus.com/v2"
+    anootate_post_endpoint = "/annotation"
+    resp = requests.post(base_url + anootate_post_endpoint, headers=build_headers(api_key), data=json.dumps(annotation))
     resp.raise_for_status()
     return resp
 
 
 def create_annotation(module):
-    ''' Takes ansible module object '''
+    """Takes ansible module object"""
     annotation = {}
-    duration = module.params['duration']
-    if module.params['start'] is not None:
-        start = module.params['start']
+    duration = module.params["duration"]
+    if module.params["start"] is not None:
+        start = module.params["start"]
     else:
         start = int(time.time())
-    if module.params['stop'] is not None:
-        stop = module.params['stop']
+    if module.params["stop"] is not None:
+        stop = module.params["stop"]
     else:
         stop = int(time.time()) + duration
-    annotation['start'] = start
-    annotation['stop'] = stop
-    annotation['category'] = module.params['category']
-    annotation['description'] = module.params['description']
-    annotation['title'] = module.params['title']
+    annotation["start"] = start
+    annotation["stop"] = stop
+    annotation["category"] = module.params["category"]
+    annotation["description"] = module.params["description"]
+    annotation["title"] = module.params["title"]
     return annotation
 
 
 def build_headers(api_token):
-    '''Takes api token, returns headers with it included.'''
-    headers = {'X-Circonus-App-Name': 'ansible',
-               'Host': 'api.circonus.com', 'X-Circonus-Auth-Token': api_token,
-               'Accept': 'application/json'}
+    """Takes api token, returns headers with it included."""
+    headers = {
+        "X-Circonus-App-Name": "ansible",
+        "Host": "api.circonus.com",
+        "X-Circonus-Auth-Token": api_token,
+        "Accept": "application/json",
+    }
     return headers
 
 
 def main():
-    '''Main function, dispatches logic'''
+    """Main function, dispatches logic"""
     module = AnsibleModule(
         argument_spec=dict(
-            start=dict(type='int'),
-            stop=dict(type='int'),
+            start=dict(type="int"),
+            stop=dict(type="int"),
             category=dict(required=True),
             title=dict(required=True),
             description=dict(required=True),
-            duration=dict(default=0, type='int'),
-            api_key=dict(required=True, no_log=True)
+            duration=dict(default=0, type="int"),
+            api_key=dict(required=True, no_log=True),
         )
     )
 
@@ -231,11 +233,11 @@ def main():
 
     annotation = create_annotation(module)
     try:
-        resp = post_annotation(annotation, module.params['api_key'])
+        resp = post_annotation(annotation, module.params["api_key"])
     except requests.exceptions.RequestException as e:
-        module.fail_json(msg='Request Failed', reason=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg="Request Failed", reason=to_native(e), exception=traceback.format_exc())
     module.exit_json(changed=True, annotation=resp.json())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

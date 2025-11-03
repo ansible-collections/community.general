@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Alberto Murillo <alberto.murillo.silva@intel.com>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -101,7 +99,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-class Swupd(object):
+class Swupd:
     FILES_NOT_MATCH = "files did not match"
     FILES_REPLACED = "missing files were replaced"
     FILES_FIXED = "files were fixed"
@@ -133,22 +131,22 @@ class Swupd(object):
         cmd = [self.swupd_cmd] + command
 
         if self.format:
-            cmd.append("--format=%s" % self.format)
+            cmd.append(f"--format={self.format}")
         if self.manifest:
-            cmd.append("--manifest=%s" % self.manifest)
+            cmd.append(f"--manifest={self.manifest}")
         if self.url:
-            cmd.append("--url=%s" % self.url)
+            cmd.append(f"--url={self.url}")
         else:
             if self.contenturl and command != "check-update":
-                cmd.append("--contenturl=%s" % self.contenturl)
+                cmd.append(f"--contenturl={self.contenturl}")
             if self.versionurl:
-                cmd.append("--versionurl=%s" % self.versionurl)
+                cmd.append(f"--versionurl={self.versionurl}")
 
         return cmd
 
     def _is_bundle_installed(self, bundle):
         try:
-            os.stat("/usr/share/clear/bundles/%s" % bundle)
+            os.stat(f"/usr/share/clear/bundles/{bundle}")
         except OSError:
             return False
 
@@ -186,7 +184,7 @@ class Swupd(object):
             self.module.exit_json(changed=not self._is_bundle_installed(bundle))
 
         if self._is_bundle_installed(bundle):
-            self.msg = "Bundle %s is already installed" % bundle
+            self.msg = f"Bundle {bundle} is already installed"
             return
 
         cmd = self._get_cmd(["bundle-add", bundle])
@@ -194,11 +192,11 @@ class Swupd(object):
 
         if self.rc == 0:
             self.changed = True
-            self.msg = "Bundle %s installed" % bundle
+            self.msg = f"Bundle {bundle} installed"
             return
 
         self.failed = True
-        self.msg = "Failed to install bundle %s" % bundle
+        self.msg = f"Failed to install bundle {bundle}"
 
     def remove_bundle(self, bundle):
         """Removes a bundle with `swupd bundle-remove bundle`"""
@@ -214,11 +212,11 @@ class Swupd(object):
 
         if self.rc == 0:
             self.changed = True
-            self.msg = "Bundle %s removed" % bundle
+            self.msg = f"Bundle {bundle} removed"
             return
 
         self.failed = True
-        self.msg = "Failed to remove bundle %s" % bundle
+        self.msg = f"Failed to remove bundle {bundle}"
 
     def update_os(self):
         """Updates the os with `swupd update`"""
@@ -252,7 +250,9 @@ class Swupd(object):
         cmd = self._get_cmd(["verify", "--fix"])
         self._run_cmd(cmd)
 
-        if self.rc == 0 and (self.FILES_REPLACED in self.stdout or self.FILES_FIXED in self.stdout or self.FILES_DELETED in self.stdout):
+        if self.rc == 0 and (
+            self.FILES_REPLACED in self.stdout or self.FILES_FIXED in self.stdout or self.FILES_DELETED in self.stdout
+        ):
             self.changed = True
             self.msg = "Fix successful"
             return
@@ -277,7 +277,7 @@ def main():
         ),
         required_one_of=[["name", "update", "verify"]],
         mutually_exclusive=[["name", "update", "verify"]],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     swupd = Swupd(module)
@@ -304,5 +304,5 @@ def main():
         module.exit_json(changed=swupd.changed, msg=swupd.msg, stdout=swupd.stdout, stderr=swupd.stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

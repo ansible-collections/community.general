@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright 2014, Max Riveiro, <kavu13@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -85,16 +83,15 @@ EXAMPLES = r"""
   revision: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
   user: "{{ lookup('env', 'USER') }}"
 """
+
 import traceback
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import fetch_url
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, no_log=True),
@@ -103,43 +100,43 @@ def main():
             user=dict(),
             rollbar_user=dict(),
             comment=dict(),
-            url=dict(default='https://api.rollbar.com/api/1/deploy/'),
-            validate_certs=dict(default=True, type='bool'),
+            url=dict(default="https://api.rollbar.com/api/1/deploy/"),
+            validate_certs=dict(default=True, type="bool"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if module.check_mode:
         module.exit_json(changed=True)
 
     params = dict(
-        access_token=module.params['token'],
-        environment=module.params['environment'],
-        revision=module.params['revision']
+        access_token=module.params["token"],
+        environment=module.params["environment"],
+        revision=module.params["revision"],
     )
 
-    if module.params['user']:
-        params['local_username'] = module.params['user']
+    if module.params["user"]:
+        params["local_username"] = module.params["user"]
 
-    if module.params['rollbar_user']:
-        params['rollbar_username'] = module.params['rollbar_user']
+    if module.params["rollbar_user"]:
+        params["rollbar_username"] = module.params["rollbar_user"]
 
-    if module.params['comment']:
-        params['comment'] = module.params['comment']
+    if module.params["comment"]:
+        params["comment"] = module.params["comment"]
 
-    url = module.params.get('url')
+    url = module.params.get("url")
 
     try:
         data = urlencode(params)
-        response, info = fetch_url(module, url, data=data, method='POST')
+        response, info = fetch_url(module, url, data=data, method="POST")
     except Exception as e:
-        module.fail_json(msg='Unable to notify Rollbar: %s' % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"Unable to notify Rollbar: {e}", exception=traceback.format_exc())
     else:
-        if info['status'] == 200:
+        if info["status"] == 200:
             module.exit_json(changed=True)
         else:
-            module.fail_json(msg='HTTP result code: %d connecting to %s' % (info['status'], url))
+            module.fail_json(msg=f"HTTP result code: {info['status']} connecting to {url}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

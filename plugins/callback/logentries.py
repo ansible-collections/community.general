@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2015, Logentries.com, Jimmy Tang <jimmy.tang@logentries.com>
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -104,12 +103,14 @@ import uuid
 
 try:
     import certifi
+
     HAS_CERTIFI = True
 except ImportError:
     HAS_CERTIFI = False
 
 try:
     import flatdict
+
     HAS_FLATDICT = True
 except ImportError:
     HAS_FLATDICT = False
@@ -121,9 +122,8 @@ from ansible.plugins.callback import CallbackBase
 #  * Better formatting of output before sending out to logentries data/api nodes.
 
 
-class PlainTextSocketAppender(object):
-    def __init__(self, display, LE_API='data.logentries.com', LE_PORT=80, LE_TLS_PORT=443):
-
+class PlainTextSocketAppender:
+    def __init__(self, display, LE_API="data.logentries.com", LE_PORT=80, LE_TLS_PORT=443):
         self.LE_API = LE_API
         self.LE_PORT = LE_PORT
         self.LE_TLS_PORT = LE_TLS_PORT
@@ -132,7 +132,7 @@ class PlainTextSocketAppender(object):
         # Error message displayed when an incorrect Token has been detected
         self.INVALID_TOKEN = "\n\nIt appears the LOGENTRIES_TOKEN parameter you entered is incorrect!\n\n"
         # Unicode Line separator character   \u2028
-        self.LINE_SEP = '\u2028'
+        self.LINE_SEP = "\u2028"
 
         self._display = display
         self._conn = None
@@ -171,13 +171,13 @@ class PlainTextSocketAppender(object):
     def put(self, data):
         # Replace newlines with Unicode line separator
         # for multi-line events
-        data = to_text(data, errors='surrogate_or_strict')
-        multiline = data.replace('\n', self.LINE_SEP)
+        data = to_text(data, errors="surrogate_or_strict")
+        multiline = data.replace("\n", self.LINE_SEP)
         multiline += "\n"
         # Send data, reconnect if needed
         while True:
             try:
-                self._conn.send(to_bytes(multiline, errors='surrogate_or_strict'))
+                self._conn.send(to_bytes(multiline, errors="surrogate_or_strict"))
             except socket.error:
                 self.reopen_connection()
                 continue
@@ -188,6 +188,7 @@ class PlainTextSocketAppender(object):
 
 try:
     import ssl
+
     HAS_SSL = True
 except ImportError:  # for systems without TLS support.
     SocketAppender = PlainTextSocketAppender
@@ -199,27 +200,28 @@ else:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             context = ssl.create_default_context(
                 purpose=ssl.Purpose.SERVER_AUTH,
-                cafile=certifi.where(), )
+                cafile=certifi.where(),
+            )
             sock = context.wrap_socket(
                 sock=sock,
                 do_handshake_on_connect=True,
-                suppress_ragged_eofs=True, )
+                suppress_ragged_eofs=True,
+            )
             sock.connect((self.LE_API, self.LE_TLS_PORT))
             self._conn = sock
 
-    SocketAppender = TLSSocketAppender
+    SocketAppender = TLSSocketAppender  # type: ignore
 
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'community.general.logentries'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "community.general.logentries"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self):
-
         # TODO: allow for alternate posting methods (REST/UDP/agent/etc)
-        super(CallbackModule, self).__init__()
+        super().__init__()
 
         # verify dependencies
         if not HAS_SSL:
@@ -227,7 +229,9 @@ class CallbackModule(CallbackBase):
 
         if not HAS_CERTIFI:
             self.disabled = True
-            self._display.warning('The `certifi` python module is not installed.\nDisabling the Logentries callback plugin.')
+            self._display.warning(
+                "The `certifi` python module is not installed.\nDisabling the Logentries callback plugin."
+            )
 
         self.le_jobid = str(uuid.uuid4())
 
@@ -235,41 +239,47 @@ class CallbackModule(CallbackBase):
         self.timeout = 10
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         # get options
         try:
-            self.api_url = self.get_option('api')
-            self.api_port = self.get_option('port')
-            self.api_tls_port = self.get_option('tls_port')
-            self.use_tls = self.get_option('use_tls')
-            self.flatten = self.get_option('flatten')
+            self.api_url = self.get_option("api")
+            self.api_port = self.get_option("port")
+            self.api_tls_port = self.get_option("tls_port")
+            self.use_tls = self.get_option("use_tls")
+            self.flatten = self.get_option("flatten")
         except KeyError as e:
             self._display.warning(f"Missing option for Logentries callback plugin: {e}")
             self.disabled = True
 
         try:
-            self.token = self.get_option('token')
+            self.token = self.get_option("token")
         except KeyError as e:
-            self._display.warning('Logentries token was not provided, this is required for this callback to operate, disabling')
+            self._display.warning(
+                "Logentries token was not provided, this is required for this callback to operate, disabling"
+            )
             self.disabled = True
 
         if self.flatten and not HAS_FLATDICT:
             self.disabled = True
-            self._display.warning('You have chosen to flatten and the `flatdict` python module is not installed.\nDisabling the Logentries callback plugin.')
+            self._display.warning(
+                "You have chosen to flatten and the `flatdict` python module is not installed.\nDisabling the Logentries callback plugin."
+            )
 
         self._initialize_connections()
 
     def _initialize_connections(self):
-
         if not self.disabled:
             if self.use_tls:
                 self._display.vvvv(f"Connecting to {self.api_url}:{self.api_tls_port} with TLS")
-                self._appender = TLSSocketAppender(display=self._display, LE_API=self.api_url, LE_TLS_PORT=self.api_tls_port)
+                self._appender = TLSSocketAppender(
+                    display=self._display, LE_API=self.api_url, LE_TLS_PORT=self.api_tls_port
+                )
             else:
                 self._display.vvvv(f"Connecting to {self.api_url}:{self.api_port}")
-                self._appender = PlainTextSocketAppender(display=self._display, LE_API=self.api_url, LE_PORT=self.api_port)
+                self._appender = PlainTextSocketAppender(
+                    display=self._display, LE_API=self.api_url, LE_PORT=self.api_port
+                )
             self._appender.reopen_connection()
 
     def emit_formatted(self, record):
@@ -280,50 +290,50 @@ class CallbackModule(CallbackBase):
             self.emit(self._dump_results(record))
 
     def emit(self, record):
-        msg = record.rstrip('\n')
+        msg = record.rstrip("\n")
         msg = f"{self.token} {msg}"
         self._appender.put(msg)
         self._display.vvvv("Sent event to logentries")
 
     def _set_info(self, host, res):
-        return {'le_jobid': self.le_jobid, 'hostname': host, 'results': res}
+        return {"le_jobid": self.le_jobid, "hostname": host, "results": res}
 
     def runner_on_ok(self, host, res):
         results = self._set_info(host, res)
-        results['status'] = 'OK'
+        results["status"] = "OK"
         self.emit_formatted(results)
 
     def runner_on_failed(self, host, res, ignore_errors=False):
         results = self._set_info(host, res)
-        results['status'] = 'FAILED'
+        results["status"] = "FAILED"
         self.emit_formatted(results)
 
     def runner_on_skipped(self, host, item=None):
         results = self._set_info(host, item)
-        del results['results']
-        results['status'] = 'SKIPPED'
+        del results["results"]
+        results["status"] = "SKIPPED"
         self.emit_formatted(results)
 
     def runner_on_unreachable(self, host, res):
         results = self._set_info(host, res)
-        results['status'] = 'UNREACHABLE'
+        results["status"] = "UNREACHABLE"
         self.emit_formatted(results)
 
     def runner_on_async_failed(self, host, res, jid):
         results = self._set_info(host, res)
-        results['jid'] = jid
-        results['status'] = 'ASYNC_FAILED'
+        results["jid"] = jid
+        results["status"] = "ASYNC_FAILED"
         self.emit_formatted(results)
 
     def v2_playbook_on_play_start(self, play):
         results = {}
-        results['le_jobid'] = self.le_jobid
-        results['started_by'] = os.getlogin()
+        results["le_jobid"] = self.le_jobid
+        results["started_by"] = os.getlogin()
         if play.name:
-            results['play'] = play.name
-        results['hosts'] = play.hosts
+            results["play"] = play.name
+        results["hosts"] = play.hosts
         self.emit_formatted(results)
 
     def playbook_on_stats(self, stats):
-        """ close connection """
+        """close connection"""
         self._appender.close_connection()

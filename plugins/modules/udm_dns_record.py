@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Adfinis SyGroup AG
 # Tobias Rueetschi <tobias.ruetschi@adfinis-sygroup.ch>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -120,78 +118,73 @@ with deps.declare("ipaddress"):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            type=dict(required=True, type='str'),
-            zone=dict(required=True, type='str'),
-            name=dict(required=True, type='str'),
-            data=dict(default={}, type='dict'),
-            state=dict(default='present', choices=['present', 'absent'], type='str')
+            type=dict(required=True, type="str"),
+            zone=dict(required=True, type="str"),
+            name=dict(required=True, type="str"),
+            data=dict(default={}, type="dict"),
+            state=dict(default="present", choices=["present", "absent"], type="str"),
         ),
         supports_check_mode=True,
-        required_if=([
-            ('state', 'present', ['data'])
-        ])
+        required_if=([("state", "present", ["data"])]),
     )
 
     deps.validate(module, "univention")
 
-    type = module.params['type']
-    zone = module.params['zone']
-    name = module.params['name']
-    data = module.params['data']
-    state = module.params['state']
+    type = module.params["type"]
+    zone = module.params["zone"]
+    name = module.params["name"]
+    data = module.params["data"]
+    state = module.params["state"]
     changed = False
     diff = None
 
     workname = name
-    if type == 'ptr_record':
+    if type == "ptr_record":
         deps.validate(module, "ipaddress")
 
         try:
-            if 'arpa' not in zone:
+            if "arpa" not in zone:
                 raise Exception("Zone must be reversed zone for ptr_record. (e.g. 1.1.192.in-addr.arpa)")
             ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
             subnet_offset = ipaddr_rev.find(zone)
             if subnet_offset == -1:
-                raise Exception("reversed IP address {0} is not part of zone.".format(ipaddr_rev))
-            workname = ipaddr_rev[0:subnet_offset - 1]
+                raise Exception(f"reversed IP address {ipaddr_rev} is not part of zone.")
+            workname = ipaddr_rev[0 : subnet_offset - 1]
         except Exception as e:
-            module.fail_json(
-                msg='handling PTR record for {0} in zone {1} failed: {2}'.format(name, zone, e)
-            )
+            module.fail_json(msg=f"handling PTR record for {name} in zone {zone} failed: {e}")
 
-    obj = list(ldap_search(
-        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(zone, workname),
-        attr=['dNSZone']
-    ))
+    obj = list(
+        ldap_search(f"(&(objectClass=dNSZone)(zoneName={zone})(relativeDomainName={workname}))", attr=["dNSZone"])
+    )
     exists = bool(len(obj))
-    container = 'zoneName={0},cn=dns,{1}'.format(zone, base_dn())
-    dn = 'relativeDomainName={0},{1}'.format(workname, container)
+    container = f"zoneName={zone},cn=dns,{base_dn()}"
+    dn = f"relativeDomainName={workname},{container}"
 
-    if state == 'present':
+    if state == "present":
         try:
             if not exists:
                 so = forward_zone.lookup(
                     config(),
                     uldap(),
-                    '(zone={0})'.format(zone),
-                    scope='domain',
+                    f"(zone={zone})",
+                    scope="domain",
                 ) or reverse_zone.lookup(
                     config(),
                     uldap(),
-                    '(zoneName={0})'.format(zone),
-                    scope='domain',
+                    f"(zoneName={zone})",
+                    scope="domain",
                 )
                 if not so == 0:
-                    raise Exception("Did not find zone '{0}' in Univention".format(zone))
-                obj = umc_module_for_add('dns/{0}'.format(type), container, superordinate=so[0])
+                    raise Exception(f"Did not find zone '{zone}' in Univention")
+                obj = umc_module_for_add(f"dns/{type}", container, superordinate=so[0])
             else:
-                obj = umc_module_for_edit('dns/{0}'.format(type), dn)
+                obj = umc_module_for_edit(f"dns/{type}", dn)
 
-            if type == 'ptr_record':
-                obj['ip'] = name
-                obj['address'] = workname
+            if type == "ptr_record":
+                obj["ip"] = name
+                obj["address"] = workname
             else:
-                obj['name'] = name
+                obj["name"] = name
 
             obj.update(data)
             diff = obj.diff()
@@ -202,28 +195,19 @@ def main():
                 else:
                     obj.modify()
         except Exception as e:
-            module.fail_json(
-                msg='Creating/editing dns entry {0} in {1} failed: {2}'.format(name, container, e)
-            )
+            module.fail_json(msg=f"Creating/editing dns entry {name} in {container} failed: {e}")
 
-    if state == 'absent' and exists:
+    if state == "absent" and exists:
         try:
-            obj = umc_module_for_edit('dns/{0}'.format(type), dn)
+            obj = umc_module_for_edit(f"dns/{type}", dn)
             if not module.check_mode:
                 obj.remove()
             changed = True
         except Exception as e:
-            module.fail_json(
-                msg='Removing dns entry {0} in {1} failed: {2}'.format(name, container, e)
-            )
+            module.fail_json(msg=f"Removing dns entry {name} in {container} failed: {e}")
 
-    module.exit_json(
-        changed=changed,
-        name=name,
-        diff=diff,
-        container=container
-    )
+    module.exit_json(changed=changed, name=name, diff=diff, container=container)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

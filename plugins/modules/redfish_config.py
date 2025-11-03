@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017-2018 Dell EMC Inc.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: redfish_config
@@ -391,15 +389,26 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
+    RedfishUtils,
+    REDFISH_COMMON_ARGUMENT_SPEC,
+)
 from ansible.module_utils.common.text.converters import to_native
 
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
-    "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
-                "SetDefaultBootOrder", "EnableSecureBoot", "SetSecureBoot", "DeleteVolumes", "CreateVolume",
-                "SetPowerRestorePolicy"],
+    "Systems": [
+        "SetBiosDefaultSettings",
+        "SetBiosAttributes",
+        "SetBootOrder",
+        "SetDefaultBootOrder",
+        "EnableSecureBoot",
+        "SetSecureBoot",
+        "DeleteVolumes",
+        "CreateVolume",
+        "SetPowerRestorePolicy",
+    ],
     "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface", "SetServiceIdentification"],
     "Sessions": ["SetSessionService"],
 }
@@ -409,126 +418,129 @@ def main():
     result = {}
     argument_spec = dict(
         category=dict(required=True),
-        command=dict(required=True, type='list', elements='str'),
+        command=dict(required=True, type="list", elements="str"),
         baseuri=dict(required=True),
         username=dict(),
         password=dict(no_log=True),
         auth_token=dict(no_log=True),
-        bios_attributes=dict(type='dict', default={}),
-        timeout=dict(type='int', default=60),
-        boot_order=dict(type='list', elements='str', default=[]),
-        network_protocols=dict(
-            type='dict',
-            default={}
-        ),
+        bios_attributes=dict(type="dict", default={}),
+        timeout=dict(type="int", default=60),
+        boot_order=dict(type="list", elements="str", default=[]),
+        network_protocols=dict(type="dict", default={}),
         resource_id=dict(),
         service_id=dict(),
-        nic_addr=dict(default='null'),
-        nic_config=dict(
-            type='dict',
-            default={}
-        ),
-        strip_etag_quotes=dict(type='bool', default=False),
-        hostinterface_config=dict(type='dict', default={}),
+        nic_addr=dict(default="null"),
+        nic_config=dict(type="dict", default={}),
+        strip_etag_quotes=dict(type="bool", default=False),
+        hostinterface_config=dict(type="dict", default={}),
         hostinterface_id=dict(),
-        sessions_config=dict(type='dict', default={}),
-        storage_subsystem_id=dict(type='str', default=''),
-        storage_none_volume_deletion=dict(type='bool', default=False),
-        volume_ids=dict(type='list', default=[], elements='str'),
-        secure_boot_enable=dict(type='bool', default=True),
-        volume_details=dict(type='dict', default={}),
-        power_restore_policy=dict(choices=['AlwaysOn', 'AlwaysOff', 'LastState']),
+        sessions_config=dict(type="dict", default={}),
+        storage_subsystem_id=dict(type="str", default=""),
+        storage_none_volume_deletion=dict(type="bool", default=False),
+        volume_ids=dict(type="list", default=[], elements="str"),
+        secure_boot_enable=dict(type="bool", default=True),
+        volume_details=dict(type="dict", default={}),
+        power_restore_policy=dict(choices=["AlwaysOn", "AlwaysOff", "LastState"]),
     )
     argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
         argument_spec,
         required_together=[
-            ('username', 'password'),
+            ("username", "password"),
         ],
         required_one_of=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
-        supports_check_mode=False
+        supports_check_mode=False,
     )
 
-    category = module.params['category']
-    command_list = module.params['command']
+    category = module.params["category"]
+    command_list = module.params["command"]
 
     # admin credentials used for authentication
-    creds = {'user': module.params['username'],
-             'pswd': module.params['password'],
-             'token': module.params['auth_token']}
+    creds = {"user": module.params["username"], "pswd": module.params["password"], "token": module.params["auth_token"]}
 
     # timeout
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
     # BIOS attributes to update
-    bios_attributes = module.params['bios_attributes']
+    bios_attributes = module.params["bios_attributes"]
 
     # boot order
-    boot_order = module.params['boot_order']
+    boot_order = module.params["boot_order"]
 
     # System, Manager or Chassis ID to modify
-    resource_id = module.params['resource_id']
+    resource_id = module.params["resource_id"]
 
     # manager nic
-    nic_addr = module.params['nic_addr']
-    nic_config = module.params['nic_config']
+    nic_addr = module.params["nic_addr"]
+    nic_config = module.params["nic_config"]
 
     # Etag options
-    strip_etag_quotes = module.params['strip_etag_quotes']
+    strip_etag_quotes = module.params["strip_etag_quotes"]
 
     # HostInterface config options
-    hostinterface_config = module.params['hostinterface_config']
+    hostinterface_config = module.params["hostinterface_config"]
 
     # HostInterface instance ID
-    hostinterface_id = module.params['hostinterface_id']
+    hostinterface_id = module.params["hostinterface_id"]
 
     # Service Identification
-    service_id = module.params['service_id']
+    service_id = module.params["service_id"]
 
     # Sessions config options
-    sessions_config = module.params['sessions_config']
+    sessions_config = module.params["sessions_config"]
 
     # Volume deletion options
-    storage_subsystem_id = module.params['storage_subsystem_id']
-    volume_ids = module.params['volume_ids']
+    storage_subsystem_id = module.params["storage_subsystem_id"]
+    volume_ids = module.params["volume_ids"]
 
     # Set SecureBoot options
-    secure_boot_enable = module.params['secure_boot_enable']
+    secure_boot_enable = module.params["secure_boot_enable"]
 
     # Volume creation options
-    volume_details = module.params['volume_details']
-    storage_subsystem_id = module.params['storage_subsystem_id']
-    storage_none_volume_deletion = module.params['storage_none_volume_deletion']
+    volume_details = module.params["volume_details"]
+    storage_subsystem_id = module.params["storage_subsystem_id"]
+    storage_none_volume_deletion = module.params["storage_none_volume_deletion"]
 
     # Power Restore Policy
-    power_restore_policy = module.params['power_restore_policy']
+    power_restore_policy = module.params["power_restore_policy"]
 
     # Build root URI
-    root_uri = "https://" + module.params['baseuri']
-    rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes)
+    root_uri = f"https://{module.params['baseuri']}"
+    rf_utils = RedfishUtils(
+        creds,
+        root_uri,
+        timeout,
+        module,
+        resource_id=resource_id,
+        data_modification=True,
+        strip_etag_quotes=strip_etag_quotes,
+    )
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(
+            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
+        )
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(
+                msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
+            )
 
     # Organize by Categories / Commands
     if category == "Systems":
         # execute only if we find a System resource
         result = rf_utils._find_systems_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         for command in command_list:
             if command == "SetBiosDefaultSettings":
@@ -553,12 +565,12 @@ def main():
     elif category == "Manager":
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         for command in command_list:
             if command == "SetNetworkProtocols":
-                result = rf_utils.set_network_protocols(module.params['network_protocols'])
+                result = rf_utils.set_network_protocols(module.params["network_protocols"])
             elif command == "SetManagerNic":
                 result = rf_utils.set_manager_nic(nic_addr, nic_config)
             elif command == "SetHostInterface":
@@ -569,22 +581,22 @@ def main():
     elif category == "Sessions":
         # execute only if we find a Sessions resource
         result = rf_utils._find_sessionservice_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         for command in command_list:
             if command == "SetSessionService":
                 result = rf_utils.set_session_service(sessions_config)
 
     # Return data back or fail with proper message
-    if result['ret'] is True:
-        if result.get('warning'):
-            module.warn(to_native(result['warning']))
+    if result["ret"] is True:
+        if result.get("warning"):
+            module.warn(to_native(result["warning"]))
 
-        module.exit_json(changed=result['changed'], msg=to_native(result['msg']))
+        module.exit_json(changed=result["changed"], msg=to_native(result["msg"]))
     else:
-        module.fail_json(msg=to_native(result['msg']))
+        module.fail_json(msg=to_native(result["msg"]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

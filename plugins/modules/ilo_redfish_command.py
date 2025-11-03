@@ -1,10 +1,8 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ilo_redfish_command
@@ -98,9 +96,7 @@ ilo_redfish_command:
 """
 
 # More will be added as module features are expanded
-CATEGORY_COMMANDS_ALL = {
-    "Systems": ["WaitforiLORebootCompletion"]
-}
+CATEGORY_COMMANDS_ALL = {"Systems": ["WaitforiLORebootCompletion"]}
 
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
@@ -112,72 +108,72 @@ def main():
     result = {}
     argument_spec = dict(
         category=dict(required=True, choices=list(CATEGORY_COMMANDS_ALL.keys())),
-        command=dict(required=True, type='list', elements='str'),
+        command=dict(required=True, type="list", elements="str"),
         baseuri=dict(required=True),
         timeout=dict(type="int", default=60),
         username=dict(),
         password=dict(no_log=True),
-        auth_token=dict(no_log=True)
+        auth_token=dict(no_log=True),
     )
     argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
         argument_spec,
         required_together=[
-            ('username', 'password'),
+            ("username", "password"),
         ],
         required_one_of=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
-        supports_check_mode=False
+        supports_check_mode=False,
     )
 
-    category = module.params['category']
-    command_list = module.params['command']
+    category = module.params["category"]
+    command_list = module.params["command"]
 
     # admin credentials used for authentication
-    creds = {'user': module.params['username'],
-             'pswd': module.params['password'],
-             'token': module.params['auth_token']}
+    creds = {"user": module.params["username"], "pswd": module.params["password"], "token": module.params["auth_token"]}
 
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
     # Build root URI
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = f"https://{module.params['baseuri']}"
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native(
-            "Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(
+            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
+        )
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
             module.fail_json(
-                msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+                msg=to_native(f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
+            )
 
     if category == "Systems":
         # execute only if we find a System resource
 
         result = rf_utils._find_systems_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        if result["ret"] is False:
+            module.fail_json(msg=to_native(result["msg"]))
 
         for command in command_list:
             if command == "WaitforiLORebootCompletion":
                 result[command] = rf_utils.wait_for_ilo_reboot_completion()
 
     # Return data back or fail with proper message
-    if not result[command]['ret']:
+    if not result[command]["ret"]:
         module.fail_json(msg=result)
 
-    changed = result[command].get('changed', False)
+    changed = result[command].get("changed", False)
     module.exit_json(ilo_redfish_command=result, changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

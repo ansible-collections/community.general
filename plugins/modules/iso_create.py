@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2020, Ansible Project
 # Copyright (c) 2020, VMware, Inc. All Rights Reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: iso_create
@@ -155,13 +153,13 @@ import traceback
 PYCDLIB_IMP_ERR = None
 try:
     import pycdlib
+
     HAS_PYCDLIB = True
 except ImportError:
     PYCDLIB_IMP_ERR = traceback.format_exc()
     HAS_PYCDLIB = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def add_file(module, iso_file=None, src_file=None, file_path=None, rock_ridge=None, use_joliet=None, use_udf=None):
@@ -171,10 +169,10 @@ def add_file(module, iso_file=None, src_file=None, file_path=None, rock_ridge=No
     # In standard ISO interchange level 1, file names have a maximum of 8 characters, followed by a required dot,
     # followed by a maximum 3 character extension, followed by a semicolon and a version
     file_name = os.path.basename(file_path)
-    if '.' not in file_name:
-        file_in_iso_path = file_path.upper() + '.;1'
+    if "." not in file_name:
+        file_in_iso_path = f"{file_path.upper()}.;1"
     else:
-        file_in_iso_path = file_path.upper() + ';1'
+        file_in_iso_path = f"{file_path.upper()};1"
     if rock_ridge:
         rr_name = file_name
     if use_joliet:
@@ -182,9 +180,11 @@ def add_file(module, iso_file=None, src_file=None, file_path=None, rock_ridge=No
     if use_udf:
         udf_path = file_path
     try:
-        iso_file.add_file(src_file, iso_path=file_in_iso_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path)
+        iso_file.add_file(
+            src_file, iso_path=file_in_iso_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path
+        )
     except Exception as err:
-        module.fail_json(msg="Failed to add file %s to ISO file due to %s" % (src_file, to_native(err)))
+        module.fail_json(msg=f"Failed to add file {src_file} to ISO file due to {err}")
 
 
 def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_joliet=None, use_udf=None):
@@ -201,36 +201,36 @@ def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_jol
     try:
         iso_file.add_directory(iso_path=iso_dir_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path)
     except Exception as err:
-        module.fail_json(msg="Failed to directory %s to ISO file due to %s" % (dir_path, to_native(err)))
+        module.fail_json(msg=f"Failed to directory {dir_path} to ISO file due to {err}")
 
 
 def main():
     argument_spec = dict(
-        src_files=dict(type='list', required=True, elements='path'),
-        dest_iso=dict(type='path', required=True),
-        interchange_level=dict(type='int', choices=[1, 2, 3, 4], default=1),
-        vol_ident=dict(type='str'),
-        rock_ridge=dict(type='str', choices=['1.09', '1.10', '1.12']),
-        joliet=dict(type='int', choices=[1, 2, 3]),
-        udf=dict(type='bool', default=False),
+        src_files=dict(type="list", required=True, elements="path"),
+        dest_iso=dict(type="path", required=True),
+        interchange_level=dict(type="int", choices=[1, 2, 3, 4], default=1),
+        vol_ident=dict(type="str"),
+        rock_ridge=dict(type="str", choices=["1.09", "1.10", "1.12"]),
+        joliet=dict(type="int", choices=[1, 2, 3]),
+        udf=dict(type="bool", default=False),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
     if not HAS_PYCDLIB:
-        module.fail_json(missing_required_lib('pycdlib'), exception=PYCDLIB_IMP_ERR)
+        module.fail_json(missing_required_lib("pycdlib"), exception=PYCDLIB_IMP_ERR)
 
-    src_file_list = module.params.get('src_files')
+    src_file_list = module.params.get("src_files")
     if src_file_list and len(src_file_list) == 0:
-        module.fail_json(msg='Please specify source file and/or directory list using src_files parameter.')
+        module.fail_json(msg="Please specify source file and/or directory list using src_files parameter.")
     for src_file in src_file_list:
         if not os.path.exists(src_file):
-            module.fail_json(msg="Specified source file/directory path does not exist on local machine, %s" % src_file)
+            module.fail_json(msg=f"Specified source file/directory path does not exist on local machine, {src_file}")
 
-    dest_iso = module.params.get('dest_iso')
+    dest_iso = module.params.get("dest_iso")
     if dest_iso and len(dest_iso) == 0:
-        module.fail_json(msg='Please specify the absolute path of the new created ISO file using dest_iso parameter.')
+        module.fail_json(msg="Please specify the absolute path of the new created ISO file using dest_iso parameter.")
 
     dest_iso_dir = os.path.dirname(dest_iso)
     if dest_iso_dir and not os.path.exists(dest_iso_dir):
@@ -238,17 +238,17 @@ def main():
         try:
             os.makedirs(dest_iso_dir)
         except OSError as err:
-            module.fail_json(msg='Exception caught when creating folder %s, with error %s' % (dest_iso_dir, to_native(err)))
+            module.fail_json(msg=f"Exception caught when creating folder {dest_iso_dir}, with error {err}")
 
-    volume_id = module.params.get('vol_ident')
+    volume_id = module.params.get("vol_ident")
     if volume_id is None:
-        volume_id = ''
-    inter_level = module.params.get('interchange_level')
-    rock_ridge = module.params.get('rock_ridge')
-    use_joliet = module.params.get('joliet')
+        volume_id = ""
+    inter_level = module.params.get("interchange_level")
+    rock_ridge = module.params.get("rock_ridge")
+    use_joliet = module.params.get("joliet")
     use_udf = None
-    if module.params['udf']:
-        use_udf = '2.60'
+    if module.params["udf"]:
+        use_udf = "2.60"
 
     result = dict(
         changed=False,
@@ -258,21 +258,29 @@ def main():
         vol_ident=volume_id,
         rock_ridge=rock_ridge,
         joliet=use_joliet,
-        udf=use_udf
+        udf=use_udf,
     )
     if not module.check_mode:
         iso_file = pycdlib.PyCdlib(always_consistent=True)
-        iso_file.new(interchange_level=inter_level, vol_ident=volume_id, rock_ridge=rock_ridge, joliet=use_joliet, udf=use_udf)
+        iso_file.new(
+            interchange_level=inter_level, vol_ident=volume_id, rock_ridge=rock_ridge, joliet=use_joliet, udf=use_udf
+        )
 
         for src_file in src_file_list:
             # if specify a dir then go through the dir to add files and dirs
             if os.path.isdir(src_file):
                 dir_list = []
                 file_list = []
-                src_file = src_file.rstrip('/')
+                src_file = src_file.rstrip("/")
                 dir_name = os.path.basename(src_file)
-                add_directory(module, iso_file=iso_file, dir_path='/' + dir_name, rock_ridge=rock_ridge,
-                              use_joliet=use_joliet, use_udf=use_udf)
+                add_directory(
+                    module,
+                    iso_file=iso_file,
+                    dir_path=f"/{dir_name}",
+                    rock_ridge=rock_ridge,
+                    use_joliet=use_joliet,
+                    use_udf=use_udf,
+                )
 
                 # get dir list and file list
                 for path, dirs, files in os.walk(src_file):
@@ -281,23 +289,42 @@ def main():
                     for dir in dirs:
                         dir_list.append(os.path.join(path, dir))
                 for new_dir in dir_list:
-                    add_directory(module, iso_file=iso_file, dir_path=new_dir.split(os.path.dirname(src_file))[1],
-                                  rock_ridge=rock_ridge, use_joliet=use_joliet, use_udf=use_udf)
+                    add_directory(
+                        module,
+                        iso_file=iso_file,
+                        dir_path=new_dir.split(os.path.dirname(src_file))[1],
+                        rock_ridge=rock_ridge,
+                        use_joliet=use_joliet,
+                        use_udf=use_udf,
+                    )
                 for new_file in file_list:
-                    add_file(module, iso_file=iso_file, src_file=new_file,
-                             file_path=new_file.split(os.path.dirname(src_file))[1], rock_ridge=rock_ridge,
-                             use_joliet=use_joliet, use_udf=use_udf)
+                    add_file(
+                        module,
+                        iso_file=iso_file,
+                        src_file=new_file,
+                        file_path=new_file.split(os.path.dirname(src_file))[1],
+                        rock_ridge=rock_ridge,
+                        use_joliet=use_joliet,
+                        use_udf=use_udf,
+                    )
             # if specify a file then add this file directly to the '/' path in ISO
             else:
-                add_file(module, iso_file=iso_file, src_file=src_file, file_path='/' + os.path.basename(src_file),
-                         rock_ridge=rock_ridge, use_joliet=use_joliet, use_udf=use_udf)
+                add_file(
+                    module,
+                    iso_file=iso_file,
+                    src_file=src_file,
+                    file_path=f"/{os.path.basename(src_file)}",
+                    rock_ridge=rock_ridge,
+                    use_joliet=use_joliet,
+                    use_udf=use_udf,
+                )
 
         iso_file.write(dest_iso)
         iso_file.close()
 
-    result['changed'] = True
+    result["changed"] = True
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

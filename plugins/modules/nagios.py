@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # This file is largely copied from the Nagios module included in the
 # Func project. Original copyright follows:
@@ -10,8 +9,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -278,84 +276,84 @@ from ansible.module_utils.basic import AnsibleModule
 def which_cmdfile():
     locations = [
         # rhel
-        '/etc/nagios/nagios.cfg',
+        "/etc/nagios/nagios.cfg",
         # debian
-        '/etc/nagios3/nagios.cfg',
+        "/etc/nagios3/nagios.cfg",
         # older debian
-        '/etc/nagios2/nagios.cfg',
+        "/etc/nagios2/nagios.cfg",
         # bsd, solaris
-        '/usr/local/etc/nagios/nagios.cfg',
+        "/usr/local/etc/nagios/nagios.cfg",
         # groundwork it monitoring
-        '/usr/local/groundwork/nagios/etc/nagios.cfg',
+        "/usr/local/groundwork/nagios/etc/nagios.cfg",
         # open monitoring distribution
-        '/omd/sites/oppy/tmp/nagios/nagios.cfg',
+        "/omd/sites/oppy/tmp/nagios/nagios.cfg",
         # ???
-        '/usr/local/nagios/etc/nagios.cfg',
-        '/usr/local/nagios/nagios.cfg',
-        '/opt/nagios/etc/nagios.cfg',
-        '/opt/nagios/nagios.cfg',
+        "/usr/local/nagios/etc/nagios.cfg",
+        "/usr/local/nagios/nagios.cfg",
+        "/opt/nagios/etc/nagios.cfg",
+        "/opt/nagios/nagios.cfg",
         # icinga on debian/ubuntu
-        '/etc/icinga/icinga.cfg',
+        "/etc/icinga/icinga.cfg",
         # icinga installed from source (default location)
-        '/usr/local/icinga/etc/icinga.cfg',
+        "/usr/local/icinga/etc/icinga.cfg",
     ]
 
     for path in locations:
         if os.path.exists(path):
             for line in open(path):
-                if line.startswith('command_file'):
-                    return line.split('=')[1].strip()
+                if line.startswith("command_file"):
+                    return line.split("=")[1].strip()
 
     return None
 
 
 def main():
     ACTION_CHOICES = [
-        'downtime',
-        'delete_downtime',
-        'silence',
-        'unsilence',
-        'enable_alerts',
-        'disable_alerts',
-        'silence_nagios',
-        'unsilence_nagios',
-        'command',
-        'servicegroup_host_downtime',
-        'servicegroup_service_downtime',
-        'acknowledge',
-        'forced_check',
+        "downtime",
+        "delete_downtime",
+        "silence",
+        "unsilence",
+        "enable_alerts",
+        "disable_alerts",
+        "silence_nagios",
+        "unsilence_nagios",
+        "command",
+        "servicegroup_host_downtime",
+        "servicegroup_service_downtime",
+        "acknowledge",
+        "forced_check",
     ]
 
     module = AnsibleModule(
         argument_spec=dict(
-            action=dict(type='str', required=True, choices=ACTION_CHOICES),
-            author=dict(type='str', default='Ansible'),
-            comment=dict(type='str', default='Scheduling downtime'),
-            host=dict(type='str'),
-            servicegroup=dict(type='str'),
-            start=dict(type='str'),
-            minutes=dict(type='int', default=30),
-            cmdfile=dict(type='str', default=which_cmdfile()),
-            services=dict(type='list', elements='str', aliases=['service']),
-            command=dict(type='str'),
+            action=dict(type="str", required=True, choices=ACTION_CHOICES),
+            author=dict(type="str", default="Ansible"),
+            comment=dict(type="str", default="Scheduling downtime"),
+            host=dict(type="str"),
+            servicegroup=dict(type="str"),
+            start=dict(type="str"),
+            minutes=dict(type="int", default=30),
+            cmdfile=dict(type="str", default=which_cmdfile()),
+            services=dict(type="list", elements="str", aliases=["service"]),
+            command=dict(type="str"),
         ),
         required_if=[
-            ('action', 'downtime', ['host', 'services']),
-            ('action', 'delete_downtime', ['host', 'services']),
-            ('action', 'silence', ['host']),
-            ('action', 'unsilence', ['host']),
-            ('action', 'enable_alerts', ['host', 'services']),
-            ('action', 'disable_alerts', ['host', 'services']),
-            ('action', 'command', ['command']),
-            ('action', 'servicegroup_host_downtime', ['host', 'servicegroup']),
-            ('action', 'servicegroup_service_downtime', ['host', 'servicegroup']),
-            ('action', 'acknowledge', ['host', 'services']),
-            ('action', 'forced_check', ['host', 'services']),
+            ("action", "downtime", ["host", "services"]),
+            ("action", "delete_downtime", ["host", "services"]),
+            ("action", "silence", ["host"]),
+            ("action", "unsilence", ["host"]),
+            ("action", "enable_alerts", ["host", "services"]),
+            ("action", "disable_alerts", ["host", "services"]),
+            ("action", "command", ["command"]),
+            ("action", "servicegroup_host_downtime", ["host", "servicegroup"]),
+            ("action", "servicegroup_service_downtime", ["host", "servicegroup"]),
+            ("action", "acknowledge", ["host", "services"]),
+            ("action", "forced_check", ["host", "services"]),
         ],
     )
 
-    if not module.params['cmdfile']:
-        module.fail_json(msg='unable to locate nagios.cfg')
+    if not module.params["cmdfile"]:
+        module.fail_json(msg="unable to locate nagios.cfg")
 
     ansible_nagios = Nagios(module, **module.params)
     if module.check_mode:
@@ -364,7 +362,7 @@ def main():
         ansible_nagios.act()
 
 
-class Nagios(object):
+class Nagios:
     """
     Perform common tasks in Nagios related to downtime and
     notifications.
@@ -381,25 +379,25 @@ class Nagios(object):
 
     def __init__(self, module, **kwargs):
         self.module = module
-        self.action = kwargs['action']
-        self.author = kwargs['author']
-        self.comment = kwargs['comment']
-        self.host = kwargs['host']
-        self.servicegroup = kwargs['servicegroup']
-        if kwargs['start'] is not None:
-            self.start = int(kwargs['start'])
+        self.action = kwargs["action"]
+        self.author = kwargs["author"]
+        self.comment = kwargs["comment"]
+        self.host = kwargs["host"]
+        self.servicegroup = kwargs["servicegroup"]
+        if kwargs["start"] is not None:
+            self.start = int(kwargs["start"])
         else:
             self.start = None
-        self.minutes = kwargs['minutes']
-        self.cmdfile = kwargs['cmdfile']
-        self.command = kwargs['command']
+        self.minutes = kwargs["minutes"]
+        self.cmdfile = kwargs["cmdfile"]
+        self.command = kwargs["command"]
 
-        if kwargs['services'] is None :
-            self.services = kwargs['services']
-        elif len(kwargs['services']) == 1 and kwargs['services'][0] in ['host', 'all']:
-            self.services = kwargs['services'][0]
+        if kwargs["services"] is None:
+            self.services = kwargs["services"]
+        elif len(kwargs["services"]) == 1 and kwargs["services"][0] in ["host", "all"]:
+            self.services = kwargs["services"][0]
         else:
-            self.services = kwargs['services']
+            self.services = kwargs["services"]
 
         self.command_results = []
 
@@ -416,23 +414,18 @@ class Nagios(object):
         """
 
         if not os.path.exists(self.cmdfile):
-            self.module.fail_json(msg='nagios command file does not exist',
-                                  cmdfile=self.cmdfile)
+            self.module.fail_json(msg="nagios command file does not exist", cmdfile=self.cmdfile)
         if not stat.S_ISFIFO(os.stat(self.cmdfile).st_mode):
-            self.module.fail_json(msg='nagios command file is not a fifo file',
-                                  cmdfile=self.cmdfile)
+            self.module.fail_json(msg="nagios command file is not a fifo file", cmdfile=self.cmdfile)
         try:
-            with open(self.cmdfile, 'w') as fp:
+            with open(self.cmdfile, "w") as fp:
                 fp.write(cmd)
                 fp.flush()
             self.command_results.append(cmd.strip())
         except IOError:
-            self.module.fail_json(msg='unable to write to nagios command file',
-                                  cmdfile=self.cmdfile)
+            self.module.fail_json(msg="unable to write to nagios command file", cmdfile=self.cmdfile)
 
-    def _fmt_dt_str(self, cmd, host, duration, author=None,
-                    comment=None, start=None,
-                    svc=None, fixed=1, trigger=0):
+    def _fmt_dt_str(self, cmd, host, duration, author=None, comment=None, start=None, svc=None, fixed=1, trigger=0):
         """
         Format an external-command downtime string.
 
@@ -457,8 +450,8 @@ class Nagios(object):
         if start is None:
             start = entry_time
 
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
-        duration_s = (duration * 60)
+        hdr = f"[{entry_time}] {cmd};{host};"
+        duration_s = duration * 60
         end = start + duration_s
 
         if not author:
@@ -468,20 +461,17 @@ class Nagios(object):
             comment = self.comment
 
         if svc is not None:
-            dt_args = [svc, str(start), str(end), str(fixed), str(trigger),
-                       str(duration_s), author, comment]
+            dt_args = [svc, str(start), str(end), str(fixed), str(trigger), str(duration_s), author, comment]
         else:
             # Downtime for a host if no svc specified
-            dt_args = [str(start), str(end), str(fixed), str(trigger),
-                       str(duration_s), author, comment]
+            dt_args = [str(start), str(end), str(fixed), str(trigger), str(duration_s), author, comment]
 
         dt_arg_str = ";".join(dt_args)
-        dt_str = hdr + dt_arg_str + "\n"
+        dt_str = f"{hdr}{dt_arg_str}\n"
 
         return dt_str
 
-    def _fmt_ack_str(self, cmd, host, author=None,
-                     comment=None, svc=None, sticky=0, notify=1, persistent=0):
+    def _fmt_ack_str(self, cmd, host, author=None, comment=None, svc=None, sticky=0, notify=1, persistent=0):
         """
         Format an external-command acknowledge string.
 
@@ -499,7 +489,7 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
+        hdr = f"[{entry_time}] {cmd};{host};"
 
         if not author:
             author = self.author
@@ -514,7 +504,7 @@ class Nagios(object):
             ack_args = [str(sticky), str(notify), str(persistent), author, comment]
 
         ack_arg_str = ";".join(ack_args)
-        ack_str = hdr + ack_arg_str + "\n"
+        ack_str = f"{hdr}{ack_arg_str}\n"
 
         return ack_str
 
@@ -533,7 +523,7 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
+        hdr = f"[{entry_time}] {cmd};{host};"
 
         if comment is None:
             comment = self.comment
@@ -542,20 +532,20 @@ class Nagios(object):
         if svc is not None:
             dt_del_args.append(svc)
         else:
-            dt_del_args.append('')
+            dt_del_args.append("")
 
         if start is not None:
             dt_del_args.append(str(start))
         else:
-            dt_del_args.append('')
+            dt_del_args.append("")
 
         if comment is not None:
             dt_del_args.append(comment)
         else:
-            dt_del_args.append('')
+            dt_del_args.append("")
 
         dt_del_arg_str = ";".join(dt_del_args)
-        dt_del_str = hdr + dt_del_arg_str + "\n"
+        dt_del_str = f"{hdr}{dt_del_arg_str}\n"
 
         return dt_del_str
 
@@ -572,7 +562,7 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        hdr = "[%s] %s;%s;" % (entry_time, cmd, host)
+        hdr = f"[{entry_time}] {cmd};{host};"
 
         if start is None:
             start = entry_time + 3
@@ -583,7 +573,7 @@ class Nagios(object):
             chk_args = [svc, str(start)]
 
         chk_arg_str = ";".join(chk_args)
-        chk_str = hdr + chk_arg_str + "\n"
+        chk_str = f"{hdr}{chk_arg_str}\n"
 
         return chk_str
 
@@ -601,12 +591,12 @@ class Nagios(object):
         """
 
         entry_time = self._now()
-        notif_str = "[%s] %s" % (entry_time, cmd)
+        notif_str = f"[{entry_time}] {cmd}"
         if host is not None:
-            notif_str += ";%s" % host
+            notif_str += f";{host}"
 
             if svc is not None:
-                notif_str += ";%s" % svc
+                notif_str += f";{svc}"
 
         notif_str += "\n"
 
@@ -1099,10 +1089,7 @@ class Nagios(object):
         Syntax: DISABLE_HOST_NOTIFICATIONS;<host_name>
         """
 
-        cmd = [
-            "DISABLE_HOST_SVC_NOTIFICATIONS",
-            "DISABLE_HOST_NOTIFICATIONS"
-        ]
+        cmd = ["DISABLE_HOST_SVC_NOTIFICATIONS", "DISABLE_HOST_NOTIFICATIONS"]
         nagios_return = True
         return_str_list = []
         for c in cmd:
@@ -1127,10 +1114,7 @@ class Nagios(object):
         Syntax: ENABLE_HOST_NOTIFICATIONS;<host_name>
         """
 
-        cmd = [
-            "ENABLE_HOST_SVC_NOTIFICATIONS",
-            "ENABLE_HOST_NOTIFICATIONS"
-        ]
+        cmd = ["ENABLE_HOST_SVC_NOTIFICATIONS", "ENABLE_HOST_NOTIFICATIONS"]
         nagios_return = True
         return_str_list = []
         for c in cmd:
@@ -1150,7 +1134,7 @@ class Nagios(object):
 
         This is a 'SHUT UP, NAGIOS' command
         """
-        cmd = 'DISABLE_NOTIFICATIONS'
+        cmd = "DISABLE_NOTIFICATIONS"
         self._write_command(self._fmt_notif_str(cmd))
 
     def unsilence_nagios(self):
@@ -1160,7 +1144,7 @@ class Nagios(object):
 
         This is a 'OK, NAGIOS, GO'' command
         """
-        cmd = 'ENABLE_NOTIFICATIONS'
+        cmd = "ENABLE_NOTIFICATIONS"
         self._write_command(self._fmt_notif_str(cmd))
 
     def nagios_cmd(self, cmd):
@@ -1172,10 +1156,10 @@ class Nagios(object):
         You just have to provide the properly formatted command
         """
 
-        pre = '[%s]' % int(time.time())
+        pre = f"[{int(time.time())}]"
 
-        post = '\n'
-        cmdstr = '%s %s%s' % (pre, cmd, post)
+        post = "\n"
+        cmdstr = f"{pre} {cmd}{post}"
         self._write_command(cmdstr)
 
     def act(self):
@@ -1184,85 +1168,81 @@ class Nagios(object):
         needful (at the earliest).
         """
         # host or service downtime?
-        if self.action == 'downtime':
-            if self.services == 'host':
-                self.schedule_host_downtime(self.host, minutes=self.minutes,
-                                            start=self.start)
-            elif self.services == 'all':
-                self.schedule_host_svc_downtime(self.host, minutes=self.minutes,
-                                                start=self.start)
+        if self.action == "downtime":
+            if self.services == "host":
+                self.schedule_host_downtime(self.host, minutes=self.minutes, start=self.start)
+            elif self.services == "all":
+                self.schedule_host_svc_downtime(self.host, minutes=self.minutes, start=self.start)
             else:
-                self.schedule_svc_downtime(self.host,
-                                           services=self.services,
-                                           minutes=self.minutes,
-                                           start=self.start)
+                self.schedule_svc_downtime(self.host, services=self.services, minutes=self.minutes, start=self.start)
 
-        elif self.action == 'acknowledge':
-            if self.services == 'host':
+        elif self.action == "acknowledge":
+            if self.services == "host":
                 self.acknowledge_host_problem(self.host)
             else:
                 self.acknowledge_svc_problem(self.host, services=self.services)
 
-        elif self.action == 'delete_downtime':
-            if self.services == 'host':
+        elif self.action == "delete_downtime":
+            if self.services == "host":
                 self.delete_host_downtime(self.host)
-            elif self.services == 'all':
-                self.delete_host_downtime(self.host, comment='')
+            elif self.services == "all":
+                self.delete_host_downtime(self.host, comment="")
             else:
                 self.delete_host_downtime(self.host, services=self.services)
 
-        elif self.action == 'forced_check':
-            if self.services == 'host':
+        elif self.action == "forced_check":
+            if self.services == "host":
                 self.schedule_forced_host_check(self.host)
-            elif self.services == 'all':
+            elif self.services == "all":
                 self.schedule_forced_host_svc_check(self.host)
             else:
                 self.schedule_forced_svc_check(self.host, services=self.services)
 
         elif self.action == "servicegroup_host_downtime":
             if self.servicegroup:
-                self.schedule_servicegroup_host_downtime(servicegroup=self.servicegroup, minutes=self.minutes, start=self.start)
+                self.schedule_servicegroup_host_downtime(
+                    servicegroup=self.servicegroup, minutes=self.minutes, start=self.start
+                )
         elif self.action == "servicegroup_service_downtime":
             if self.servicegroup:
-                self.schedule_servicegroup_svc_downtime(servicegroup=self.servicegroup, minutes=self.minutes, start=self.start)
+                self.schedule_servicegroup_svc_downtime(
+                    servicegroup=self.servicegroup, minutes=self.minutes, start=self.start
+                )
 
         # toggle the host AND service alerts
-        elif self.action == 'silence':
+        elif self.action == "silence":
             self.silence_host(self.host)
 
-        elif self.action == 'unsilence':
+        elif self.action == "unsilence":
             self.unsilence_host(self.host)
 
         # toggle host/svc alerts
-        elif self.action == 'enable_alerts':
-            if self.services == 'host':
+        elif self.action == "enable_alerts":
+            if self.services == "host":
                 self.enable_host_notifications(self.host)
-            elif self.services == 'all':
+            elif self.services == "all":
                 self.enable_host_svc_notifications(self.host)
             else:
-                self.enable_svc_notifications(self.host,
-                                              services=self.services)
+                self.enable_svc_notifications(self.host, services=self.services)
 
-        elif self.action == 'disable_alerts':
-            if self.services == 'host':
+        elif self.action == "disable_alerts":
+            if self.services == "host":
                 self.disable_host_notifications(self.host)
-            elif self.services == 'all':
+            elif self.services == "all":
                 self.disable_host_svc_notifications(self.host)
             else:
-                self.disable_svc_notifications(self.host,
-                                               services=self.services)
-        elif self.action == 'silence_nagios':
+                self.disable_svc_notifications(self.host, services=self.services)
+        elif self.action == "silence_nagios":
             self.silence_nagios()
 
-        elif self.action == 'unsilence_nagios':
+        elif self.action == "unsilence_nagios":
             self.unsilence_nagios()
 
-        else:    # self.action == 'command'
+        else:  # self.action == 'command'
             self.nagios_cmd(self.command)
 
-        self.module.exit_json(nagios_commands=self.command_results,
-                              changed=True)
+        self.module.exit_json(nagios_commands=self.command_results, changed=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

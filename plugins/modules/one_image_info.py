@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Milan Ilic <milani@nordeus.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: one_image_info
@@ -275,28 +273,37 @@ images:
 from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
 
 
-IMAGE_STATES = ['INIT', 'READY', 'USED', 'DISABLED', 'LOCKED', 'ERROR', 'CLONE', 'DELETE', 'USED_PERS', 'LOCKED_USED', 'LOCKED_USED_PERS']
+IMAGE_STATES = [
+    "INIT",
+    "READY",
+    "USED",
+    "DISABLED",
+    "LOCKED",
+    "ERROR",
+    "CLONE",
+    "DELETE",
+    "USED_PERS",
+    "LOCKED_USED",
+    "LOCKED_USED_PERS",
+]
 
 
 class ImageInfoModule(OpenNebulaModule):
     def __init__(self):
         argument_spec = dict(
-            ids=dict(type='list', aliases=['id'], elements='str'),
-            name=dict(type='str'),
+            ids=dict(type="list", aliases=["id"], elements="str"),
+            name=dict(type="str"),
         )
         mutually_exclusive = [
-            ['ids', 'name'],
+            ["ids", "name"],
         ]
 
-        OpenNebulaModule.__init__(self,
-                                  argument_spec,
-                                  supports_check_mode=True,
-                                  mutually_exclusive=mutually_exclusive)
+        OpenNebulaModule.__init__(self, argument_spec, supports_check_mode=True, mutually_exclusive=mutually_exclusive)
 
     def run(self, one, module, result):
         params = module.params
-        ids = params.get('ids')
-        name = params.get('name')
+        ids = params.get("ids")
+        name = params.get("name")
 
         if ids:
             images = self.get_images_by_ids(ids)
@@ -305,9 +312,7 @@ class ImageInfoModule(OpenNebulaModule):
         else:
             images = self.get_all_images().IMAGE
 
-        self.result = {
-            'images': [self.get_image_info(image) for image in images]
-        }
+        self.result = {"images": [self.get_image_info(image) for image in images]}
 
         self.exit()
 
@@ -329,7 +334,7 @@ class ImageInfoModule(OpenNebulaModule):
                     break
 
         if len(ids) > 0:
-            self.module.fail_json(msg='There is no IMAGE(s) with id(s)=' + ', '.join('{id}'.format(id=str(image_id)) for image_id in ids))
+            self.module.fail_json(msg=f"There is no IMAGE(s) with id(s)={', '.join(str(image_id) for image_id in ids)}")
 
         return images
 
@@ -339,9 +344,10 @@ class ImageInfoModule(OpenNebulaModule):
 
         pool = self.get_all_images()
 
-        if name_pattern.startswith('~'):
+        if name_pattern.startswith("~"):
             import re
-            if name_pattern[1] == '*':
+
+            if name_pattern[1] == "*":
                 pattern = re.compile(name_pattern[2:], re.IGNORECASE)
             else:
                 pattern = re.compile(name_pattern[1:])
@@ -356,7 +362,7 @@ class ImageInfoModule(OpenNebulaModule):
 
         # if the specific name is indicated
         if pattern is None and len(images) == 0:
-            self.module.fail_json(msg="There is no IMAGE with name=" + name_pattern)
+            self.module.fail_json(msg=f"There is no IMAGE with name={name_pattern}")
 
         return images
 
@@ -365,5 +371,5 @@ def main():
     ImageInfoModule().run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

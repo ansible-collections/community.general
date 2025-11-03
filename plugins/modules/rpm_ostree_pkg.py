@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Dusty Mabe <dusty@dustymabe.com>
 # Copyright (c) 2018, Ansible Project
 # Copyright (c) 2021, Abhijeet Kasurde <akasurde@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -112,65 +110,67 @@ class RpmOstreePkg:
     def __init__(self, module):
         self.module = module
         self.params = module.params
-        self.state = module.params['state']
+        self.state = module.params["state"]
 
     def ensure(self):
         results = dict(
             rc=0,
             changed=False,
-            action='',
+            action="",
             packages=[],
-            stdout='',
-            stderr='',
-            cmd='',
+            stdout="",
+            stderr="",
+            cmd="",
             needs_reboot=False,
         )
 
         # Ensure rpm-ostree command exists
-        cmd = [self.module.get_bin_path('rpm-ostree', required=True)]
+        cmd = [self.module.get_bin_path("rpm-ostree", required=True)]
 
         # Decide action to perform
-        if self.state == 'present':
-            results['action'] = 'install'
-            cmd.append('install')
-        elif self.state == 'absent':
-            results['action'] = 'uninstall'
-            cmd.append('uninstall')
+        if self.state == "present":
+            results["action"] = "install"
+            cmd.append("install")
+        elif self.state == "absent":
+            results["action"] = "uninstall"
+            cmd.append("uninstall")
 
         # Add the options to the command line
-        if self.params['apply_live'] and self.state == 'present':
-            cmd.extend(['--apply-live', '--assumeyes'])
+        if self.params["apply_live"] and self.state == "present":
+            cmd.extend(["--apply-live", "--assumeyes"])
 
         # Additional parameters
-        cmd.extend(['--allow-inactive', '--idempotent', '--unchanged-exit-77'])
-        for pkg in self.params['name']:
+        cmd.extend(["--allow-inactive", "--idempotent", "--unchanged-exit-77"])
+        for pkg in self.params["name"]:
             cmd.append(pkg)
-            results['packages'].append(pkg)
+            results["packages"].append(pkg)
 
         rc, out, err = self.module.run_command(cmd)
 
         # Determine if system needs a reboot to apply change
         if 'Changes queued for next boot. Run "systemctl reboot" to start a reboot' in out:
-            results['needs_reboot'] = True
+            results["needs_reboot"] = True
 
-        results.update(dict(
-            rc=rc,
-            cmd=' '.join(cmd),
-            stdout=out,
-            stderr=err,
-        ))
+        results.update(
+            dict(
+                rc=rc,
+                cmd=" ".join(cmd),
+                stdout=out,
+                stderr=err,
+            )
+        )
 
         # A few possible options:
         #     - rc=0  - succeeded in making a change
         #     - rc=77 - no change was needed
         #     - rc=?  - error
         if rc == 0:
-            results['changed'] = True
+            results["changed"] = True
         elif rc == 77:
-            results['changed'] = False
-            results['rc'] = 0
+            results["changed"] = False
+            results["rc"] = 0
         else:
-            self.module.fail_json(msg='non-zero return code', **results)
+            self.module.fail_json(msg="non-zero return code", **results)
 
         self.module.exit_json(**results)
 
@@ -178,18 +178,15 @@ class RpmOstreePkg:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(
-                default="present",
-                choices=['absent', 'present']
-            ),
+            state=dict(default="present", choices=["absent", "present"]),
             name=dict(
                 aliases=["pkg"],
                 required=True,
-                type='list',
-                elements='str',
+                type="list",
+                elements="str",
             ),
             apply_live=dict(
-                type='bool',
+                type="bool",
                 default=False,
             ),
         ),
@@ -199,5 +196,5 @@ def main():
     rpm_ostree_pkg.ensure()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

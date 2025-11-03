@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Matt Makai <matthew.makai@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -109,30 +107,29 @@ EXAMPLES = r"""
 # =======================================
 # twilio module support methods
 #
+from urllib.parse import urlencode
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 
 
-def post_twilio_api(module, account_sid, auth_token, msg, from_number,
-                    to_number, media_url=None):
-    URI = "https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json" \
-        % (account_sid,)
+def post_twilio_api(module, account_sid, auth_token, msg, from_number, to_number, media_url=None):
+    URI = f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json"
     AGENT = "Ansible"
 
-    data = {'From': from_number, 'To': to_number, 'Body': msg}
+    data = {"From": from_number, "To": to_number, "Body": msg}
     if media_url:
-        data['MediaUrl'] = media_url
+        data["MediaUrl"] = media_url
     encoded_data = urlencode(data)
 
-    headers = {'User-Agent': AGENT,
-               'Content-type': 'application/x-www-form-urlencoded',
-               'Accept': 'application/json',
-               }
+    headers = {
+        "User-Agent": AGENT,
+        "Content-type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+    }
 
     # Hack module params to have the Basic auth params that fetch_url expects
-    module.params['url_username'] = account_sid.replace('\n', '')
-    module.params['url_password'] = auth_token.replace('\n', '')
+    module.params["url_username"] = account_sid.replace("\n", "")
+    module.params["url_password"] = auth_token.replace("\n", "")
 
     return fetch_url(module, URI, data=encoded_data, headers=headers)
 
@@ -141,39 +138,38 @@ def post_twilio_api(module, account_sid, auth_token, msg, from_number,
 # Main
 #
 
-def main():
 
+def main():
     module = AnsibleModule(
         argument_spec=dict(
             account_sid=dict(required=True),
             auth_token=dict(required=True, no_log=True),
             msg=dict(required=True),
             from_number=dict(required=True),
-            to_numbers=dict(required=True, aliases=['to_number'], type='list', elements='str'),
+            to_numbers=dict(required=True, aliases=["to_number"], type="list", elements="str"),
             media_url=dict(),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    account_sid = module.params['account_sid']
-    auth_token = module.params['auth_token']
-    msg = module.params['msg']
-    from_number = module.params['from_number']
-    to_numbers = module.params['to_numbers']
-    media_url = module.params['media_url']
+    account_sid = module.params["account_sid"]
+    auth_token = module.params["auth_token"]
+    msg = module.params["msg"]
+    from_number = module.params["from_number"]
+    to_numbers = module.params["to_numbers"]
+    media_url = module.params["media_url"]
 
     for number in to_numbers:
-        r, info = post_twilio_api(module, account_sid, auth_token, msg,
-                                  from_number, number, media_url)
-        if info['status'] not in [200, 201]:
+        r, info = post_twilio_api(module, account_sid, auth_token, msg, from_number, number, media_url)
+        if info["status"] not in [200, 201]:
             body_message = "unknown error"
-            if 'body' in info:
-                body = module.from_json(info['body'])
-                body_message = body['message']
-            module.fail_json(msg="unable to send message to %s: %s" % (number, body_message))
+            if "body" in info:
+                body = module.from_json(info["body"])
+                body_message = body["message"]
+            module.fail_json(msg=f"unable to send message to {number}: {body_message}")
 
     module.exit_json(msg=msg, changed=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

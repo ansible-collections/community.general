@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Patrick Pelletier <pp.pelletier@gmail.com>
 # Based on pacman (Afterburn) and pkgin (Shaun Zinck) modules
@@ -7,8 +6,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -43,10 +41,7 @@ options:
   force:
     description:
       - The C(opkg --force) parameter used.
-      - State V("") is deprecated and will be removed in community.general 12.0.0. Please omit the parameter O(force) to obtain
-        the same behavior.
     choices:
-      - ""
       - "depends"
       - "maintainer"
       - "reinstall"
@@ -128,9 +123,21 @@ class Opkg(StateModuleHelper):
         argument_spec=dict(
             name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
-            force=dict(choices=["", "depends", "maintainer", "reinstall", "overwrite", "downgrade", "space",
-                                "postinstall", "remove", "checksum", "removal-of-dependent-packages"]),
-            update_cache=dict(default=False, type='bool'),
+            force=dict(
+                choices=[
+                    "depends",
+                    "maintainer",
+                    "reinstall",
+                    "overwrite",
+                    "downgrade",
+                    "space",
+                    "postinstall",
+                    "remove",
+                    "checksum",
+                    "removal-of-dependent-packages",
+                ]
+            ),
+            update_cache=dict(default=False, type="bool"),
             executable=dict(type="path"),
         ),
     )
@@ -147,15 +154,6 @@ class Opkg(StateModuleHelper):
             removed="remove",
         )
 
-        def _force(value):
-            # 12.0.0 function _force() to be removed entirely
-            if value == "":
-                self.deprecate('Value "" is deprecated. Simply omit the parameter "force" to prevent any --force-X argument when running opkg',
-                               version="12.0.0",
-                               collection_name="community.general")
-                value = None
-            return cmd_runner_fmt.as_optval("--force-")(value, ctx_ignore_none=True)
-
         dir, cmd = os.path.split(self.vars.executable) if self.vars.executable else (None, "opkg")
 
         self.runner = CmdRunner(
@@ -164,7 +162,7 @@ class Opkg(StateModuleHelper):
             arg_formats=dict(
                 package=cmd_runner_fmt.as_list(),
                 state=cmd_runner_fmt.as_map(state_map),
-                force=cmd_runner_fmt.as_func(_force),  # 12.0.0 replace with cmd_runner_fmt.as_optval("--force-")
+                force=cmd_runner_fmt.as_optval("--force-"),
                 update_cache=cmd_runner_fmt.as_bool("update"),
                 version=cmd_runner_fmt.as_fixed("--version"),
             ),
@@ -182,8 +180,8 @@ class Opkg(StateModuleHelper):
 
     @staticmethod
     def split_name_and_version(package):
-        """ Split the name and the version when using the NAME=VERSION syntax """
-        splitted = package.split('=', 1)
+        """Split the name and the version when using the NAME=VERSION syntax"""
+        splitted = package.split("=", 1)
         if len(splitted) == 1:
             return splitted[0], None
         else:
@@ -192,21 +190,24 @@ class Opkg(StateModuleHelper):
     def _package_in_desired_state(self, name, want_installed, version=None):
         dummy, out, dummy = self.runner("state package").run(state="query", package=name)
 
-        has_package = out.startswith(name + " - %s" % ("" if not version else (version + " ")))
+        has_package = out.startswith(f"{name} - {'' if not version else f'{version} '}")
         return want_installed == has_package
 
     def state_present(self):
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 pkg_name, pkg_version = self.split_name_and_version(package)
-                if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version) or self.vars.force == "reinstall":
+                if (
+                    not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version)
+                    or self.vars.force == "reinstall"
+                ):
                     ctx.run(package=package)
                     self.vars.set("run_info", ctx.run_info, verbosity=4)
                     if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version):
-                        self.do_raise("failed to install %s" % package)
+                        self.do_raise(f"failed to install {package}")
                     self.vars.install_c += 1
         if self.vars.install_c > 0:
-            self.vars.msg = "installed %s package(s)" % self.vars.install_c
+            self.vars.msg = f"installed {self.vars.install_c} package(s)"
         else:
             self.vars.msg = "package(s) already present"
 
@@ -218,10 +219,10 @@ class Opkg(StateModuleHelper):
                     ctx.run(package=package)
                     self.vars.set("run_info", ctx.run_info, verbosity=4)
                     if not self._package_in_desired_state(package, want_installed=False):
-                        self.do_raise("failed to remove %s" % package)
+                        self.do_raise(f"failed to remove {package}")
                     self.vars.remove_c += 1
         if self.vars.remove_c > 0:
-            self.vars.msg = "removed %s package(s)" % self.vars.remove_c
+            self.vars.msg = f"removed {self.vars.remove_c} package(s)"
         else:
             self.vars.msg = "package(s) already absent"
 
@@ -233,5 +234,5 @@ def main():
     Opkg.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

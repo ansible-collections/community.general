@@ -1,28 +1,22 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2022, Håkon Lerring
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 import copy
 import json
 import re
+import typing as t
+from urllib import error as urllib_error
+from urllib.parse import urlencode
 
-from ansible.module_utils.six.moves.urllib import error as urllib_error
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import open_url
 
 
 def get_consul_url(configuration):
-    return "%s://%s:%s/v1" % (
-        configuration.scheme,
-        configuration.host,
-        configuration.port,
-    )
+    return f"{configuration.scheme}://{configuration.host}:{configuration.port}/v1"
 
 
 def get_auth_headers(configuration):
@@ -41,12 +35,12 @@ class RequestError(Exception):
         if self.response_data is None:
             # self.status is already the message (backwards compat)
             return self.status
-        return "HTTP %d: %s" % (self.status, self.response_data)
+        return f"HTTP {self.status}: {self.response_data}"
 
 
 def handle_consul_response_error(response):
     if 400 <= response.status_code < 600:
-        raise RequestError("%d %s" % (response.status_code, response.content))
+        raise RequestError(f"{response.status_code} {response.content}")
 
 
 AUTH_ARGUMENTS_SPEC = dict(
@@ -70,12 +64,12 @@ def camel_case_key(key):
 
 
 def validate_check(check):
-    validate_duration_keys = ['Interval', 'Ttl', 'Timeout']
+    validate_duration_keys = ["Interval", "Ttl", "Timeout"]
     validate_tcp_regex = r"(?P<host>.*):(?P<port>(?:[0-9]+))$"
-    if check.get('Tcp') is not None:
-        match = re.match(validate_tcp_regex, check['Tcp'])
+    if check.get("Tcp") is not None:
+        match = re.match(validate_tcp_regex, check["Tcp"])
         if not match:
-            raise Exception('tcp check must be in host:port format')
+            raise Exception("tcp check must be in host:port format")
     for duration in validate_duration_keys:
         if duration in check and check[duration] is not None:
             check[duration] = validate_duration(check[duration])
@@ -84,7 +78,7 @@ def validate_check(check):
 def validate_duration(duration):
     if duration:
         if not re.search(r"\d+(?:ns|us|ms|s|m|h)", duration):
-            duration = "{0}s".format(duration)
+            duration = f"{duration}s"
     return duration
 
 
@@ -104,12 +98,7 @@ def _normalize_params(params, arg_spec):
         if k not in arg_spec or v is None:  # Alias
             continue
         spec = arg_spec[k]
-        if (
-            spec.get("type") == "list"
-            and spec.get("elements") == "dict"
-            and spec.get("options")
-            and v
-        ):
+        if spec.get("type") == "list" and spec.get("elements") == "dict" and spec.get("options") and v:
             v = [_normalize_params(d, spec["options"]) for d in v]
         elif spec.get("type") == "dict" and spec.get("options") and v:
             v = _normalize_params(v, spec["options"])
@@ -124,20 +113,18 @@ class _ConsulModule:
     As such backwards incompatible changes can occur even in bugfix releases.
     """
 
-    api_endpoint = None  # type: str
-    unique_identifiers = None  # type: list
-    result_key = None  # type: str
-    create_only_fields = set()
-    operational_attributes = set()
-    params = {}
+    api_endpoint: str | None = None
+    unique_identifiers: list | None = None
+    result_key: str | None = None
+    create_only_fields: set[str] = set()
+    operational_attributes: set[str] = set()
+    params: dict[str, t.Any] = {}
 
     def __init__(self, module):
         self._module = module
         self.params = _normalize_params(module.params, module.argument_spec)
         self.api_params = {
-            k: camel_case_key(k)
-            for k in self.params
-            if k not in STATE_PARAMETER and k not in AUTH_ARGUMENTS_SPEC
+            k: camel_case_key(k) for k in self.params if k not in STATE_PARAMETER and k not in AUTH_ARGUMENTS_SPEC
         }
 
         self.operational_attributes.update({"CreateIndex", "CreateTime", "Hash", "ModifyIndex"})
@@ -197,11 +184,9 @@ class _ConsulModule:
 
         def needs_camel_case(k):
             spec = self._module.argument_spec[k]
-            return (
-                spec.get("type") == "list"
-                and spec.get("elements") == "dict"
-                and spec.get("options")
-            ) or (spec.get("type") == "dict" and spec.get("options"))
+            return (spec.get("type") == "list" and spec.get("elements") == "dict" and spec.get("options")) or (
+                spec.get("type") == "dict" and spec.get("options")
+            )
 
         if k in self.api_params and v is not None:
             if isinstance(v, dict) and needs_camel_case(k):
@@ -226,9 +211,7 @@ class _ConsulModule:
         return False
 
     def prepare_object(self, existing, obj):
-        existing = {
-            k: v for k, v in existing.items() if k not in self.operational_attributes
-        }
+        existing = {k: v for k, v in existing.items() if k not in self.operational_attributes}
         for k, v in obj.items():
             existing[k] = v
         return existing
@@ -248,7 +231,7 @@ class _ConsulModule:
         if operation == OPERATION_CREATE:
             return self.api_endpoint
         elif identifier:
-            return "/".join([self.api_endpoint, identifier])
+            return f"{self.api_endpoint}/{identifier}"
         raise RuntimeError("invalid arguments passed")
 
     def read_object(self):
@@ -301,11 +284,7 @@ class _ConsulModule:
             params = {k: v for k, v in params.items() if v is not None}
 
         ca_path = module_params.get("ca_path")
-        base_url = "%s://%s:%s/v1" % (
-            module_params["scheme"],
-            module_params["host"],
-            module_params["port"],
-        )
+        base_url = f"{module_params['scheme']}://{module_params['host']}:{module_params['port']}/v1"
         url = "/".join([base_url] + list(url_parts))
 
         headers = {}
@@ -318,7 +297,7 @@ class _ConsulModule:
                 data = json.dumps(data)
                 headers["Content-Type"] = "application/json"
             if params:
-                url = "%s?%s" % (url, urlencode(params))
+                url = f"{url}?{urlencode(params)}"
             response = open_url(
                 url,
                 method=method,
@@ -328,9 +307,7 @@ class _ConsulModule:
                 ca_path=ca_path,
             )
             response_data = response.read()
-            status = (
-                response.status if hasattr(response, "status") else response.getcode()
-            )
+            status = response.status if hasattr(response, "status") else response.getcode()
 
         except urllib_error.URLError as e:
             if isinstance(e, urllib_error.HTTPError):
@@ -338,8 +315,7 @@ class _ConsulModule:
                 response_data = e.fp.read()
             else:
                 self._module.fail_json(
-                    msg="Could not connect to consul agent at %s:%s, error was %s"
-                    % (module_params["host"], module_params["port"], str(e))
+                    msg=f"Could not connect to consul agent at {module_params['host']}:{module_params['port']}, error was {e}"
                 )
                 raise
 

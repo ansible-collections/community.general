@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Juan Manuel Parrilla <jparrill@redhat.com>
 # Copyright (c) 2012-17 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 author:
@@ -15,6 +13,12 @@ requirements:
   - hiera (command line utility)
 description:
   - Retrieves data from an Puppetmaster node using Hiera as ENC.
+deprecated:
+  removed_in: 13.0.0
+  why: >-
+    Hiera has been deprecated a long time ago.
+    If you disagree with this deprecation, please create an issue in the community.general repository.
+  alternative: Unknown.
 options:
   _terms:
     description:
@@ -68,14 +72,14 @@ from ansible.utils.cmd_functions import run_cmd
 from ansible.module_utils.common.text.converters import to_text
 
 
-class Hiera(object):
+class Hiera:
     def __init__(self, hiera_cfg, hiera_bin):
         self.hiera_cfg = hiera_cfg
         self.hiera_bin = hiera_bin
 
     def get(self, hiera_key):
         pargs = [self.hiera_bin]
-        pargs.extend(['-c', self.hiera_cfg])
+        pargs.extend(["-c", self.hiera_cfg])
 
         pargs.extend(hiera_key)
 
@@ -88,6 +92,6 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
-        hiera = Hiera(self.get_option('config_file'), self.get_option('executable'))
+        hiera = Hiera(self.get_option("config_file"), self.get_option("executable"))
         ret = [hiera.get(terms)]
         return ret

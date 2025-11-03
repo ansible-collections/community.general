@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_realm_info
@@ -108,27 +106,25 @@ def main():
     :return:
     """
     argument_spec = dict(
-        auth_keycloak_url=dict(type='str', aliases=['url'], required=True, no_log=False),
-        validate_certs=dict(type='bool', default=True),
-
-        realm=dict(default='master'),
+        auth_keycloak_url=dict(type="str", aliases=["url"], required=True, no_log=False),
+        validate_certs=dict(type="bool", default=True),
+        realm=dict(default="master"),
     )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    result = dict(changed=False, msg='', realm_info='')
+    result = dict(changed=False, msg="", realm_info="")
 
     kc = KeycloakAPI(module, {})
 
-    realm = module.params.get('realm')
+    realm = module.params.get("realm")
 
     realm_info = kc.get_realm_info_by_id(realm=realm)
 
-    result['realm_info'] = realm_info
-    result['msg'] = 'Get realm public info successful for ID {realm}'.format(realm=realm)
+    result["realm_info"] = realm_info
+    result["msg"] = f"Get realm public info successful for ID {realm}"
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

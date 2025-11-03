@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016, Werner Dijkerman (ikben@werner-dijkerman.nl)
 # Copyright (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: opendj_backendprop
@@ -99,46 +97,57 @@ RETURN = r"""
 from ansible.module_utils.basic import AnsibleModule
 
 
-class BackendProp(object):
-
+class BackendProp:
     def __init__(self, module):
         self._module = module
 
     def get_property(self, opendj_bindir, hostname, port, username, password_method, backend_name):
         my_command = [
-            opendj_bindir + '/dsconfig',
-            'get-backend-prop',
-            '-h', hostname,
-            '--port', str(port),
-            '--bindDN', username,
-            '--backend-name', backend_name,
-            '-n', '-X', '-s'
+            f"{opendj_bindir}/dsconfig",
+            "get-backend-prop",
+            "-h",
+            hostname,
+            "--port",
+            str(port),
+            "--bindDN",
+            username,
+            "--backend-name",
+            backend_name,
+            "-n",
+            "-X",
+            "-s",
         ] + password_method
         rc, stdout, stderr = self._module.run_command(my_command)
         if rc == 0:
             return stdout
         else:
-            self._module.fail_json(msg="Error message: " + str(stderr))
+            self._module.fail_json(msg=f"Error message: {stderr}")
 
     def set_property(self, opendj_bindir, hostname, port, username, password_method, backend_name, name, value):
         my_command = [
-            opendj_bindir + '/dsconfig',
-            'set-backend-prop',
-            '-h', hostname,
-            '--port', str(port),
-            '--bindDN', username,
-            '--backend-name', backend_name,
-            '--set', name + ":" + value,
-            '-n', '-X'
+            f"{opendj_bindir}/dsconfig",
+            "set-backend-prop",
+            "-h",
+            hostname,
+            "--port",
+            str(port),
+            "--bindDN",
+            username,
+            "--backend-name",
+            backend_name,
+            "--set",
+            f"{name}:{value}",
+            "-n",
+            "-X",
         ] + password_method
         rc, stdout, stderr = self._module.run_command(my_command)
         if rc == 0:
             return True
         else:
-            self._module.fail_json(msg="Error message: " + stderr)
+            self._module.fail_json(msg=f"Error message: {stderr}")
 
     def validate_data(self, data=None, name=None, value=None):
-        for config_line in data.split('\n'):
+        for config_line in data.split("\n"):
             if config_line:
                 split_line = config_line.split()
                 if split_line[0] == name:
@@ -162,46 +171,50 @@ def main():
             state=dict(default="present"),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[['password', 'passwordfile']],
-        required_one_of=[['password', 'passwordfile']]
+        mutually_exclusive=[["password", "passwordfile"]],
+        required_one_of=[["password", "passwordfile"]],
     )
 
-    opendj_bindir = module.params['opendj_bindir']
-    hostname = module.params['hostname']
-    port = module.params['port']
-    username = module.params['username']
-    password = module.params['password']
-    passwordfile = module.params['passwordfile']
-    backend_name = module.params['backend']
-    name = module.params['name']
-    value = module.params['value']
-    state = module.params['state']
+    opendj_bindir = module.params["opendj_bindir"]
+    hostname = module.params["hostname"]
+    port = module.params["port"]
+    username = module.params["username"]
+    password = module.params["password"]
+    passwordfile = module.params["passwordfile"]
+    backend_name = module.params["backend"]
+    name = module.params["name"]
+    value = module.params["value"]
+    state = module.params["state"]
 
     if module.params["password"] is not None:
-        password_method = ['-w', password]
+        password_method = ["-w", password]
     elif module.params["passwordfile"] is not None:
-        password_method = ['-j', passwordfile]
+        password_method = ["-j", passwordfile]
 
     opendj = BackendProp(module)
-    validate = opendj.get_property(opendj_bindir=opendj_bindir,
-                                   hostname=hostname,
-                                   port=port,
-                                   username=username,
-                                   password_method=password_method,
-                                   backend_name=backend_name)
+    validate = opendj.get_property(
+        opendj_bindir=opendj_bindir,
+        hostname=hostname,
+        port=port,
+        username=username,
+        password_method=password_method,
+        backend_name=backend_name,
+    )
 
     if validate:
         if not opendj.validate_data(data=validate, name=name, value=value):
             if module.check_mode:
                 module.exit_json(changed=True)
-            if opendj.set_property(opendj_bindir=opendj_bindir,
-                                   hostname=hostname,
-                                   port=port,
-                                   username=username,
-                                   password_method=password_method,
-                                   backend_name=backend_name,
-                                   name=name,
-                                   value=value):
+            if opendj.set_property(
+                opendj_bindir=opendj_bindir,
+                hostname=hostname,
+                port=port,
+                username=username,
+                password_method=password_method,
+                backend_name=backend_name,
+                name=name,
+                value=value,
+            ):
                 module.exit_json(changed=True)
             else:
                 module.exit_json(changed=False)
@@ -211,5 +224,5 @@ def main():
         module.exit_json(changed=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

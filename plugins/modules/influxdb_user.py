@@ -1,14 +1,12 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Vitaliy Zhhuta <zhhuta () gmail.com>
 # insipred by Kamil Szczygiel <kamil.szczygiel () intel.com> influxdb_database module
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: influxdb_user
@@ -117,7 +115,7 @@ def find_user(module, client, user_name):
     try:
         users = client.get_list_users()
         for user in users:
-            if user['user'] == user_name:
+            if user["user"] == user_name:
                 user_result = user
                 break
     except ConnectionError as e:
@@ -136,7 +134,7 @@ def check_user_password(module, client, user_name, user_password):
         module.fail_json(msg=to_native(e))
     finally:
         # restore previous user
-        client.switch_user(module.params['username'], module.params['password'])
+        client.switch_user(module.params["username"], module.params["password"])
     return True
 
 
@@ -173,34 +171,30 @@ def set_user_grants(module, client, user_name, grants):
     try:
         current_grants = client.get_list_privileges(user_name)
     except influx.exceptions.InfluxDBClientError as e:
-        if not module.check_mode or 'user not found' not in e.content:
+        if not module.check_mode or "user not found" not in e.content:
             module.fail_json(msg=e.content)
 
     try:
         parsed_grants = []
         # Fix privileges wording
         for i, v in enumerate(current_grants):
-            if v['privilege'] != 'NO PRIVILEGES':
-                if v['privilege'] == 'ALL PRIVILEGES':
-                    v['privilege'] = 'ALL'
+            if v["privilege"] != "NO PRIVILEGES":
+                if v["privilege"] == "ALL PRIVILEGES":
+                    v["privilege"] = "ALL"
                 parsed_grants.append(v)
 
         # check if the current grants are included in the desired ones
         for current_grant in parsed_grants:
             if current_grant not in grants:
                 if not module.check_mode:
-                    client.revoke_privilege(current_grant['privilege'],
-                                            current_grant['database'],
-                                            user_name)
+                    client.revoke_privilege(current_grant["privilege"], current_grant["database"], user_name)
                 changed = True
 
         # check if the desired grants are included in the current ones
         for grant in grants:
             if grant not in parsed_grants:
                 if not module.check_mode:
-                    client.grant_privilege(grant['privilege'],
-                                           grant['database'],
-                                           user_name)
+                    client.grant_privilege(grant["privilege"], grant["database"], user_name)
                 changed = True
 
     except influx.exceptions.InfluxDBClientError as e:
@@ -215,22 +209,19 @@ INFLUX_AUTH_FIRST_USER_REQUIRED = "error authorizing query: create admin user fi
 def main():
     argument_spec = influx.InfluxDb.influxdb_argument_spec()
     argument_spec.update(
-        state=dict(default='present', type='str', choices=['present', 'absent']),
-        user_name=dict(required=True, type='str'),
-        user_password=dict(type='str', no_log=True),
-        admin=dict(default='False', type='bool'),
-        grants=dict(type='list', elements='dict'),
+        state=dict(default="present", type="str", choices=["present", "absent"]),
+        user_name=dict(required=True, type="str"),
+        user_password=dict(type="str", no_log=True),
+        admin=dict(default="False", type="bool"),
+        grants=dict(type="list", elements="dict"),
     )
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    state = module.params['state']
-    user_name = module.params['user_name']
-    user_password = module.params['user_password']
-    admin = module.params['admin']
-    grants = module.params['grants']
+    state = module.params["state"]
+    user_name = module.params["user_name"]
+    user_password = module.params["user_password"]
+    admin = module.params["admin"]
+    grants = module.params["grants"]
     influxdb = influx.InfluxDb(module)
     client = influxdb.connect_to_influxdb()
 
@@ -253,18 +244,18 @@ def main():
 
     changed = False
 
-    if state == 'present':
+    if state == "present":
         if user:
             if not check_user_password(module, client, user_name, user_password) and user_password is not None:
                 set_user_password(module, client, user_name, user_password)
                 changed = True
 
             try:
-                if admin and not user['admin']:
+                if admin and not user["admin"]:
                     if not module.check_mode:
                         client.grant_admin_privileges(user_name)
                     changed = True
-                elif not admin and user['admin']:
+                elif not admin and user["admin"]:
                     if not module.check_mode:
                         client.revoke_admin_privileges(user_name)
                     changed = True
@@ -272,7 +263,7 @@ def main():
                 module.fail_json(msg=to_native(e))
 
         else:
-            user_password = user_password or ''
+            user_password = user_password or ""
             create_user(module, client, user_name, user_password, admin)
             changed = True
 
@@ -282,12 +273,12 @@ def main():
 
         module.exit_json(changed=changed)
 
-    if state == 'absent':
+    if state == "absent":
         if user:
             drop_user(module, client, user_name)
         else:
             module.exit_json(changed=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

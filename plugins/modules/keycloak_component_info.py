@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_component_info
@@ -101,10 +99,14 @@ components:
   elements: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import quote
+from urllib.parse import quote
 
 
 def main():
@@ -116,16 +118,15 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        name=dict(type='str'),
-        realm=dict(type='str', required=True),
-        parent_id=dict(type='str'),
-        provider_type=dict(type='str'),
+        name=dict(type="str"),
+        realm=dict(type="str", required=True),
+        parent_id=dict(type="str"),
+        provider_type=dict(type="str"),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     result = dict(changed=False, components=[])
 
@@ -137,31 +138,31 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    parentId = module.params.get('parent_id')
-    name = module.params.get('name')
-    providerType = module.params.get('provider_type')
+    realm = module.params.get("realm")
+    parentId = module.params.get("parent_id")
+    name = module.params.get("name")
+    providerType = module.params.get("provider_type")
 
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
-        module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
+        module.fail_json(msg=f"Failed to retrive realm '{realm}'")
 
     filters = []
 
     if parentId:
-        filters.append("parent=%s" % (quote(parentId, safe='')))
+        filters.append(f"parent={quote(parentId, safe='')}")
     else:
-        filters.append("parent=%s" % (quote(objRealm['id'], safe='')))
+        filters.append(f"parent={quote(objRealm['id'], safe='')}")
 
     if name:
-        filters.append("name=%s" % (quote(name, safe='')))
+        filters.append(f"name={quote(name, safe='')}")
     if providerType:
-        filters.append("type=%s" % (quote(providerType, safe='')))
+        filters.append(f"type={quote(providerType, safe='')}")
 
-    result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
+    result["components"] = kc.get_components(filter="&".join(filters), realm=realm)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

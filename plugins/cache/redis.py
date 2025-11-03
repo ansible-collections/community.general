@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2014, Brian Coca, Josh Drake, et al
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -78,6 +77,7 @@ from ansible.utils.display import Display
 
 try:
     from redis import StrictRedis, VERSION
+
     HAS_REDIS = True
 except ImportError:
     HAS_REDIS = False
@@ -94,32 +94,35 @@ class CacheModule(BaseCacheModule):
     to expire keys. This mechanism is used or a pattern matched 'scan' for
     performance.
     """
+
     _sentinel_service_name = None
-    re_url_conn = re.compile(r'^([^:]+|\[[^]]+\]):(\d+):(\d+)(?::(.*))?$')
-    re_sent_conn = re.compile(r'^(.*):(\d+)$')
+    re_url_conn = re.compile(r"^([^:]+|\[[^]]+\]):(\d+):(\d+)(?::(.*))?$")
+    re_sent_conn = re.compile(r"^(.*):(\d+)$")
 
     def __init__(self, *args, **kwargs):
-        uri = ''
+        uri = ""
 
-        super(CacheModule, self).__init__(*args, **kwargs)
-        if self.get_option('_uri'):
-            uri = self.get_option('_uri')
-        self._timeout = float(self.get_option('_timeout'))
-        self._prefix = self.get_option('_prefix')
-        self._keys_set = self.get_option('_keyset_name')
-        self._sentinel_service_name = self.get_option('_sentinel_service_name')
+        super().__init__(*args, **kwargs)
+        if self.get_option("_uri"):
+            uri = self.get_option("_uri")
+        self._timeout = float(self.get_option("_timeout"))
+        self._prefix = self.get_option("_prefix")
+        self._keys_set = self.get_option("_keyset_name")
+        self._sentinel_service_name = self.get_option("_sentinel_service_name")
 
         if not HAS_REDIS:
-            raise AnsibleError("The 'redis' python module (version 2.4.5 or newer) is required for the redis fact cache, 'pip install redis'")
+            raise AnsibleError(
+                "The 'redis' python module (version 2.4.5 or newer) is required for the redis fact cache, 'pip install redis'"
+            )
 
         self._cache = {}
         kw = {}
 
         # tls connection
-        tlsprefix = 'tls://'
+        tlsprefix = "tls://"
         if uri.startswith(tlsprefix):
-            kw['ssl'] = True
-            uri = uri[len(tlsprefix):]
+            kw["ssl"] = True
+            uri = uri[len(tlsprefix) :]
 
         # redis sentinel connection
         if self._sentinel_service_name:
@@ -129,7 +132,7 @@ class CacheModule(BaseCacheModule):
             connection = self._parse_connection(self.re_url_conn, uri)
             self._db = StrictRedis(*connection, **kw)
 
-        display.vv(f'Redis connection: {self._db}')
+        display.vv(f"Redis connection: {self._db}")
 
     @staticmethod
     def _parse_connection(re_patt, uri):
@@ -147,33 +150,32 @@ class CacheModule(BaseCacheModule):
         except ImportError:
             raise AnsibleError("The 'redis' python module (version 2.9.0 or newer) is required to use redis sentinel.")
 
-        if ';' not in uri:
-            raise AnsibleError('_uri does not have sentinel syntax.')
+        if ";" not in uri:
+            raise AnsibleError("_uri does not have sentinel syntax.")
 
         # format: "localhost:26379;localhost2:26379;0:changeme"
-        connections = uri.split(';')
+        connections = uri.split(";")
         connection_args = connections.pop(-1)
         if len(connection_args) > 0:  # handle if no db nr is given
-            connection_args = connection_args.split(':')
-            kw['db'] = connection_args.pop(0)
+            connection_args = connection_args.split(":")
+            kw["db"] = connection_args.pop(0)
             try:
-                kw['password'] = connection_args.pop(0)
+                kw["password"] = connection_args.pop(0)
             except IndexError:
                 pass  # password is optional
 
         sentinels = [self._parse_connection(self.re_sent_conn, shost) for shost in connections]
-        display.vv(f'\nUsing redis sentinels: {sentinels}')
+        display.vv(f"\nUsing redis sentinels: {sentinels}")
         scon = Sentinel(sentinels, **kw)
         try:
             return scon.master_for(self._sentinel_service_name, socket_timeout=0.2)
         except Exception as exc:
-            raise AnsibleError(f'Could not connect to redis sentinel: {exc}')
+            raise AnsibleError(f"Could not connect to redis sentinel: {exc}")
 
     def _make_key(self, key):
         return self._prefix + key
 
     def get(self, key):
-
         if key not in self._cache:
             value = self._db.get(self._make_key(key))
             # guard against the key not being removed from the zset;
@@ -187,7 +189,6 @@ class CacheModule(BaseCacheModule):
         return self._cache.get(key)
 
     def set(self, key, value):
-
         value2 = json.dumps(value, cls=AnsibleJSONEncoder, sort_keys=True, indent=4)
         if self._timeout > 0:  # a timeout of 0 is handled as meaning 'never expire'
             self._db.setex(self._make_key(key), int(self._timeout), value2)
@@ -211,7 +212,7 @@ class CacheModule(BaseCacheModule):
 
     def contains(self, key):
         self._expire_keys()
-        return (self._db.zrank(self._keys_set, key) is not None)
+        return self._db.zrank(self._keys_set, key) is not None
 
     def delete(self, key):
         if key in self._cache:

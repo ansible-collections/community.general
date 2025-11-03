@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -109,11 +107,18 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def do_install(module, mode, rootfs, container, image, values_list, backend):
-    system_list = ["--system"] if mode == 'system' else []
-    user_list = ["--user"] if mode == 'user' else []
+    system_list = ["--system"] if mode == "system" else []
+    user_list = ["--user"] if mode == "user" else []
     rootfs_list = ["--rootfs=%s" % rootfs] if rootfs else []
-    atomic_bin = module.get_bin_path('atomic')
-    args = [atomic_bin, 'install', "--storage=%s" % backend, '--name=%s' % container] + system_list + user_list + rootfs_list + values_list + [image]
+    atomic_bin = module.get_bin_path("atomic")
+    args = (
+        [atomic_bin, "install", "--storage=%s" % backend, "--name=%s" % container]
+        + system_list
+        + user_list
+        + rootfs_list
+        + values_list
+        + [image]
+    )
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -123,8 +128,8 @@ def do_install(module, mode, rootfs, container, image, values_list, backend):
 
 
 def do_update(module, container, image, values_list):
-    atomic_bin = module.get_bin_path('atomic')
-    args = [atomic_bin, 'containers', 'update', "--rebase=%s" % image] + values_list + [container]
+    atomic_bin = module.get_bin_path("atomic")
+    args = [atomic_bin, "containers", "update", "--rebase=%s" % image] + values_list + [container]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -134,8 +139,8 @@ def do_update(module, container, image, values_list):
 
 
 def do_uninstall(module, name, backend):
-    atomic_bin = module.get_bin_path('atomic')
-    args = [atomic_bin, 'uninstall', "--storage=%s" % backend, name]
+    atomic_bin = module.get_bin_path("atomic")
+    args = [atomic_bin, "uninstall", "--storage=%s" % backend, name]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -143,8 +148,8 @@ def do_uninstall(module, name, backend):
 
 
 def do_rollback(module, name):
-    atomic_bin = module.get_bin_path('atomic')
-    args = [atomic_bin, 'containers', 'rollback', name]
+    atomic_bin = module.get_bin_path("atomic")
+    args = [atomic_bin, "containers", "rollback", name]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -154,65 +159,76 @@ def do_rollback(module, name):
 
 
 def core(module):
-    mode = module.params['mode']
-    name = module.params['name']
-    image = module.params['image']
-    rootfs = module.params['rootfs']
-    values = module.params['values']
-    backend = module.params['backend']
-    state = module.params['state']
+    mode = module.params["mode"]
+    name = module.params["name"]
+    image = module.params["image"]
+    rootfs = module.params["rootfs"]
+    values = module.params["values"]
+    backend = module.params["backend"]
+    state = module.params["state"]
 
-    atomic_bin = module.get_bin_path('atomic')
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
+    atomic_bin = module.get_bin_path("atomic")
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C")
 
     values_list = ["--set=%s" % x for x in values] if values else []
 
-    args = [atomic_bin, 'containers', 'list', '--no-trunc', '-n', '--all', '-f', 'backend=%s' % backend, '-f', 'container=%s' % name]
+    args = [
+        atomic_bin,
+        "containers",
+        "list",
+        "--no-trunc",
+        "-n",
+        "--all",
+        "-f",
+        "backend=%s" % backend,
+        "-f",
+        "container=%s" % name,
+    ]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
         return
     present = name in out
 
-    if state == 'present' and present:
+    if state == "present" and present:
         module.exit_json(msg=out, changed=False)
-    elif (state in ['latest', 'present']) and not present:
+    elif (state in ["latest", "present"]) and not present:
         do_install(module, mode, rootfs, name, image, values_list, backend)
-    elif state == 'latest':
+    elif state == "latest":
         do_update(module, name, image, values_list)
-    elif state == 'absent':
+    elif state == "absent":
         if not present:
             module.exit_json(msg="The container is not present", changed=False)
         else:
             do_uninstall(module, name, backend)
-    elif state == 'rollback':
+    elif state == "rollback":
         do_rollback(module, name)
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            mode=dict(choices=['user', 'system']),
+            mode=dict(choices=["user", "system"]),
             name=dict(required=True),
             image=dict(required=True),
             rootfs=dict(),
-            state=dict(default='latest', choices=['present', 'absent', 'latest', 'rollback']),
-            backend=dict(required=True, choices=['docker', 'ostree']),
-            values=dict(type='list', default=[], elements='str'),
+            state=dict(default="latest", choices=["present", "absent", "latest", "rollback"]),
+            backend=dict(required=True, choices=["docker", "ostree"]),
+            values=dict(type="list", default=[], elements="str"),
         ),
     )
 
-    if module.params['values'] is not None and module.params['mode'] == 'default':
+    if module.params["values"] is not None and module.params["mode"] == "default":
         module.fail_json(msg="values is supported only with user or system mode")
 
     # Verify that the platform supports atomic command
-    dummy = module.get_bin_path('atomic', required=True)
+    dummy = module.get_bin_path("atomic", required=True)
 
     try:
         core(module)
     except Exception as e:
-        module.fail_json(msg='Unanticipated error running atomic: %s' % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg="Unanticipated error running atomic: %s" % to_native(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

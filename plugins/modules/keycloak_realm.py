@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 # Copyright (c) 2021, Christophe Gilles <christophe.gilles54@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_realm
@@ -113,6 +111,13 @@ options:
     aliases:
       - adminEventsEnabled
     type: bool
+  admin_permissions_enabled:
+    description:
+      - The realm admin permissions enabled.
+    aliases:
+      - adminPermissionsEnabled
+    type: bool
+    version_added: 12.0.0
   admin_theme:
     description:
       - The realm admin theme.
@@ -567,6 +572,166 @@ options:
       - oauth2DevicePollingInterval
     type: int
     version_added: 11.2.0
+  web_authn_policy_rp_entity_name:
+    description:
+      - WebAuthn Relying Party Entity Name.
+    aliases:
+      - webAuthnPolicyRpEntityName
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_signature_algorithms:
+    description:
+      - List of acceptable WebAuthn signature algorithms.
+    aliases:
+      - webAuthnPolicySignatureAlgorithms
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_rp_id:
+    description:
+      - WebAuthn Relying Party ID (domain). Empty string means use request host.
+    aliases:
+      - webAuthnPolicyRpId
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_attestation_conveyance_preference:
+    description:
+      - Attestation conveyance preference for WebAuthn.
+    aliases:
+      - webAuthnPolicyAttestationConveyancePreference
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_authenticator_attachment:
+    description:
+      - Authenticator attachment preference for WebAuthn authenticators.
+    aliases:
+      - webAuthnPolicyAuthenticatorAttachment
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_require_resident_key:
+    description:
+      - Whether resident keys are required for WebAuthn (Yes/No/not specified).
+    aliases:
+      - webAuthnPolicyRequireResidentKey
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_user_verification_requirement:
+    description:
+      - User verification requirement for WebAuthn.
+    aliases:
+      - webAuthnPolicyUserVerificationRequirement
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_create_timeout:
+    description:
+      - Timeout for WebAuthn credential creation (ms).
+    aliases:
+      - webAuthnPolicyCreateTimeout
+    type: int
+    version_added: 11.3.0
+  web_authn_policy_avoid_same_authenticator_register:
+    description:
+      - Avoid registering the same authenticator multiple times.
+    aliases:
+      - webAuthnPolicyAvoidSameAuthenticatorRegister
+    type: bool
+    version_added: 11.3.0
+  web_authn_policy_acceptable_aaguids:
+    description:
+      - List of acceptable AAGUIDs for WebAuthn authenticators.
+    aliases:
+      - webAuthnPolicyAcceptableAaguids
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_extra_origins:
+    description:
+      - Additional acceptable origins for WebAuthn requests.
+    aliases:
+      - webAuthnPolicyExtraOrigins
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_passwordless_rp_entity_name:
+    description:
+      - WebAuthn Passwordless Relying Party Entity Name.
+    aliases:
+      - webAuthnPolicyPasswordlessRpEntityName
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_signature_algorithms:
+    description:
+      - List of acceptable WebAuthn signature algorithms for passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessSignatureAlgorithms
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_passwordless_rp_id:
+    description:
+      - WebAuthn Passwordless Relying Party ID (domain).
+    aliases:
+      - webAuthnPolicyPasswordlessRpId
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_attestation_conveyance_preference:
+    description:
+      - Attestation conveyance preference for WebAuthn passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessAttestationConveyancePreference
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_authenticator_attachment:
+    description:
+      - Authenticator attachment for WebAuthn passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessAuthenticatorAttachment
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_require_resident_key:
+    description:
+      - Whether resident keys are required for WebAuthn passwordless (V(Yes)/V(No)/V(not specified)).
+    aliases:
+      - webAuthnPolicyPasswordlessRequireResidentKey
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_user_verification_requirement:
+    description:
+      - User verification requirement for WebAuthn passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessUserVerificationRequirement
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_create_timeout:
+    description:
+      - Timeout for WebAuthn passwordless credential creation (ms).
+    aliases:
+      - webAuthnPolicyPasswordlessCreateTimeout
+    type: int
+    version_added: 11.3.0
+  web_authn_policy_passwordless_avoid_same_authenticator_register:
+    description:
+      - Avoid registering the same authenticator multiple times for passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister
+    type: bool
+    version_added: 11.3.0
+  web_authn_policy_passwordless_acceptable_aaguids:
+    description:
+      - List of acceptable AAGUIDs for WebAuthn passwordless authenticators.
+    aliases:
+      - webAuthnPolicyPasswordlessAcceptableAaguids
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_passwordless_extra_origins:
+    description:
+      - Additional acceptable origins for WebAuthn passwordless requests.
+    aliases:
+      - webAuthnPolicyPasswordlessExtraOrigins
+    type: list
+    version_added: 11.3.0
+    elements: str
 
 extends_documentation_fragment:
   - community.general.keycloak
@@ -637,13 +802,18 @@ end_state:
     }
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
 def normalise_cr(realmrep):
-    """ Re-sorts any properties where the order is important so that diff's is minimised and the change detection is more effective.
+    """Re-sorts any properties where the order is important so that diff's is minimised and the change detection is more effective.
 
     :param realmrep: the realmrep dict to be sanitized
     :return: normalised realmrep dict
@@ -651,31 +821,31 @@ def normalise_cr(realmrep):
     # Avoid the dict passed in to be modified
     realmrep = realmrep.copy()
 
-    if 'enabledEventTypes' in realmrep:
-        realmrep['enabledEventTypes'] = list(sorted(realmrep['enabledEventTypes']))
+    if "enabledEventTypes" in realmrep:
+        realmrep["enabledEventTypes"] = list(sorted(realmrep["enabledEventTypes"]))
 
-    if 'otpSupportedApplications' in realmrep:
-        realmrep['otpSupportedApplications'] = list(sorted(realmrep['otpSupportedApplications']))
+    if "otpSupportedApplications" in realmrep:
+        realmrep["otpSupportedApplications"] = list(sorted(realmrep["otpSupportedApplications"]))
 
-    if 'supportedLocales' in realmrep:
-        realmrep['supportedLocales'] = list(sorted(realmrep['supportedLocales']))
+    if "supportedLocales" in realmrep:
+        realmrep["supportedLocales"] = list(sorted(realmrep["supportedLocales"]))
 
     return realmrep
 
 
 def sanitize_cr(realmrep):
-    """ Removes probably sensitive details from a realm representation.
+    """Removes probably sensitive details from a realm representation.
 
     :param realmrep: the realmrep dict to be sanitized
     :return: sanitized realmrep dict
     """
     result = realmrep.copy()
-    if 'secret' in result:
-        result['secret'] = '********'
-    if 'attributes' in result:
-        if 'saml.signing.private.key' in result['attributes']:
-            result['attributes'] = result['attributes'].copy()
-            result['attributes']['saml.signing.private.key'] = '********'
+    if "secret" in result:
+        result["secret"] = "********"
+    if "attributes" in result:
+        if "saml.signing.private.key" in result["attributes"]:
+            result["attributes"] = result["attributes"].copy()
+            result["attributes"]["saml.signing.private.key"] = "********"
     return normalise_cr(result)
 
 
@@ -688,106 +858,171 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-
-        id=dict(type='str'),
-        realm=dict(type='str'),
-        access_code_lifespan=dict(type='int', aliases=['accessCodeLifespan']),
-        access_code_lifespan_login=dict(type='int', aliases=['accessCodeLifespanLogin']),
-        access_code_lifespan_user_action=dict(type='int', aliases=['accessCodeLifespanUserAction']),
-        access_token_lifespan=dict(type='int', aliases=['accessTokenLifespan'], no_log=False),
-        access_token_lifespan_for_implicit_flow=dict(type='int', aliases=['accessTokenLifespanForImplicitFlow'], no_log=False),
-        account_theme=dict(type='str', aliases=['accountTheme']),
-        action_token_generated_by_admin_lifespan=dict(type='int', aliases=['actionTokenGeneratedByAdminLifespan'], no_log=False),
-        action_token_generated_by_user_lifespan=dict(type='int', aliases=['actionTokenGeneratedByUserLifespan'], no_log=False),
-        admin_events_details_enabled=dict(type='bool', aliases=['adminEventsDetailsEnabled']),
-        admin_events_enabled=dict(type='bool', aliases=['adminEventsEnabled']),
-        admin_theme=dict(type='str', aliases=['adminTheme']),
-        attributes=dict(type='dict'),
-        browser_flow=dict(type='str', aliases=['browserFlow']),
-        browser_security_headers=dict(type='dict', aliases=['browserSecurityHeaders']),
-        brute_force_protected=dict(type='bool', aliases=['bruteForceProtected']),
-        brute_force_strategy=dict(type='str', choices=['LINEAR', 'MULTIPLE'], aliases=['bruteForceStrategy']),
-        client_authentication_flow=dict(type='str', aliases=['clientAuthenticationFlow']),
-        client_scope_mappings=dict(type='dict', aliases=['clientScopeMappings']),
-        default_default_client_scopes=dict(type='list', elements='str', aliases=['defaultDefaultClientScopes']),
-        default_groups=dict(type='list', elements='str', aliases=['defaultGroups']),
-        default_locale=dict(type='str', aliases=['defaultLocale']),
-        default_optional_client_scopes=dict(type='list', elements='str', aliases=['defaultOptionalClientScopes']),
-        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
-        default_signature_algorithm=dict(type='str', aliases=['defaultSignatureAlgorithm']),
-        direct_grant_flow=dict(type='str', aliases=['directGrantFlow']),
-        display_name=dict(type='str', aliases=['displayName']),
-        display_name_html=dict(type='str', aliases=['displayNameHtml']),
-        docker_authentication_flow=dict(type='str', aliases=['dockerAuthenticationFlow']),
-        duplicate_emails_allowed=dict(type='bool', aliases=['duplicateEmailsAllowed']),
-        edit_username_allowed=dict(type='bool', aliases=['editUsernameAllowed']),
-        email_theme=dict(type='str', aliases=['emailTheme']),
-        enabled=dict(type='bool'),
-        enabled_event_types=dict(type='list', elements='str', aliases=['enabledEventTypes']),
-        events_enabled=dict(type='bool', aliases=['eventsEnabled']),
-        events_expiration=dict(type='int', aliases=['eventsExpiration']),
-        events_listeners=dict(type='list', elements='str', aliases=['eventsListeners']),
-        failure_factor=dict(type='int', aliases=['failureFactor']),
-        internationalization_enabled=dict(type='bool', aliases=['internationalizationEnabled']),
-        login_theme=dict(type='str', aliases=['loginTheme']),
-        login_with_email_allowed=dict(type='bool', aliases=['loginWithEmailAllowed']),
-        max_delta_time_seconds=dict(type='int', aliases=['maxDeltaTimeSeconds']),
-        max_failure_wait_seconds=dict(type='int', aliases=['maxFailureWaitSeconds']),
-        max_temporary_lockouts=dict(type='int', aliases=['maxTemporaryLockouts']),
-        minimum_quick_login_wait_seconds=dict(type='int', aliases=['minimumQuickLoginWaitSeconds']),
-        not_before=dict(type='int', aliases=['notBefore']),
-        offline_session_idle_timeout=dict(type='int', aliases=['offlineSessionIdleTimeout']),
-        offline_session_max_lifespan=dict(type='int', aliases=['offlineSessionMaxLifespan']),
-        offline_session_max_lifespan_enabled=dict(type='bool', aliases=['offlineSessionMaxLifespanEnabled']),
-        otp_policy_algorithm=dict(type='str', aliases=['otpPolicyAlgorithm']),
-        otp_policy_digits=dict(type='int', aliases=['otpPolicyDigits']),
-        otp_policy_initial_counter=dict(type='int', aliases=['otpPolicyInitialCounter']),
-        otp_policy_look_ahead_window=dict(type='int', aliases=['otpPolicyLookAheadWindow']),
-        otp_policy_period=dict(type='int', aliases=['otpPolicyPeriod']),
-        otp_policy_type=dict(type='str', aliases=['otpPolicyType']),
-        otp_supported_applications=dict(type='list', elements='str', aliases=['otpSupportedApplications']),
-        password_policy=dict(type='str', aliases=['passwordPolicy'], no_log=False),
-        organizations_enabled=dict(type='bool', aliases=['organizationsEnabled']),
-        permanent_lockout=dict(type='bool', aliases=['permanentLockout']),
-        quick_login_check_milli_seconds=dict(type='int', aliases=['quickLoginCheckMilliSeconds']),
-        refresh_token_max_reuse=dict(type='int', aliases=['refreshTokenMaxReuse'], no_log=False),
-        registration_allowed=dict(type='bool', aliases=['registrationAllowed']),
-        registration_email_as_username=dict(type='bool', aliases=['registrationEmailAsUsername']),
-        registration_flow=dict(type='str', aliases=['registrationFlow']),
-        remember_me=dict(type='bool', aliases=['rememberMe']),
-        reset_credentials_flow=dict(type='str', aliases=['resetCredentialsFlow']),
-        reset_password_allowed=dict(type='bool', aliases=['resetPasswordAllowed'], no_log=False),
-        revoke_refresh_token=dict(type='bool', aliases=['revokeRefreshToken']),
-        smtp_server=dict(type='dict', aliases=['smtpServer']),
-        ssl_required=dict(choices=["external", "all", "none"], aliases=['sslRequired']),
-        sso_session_idle_timeout=dict(type='int', aliases=['ssoSessionIdleTimeout']),
-        sso_session_idle_timeout_remember_me=dict(type='int', aliases=['ssoSessionIdleTimeoutRememberMe']),
-        sso_session_max_lifespan=dict(type='int', aliases=['ssoSessionMaxLifespan']),
-        sso_session_max_lifespan_remember_me=dict(type='int', aliases=['ssoSessionMaxLifespanRememberMe']),
-        supported_locales=dict(type='list', elements='str', aliases=['supportedLocales']),
-        user_managed_access_allowed=dict(type='bool', aliases=['userManagedAccessAllowed']),
-        verify_email=dict(type='bool', aliases=['verifyEmail']),
-        wait_increment_seconds=dict(type='int', aliases=['waitIncrementSeconds']),
-        client_session_idle_timeout=dict(type='int', aliases=['clientSessionIdleTimeout']),
-        client_session_max_lifespan=dict(type='int', aliases=['clientSessionMaxLifespan']),
-        client_offline_session_idle_timeout=dict(type='int', aliases=['clientOfflineSessionIdleTimeout']),
-        client_offline_session_max_lifespan=dict(type='int', aliases=['clientOfflineSessionMaxLifespan']),
-        oauth2_device_code_lifespan=dict(type='int', aliases=['oauth2DeviceCodeLifespan']),
-        oauth2_device_polling_interval=dict(type='int', aliases=['oauth2DevicePollingInterval']),
+        state=dict(default="present", choices=["present", "absent"]),
+        id=dict(type="str"),
+        realm=dict(type="str"),
+        access_code_lifespan=dict(type="int", aliases=["accessCodeLifespan"]),
+        access_code_lifespan_login=dict(type="int", aliases=["accessCodeLifespanLogin"]),
+        access_code_lifespan_user_action=dict(type="int", aliases=["accessCodeLifespanUserAction"]),
+        access_token_lifespan=dict(type="int", aliases=["accessTokenLifespan"], no_log=False),
+        access_token_lifespan_for_implicit_flow=dict(
+            type="int", aliases=["accessTokenLifespanForImplicitFlow"], no_log=False
+        ),
+        account_theme=dict(type="str", aliases=["accountTheme"]),
+        action_token_generated_by_admin_lifespan=dict(
+            type="int", aliases=["actionTokenGeneratedByAdminLifespan"], no_log=False
+        ),
+        action_token_generated_by_user_lifespan=dict(
+            type="int", aliases=["actionTokenGeneratedByUserLifespan"], no_log=False
+        ),
+        admin_events_details_enabled=dict(type="bool", aliases=["adminEventsDetailsEnabled"]),
+        admin_events_enabled=dict(type="bool", aliases=["adminEventsEnabled"]),
+        admin_permissions_enabled=dict(type="bool", aliases=["adminPermissionsEnabled"]),
+        admin_theme=dict(type="str", aliases=["adminTheme"]),
+        attributes=dict(type="dict"),
+        browser_flow=dict(type="str", aliases=["browserFlow"]),
+        browser_security_headers=dict(type="dict", aliases=["browserSecurityHeaders"]),
+        brute_force_protected=dict(type="bool", aliases=["bruteForceProtected"]),
+        brute_force_strategy=dict(type="str", choices=["LINEAR", "MULTIPLE"], aliases=["bruteForceStrategy"]),
+        client_authentication_flow=dict(type="str", aliases=["clientAuthenticationFlow"]),
+        client_scope_mappings=dict(type="dict", aliases=["clientScopeMappings"]),
+        default_default_client_scopes=dict(type="list", elements="str", aliases=["defaultDefaultClientScopes"]),
+        default_groups=dict(type="list", elements="str", aliases=["defaultGroups"]),
+        default_locale=dict(type="str", aliases=["defaultLocale"]),
+        default_optional_client_scopes=dict(type="list", elements="str", aliases=["defaultOptionalClientScopes"]),
+        default_roles=dict(type="list", elements="str", aliases=["defaultRoles"]),
+        default_signature_algorithm=dict(type="str", aliases=["defaultSignatureAlgorithm"]),
+        direct_grant_flow=dict(type="str", aliases=["directGrantFlow"]),
+        display_name=dict(type="str", aliases=["displayName"]),
+        display_name_html=dict(type="str", aliases=["displayNameHtml"]),
+        docker_authentication_flow=dict(type="str", aliases=["dockerAuthenticationFlow"]),
+        duplicate_emails_allowed=dict(type="bool", aliases=["duplicateEmailsAllowed"]),
+        edit_username_allowed=dict(type="bool", aliases=["editUsernameAllowed"]),
+        email_theme=dict(type="str", aliases=["emailTheme"]),
+        enabled=dict(type="bool"),
+        enabled_event_types=dict(type="list", elements="str", aliases=["enabledEventTypes"]),
+        events_enabled=dict(type="bool", aliases=["eventsEnabled"]),
+        events_expiration=dict(type="int", aliases=["eventsExpiration"]),
+        events_listeners=dict(type="list", elements="str", aliases=["eventsListeners"]),
+        failure_factor=dict(type="int", aliases=["failureFactor"]),
+        internationalization_enabled=dict(type="bool", aliases=["internationalizationEnabled"]),
+        login_theme=dict(type="str", aliases=["loginTheme"]),
+        login_with_email_allowed=dict(type="bool", aliases=["loginWithEmailAllowed"]),
+        max_delta_time_seconds=dict(type="int", aliases=["maxDeltaTimeSeconds"]),
+        max_failure_wait_seconds=dict(type="int", aliases=["maxFailureWaitSeconds"]),
+        max_temporary_lockouts=dict(type="int", aliases=["maxTemporaryLockouts"]),
+        minimum_quick_login_wait_seconds=dict(type="int", aliases=["minimumQuickLoginWaitSeconds"]),
+        not_before=dict(type="int", aliases=["notBefore"]),
+        offline_session_idle_timeout=dict(type="int", aliases=["offlineSessionIdleTimeout"]),
+        offline_session_max_lifespan=dict(type="int", aliases=["offlineSessionMaxLifespan"]),
+        offline_session_max_lifespan_enabled=dict(type="bool", aliases=["offlineSessionMaxLifespanEnabled"]),
+        otp_policy_algorithm=dict(type="str", aliases=["otpPolicyAlgorithm"]),
+        otp_policy_digits=dict(type="int", aliases=["otpPolicyDigits"]),
+        otp_policy_initial_counter=dict(type="int", aliases=["otpPolicyInitialCounter"]),
+        otp_policy_look_ahead_window=dict(type="int", aliases=["otpPolicyLookAheadWindow"]),
+        otp_policy_period=dict(type="int", aliases=["otpPolicyPeriod"]),
+        otp_policy_type=dict(type="str", aliases=["otpPolicyType"]),
+        otp_supported_applications=dict(type="list", elements="str", aliases=["otpSupportedApplications"]),
+        password_policy=dict(type="str", aliases=["passwordPolicy"], no_log=False),
+        organizations_enabled=dict(type="bool", aliases=["organizationsEnabled"]),
+        permanent_lockout=dict(type="bool", aliases=["permanentLockout"]),
+        quick_login_check_milli_seconds=dict(type="int", aliases=["quickLoginCheckMilliSeconds"]),
+        refresh_token_max_reuse=dict(type="int", aliases=["refreshTokenMaxReuse"], no_log=False),
+        registration_allowed=dict(type="bool", aliases=["registrationAllowed"]),
+        registration_email_as_username=dict(type="bool", aliases=["registrationEmailAsUsername"]),
+        registration_flow=dict(type="str", aliases=["registrationFlow"]),
+        remember_me=dict(type="bool", aliases=["rememberMe"]),
+        reset_credentials_flow=dict(type="str", aliases=["resetCredentialsFlow"]),
+        reset_password_allowed=dict(type="bool", aliases=["resetPasswordAllowed"], no_log=False),
+        revoke_refresh_token=dict(type="bool", aliases=["revokeRefreshToken"]),
+        smtp_server=dict(type="dict", aliases=["smtpServer"]),
+        ssl_required=dict(choices=["external", "all", "none"], aliases=["sslRequired"]),
+        sso_session_idle_timeout=dict(type="int", aliases=["ssoSessionIdleTimeout"]),
+        sso_session_idle_timeout_remember_me=dict(type="int", aliases=["ssoSessionIdleTimeoutRememberMe"]),
+        sso_session_max_lifespan=dict(type="int", aliases=["ssoSessionMaxLifespan"]),
+        sso_session_max_lifespan_remember_me=dict(type="int", aliases=["ssoSessionMaxLifespanRememberMe"]),
+        supported_locales=dict(type="list", elements="str", aliases=["supportedLocales"]),
+        user_managed_access_allowed=dict(type="bool", aliases=["userManagedAccessAllowed"]),
+        verify_email=dict(type="bool", aliases=["verifyEmail"]),
+        wait_increment_seconds=dict(type="int", aliases=["waitIncrementSeconds"]),
+        client_session_idle_timeout=dict(type="int", aliases=["clientSessionIdleTimeout"]),
+        client_session_max_lifespan=dict(type="int", aliases=["clientSessionMaxLifespan"]),
+        client_offline_session_idle_timeout=dict(type="int", aliases=["clientOfflineSessionIdleTimeout"]),
+        client_offline_session_max_lifespan=dict(type="int", aliases=["clientOfflineSessionMaxLifespan"]),
+        oauth2_device_code_lifespan=dict(type="int", aliases=["oauth2DeviceCodeLifespan"]),
+        oauth2_device_polling_interval=dict(type="int", aliases=["oauth2DevicePollingInterval"]),
+        web_authn_policy_rp_entity_name=dict(type="str", aliases=["webAuthnPolicyRpEntityName"]),
+        web_authn_policy_signature_algorithms=dict(
+            type="list", elements="str", aliases=["webAuthnPolicySignatureAlgorithms"]
+        ),
+        web_authn_policy_rp_id=dict(type="str", aliases=["webAuthnPolicyRpId"]),
+        web_authn_policy_attestation_conveyance_preference=dict(
+            type="str", aliases=["webAuthnPolicyAttestationConveyancePreference"]
+        ),
+        web_authn_policy_authenticator_attachment=dict(type="str", aliases=["webAuthnPolicyAuthenticatorAttachment"]),
+        web_authn_policy_require_resident_key=dict(
+            type="str", aliases=["webAuthnPolicyRequireResidentKey"], no_log=False
+        ),
+        web_authn_policy_user_verification_requirement=dict(
+            type="str", aliases=["webAuthnPolicyUserVerificationRequirement"]
+        ),
+        web_authn_policy_create_timeout=dict(type="int", aliases=["webAuthnPolicyCreateTimeout"]),
+        web_authn_policy_avoid_same_authenticator_register=dict(
+            type="bool", aliases=["webAuthnPolicyAvoidSameAuthenticatorRegister"]
+        ),
+        web_authn_policy_acceptable_aaguids=dict(
+            type="list", elements="str", aliases=["webAuthnPolicyAcceptableAaguids"]
+        ),
+        web_authn_policy_extra_origins=dict(type="list", elements="str", aliases=["webAuthnPolicyExtraOrigins"]),
+        web_authn_policy_passwordless_rp_entity_name=dict(
+            type="str", aliases=["webAuthnPolicyPasswordlessRpEntityName"]
+        ),
+        web_authn_policy_passwordless_signature_algorithms=dict(
+            type="list", elements="str", aliases=["webAuthnPolicyPasswordlessSignatureAlgorithms"], no_log=False
+        ),
+        web_authn_policy_passwordless_rp_id=dict(type="str", aliases=["webAuthnPolicyPasswordlessRpId"]),
+        web_authn_policy_passwordless_attestation_conveyance_preference=dict(
+            type="str", aliases=["webAuthnPolicyPasswordlessAttestationConveyancePreference"], no_log=False
+        ),
+        web_authn_policy_passwordless_authenticator_attachment=dict(
+            type="str", aliases=["webAuthnPolicyPasswordlessAuthenticatorAttachment"], no_log=False
+        ),
+        web_authn_policy_passwordless_require_resident_key=dict(
+            type="str", aliases=["webAuthnPolicyPasswordlessRequireResidentKey"], no_log=False
+        ),
+        web_authn_policy_passwordless_user_verification_requirement=dict(
+            type="str", aliases=["webAuthnPolicyPasswordlessUserVerificationRequirement"], no_log=False
+        ),
+        web_authn_policy_passwordless_create_timeout=dict(
+            type="int", aliases=["webAuthnPolicyPasswordlessCreateTimeout"]
+        ),
+        web_authn_policy_passwordless_avoid_same_authenticator_register=dict(
+            type="bool", aliases=["webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister"]
+        ),
+        web_authn_policy_passwordless_acceptable_aaguids=dict(
+            type="list", elements="str", aliases=["webAuthnPolicyPasswordlessAcceptableAaguids"], no_log=False
+        ),
+        web_authn_policy_passwordless_extra_origins=dict(
+            type="list", elements="str", aliases=["webAuthnPolicyPasswordlessExtraOrigins"], no_log=False
+        ),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['id', 'realm', 'enabled'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
-                           required_together=([['auth_username', 'auth_password']]),
-                           required_by={'refresh_token': 'auth_realm'},
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [
+                ["id", "realm", "enabled"],
+                ["token", "auth_realm", "auth_username", "auth_password", "auth_client_id", "auth_client_secret"],
+            ]
+        ),
+        required_together=([["auth_username", "auth_password"]]),
+        required_by={"refresh_token": "auth_realm"},
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(changed=False, msg="", diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -797,16 +1032,14 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    state = module.params.get('state')
+    realm = module.params.get("realm")
+    state = module.params.get("state")
 
     # convert module parameters to realm representation parameters (if they belong in there)
-    params_to_ignore = list(keycloak_argument_spec().keys()) + ['state']
+    params_to_ignore = list(keycloak_argument_spec().keys()) + ["state"]
 
     # Filter and map the parameters names that apply to the role
-    realm_params = [x for x in module.params
-                    if x not in params_to_ignore and
-                    module.params.get(x) is not None]
+    realm_params = [x for x in module.params if x not in params_to_ignore and module.params.get(x) is not None]
 
     # See whether the realm already exists in Keycloak
     before_realm = kc.get_realm_by_id(realm=realm)
@@ -825,53 +1058,52 @@ def main():
     desired_realm = before_realm.copy()
     desired_realm.update(changeset)
 
-    result['proposed'] = sanitize_cr(changeset)
+    result["proposed"] = sanitize_cr(changeset)
     before_realm_sanitized = sanitize_cr(before_realm)
-    result['existing'] = before_realm_sanitized
+    result["existing"] = before_realm_sanitized
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_realm:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Realm does not exist, doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "Realm does not exist, doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
+        result["changed"] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(desired_realm))
+            result["diff"] = dict(before="", after=sanitize_cr(desired_realm))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # create it
         kc.create_realm(desired_realm)
-        after_realm = kc.get_realm_by_id(desired_realm['realm'])
+        after_realm = kc.get_realm_by_id(desired_realm["realm"])
 
-        result['end_state'] = sanitize_cr(after_realm)
+        result["end_state"] = sanitize_cr(after_realm)
 
-        result['msg'] = 'Realm %s has been created.' % desired_realm['realm']
+        result["msg"] = f"Realm {desired_realm['realm']} has been created."
         module.exit_json(**result)
 
     else:
-        if state == 'present':
+        if state == "present":
             # Process an update
 
             # doing an update
-            result['changed'] = True
+            result["changed"] = True
             if module.check_mode:
                 # We can only compare the current realm with the proposed updates we have
                 before_norm = normalise_cr(before_realm)
                 desired_norm = normalise_cr(desired_realm)
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_norm),
-                                          after=sanitize_cr(desired_norm))
-                result['changed'] = (before_norm != desired_norm)
+                    result["diff"] = dict(before=sanitize_cr(before_norm), after=sanitize_cr(desired_norm))
+                result["changed"] = before_norm != desired_norm
 
                 module.exit_json(**result)
 
@@ -881,23 +1113,22 @@ def main():
             after_realm = kc.get_realm_by_id(realm=realm)
 
             if before_realm == after_realm:
-                result['changed'] = False
+                result["changed"] = False
 
-            result['end_state'] = sanitize_cr(after_realm)
+            result["end_state"] = sanitize_cr(after_realm)
 
             if module._diff:
-                result['diff'] = dict(before=before_realm_sanitized,
-                                      after=sanitize_cr(after_realm))
+                result["diff"] = dict(before=before_realm_sanitized, after=sanitize_cr(after_realm))
 
-            result['msg'] = 'Realm %s has been updated.' % desired_realm['realm']
+            result["msg"] = f"Realm {desired_realm['realm']} has been updated."
             module.exit_json(**result)
 
         else:
             # Process a deletion (because state was not 'present')
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_realm_sanitized, after='')
+                result["diff"] = dict(before=before_realm_sanitized, after="")
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -905,13 +1136,13 @@ def main():
             # delete it
             kc.delete_realm(realm=realm)
 
-            result['proposed'] = {}
-            result['end_state'] = {}
+            result["proposed"] = {}
+            result["end_state"] = {}
 
-            result['msg'] = 'Realm %s has been deleted.' % before_realm['realm']
+            result["msg"] = f"Realm {before_realm['realm']} has been deleted."
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

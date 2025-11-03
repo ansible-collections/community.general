@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Scaleway Load-balancer management module
 #
@@ -9,9 +8,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: scaleway_lb
@@ -166,17 +164,16 @@ import datetime
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.datetime import now
-from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_REGIONS, SCALEWAY_ENDPOINT, scaleway_argument_spec, Scaleway
-
-STABLE_STATES = (
-    "ready",
-    "absent"
+from ansible_collections.community.general.plugins.module_utils.scaleway import (
+    SCALEWAY_REGIONS,
+    SCALEWAY_ENDPOINT,
+    scaleway_argument_spec,
+    Scaleway,
 )
 
-MUTABLE_ATTRIBUTES = (
-    "name",
-    "description"
-)
+STABLE_STATES = ("ready", "absent")
+
+MUTABLE_ATTRIBUTES = ("name", "description")
 
 
 def payload_from_wished_lb(wished_lb):
@@ -184,26 +181,26 @@ def payload_from_wished_lb(wished_lb):
         "organization_id": wished_lb["organization_id"],
         "name": wished_lb["name"],
         "tags": wished_lb["tags"],
-        "description": wished_lb["description"]
+        "description": wished_lb["description"],
     }
 
 
 def fetch_state(api, lb):
-    api.module.debug("fetch_state of load-balancer: %s" % lb["id"])
-    response = api.get(path=api.api_path + "/%s" % lb["id"])
+    api.module.debug(f"fetch_state of load-balancer: {lb['id']}")
+    response = api.get(path=f"{api.api_path}/{lb['id']}")
 
     if response.status_code == 404:
         return "absent"
 
     if not response.ok:
-        msg = 'Error during state fetching: (%s) %s' % (response.status_code, response.json)
+        msg = f"Error during state fetching: ({response.status_code}) {response.json}"
         api.module.fail_json(msg=msg)
 
     try:
-        api.module.debug("Load-balancer %s in state: %s" % (lb["id"], response.json["status"]))
+        api.module.debug(f"Load-balancer {lb['id']} in state: {response.json['status']}")
         return response.json["status"]
     except KeyError:
-        api.module.fail_json(msg="Could not fetch state in %s" % response.json)
+        api.module.fail_json(msg=f"Could not fetch state in {response.json}")
 
 
 def wait_to_complete_state_transition(api, lb, force_wait=False):
@@ -220,7 +217,7 @@ def wait_to_complete_state_transition(api, lb, force_wait=False):
         state = fetch_state(api, lb)
         if state in STABLE_STATES:
             api.module.debug("It seems that the load-balancer is not in transition anymore.")
-            api.module.debug("load-balancer in state: %s" % fetch_state(api, lb))
+            api.module.debug(f"load-balancer in state: {fetch_state(api, lb)}")
             break
         time.sleep(wait_sleep_time)
     else:
@@ -241,8 +238,7 @@ def present_strategy(api, wished_lb):
 
     response = api.get(path=api.api_path)
     if not response.ok:
-        api.module.fail_json(msg='Error getting load-balancers [{0}: {1}]'.format(
-            response.status_code, response.json['message']))
+        api.module.fail_json(msg=f"Error getting load-balancers [{response.status_code}: {response.json['message']}]")
 
     lbs_list = response.json["lbs"]
     lb_lookup = {lb["name"]: lb for lb in lbs_list}
@@ -254,22 +250,18 @@ def present_strategy(api, wished_lb):
 
         # Create Load-balancer
         api.warn(payload_from_wished_lb(wished_lb))
-        creation_response = api.post(path=api.api_path,
-                                     data=payload_from_wished_lb(wished_lb))
+        creation_response = api.post(path=api.api_path, data=payload_from_wished_lb(wished_lb))
 
         if not creation_response.ok:
-            msg = "Error during lb creation: %s: '%s' (%s)" % (creation_response.info['msg'],
-                                                               creation_response.json['message'],
-                                                               creation_response.json)
+            msg = f"Error during lb creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
             api.module.fail_json(msg=msg)
 
         wait_to_complete_state_transition(api=api, lb=creation_response.json)
-        response = api.get(path=api.api_path + "/%s" % creation_response.json["id"])
+        response = api.get(path=f"{api.api_path}/{creation_response.json['id']}")
         return changed, response.json
 
     target_lb = lb_lookup[wished_lb["name"]]
-    patch_payload = lb_attributes_should_be_changed(target_lb=target_lb,
-                                                    wished_lb=wished_lb)
+    patch_payload = lb_attributes_should_be_changed(target_lb=target_lb, wished_lb=wished_lb)
 
     if not patch_payload:
         return changed, target_lb
@@ -278,12 +270,12 @@ def present_strategy(api, wished_lb):
     if api.module.check_mode:
         return changed, {"status": "Load-balancer attributes would be changed."}
 
-    lb_patch_response = api.put(path=api.api_path + "/%s" % target_lb["id"],
-                                data=patch_payload)
+    lb_patch_response = api.put(path=f"{api.api_path}/{target_lb['id']}", data=patch_payload)
 
     if not lb_patch_response.ok:
-        api.module.fail_json(msg='Error during load-balancer attributes update: [{0}: {1}]'.format(
-            lb_patch_response.status_code, lb_patch_response.json['message']))
+        api.module.fail_json(
+            msg=f"Error during load-balancer attributes update: [{lb_patch_response.status_code}: {lb_patch_response.json['message']}]"
+        )
 
     wait_to_complete_state_transition(api=api, lb=target_lb)
     return changed, lb_patch_response.json
@@ -298,8 +290,7 @@ def absent_strategy(api, wished_lb):
     lbs_list = lbs_json["lbs"]
 
     if not response.ok:
-        api.module.fail_json(msg='Error getting load-balancers [{0}: {1}]'.format(
-            status_code, response.json['message']))
+        api.module.fail_json(msg=f"Error getting load-balancers [{status_code}: {response.json['message']}]")
 
     lb_lookup = {lb["name"]: lb for lb in lbs_list}
     if wished_lb["name"] not in lb_lookup.keys():
@@ -311,19 +302,15 @@ def absent_strategy(api, wished_lb):
         return changed, {"status": "Load-balancer would be destroyed"}
 
     wait_to_complete_state_transition(api=api, lb=target_lb, force_wait=True)
-    response = api.delete(path=api.api_path + "/%s" % target_lb["id"])
+    response = api.delete(path=f"{api.api_path}/{target_lb['id']}")
     if not response.ok:
-        api.module.fail_json(msg='Error deleting load-balancer [{0}: {1}]'.format(
-            response.status_code, response.json))
+        api.module.fail_json(msg=f"Error deleting load-balancer [{response.status_code}: {response.json}]")
 
     wait_to_complete_state_transition(api=api, lb=target_lb)
     return changed, response.json
 
 
-state_strategy = {
-    "present": present_strategy,
-    "absent": absent_strategy
-}
+state_strategy = {"present": present_strategy, "absent": absent_strategy}
 
 
 def core(module):
@@ -333,30 +320,31 @@ def core(module):
         "name": module.params["name"],
         "description": module.params["description"],
         "tags": module.params["tags"],
-        "organization_id": module.params["organization_id"]
+        "organization_id": module.params["organization_id"],
     }
-    module.params['api_url'] = SCALEWAY_ENDPOINT
+    module.params["api_url"] = SCALEWAY_ENDPOINT
     api = Scaleway(module=module)
-    api.api_path = "lb/v1/regions/%s/lbs" % region
+    api.api_path = f"lb/v1/regions/{region}/lbs"
 
-    changed, summary = state_strategy[wished_load_balancer["state"]](api=api,
-                                                                     wished_lb=wished_load_balancer)
+    changed, summary = state_strategy[wished_load_balancer["state"]](api=api, wished_lb=wished_load_balancer)
     module.exit_json(changed=changed, scaleway_lb=summary)
 
 
 def main():
     argument_spec = scaleway_argument_spec()
-    argument_spec.update(dict(
-        name=dict(required=True),
-        description=dict(required=True),
-        region=dict(required=True, choices=SCALEWAY_REGIONS),
-        state=dict(choices=list(state_strategy.keys()), default='present'),
-        tags=dict(type="list", elements="str", default=[]),
-        organization_id=dict(required=True),
-        wait=dict(type="bool", default=False),
-        wait_timeout=dict(type="int", default=300),
-        wait_sleep_time=dict(type="int", default=3),
-    ))
+    argument_spec.update(
+        dict(
+            name=dict(required=True),
+            description=dict(required=True),
+            region=dict(required=True, choices=SCALEWAY_REGIONS),
+            state=dict(choices=list(state_strategy.keys()), default="present"),
+            tags=dict(type="list", elements="str", default=[]),
+            organization_id=dict(required=True),
+            wait=dict(type="bool", default=False),
+            wait_timeout=dict(type="int", default=300),
+            wait_sleep_time=dict(type="int", default=3),
+        )
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -365,5 +353,5 @@ def main():
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

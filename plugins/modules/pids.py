@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2019, Saranya Sridharan
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: pids
@@ -67,7 +65,6 @@ import abc
 import re
 from os.path import basename
 
-from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.common.text.converters import to_native
@@ -82,10 +79,9 @@ class PSAdapterError(Exception):
     pass
 
 
-@six.add_metaclass(abc.ABCMeta)
-class PSAdapter(object):
-    NAME_ATTRS = ('name', 'cmdline')
-    PATTERN_ATTRS = ('name', 'exe', 'cmdline')
+class PSAdapter(metaclass=abc.ABCMeta):
+    NAME_ATTRS = ("name", "cmdline")
+    PATTERN_ATTRS = ("name", "exe", "cmdline")
 
     def __init__(self, psutil):
         self._psutil = psutil
@@ -93,9 +89,9 @@ class PSAdapter(object):
     @staticmethod
     def from_package(psutil):
         version = LooseVersion(psutil.__version__)
-        if version < LooseVersion('2.0.0'):
+        if version < LooseVersion("2.0.0"):
             return PSAdapter100(psutil)
-        elif version < LooseVersion('5.3.0'):
+        elif version < LooseVersion("5.3.0"):
             return PSAdapter200(psutil)
         else:
             return PSAdapter530(psutil)
@@ -108,8 +104,11 @@ class PSAdapter(object):
 
     def _has_name(self, proc, name):
         attributes = self._get_proc_attributes(proc, *self.NAME_ATTRS)
-        return (compare_lower(attributes['name'], name) or
-                attributes['cmdline'] and compare_lower(attributes['cmdline'][0], name))
+        return (
+            compare_lower(attributes["name"], name)
+            or attributes["cmdline"]
+            and compare_lower(attributes["cmdline"][0], name)
+        )
 
     def _get_proc_attributes(self, proc, *attributes):
         return {attribute: self._get_attribute_from_proc(proc, attribute) for attribute in attributes}
@@ -127,23 +126,23 @@ class PSAdapter(object):
         try:
             regex = re.compile(pattern, flags)
         except re.error as e:
-            raise PSAdapterError("'%s' is not a valid regular expression: %s" % (pattern, to_native(e)))
+            raise PSAdapterError(f"'{pattern}' is not a valid regular expression: {e}")
 
         return [p.pid for p in self._process_iter(*self.PATTERN_ATTRS) if self._matches_regex(p, regex)]
 
     def _matches_regex(self, proc, regex):
         # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
         attributes = self._get_proc_attributes(proc, *self.PATTERN_ATTRS)
-        matches_name = regex.search(to_native(attributes['name']))
-        matches_exe = attributes['exe'] and regex.search(basename(to_native(attributes['exe'])))
-        matches_cmd = attributes['cmdline'] and regex.search(to_native(' '.join(attributes['cmdline'])))
+        matches_name = regex.search(to_native(attributes["name"]))
+        matches_exe = attributes["exe"] and regex.search(basename(to_native(attributes["exe"])))
+        matches_cmd = attributes["cmdline"] and regex.search(to_native(" ".join(attributes["cmdline"])))
 
         return any([matches_name, matches_exe, matches_cmd])
 
 
 class PSAdapter100(PSAdapter):
     def __init__(self, psutil):
-        super(PSAdapter100, self).__init__(psutil)
+        super().__init__(psutil)
 
     @staticmethod
     def _get_attribute_from_proc(proc, attribute):
@@ -152,7 +151,7 @@ class PSAdapter100(PSAdapter):
 
 class PSAdapter200(PSAdapter):
     def __init__(self, psutil):
-        super(PSAdapter200, self).__init__(psutil)
+        super().__init__(psutil)
 
     @staticmethod
     def _get_attribute_from_proc(proc, attribute):
@@ -162,7 +161,7 @@ class PSAdapter200(PSAdapter):
 
 class PSAdapter530(PSAdapter):
     def __init__(self, psutil):
-        super(PSAdapter530, self).__init__(psutil)
+        super().__init__(psutil)
 
     def _process_iter(self, *attrs):
         return self._psutil.process_iter(attrs=attrs)
@@ -180,17 +179,16 @@ def compare_lower(a, b):
     return a.lower() == b.lower()
 
 
-class Pids(object):
+class Pids:
     def __init__(self, module):
-
         deps.validate(module)
 
         self._ps = PSAdapter.from_package(psutil)
 
         self._module = module
-        self._name = module.params['name']
-        self._pattern = module.params['pattern']
-        self._ignore_case = module.params['ignore_case']
+        self._name = module.params["name"]
+        self._pattern = module.params["pattern"]
+        self._ignore_case = module.params["ignore_case"]
 
         self._pids = []
 
@@ -208,7 +206,7 @@ class Pids(object):
     @property
     def result(self):
         return {
-            'pids': self._pids,
+            "pids": self._pids,
         }
 
 
@@ -219,17 +217,13 @@ def main():
             pattern=dict(type="str"),
             ignore_case=dict(type="bool", default=False),
         ),
-        required_one_of=[
-            ('name', 'pattern')
-        ],
-        mutually_exclusive=[
-            ('name', 'pattern')
-        ],
+        required_one_of=[("name", "pattern")],
+        mutually_exclusive=[("name", "pattern")],
         supports_check_mode=True,
     )
 
     Pids(module).execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 import json
@@ -14,27 +12,27 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 
 
 pipx_common_argspec = {
-    "global": dict(type='bool', default=False),
-    "executable": dict(type='path'),
+    "global": dict(type="bool", default=False),
+    "executable": dict(type="path"),
 }
 
 
 _state_map = dict(
-    install='install',
-    install_all='install-all',
-    present='install',
-    uninstall='uninstall',
-    absent='uninstall',
-    uninstall_all='uninstall-all',
-    inject='inject',
-    uninject='uninject',
-    upgrade='upgrade',
-    upgrade_shared='upgrade-shared',
-    upgrade_all='upgrade-all',
-    reinstall='reinstall',
-    reinstall_all='reinstall-all',
-    pin='pin',
-    unpin='unpin',
+    install="install",
+    install_all="install-all",
+    present="install",
+    uninstall="uninstall",
+    absent="uninstall",
+    uninstall_all="uninstall-all",
+    inject="inject",
+    uninject="uninject",
+    upgrade="upgrade",
+    upgrade_shared="upgrade-shared",
+    upgrade_all="upgrade-all",
+    reinstall="reinstall",
+    reinstall_all="reinstall-all",
+    pin="pin",
+    unpin="unpin",
 )
 
 
@@ -48,15 +46,15 @@ def pipx_runner(module, command, **kwargs):
         inject_packages=cmd_runner_fmt.as_list(),
         force=cmd_runner_fmt.as_bool("--force"),
         include_injected=cmd_runner_fmt.as_bool("--include-injected"),
-        index_url=cmd_runner_fmt.as_opt_val('--index-url'),
-        python=cmd_runner_fmt.as_opt_val('--python'),
+        index_url=cmd_runner_fmt.as_opt_val("--index-url"),
+        python=cmd_runner_fmt.as_opt_val("--python"),
         system_site_packages=cmd_runner_fmt.as_bool("--system-site-packages"),
-        _list=cmd_runner_fmt.as_fixed(['list', '--include-injected', '--json']),
+        _list=cmd_runner_fmt.as_fixed(["list", "--include-injected", "--json"]),
         editable=cmd_runner_fmt.as_bool("--editable"),
-        pip_args=cmd_runner_fmt.as_opt_eq_val('--pip-args'),
-        suffix=cmd_runner_fmt.as_opt_val('--suffix'),
+        pip_args=cmd_runner_fmt.as_opt_eq_val("--pip-args"),
+        suffix=cmd_runner_fmt.as_opt_val("--suffix"),
         spec_metadata=cmd_runner_fmt.as_list(),
-        version=cmd_runner_fmt.as_fixed('--version'),
+        version=cmd_runner_fmt.as_fixed("--version"),
     )
     arg_formats["global"] = cmd_runner_fmt.as_bool("--global")
 
@@ -64,23 +62,23 @@ def pipx_runner(module, command, **kwargs):
         module,
         command=command,
         arg_formats=arg_formats,
-        environ_update={'USE_EMOJI': '0'},
+        environ_update={"USE_EMOJI": "0", "PIPX_USE_EMOJI": "0"},
         check_rc=True,
-        **kwargs
+        **kwargs,
     )
     return runner
 
 
 def _make_entry(venv_name, venv, include_injected, include_deps):
     entry = {
-        'name': venv_name,
-        'version': venv['metadata']['main_package']['package_version'],
-        'pinned': venv['metadata']['main_package'].get('pinned'),
+        "name": venv_name,
+        "version": venv["metadata"]["main_package"]["package_version"],
+        "pinned": venv["metadata"]["main_package"].get("pinned"),
     }
     if include_injected:
-        entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
+        entry["injected"] = {k: v["package_version"] for k, v in venv["metadata"]["injected_packages"].items()}
     if include_deps:
-        entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
+        entry["dependencies"] = list(venv["metadata"]["main_package"]["app_paths_of_dependencies"])
     return entry
 
 
@@ -91,7 +89,7 @@ def make_process_dict(include_injected, include_deps=False):
 
         results = {}
         raw_data = json.loads(out)
-        for venv_name, venv in raw_data['venvs'].items():
+        for venv_name, venv in raw_data["venvs"].items():
             results[venv_name] = _make_entry(venv_name, venv, include_injected, include_deps)
 
         return results, raw_data
@@ -113,9 +111,6 @@ def make_process_list(mod_helper, **kwargs):
         if kwargs.get("include_raw"):
             mod_helper.vars.raw_output = raw_data
 
-        return [
-            entry
-            for name, entry in res_dict.items()
-            if name == kwargs.get("name")
-        ]
+        return [entry for name, entry in res_dict.items() if name == kwargs.get("name")]
+
     return process_list

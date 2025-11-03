@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: python_requirements_info
@@ -127,6 +125,7 @@ HAS_DISTUTILS = False
 try:
     import pkg_resources
     from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+
     HAS_DISTUTILS = True
 except ImportError:
     pass
@@ -134,11 +133,11 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule
 
 operations = {
-    '<=': operator.le,
-    '>=': operator.ge,
-    '<': operator.lt,
-    '>': operator.gt,
-    '==': operator.eq,
+    "<=": operator.le,
+    ">=": operator.ge,
+    "<": operator.lt,
+    ">": operator.gt,
+    "==": operator.eq,
 }
 
 python_version_info = dict(
@@ -152,9 +151,7 @@ python_version_info = dict(
 
 def main():
     module = AnsibleModule(
-        argument_spec=dict(
-            dependencies=dict(type='list', elements='str', default=[])
-        ),
+        argument_spec=dict(dependencies=dict(type="list", elements="str", default=[])),
         supports_check_mode=True,
     )
     if not HAS_DISTUTILS:
@@ -165,7 +162,7 @@ def main():
             python_version_info=python_version_info,
             python_system_path=sys.path,
         )
-    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(?:(==|[><]=?)([0-9.]+))?$')
+    pkg_dep_re = re.compile(r"(^[a-zA-Z][a-zA-Z0-9_-]+)(?:(==|[><]=?)([0-9.]+))?$")
 
     results = dict(
         not_found=[],
@@ -173,33 +170,35 @@ def main():
         valid={},
     )
 
-    for dep in module.params['dependencies']:
+    for dep in module.params["dependencies"]:
         match = pkg_dep_re.match(dep)
         if not match:
-            module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
+            module.fail_json(msg=f"Failed to parse version requirement '{dep}'. Must be formatted like 'ansible>2.6'")
         pkg, op, version = match.groups()
         if op is not None and op not in operations:
-            module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
+            module.fail_json(
+                msg=f"Failed to parse version requirement '{dep}'. Operator must be one of >, <, <=, >=, or =="
+            )
         try:
             existing = pkg_resources.get_distribution(pkg).version
         except pkg_resources.DistributionNotFound:
             # not there
-            results['not_found'].append(pkg)
+            results["not_found"].append(pkg)
             continue
         if op is None and version is None:
-            results['valid'][pkg] = {
-                'installed': existing,
-                'desired': None,
+            results["valid"][pkg] = {
+                "installed": existing,
+                "desired": None,
             }
         elif operations[op](LooseVersion(existing), LooseVersion(version)):
-            results['valid'][pkg] = {
-                'installed': existing,
-                'desired': dep,
+            results["valid"][pkg] = {
+                "installed": existing,
+                "desired": dep,
             }
         else:
-            results['mismatched'][pkg] = {
-                'installed': existing,
-                'desired': dep,
+            results["mismatched"][pkg] = {
+                "installed": existing,
+                "desired": dep,
             }
 
     module.exit_json(
@@ -207,9 +206,9 @@ def main():
         python_version=sys.version,
         python_version_info=python_version_info,
         python_system_path=sys.path,
-        **results
+        **results,
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

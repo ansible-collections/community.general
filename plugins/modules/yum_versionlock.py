@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2018, Florian Paul Azim Hoberg (@gyptazy) <gyptazy@gyptazy.ch>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: yum_versionlock
@@ -94,36 +92,42 @@ from ansible.module_utils.common.text.converters import to_native
 from fnmatch import fnmatch
 
 # on DNF-based distros, yum is a symlink to dnf, so we try to handle their different entry formats.
-NEVRA_RE_YUM = re.compile(r'^(?P<exclude>!)?(?P<epoch>\d+):(?P<name>.+)-'
-                          r'(?P<version>.+)-(?P<release>.+)\.(?P<arch>.+)$')
-NEVRA_RE_DNF = re.compile(r"^(?P<exclude>!)?(?P<name>.+)-(?P<epoch>\d+):(?P<version>.+)-"
-                          r"(?P<release>.+)\.(?P<arch>.+)$")
+NEVRA_RE_YUM = re.compile(
+    r"^(?P<exclude>!)?(?P<epoch>\d+):(?P<name>.+)-"
+    r"(?P<version>.+)-(?P<release>.+)\.(?P<arch>.+)$"
+)
+NEVRA_RE_DNF = re.compile(
+    r"^(?P<exclude>!)?(?P<name>.+)-(?P<epoch>\d+):(?P<version>.+)-"
+    r"(?P<release>.+)\.(?P<arch>.+)$"
+)
 
 
 class YumVersionLock:
     def __init__(self, module):
         self.module = module
         self.params = module.params
-        self.yum_bin = module.get_bin_path('yum', required=True)
+        self.yum_bin = module.get_bin_path("yum", required=True)
 
     def get_versionlock_packages(self):
-        """ Get an overview of all packages on yum versionlock """
+        """Get an overview of all packages on yum versionlock"""
         rc, out, err = self.module.run_command([self.yum_bin, "versionlock", "list"])
         if rc == 0:
             return out
-        elif rc == 1 and 'o such command:' in err:
-            self.module.fail_json(msg="Error: Please install rpm package yum-plugin-versionlock : " + to_native(err) + to_native(out))
-        self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
+        elif rc == 1 and "o such command:" in err:
+            self.module.fail_json(
+                msg=f"Error: Please install rpm package yum-plugin-versionlock : {to_native(err)}{to_native(out)}"
+            )
+        self.module.fail_json(msg=f"Error: {to_native(err)}{to_native(out)}")
 
     def ensure_state(self, packages, command):
-        """ Ensure packages state """
+        """Ensure packages state"""
         rc, out, err = self.module.run_command([self.yum_bin, "-q", "versionlock", command] + packages)
         # If no package can be found this will be written on stdout with rc 0
-        if 'No package found for' in out:
+        if "No package found for" in out:
             self.module.fail_json(msg=out)
         if rc == 0:
             return True
-        self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
+        self.module.fail_json(msg=f"Error: {to_native(err)}{to_native(out)}")
 
 
 def match(entry, name):
@@ -135,23 +139,23 @@ def match(entry, name):
         return False
     if fnmatch(m.group("name"), name):
         match = True
-    if entry.rstrip('.*') == name:
+    if entry.rstrip(".*") == name:
         match = True
     return match
 
 
 def main():
-    """ start main program to add/delete a package to yum versionlock """
+    """start main program to add/delete a package to yum versionlock"""
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent']),
-            name=dict(required=True, type='list', elements='str'),
+            state=dict(default="present", choices=["present", "absent"]),
+            name=dict(required=True, type="list", elements="str"),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    state = module.params['state']
-    packages = module.params['name']
+    state = module.params["state"]
+    packages = module.params["name"]
     changed = False
 
     yum_v = YumVersionLock(module)
@@ -161,8 +165,8 @@ def main():
 
     # Ensure versionlock state of packages
     packages_list = []
-    if state in ('present', ):
-        command = 'add'
+    if state in ("present",):
+        command = "add"
         for single_pkg in packages:
             if not any(match(pkg, single_pkg) for pkg in versionlock_packages.split()):
                 packages_list.append(single_pkg)
@@ -171,8 +175,8 @@ def main():
                 changed = True
             else:
                 changed = yum_v.ensure_state(packages_list, command)
-    elif state in ('absent', ):
-        command = 'delete'
+    elif state in ("absent",):
+        command = "delete"
         for single_pkg in packages:
             if any(match(pkg, single_pkg) for pkg in versionlock_packages.split()):
                 packages_list.append(single_pkg)
@@ -182,14 +186,8 @@ def main():
             else:
                 changed = yum_v.ensure_state(packages_list, command)
 
-    module.exit_json(
-        changed=changed,
-        meta={
-            "packages": packages,
-            "state": state
-        }
-    )
+    module.exit_json(changed=changed, meta={"packages": packages, "state": state})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

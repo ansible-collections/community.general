@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright 2012 Dag Wieers <dag@wieers.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -135,6 +133,7 @@ import warnings
 HPILO_IMP_ERR = None
 try:
     import hpilo
+
     HAS_HPILO = True
 except ImportError:
     HPILO_IMP_ERR = traceback.format_exc()
@@ -145,46 +144,42 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 # Suppress warnings from hpilo
-warnings.simplefilter('ignore')
+warnings.simplefilter("ignore")
 
 
-def parse_flat_interface(entry, non_numeric='hw_eth_ilo'):
+def parse_flat_interface(entry, non_numeric="hw_eth_ilo"):
     try:
-        infoname = 'hw_eth' + str(int(entry['Port']) - 1)
+        infoname = f"hw_eth{int(entry['Port']) - 1}"
     except Exception:
         infoname = non_numeric
 
-    info = {
-        'macaddress': entry['MAC'].replace('-', ':'),
-        'macaddress_dash': entry['MAC']
-    }
+    info = {"macaddress": entry["MAC"].replace("-", ":"), "macaddress_dash": entry["MAC"]}
     return (infoname, info)
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(type='str', required=True),
-            login=dict(type='str', default='Administrator'),
-            password=dict(type='str', default='admin', no_log=True),
-            ssl_version=dict(type='str', default='TLSv1', choices=['SSLv3', 'SSLv23', 'TLSv1', 'TLSv1_1', 'TLSv1_2']),
+            host=dict(type="str", required=True),
+            login=dict(type="str", default="Administrator"),
+            password=dict(type="str", default="admin", no_log=True),
+            ssl_version=dict(type="str", default="TLSv1", choices=["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]),
         ),
         supports_check_mode=True,
     )
 
     if not HAS_HPILO:
-        module.fail_json(msg=missing_required_lib('python-hpilo'), exception=HPILO_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("python-hpilo"), exception=HPILO_IMP_ERR)
 
-    host = module.params['host']
-    login = module.params['login']
-    password = module.params['password']
-    ssl_version = getattr(hpilo.ssl, 'PROTOCOL_' + module.params.get('ssl_version').upper().replace('V', 'v'))
+    host = module.params["host"]
+    login = module.params["login"]
+    password = module.params["password"]
+    ssl_version = getattr(hpilo.ssl, f"PROTOCOL_{module.params.get('ssl_version').upper().replace('V', 'v')}")
 
     ilo = hpilo.Ilo(host, login=login, password=password, ssl_version=ssl_version)
 
     info = {
-        'module_hw': True,
+        "module_hw": True,
     }
 
     # TODO: Count number of CPUs, DIMMs and total memory
@@ -195,73 +190,67 @@ def main():
         module.fail_json(msg=to_native(e))
 
     for entry in data:
-        if 'type' not in entry:
+        if "type" not in entry:
             continue
-        elif entry['type'] == 0:  # BIOS Information
-            info['hw_bios_version'] = entry['Family']
-            info['hw_bios_date'] = entry['Date']
-        elif entry['type'] == 1:  # System Information
-            info['hw_uuid'] = entry['UUID']
-            info['hw_system_serial'] = entry['Serial Number'].rstrip()
-            info['hw_product_name'] = entry['Product Name']
-            info['hw_product_uuid'] = entry['cUUID']
-        elif entry['type'] == 209:  # Embedded NIC MAC Assignment
-            if 'fields' in entry:
-                for (name, value) in [(e['name'], e['value']) for e in entry['fields']]:
-                    if name.startswith('Port'):
+        elif entry["type"] == 0:  # BIOS Information
+            info["hw_bios_version"] = entry["Family"]
+            info["hw_bios_date"] = entry["Date"]
+        elif entry["type"] == 1:  # System Information
+            info["hw_uuid"] = entry["UUID"]
+            info["hw_system_serial"] = entry["Serial Number"].rstrip()
+            info["hw_product_name"] = entry["Product Name"]
+            info["hw_product_uuid"] = entry["cUUID"]
+        elif entry["type"] == 209:  # Embedded NIC MAC Assignment
+            if "fields" in entry:
+                for name, value in [(e["name"], e["value"]) for e in entry["fields"]]:
+                    if name.startswith("Port"):
                         try:
-                            infoname = 'hw_eth' + str(int(value) - 1)
+                            infoname = f"hw_eth{int(value) - 1}"
                         except Exception:
-                            infoname = 'hw_eth_ilo'
-                    elif name.startswith('MAC'):
-                        info[infoname] = {
-                            'macaddress': value.replace('-', ':'),
-                            'macaddress_dash': value
-                        }
+                            infoname = "hw_eth_ilo"
+                    elif name.startswith("MAC"):
+                        info[infoname] = {"macaddress": value.replace("-", ":"), "macaddress_dash": value}
             else:
-                (infoname, entry_info) = parse_flat_interface(entry, 'hw_eth_ilo')
+                (infoname, entry_info) = parse_flat_interface(entry, "hw_eth_ilo")
                 info[infoname] = entry_info
-        elif entry['type'] == 209:  # HPQ NIC iSCSI MAC Info
-            for (name, value) in [(e['name'], e['value']) for e in entry['fields']]:
-                if name.startswith('Port'):
+        elif entry["type"] == 209:  # HPQ NIC iSCSI MAC Info
+            for name, value in [(e["name"], e["value"]) for e in entry["fields"]]:
+                if name.startswith("Port"):
                     try:
-                        infoname = 'hw_iscsi' + str(int(value) - 1)
+                        infoname = f"hw_iscsi{int(value) - 1}"
                     except Exception:
-                        infoname = 'hw_iscsi_ilo'
-                elif name.startswith('MAC'):
-                    info[infoname] = {
-                        'macaddress': value.replace('-', ':'),
-                        'macaddress_dash': value
-                    }
-        elif entry['type'] == 233:  # Embedded NIC MAC Assignment (Alternate data format)
-            (infoname, entry_info) = parse_flat_interface(entry, 'hw_eth_ilo')
+                        infoname = "hw_iscsi_ilo"
+                elif name.startswith("MAC"):
+                    info[infoname] = {"macaddress": value.replace("-", ":"), "macaddress_dash": value}
+        elif entry["type"] == 233:  # Embedded NIC MAC Assignment (Alternate data format)
+            (infoname, entry_info) = parse_flat_interface(entry, "hw_eth_ilo")
             info[infoname] = entry_info
 
     # Collect health (RAM/CPU data)
     health = ilo.get_embedded_health()
-    info['hw_health'] = health
+    info["hw_health"] = health
 
-    memory_details_summary = health.get('memory', {}).get('memory_details_summary')
+    memory_details_summary = health.get("memory", {}).get("memory_details_summary")
     # RAM as reported by iLO 2.10 on ProLiant BL460c Gen8
     if memory_details_summary:
-        info['hw_memory_details_summary'] = memory_details_summary
-        info['hw_memory_total'] = 0
+        info["hw_memory_details_summary"] = memory_details_summary
+        info["hw_memory_total"] = 0
         for cpu, details in memory_details_summary.items():
-            cpu_total_memory_size = details.get('total_memory_size')
+            cpu_total_memory_size = details.get("total_memory_size")
             if cpu_total_memory_size:
-                ram = re.search(r'(\d+)\s+(\w+)', cpu_total_memory_size)
+                ram = re.search(r"(\d+)\s+(\w+)", cpu_total_memory_size)
                 if ram:
-                    if ram.group(2) == 'GB':
-                        info['hw_memory_total'] = info['hw_memory_total'] + int(ram.group(1))
+                    if ram.group(2) == "GB":
+                        info["hw_memory_total"] = info["hw_memory_total"] + int(ram.group(1))
 
         # reformat into a text friendly format
-        info['hw_memory_total'] = "{0} GB".format(info['hw_memory_total'])
+        info["hw_memory_total"] = f"{info['hw_memory_total']} GB"
 
     # Report host state
-    info['host_power_status'] = power_state or 'UNKNOWN'
+    info["host_power_status"] = power_state or "UNKNOWN"
 
     module.exit_json(**info)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

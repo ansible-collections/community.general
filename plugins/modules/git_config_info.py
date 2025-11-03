@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2023, Guenther Grill <grill.guenther@gmail.com>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""
@@ -125,7 +123,7 @@ def main():
 
     # We check error message for a pattern, so we need to make sure the messages appear in the form we're expecting.
     # Set the locale to C to ensure consistent messages.
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     name = module.params["name"]
     path = module.params["path"]
@@ -156,7 +154,7 @@ def main():
 
 def build_args(module, name, path, scope):
     git_path = module.get_bin_path("git", True)
-    args = [git_path, "config", "--includes", "--null", "--" + scope]
+    args = [git_path, "config", "--includes", "--null", f"--{scope}"]
 
     if scope == "file":
         args.append(path)

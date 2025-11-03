@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is BSD licensed.
 # Modules you write using this snippet, which is embedded dynamically by Ansible
@@ -12,8 +10,7 @@
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 """Univention Corporate Server (UCS) access module.
@@ -46,24 +43,25 @@ import re
 
 
 __all__ = [
-    'ldap_search',
-    'config_registry',
-    'base_dn',
-    'uldap',
-    'umc_module_for_add',
-    'umc_module_for_edit',
+    "ldap_search",
+    "config_registry",
+    "base_dn",
+    "uldap",
+    "umc_module_for_add",
+    "umc_module_for_edit",
 ]
 
 
-_singletons = {}
+_singletons: dict[str, object] = {}
 
 
 def ldap_module():
     import ldap as orig_ldap
+
     return orig_ldap
 
 
-def _singleton(name, constructor):
+def _singleton(name: str, constructor):
     if name in _singletons:
         return _singletons[name]
     _singletons[name] = constructor()
@@ -71,18 +69,18 @@ def _singleton(name, constructor):
 
 
 def config_registry():
-
     def construct():
         import univention.config_registry
+
         ucr = univention.config_registry.ConfigRegistry()
         ucr.load()
         return ucr
 
-    return _singleton('config_registry', construct)
+    return _singleton("config_registry", construct)
 
 
 def base_dn():
-    return config_registry()['ldap/base']
+    return config_registry()["ldap/base"]
 
 
 def uldap():
@@ -90,52 +88,59 @@ def uldap():
 
     def construct():
         try:
-            secret_file = open('/etc/ldap.secret', 'r')
-            bind_dn = 'cn=admin,{0}'.format(base_dn())
+            secret_file = open("/etc/ldap.secret", "r")
+            bind_dn = f"cn=admin,{base_dn()}"
         except IOError:  # pragma: no cover
-            secret_file = open('/etc/machine.secret', 'r')
+            secret_file = open("/etc/machine.secret", "r")
             bind_dn = config_registry()["ldap/hostdn"]
         pwd_line = secret_file.readline()
-        pwd = re.sub('\n', '', pwd_line)
+        pwd = re.sub("\n", "", pwd_line)
 
         import univention.admin.uldap
+
         return univention.admin.uldap.access(
-            host=config_registry()['ldap/master'],
+            host=config_registry()["ldap/master"],
             base=base_dn(),
             binddn=bind_dn,
             bindpw=pwd,
             start_tls=1,
         )
 
-    return _singleton('uldap', construct)
+    return _singleton("uldap", construct)
 
 
 def config():
     def construct():
         import univention.admin.config
+
         return univention.admin.config.config()
-    return _singleton('config', construct)
+
+    return _singleton("config", construct)
 
 
 def init_modules():
     def construct():
         import univention.admin.modules
+
         univention.admin.modules.update()
         return True
-    return _singleton('modules_initialized', construct)
+
+    return _singleton("modules_initialized", construct)
 
 
 def position_base_dn():
     def construct():
         import univention.admin.uldap
+
         return univention.admin.uldap.position(base_dn())
-    return _singleton('position_base_dn', construct)
+
+    return _singleton("position_base_dn", construct)
 
 
 def ldap_dn_tree_parent(dn, count=1):
-    dn_array = dn.split(',')
+    dn_array = dn.split(",")
     dn_array[0:count] = []
-    return ','.join(dn_array)
+    return ",".join(dn_array)
 
 
 def ldap_search(filter, base=None, attr=None):
@@ -144,12 +149,7 @@ def ldap_search(filter, base=None, attr=None):
 
     if base is None:
         base = base_dn()
-    msgid = uldap().lo.lo.search(
-        base,
-        ldap_module().SCOPE_SUBTREE,
-        filterstr=filter,
-        attrlist=attr
-    )
+    msgid = uldap().lo.lo.search(base, ldap_module().SCOPE_SUBTREE, filterstr=filter, attrlist=attr)
     # I used to have a try: finally: here but there seems to be a bug in python
     # which swallows the KeyboardInterrupt
     # The abandon now doesn't make too much sense
@@ -183,12 +183,13 @@ def module_by_name(module_name_):
 
     def construct():
         import univention.admin.modules
+
         init_modules()
         module = univention.admin.modules.get(module_name_)
         univention.admin.modules.init(uldap(), position_base_dn(), module)
         return module
 
-    return _singleton('module/%s' % module_name_, construct)
+    return _singleton(f"module/{module_name_}", construct)
 
 
 def get_umc_admin_objects():
@@ -198,6 +199,7 @@ def get_umc_admin_objects():
     are not loaded until this function is called.
     """
     import univention.admin
+
     return univention.admin.objects
 
 
@@ -228,14 +230,14 @@ def umc_module_for_add(module, container_dn, superordinate=None):
 def umc_module_for_edit(module, object_dn, superordinate=None):
     """Returns an UMC module object prepared for editing an existing entry.
 
-   The module is a module specification according to the udm commandline.
-   Example values are:
-       * users/user
-       * shares/share
-       * groups/group
+    The module is a module specification according to the udm commandline.
+    Example values are:
+        * users/user
+        * shares/share
+        * groups/group
 
-   The object_dn MUST be the dn of the object itself, not the container!
-   """
+    The object_dn MUST be the dn of the object itself, not the container!
+    """
     mod = module_by_name(module)
 
     objects = get_umc_admin_objects()
@@ -243,14 +245,7 @@ def umc_module_for_edit(module, object_dn, superordinate=None):
     position = position_base_dn()
     position.setDn(ldap_dn_tree_parent(object_dn))
 
-    obj = objects.get(
-        mod,
-        config(),
-        uldap(),
-        position=position,
-        superordinate=superordinate,
-        dn=object_dn
-    )
+    obj = objects.get(mod, config(), uldap(), position=position, superordinate=superordinate, dn=object_dn)
     obj.open()
 
     return obj
@@ -259,21 +254,16 @@ def umc_module_for_edit(module, object_dn, superordinate=None):
 def create_containers_and_parents(container_dn):
     """Create a container and if needed the parents containers"""
     import univention.admin.uexceptions as uexcp
+
     if not container_dn.startswith("cn="):
         raise AssertionError()
     try:
         parent = ldap_dn_tree_parent(container_dn)
-        obj = umc_module_for_add(
-            'container/cn',
-            parent
-        )
-        obj['name'] = container_dn.split(',')[0].split('=')[1]
-        obj['description'] = "container created by import"
+        obj = umc_module_for_add("container/cn", parent)
+        obj["name"] = container_dn.split(",")[0].split("=")[1]
+        obj["description"] = "container created by import"
     except uexcp.ldapError:
         create_containers_and_parents(parent)
-        obj = umc_module_for_add(
-            'container/cn',
-            parent
-        )
-        obj['name'] = container_dn.split(',')[0].split('=')[1]
-        obj['description'] = "container created by import"
+        obj = umc_module_for_add("container/cn", parent)
+        obj["name"] = container_dn.split(",")[0].split("=")[1]
+        obj["description"] = "container created by import"

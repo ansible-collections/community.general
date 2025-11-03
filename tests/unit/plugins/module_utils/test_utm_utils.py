@@ -9,8 +9,7 @@
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM
 
@@ -23,8 +22,15 @@ class FakeModule:
 def test_combine_headers_returns_only_default():
     expected = {"Accept": "application/json", "Content-type": "application/json"}
     module = FakeModule(
-        params={'utm_protocol': 'utm_protocol', 'utm_host': 'utm_host', 'utm_port': 1234, 'utm_token': 'utm_token',
-                'name': 'FakeName', 'headers': {}})
+        params={
+            "utm_protocol": "utm_protocol",
+            "utm_host": "utm_host",
+            "utm_port": 1234,
+            "utm_token": "utm_token",
+            "name": "FakeName",
+            "headers": {},
+        }
+    )
     result = UTM(module, "endpoint", [])._combine_headers()
     assert result == expected
 
@@ -32,17 +38,29 @@ def test_combine_headers_returns_only_default():
 def test_combine_headers_returns_only_default2():
     expected = {"Accept": "application/json", "Content-type": "application/json"}
     module = FakeModule(
-        params={'utm_protocol': 'utm_protocol', 'utm_host': 'utm_host', 'utm_port': 1234, 'utm_token': 'utm_token',
-                'name': 'FakeName'})
+        params={
+            "utm_protocol": "utm_protocol",
+            "utm_host": "utm_host",
+            "utm_port": 1234,
+            "utm_token": "utm_token",
+            "name": "FakeName",
+        }
+    )
     result = UTM(module, "endpoint", [])._combine_headers()
     assert result == expected
 
 
 def test_combine_headers_returns_combined():
-    expected = {"Accept": "application/json", "Content-type": "application/json",
-                "extraHeader": "extraHeaderValue"}
-    module = FakeModule(params={'utm_protocol': 'utm_protocol', 'utm_host': 'utm_host', 'utm_port': 1234,
-                                'utm_token': 'utm_token', 'name': 'FakeName',
-                                "headers": {"extraHeader": "extraHeaderValue"}})
+    expected = {"Accept": "application/json", "Content-type": "application/json", "extraHeader": "extraHeaderValue"}
+    module = FakeModule(
+        params={
+            "utm_protocol": "utm_protocol",
+            "utm_host": "utm_host",
+            "utm_port": 1234,
+            "utm_token": "utm_token",
+            "name": "FakeName",
+            "headers": {"extraHeader": "extraHeaderValue"},
+        }
+    )
     result = UTM(module, "endpoint", [])._combine_headers()
     assert result == expected
