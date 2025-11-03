@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_realm - support setting ``adminPermissionsEnabled`` for a realm (https://github.com/ansible-collections/community.general/issues/10962).
