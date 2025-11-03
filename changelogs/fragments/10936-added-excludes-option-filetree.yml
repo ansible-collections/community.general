@@ -1,2 +1,0 @@
-minor_changes:
-  - filetree - add ``exclude`` option (https://github.com/ansible-collections/community.general/issues/10936, https://github.com/ansible-collections/community.general/pull/10936).

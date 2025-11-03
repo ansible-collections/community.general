@@ -1,3 +1,0 @@
----
-minor_changes:
-    - random_string lookup plugin - allow to specify seed while generating random string (https://github.com/ansible-collections/community.general/issues/5362, https://github.com/ansible-collections/community.general/pull/10710).

@@ -1,2 +1,0 @@
-deprecated_features:
-  - cpanm - deprecate ``mode=compatibility``, ``mode=new`` should be used instead (https://github.com/ansible-collections/community.general/pull/10434).

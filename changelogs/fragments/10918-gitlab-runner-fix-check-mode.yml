@@ -1,2 +1,0 @@
-bugfixes:
-  - gitlab_runner - fix exception in check mode when a new runner is created (https://github.com/ansible-collections/community.general/issues/8854).

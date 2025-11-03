@@ -1,2 +1,0 @@
-minor_changes:
-  - npm - improve parameter validation using Ansible construct (https://github.com/ansible-collections/community.general/pull/10983).

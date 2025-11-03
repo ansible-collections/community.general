@@ -1,2 +1,0 @@
-removed_features:
-  - "Ansible-core 2.16 is no longer supported. This also means that the collection now requires Python 3.7+ (https://github.com/ansible-collections/community.general/pull/10884)."

@@ -1,2 +1,0 @@
-bugfixes:
-  - "yaml cache plugin - make compatible with ansible-core 2.19 (https://github.com/ansible-collections/community.general/issues/10849, https://github.com/ansible-collections/community.general/issues/10852)."

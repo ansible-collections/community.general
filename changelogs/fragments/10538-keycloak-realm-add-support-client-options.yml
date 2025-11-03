@@ -1,2 +1,0 @@
-minor_changes:
-  - keycloak_realm - add support for client-related options and Oauth2 device (https://github.com/ansible-collections/community.general/pull/10538).
