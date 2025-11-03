@@ -65,6 +65,14 @@ options:
     type: bool
     default: false
 
+  changed_deps:
+    description:
+      - Tells emerge to replace installed packages for which the ebuild dependencies
+        have changed since the packages were built (C(--changed-deps)).
+    type: bool
+    default: false
+    version_added: 12.0.0
+
   changed_use:
     description:
       - Include installed packages where USE flags have changed, except when.
@@ -333,10 +341,17 @@ def emerge_packages(module, packages):
     """Run emerge command against given list of atoms."""
     p = module.params
 
-    if p["noreplace"] and not p["changed_use"] and not p["newuse"] and not (p["update"] or p["state"] == "latest"):
+    if (
+        p["noreplace"]
+        and not p["changed_deps"]
+        and not p["changed_use"]
+        and not p["newuse"]
+        and not (p["update"] or p["state"] == "latest")
+    ):
         for package in packages:
             if (
                 p["noreplace"]
+                and not p["changed_deps"]
                 and not p["changed_use"]
                 and not p["newuse"]
                 and not query_package(module, package, "emerge")
@@ -352,6 +367,7 @@ def emerge_packages(module, packages):
         "update": "--update",
         "deep": "--deep",
         "newuse": "--newuse",
+        "changed_deps": "--changed-deps",
         "changed_use": "--changed-use",
         "oneshot": "--oneshot",
         "noreplace": "--noreplace",
@@ -542,6 +558,7 @@ def main():
             backtrack=dict(type="int"),
             deep=dict(default=False, type="bool"),
             newuse=dict(default=False, type="bool"),
+            changed_deps=dict(default=False, type="bool"),
             changed_use=dict(default=False, type="bool"),
             oneshot=dict(default=False, type="bool"),
             noreplace=dict(default=True, type="bool"),
