@@ -21,9 +21,20 @@ You can use the :ansplugin:`community.general.unicode_normalize filter <communit
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
-    TASK [Compare Unicode representations] ********************************************************
+    TASK [Compare Unicode representations] ****************************************************
     ok: [localhost] => {
         "msg": true
     }

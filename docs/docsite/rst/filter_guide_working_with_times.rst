@@ -69,21 +69,32 @@ Note that months and years are using a simplified representation: a month is 30 
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
     TASK [Convert string to seconds] **********************************************************
     ok: [localhost] => {
-        "msg": "109210.123"
+        "msg": 109210.123
     }
 
     TASK [Convert string to hours] ************************************************************
     ok: [localhost] => {
-        "msg": "30.336145277778"
+        "msg": 30.336145277778
     }
 
     TASK [Convert string to years (using 365.25 days == 1 year)] ******************************
     ok: [localhost] => {
-        "msg": "1.096851471595"
+        "msg": 1.096851471595
     }
 
 .. versionadded: 0.2.0
