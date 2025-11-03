@@ -12,7 +12,6 @@ from ruamel.yaml import YAML
 def main() -> None:
     yaml = YAML(typ='rt')
     yaml.indent(mapping=2, sequence=4, offset=2)
-    yaml.allow_duplicate_keys = True
 
     # Load
     data = yaml.load(sys.stdin)
