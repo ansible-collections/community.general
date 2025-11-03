@@ -1,2 +1,0 @@
-minor_changes:
-  - "portage - add a ``changed_deps`` option (https://github.com/ansible-collections/community.general/pull/11023)."

@@ -1,2 +1,0 @@
-minor_changes:
-  - scaleway modules - add a ``scaleway`` group to use ``module_defaults`` (https://github.com/ansible-collections/community.general/pull/10647).

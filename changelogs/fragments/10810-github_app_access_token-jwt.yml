@@ -1,2 +1,0 @@
-bugfixes:
-  - "github_app_access_token lookup plugin - fix compatibility imports for using jwt (https://github.com/ansible-collections/community.general/issues/10807, https://github.com/ansible-collections/community.general/pull/10810)."

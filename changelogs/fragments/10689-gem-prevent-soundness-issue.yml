@@ -1,2 +1,0 @@
-bugfixes:
-  - "gem - fix soundness issue when uninstalling default gems on Ubuntu  (https://github.com/ansible-collections/community.general/issues/10451, https://github.com/ansible-collections/community.general/pull/10689)."

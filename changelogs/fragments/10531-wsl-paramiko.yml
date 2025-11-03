@@ -1,3 +1,0 @@
-bugfixes:
-  - "wsl connection plugin - avoid deprecated ansible-core paramiko import helper, import paramiko directly instead
-     (https://github.com/ansible-collections/community.general/issues/10515, https://github.com/ansible-collections/community.general/pull/10531)."
