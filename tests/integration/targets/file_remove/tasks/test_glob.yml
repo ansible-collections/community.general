@@ -1,0 +1,102 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test glob pattern matching
+
+- name: Create test files for glob testing
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+    state: touch
+    mode: '0644'
+  loop:
+    - test1.txt
+    - test2.txt
+    - test3.log
+    - data.txt
+    - readme.md
+    - backup_file.bak
+
+- name: Remove files matching *.txt pattern
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.txt"
+  register: glob_result_1
+
+- name: Verify *.txt files were removed
+  ansible.builtin.assert:
+    that:
+      - glob_result_1 is changed
+      - glob_result_1.files_count == 3
+      - "file_remove_testdir ~ '/test1.txt' in glob_result_1.removed_files"
+      - "file_remove_testdir ~ '/test2.txt' in glob_result_1.removed_files"
+      - "file_remove_testdir ~ '/data.txt' in glob_result_1.removed_files"
+      - "'3 file(s)' in glob_result_1.msg"
+
+- name: Verify remaining files still exist
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+  register: remaining_files
+  loop:
+    - test3.log
+    - readme.md
+    - backup_file.bak
+
+- name: Assert remaining files exist
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+  loop: "{{ remaining_files.results }}"
+
+- name: Remove files matching test* pattern
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "test*"
+  register: glob_result_2
+
+- name: Verify test* files were removed
+  ansible.builtin.assert:
+    that:
+      - glob_result_2 is changed
+      - glob_result_2.files_count == 1
+      - "file_remove_testdir ~ '/test3.log' in glob_result_2.removed_files"
+
+- name: Remove files matching [rb]* pattern (character set)
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "[rb]*"
+  register: glob_result_3
+
+- name: Verify [rb]* files were removed
+  ansible.builtin.assert:
+    that:
+      - glob_result_3 is changed
+      - glob_result_3.files_count == 2
+      - "file_remove_testdir ~ '/readme.md' in glob_result_3.removed_files"
+      - "file_remove_testdir ~ '/backup_file.bak' in glob_result_3.removed_files"
+
+- name: Try to remove with non-matching pattern
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.nonexistent"
+  register: glob_result_4
+
+- name: Verify no files were removed (idempotent)
+  ansible.builtin.assert:
+    that:
+      - glob_result_4 is not changed
+      - glob_result_4.files_count == 0
+      - glob_result_4.removed_files == []
+      - "'0 file(s)' in glob_result_4.msg"
+
+- name: Clean up for next test
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: absent
+
+- name: Recreate test directory
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: directory
+    mode: '0755'
