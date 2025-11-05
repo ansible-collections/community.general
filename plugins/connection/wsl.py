@@ -613,14 +613,14 @@ class Connection(ConnectionBase):
 
         display.vvv(f"EXEC {cmd}", host=self.get_option("remote_addr"))
 
-        cmd = to_bytes(cmd, errors="surrogate_or_strict")
+        cmd_b = to_bytes(cmd, errors="surrogate_or_strict")
 
         no_prompt_out = b""
         no_prompt_err = b""
         become_output = b""
 
         try:
-            chan.exec_command(cmd)
+            chan.exec_command(cmd_b)
             if self.become and self.become.expect_prompt():
                 password_prompt = False
                 become_success = False
