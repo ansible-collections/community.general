@@ -407,7 +407,8 @@ class Infinity:
         response = self._get_api_call_ansible_handler(method, resource_url)
         if not response:
             self.module.exit_json(
-                msg=f"There is an error in releasing network {network_id} from network {released_network_name}.")
+                msg=f"There is an error in releasing network {network_id} from network {released_network_name}."
+            )
         if response:
             response = json.loads(response)
             for child_net in response:
@@ -421,7 +422,8 @@ class Infinity:
             response = self._get_api_call_ansible_handler(method, resource_url, stat_codes=[204])
         else:
             self.module.exit_json(
-                msg=f"When release network, could not find the network {released_network_name} from the given superent {network_id} ")
+                msg=f"When release network, could not find the network {released_network_name} from the given superent {network_id} "
+            )
 
         return response
 
@@ -446,7 +448,8 @@ class Infinity:
         response = None
         if network_name is None or network_address is None or network_size is None:
             self.module.exit_json(
-                msg="You must specify those options 'network_name', 'network_address' and 'network_size'")
+                msg="You must specify those options 'network_name', 'network_address' and 'network_size'"
+            )
 
         if not network_family:
             network_family = "4"
