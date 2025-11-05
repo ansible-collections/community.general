@@ -350,7 +350,7 @@ def validate_modifications(ansible_to_ipa, module, ipa_otptoken, module_otptoken
             else:
                 if len(ipa_otptoken[ansible_to_ipa[parameter]]) != 1:
                     module.fail_json(
-                        msg="Invariant fail: Return value from IPA is not a list of length 1.  Please open a bug report for the module."
+                        msg="Invariant fail: Return value from IPA is not a list of length 1. Please open a bug report for the module."
                     )
                 if parameter == "secretkey":
                     # We stored the secret key in base32 since we had assumed that would need to
