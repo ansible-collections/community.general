@@ -302,7 +302,6 @@ EXAMPLES = r"""
 import abc
 import os
 from ansible.errors import AnsibleError, AnsibleOptionsError
-from ansible.module_utils import six
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 

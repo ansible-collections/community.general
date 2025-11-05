@@ -1,0 +1,5 @@
+minor_changes:
+  - "tss lookup plugin - updated documentation to reflect Delinea rebranding, changing references from 'Thycotic Secret Server' to 'Delinea Secret Server' in the short description (https://github.com/ansible-collections/community.general/pull/11031)."
+  - "tss lookup plugin - enhanced EXAMPLES section with clearer task names and added Platform authentication examples for Delinea Platform service users and tokens (https://github.com/ansible-collections/community.general/pull/11031)."
+  - "tss lookup plugin - improved RETURN documentation to include both secret ID and secret path lookup responses (https://github.com/ansible-collections/community.general/pull/11031)."
+  - "tss lookup plugin - fixed AccessTokenAuthorizer initialization to include base_url parameter for proper token authentication (https://github.com/ansible-collections/community.general/pull/11031)."
