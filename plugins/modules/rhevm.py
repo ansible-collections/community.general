@@ -452,7 +452,7 @@ class RHEVConn:
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg(f"The disk  {diskname} is ready.")
+            setMsg(f"The disk {diskname} is ready.")
         except Exception as e:
             setFailed()
             setMsg(f"Error getting the state of {diskname}.")
@@ -488,7 +488,7 @@ class RHEVConn:
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg(f"The iface  {nicname} is ready.")
+            setMsg(f"The iface {nicname} is ready.")
         except Exception as e:
             setFailed()
             setMsg(f"Error getting the state of {nicname}.")
@@ -739,7 +739,7 @@ class RHEVConn:
                                         ),
                                     )
                                 except Exception as e:
-                                    setMsg(f"Failed to create the bond for  {iface['name']}")
+                                    setMsg(f"Failed to create the bond for {iface['name']}")
                                     setFailed()
                                     setMsg(str(e))
                                     return False

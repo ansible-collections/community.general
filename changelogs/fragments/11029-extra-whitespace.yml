@@ -1,0 +1,5 @@
+minor_changes:
+  - infinity - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
+  - ipa_otptoken - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
+  - rhevm - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
+  - slack - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
