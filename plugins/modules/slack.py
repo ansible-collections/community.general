@@ -431,7 +431,7 @@ def do_notify_slack(module, domain, token, payload):
     else:
         if not domain:
             module.fail_json(
-                msg="Slack has updated its webhook API.  You need to specify a token of the form "
+                msg="Slack has updated its webhook API. You need to specify a token of the form "
                 "XXXX/YYYY/ZZZZ in your playbook"
             )
         slack_uri = OLD_SLACK_INCOMING_WEBHOOK % (domain, token)

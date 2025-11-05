@@ -59,7 +59,7 @@ EXAMPLES = r"""
 
 - name: List TCP ports
   ansible.builtin.debug:
-    msg: "{{ ansible_facts.tcp_listen  | map(attribute='port') | sort | list }}"
+    msg: "{{ ansible_facts.tcp_listen | map(attribute='port') | sort | list }}"
 
 - name: List UDP ports
   ansible.builtin.debug:
