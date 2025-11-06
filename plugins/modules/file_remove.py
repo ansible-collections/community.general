@@ -64,11 +64,12 @@ options:
 
   file_type:
     description:
-      - V(file) - remove only regular files.
-      - V(link) - remove only symbolic links.
-      - V(any) - remove both files and symbolic links.
+      - Type of files to remove.
     type: str
-    choices: ['file', 'link', 'any']
+    choices:
+      file: remove only regular files.
+      link: remove only symbolic links.
+      any: remove both files and symbolic links.
     default: file
 
 notes:
