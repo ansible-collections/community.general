@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2025, Shahar Golshani (@shahargolshani)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -15,21 +14,22 @@ short_description: Remove files matching a pattern from a directory
 
 description:
   - This module removes files from a specified directory that match a given pattern.
-  - The pattern can include wildcards and regular expressions.
+    The pattern can include wildcards and regular expressions.
   - By default, only files in the specified directory are removed (non-recursive).
-  - Use the O(recursive) option to search and remove files in subdirectories.
+    Use the O(recursive) option to search and remove files in subdirectories.
 
 version_added: "12.1.0"
 
 author:
   - Shahar Golshani (@shahargolshani)
 
+extends_documentation_fragment:
+  - community.general.attributes
+
 attributes:
   check_mode:
-    description: Can run in check_mode and return changed status without modifying the target.
     support: full
   diff_mode:
-    description: Will return details on what has changed (or possibly needs changing in check_mode).
     support: full
 
 options:
@@ -43,7 +43,7 @@ options:
   pattern:
     description:
       - Pattern to match files for removal.
-      - Supports wildcards (*, ?, [seq], [!seq]) for glob-style matching.
+      - Supports wildcards (V(*), V(?), V([seq]), V([!seq])) for glob-style matching.
       - Use O(use_regex=true) to interpret this as a regular expression instead.
     type: str
     required: true
@@ -64,7 +64,6 @@ options:
 
   file_type:
     description:
-      - Type of files to remove.
       - V(file) - remove only regular files.
       - V(link) - remove only symbolic links.
       - V(any) - remove both files and symbolic links.
@@ -122,12 +121,6 @@ files_count:
   type: int
   returned: always
   sample: 2
-
-msg:
-  description: Status message.
-  type: str
-  returned: always
-  sample: "Removed 2 files matching pattern '*.log'"
 
 path:
   description: The directory path that was searched.
@@ -252,7 +245,7 @@ def main():
         try:
             re.compile(pattern)
         except re.error as e:
-            module.fail_json(msg=f"Invalid regular expression pattern: {to_native(e)}")
+            module.fail_json(msg=f"Invalid regular expression pattern: {e}")
 
     # Find matching files
     try:
