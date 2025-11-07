@@ -237,7 +237,6 @@ import hashlib
 import os
 import posixpath
 import shutil
-import io
 import tempfile
 import traceback
 import re
@@ -503,7 +502,7 @@ class MavenDownloader:
         if self.local:
             parsed_url = urlparse(url)
             if os.path.isfile(parsed_url.path):
-                with io.open(parsed_url.path, "rb") as f:
+                with open(parsed_url.path, "rb") as f:
                     return f.read()
             if force:
                 raise ValueError(f"{failmsg} because can not find file: {url}")
@@ -630,7 +629,7 @@ class MavenDownloader:
             hash = hashlib.sha1()
         else:
             raise ValueError(f"Unknown checksum_alg {checksum_alg}")
-        with io.open(file, "rb") as f:
+        with open(file, "rb") as f:
             for chunk in iter(lambda: f.read(8192), b""):
                 hash.update(chunk)
         return hash.hexdigest()

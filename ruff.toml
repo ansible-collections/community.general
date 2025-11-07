@@ -24,7 +24,6 @@ ignore = [
     "E721",  # Type comparison
     "F841",  # Unused variable
     "UP014",  # Convert `xxx` from `NamedTuple` functional to class syntax
-    "UP020",  # Use builtin `open`
     "UP024",  # Replace aliased errors with `OSError`
     "UP028",  # Replace `yield` over `for` loop with `yield from`
     "UP029",  # Unnecessary builtin import: `open`
