@@ -47,7 +47,6 @@ ignore = [
     "SIM118",  # in-dict-keys
     "SIM201",  # negate-equal-op
     "SIM210",  # if-expr-with-true-false
-    "SIM211",  # if-expr-with-false-true
     "SIM212",  # if-expr-with-twisted-arms
     "SIM401",  # if-else-block-instead-of-dict-get
     "A001",  # builtin-variable-shadowing
