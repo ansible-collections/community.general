@@ -210,6 +210,7 @@ class Filesystem(object):
     MKFS_SET_UUID_EXTRA_OPTIONS = []
     INFO = None
     GROW = None
+    GROW_SLACK = 0
     GROW_MAX_SPACE_FLAGS = []
     GROW_MOUNTPOINT_ONLY = False
     CHANGE_UUID = None
@@ -278,7 +279,7 @@ class Filesystem(object):
             self.module.warn("unable to process %s output '%s'" % (self.INFO, to_native(err)))
             self.module.fail_json(msg="unable to process %s output for %s" % (self.INFO, dev))
 
-        if not fssize_in_bytes < devsize_in_bytes:
+        if fssize_in_bytes + self.GROW_SLACK >= devsize_in_bytes:
             self.module.exit_json(changed=False, msg="%s filesystem is using the whole device %s" % (self.fstype, dev))
         elif self.module.check_mode:
             self.module.exit_json(changed=True, msg="resizing filesystem %s on device %s" % (self.fstype, dev))
@@ -356,6 +357,10 @@ class XFS(Filesystem):
     MKFS_FORCE_FLAGS = ['-f']
     INFO = 'xfs_info'
     GROW = 'xfs_growfs'
+    # XFS (defaults with 4KiB blocksize) requires at least 64 block of free
+    # space to add a new allocation group, avoid resizing (noop, but shown as
+    # diff) if the difference between the filesystem and the device is less
+    GROW_SLACK = 64 * 4096 - 1
     GROW_MOUNTPOINT_ONLY = True
     CHANGE_UUID = "xfs_admin"
     CHANGE_UUID_OPTION = "-U"
