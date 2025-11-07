@@ -135,7 +135,6 @@ import os
 import re
 import glob
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def find_matching_files(path, pattern, use_regex, recursive, file_type):
@@ -160,7 +159,7 @@ def find_matching_files(path, pattern, use_regex, recursive, file_type):
                         if should_include_file(full_path, file_type):
                             matching_files.append(full_path)
             except OSError as e:
-                raise AssertionError(f"Failed to list directory {path}: {to_native(e)}")
+                raise AssertionError(f"Failed to list directory {path}: {e}")
     else:
         # Use glob pattern matching
         if recursive:
@@ -211,7 +210,7 @@ def remove_files(module, files):
                 os.remove(file_path)
                 removed_files.append(file_path)
         except OSError as e:
-            failed_files.append((file_path, to_native(e)))
+            failed_files.append((file_path, str(e)))
 
     return removed_files, failed_files
 
@@ -252,7 +251,7 @@ def main():
     try:
         matching_files = find_matching_files(path, pattern, use_regex, recursive, file_type)
     except AssertionError as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=str(e))
 
     # Prepare diff information
     diff = dict(before=dict(files=matching_files), after=dict(files=[]))
