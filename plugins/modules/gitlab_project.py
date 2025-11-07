@@ -572,7 +572,7 @@ class GitLabProject:
 
                         if all(old_val.get(key) == value for key, value in final_val.items()):
                             continue
-                        setattr(project, "container_expiration_policy_attributes", final_val)
+                        project.container_expiration_policy_attributes = final_val
                     else:
                         setattr(project, arg_key, arg_value)
                     changed = True

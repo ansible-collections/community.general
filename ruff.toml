@@ -33,8 +33,6 @@ ignore = [
     "UP039",  # Unnecessary parentheses after class definition
     "UP041",  # Replace aliased errors with `TimeoutError`
     "B007",  # unused-loop-control-variable
-    "B009",  # get-attr-with-constant
-    "B010",  # set-attr-with-constant
     "B015",  # useless-comparison
     "B017",  # assert-raises-exception
     "B020",  # loop-variable-overrides-iterator

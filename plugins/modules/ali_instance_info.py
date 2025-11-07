@@ -389,8 +389,8 @@ def main():
             if not str(inst.instance_name).startswith(name_prefix):
                 continue
         volumes = ecs.describe_disks(instance_id=inst.id)
-        setattr(inst, "block_device_mappings", volumes)
-        setattr(inst, "user_data", inst.describe_user_data())
+        inst.block_device_mappings = volumes
+        inst.user_data = inst.describe_user_data()
         instances.append(inst.read())
         instance_ids.append(inst.id)
 

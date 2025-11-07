@@ -631,8 +631,8 @@ def get_instances_info(connection, ids):
     if len(instances) > 0:
         for inst in instances:
             volumes = connection.describe_disks(instance_id=inst.id)
-            setattr(inst, "block_device_mappings", volumes)
-            setattr(inst, "user_data", inst.describe_user_data())
+            inst.block_device_mappings = volumes
+            inst.user_data = inst.describe_user_data()
             result.append(inst.read())
     return result
 
@@ -748,7 +748,7 @@ def modify_instance(module, instance):
         password = module.params["password"]
 
     # userdata can be modified only when instance is stopped
-    setattr(instance, "user_data", instance.describe_user_data())
+    instance.user_data = instance.describe_user_data()
     user_data = instance.user_data
     if state == "stopped":
         user_data = module.params["user_data"].encode()

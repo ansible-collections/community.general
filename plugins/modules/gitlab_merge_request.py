@@ -272,11 +272,11 @@ class GitlabMergeRequest:
                     key = "force_remove_source_branch"
 
                 if key == "assignee_ids":
-                    if value != sorted([user["id"] for user in getattr(mr, "assignees")]):
+                    if value != sorted([user["id"] for user in mr.assignees]):
                         return True
 
                 elif key == "reviewer_ids":
-                    if value != sorted([user["id"] for user in getattr(mr, "reviewers")]):
+                    if value != sorted([user["id"] for user in mr.reviewers]):
                         return True
 
                 elif key == "labels":
