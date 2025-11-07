@@ -26,7 +26,6 @@ ignore = [
     "UP014",  # Convert `xxx` from `NamedTuple` functional to class syntax
     "UP024",  # Replace aliased errors with `OSError`
     "UP028",  # Replace `yield` over `for` loop with `yield from`
-    "UP029",  # Unnecessary builtin import: `open`
     "UP030",  # Use implicit references for positional format fields
     "UP031",  # Use format specifiers instead of percent format
     "UP036",  # Version block is outdated for minimum Python version
