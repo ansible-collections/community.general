@@ -10,7 +10,7 @@ from ansible.errors import AnsibleFilterError
 
 
 if t.TYPE_CHECKING:
-    from typing import Any, Union
+    from typing import Any
     from collections.abc import Callable
 
 JSONPATCH_IMPORT_ERROR: ImportError | None
