@@ -293,7 +293,7 @@ def ss_parse(raw):
         try:
             if len(cells) == 6:
                 # no process column, e.g. due to unprivileged user
-                process = str()
+                process = ""
                 protocol, state, recv_q, send_q, local_addr_port, peer_addr_port = cells
             else:
                 protocol, state, recv_q, send_q, local_addr_port, peer_addr_port, process = cells
@@ -312,7 +312,7 @@ def ss_parse(raw):
         if pids is None:
             # likely unprivileged user, so add empty name & pid
             # as we do in netstat logic to be consistent with output
-            pids = [(str(), 0)]
+            pids = [("", 0)]
 
         address = conns.group(1)
         port = conns.group(2)

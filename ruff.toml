@@ -27,7 +27,6 @@ ignore = [
     "UP007",  # Use `X | Y` for type annotations
     "UP009",  # UTF-8 encoding declaration is unnecessary
     "UP014",  # Convert `xxx` from `NamedTuple` functional to class syntax
-    "UP018",  # Unnecessary `str` call (rewrite as a literal)
     "UP020",  # Use builtin `open`
     "UP024",  # Replace aliased errors with `OSError`
     "UP028",  # Replace `yield` over `for` loop with `yield from`
