@@ -20,28 +20,20 @@
     state: directory
     mode: '0755'
 
-- name: Run all tests and clean up afterwards
-  block:
-    - name: Include tasks to test error handling
-      include_tasks: test_errors.yml
+- name: Include tasks to test error handling
+  include_tasks: test_errors.yml
 
-    - name: Include tasks to test glob pattern matching
-      include_tasks: test_glob.yml
+- name: Include tasks to test glob pattern matching
+  include_tasks: test_glob.yml
 
-    - name: Include tasks to test regex pattern matching
-      include_tasks: test_regex.yml
+- name: Include tasks to test regex pattern matching
+  include_tasks: test_regex.yml
 
-    - name: Include tasks to test recursive removal
-      include_tasks: test_recursive.yml
+- name: Include tasks to test recursive removal
+  include_tasks: test_recursive.yml
 
-    - name: Include tasks to test different file types
-      include_tasks: test_file_types.yml
+- name: Include tasks to test different file types
+  include_tasks: test_file_types.yml
 
-    - name: Include tasks to test check mode and diff mode
-      include_tasks: test_check_diff.yml
-
-  always:
-    - name: Remove test directory
-      ansible.builtin.file:
-        path: "{{ file_remove_testdir }}"
-        state: absent
+- name: Include tasks to test check mode and diff mode
+  include_tasks: test_check_diff.yml
