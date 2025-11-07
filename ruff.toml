@@ -53,7 +53,6 @@ ignore = [
     "SIM210",  # if-expr-with-true-false
     "SIM211",  # if-expr-with-false-true
     "SIM212",  # if-expr-with-twisted-arms
-    "SIM300",  # yoda-conditions
     "SIM401",  # if-else-block-instead-of-dict-get
     "A001",  # builtin-variable-shadowing
     "A002",  # builtin-argument-shadowing

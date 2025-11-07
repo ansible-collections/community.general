@@ -190,7 +190,7 @@ class BtrfsSubvolume:
         return mountpoints is not None and len(mountpoints) > 0
 
     def is_filesystem_root(self):
-        return 5 == self.__subvolume_id
+        return self.__subvolume_id == 5
 
     def is_filesystem_default(self):
         return self.__filesystem.default_subvolid == self.__subvolume_id
