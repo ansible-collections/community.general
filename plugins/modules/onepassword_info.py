@@ -252,8 +252,8 @@ class OnePasswordInfo:
                 module.fail_json(msg=f"Missing required 'name' field from search term, got: '{term}'")
 
             term["field"] = term.get("field", "password")
-            term["section"] = term.get("section", None)
-            term["vault"] = term.get("vault", None)
+            term["section"] = term.get("section")
+            term["vault"] = term.get("vault")
 
             processed_terms.append(term)
 

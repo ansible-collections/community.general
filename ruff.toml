@@ -59,7 +59,6 @@ ignore = [
     "SIM212",  # if-expr-with-twisted-arms
     "SIM300",  # yoda-conditions
     "SIM401",  # if-else-block-instead-of-dict-get
-    "SIM910",  # dict-get-with-none-default
     "A001",  # builtin-variable-shadowing
     "A002",  # builtin-argument-shadowing
     "A004",  # builtin-import-shadowing

@@ -714,7 +714,7 @@ class LXDContainerManagement:
 
             if self._needs_to_change_instance_config(param):
                 if param == "config":
-                    body_json["config"] = body_json.get("config", None) or {}
+                    body_json["config"] = body_json.get("config") or {}
                     for k, v in self.config["config"].items():
                         body_json["config"][k] = v
                 else:
