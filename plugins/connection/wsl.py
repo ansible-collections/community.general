@@ -416,7 +416,7 @@ class Connection(ConnectionBase):
 
         sock_kwarg = {}
         if proxy_command:
-            replacers: t.Dict[str, str] = {
+            replacers: dict[str, str] = {
                 "%h": self.get_option("remote_addr"),
                 "%p": str(port),
                 "%r": self.get_option("remote_user"),
@@ -457,7 +457,7 @@ class Connection(ConnectionBase):
         paramiko_preferred_pubkeys = getattr(paramiko.Transport, "_preferred_pubkeys", ())
         paramiko_preferred_hostkeys = getattr(paramiko.Transport, "_preferred_keys", ())
         use_rsa_sha2_algorithms = self.get_option("use_rsa_sha2_algorithms")
-        disabled_algorithms: t.Dict[str, t.Iterable[str]] = {}
+        disabled_algorithms: dict[str, t.Iterable[str]] = {}
         if not use_rsa_sha2_algorithms:
             if paramiko_preferred_pubkeys:
                 disabled_algorithms["pubkeys"] = tuple(a for a in paramiko_preferred_pubkeys if "rsa-sha2" in a)
