@@ -43,7 +43,6 @@ ignore = [
     "SIM117",  # multiple-with-statements
     "SIM118",  # in-dict-keys
     "SIM210",  # if-expr-with-true-false
-    "SIM212",  # if-expr-with-twisted-arms
     "SIM401",  # if-else-block-instead-of-dict-get
     "A001",  # builtin-variable-shadowing
     "A002",  # builtin-argument-shadowing
