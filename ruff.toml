@@ -56,7 +56,6 @@ ignore = [
     "A001",  # builtin-variable-shadowing
     "A002",  # builtin-argument-shadowing
     "A004",  # builtin-import-shadowing
-    "FLY002",  # static-join-to-f-string
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.

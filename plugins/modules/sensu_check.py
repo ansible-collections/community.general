@@ -365,7 +365,7 @@ def main():
 
     module = AnsibleModule(argument_spec=arg_spec, required_together=required_together, supports_check_mode=True)
     if module.params["state"] != "absent" and module.params["command"] is None:
-        module.fail_json(msg="missing required arguments: %s" % ",".join(["command"]))
+        module.fail_json(msg="missing required arguments: command")
 
     path = module.params["path"]
     name = module.params["name"]
