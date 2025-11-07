@@ -736,7 +736,7 @@ def main():
         state_msg = "no change in state"
         state_changed = False
 
-    module.exit_json(changed=state_changed, msg=f"{state_msg}: {'; '.join((x[1] for x in changed.values()))}")
+    module.exit_json(changed=state_changed, msg=f"{state_msg}: {'; '.join(x[1] for x in changed.values())}")
 
 
 if __name__ == "__main__":

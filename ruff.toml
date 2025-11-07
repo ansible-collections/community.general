@@ -31,7 +31,6 @@ ignore = [
     "UP029",  # Unnecessary builtin import: `open`
     "UP030",  # Use implicit references for positional format fields
     "UP031",  # Use format specifiers instead of percent format
-    "UP034",  # Avoid extraneous parentheses
     "UP036",  # Version block is outdated for minimum Python version
     "UP039",  # Unnecessary parentheses after class definition
     "UP041",  # Replace aliased errors with `TimeoutError`
