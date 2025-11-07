@@ -36,7 +36,6 @@ ignore = [
     "B017",  # assert-raises-exception
     "B020",  # loop-variable-overrides-iterator
     "B026",  # star-arg-unpacking-after-keyword-arg
-    "B034",  # re-sub-positional-args
     "B904",  # raise-without-from-inside-except
     "SIM102",  # collapsible-if
     "SIM103",  # needless-bool
