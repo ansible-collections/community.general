@@ -22,8 +22,6 @@ ignore = [
     # To fix:
     "F401",  # Unused import
     "E721",  # Type comparison
-    "E713",  # "not in" test
-    "E714",  # "not is" test
     "F841",  # Unused variable
     "UP006",  # Use `dict` instead of `t.Dict` for type annotation
     "UP007",  # Use `X | Y` for type annotations

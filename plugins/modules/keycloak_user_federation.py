@@ -1044,7 +1044,7 @@ def main():
             # we remove all unwanted default mappers
             # we use ids so we dont accidently remove one of the previously updated default mapper
             for default_mapper in default_mappers:
-                if not default_mapper["id"] in [x["id"] for x in updated_mappers]:
+                if default_mapper["id"] not in [x["id"] for x in updated_mappers]:
                     kc.delete_component(default_mapper["id"], realm)
 
         after_comp["mappers"] = kc.get_components(urlencode(dict(parent=cid)), realm)
@@ -1088,7 +1088,7 @@ def main():
 
             for before_mapper in before_comp.get("mappers", []):
                 # remove unwanted existing mappers that will not be updated
-                if not before_mapper["id"] in [x["id"] for x in desired_mappers if "id" in x]:
+                if before_mapper["id"] not in [x["id"] for x in desired_mappers if "id" in x]:
                     kc.delete_component(before_mapper["id"], realm)
 
             for mapper in desired_mappers:
