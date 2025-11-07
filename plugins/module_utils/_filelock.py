@@ -11,7 +11,6 @@ import os
 import stat
 import time
 import fcntl
-import sys
 
 from contextlib import contextmanager
 
@@ -59,9 +58,6 @@ class FileLock:
         """
         lock_path = os.path.join(tmpdir, f"ansible-{os.path.basename(path)}.lock")
         l_wait = 0.1
-        r_exception = IOError
-        if sys.version_info[0] == 3:
-            r_exception = BlockingIOError
 
         self.lockfd = open(lock_path, "w")
 
@@ -77,7 +73,7 @@ class FileLock:
                     fcntl.flock(self.lockfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
                     os.chmod(lock_path, stat.S_IWRITE | stat.S_IREAD)
                     return True
-                except r_exception:
+                except BlockingIOError:
                     time.sleep(l_wait)
                     e_secs += l_wait
                     continue

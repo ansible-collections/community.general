@@ -28,7 +28,6 @@ ignore = [
     "UP028",  # Replace `yield` over `for` loop with `yield from`
     "UP030",  # Use implicit references for positional format fields
     "UP031",  # Use format specifiers instead of percent format
-    "UP036",  # Version block is outdated for minimum Python version
     "UP039",  # Unnecessary parentheses after class definition
     "UP041",  # Replace aliased errors with `TimeoutError`
     "B007",  # unused-loop-control-variable

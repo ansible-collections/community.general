@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import sys
 from unittest.mock import patch
 
 from ansible_collections.community.general.plugins.modules import (
@@ -26,10 +25,6 @@ class TestPritunlUserInfo(ModuleTestCase):
     def setUp(self):
         super().setUp()
         self.module = pritunl_user_info
-
-        # Add backward compatibility
-        if sys.version_info < (3, 2):
-            self.assertRegex = self.assertRegexpMatches
 
     def tearDown(self):
         super().tearDown()

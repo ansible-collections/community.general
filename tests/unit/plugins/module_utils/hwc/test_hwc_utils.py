@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import HwcModuleException, navigate_value
@@ -13,10 +12,6 @@ from ansible_collections.community.general.plugins.module_utils.hwc_utils import
 class HwcUtilsTestCase(unittest.TestCase):
     def setUp(self):
         super().setUp()
-
-        # Add backward compatibility
-        if sys.version_info < (3, 0):
-            self.assertRaisesRegex = self.assertRaisesRegexp
 
     def test_navigate_value(self):
         value = {

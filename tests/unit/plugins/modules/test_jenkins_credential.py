@@ -12,17 +12,8 @@ from unittest.mock import (
     mock_open,
 )
 
+import builtins
 import json
-import sys
-
-if sys.version_info[0] == 3:
-    import builtins
-
-    open_path = "builtins.open"
-else:
-    import __builtin__ as builtins
-
-    open_path = "__builtin__.open"
 
 
 def test_validate_file_exist_passes_when_file_exists():
@@ -251,7 +242,7 @@ def test_read_privateKey_returns_trimmed_contents():
     module.params = {"private_key_path": "/fake/path/key.pem"}
 
     mocked_file = mock_open(read_data="\n   \t  -----BEGIN PRIVATE KEY-----\nKEYDATA\n-----END PRIVATE KEY-----   \n\n")
-    with patch(open_path, mocked_file):
+    with patch("builtins.open", mocked_file):
         result = jenkins_credential.read_privateKey(module)
 
     expected = "-----BEGIN PRIVATE KEY-----\nKEYDATA\n-----END PRIVATE KEY-----"
@@ -264,7 +255,7 @@ def test_read_privateKey_handles_file_read_error():
     module = MagicMock()
     module.params = {"private_key_path": "/invalid/path.pem"}
 
-    with patch(open_path, side_effect=IOError("cannot read file")):
+    with patch("builtins.open", side_effect=IOError("cannot read file")):
         jenkins_credential.read_privateKey(module)
 
     module.fail_json.assert_called_once()
@@ -295,7 +286,7 @@ def test_embed_file_into_body_fails_when_file_unreadable():
     file_path = "/fake/path/missing.pem"
     credentials = {"id": "something"}
 
-    with patch(open_path, side_effect=IOError("can't read file")):
+    with patch("builtins.open", side_effect=IOError("can't read file")):
         jenkins_credential.embed_file_into_body(module, file_path, credentials)
 
     module.fail_json.assert_called_once()
@@ -307,7 +298,7 @@ def test_embed_file_into_body_injects_file_keys_into_credentials():
     file_path = "/fake/path/file.txt"
     credentials = {"id": "test"}
 
-    with patch(open_path, mock_open(read_data=b"1234")), patch("os.path.basename", return_value="file.txt"):
+    with patch("builtins.open", mock_open(read_data=b"1234")), patch("os.path.basename", return_value="file.txt"):
         jenkins_credential.embed_file_into_body(module, file_path, credentials)
 
     assert credentials["file"] == "file0"
