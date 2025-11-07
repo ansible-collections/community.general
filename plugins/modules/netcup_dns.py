@@ -279,7 +279,7 @@ def main():
                         for r in all_records
                         if r.hostname == record.hostname
                         and r.type == record.type
-                        and not r.destination == record.destination
+                        and r.destination != record.destination
                     ]
 
                     if obsolete_records:

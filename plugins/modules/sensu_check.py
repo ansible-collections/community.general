@@ -275,7 +275,7 @@ def sensu_check(module, path, name, state="present", backup=False):
 
             for k, v in custom_params.items():
                 if k in config["checks"][name]:
-                    if not config["checks"][name][k] == v:
+                    if config["checks"][name][k] != v:
                         changed = True
                         reasons.append(f"`custom param {k}' was changed")
                 else:

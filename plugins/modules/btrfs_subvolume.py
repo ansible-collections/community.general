@@ -568,7 +568,7 @@ class BtrfsSubvolumeModule:
         last = None
         ordered = sorted(subvolumes, key=lambda x: x.path)
         for next in ordered:
-            if last is None or not next.path[0 : len(last)] == last:
+            if last is None or next.path[0:len(last)] != last:
                 filtered.append(next)
                 last = next.path
         return filtered

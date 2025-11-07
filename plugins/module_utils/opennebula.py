@@ -305,7 +305,7 @@ class OpenNebulaModule:
                 intersection[dkey] = current[dkey]
             else:
                 return True
-        return not (desired == intersection)
+        return desired != intersection
 
     def wait_for_state(
         self,

@@ -307,7 +307,7 @@ def main():
 
     present = monit.is_process_present()
 
-    if not present and not state == "present":
+    if not present and state != "present":
         module.fail_json(msg=f"{name} process not presently configured with monit", name=name)
 
     if state == "present":
