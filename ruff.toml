@@ -25,7 +25,6 @@ ignore = [
     "E721",  # Type comparison
     "F841",  # Unused variable
     "UP006",  # Use `dict` instead of `t.Dict` for type annotation
-    "UP007",  # Use `X | Y` for type annotations
     "UP009",  # UTF-8 encoding declaration is unnecessary
     "UP014",  # Convert `xxx` from `NamedTuple` functional to class syntax
     "UP020",  # Use builtin `open`
