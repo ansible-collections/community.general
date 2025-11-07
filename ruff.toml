@@ -24,7 +24,6 @@ ignore = [
     "F401",  # Unused import
     "E721",  # Type comparison
     "F841",  # Unused variable
-    "UP009",  # UTF-8 encoding declaration is unnecessary
     "UP014",  # Convert `xxx` from `NamedTuple` functional to class syntax
     "UP020",  # Use builtin `open`
     "UP024",  # Replace aliased errors with `OSError`
