@@ -802,9 +802,8 @@ class XenServerVM(XenServerObject):
                         vm_disk_params_list = [
                             disk_params for disk_params in self.vm_params["VBDs"] if disk_params["type"] == "Disk"
                         ]
-                        position = 0
 
-                        for disk_change_list in change["disks_changed"]:
+                        for position, disk_change_list in enumerate(change["disks_changed"]):
                             for disk_change in disk_change_list:
                                 vdi_ref = self.xapi_session.xenapi.VDI.get_by_uuid(
                                     vm_disk_params_list[position]["VDI"]["uuid"]
@@ -829,7 +828,6 @@ class XenServerVM(XenServerObject):
                                         ),
                                     )
 
-                            position += 1
                     elif change.get("disks_new"):
                         for position, disk_userdevice in change["disks_new"]:
                             disk_params = self.module.params["disks"][position]
