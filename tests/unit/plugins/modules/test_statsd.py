@@ -47,21 +47,21 @@ class TestStatsDModule(ModuleTestCase):
 
     def test_udp_without_parameters(self):
         """Test udp without parameters"""
-        with self.patch_udp_statsd_client(side_effect=FakeStatsD) as fake_statsd:
-            with self.assertRaises(AnsibleFailJson) as result:
+        with self.patch_udp_statsd_client(side_effect=FakeStatsD):
+            with self.assertRaises(AnsibleFailJson):
                 with set_module_args({}):
                     self.module.main()
 
     def test_tcp_without_parameters(self):
         """Test tcp without parameters"""
-        with self.patch_tcp_statsd_client(side_effect=FakeStatsD) as fake_statsd:
-            with self.assertRaises(AnsibleFailJson) as result:
+        with self.patch_tcp_statsd_client(side_effect=FakeStatsD):
+            with self.assertRaises(AnsibleFailJson):
                 with set_module_args({}):
                     self.module.main()
 
     def test_udp_with_parameters(self):
         """Test udp with parameters"""
-        with self.patch_udp_statsd_client(side_effect=FakeStatsD) as fake_statsd:
+        with self.patch_udp_statsd_client(side_effect=FakeStatsD):
             with self.assertRaises(AnsibleExitJson) as result:
                 with set_module_args(
                     {
@@ -73,7 +73,7 @@ class TestStatsDModule(ModuleTestCase):
                     self.module.main()
             self.assertEqual(result.exception.args[0]["msg"], "Sent counter my_counter -> 1 to StatsD")
             self.assertEqual(result.exception.args[0]["changed"], True)
-        with self.patch_udp_statsd_client(side_effect=FakeStatsD) as fake_statsd:
+        with self.patch_udp_statsd_client(side_effect=FakeStatsD):
             with self.assertRaises(AnsibleExitJson) as result:
                 with set_module_args(
                     {
@@ -88,7 +88,7 @@ class TestStatsDModule(ModuleTestCase):
 
     def test_tcp_with_parameters(self):
         """Test tcp with parameters"""
-        with self.patch_tcp_statsd_client(side_effect=FakeStatsD) as fake_statsd:
+        with self.patch_tcp_statsd_client(side_effect=FakeStatsD):
             with self.assertRaises(AnsibleExitJson) as result:
                 with set_module_args(
                     {
@@ -101,7 +101,7 @@ class TestStatsDModule(ModuleTestCase):
                     self.module.main()
             self.assertEqual(result.exception.args[0]["msg"], "Sent counter my_counter -> 1 to StatsD")
             self.assertEqual(result.exception.args[0]["changed"], True)
-        with self.patch_tcp_statsd_client(side_effect=FakeStatsD) as fake_statsd:
+        with self.patch_tcp_statsd_client(side_effect=FakeStatsD):
             with self.assertRaises(AnsibleExitJson) as result:
                 with set_module_args(
                     {

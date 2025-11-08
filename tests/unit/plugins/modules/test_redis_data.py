@@ -20,7 +20,7 @@ if tuple(map(int, __version__.split("."))) < (3, 4, 0):
 
 def test_redis_data_without_arguments(capfd):
     with set_module_args({}):
-        with pytest.raises(SystemExit) as results:
+        with pytest.raises(SystemExit):
             redis_data.main()
     out, err = capfd.readouterr()
     assert not err

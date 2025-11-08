@@ -226,7 +226,7 @@ def netStatParse(raw):
             pid_and_name = ""
             process = ""
             formatted_line = line.split()
-            protocol, recv_q, send_q, address, foreign_address, rest = (
+            protocol, _recv_q, _send_q, address, foreign_address, rest = (
                 formatted_line[0],
                 formatted_line[1],
                 formatted_line[2],

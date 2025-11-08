@@ -289,7 +289,7 @@ def get_object_ref(module, name, uuid=None, obj_type="VM", fail=True, msg_prefix
             # Find object by UUID. If no object is found using given UUID,
             # an exception will be generated.
             obj_ref = xapi_session.xenapi_request(f"{real_obj_type}.get_by_uuid", (uuid,))
-        except XenAPI.Failure as f:
+        except XenAPI.Failure:
             if fail:
                 module.fail_json(msg=f"{msg_prefix}{obj_type} with UUID '{uuid}' not found!")
     elif name:

@@ -656,7 +656,7 @@ def run_instance(module, ecs, exact_count):
     system_disk_size = module.params["system_disk_size"]
     system_disk_name = module.params["system_disk_name"]
     system_disk_description = module.params["system_disk_description"]
-    allocate_public_ip = module.params["allocate_public_ip"]
+    # allocate_public_ip = module.params["allocate_public_ip"]  TODO - this is unused!
     period = module.params["period"]
     auto_renew = module.params["auto_renew"]
     instance_charge_type = module.params["instance_charge_type"]

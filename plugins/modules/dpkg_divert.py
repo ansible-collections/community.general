@@ -332,7 +332,7 @@ def main():
                 if os.path.exists(b_old) and not os.path.exists(b_new):
                     try:
                         os.rename(b_old, b_new)
-                    except OSError as e:
+                    except OSError:
                         pass
 
     if not module.check_mode:

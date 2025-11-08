@@ -437,7 +437,7 @@ def change_service_permissions(module, auth, service_id, permissions):
     data = {"action": {"perform": "chmod", "params": {"octet": permissions}}}
 
     try:
-        status_result = open_url(
+        open_url(
             f"{auth.url}/service/{service_id!s}/action",
             method="POST",
             force_basic_auth=True,
@@ -453,7 +453,7 @@ def change_service_owner(module, auth, service_id, owner_id):
     data = {"action": {"perform": "chown", "params": {"owner_id": owner_id}}}
 
     try:
-        status_result = open_url(
+        open_url(
             f"{auth.url}/service/{service_id!s}/action",
             method="POST",
             force_basic_auth=True,
@@ -469,7 +469,7 @@ def change_service_group(module, auth, service_id, group_id):
     data = {"action": {"perform": "chgrp", "params": {"group_id": group_id}}}
 
     try:
-        status_result = open_url(
+        open_url(
             f"{auth.url}/service/{service_id!s}/action",
             method="POST",
             force_basic_auth=True,
@@ -666,7 +666,7 @@ def delete_service(module, auth, service_id):
         return service_info
 
     try:
-        result = open_url(
+        open_url(
             f"{auth.url}/service/{service_id!s}",
             method="DELETE",
             force_basic_auth=True,

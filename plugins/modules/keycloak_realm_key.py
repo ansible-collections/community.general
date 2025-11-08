@@ -367,8 +367,6 @@ def main():
     name = module.params.get("name")
     force = module.params.get("force")
     state = module.params.get("state")
-    enabled = module.params.get("enabled")
-    provider_id = module.params.get("provider_id")
     parent_id = module.params.get("parent_id")
 
     # Get a list of all Keycloak components that are of keyprovider type.

@@ -552,7 +552,7 @@ class JenkinsPlugin:
             data = urlencode(script_data)
 
             # Send the installation request
-            r = self._get_url_data(
+            self._get_url_data(
                 f"{self.url}/scriptText",
                 msg_status="Cannot install plugin.",
                 msg_exception="Plugin installation has failed.",

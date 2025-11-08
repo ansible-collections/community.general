@@ -342,7 +342,6 @@ class TestKeycloakUserFederation(ModuleTestCase):
                 }
             ],
         ]
-        return_value_component_delete = [None]
         return_value_component_create = [
             {
                 "id": "eb691537-b73c-4cd8-b481-6031c26499d8",

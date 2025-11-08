@@ -181,7 +181,7 @@ def get_vault_diff(client, ipa_vault, module_vault, module):
 def ensure(module, client):
     state = module.params["state"]
     name = module.params["cn"]
-    user = module.params["username"]
+    # user = module.params["username"]  TODO is this really not needed?
     replace = module.params["replace"]
 
     module_vault = get_vault_dict(

@@ -77,7 +77,6 @@ class TestInterfacesFileModule(unittest.TestCase):
         string = json.dumps(ifaces, sort_keys=True, indent=4, separators=(",", ": "))
         if string and not string.endswith("\n"):
             string += "\n"
-        goldenstring = string
         goldenData = ifaces
         if not os.path.isfile(testfilepath):
             with open(testfilepath, "wb") as f:

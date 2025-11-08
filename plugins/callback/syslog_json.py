@@ -129,7 +129,7 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_async_failed(self, result):
         res = result._result
         host = result._host.get_name()
-        jid = result._result.get("ansible_job_id")
+        # jid = result._result.get("ansible_job_id")
         self.logger.error(
             "%s ansible-command: task execution FAILED; host: %s; message: %s",
             self.hostname,

@@ -13,7 +13,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 def test_terraform_without_argument(capfd):
     with set_module_args({}):
-        with pytest.raises(SystemExit) as results:
+        with pytest.raises(SystemExit):
             terraform.main()
 
     out, err = capfd.readouterr()

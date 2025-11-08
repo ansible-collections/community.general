@@ -112,7 +112,7 @@ class GitlabProtectedBranch:
     def protected_branch_exist(self, name):
         try:
             return self.project.protectedbranches.get(name)
-        except Exception as e:
+        except Exception:
             return False
 
     def create_or_update_protected_branch(self, name, options):

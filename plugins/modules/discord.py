@@ -183,11 +183,6 @@ def main():
         supports_check_mode=True,
     )
 
-    result = dict(
-        changed=False,
-        http_code="",
-    )
-
     if module.check_mode:
         response, info = discord_check_mode(module)
         if info["status"] != 200:
