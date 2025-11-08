@@ -77,17 +77,14 @@ options:
       - Specifies the ID of the backup that can be used to create a disk. This parameter is mandatory when you use a backup
         to create the disk.
     type: str
-    required: false
   description:
     description:
       - Specifies the disk description. The value can contain a maximum of 255 bytes.
     type: str
-    required: false
   enable_full_clone:
     description:
       - If the disk is created from a snapshot and linked cloning needs to be used, set this parameter to True.
     type: bool
-    required: false
   enable_scsi:
     description:
       - If this parameter is set to V(true), the disk device type is SCSI, which allows ECS OSs to directly access underlying
@@ -96,29 +93,24 @@ options:
       - If parameter enable_share is set to True and this parameter is not specified, shared SCSI disks are created. SCSI
         EVS disks cannot be created from backups, which means that this parameter cannot be True if backup_id has been specified.
     type: bool
-    required: false
   enable_share:
     description:
       - Specifies whether the disk is shareable. The default value is False.
     type: bool
-    required: false
   encryption_id:
     description:
       - Specifies the encryption ID. The length of it fixes at 36 bytes.
     type: str
-    required: false
   enterprise_project_id:
     description:
       - Specifies the enterprise project ID. This ID is associated with the disk during the disk creation. If it is not specified,
         the disk is bound to the default enterprise project.
     type: str
-    required: false
   image_id:
     description:
       - Specifies the image ID. If this parameter is specified, the disk is created from an image. BMS system disks cannot
         be created from BMS images.
     type: str
-    required: false
   size:
     description:
       - Specifies the disk size, in GB. Its values are as follows, System disk 1 GB to 1024 GB, Data disk 10 GB to 32768 GB.
@@ -127,12 +119,10 @@ options:
         This parameter is optional when you use a backup to create a disk. If this parameter is not specified, the disk size
         is equal to the backup size.
     type: int
-    required: false
   snapshot_id:
     description:
       - Specifies the snapshot ID. If this parameter is specified, the disk is created from a snapshot.
     type: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

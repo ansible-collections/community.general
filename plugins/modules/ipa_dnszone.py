@@ -25,7 +25,6 @@ options:
     type: str
   state:
     description: State to ensure.
-    required: false
     default: present
     choices: ["absent", "present"]
     type: str

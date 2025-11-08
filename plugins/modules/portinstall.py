@@ -33,14 +33,12 @@ options:
     description:
       - State of the package.
     choices: ['present', 'absent']
-    required: false
     default: present
     type: str
   use_packages:
     description:
       - Use packages instead of ports whenever available.
     type: bool
-    required: false
     default: true
 author: "berenddeboer (@berenddeboer)"
 """

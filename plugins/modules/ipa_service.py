@@ -27,25 +27,21 @@ options:
   hosts:
     description:
       - Defines the list of C(ManagedBy) hosts.
-    required: false
     type: list
     elements: str
   force:
     description:
       - Force principal name even if host is not in DNS.
-    required: false
     type: bool
   skip_host_check:
     description:
       - Force service to be created even when host object does not exist to manage it.
       - This is only used on creation, not for updating existing services.
-    required: false
     type: bool
     default: false
     version_added: 4.7.0
   state:
     description: State to ensure.
-    required: false
     default: present
     choices: ["absent", "present"]
     type: str

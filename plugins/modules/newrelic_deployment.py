@@ -31,23 +31,19 @@ options:
     description:
       - The value of C(app_name) in the C(newrelic.yml) file used by the application.
       - One of O(app_name) or O(application_id) is required.
-    required: false
   application_id:
     type: str
     description:
       - The application ID found in the metadata of the application in APM.
       - One of O(app_name) or O(application_id) is required.
-    required: false
   changelog:
     type: str
     description:
       - A list of changes for this deployment.
-    required: false
   description:
     type: str
     description:
       - Text annotation for the deployment - notes for you.
-    required: false
   revision:
     type: str
     description:
@@ -57,12 +53,10 @@ options:
     type: str
     description:
       - The name of the user/process that triggered this deployment.
-    required: false
   validate_certs:
     description:
       - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
         certificates.
-    required: false
     default: true
     type: bool
   app_name_exact_match:
@@ -70,7 +64,6 @@ options:
     description:
       - If this flag is set to V(true) then the application ID lookup by name would only work for an exact match. If set to
         V(false) it returns the first result.
-    required: false
     default: false
     version_added: 7.5.0
 requirements: []

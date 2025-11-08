@@ -33,14 +33,12 @@ options:
   increment_int:
     description:
       - Integer amount to increment the key by.
-    required: false
     type: int
   increment_float:
     description:
       - Float amount to increment the key by.
       - This only works with keys that contain float values in their string representation.
     type: float
-    required: false
 
 
 extends_documentation_fragment:

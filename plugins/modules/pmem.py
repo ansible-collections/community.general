@@ -36,7 +36,6 @@ options:
     description:
       - Create AppDirect capacity that is interleaved any other PMem modules.
     type: bool
-    required: false
     default: true
   memorymode:
     description:
@@ -48,7 +47,6 @@ options:
         and is presented as reserved capacity with Show Device and Show Memory Resources Commands.
       - O(reserved) is set automatically if this is not configured.
     type: int
-    required: false
   socket:
     description:
       - This enables to set the configuration for each socket by using the socket ID.
@@ -69,7 +67,6 @@ options:
         description:
           - Create AppDirect capacity that is interleaved any other PMem modules within the socket ID.
         type: bool
-        required: false
         default: true
       memorymode:
         description:
@@ -96,7 +93,6 @@ options:
         description:
           - The type of namespace. The detail of the type is in the man page of ndctl-create-namespace.
         type: str
-        required: false
         choices: ['pmem', 'blk']
       size:
         description:
@@ -105,14 +101,12 @@ options:
           - This option is required if multiple namespaces are configured.
           - If this option is not set, all of the available space of a region is configured.
         type: str
-        required: false
   namespace_append:
     description:
       - Enable to append the new namespaces to the system.
       - The default is V(false) so the all existing namespaces not listed in O(namespace) are removed.
     type: bool
     default: false
-    required: false
 """
 
 RETURN = r"""

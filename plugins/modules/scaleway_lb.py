@@ -85,14 +85,12 @@ options:
     type: int
     description:
       - Time to wait for the load-balancer to reach the expected state.
-    required: false
     default: 300
 
   wait_sleep_time:
     type: int
     description:
       - Time to wait before every attempt to check the state of the load-balancer.
-    required: false
     default: 3
 """
 

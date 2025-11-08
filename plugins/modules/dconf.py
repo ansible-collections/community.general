@@ -55,7 +55,6 @@ options:
       - A dconf key to modify or read from the dconf database.
   value:
     type: raw
-    required: false
     description:
       - Value to set for the specified dconf key. Value should be specified in GVariant format. Due to complexity of this
         format, it is best to have a look at existing values in the dconf database.
@@ -65,7 +64,6 @@ options:
         is why the type of this parameter is "raw").
   state:
     type: str
-    required: false
     default: present
     choices: ['read', 'present', 'absent']
     description:

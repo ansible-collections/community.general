@@ -56,7 +56,6 @@ options:
     default: 10
     type: int
   resource_id:
-    required: false
     description:
       - ID of the System, Manager or Chassis to modify.
     type: str

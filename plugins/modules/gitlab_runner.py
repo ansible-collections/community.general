@@ -71,7 +71,6 @@ options:
     description:
       - Make sure that the runner with the same name exists with the same configuration or delete the runner with the same
         name.
-    required: false
     default: present
     choices: ["present", "absent"]
     type: str
@@ -95,21 +94,18 @@ options:
     description:
       - Define if the runners is immediately active after creation.
       - Mutually exclusive with O(paused).
-    required: false
     default: true
     type: bool
   paused:
     description:
       - Define if the runners is active or paused after creation.
       - Mutually exclusive with O(active).
-    required: false
     default: false
     type: bool
     version_added: 8.1.0
   locked:
     description:
       - Determines if the runner is locked or not.
-    required: false
     default: false
     type: bool
   access_level:
@@ -122,7 +118,6 @@ options:
       - Before community.general 8.0.0 the default was V(ref_protected). This was changed to no default in community.general
         8.0.0. If this option is not specified explicitly, GitLab uses V(not_protected) on creation, and the value set is
         not changed on any updates.
-    required: false
     choices: ["not_protected", "ref_protected"]
     type: str
   access_level_on_creation:
@@ -131,25 +126,21 @@ options:
       - If set to V(true), the value of O(access_level) is used for runner registration.
       - If set to V(false), GitLab registers the runner with the default access level.
       - The default of this option changed to V(true) in community.general 7.0.0. Before, it was V(false).
-    required: false
     default: true
     type: bool
     version_added: 6.3.0
   maximum_timeout:
     description:
       - The maximum time that a runner has to complete a specific job.
-    required: false
     default: 3600
     type: int
   run_untagged:
     description:
       - Run untagged jobs or not.
-    required: false
     default: true
     type: bool
   tag_list:
     description: The tags that apply to the runner.
-    required: false
     default: []
     type: list
     elements: str

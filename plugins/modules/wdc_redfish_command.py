@@ -60,29 +60,24 @@ options:
     default: 10
     type: int
   resource_id:
-    required: false
     description:
       - ID of the component to modify, such as V(Enclosure), V(IOModuleAFRU), V(PowerSupplyBFRU), V(FanExternalFRU3), or V(FanInternalFRU).
     type: str
     version_added: 5.4.0
   update_image_uri:
-    required: false
     description:
       - The URI of the image for the update.
     type: str
   update_creds:
-    required: false
     description:
       - The credentials for retrieving the update image.
     type: dict
     suboptions:
       username:
-        required: false
         description:
           - The username for retrieving the update image.
         type: str
       password:
-        required: false
         description:
           - The password for retrieving the update image.
         type: str

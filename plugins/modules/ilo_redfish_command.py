@@ -37,22 +37,18 @@ options:
       - Base URI of OOB controller.
     type: str
   username:
-    required: false
     description:
       - Username for authenticating to iLO.
     type: str
   password:
-    required: false
     description:
       - Password for authenticating to iLO.
     type: str
   auth_token:
-    required: false
     description:
       - Security token for authenticating to iLO.
     type: str
   timeout:
-    required: false
     description:
       - Timeout in seconds for HTTP requests to iLO.
     default: 60

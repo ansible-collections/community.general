@@ -68,12 +68,10 @@ options:
         description:
           - Specifies the ID of the project which the peering vpc belongs to.
         type: str
-        required: false
   description:
     description:
       - The description of vpc peering connection.
     type: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

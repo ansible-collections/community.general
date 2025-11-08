@@ -55,20 +55,17 @@ options:
   response_file:
     description:
       - Specifies the location of a response file to be used if package expects input on install.
-    required: false
     type: str
   zone:
     description:
       - Whether to install the package only in the current zone, or install it into all zones.
       - The installation into all zones works only if you are working with the global zone.
-    required: false
     default: "all"
     choices: ["current", "all"]
     type: str
   category:
     description:
       - Install/Remove category instead of a single package.
-    required: false
     type: bool
     default: false
 """

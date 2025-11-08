@@ -41,19 +41,16 @@ options:
     type: str
     description:
       - Message title.
-    required: false
   pri:
     type: str
     description:
       - Message priority (see U(https://pushover.net) for details).
-    required: false
     default: '0'
     choices: ['-2', '-1', '0', '1', '2']
   device:
     type: str
     description:
       - A device the message should be sent to. Multiple devices can be specified, separated by a comma.
-    required: false
     version_added: 1.2.0
 
 author:

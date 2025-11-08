@@ -59,21 +59,18 @@ options:
     choices: [digest, sasl]
     type: str
     default: "digest"
-    required: false
     version_added: 5.8.0
   auth_credential:
     description:
       - The authentication credential value. Depends on O(auth_scheme).
       - The format for O(auth_scheme=digest) is C(user:password), and the format for O(auth_scheme=sasl) is C(user:password).
     type: str
-    required: false
     version_added: 5.8.0
   use_tls:
     description:
       - Using TLS/SSL or not.
     type: bool
     default: false
-    required: false
     version_added: '6.5.0'
 requirements:
   - kazoo >= 2.1

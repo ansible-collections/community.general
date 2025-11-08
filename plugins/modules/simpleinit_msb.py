@@ -30,7 +30,6 @@ options:
     aliases: ['service']
   state:
     type: str
-    required: false
     choices: [running, started, stopped, restarted, reloaded]
     description:
       - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary. V(restarted) always bounces
@@ -39,7 +38,6 @@ options:
       - Note that V(reloaded) starts the service if it is not already started, even if your chosen init system would not normally.
   enabled:
     type: bool
-    required: false
     description:
       - Whether the service should start on boot.
       - At least one of O(state) and O(enabled) are required.

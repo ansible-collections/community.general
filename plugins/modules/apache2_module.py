@@ -34,11 +34,9 @@ options:
     description:
       - Identifier of the module as listed by C(apache2ctl -M). This is optional and usually determined automatically by the
         common convention of appending V(_module) to O(name) as well as custom exception for popular modules.
-    required: false
   force:
     description:
       - Force disabling of default modules and override Debian warnings.
-    required: false
     type: bool
     default: false
   state:

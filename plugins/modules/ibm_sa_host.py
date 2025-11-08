@@ -35,23 +35,19 @@ options:
   cluster:
     description:
       - The name of the cluster to include the host.
-    required: false
     type: str
   domain:
     description:
       - The domains the cluster is attached to. To include more than one domain, separate domain names with commas. To include
         all existing domains, use an asterisk (V(*)).
-    required: false
     type: str
   iscsi_chap_name:
     description:
       - The host's CHAP name identifier.
-    required: false
     type: str
   iscsi_chap_secret:
     description:
       - The password of the initiator used to authenticate to the system when CHAP is enable.
-    required: false
     type: str
 
 extends_documentation_fragment:

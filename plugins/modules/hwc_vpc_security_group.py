@@ -48,12 +48,10 @@ options:
       - Specifies the enterprise project ID. When creating a security group, associate the enterprise project ID with the
         security group.s.
     type: str
-    required: false
   vpc_id:
     description:
       - Specifies the resource ID of the VPC to which the security group belongs.
     type: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

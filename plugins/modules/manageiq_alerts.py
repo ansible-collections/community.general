@@ -29,7 +29,6 @@ options:
     description:
       - V(absent) - alert should not exist,
       - V(present) - alert should exist.
-    required: false
     choices: ['absent', 'present']
     default: 'present'
   description:

@@ -43,7 +43,6 @@ options:
   section_has_values:
     type: list
     elements: dict
-    required: false
     suboptions:
       option:
         type: str

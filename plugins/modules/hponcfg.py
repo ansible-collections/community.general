@@ -30,7 +30,6 @@ options:
   minfw:
     description:
       - The minimum firmware level needed.
-    required: false
     type: str
   executable:
     description:

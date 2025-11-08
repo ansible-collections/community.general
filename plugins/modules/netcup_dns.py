@@ -70,12 +70,10 @@ options:
   priority:
     description:
       - Record priority. Required for O(type=MX).
-    required: false
     type: int
   state:
     description:
       - Whether the record should exist or not.
-    required: false
     default: present
     choices: ['present', 'absent']
     type: str

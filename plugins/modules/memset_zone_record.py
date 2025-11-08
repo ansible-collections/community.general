@@ -48,7 +48,6 @@ options:
     type: int
     default: 0
   record:
-    required: false
     description:
       - The subdomain to create.
     type: str

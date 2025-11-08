@@ -42,13 +42,11 @@ options:
       - Is only used if the state would change, which is solely checked based on the name parameter. If, for example, the
         plugin is already installed, changing this has no effect.
       - For ES 1.x use O(url).
-    required: false
     type: str
   url:
     description:
       - Set exact URL to download the plugin from (Only works for ES 1.x).
       - For ES 2.x and higher, use src.
-    required: false
     type: str
   timeout:
     description:

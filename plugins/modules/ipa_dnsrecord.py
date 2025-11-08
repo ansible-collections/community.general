@@ -34,7 +34,6 @@ options:
       - The type of DNS record name.
       - Support for V(NS) was added in comunity.general 8.2.0.
       - Support for V(SSHFP) was added in community.general 9.1.0.
-    required: false
     default: 'A'
     choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT', 'SSHFP']
     type: str
@@ -74,11 +73,9 @@ options:
     description:
       - Set the TTL for the record.
       - Applies only when adding a new or changing the value of O(record_value) or O(record_values).
-    required: false
     type: int
   state:
     description: State to ensure.
-    required: false
     default: present
     choices: ["absent", "present"]
     type: str

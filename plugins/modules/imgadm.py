@@ -22,18 +22,15 @@ attributes:
     support: none
 options:
   force:
-    required: false
     type: bool
     description:
       - Force a given operation (where supported by imgadm(1M)).
   pool:
-    required: false
     default: zones
     description:
       - The zpool to import to or delete images from.
     type: str
   source:
-    required: false
     description:
       - URI for the image source.
     type: str
@@ -46,7 +43,6 @@ options:
     type: str
 
   type:
-    required: false
     choices: [imgapi, docker, dsapi]
     default: imgapi
     description:
@@ -54,7 +50,6 @@ options:
     type: str
 
   uuid:
-    required: false
     description:
       - Image UUID. Can either be a full UUID or V(*) for all images.
     type: str
