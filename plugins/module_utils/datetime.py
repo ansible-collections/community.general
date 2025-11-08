@@ -6,25 +6,17 @@
 from __future__ import annotations
 
 import datetime as _datetime
-import sys
-
-
-_USE_TIMEZONE = sys.version_info >= (3, 6)
 
 
 def ensure_timezone_info(value):
-    if not _USE_TIMEZONE or value.tzinfo is not None:
+    if value.tzinfo is not None:
         return value
     return value.astimezone(_datetime.timezone.utc)
 
 
 def fromtimestamp(value):
-    if _USE_TIMEZONE:
-        return _datetime.fromtimestamp(value, tz=_datetime.timezone.utc)
-    return _datetime.utcfromtimestamp(value)
+    return _datetime.fromtimestamp(value, tz=_datetime.timezone.utc)
 
 
 def now():
-    if _USE_TIMEZONE:
-        return _datetime.datetime.now(tz=_datetime.timezone.utc)
-    return _datetime.datetime.utcnow()
+    return _datetime.datetime.now(tz=_datetime.timezone.utc)
