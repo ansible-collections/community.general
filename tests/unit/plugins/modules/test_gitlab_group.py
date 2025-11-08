@@ -19,7 +19,6 @@ pytestmark = []
 try:
     from .gitlab import (
         GitlabModuleTestCase,
-        python_version_match_requirement,
         resp_get_group,
         resp_get_missing_group,
         resp_create_group,
@@ -29,8 +28,7 @@ try:
     )
 
     # GitLab module requirements
-    if python_version_match_requirement():
-        from gitlab.v4.objects import Group
+    from gitlab.v4.objects import Group
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing

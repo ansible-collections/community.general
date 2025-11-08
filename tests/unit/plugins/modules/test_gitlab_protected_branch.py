@@ -21,7 +21,6 @@ pytestmark = []
 try:
     from .gitlab import (
         GitlabModuleTestCase,
-        python_version_match_requirement,
         python_gitlab_module_version,
         python_gitlab_version_match_requirement,
         resp_get_protected_branch,
@@ -32,12 +31,12 @@ try:
     )
 
     # GitLab module requirements
-    if python_version_match_requirement():
-        from gitlab.v4.objects import Project  # noqa: F401, pylint: disable=unused-import
+    from gitlab.v4.objects import Project  # noqa: F401, pylint: disable=unused-import
+
     gitlab_req_version = python_gitlab_version_match_requirement()
     gitlab_module_version = python_gitlab_module_version()
     if LooseVersion(gitlab_module_version) < LooseVersion(gitlab_req_version):
-        pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing (Wrong  version)"))
+        pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing (Wrong version)"))
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
 
