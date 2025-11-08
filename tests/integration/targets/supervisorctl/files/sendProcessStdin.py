@@ -7,18 +7,14 @@
 from __future__ import annotations
 
 import sys
+from xmlrpc.client import ServerProxy
+from urllib.parse import quote
+
 
 proc = sys.argv[1]
 value = sys.argv[2]
 username = sys.argv[3]
 password = sys.argv[4]
-
-if sys.version_info[0] == 2:
-    from xmlrpclib import ServerProxy
-    from urllib import quote
-else:
-    from xmlrpc.client import ServerProxy
-    from urllib.parse import quote
 
 if username:
     url = 'http://%s:%s@127.0.0.1:9001/RPC2' % (quote(username, safe=''), quote(password, safe=''))
