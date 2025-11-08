@@ -901,10 +901,10 @@ class RhsmPool:
         return str(self.__getattribute__("_name"))
 
     def get_pool_id(self):
-        return getattr(self, "PoolId", getattr(self, "PoolID"))
+        return getattr(self, "PoolId", self.PoolID)
 
     def get_quantity_used(self):
-        return int(getattr(self, "QuantityUsed"))
+        return int(self.QuantityUsed)
 
     def subscribe(self):
         args = f"subscription-manager attach --pool {self.get_pool_id()}"

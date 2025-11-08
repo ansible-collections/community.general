@@ -455,7 +455,7 @@ def delete_target(module, headers):
         )
 
         status = info.get("status", 0)
-        if not status == 200:
+        if status != 200:
             module.fail_json(msg=f"Failed to delete: HTTP {status}, {response}, {headers}")
 
     except Exception as e:
@@ -605,7 +605,7 @@ def run_module():
     does_exist = target_exists(module)
 
     # Check if the credential/domain doesn't exist and the user wants to delete
-    if not does_exist and state == "absent" and not type == "token":
+    if not does_exist and state == "absent" and type != "token":
         result["changed"] = False
         result["msg"] = f"{id} does not exist."
         module.exit_json(**result)
@@ -762,7 +762,7 @@ def run_module():
 
             payload = {"credentials": credentials}
 
-        if not type == "file" and not type == "token":
+        if type != "file" and type != "token":
             body = urlencode({"json": json.dumps(payload)})
 
     else:  # Delete
@@ -770,7 +770,7 @@ def run_module():
 
         module.exit_json(changed=True, msg=f"{id} deleted successfully.")
 
-    if not type == "scope" and not scope == "_":  # Check if custom scope exists if adding to a custom scope
+    if type != "scope" and scope != "_":  # Check if custom scope exists if adding to a custom scope
         if not target_exists(module, True):
             module.fail_json(msg=f"Domain {scope} doesn't exists")
 
@@ -781,7 +781,7 @@ def run_module():
 
     status = info.get("status", 0)
 
-    if not status == 200:
+    if status != 200:
         body = response.read() if response else b""
         module.fail_json(
             msg=f"Failed to {'add/update' if state == 'present' else 'delete'} credential",

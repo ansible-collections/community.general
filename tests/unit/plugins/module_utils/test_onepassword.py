@@ -32,7 +32,7 @@ def test_op_config(mocker, os_expanduser):
     mocker.patch("os.path.exists", side_effect=[False, True])
     op_config = OnePasswordConfig()
 
-    assert "/home/testuser/.config/op/config" == op_config.config_file_path
+    assert op_config.config_file_path == "/home/testuser/.config/op/config"
 
 
 def test_op_no_config(mocker, os_expanduser):

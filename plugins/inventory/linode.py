@@ -151,7 +151,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             access_token = self.templar.template(variable=access_token)
 
         if access_token is None:
-            raise AnsibleError(("Could not retrieve Linode access token from plugin configuration sources"))
+            raise AnsibleError("Could not retrieve Linode access token from plugin configuration sources")
 
         self.client = LinodeClient(access_token)
 

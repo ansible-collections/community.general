@@ -119,5 +119,5 @@ class CallbackModule(Default):
             tzinfo = ZoneInfo(self.get_option("timezone"))
 
         # Inject options into the display object
-        setattr(self._display, "timestamp_tzinfo", tzinfo)
-        setattr(self._display, "timestamp_format_string", self.get_option("format_string"))
+        self._display.timestamp_tzinfo = tzinfo
+        self._display.timestamp_format_string = self.get_option("format_string")

@@ -2878,7 +2878,7 @@ def main():
 
     # team checks
     if nmcli.type == "team":
-        if nmcli.runner_hwaddr_policy and not nmcli.runner == "activebackup":
+        if nmcli.runner_hwaddr_policy and nmcli.runner != "activebackup":
             nmcli.module.fail_json(msg="Runner-hwaddr-policy is only allowed for runner activebackup")
         if nmcli.runner_fast_rate is not None and nmcli.runner != "lacp":
             nmcli.module.fail_json(msg="runner-fast-rate is only allowed for runner lacp")
