@@ -25,7 +25,6 @@ options:
   opendj_bindir:
     description:
       - The path to the bin directory of OpenDJ.
-    required: false
     default: /opt/opendj/bin
     type: path
   hostname:
@@ -40,21 +39,18 @@ options:
     type: str
   username:
     description:
-      - The username to connect to.
-    required: false
+      - The username to connect with.
     default: cn=Directory Manager
     type: str
   password:
     description:
-      - The password for the C(cn=Directory Manager) user.
-      - Either password or passwordfile is needed.
-    required: false
+      - The password for O(username).
+      - Either O(password) or O(passwordfile) is needed.
     type: str
   passwordfile:
     description:
-      - Location to the password file which holds the password for the C(cn=Directory Manager) user.
-      - Either password or passwordfile is needed.
-    required: false
+      - Location to the password file which holds the password for O(username).
+      - Either O(password) or O(passwordfile) is needed.
     type: path
   backend:
     description:
@@ -74,7 +70,6 @@ options:
   state:
     description:
       - If configuration needs to be added/updated.
-    required: false
     default: "present"
     type: str
 """
