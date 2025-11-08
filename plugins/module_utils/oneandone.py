@@ -38,7 +38,7 @@ def get_resource(oneandone_conn, resource_type, resource_id):
         "vpn": oneandone_conn.get_vpn,
     }
 
-    return switcher.get(resource_type, None)(resource_id)
+    return switcher.get(resource_type)(resource_id)
 
 
 def get_datacenter(oneandone_conn, datacenter, full_object=False):

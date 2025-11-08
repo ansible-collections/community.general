@@ -431,7 +431,7 @@ class Homebrew:
         if len(package_names) != 1:
             self.failed = True
             self.message = (
-                f"Package names for {name} are missing or ambiguous: {', '.join((str(p) for p in package_names))}"
+                f"Package names for {name} are missing or ambiguous: {', '.join(str(p) for p in package_names)}"
             )
             raise HomebrewException(self.message)
 

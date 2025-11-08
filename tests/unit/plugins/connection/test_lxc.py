@@ -49,7 +49,7 @@ def lxc(request):
 
         from ansible_collections.community.general.plugins.connection import lxc as lxc_plugin_module
 
-        assert lxc_plugin_module.HAS_LIBLXC == liblxc_present
+        assert liblxc_present == lxc_plugin_module.HAS_LIBLXC
         assert bool(getattr(lxc_plugin_module, "_lxc", None)) == liblxc_present
 
         yield lxc_plugin_module

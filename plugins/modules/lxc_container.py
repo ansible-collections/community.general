@@ -857,7 +857,7 @@ class LxcContainerManagement:
 
         if self._container_exists(container_name=self.container_name, lxc_path=self.lxc_path):
             return str(self.container.state).lower()
-        return str("absent")
+        return "absent"
 
     def _execute_command(self):
         """Execute a shell command."""

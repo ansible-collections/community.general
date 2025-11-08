@@ -756,7 +756,7 @@ def main():
                 cmd=" ".join(command),
             )
         # checks out to decide if changes were made during execution
-        if " 0 added, 0 changed" not in out and not state == "absent" or " 0 destroyed" not in out:
+        if " 0 added, 0 changed" not in out and state != "absent" or " 0 destroyed" not in out:
             changed = True
 
     if no_color:

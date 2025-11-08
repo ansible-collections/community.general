@@ -197,7 +197,7 @@ class SimpleinitMSB:
 
         (rc, out, err) = self.execute_command(f"{self.telinit_cmd} {self.enable}d")
 
-        service_enabled = False if self.enable else True
+        service_enabled = not self.enable
 
         rex = re.compile(rf"^{self.name}$")
 

@@ -413,7 +413,7 @@ class HAProxy:
         haproxy_version = self.discover_version()
 
         # check if haproxy version supports DRAIN state (starting with 1.5)
-        if haproxy_version and (1, 5) <= haproxy_version:
+        if haproxy_version and haproxy_version >= (1, 5):
             cmd = "set server $pxname/$svname state drain"
             self.execute_for_backends(cmd, backend, host, "DRAIN")
             if status == "MAINT":

@@ -792,7 +792,7 @@ def main():
             ("state", "after", ["new_control", "new_type", "new_module_path"]),
         ],
     )
-    content = str()
+    content = ""
     fname = os.path.join(module.params["path"], module.params["name"])
 
     # Open the file and read the content or fail

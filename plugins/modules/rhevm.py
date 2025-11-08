@@ -1078,14 +1078,13 @@ class RHEV:
 
     def setDisks(self, name, disks):
         self.__get_conn()
-        counter = 0
         bootselect = False
         for disk in disks:
             if "bootable" in disk:
                 if disk["bootable"] is True:
                     bootselect = True
 
-        for disk in disks:
+        for counter, disk in enumerate(disks):
             diskname = f"{name}_Disk{counter}_{disk.get('name', '').replace('/', '_')}"
             disksize = disk.get("size", 1)
             diskdomain = disk.get("domain", None)
@@ -1110,7 +1109,6 @@ class RHEV:
             else:
                 self.conn.set_Disk(diskname, disksize, diskinterface, diskboot)
             checkFail()
-            counter += 1
 
         return True
 

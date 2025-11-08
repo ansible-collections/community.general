@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import sys
 from unittest.mock import patch
 
 from ansible.module_utils.common.dict_transformations import dict_merge
@@ -41,10 +40,6 @@ class TestPritunlUser(ModuleTestCase):
     def setUp(self):
         super().setUp()
         self.module = pritunl_user
-
-        # Add backward compatibility
-        if sys.version_info < (3, 2):
-            self.assertRegex = self.assertRegexpMatches
 
     def tearDown(self):
         super().tearDown()

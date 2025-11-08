@@ -252,7 +252,7 @@ def get_otptoken_dict(
     if owner is not None:
         otptoken[ansible_to_ipa["owner"]] = owner
     if enabled is not None:
-        otptoken[ansible_to_ipa["enabled"]] = False if enabled else True
+        otptoken[ansible_to_ipa["enabled"]] = not enabled
     if notbefore is not None:
         otptoken[ansible_to_ipa["notbefore"]] = f"{notbefore}Z"
     if notafter is not None:
