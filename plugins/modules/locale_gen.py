@@ -164,8 +164,8 @@ class LocaleGen(StateModuleHelper):
                 with open(locale_path, "r") as fd:
                     self.vars.available_lines.extend(fd.readlines())
 
-        re_compiled = re.compile(r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$")
-        available_locale_entry_re_matches.extend([re_compiled.match(line) for line in self.vars.available_lines])
+        re_locale_entry = re.compile(r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$")
+        available_locale_entry_re_matches.extend([re_locale_entry.match(line) for line in self.vars.available_lines])
 
         locales_not_found = []
         for locale in self.vars.name:
