@@ -189,7 +189,7 @@ class OpenNebulaModule:
         if "cluster_name" in self.module.params:
             clusters = self.one.clusterpool.info()
             for cluster in clusters.CLUSTER:
-                if cluster.NAME == self.module.params.get("cluster_name"):
+                if self.module.params.get("cluster_name") == cluster.NAME:
                     resolved_params["cluster_id"] = cluster.ID
 
         return resolved_params
@@ -223,7 +223,7 @@ class OpenNebulaModule:
         """
         hosts = self.one.hostpool.info()
         for h in hosts.HOST:
-            if h.NAME == name:
+            if name == h.NAME:
                 return h
         return None
 
@@ -238,7 +238,7 @@ class OpenNebulaModule:
 
         clusters = self.one.clusterpool.info()
         for c in clusters.CLUSTER:
-            if c.NAME == name:
+            if name == c.NAME:
                 return c
         return None
 
@@ -253,7 +253,7 @@ class OpenNebulaModule:
         """
         templates = self.one.templatepool.info()
         for t in templates.TEMPLATE:
-            if t.NAME == name:
+            if name == t.NAME:
                 return t
         return None
 
@@ -305,7 +305,7 @@ class OpenNebulaModule:
                 intersection[dkey] = current[dkey]
             else:
                 return True
-        return not (desired == intersection)
+        return desired != intersection
 
     def wait_for_state(
         self,

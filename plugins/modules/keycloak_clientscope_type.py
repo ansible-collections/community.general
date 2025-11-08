@@ -185,7 +185,7 @@ def clientscopes_to_add(existing, proposed):
     to_add = []
     existing_clientscope_ids = extract_field(existing, "id")
     for clientscope in proposed:
-        if not clientscope["id"] in existing_clientscope_ids:
+        if clientscope["id"] not in existing_clientscope_ids:
             to_add.append(clientscope)
     return to_add
 
@@ -194,7 +194,7 @@ def clientscopes_to_delete(existing, proposed):
     to_delete = []
     proposed_clientscope_ids = extract_field(proposed, "id")
     for clientscope in existing:
-        if not clientscope["id"] in proposed_clientscope_ids:
+        if clientscope["id"] not in proposed_clientscope_ids:
             to_delete.append(clientscope)
     return to_delete
 

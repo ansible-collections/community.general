@@ -231,7 +231,7 @@ class pulp_server:
                 if key not in distributor["config"].keys():
                     return False
 
-                if not distributor["config"][key] == value:
+                if distributor["config"][key] != value:
                     return False
 
         return True
@@ -245,7 +245,7 @@ class pulp_server:
                     if key not in importer["config"].keys():
                         return False
 
-                    if not importer["config"][key] == value:
+                    if importer["config"][key] != value:
                         return False
 
         return True

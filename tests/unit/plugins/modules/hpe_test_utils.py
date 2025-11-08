@@ -47,7 +47,7 @@ class OneViewBaseTest:
     def test_main_function_should_call_run_method(self, testing_module, mock_ansible_module):
         mock_ansible_module.params = {"config": "config.json"}
 
-        main_func = getattr(testing_module, "main")
+        main_func = testing_module.main
 
         with patch.object(self.testing_class, "run") as mock_run:
             main_func()
@@ -125,7 +125,7 @@ class OneViewBaseTestCase:
     def test_main_function_should_call_run_method(self):
         self.mock_ansible_module.params = {"config": "config.json"}
 
-        main_func = getattr(self.testing_module, "main")
+        main_func = self.testing_module.main
 
         with patch.object(self.testing_class, "run") as mock_run:
             main_func()

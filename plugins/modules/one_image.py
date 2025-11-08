@@ -466,10 +466,10 @@ class ImageModule(OpenNebulaModule):
         return None
 
     def get_image_by_name(self, image_name):
-        return self.get_image(lambda image: (image.NAME == image_name))
+        return self.get_image(lambda image: (image_name == image.NAME))
 
     def get_image_by_id(self, image_id):
-        return self.get_image(lambda image: (image.ID == image_id))
+        return self.get_image(lambda image: (image_id == image.ID))
 
     def get_image_instance(self, requested_id, requested_name):
         # Using 'if requested_id:' doesn't work properly when requested_id=0
@@ -589,7 +589,7 @@ class ImageModule(OpenNebulaModule):
             result["changed"] = False
             return result
 
-        if image.STATE == IMAGE_STATES.index("DISABLED"):
+        if IMAGE_STATES.index("DISABLED") == image.STATE:
             self.module.fail_json(msg="Cannot clone DISABLED image")
 
         if not self.module.check_mode:

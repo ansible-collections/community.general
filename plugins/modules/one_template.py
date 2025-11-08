@@ -226,10 +226,10 @@ class TemplateModule(OpenNebulaModule):
         return None
 
     def get_template_by_id(self, template_id, filter):
-        return self.get_template(lambda template: (template.ID == template_id), filter)
+        return self.get_template(lambda template: (template_id == template.ID), filter)
 
     def get_template_by_name(self, name, filter):
-        return self.get_template(lambda template: (template.NAME == name), filter)
+        return self.get_template(lambda template: (name == template.NAME), filter)
 
     def get_template_instance(self, requested_id, requested_name, filter):
         if requested_id:
@@ -270,7 +270,7 @@ class TemplateModule(OpenNebulaModule):
             result["changed"] = True
         else:
             # if the previous parsed template data is not equal to the updated one, this has changed
-            result["changed"] = template.TEMPLATE != result["template"]
+            result["changed"] = result["template"] != template.TEMPLATE
 
         return result
 

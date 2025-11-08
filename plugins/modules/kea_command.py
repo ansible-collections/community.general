@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Copyright © Thorsten Glaser <tglaser@b1-systems.de>

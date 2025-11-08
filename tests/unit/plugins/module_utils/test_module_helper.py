@@ -44,7 +44,7 @@ def test_cause_changes_deco(deco_args, expect_exception, expect_changed):
 
     mh = MockMH()
     if expect_exception:
-        with pytest.raises(Exception):
+        with pytest.raises(ZeroDivisionError):
             mh.div_(1, 0)
     else:
         mh.div_(9, 3)

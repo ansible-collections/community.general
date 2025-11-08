@@ -411,15 +411,15 @@ def test_populate(inventory, mocker):
     assert group_centos.hosts == [host_gitlab]
 
     # check IPv4 address
-    assert "172.22.4.187" == host_sam.get_vars()["v4_first_ip"]
+    assert host_sam.get_vars()["v4_first_ip"] == "172.22.4.187"
 
     # check IPv6 address
-    assert "2000:a001::b9ff:feae:aa0d" == host_zabbix.get_vars()["v6_first_ip"]
+    assert host_zabbix.get_vars()["v6_first_ip"] == "2000:a001::b9ff:feae:aa0d"
 
     # check ansible_hosts
-    assert "172.22.4.187" == host_sam.get_vars()["ansible_host"]
-    assert "185.165.1.1" == host_zabbix.get_vars()["ansible_host"]
-    assert "185.165.1.3" == host_gitlab.get_vars()["ansible_host"]
+    assert host_sam.get_vars()["ansible_host"] == "172.22.4.187"
+    assert host_zabbix.get_vars()["ansible_host"] == "185.165.1.1"
+    assert host_gitlab.get_vars()["ansible_host"] == "185.165.1.3"
 
     # check for custom ssh port
-    assert "8822" == host_gitlab.get_vars()["ansible_port"]
+    assert host_gitlab.get_vars()["ansible_port"] == "8822"

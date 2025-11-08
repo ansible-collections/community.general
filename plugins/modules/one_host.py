@@ -282,7 +282,7 @@ class HostModule(OpenNebulaModule):
                     self.fail(msg=f"Failed to update the host template, ERROR: {e}")
 
             # the cluster
-            if host.CLUSTER_ID != self.get_parameter("cluster_id"):
+            if self.get_parameter("cluster_id") != host.CLUSTER_ID:
                 # returns cluster id in int
                 try:
                     one.cluster.addhost(self.get_parameter("cluster_id"), host.ID)

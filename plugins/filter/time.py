@@ -56,10 +56,8 @@ def to_time_unit(human_time, unit="ms", **kwargs):
     unit = unit_to_short_form.get(unit.rstrip("s"), unit)
     if unit not in unit_factors:
         raise AnsibleFilterError(
-            (
-                f"to_time_unit() can not convert to the following unit: {unit}. Available units (singular or plural):"
-                f"{', '.join(unit_to_short_form.keys())}. Available short units: {', '.join(unit_factors.keys())}"
-            )
+            f"to_time_unit() can not convert to the following unit: {unit}. Available units (singular or plural):"
+            f"{', '.join(unit_to_short_form.keys())}. Available short units: {', '.join(unit_factors.keys())}"
         )
 
     if "year" in kwargs:

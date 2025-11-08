@@ -499,8 +499,8 @@ class GitLabUser:
 
         for identity in identities:
             if identity not in user.identities:
-                setattr(user, "provider", identity["provider"])
-                setattr(user, "extern_uid", identity["extern_uid"])
+                user.provider = identity["provider"]
+                user.extern_uid = identity["extern_uid"]
                 if not self._module.check_mode:
                     user.save()
                 changed = True

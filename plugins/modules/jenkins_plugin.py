@@ -332,7 +332,6 @@ state:
 """
 
 import hashlib
-import io
 import json
 import os
 import tempfile
@@ -770,7 +769,7 @@ class JenkinsPlugin:
 
         # Open the updates file
         try:
-            f = io.open(tmp_updates_file, encoding="utf-8")
+            f = open(tmp_updates_file, encoding="utf-8")
 
             # Read only the second line
             dummy = f.readline()
