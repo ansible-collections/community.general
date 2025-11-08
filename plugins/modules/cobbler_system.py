@@ -278,7 +278,7 @@ def main():
         if system:
             # Update existing entry
             system_id = ""
-            if LooseVersion(str(conn.version())) >= LooseVersion("3.4"):
+            if LooseVersion(str(conn.version())) >= LooseVersion("3.400"):
                 system_id = conn.get_system_handle(name)
             else:
                 system_id = conn.get_system_handle(name, token)
