@@ -2409,6 +2409,7 @@ class RedfishUtils:
             return {"ret": False, "msg": "Key BootOrder not found"}
 
         boot = data["Boot"]
+        # boot_order = boot["BootOrder"] - TODO is this needed?
         boot_options_dict = self._get_boot_options_dict(boot)
 
         # Verify the requested boot options are valid
