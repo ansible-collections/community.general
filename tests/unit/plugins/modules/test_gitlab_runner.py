@@ -22,7 +22,6 @@ try:
     from .gitlab import (
         FakeAnsibleModule,
         GitlabModuleTestCase,
-        python_version_match_requirement,
         resp_find_runners_all,
         resp_find_runners_list,
         resp_find_project_runners,
@@ -35,8 +34,7 @@ try:
     )
 
     # GitLab module requirements
-    if python_version_match_requirement():
-        from gitlab.v4.objects import Runner
+    from gitlab.v4.objects import Runner
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing

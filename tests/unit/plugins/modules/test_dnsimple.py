@@ -12,12 +12,8 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 )
 from unittest.mock import patch
 import pytest
-import sys
 
 dnsimple = pytest.importorskip("dnsimple")
-mandatory_py_version = pytest.mark.skipif(
-    sys.version_info < (3, 6), reason="The dnsimple dependency requires python3.6 or higher"
-)
 
 from dnsimple import DNSimpleException
 

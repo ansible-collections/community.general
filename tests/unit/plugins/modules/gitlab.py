@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
 
 from httmock import response  # noqa
@@ -27,20 +26,9 @@ class FakeAnsibleModule:
 
 class GitlabModuleTestCase(unittest.TestCase):
     def setUp(self):
-        unitest_python_version_check_requirement(self)
-
         self.mock_module = FakeAnsibleModule()
 
         self.gitlab_instance = gitlab.Gitlab("http://localhost", private_token="private_token", api_version=4)
-
-
-# Python 2.7+ is needed for python-gitlab
-GITLAB_MINIMUM_PYTHON_VERSION = (2, 7)
-
-
-# Verify if the current Python version is higher than GITLAB_MINIMUM_PYTHON_VERSION
-def python_version_match_requirement():
-    return sys.version_info >= GITLAB_MINIMUM_PYTHON_VERSION
 
 
 def python_gitlab_module_version():
@@ -49,14 +37,6 @@ def python_gitlab_module_version():
 
 def python_gitlab_version_match_requirement():
     return "2.3.0"
-
-
-# Skip unittest test case if python version don't match requirement
-def unitest_python_version_check_requirement(unittest_testcase):
-    if not python_version_match_requirement():
-        unittest_testcase.skipTest(
-            f"Python {'.'.join(map(str, GITLAB_MINIMUM_PYTHON_VERSION))}+ is needed for python-gitlab"
-        )
 
 
 """

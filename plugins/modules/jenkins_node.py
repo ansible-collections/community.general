@@ -145,7 +145,6 @@ configured:
   type: bool
 """
 
-import sys
 import traceback
 from xml.etree import ElementTree as et
 
@@ -158,9 +157,6 @@ with deps.declare(
     url="https://opendev.org/jjb/python-jenkins",
 ):
     import jenkins
-
-
-IS_PYTHON_2 = sys.version_info[0] <= 2
 
 
 class JenkinsNode:
@@ -246,10 +242,7 @@ class JenkinsNode:
                 configured = True
 
         if configured:
-            if IS_PYTHON_2:
-                data = et.tostring(root)
-            else:
-                data = et.tostring(root, encoding="unicode")
+            data = et.tostring(root, encoding="unicode")
 
             self.instance.reconfig_node(self.name, data)
 
