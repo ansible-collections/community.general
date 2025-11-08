@@ -24,6 +24,7 @@
   ansible.builtin.copy:
     src: /etc/locale.gen
     dest: /etc/locale.gen.bkp
+    remote_src: true
 
 - name: Add line to /etc/locale.gen
   ansible.builtin.shell: >
@@ -77,3 +78,4 @@
   ansible.builtin.copy:
     src: /etc/locale.gen.bkp
     dest: /etc/locale.gen
+    remote_src: true
