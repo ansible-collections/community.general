@@ -34,17 +34,20 @@ options:
       - Whether the locales shall be present.
     choices: [absent, present]
     default: present
+
 notes:
+  - Currently the module is B(only supported for Debian, Ubuntu, and Archlinux) systems.
+  - This module requires the package C(locales) installed in Debian and Ubuntu systems.
   - If C(/etc/locale.gen) exists, the module assumes to be using the B(glibc) mechanism, else if C(/var/lib/locales/supported.d/)
     exists it assumes to be using the B(ubuntu_legacy) mechanism, else it raises an error.
-  - When using glibc mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
-  - When using ubuntu_legacy mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running
+  - When using V(glibc) mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
+  - When using V(ubuntu_legacy) mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running
     C(locale-gen).
-  - Please note that the code path that uses ubuntu_legacy mechanism has not been tested for a while, because Ubuntu is already
-    using the glibc mechanism. There is no support for that, given our inability to test it. Therefore, that mechanism is
-    B(deprecated) and will be removed in community.general 13.0.0.
-  - Currently the module is B(only supported for Debian and Ubuntu) systems.
-  - This module requires the package C(locales) installed in Debian and Ubuntu systems.
+  - Please note that the module asserts the availability of the locale by checking the files C(/usr/share/i18n/SUPPORTED) and
+    C(/usr/local/share/i18n/SUPPORTED), but the C(/usr/local) one is not supported by Archlinux.
+  - Please note that the code path that uses V(ubuntu_legacy) mechanism has not been tested for a while, because recent versions of
+    Ubuntu is already using the V(glibc) mechanism. There is no support for V(ubuntu_legacy), given our inability to test it.
+    Therefore, that mechanism is B(deprecated) and will be removed in community.general 13.0.0.
 """
 
 EXAMPLES = r"""
