@@ -31,9 +31,8 @@ class TestPagerDutyChangeModule(ModuleTestCase):
         return mocker.patch("ansible.module_utils.monitoring.pagerduty_change.fetch_url")
 
     def test_module_fail_when_required_args_missing(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            self.module.main()
 
     def test_ensure_change_event_created_with_minimal_data(self):
         with set_module_args({"integration_key": "test", "summary": "Testing"}):

@@ -1,0 +1,2 @@
+bugfixes:
+  - decompress - improve Python code by consolidating ``with`` statements (https://github.com/ansible-collections/community.general/pull/11051).

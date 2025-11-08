@@ -57,9 +57,11 @@ def _mock_good_connection():
 @contextmanager
 def patch_keycloak_api(get_user_by_username=None, send_execute_actions_email=None):
     obj = module_under_test.KeycloakAPI
-    with patch.object(obj, "get_user_by_username", side_effect=get_user_by_username) as m_get_user:
-        with patch.object(obj, "send_execute_actions_email", side_effect=send_execute_actions_email) as m_send:
-            yield m_get_user, m_send
+    with (
+        patch.object(obj, "get_user_by_username", side_effect=get_user_by_username) as m_get_user,
+        patch.object(obj, "send_execute_actions_email", side_effect=send_execute_actions_email) as m_send,
+    ):
+        yield m_get_user, m_send
 
 
 class TestKeycloakUserExecuteActionsEmail(ModuleTestCase):
@@ -78,14 +80,16 @@ class TestKeycloakUserExecuteActionsEmail(ModuleTestCase):
             "username": "jdoe",
         }
 
-        with set_module_args(module_args):
-            with _mock_good_connection():
-                with patch_keycloak_api(
-                    get_user_by_username=lambda **kwargs: {"id": "uid-123", "username": "jdoe"},
-                    send_execute_actions_email=lambda **kwargs: None,
-                ) as (m_get_user, m_send):
-                    with self.assertRaises(AnsibleExitJson) as result:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            _mock_good_connection(),
+            patch_keycloak_api(
+                get_user_by_username=lambda **kwargs: {"id": "uid-123", "username": "jdoe"},
+                send_execute_actions_email=lambda **kwargs: None,
+            ) as (m_get_user, m_send),
+            self.assertRaises(AnsibleExitJson) as result,
+        ):
+            self.module.main()
 
         data = result.exception.args[0]
         self.assertTrue(data["changed"])
@@ -105,14 +109,16 @@ class TestKeycloakUserExecuteActionsEmail(ModuleTestCase):
             "username": "missing",
         }
 
-        with set_module_args(module_args):
-            with _mock_good_connection():
-                with patch_keycloak_api(
-                    get_user_by_username=lambda **kwargs: None,
-                    send_execute_actions_email=lambda **kwargs: None,
-                ):
-                    with self.assertRaises(AnsibleFailJson) as result:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            _mock_good_connection(),
+            patch_keycloak_api(
+                get_user_by_username=lambda **kwargs: None,
+                send_execute_actions_email=lambda **kwargs: None,
+            ),
+            self.assertRaises(AnsibleFailJson) as result,
+        ):
+            self.module.main()
         data = result.exception.args[0]
         self.assertIn("User 'missing' not found", data["msg"])
 

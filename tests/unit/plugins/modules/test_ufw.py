@@ -176,19 +176,21 @@ class TestUFW(unittest.TestCase):
         self.assertTrue(result.exception.args[0]["changed"])
 
     def test_check_mode_add_ambiguous_route(self):
-        with set_module_args(
-            {
-                "rule": "allow",
-                "route": "yes",
-                "interface_in": "foo",
-                "interface_out": "bar",
-                "direction": "in",
-                "interface": "baz",
-                "_ansible_check_mode": True,
-            }
+        with (
+            set_module_args(
+                {
+                    "rule": "allow",
+                    "route": "yes",
+                    "interface_in": "foo",
+                    "interface_out": "bar",
+                    "direction": "in",
+                    "interface": "baz",
+                    "_ansible_check_mode": True,
+                }
+            ),
+            self.assertRaises(AnsibleFailJson) as result,
         ):
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.__getResult(do_nothing_func_port_7000)
+            self.__getResult(do_nothing_func_port_7000)
 
         exc = result.exception.args[0]
         self.assertTrue(exc["failed"])
@@ -209,18 +211,20 @@ class TestUFW(unittest.TestCase):
         self.assertTrue(result.exception.args[0]["changed"])
 
     def test_check_mode_add_non_route_interface_both(self):
-        with set_module_args(
-            {
-                "rule": "allow",
-                "proto": "tcp",
-                "port": "7004",
-                "interface_in": "foo",
-                "interface_out": "bar",
-                "_ansible_check_mode": True,
-            }
+        with (
+            set_module_args(
+                {
+                    "rule": "allow",
+                    "proto": "tcp",
+                    "port": "7004",
+                    "interface_in": "foo",
+                    "interface_out": "bar",
+                    "_ansible_check_mode": True,
+                }
+            ),
+            self.assertRaises(AnsibleFailJson) as result,
         ):
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.__getResult(do_nothing_func_port_7000)
+            self.__getResult(do_nothing_func_port_7000)
 
         exc = result.exception.args[0]
         self.assertTrue(exc["failed"])

@@ -23,9 +23,8 @@ from .linode_conftest import access_token, no_access_token_in_env, default_args,
 
 
 def test_mandatory_state_is_validated(capfd):
-    with pytest.raises(SystemExit):
-        with set_module_args({"label": "foo"}):
-            linode_v4.initialise_module()
+    with pytest.raises(SystemExit), set_module_args({"label": "foo"}):
+        linode_v4.initialise_module()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -35,9 +34,8 @@ def test_mandatory_state_is_validated(capfd):
 
 
 def test_mandatory_label_is_validated(capfd):
-    with pytest.raises(SystemExit):
-        with set_module_args({"state": "present"}):
-            linode_v4.initialise_module()
+    with pytest.raises(SystemExit), set_module_args({"state": "present"}):
+        linode_v4.initialise_module()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -47,9 +45,8 @@ def test_mandatory_label_is_validated(capfd):
 
 
 def test_mandatory_access_token_is_validated(default_args, no_access_token_in_env, capfd):
-    with pytest.raises(SystemExit):
-        with set_module_args(default_args):
-            linode_v4.initialise_module()
+    with pytest.raises(SystemExit), set_module_args(default_args):
+        linode_v4.initialise_module()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -93,9 +90,8 @@ def test_instance_by_label_cannot_authenticate(capfd, access_token, default_args
         client = LinodeClient(module.params["access_token"])
 
         target = "linode_api4.linode_client.LinodeGroup.instances"
-        with mock.patch(target, side_effect=LinodeApiError("foo")):
-            with pytest.raises(SystemExit):
-                linode_v4.maybe_instance_from_label(module, client)
+        with mock.patch(target, side_effect=LinodeApiError("foo")), pytest.raises(SystemExit):
+            linode_v4.maybe_instance_from_label(module, client)
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -118,9 +114,8 @@ def test_no_instances_found_with_label_gives_none(default_args, access_token):
 
 def test_optional_region_is_validated(default_args, capfd, access_token):
     default_args.update({"type": "foo", "image": "bar"})
-    with set_module_args(default_args):
-        with pytest.raises(SystemExit):
-            linode_v4.initialise_module()
+    with set_module_args(default_args), pytest.raises(SystemExit):
+        linode_v4.initialise_module()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -131,9 +126,8 @@ def test_optional_region_is_validated(default_args, capfd, access_token):
 
 def test_optional_type_is_validated(default_args, capfd, access_token):
     default_args.update({"region": "foo", "image": "bar"})
-    with set_module_args(default_args):
-        with pytest.raises(SystemExit):
-            linode_v4.initialise_module()
+    with set_module_args(default_args), pytest.raises(SystemExit):
+        linode_v4.initialise_module()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -144,9 +138,8 @@ def test_optional_type_is_validated(default_args, capfd, access_token):
 
 def test_optional_image_is_validated(default_args, capfd, access_token):
     default_args.update({"type": "foo", "region": "bar"})
-    with set_module_args(default_args):
-        with pytest.raises(SystemExit):
-            linode_v4.initialise_module()
+    with set_module_args(default_args), pytest.raises(SystemExit):
+        linode_v4.initialise_module()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -167,9 +160,8 @@ def test_private_ip_valid_values(default_args, access_token, value):
 @pytest.mark.parametrize("value", ["not-a-bool", 42])
 def test_private_ip_invalid_values(default_args, capfd, access_token, value):
     default_args.update({"private_ip": value})
-    with set_module_args(default_args):
-        with pytest.raises(SystemExit):
-            linode_v4.initialise_module()
+    with set_module_args(default_args), pytest.raises(SystemExit):
+        linode_v4.initialise_module()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -190,11 +182,10 @@ def test_private_ip_is_forwarded_to_linode(default_args, mock_linode, access_tok
     default_args.update({"private_ip": True})
     with set_module_args(default_args):
         target = "linode_api4.linode_client.LinodeGroup.instances"
-        with mock.patch(target, return_value=[]):
-            with pytest.raises(SystemExit):
-                target = "linode_api4.linode_client.LinodeGroup.instance_create"
-                with mock.patch(target, return_value=(mock_linode, "passw0rd")) as instance_create_mock:
-                    linode_v4.main()
+        with mock.patch(target, return_value=[]), pytest.raises(SystemExit):
+            target = "linode_api4.linode_client.LinodeGroup.instance_create"
+            with mock.patch(target, return_value=(mock_linode, "passw0rd")) as instance_create_mock:
+                linode_v4.main()
 
     args, kwargs = instance_create_mock.call_args
     assert kwargs["private_ip"] is True
@@ -204,9 +195,8 @@ def test_instance_already_created(default_args, mock_linode, capfd, access_token
     default_args.update({"type": "foo", "region": "bar", "image": "baz"})
     with set_module_args(default_args):
         target = "linode_api4.linode_client.LinodeGroup.instances"
-        with mock.patch(target, return_value=[mock_linode]):
-            with pytest.raises(SystemExit) as sys_exit_exc:
-                linode_v4.main()
+        with mock.patch(target, return_value=[mock_linode]), pytest.raises(SystemExit) as sys_exit_exc:
+            linode_v4.main()
 
     assert sys_exit_exc.value.code == 0
 
@@ -222,11 +212,10 @@ def test_instance_to_be_created_without_root_pass(default_args, mock_linode, cap
     default_args.update({"type": "foo", "region": "bar", "image": "baz"})
     with set_module_args(default_args):
         target = "linode_api4.linode_client.LinodeGroup.instances"
-        with mock.patch(target, return_value=[]):
-            with pytest.raises(SystemExit) as sys_exit_exc:
-                target = "linode_api4.linode_client.LinodeGroup.instance_create"
-                with mock.patch(target, return_value=(mock_linode, "passw0rd")):
-                    linode_v4.main()
+        with mock.patch(target, return_value=[]), pytest.raises(SystemExit) as sys_exit_exc:
+            target = "linode_api4.linode_client.LinodeGroup.instance_create"
+            with mock.patch(target, return_value=(mock_linode, "passw0rd")):
+                linode_v4.main()
 
     assert sys_exit_exc.value.code == 0
 
@@ -249,11 +238,10 @@ def test_instance_to_be_created_with_root_pass(default_args, mock_linode, capfd,
     )
     with set_module_args(default_args):
         target = "linode_api4.linode_client.LinodeGroup.instances"
-        with mock.patch(target, return_value=[]):
-            with pytest.raises(SystemExit) as sys_exit_exc:
-                target = "linode_api4.linode_client.LinodeGroup.instance_create"
-                with mock.patch(target, return_value=mock_linode):
-                    linode_v4.main()
+        with mock.patch(target, return_value=[]), pytest.raises(SystemExit) as sys_exit_exc:
+            target = "linode_api4.linode_client.LinodeGroup.instance_create"
+            with mock.patch(target, return_value=mock_linode):
+                linode_v4.main()
 
     assert sys_exit_exc.value.code == 0
 
@@ -269,9 +257,8 @@ def test_instance_to_be_deleted(default_args, mock_linode, capfd, access_token):
     default_args.update({"state": "absent"})
     with set_module_args(default_args):
         target = "linode_api4.linode_client.LinodeGroup.instances"
-        with mock.patch(target, return_value=[mock_linode]):
-            with pytest.raises(SystemExit) as sys_exit_exc:
-                linode_v4.main()
+        with mock.patch(target, return_value=[mock_linode]), pytest.raises(SystemExit) as sys_exit_exc:
+            linode_v4.main()
 
     assert sys_exit_exc.value.code == 0
 
@@ -286,9 +273,8 @@ def test_instance_already_deleted_no_change(default_args, mock_linode, capfd, ac
     default_args.update({"state": "absent"})
     with set_module_args(default_args):
         target = "linode_api4.linode_client.LinodeGroup.instances"
-        with mock.patch(target, return_value=[]):
-            with pytest.raises(SystemExit) as sys_exit_exc:
-                linode_v4.main()
+        with mock.patch(target, return_value=[]), pytest.raises(SystemExit) as sys_exit_exc:
+            linode_v4.main()
 
     assert sys_exit_exc.value.code == 0
 

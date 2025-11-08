@@ -51,9 +51,8 @@ class TestLvgRename(ModuleTestCase):
             "vg": "vg_missing",
             "vg_new": "vg_data_testhost2",
         }
-        with set_module_args(args=module_args):
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.module.main()
+        with set_module_args(args=module_args), self.assertRaises(AnsibleFailJson) as result:
+            self.module.main()
 
         self.assertEqual(len(self.mock_module_run_command.mock_calls), 1)
         self.assertIs(result.exception.args[0]["failed"], failed)
@@ -71,9 +70,8 @@ class TestLvgRename(ModuleTestCase):
             "vg": "Yfj4YG-c8nI-z7w5-B7Fw-i2eM-HqlF-ApFVp0",
             "vg_new": "vg_data_testhost2",
         }
-        with set_module_args(args=module_args):
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.module.main()
+        with set_module_args(args=module_args), self.assertRaises(AnsibleFailJson) as result:
+            self.module.main()
 
         self.assertEqual(len(self.mock_module_run_command.mock_calls), 1)
         self.assertIs(result.exception.args[0]["failed"], failed)
@@ -89,9 +87,8 @@ class TestLvgRename(ModuleTestCase):
             "vg": "vg_data_testhost1",
             "vg_new": "vg_sys_testhost2",
         }
-        with set_module_args(args=module_args):
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.module.main()
+        with set_module_args(args=module_args), self.assertRaises(AnsibleFailJson) as result:
+            self.module.main()
 
         self.assertEqual(len(self.mock_module_run_command.mock_calls), 1)
         self.assertIs(result.exception.args[0]["failed"], failed)
@@ -111,9 +108,8 @@ class TestLvgRename(ModuleTestCase):
             "vg": "/dev/vg_data_testhost1",
             "vg_new": "vg_data_testhost2",
         }
-        with set_module_args(args=module_args):
-            with self.assertRaises(AnsibleExitJson) as result:
-                self.module.main()
+        with set_module_args(args=module_args), self.assertRaises(AnsibleExitJson) as result:
+            self.module.main()
 
         self.assertEqual(len(self.mock_module_run_command.mock_calls), 2)
         self.assertIs(result.exception.args[0]["changed"], changed)
@@ -131,9 +127,8 @@ class TestLvgRename(ModuleTestCase):
             "vg_new": "vg_data_testhost2",
             "_ansible_check_mode": True,
         }
-        with set_module_args(args=module_args):
-            with self.assertRaises(AnsibleExitJson) as result:
-                self.module.main()
+        with set_module_args(args=module_args), self.assertRaises(AnsibleExitJson) as result:
+            self.module.main()
 
         self.assertEqual(len(self.mock_module_run_command.mock_calls), 1)
         self.assertIs(result.exception.args[0]["changed"], changed)
@@ -150,9 +145,8 @@ class TestLvgRename(ModuleTestCase):
             "vg": "vg_data_testhostX",
             "vg_new": "vg_data_testhost1",
         }
-        with set_module_args(args=module_args):
-            with self.assertRaises(AnsibleExitJson) as result:
-                self.module.main()
+        with set_module_args(args=module_args), self.assertRaises(AnsibleExitJson) as result:
+            self.module.main()
 
         self.assertEqual(len(self.mock_module_run_command.mock_calls), 1)
         self.assertIs(result.exception.args[0]["changed"], changed)

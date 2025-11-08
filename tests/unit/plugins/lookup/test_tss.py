@@ -56,9 +56,8 @@ class TestTSSClient(TestCase):
         with patch(make_absolute("HAS_TSS_AUTHORIZER"), False):
             self.assert_client_version("v0")
 
-            with patch.dict(self.server_params, {"domain": "foo"}):
-                with self.assertRaises(tss.AnsibleError):
-                    self._get_client()
+            with patch.dict(self.server_params, {"domain": "foo"}), self.assertRaises(tss.AnsibleError):
+                self._get_client()
 
         with patch.multiple(
             TSS_IMPORT_PATH,
@@ -101,9 +100,8 @@ class TestLookupModule(TestCase):
             with self.assertRaises(tss.AnsibleOptionsError):
                 self._run_lookup(self.INVALID_TERMS)
 
-        with patch(make_absolute("SecretServer"), MockFaultySecretServer):
-            with self.assertRaises(tss.AnsibleError):
-                self._run_lookup(self.VALID_TERMS)
+        with patch(make_absolute("SecretServer"), MockFaultySecretServer), self.assertRaises(tss.AnsibleError):
+            self._run_lookup(self.VALID_TERMS)
 
     def _run_lookup(self, terms, variables=None, **kwargs):
         variables = variables or []

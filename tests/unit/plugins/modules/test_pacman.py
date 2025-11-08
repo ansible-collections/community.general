@@ -147,9 +147,8 @@ class TestPacman:
         return mocker.patch.object(pacman.Pacman, "_build_inventory", return_value=valid_inventory)
 
     def test_fail_without_required_args(self):
-        with pytest.raises(AnsibleFailJson) as e:
-            with set_module_args({}):
-                pacman.main()
+        with pytest.raises(AnsibleFailJson) as e, set_module_args({}):
+            pacman.main()
         assert e.match(r"one of the following is required")
 
     def test_success(self, mock_empty_inventory):

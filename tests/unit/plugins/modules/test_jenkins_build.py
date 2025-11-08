@@ -87,16 +87,14 @@ class TestJenkinsBuild(unittest.TestCase):
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies")
     def test_module_fail_when_required_args_missing(self, test_deps):
         test_deps.return_value = None
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                jenkins_build.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            jenkins_build.main()
 
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies")
     def test_module_fail_when_missing_build_number(self, test_deps):
         test_deps.return_value = None
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({"name": "required-if", "state": "stopped"}):
-                jenkins_build.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({"name": "required-if", "state": "stopped"}):
+            jenkins_build.main()
 
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies")
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection")
@@ -104,9 +102,8 @@ class TestJenkinsBuild(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
-        with self.assertRaises(AnsibleExitJson):
-            with set_module_args({"name": "host-check", "user": "abc", "token": "xyz"}):
-                jenkins_build.main()
+        with self.assertRaises(AnsibleExitJson), set_module_args({"name": "host-check", "user": "abc", "token": "xyz"}):
+            jenkins_build.main()
 
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies")
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection")
@@ -114,11 +111,13 @@ class TestJenkinsBuild(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args(
                 {"name": "host-check", "build_number": "1234", "state": "stopped", "user": "abc", "token": "xyz"}
-            ):
-                jenkins_build.main()
+            ),
+        ):
+            jenkins_build.main()
 
         self.assertTrue(return_json.exception.args[0]["changed"])
 
@@ -128,11 +127,13 @@ class TestJenkinsBuild(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMockIdempotent()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args(
                 {"name": "host-check", "build_number": "1234", "state": "stopped", "user": "abc", "password": "xyz"}
-            ):
-                jenkins_build.main()
+            ),
+        ):
+            jenkins_build.main()
 
         self.assertFalse(return_json.exception.args[0]["changed"])
 
@@ -144,11 +145,13 @@ class TestJenkinsBuild(unittest.TestCase):
         jenkins_connection.return_value = JenkinsMock()
         build_status.return_value = JenkinsBuildMock().get_build_status()
 
-        with self.assertRaises(AnsibleExitJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleExitJson),
+            set_module_args(
                 {"name": "host-delete", "build_number": "1234", "state": "absent", "user": "abc", "token": "xyz"}
-            ):
-                jenkins_build.main()
+            ),
+        ):
+            jenkins_build.main()
 
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies")
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection")
@@ -156,11 +159,13 @@ class TestJenkinsBuild(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMockIdempotent()
 
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {"name": "host-delete", "build_number": "1234", "state": "absent", "user": "abc", "token": "xyz"}
-            ):
-                jenkins_build.main()
+            ),
+        ):
+            jenkins_build.main()
 
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies")
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection")
@@ -170,9 +175,11 @@ class TestJenkinsBuild(unittest.TestCase):
         jenkins_connection.return_value = JenkinsMock()
         build_status.return_value = JenkinsBuildMock().get_build_status()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args({"name": "create-detached", "user": "abc", "token": "xyz"}):
-                jenkins_build.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args({"name": "create-detached", "user": "abc", "token": "xyz"}),
+        ):
+            jenkins_build.main()
 
         self.assertFalse(return_json.exception.args[0]["changed"])
 
@@ -182,8 +189,10 @@ class TestJenkinsBuild(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args({"name": "create-detached", "user": "abc", "token": "xyz", "detach": True}):
-                jenkins_build.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args({"name": "create-detached", "user": "abc", "token": "xyz", "detach": True}),
+        ):
+            jenkins_build.main()
 
         self.assertTrue(return_json.exception.args[0]["changed"])

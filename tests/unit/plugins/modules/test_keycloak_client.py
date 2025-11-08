@@ -40,18 +40,20 @@ def patch_keycloak_api(
     """
 
     obj = keycloak_client.KeycloakAPI
-    with patch.object(obj, "get_client_by_clientid", side_effect=get_client_by_clientid) as mock_get_client_by_clientid:
-        with patch.object(obj, "get_client_by_id", side_effect=get_client_by_id) as mock_get_client_by_id:
-            with patch.object(obj, "create_client", side_effect=create_client) as mock_create_client:
-                with patch.object(obj, "update_client", side_effect=update_client) as mock_update_client:
-                    with patch.object(obj, "delete_client", side_effect=delete_client) as mock_delete_client:
-                        yield (
-                            mock_get_client_by_clientid,
-                            mock_get_client_by_id,
-                            mock_create_client,
-                            mock_update_client,
-                            mock_delete_client,
-                        )
+    with (
+        patch.object(obj, "get_client_by_clientid", side_effect=get_client_by_clientid) as mock_get_client_by_clientid,
+        patch.object(obj, "get_client_by_id", side_effect=get_client_by_id) as mock_get_client_by_id,
+        patch.object(obj, "create_client", side_effect=create_client) as mock_create_client,
+        patch.object(obj, "update_client", side_effect=update_client) as mock_update_client,
+        patch.object(obj, "delete_client", side_effect=delete_client) as mock_delete_client,
+    ):
+        yield (
+            mock_get_client_by_clientid,
+            mock_get_client_by_id,
+            mock_create_client,
+            mock_update_client,
+            mock_delete_client,
+        )
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -129,17 +131,19 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_client_by_clientid=return_value_get_client_by_clientid) as (
-                    mock_get_client_by_clientid,
-                    mock_get_client_by_id,
-                    mock_create_client,
-                    mock_update_client,
-                    mock_delete_client,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_client_by_clientid=return_value_get_client_by_clientid) as (
+                mock_get_client_by_clientid,
+                mock_get_client_by_id,
+                mock_create_client,
+                mock_update_client,
+                mock_delete_client,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(mock_get_client_by_clientid.call_count, 2)
         self.assertEqual(mock_get_client_by_id.call_count, 0)

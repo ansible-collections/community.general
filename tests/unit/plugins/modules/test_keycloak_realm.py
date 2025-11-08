@@ -37,11 +37,13 @@ def patch_keycloak_api(get_realm_by_id, create_realm=None, update_realm=None, de
     """
 
     obj = keycloak_realm.KeycloakAPI
-    with patch.object(obj, "get_realm_by_id", side_effect=get_realm_by_id) as mock_get_realm_by_id:
-        with patch.object(obj, "create_realm", side_effect=create_realm) as mock_create_realm:
-            with patch.object(obj, "update_realm", side_effect=update_realm) as mock_update_realm:
-                with patch.object(obj, "delete_realm", side_effect=delete_realm) as mock_delete_realm:
-                    yield mock_get_realm_by_id, mock_create_realm, mock_update_realm, mock_delete_realm
+    with (
+        patch.object(obj, "get_realm_by_id", side_effect=get_realm_by_id) as mock_get_realm_by_id,
+        patch.object(obj, "create_realm", side_effect=create_realm) as mock_create_realm,
+        patch.object(obj, "update_realm", side_effect=update_realm) as mock_update_realm,
+        patch.object(obj, "delete_realm", side_effect=delete_realm) as mock_delete_realm,
+    ):
+        yield mock_get_realm_by_id, mock_create_realm, mock_update_realm, mock_delete_realm
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -114,16 +116,18 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_realm_by_id=return_value_absent, create_realm=return_value_created) as (
-                    mock_get_realm_by_id,
-                    mock_create_realm,
-                    mock_update_realm,
-                    mock_delete_realm,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_realm_by_id=return_value_absent, create_realm=return_value_created) as (
+                mock_get_realm_by_id,
+                mock_create_realm,
+                mock_update_realm,
+                mock_delete_realm,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_realm_by_id.mock_calls), 2)
         self.assertEqual(len(mock_create_realm.mock_calls), 1)
@@ -155,16 +159,18 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_realm_by_id=return_value_absent, update_realm=return_value_updated) as (
-                    mock_get_realm_by_id,
-                    mock_create_realm,
-                    mock_update_realm,
-                    mock_delete_realm,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_realm_by_id=return_value_absent, update_realm=return_value_updated) as (
+                mock_get_realm_by_id,
+                mock_create_realm,
+                mock_update_realm,
+                mock_delete_realm,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_realm_by_id.mock_calls), 2)
         self.assertEqual(len(mock_create_realm.mock_calls), 0)
@@ -196,16 +202,18 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_realm_by_id=return_value_absent, update_realm=return_value_updated) as (
-                    mock_get_realm_by_id,
-                    mock_create_realm,
-                    mock_update_realm,
-                    mock_delete_realm,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_realm_by_id=return_value_absent, update_realm=return_value_updated) as (
+                mock_get_realm_by_id,
+                mock_create_realm,
+                mock_update_realm,
+                mock_delete_realm,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_realm_by_id.mock_calls), 2)
         self.assertEqual(len(mock_create_realm.mock_calls), 0)
@@ -235,16 +243,18 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_realm_by_id=return_value_absent, delete_realm=return_value_deleted) as (
-                    mock_get_realm_by_id,
-                    mock_create_realm,
-                    mock_update_realm,
-                    mock_delete_realm,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_realm_by_id=return_value_absent, delete_realm=return_value_deleted) as (
+                mock_get_realm_by_id,
+                mock_create_realm,
+                mock_update_realm,
+                mock_delete_realm,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_realm_by_id.mock_calls), 1)
         self.assertEqual(len(mock_delete_realm.mock_calls), 0)
@@ -273,16 +283,18 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_realm_by_id=return_value_absent, delete_realm=return_value_deleted) as (
-                    mock_get_realm_by_id,
-                    mock_create_realm,
-                    mock_update_realm,
-                    mock_delete_realm,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_realm_by_id=return_value_absent, delete_realm=return_value_deleted) as (
+                mock_get_realm_by_id,
+                mock_create_realm,
+                mock_update_realm,
+                mock_delete_realm,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_realm_by_id.mock_calls), 1)
         self.assertEqual(len(mock_delete_realm.mock_calls), 1)

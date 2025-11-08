@@ -27,18 +27,20 @@ def patch_keycloak_api(
     """Mock context manager for patching the methods in KeycloakAPI"""
 
     obj = keycloak_realm_key.KeycloakAPI
-    with patch.object(obj, "get_components", side_effect=get_components) as mock_get_components:
-        with patch.object(obj, "get_component", side_effect=get_component) as mock_get_component:
-            with patch.object(obj, "create_component", side_effect=create_component) as mock_create_component:
-                with patch.object(obj, "update_component", side_effect=update_component) as mock_update_component:
-                    with patch.object(obj, "delete_component", side_effect=delete_component) as mock_delete_component:
-                        yield (
-                            mock_get_components,
-                            mock_get_component,
-                            mock_create_component,
-                            mock_update_component,
-                            mock_delete_component,
-                        )
+    with (
+        patch.object(obj, "get_components", side_effect=get_components) as mock_get_components,
+        patch.object(obj, "get_component", side_effect=get_component) as mock_get_component,
+        patch.object(obj, "create_component", side_effect=create_component) as mock_create_component,
+        patch.object(obj, "update_component", side_effect=update_component) as mock_update_component,
+        patch.object(obj, "delete_component", side_effect=delete_component) as mock_delete_component,
+    ):
+        yield (
+            mock_get_components,
+            mock_get_component,
+            mock_create_component,
+            mock_update_component,
+            mock_delete_component,
+        )
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -133,19 +135,21 @@ class TestKeycloakRealmKeys(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_components=return_value_components_get, create_component=return_value_component_create
-                ) as (
-                    mock_get_components,
-                    mock_get_component,
-                    mock_create_component,
-                    mock_update_component,
-                    mock_delete_component,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_components=return_value_components_get, create_component=return_value_component_create
+            ) as (
+                mock_get_components,
+                mock_get_component,
+                mock_create_component,
+                mock_update_component,
+                mock_delete_component,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
@@ -220,19 +224,21 @@ class TestKeycloakRealmKeys(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_components=return_value_components_get, update_component=return_value_component_update
-                ) as (
-                    mock_get_components,
-                    mock_get_component,
-                    mock_create_component,
-                    mock_update_component,
-                    mock_delete_component,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_components=return_value_components_get, update_component=return_value_component_update
+            ) as (
+                mock_get_components,
+                mock_get_component,
+                mock_create_component,
+                mock_update_component,
+                mock_delete_component,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
@@ -268,17 +274,19 @@ class TestKeycloakRealmKeys(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_components=return_value_components_get) as (
-                    mock_get_components,
-                    mock_get_component,
-                    mock_create_component,
-                    mock_update_component,
-                    mock_delete_component,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_components=return_value_components_get) as (
+                mock_get_components,
+                mock_get_component,
+                mock_create_component,
+                mock_update_component,
+                mock_delete_component,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
@@ -336,19 +344,21 @@ class TestKeycloakRealmKeys(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_components=return_value_components_get, delete_component=return_value_component_delete
-                ) as (
-                    mock_get_components,
-                    mock_get_component,
-                    mock_create_component,
-                    mock_update_component,
-                    mock_delete_component,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_components=return_value_components_get, delete_component=return_value_component_delete
+            ) as (
+                mock_get_components,
+                mock_get_component,
+                mock_create_component,
+                mock_update_component,
+                mock_delete_component,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)

@@ -61,15 +61,17 @@ class TestGem(ModuleTestCase):
         return mock
 
     def test_fails_when_user_install_and_install_dir_are_combined(self):
-        with set_module_args(
-            {
-                "name": "dummy",
-                "user_install": True,
-                "install_dir": "/opt/dummy",
-            }
+        with (
+            set_module_args(
+                {
+                    "name": "dummy",
+                    "user_install": True,
+                    "install_dir": "/opt/dummy",
+                }
+            ),
+            pytest.raises(AnsibleFailJson) as exc,
         ):
-            with pytest.raises(AnsibleFailJson) as exc:
-                gem.main()
+            gem.main()
 
         result = exc.value.args[0]
         assert result["failed"]

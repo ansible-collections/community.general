@@ -51,12 +51,11 @@ class TestSysupgradeModule(ModuleTestCase):
         """
         stderr = ""
 
-        with set_module_args({}):
-            with patch.object(basic.AnsibleModule, "run_command") as run_command:
-                run_command.return_value = (rc, stdout, stderr)
-                with self.assertRaises(AnsibleExitJson) as result:
-                    self.module.main()
-                self.assertTrue(result.exception.args[0]["changed"])
+        with set_module_args({}), patch.object(basic.AnsibleModule, "run_command") as run_command:
+            run_command.return_value = (rc, stdout, stderr)
+            with self.assertRaises(AnsibleExitJson) as result:
+                self.module.main()
+            self.assertTrue(result.exception.args[0]["changed"])
 
     def test_upgrade_failed(self):
         """Upgrade failed"""
@@ -65,10 +64,9 @@ class TestSysupgradeModule(ModuleTestCase):
         stdout = ""
         stderr = "sysupgrade: need root privileges"
 
-        with set_module_args({}):
-            with patch.object(basic.AnsibleModule, "run_command") as run_command_mock:
-                run_command_mock.return_value = (rc, stdout, stderr)
-                with self.assertRaises(AnsibleFailJson) as result:
-                    self.module.main()
-                self.assertTrue(result.exception.args[0]["failed"])
-                self.assertIn("need root", result.exception.args[0]["msg"])
+        with set_module_args({}), patch.object(basic.AnsibleModule, "run_command") as run_command_mock:
+            run_command_mock.return_value = (rc, stdout, stderr)
+            with self.assertRaises(AnsibleFailJson) as result:
+                self.module.main()
+            self.assertTrue(result.exception.args[0]["failed"])
+            self.assertIn("need root", result.exception.args[0]["msg"])

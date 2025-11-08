@@ -16,6 +16,5 @@ if not linode.HAS_LINODE:
 
 
 def test_name_is_a_required_parameter(api_key, auth):
-    with pytest.raises(SystemExit):
-        with set_module_args({}):
-            linode.main()
+    with pytest.raises(SystemExit), set_module_args({}):
+        linode.main()

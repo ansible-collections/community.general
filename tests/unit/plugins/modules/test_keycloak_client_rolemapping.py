@@ -46,40 +46,40 @@ def patch_keycloak_api(
     """
 
     obj = keycloak_client_rolemapping.KeycloakAPI
-    with patch.object(obj, "get_group_by_name", side_effect=get_group_by_name) as mock_get_group_by_name:
-        with patch.object(obj, "get_client_id", side_effect=get_client_id) as mock_get_client_id:
-            with patch.object(
-                obj, "get_client_role_id_by_name", side_effect=get_client_role_id_by_name
-            ) as mock_get_client_role_id_by_name:
-                with patch.object(
-                    obj, "get_client_group_rolemapping_by_id", side_effect=get_client_group_rolemapping_by_id
-                ) as mock_get_client_group_rolemapping_by_id:
-                    with patch.object(
-                        obj,
-                        "get_client_group_available_rolemappings",
-                        side_effect=get_client_group_available_rolemappings,
-                    ) as mock_get_client_group_available_rolemappings:
-                        with patch.object(
-                            obj,
-                            "get_client_group_composite_rolemappings",
-                            side_effect=get_client_group_composite_rolemappings,
-                        ) as mock_get_client_group_composite_rolemappings:
-                            with patch.object(
-                                obj, "add_group_rolemapping", side_effect=add_group_rolemapping
-                            ) as mock_add_group_rolemapping:
-                                with patch.object(
-                                    obj, "delete_group_rolemapping", side_effect=delete_group_rolemapping
-                                ) as mock_delete_group_rolemapping:
-                                    yield (
-                                        mock_get_group_by_name,
-                                        mock_get_client_id,
-                                        mock_get_client_role_id_by_name,
-                                        mock_add_group_rolemapping,
-                                        mock_get_client_group_rolemapping_by_id,
-                                        mock_get_client_group_available_rolemappings,
-                                        mock_get_client_group_composite_rolemappings,
-                                        mock_delete_group_rolemapping,
-                                    )
+    with (
+        patch.object(obj, "get_group_by_name", side_effect=get_group_by_name) as mock_get_group_by_name,
+        patch.object(obj, "get_client_id", side_effect=get_client_id) as mock_get_client_id,
+        patch.object(
+            obj, "get_client_role_id_by_name", side_effect=get_client_role_id_by_name
+        ) as mock_get_client_role_id_by_name,
+        patch.object(
+            obj, "get_client_group_rolemapping_by_id", side_effect=get_client_group_rolemapping_by_id
+        ) as mock_get_client_group_rolemapping_by_id,
+        patch.object(
+            obj,
+            "get_client_group_available_rolemappings",
+            side_effect=get_client_group_available_rolemappings,
+        ) as mock_get_client_group_available_rolemappings,
+        patch.object(
+            obj,
+            "get_client_group_composite_rolemappings",
+            side_effect=get_client_group_composite_rolemappings,
+        ) as mock_get_client_group_composite_rolemappings,
+        patch.object(obj, "add_group_rolemapping", side_effect=add_group_rolemapping) as mock_add_group_rolemapping,
+        patch.object(
+            obj, "delete_group_rolemapping", side_effect=delete_group_rolemapping
+        ) as mock_delete_group_rolemapping,
+    ):
+        yield (
+            mock_get_group_by_name,
+            mock_get_client_id,
+            mock_get_client_role_id_by_name,
+            mock_add_group_rolemapping,
+            mock_get_client_group_rolemapping_by_id,
+            mock_get_client_group_available_rolemappings,
+            mock_get_client_group_composite_rolemappings,
+            mock_delete_group_rolemapping,
+        )
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -211,26 +211,28 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_group_by_name=return_value_get_group_by_name,
-                    get_client_id=return_value_get_client_id,
-                    get_client_role_id_by_name=return_value_get_client_role_id_by_name,
-                    get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
-                    get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
-                ) as (
-                    mock_get_group_by_name,
-                    mock_get_client_id,
-                    mock_get_client_role_id_by_name,
-                    mock_add_group_rolemapping,
-                    mock_get_client_group_rolemapping_by_id,
-                    mock_get_client_group_available_rolemappings,
-                    mock_get_client_group_composite_rolemappings,
-                    mock_delete_group_rolemapping,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_group_by_name=return_value_get_group_by_name,
+                get_client_id=return_value_get_client_id,
+                get_client_role_id_by_name=return_value_get_client_role_id_by_name,
+                get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
+                get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
+            ) as (
+                mock_get_group_by_name,
+                mock_get_client_id,
+                mock_get_client_role_id_by_name,
+                mock_add_group_rolemapping,
+                mock_get_client_group_rolemapping_by_id,
+                mock_get_client_group_available_rolemappings,
+                mock_get_client_group_composite_rolemappings,
+                mock_delete_group_rolemapping,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(mock_get_group_by_name.call_count, 1)
         self.assertEqual(mock_get_client_id.call_count, 1)
@@ -303,26 +305,28 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_group_by_name=return_value_get_group_by_name,
-                    get_client_id=return_value_get_client_id,
-                    get_client_role_id_by_name=return_value_get_client_role_id_by_name,
-                    get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
-                    get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
-                ) as (
-                    mock_get_group_by_name,
-                    mock_get_client_id,
-                    mock_get_client_role_id_by_name,
-                    mock_add_group_rolemapping,
-                    mock_get_client_group_rolemapping_by_id,
-                    mock_get_client_group_available_rolemappings,
-                    mock_get_client_group_composite_rolemappings,
-                    mock_delete_group_rolemapping,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_group_by_name=return_value_get_group_by_name,
+                get_client_id=return_value_get_client_id,
+                get_client_role_id_by_name=return_value_get_client_role_id_by_name,
+                get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
+                get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
+            ) as (
+                mock_get_group_by_name,
+                mock_get_client_id,
+                mock_get_client_role_id_by_name,
+                mock_add_group_rolemapping,
+                mock_get_client_group_rolemapping_by_id,
+                mock_get_client_group_available_rolemappings,
+                mock_get_client_group_composite_rolemappings,
+                mock_delete_group_rolemapping,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(mock_get_group_by_name.call_count, 1)
         self.assertEqual(mock_get_client_id.call_count, 1)
@@ -413,26 +417,28 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_group_by_name=return_value_get_group_by_name,
-                    get_client_id=return_value_get_client_id,
-                    get_client_role_id_by_name=return_value_get_client_role_id_by_name,
-                    get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
-                    get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
-                ) as (
-                    mock_get_group_by_name,
-                    mock_get_client_id,
-                    mock_get_client_role_id_by_name,
-                    mock_add_group_rolemapping,
-                    mock_get_client_group_rolemapping_by_id,
-                    mock_get_client_group_available_rolemappings,
-                    mock_get_client_group_composite_rolemappings,
-                    mock_delete_group_rolemapping,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_group_by_name=return_value_get_group_by_name,
+                get_client_id=return_value_get_client_id,
+                get_client_role_id_by_name=return_value_get_client_role_id_by_name,
+                get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
+                get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
+            ) as (
+                mock_get_group_by_name,
+                mock_get_client_id,
+                mock_get_client_role_id_by_name,
+                mock_add_group_rolemapping,
+                mock_get_client_group_rolemapping_by_id,
+                mock_get_client_group_available_rolemappings,
+                mock_get_client_group_composite_rolemappings,
+                mock_delete_group_rolemapping,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(mock_get_group_by_name.call_count, 0)
         self.assertEqual(mock_get_client_id.call_count, 0)
@@ -506,26 +512,28 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_group_by_name=return_value_get_group_by_name,
-                    get_client_id=return_value_get_client_id,
-                    get_client_role_id_by_name=return_value_get_client_role_id_by_name,
-                    get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
-                    get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
-                ) as (
-                    mock_get_group_by_name,
-                    mock_get_client_id,
-                    mock_get_client_role_id_by_name,
-                    mock_add_group_rolemapping,
-                    mock_get_client_group_rolemapping_by_id,
-                    mock_get_client_group_available_rolemappings,
-                    mock_get_client_group_composite_rolemappings,
-                    mock_delete_group_rolemapping,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_group_by_name=return_value_get_group_by_name,
+                get_client_id=return_value_get_client_id,
+                get_client_role_id_by_name=return_value_get_client_role_id_by_name,
+                get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
+                get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
+            ) as (
+                mock_get_group_by_name,
+                mock_get_client_id,
+                mock_get_client_role_id_by_name,
+                mock_add_group_rolemapping,
+                mock_get_client_group_rolemapping_by_id,
+                mock_get_client_group_available_rolemappings,
+                mock_get_client_group_composite_rolemappings,
+                mock_delete_group_rolemapping,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(mock_get_group_by_name.call_count, 1)
         self.assertEqual(mock_get_client_id.call_count, 1)
@@ -598,26 +606,28 @@ class TestKeycloakRealm(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_group_by_name=return_value_get_group_by_name,
-                    get_client_id=return_value_get_client_id,
-                    get_client_role_id_by_name=return_value_get_client_role_id_by_name,
-                    get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
-                    get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
-                ) as (
-                    mock_get_group_by_name,
-                    mock_get_client_id,
-                    mock_get_client_role_id_by_name,
-                    mock_add_group_rolemapping,
-                    mock_get_client_group_rolemapping_by_id,
-                    mock_get_client_group_available_rolemappings,
-                    mock_get_client_group_composite_rolemappings,
-                    mock_delete_group_rolemapping,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_group_by_name=return_value_get_group_by_name,
+                get_client_id=return_value_get_client_id,
+                get_client_role_id_by_name=return_value_get_client_role_id_by_name,
+                get_client_group_available_rolemappings=return_value_get_client_group_available_rolemappings,
+                get_client_group_composite_rolemappings=return_value_get_client_group_composite_rolemappings,
+            ) as (
+                mock_get_group_by_name,
+                mock_get_client_id,
+                mock_get_client_role_id_by_name,
+                mock_add_group_rolemapping,
+                mock_get_client_group_rolemapping_by_id,
+                mock_get_client_group_available_rolemappings,
+                mock_get_client_group_composite_rolemappings,
+                mock_delete_group_rolemapping,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(mock_get_group_by_name.call_count, 1)
         self.assertEqual(mock_get_client_id.call_count, 1)

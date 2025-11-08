@@ -39,82 +39,89 @@ class TestPritunlOrgInfo(ModuleTestCase):
     def test_without_parameters(self):
         """Test without parameters"""
         with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
-            with set_module_args({}):
-                with self.assertRaises(AnsibleFailJson):
-                    self.module.main()
+            with set_module_args({}), self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
             self.assertEqual(org_mock.call_count, 0)
 
     def test_list_empty_organizations(self):
         """Listing all organizations even when no org exists should be valid."""
-        with self.patch_get_pritunl_organizations(side_effect=PritunlEmptyOrganizationMock) as org_mock:
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args(
-                    {
-                        "pritunl_api_token": "token",
-                        "pritunl_api_secret": "secret",
-                        "pritunl_url": "https://pritunl.domain.com",
-                    }
-                ):
-                    self.module.main()
+        with (
+            self.patch_get_pritunl_organizations(side_effect=PritunlEmptyOrganizationMock) as org_mock,
+            self.assertRaises(AnsibleExitJson) as result,
+        ):
+            with set_module_args(
+                {
+                    "pritunl_api_token": "token",
+                    "pritunl_api_secret": "secret",
+                    "pritunl_url": "https://pritunl.domain.com",
+                }
+            ):
+                self.module.main()
 
-                self.assertEqual(org_mock.call_count, 1)
+            self.assertEqual(org_mock.call_count, 1)
 
-                exc = result.exception.args[0]
-                self.assertEqual(len(exc["organizations"]), 0)
+            exc = result.exception.args[0]
+            self.assertEqual(len(exc["organizations"]), 0)
 
     def test_list_specific_organization(self):
         """Listing a specific organization should be valid."""
-        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args(
-                    {
-                        "pritunl_api_token": "token",
-                        "pritunl_api_secret": "secret",
-                        "pritunl_url": "https://pritunl.domain.com",
-                        "org": "GumGum",
-                    }
-                ):
-                    self.module.main()
+        with (
+            self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock,
+            self.assertRaises(AnsibleExitJson) as result,
+        ):
+            with set_module_args(
+                {
+                    "pritunl_api_token": "token",
+                    "pritunl_api_secret": "secret",
+                    "pritunl_url": "https://pritunl.domain.com",
+                    "org": "GumGum",
+                }
+            ):
+                self.module.main()
 
-                self.assertEqual(org_mock.call_count, 1)
+            self.assertEqual(org_mock.call_count, 1)
 
-                exc = result.exception.args[0]
-                self.assertEqual(len(exc["organizations"]), 1)
+            exc = result.exception.args[0]
+            self.assertEqual(len(exc["organizations"]), 1)
 
     def test_list_unknown_organization(self):
         """Listing an unknown organization should result in a failure."""
-        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
-            with self.assertRaises(AnsibleFailJson) as result:
-                with set_module_args(
-                    {
-                        "pritunl_api_token": "token",
-                        "pritunl_api_secret": "secret",
-                        "pritunl_url": "https://pritunl.domain.com",
-                        "org": "Unknown",
-                    }
-                ):
-                    self.module.main()
+        with (
+            self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock,
+            self.assertRaises(AnsibleFailJson) as result,
+        ):
+            with set_module_args(
+                {
+                    "pritunl_api_token": "token",
+                    "pritunl_api_secret": "secret",
+                    "pritunl_url": "https://pritunl.domain.com",
+                    "org": "Unknown",
+                }
+            ):
+                self.module.main()
 
-                self.assertEqual(org_mock.call_count, 1)
+            self.assertEqual(org_mock.call_count, 1)
 
-                exc = result.exception.args[0]
-                self.assertRegex(exc["msg"], "does not exist")
+            exc = result.exception.args[0]
+            self.assertRegex(exc["msg"], "does not exist")
 
     def test_list_all_organizations(self):
         """Listing all organizations should be valid."""
-        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock:
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args(
-                    {
-                        "pritunl_api_token": "token",
-                        "pritunl_api_secret": "secret",
-                        "pritunl_url": "https://pritunl.domain.com",
-                    }
-                ):
-                    self.module.main()
+        with (
+            self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as org_mock,
+            self.assertRaises(AnsibleExitJson) as result,
+        ):
+            with set_module_args(
+                {
+                    "pritunl_api_token": "token",
+                    "pritunl_api_secret": "secret",
+                    "pritunl_url": "https://pritunl.domain.com",
+                }
+            ):
+                self.module.main()
 
-                self.assertEqual(org_mock.call_count, 1)
+            self.assertEqual(org_mock.call_count, 1)
 
-                exc = result.exception.args[0]
-                self.assertEqual(len(exc["organizations"]), 3)
+            exc = result.exception.args[0]
+            self.assertEqual(len(exc["organizations"]), 3)

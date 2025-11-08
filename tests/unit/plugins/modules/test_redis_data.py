@@ -19,9 +19,8 @@ if tuple(map(int, __version__.split("."))) < (3, 4, 0):
 
 
 def test_redis_data_without_arguments(capfd):
-    with set_module_args({}):
-        with pytest.raises(SystemExit):
-            redis_data.main()
+    with set_module_args({}), pytest.raises(SystemExit):
+        redis_data.main()
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)["failed"]
@@ -140,18 +139,20 @@ def test_redis_data_delete_absent_key(capfd, mocker):
 
 @pytest.mark.skipif(HAS_REDIS_USERNAME_OPTION, reason="Redis version > 3.4.0")
 def test_redis_data_fail_username(capfd, mocker):
-    with set_module_args(
-        {
-            "login_host": "localhost",
-            "login_user": "root",
-            "login_password": "secret",
-            "key": "foo",
-            "value": "baz",
-            "_ansible_check_mode": False,
-        }
+    with (
+        set_module_args(
+            {
+                "login_host": "localhost",
+                "login_user": "root",
+                "login_password": "secret",
+                "key": "foo",
+                "value": "baz",
+                "_ansible_check_mode": False,
+            }
+        ),
+        pytest.raises(SystemExit),
     ):
-        with pytest.raises(SystemExit):
-            redis_data.main()
+        redis_data.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err

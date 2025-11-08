@@ -95,50 +95,55 @@ class TestAlertaCustomerModule(ModuleTestCase):
 
     def test_without_parameters(self):
         """Failure if no parameters set"""
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            self.module.main()
 
     def test_without_content(self):
         """Failure if customer and match are missing"""
-        with set_module_args(
-            {"alerta_url": "http://localhost:8080", "api_username": "admin@example.com", "api_password": "password"}
+        with (
+            set_module_args(
+                {"alerta_url": "http://localhost:8080", "api_username": "admin@example.com", "api_password": "password"}
+            ),
+            self.assertRaises(AnsibleFailJson),
         ):
-            with self.assertRaises(AnsibleFailJson):
-                self.module.main()
+            self.module.main()
 
     def test_successful_existing_customer_creation(self):
         """Test the customer creation (already exists)."""
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_username": "admin@example.com",
-                "api_password": "password",
-                "customer": "Developer",
-                "match": "dev@example.com",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_username": "admin@example.com",
+                    "api_password": "password",
+                    "customer": "Developer",
+                    "match": "dev@example.com",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = customer_response_page1()
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
-                self.assertTrue(fetch_url_mock.call_count, 1)
+            fetch_url_mock.return_value = customer_response_page1()
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
+            self.assertTrue(fetch_url_mock.call_count, 1)
 
     def test_successful_customer_creation(self):
         """Test the customer creation."""
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_username": "admin@example.com",
-                "api_password": "password",
-                "customer": "Developer",
-                "match": "dev2@example.com",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_username": "admin@example.com",
+                    "api_password": "password",
+                    "customer": "Developer",
+                    "match": "dev2@example.com",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = customer_response_page1()
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+            fetch_url_mock.return_value = customer_response_page1()
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
@@ -147,18 +152,20 @@ class TestAlertaCustomerModule(ModuleTestCase):
 
     def test_successful_customer_creation_key(self):
         """Test the customer creation using api_key."""
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_key": "demo-key",
-                "customer": "Developer",
-                "match": "dev2@example.com",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_key": "demo-key",
+                    "customer": "Developer",
+                    "match": "dev2@example.com",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = customer_response_page1()
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+            fetch_url_mock.return_value = customer_response_page1()
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
@@ -168,113 +175,125 @@ class TestAlertaCustomerModule(ModuleTestCase):
     def test_failed_not_found(self):
         """Test failure with wrong URL."""
 
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080/s",
-                "api_username": "admin@example.com",
-                "api_password": "password",
-                "customer": "Developer",
-                "match": "dev@example.com",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080/s",
+                    "api_username": "admin@example.com",
+                    "api_password": "password",
+                    "customer": "Developer",
+                    "match": "dev@example.com",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (
-                    None,
-                    {"status": 404, "msg": "Not found for request GET on http://localhost:8080/a/api/customers"},
-                )
-                with self.assertRaises(AnsibleFailJson):
-                    self.module.main()
+            fetch_url_mock.return_value = (
+                None,
+                {"status": 404, "msg": "Not found for request GET on http://localhost:8080/a/api/customers"},
+            )
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_failed_forbidden(self):
         """Test failure with wrong user."""
 
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_username": "dev@example.com",
-                "api_password": "password",
-                "customer": "Developer",
-                "match": "dev@example.com",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_username": "dev@example.com",
+                    "api_password": "password",
+                    "customer": "Developer",
+                    "match": "dev@example.com",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (
-                    None,
-                    {"status": 403, "msg": "Permission Denied for GET on http://localhost:8080/api/customers"},
-                )
-                with self.assertRaises(AnsibleFailJson):
-                    self.module.main()
+            fetch_url_mock.return_value = (
+                None,
+                {"status": 403, "msg": "Permission Denied for GET on http://localhost:8080/api/customers"},
+            )
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_failed_unauthorized(self):
         """Test failure with wrong username or password."""
 
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_username": "admin@example.com",
-                "api_password": "password_wrong",
-                "customer": "Developer",
-                "match": "dev@example.com",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_username": "admin@example.com",
+                    "api_password": "password_wrong",
+                    "customer": "Developer",
+                    "match": "dev@example.com",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (
-                    None,
-                    {"status": 401, "msg": "Unauthorized to request GET on http://localhost:8080/api/customers"},
-                )
-                with self.assertRaises(AnsibleFailJson):
-                    self.module.main()
+            fetch_url_mock.return_value = (
+                None,
+                {"status": 401, "msg": "Unauthorized to request GET on http://localhost:8080/api/customers"},
+            )
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_successful_customer_deletion(self):
         """Test the customer deletion."""
 
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_username": "admin@example.com",
-                "api_password": "password",
-                "customer": "Developer",
-                "match": "dev@example.com",
-                "state": "absent",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_username": "admin@example.com",
+                    "api_password": "password",
+                    "customer": "Developer",
+                    "match": "dev@example.com",
+                    "state": "absent",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = customer_response_page1()
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+            fetch_url_mock.return_value = customer_response_page1()
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
     def test_successful_customer_deletion_page2(self):
         """Test the customer deletion on the second page."""
 
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_username": "admin@example.com",
-                "api_password": "password",
-                "customer": "Developer",
-                "match": "dev@example.com",
-                "state": "absent",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_username": "admin@example.com",
+                    "api_password": "password",
+                    "customer": "Developer",
+                    "match": "dev@example.com",
+                    "state": "absent",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = customer_response_page2()
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+            fetch_url_mock.return_value = customer_response_page2()
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
     def test_successful_nonexisting_customer_deletion(self):
         """Test the customer deletion (non existing)."""
 
-        with set_module_args(
-            {
-                "alerta_url": "http://localhost:8080",
-                "api_username": "admin@example.com",
-                "api_password": "password",
-                "customer": "Billing",
-                "match": "dev@example.com",
-                "state": "absent",
-            }
+        with (
+            set_module_args(
+                {
+                    "alerta_url": "http://localhost:8080",
+                    "api_username": "admin@example.com",
+                    "api_password": "password",
+                    "customer": "Billing",
+                    "match": "dev@example.com",
+                    "state": "absent",
+                }
+            ),
+            patch.object(alerta_customer, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(alerta_customer, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = customer_response_page1()
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+            fetch_url_mock.return_value = customer_response_page1()
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()

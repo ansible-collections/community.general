@@ -30,27 +30,30 @@ class TestSlackModule(ModuleTestCase):
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            self.module.main()
 
     def test_invalid_old_token(self):
         """Failure if there is an old style token"""
-        with set_module_args(
-            {
-                "token": "test",
-            }
+        with (
+            set_module_args(
+                {
+                    "token": "test",
+                }
+            ),
+            self.assertRaises(AnsibleFailJson),
         ):
-            with self.assertRaises(AnsibleFailJson):
-                self.module.main()
+            self.module.main()
 
     def test_successful_message(self):
         """tests sending a message. This is example 1 from the docs"""
-        with set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test"}):
-            with patch.object(slack, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": 200})
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with (
+            set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test"}),
+            patch.object(slack, "fetch_url") as fetch_url_mock,
+        ):
+            fetch_url_mock.return_value = (None, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
@@ -61,19 +64,23 @@ class TestSlackModule(ModuleTestCase):
     def test_failed_message(self):
         """tests failing to send a message"""
 
-        with set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test"}):
-            with patch.object(slack, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": 404, "msg": "test"})
-                with self.assertRaises(AnsibleFailJson):
-                    self.module.main()
+        with (
+            set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test"}),
+            patch.object(slack, "fetch_url") as fetch_url_mock,
+        ):
+            fetch_url_mock.return_value = (None, {"status": 404, "msg": "test"})
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_message_with_thread(self):
         """tests sending a message with a thread"""
-        with set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test", "thread_id": "100.00"}):
-            with patch.object(slack, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": 200})
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with (
+            set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test", "thread_id": "100.00"}),
+            patch.object(slack, "fetch_url") as fetch_url_mock,
+        ):
+            fetch_url_mock.return_value = (None, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
@@ -84,40 +91,46 @@ class TestSlackModule(ModuleTestCase):
 
     # https://github.com/ansible-collections/community.general/issues/1097
     def test_ts_in_message_does_not_cause_edit(self):
-        with set_module_args({"token": "xoxa-123456789abcdef", "msg": "test with ts"}):
-            with patch.object(slack, "fetch_url") as fetch_url_mock:
-                mock_response = Mock()
-                mock_response.read.return_value = '{"fake":"data"}'
-                fetch_url_mock.return_value = (mock_response, {"status": 200})
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with (
+            set_module_args({"token": "xoxa-123456789abcdef", "msg": "test with ts"}),
+            patch.object(slack, "fetch_url") as fetch_url_mock,
+        ):
+            mock_response = Mock()
+            mock_response.read.return_value = '{"fake":"data"}'
+            fetch_url_mock.return_value = (mock_response, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
         self.assertEqual(fetch_url_mock.call_args[1]["url"], "https://slack.com/api/chat.postMessage")
 
     def test_govslack_message(self):
-        with set_module_args({"token": "xoxa-123456789abcdef", "domain": "slack-gov.com", "msg": "test with ts"}):
-            with patch.object(slack, "fetch_url") as fetch_url_mock:
-                mock_response = Mock()
-                mock_response.read.return_value = '{"fake":"data"}'
-                fetch_url_mock.return_value = (mock_response, {"status": 200})
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with (
+            set_module_args({"token": "xoxa-123456789abcdef", "domain": "slack-gov.com", "msg": "test with ts"}),
+            patch.object(slack, "fetch_url") as fetch_url_mock,
+        ):
+            mock_response = Mock()
+            mock_response.read.return_value = '{"fake":"data"}'
+            fetch_url_mock.return_value = (mock_response, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
         self.assertEqual(fetch_url_mock.call_args[1]["url"], "https://slack-gov.com/api/chat.postMessage")
 
     def test_edit_message(self):
-        with set_module_args({"token": "xoxa-123456789abcdef", "msg": "test2", "message_id": "12345"}):
-            with patch.object(slack, "fetch_url") as fetch_url_mock:
-                mock_response = Mock()
-                mock_response.read.return_value = '{"messages":[{"ts":"12345","msg":"test1"}]}'
-                fetch_url_mock.side_effect = [
-                    (mock_response, {"status": 200}),
-                    (mock_response, {"status": 200}),
-                ]
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with (
+            set_module_args({"token": "xoxa-123456789abcdef", "msg": "test2", "message_id": "12345"}),
+            patch.object(slack, "fetch_url") as fetch_url_mock,
+        ):
+            mock_response = Mock()
+            mock_response.read.return_value = '{"messages":[{"ts":"12345","msg":"test1"}]}'
+            fetch_url_mock.side_effect = [
+                (mock_response, {"status": 200}),
+                (mock_response, {"status": 200}),
+            ]
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 2)
         self.assertEqual(fetch_url_mock.call_args[1]["url"], "https://slack.com/api/chat.update")
@@ -126,28 +139,30 @@ class TestSlackModule(ModuleTestCase):
 
     def test_message_with_blocks(self):
         """tests sending a message with blocks"""
-        with set_module_args(
-            {
-                "token": "XXXX/YYYY/ZZZZ",
-                "msg": "test",
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {"type": "mrkdwn", "text": "*test*"},
-                        "accessory": {
-                            "type": "image",
-                            "image_url": "https://docs.ansible.com/favicon.ico",
-                            "alt_text": "test",
+        with (
+            set_module_args(
+                {
+                    "token": "XXXX/YYYY/ZZZZ",
+                    "msg": "test",
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {"type": "mrkdwn", "text": "*test*"},
+                            "accessory": {
+                                "type": "image",
+                                "image_url": "https://docs.ansible.com/favicon.ico",
+                                "alt_text": "test",
+                            },
                         },
-                    },
-                    {"type": "section", "text": {"type": "plain_text", "text": "test", "emoji": True}},
-                ],
-            }
+                        {"type": "section", "text": {"type": "plain_text", "text": "test", "emoji": True}},
+                    ],
+                }
+            ),
+            patch.object(slack, "fetch_url") as fetch_url_mock,
         ):
-            with patch.object(slack, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": 200})
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+            fetch_url_mock.return_value = (None, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
@@ -157,15 +172,17 @@ class TestSlackModule(ModuleTestCase):
 
     def test_message_with_invalid_color(self):
         """tests sending invalid color value to module"""
-        with set_module_args(
-            {
-                "token": "XXXX/YYYY/ZZZZ",
-                "msg": "test",
-                "color": "aa",
-            }
+        with (
+            set_module_args(
+                {
+                    "token": "XXXX/YYYY/ZZZZ",
+                    "msg": "test",
+                    "color": "aa",
+                }
+            ),
+            self.assertRaises(AnsibleFailJson) as exec_info,
         ):
-            with self.assertRaises(AnsibleFailJson) as exec_info:
-                self.module.main()
+            self.module.main()
 
         msg = (
             "Color value specified should be either one of"

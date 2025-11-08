@@ -64,9 +64,8 @@ class TestJenkinsBuildInfo(unittest.TestCase):
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies")
     def test_module_fail_when_required_args_missing(self, test_deps):
         test_deps.return_value = None
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                jenkins_build_info.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            jenkins_build_info.main()
 
     @patch("ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies")
     @patch(
@@ -76,9 +75,11 @@ class TestJenkinsBuildInfo(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args({"name": "job-present", "user": "abc", "token": "xyz", "build_number": 30}):
-                jenkins_build_info.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args({"name": "job-present", "user": "abc", "token": "xyz", "build_number": 30}),
+        ):
+            jenkins_build_info.main()
 
         self.assertFalse(return_json.exception.args[0]["changed"])
 
@@ -92,9 +93,11 @@ class TestJenkinsBuildInfo(unittest.TestCase):
         jenkins_connection.return_value = JenkinsMock()
         build_status.return_value = JenkinsBuildMock("job-absent", 30).get_build_status()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args({"name": "job-absent", "user": "abc", "token": "xyz", "build_number": 30}):
-                jenkins_build_info.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args({"name": "job-absent", "user": "abc", "token": "xyz", "build_number": 30}),
+        ):
+            jenkins_build_info.main()
 
         self.assertFalse(return_json.exception.args[0]["changed"])
         self.assertTrue(return_json.exception.args[0]["failed"])
@@ -108,9 +111,11 @@ class TestJenkinsBuildInfo(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args({"name": "job-present", "user": "abc", "token": "xyz"}):
-                jenkins_build_info.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args({"name": "job-present", "user": "abc", "token": "xyz"}),
+        ):
+            jenkins_build_info.main()
 
         self.assertFalse(return_json.exception.args[0]["changed"])
         self.assertEqual("SUCCESS", return_json.exception.args[0]["build_info"]["result"])
@@ -125,9 +130,11 @@ class TestJenkinsBuildInfo(unittest.TestCase):
         jenkins_connection.return_value = JenkinsMock()
         build_status.return_value = JenkinsBuildMock("job-absent").get_build_status()
 
-        with self.assertRaises(AnsibleExitJson) as return_json:
-            with set_module_args({"name": "job-absent", "user": "abc", "token": "xyz"}):
-                jenkins_build_info.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as return_json,
+            set_module_args({"name": "job-absent", "user": "abc", "token": "xyz"}),
+        ):
+            jenkins_build_info.main()
 
         self.assertFalse(return_json.exception.args[0]["changed"])
         self.assertTrue(return_json.exception.args[0]["failed"])

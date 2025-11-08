@@ -23,9 +23,8 @@ if HAS_REDIS_USERNAME_OPTION:
 
 
 def test_redis_data_incr_without_arguments(capfd):
-    with set_module_args({}):
-        with pytest.raises(SystemExit):
-            redis_data_incr.main()
+    with set_module_args({}), pytest.raises(SystemExit):
+        redis_data_incr.main()
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)["failed"]
@@ -92,17 +91,19 @@ def test_redis_data_inc_float(capfd, mocker):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_incr_float_wrong_value(capfd):
-    with set_module_args(
-        {
-            "login_host": "localhost",
-            "login_user": "root",
-            "login_password": "secret",
-            "key": "foo",
-            "increment_float": "not_a_number",
-        }
+    with (
+        set_module_args(
+            {
+                "login_host": "localhost",
+                "login_user": "root",
+                "login_password": "secret",
+                "key": "foo",
+                "increment_float": "not_a_number",
+            }
+        ),
+        pytest.raises(SystemExit),
     ):
-        with pytest.raises(SystemExit):
-            redis_data_incr.main()
+        redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -111,17 +112,19 @@ def test_redis_data_incr_float_wrong_value(capfd):
 
 @pytest.mark.skipif(HAS_REDIS_USERNAME_OPTION, reason="Redis version > 3.4.0")
 def test_redis_data_incr_fail_username(capfd, mocker):
-    with set_module_args(
-        {
-            "login_host": "localhost",
-            "login_user": "root",
-            "login_password": "secret",
-            "key": "foo",
-            "_ansible_check_mode": False,
-        }
+    with (
+        set_module_args(
+            {
+                "login_host": "localhost",
+                "login_user": "root",
+                "login_password": "secret",
+                "key": "foo",
+                "_ansible_check_mode": False,
+            }
+        ),
+        pytest.raises(SystemExit),
     ):
-        with pytest.raises(SystemExit):
-            redis_data_incr.main()
+        redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err

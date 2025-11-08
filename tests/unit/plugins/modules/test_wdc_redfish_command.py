@@ -221,13 +221,13 @@ class TestWdcRedfishCommand(unittest.TestCase):
         shutil.rmtree(self.tempdir)
 
     def test_module_fail_when_required_args_missing(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            module.main()
 
     def test_module_fail_when_unknown_category(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "category": "unknown",
                     "command": "FWActivate",
@@ -235,12 +235,14 @@ class TestWdcRedfishCommand(unittest.TestCase):
                     "password": "PASSW0RD=21",
                     "ioms": [],
                 }
-            ):
-                module.main()
+            ),
+        ):
+            module.main()
 
     def test_module_fail_when_unknown_command(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "category": "Update",
                     "command": "unknown",
@@ -248,8 +250,9 @@ class TestWdcRedfishCommand(unittest.TestCase):
                     "password": "PASSW0RD=21",
                     "ioms": [],
                 }
-            ):
-                module.main()
+            ),
+        ):
+            module.main()
 
     def test_module_chassis_power_mode_low(self):
         """Test setting chassis power mode to low (happy path)."""
@@ -261,16 +264,18 @@ class TestWdcRedfishCommand(unittest.TestCase):
             "resource_id": "Enclosure",
             "baseuri": "example.com",
         }
-        with set_module_args(module_args):
-            with patch.multiple(
+        with (
+            set_module_args(module_args),
+            patch.multiple(
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
                 post_request=mock_post_request,
-            ):
-                with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                    module.main()
-                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
-                self.assertTrue(is_changed(ansible_exit_json))
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
+            self.assertTrue(is_changed(ansible_exit_json))
 
     def test_module_chassis_power_mode_normal_when_already_normal(self):
         """Test setting chassis power mode to normal when it already is.  Verify we get changed=False."""
@@ -282,15 +287,17 @@ class TestWdcRedfishCommand(unittest.TestCase):
             "resource_id": "Enclosure",
             "baseuri": "example.com",
         }
-        with set_module_args(module_args):
-            with patch.multiple(
+        with (
+            set_module_args(module_args),
+            patch.multiple(
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
-            ):
-                with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                    module.main()
-                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
-                self.assertFalse(is_changed(ansible_exit_json))
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
+            self.assertFalse(is_changed(ansible_exit_json))
 
     def test_module_chassis_power_mode_invalid_command(self):
         """Test that we get an error when issuing an invalid PowerMode command."""
@@ -302,15 +309,17 @@ class TestWdcRedfishCommand(unittest.TestCase):
             "resource_id": "Enclosure",
             "baseuri": "example.com",
         }
-        with set_module_args(module_args):
-            with patch.multiple(
+        with (
+            set_module_args(module_args),
+            patch.multiple(
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
-            ):
-                with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                    module.main()
-                expected_error_message = "Invalid Command 'PowerModeExtraHigh'"
-                self.assertIn(expected_error_message, get_exception_message(ansible_fail_json))
+            ),
+        ):
+            with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
+                module.main()
+            expected_error_message = "Invalid Command 'PowerModeExtraHigh'"
+            self.assertIn(expected_error_message, get_exception_message(ansible_fail_json))
 
     def test_module_enclosure_led_indicator_on(self):
         """Test turning on a valid LED indicator (in this case we use the Enclosure resource)."""
@@ -322,16 +331,18 @@ class TestWdcRedfishCommand(unittest.TestCase):
             "resource_id": "Enclosure",
             "baseuri": "example.com",
         }
-        with set_module_args(module_args):
-            with patch.multiple(
+        with (
+            set_module_args(module_args),
+            patch.multiple(
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
                 post_request=mock_post_request,
-            ):
-                with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                    module.main()
-                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
-                self.assertTrue(is_changed(ansible_exit_json))
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
+            self.assertTrue(is_changed(ansible_exit_json))
 
     def test_module_invalid_resource_led_indicator_on(self):
         """Test turning LED on for an invalid resource id."""
@@ -343,16 +354,18 @@ class TestWdcRedfishCommand(unittest.TestCase):
             "resource_id": "Disk99",
             "baseuri": "example.com",
         }
-        with set_module_args(module_args):
-            with patch.multiple(
+        with (
+            set_module_args(module_args),
+            patch.multiple(
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
                 post_request=mock_post_request,
-            ):
-                with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                    module.main()
-                expected_error_message = "Chassis resource Disk99 not found"
-                self.assertEqual(expected_error_message, get_exception_message(ansible_fail_json))
+            ),
+        ):
+            with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
+                module.main()
+            expected_error_message = "Chassis resource Disk99 not found"
+            self.assertEqual(expected_error_message, get_exception_message(ansible_fail_json))
 
     def test_module_enclosure_led_off_already_off(self):
         """Test turning LED indicator off when it's already off.  Confirm changed is False and no POST occurs."""
@@ -364,15 +377,17 @@ class TestWdcRedfishCommand(unittest.TestCase):
             "resource_id": "Enclosure",
             "baseuri": "example.com",
         }
-        with set_module_args(module_args):
-            with patch.multiple(
+        with (
+            set_module_args(module_args),
+            patch.multiple(
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
-            ):
-                with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                    module.main()
-                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
-                self.assertFalse(is_changed(ansible_exit_json))
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
+            self.assertFalse(is_changed(ansible_exit_json))
 
     def test_module_fw_activate_first_iom_unavailable(self):
         """Test that if the first IOM is not available, the 2nd one is used."""
@@ -419,8 +434,9 @@ class TestWdcRedfishCommand(unittest.TestCase):
                 "password": "PASSW0RD=21",
             }
             module_args.update(uri_specifier)
-            with set_module_args(module_args):
-                with patch.multiple(
+            with (
+                set_module_args(module_args),
+                patch.multiple(
                     "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
                     _firmware_activate_uri=mock_fw_activate_url,
                     _update_uri=mock_update_url,
@@ -428,11 +444,12 @@ class TestWdcRedfishCommand(unittest.TestCase):
                     _find_updateservice_additional_uris=empty_return,
                     get_request=mock_get_request_enclosure_single_tenant,
                     post_request=mock_post_request,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                        module.main()
-                    self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
-                    self.assertTrue(is_changed(ansible_exit_json))
+                ),
+            ):
+                with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                    module.main()
+                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
+                self.assertTrue(is_changed(ansible_exit_json))
 
     def test_module_fw_activate_service_does_not_support_fw_activate(self):
         """Test FW Activate when it is not supported."""
@@ -468,16 +485,54 @@ class TestWdcRedfishCommand(unittest.TestCase):
     def test_module_update_and_activate_image_uri_not_http(self):
         """Test Update and Activate when URI is not http(s)"""
         expected_error_message = "Bundle URI must be HTTP or HTTPS"
-        with set_module_args(
-            {
-                "category": "Update",
-                "command": "UpdateAndActivate",
-                "username": "USERID",
-                "password": "PASSW0RD=21",
-                "ioms": ["example1.example.com"],
-                "update_image_uri": "ftp://example.com/image",
-            }
+        with (
+            set_module_args(
+                {
+                    "category": "Update",
+                    "command": "UpdateAndActivate",
+                    "username": "USERID",
+                    "password": "PASSW0RD=21",
+                    "ioms": ["example1.example.com"],
+                    "update_image_uri": "ftp://example.com/image",
+                }
+            ),
+            patch.multiple(
+                module.WdcRedfishUtils,
+                _firmware_activate_uri=mocked_url_response,
+                _update_uri=mock_update_url,
+                _find_updateservice_resource=empty_return,
+                _find_updateservice_additional_uris=empty_return,
+            ),
         ):
+            with self.assertRaises(AnsibleFailJson) as cm:
+                module.main()
+            self.assertEqual(expected_error_message, get_exception_message(cm))
+
+    def test_module_update_and_activate_target_not_ready_for_fw_update(self):
+        """Test Update and Activate when target is not in the correct state."""
+        mock_status_code = 999
+        mock_status_description = "mock status description"
+        expected_error_message = (
+            f"Target is not ready for FW update.  Current status: {mock_status_code} ({mock_status_description})"
+        )
+        with (
+            set_module_args(
+                {
+                    "category": "Update",
+                    "command": "UpdateAndActivate",
+                    "username": "USERID",
+                    "password": "PASSW0RD=21",
+                    "ioms": ["example1.example.com"],
+                    "update_image_uri": "http://example.com/image",
+                }
+            ),
+            patch.object(module.WdcRedfishUtils, "get_simple_update_status") as mock_get_simple_update_status,
+        ):
+            mock_get_simple_update_status.return_value = {
+                "ret": True,
+                "entries": {"StatusCode": mock_status_code, "Description": mock_status_description},
+            }
+
             with patch.multiple(
                 module.WdcRedfishUtils,
                 _firmware_activate_uri=mocked_url_response,
@@ -489,70 +544,38 @@ class TestWdcRedfishCommand(unittest.TestCase):
                     module.main()
                 self.assertEqual(expected_error_message, get_exception_message(cm))
 
-    def test_module_update_and_activate_target_not_ready_for_fw_update(self):
-        """Test Update and Activate when target is not in the correct state."""
-        mock_status_code = 999
-        mock_status_description = "mock status description"
-        expected_error_message = (
-            f"Target is not ready for FW update.  Current status: {mock_status_code} ({mock_status_description})"
-        )
-        with set_module_args(
-            {
-                "category": "Update",
-                "command": "UpdateAndActivate",
-                "username": "USERID",
-                "password": "PASSW0RD=21",
-                "ioms": ["example1.example.com"],
-                "update_image_uri": "http://example.com/image",
-            }
-        ):
-            with patch.object(module.WdcRedfishUtils, "get_simple_update_status") as mock_get_simple_update_status:
-                mock_get_simple_update_status.return_value = {
-                    "ret": True,
-                    "entries": {"StatusCode": mock_status_code, "Description": mock_status_description},
-                }
-
-                with patch.multiple(
-                    module.WdcRedfishUtils,
-                    _firmware_activate_uri=mocked_url_response,
-                    _update_uri=mock_update_url,
-                    _find_updateservice_resource=empty_return,
-                    _find_updateservice_additional_uris=empty_return,
-                ):
-                    with self.assertRaises(AnsibleFailJson) as cm:
-                        module.main()
-                    self.assertEqual(expected_error_message, get_exception_message(cm))
-
     def test_module_update_and_activate_bundle_not_a_tarfile(self):
         """Test Update and Activate when bundle is not a tarfile"""
         mock_filename = os.path.abspath(__file__)
         expected_error_message = ERROR_MESSAGE_UNABLE_TO_EXTRACT_BUNDLE_VERSION
-        with set_module_args(
-            {
-                "category": "Update",
-                "command": "UpdateAndActivate",
-                "username": "USERID",
-                "password": "PASSW0RD=21",
-                "ioms": ["example1.example.com"],
-                "update_image_uri": "http://example.com/image",
-                "update_creds": {"username": "image_user", "password": "image_password"},
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "category": "Update",
+                    "command": "UpdateAndActivate",
+                    "username": "USERID",
+                    "password": "PASSW0RD=21",
+                    "ioms": ["example1.example.com"],
+                    "update_image_uri": "http://example.com/image",
+                    "update_creds": {"username": "image_user", "password": "image_password"},
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
-            ) as mock_fetch_file:
-                mock_fetch_file.return_value = mock_filename
-                with patch.multiple(
-                    module.WdcRedfishUtils,
-                    get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
-                    _firmware_activate_uri=mocked_url_response,
-                    _update_uri=mock_update_url,
-                    _find_updateservice_resource=empty_return,
-                    _find_updateservice_additional_uris=empty_return,
-                ):
-                    with self.assertRaises(AnsibleFailJson) as cm:
-                        module.main()
-                    self.assertEqual(expected_error_message, get_exception_message(cm))
+            ) as mock_fetch_file,
+        ):
+            mock_fetch_file.return_value = mock_filename
+            with patch.multiple(
+                module.WdcRedfishUtils,
+                get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
+                _firmware_activate_uri=mocked_url_response,
+                _update_uri=mock_update_url,
+                _find_updateservice_resource=empty_return,
+                _find_updateservice_additional_uris=empty_return,
+            ):
+                with self.assertRaises(AnsibleFailJson) as cm:
+                    module.main()
+                self.assertEqual(expected_error_message, get_exception_message(cm))
 
     def test_module_update_and_activate_bundle_contains_no_firmware_version(self):
         """Test Update and Activate when bundle contains no firmware version"""
@@ -677,24 +700,26 @@ class TestWdcRedfishCommand(unittest.TestCase):
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-                with patch.multiple(
-                    "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
-                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
-                    simple_update=mock_simple_update,
-                    _simple_update_status_uri=mocked_url_response,
-                    # _find_updateservice_resource=empty_return,
-                    # _find_updateservice_additional_uris=empty_return,
-                    get_request=mock_get_request_enclosure_single_tenant,
-                    post_request=mock_post_request,
-                ):
-                    with patch(
+                with (
+                    patch.multiple(
+                        "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                        get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
+                        simple_update=mock_simple_update,
+                        _simple_update_status_uri=mocked_url_response,
+                        # _find_updateservice_resource=empty_return,
+                        # _find_updateservice_additional_uris=empty_return,
+                        get_request=mock_get_request_enclosure_single_tenant,
+                        post_request=mock_post_request,
+                    ),
+                    patch(
                         "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils.get_simple_update_status"
-                    ) as mock_get_simple_update_status:
-                        mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
-                        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                            module.main()
-                        self.assertTrue(is_changed(ansible_exit_json))
-                        self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
+                    ) as mock_get_simple_update_status,
+                ):
+                    mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
+                    with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                        module.main()
+                    self.assertTrue(is_changed(ansible_exit_json))
+                    self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
 
     def test_module_update_and_activate_pass_multi_tenant(self):
         """Test Update and Activate with multi-tenant (happy path)"""
@@ -716,24 +741,26 @@ class TestWdcRedfishCommand(unittest.TestCase):
                 "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-                with patch.multiple(
-                    module.WdcRedfishUtils,
-                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
-                    simple_update=mock_simple_update,
-                    _simple_update_status_uri=mocked_url_response,
-                    # _find_updateservice_resource=empty_return,
-                    # _find_updateservice_additional_uris=empty_return,
-                    get_request=mock_get_request_enclosure_multi_tenant,
-                    post_request=mock_post_request,
-                ):
-                    with patch(
+                with (
+                    patch.multiple(
+                        module.WdcRedfishUtils,
+                        get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
+                        simple_update=mock_simple_update,
+                        _simple_update_status_uri=mocked_url_response,
+                        # _find_updateservice_resource=empty_return,
+                        # _find_updateservice_additional_uris=empty_return,
+                        get_request=mock_get_request_enclosure_multi_tenant,
+                        post_request=mock_post_request,
+                    ),
+                    patch(
                         "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils.get_simple_update_status"
-                    ) as mock_get_simple_update_status:
-                        mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
-                        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                            module.main()
-                        self.assertTrue(is_changed(ansible_exit_json))
-                        self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
+                    ) as mock_get_simple_update_status,
+                ):
+                    mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
+                    with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                        module.main()
+                    self.assertTrue(is_changed(ansible_exit_json))
+                    self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, get_exception_message(ansible_exit_json))
 
     def test_module_fw_update_multi_tenant_firmware_single_tenant_enclosure(self):
         """Test Update and Activate using multi-tenant bundle on single-tenant enclosure"""

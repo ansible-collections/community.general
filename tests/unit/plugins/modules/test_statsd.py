@@ -47,70 +47,82 @@ class TestStatsDModule(ModuleTestCase):
 
     def test_udp_without_parameters(self):
         """Test udp without parameters"""
-        with self.patch_udp_statsd_client(side_effect=FakeStatsD):
-            with self.assertRaises(AnsibleFailJson):
-                with set_module_args({}):
-                    self.module.main()
+        with (
+            self.patch_udp_statsd_client(side_effect=FakeStatsD),
+            self.assertRaises(AnsibleFailJson),
+            set_module_args({}),
+        ):
+            self.module.main()
 
     def test_tcp_without_parameters(self):
         """Test tcp without parameters"""
-        with self.patch_tcp_statsd_client(side_effect=FakeStatsD):
-            with self.assertRaises(AnsibleFailJson):
-                with set_module_args({}):
-                    self.module.main()
+        with (
+            self.patch_tcp_statsd_client(side_effect=FakeStatsD),
+            self.assertRaises(AnsibleFailJson),
+            set_module_args({}),
+        ):
+            self.module.main()
 
     def test_udp_with_parameters(self):
         """Test udp with parameters"""
         with self.patch_udp_statsd_client(side_effect=FakeStatsD):
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as result,
+                set_module_args(
                     {
                         "metric": "my_counter",
                         "metric_type": "counter",
                         "value": 1,
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
             self.assertEqual(result.exception.args[0]["msg"], "Sent counter my_counter -> 1 to StatsD")
             self.assertEqual(result.exception.args[0]["changed"], True)
         with self.patch_udp_statsd_client(side_effect=FakeStatsD):
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as result,
+                set_module_args(
                     {
                         "metric": "my_gauge",
                         "metric_type": "gauge",
                         "value": 3,
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
             self.assertEqual(result.exception.args[0]["msg"], "Sent gauge my_gauge -> 3 (delta=False) to StatsD")
             self.assertEqual(result.exception.args[0]["changed"], True)
 
     def test_tcp_with_parameters(self):
         """Test tcp with parameters"""
         with self.patch_tcp_statsd_client(side_effect=FakeStatsD):
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as result,
+                set_module_args(
                     {
                         "protocol": "tcp",
                         "metric": "my_counter",
                         "metric_type": "counter",
                         "value": 1,
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
             self.assertEqual(result.exception.args[0]["msg"], "Sent counter my_counter -> 1 to StatsD")
             self.assertEqual(result.exception.args[0]["changed"], True)
         with self.patch_tcp_statsd_client(side_effect=FakeStatsD):
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as result,
+                set_module_args(
                     {
                         "protocol": "tcp",
                         "metric": "my_gauge",
                         "metric_type": "gauge",
                         "value": 3,
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
             self.assertEqual(result.exception.args[0]["msg"], "Sent gauge my_gauge -> 3 (delta=False) to StatsD")
             self.assertEqual(result.exception.args[0]["changed"], True)

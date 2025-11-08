@@ -65,13 +65,13 @@ class TestWdcRedfishInfo(unittest.TestCase):
         self.addCleanup(self.mock_module_helper.stop)
 
     def test_module_fail_when_required_args_missing(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            module.main()
 
     def test_module_fail_when_unknown_category(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "category": "unknown",
                     "command": "SimpleUpdateStatus",
@@ -79,12 +79,14 @@ class TestWdcRedfishInfo(unittest.TestCase):
                     "password": "PASSW0RD=21",
                     "ioms": [],
                 }
-            ):
-                module.main()
+            ),
+        ):
+            module.main()
 
     def test_module_fail_when_unknown_command(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "category": "Update",
                     "command": "unknown",
@@ -92,8 +94,9 @@ class TestWdcRedfishInfo(unittest.TestCase):
                     "password": "PASSW0RD=21",
                     "ioms": [],
                 }
-            ):
-                module.main()
+            ),
+        ):
+            module.main()
 
     def test_module_simple_update_status_pass(self):
         with set_module_args(
@@ -136,23 +139,25 @@ class TestWdcRedfishInfo(unittest.TestCase):
                 self.assertEqual(mock_simple_update_status()["data"], redfish_facts["simple_update_status"]["entries"])
 
     def test_module_simple_update_status_updateservice_resource_not_found(self):
-        with set_module_args(
-            {
-                "category": "Update",
-                "command": "SimpleUpdateStatus",
-                "username": "USERID",
-                "password": "PASSW0RD=21",
-                "ioms": ["example1.example.com"],
-            }
-        ):
-            with patch.object(module.WdcRedfishUtils, "get_request") as mock_get_request:
-                mock_get_request.return_value = {
-                    "ret": True,
-                    "data": {},  # Missing UpdateService property
+        with (
+            set_module_args(
+                {
+                    "category": "Update",
+                    "command": "SimpleUpdateStatus",
+                    "username": "USERID",
+                    "password": "PASSW0RD=21",
+                    "ioms": ["example1.example.com"],
                 }
-                with self.assertRaises(AnsibleFailJson) as ansible_exit_json:
-                    module.main()
-                self.assertEqual("UpdateService resource not found", get_exception_message(ansible_exit_json))
+            ),
+            patch.object(module.WdcRedfishUtils, "get_request") as mock_get_request,
+        ):
+            mock_get_request.return_value = {
+                "ret": True,
+                "data": {},  # Missing UpdateService property
+            }
+            with self.assertRaises(AnsibleFailJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual("UpdateService resource not found", get_exception_message(ansible_exit_json))
 
     def test_module_simple_update_status_service_does_not_support_simple_update(self):
         with set_module_args(

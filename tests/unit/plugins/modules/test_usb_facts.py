@@ -55,9 +55,8 @@ class TestUsbFacts(unittest.TestCase):
             with mock.patch.object(basic.AnsibleModule, "run_command") as mock_run_command:
                 command_output = data["input"]
                 mock_run_command.return_value = 0, command_output, None
-                with self.assertRaises(AnsibleExitJson) as result:
-                    with set_module_args({}):
-                        usb_facts.main()
+                with self.assertRaises(AnsibleExitJson) as result, set_module_args({}):
+                    usb_facts.main()
                 for output_field in self.output_fields:
                     self.assertEqual(
                         result.exception.args[0]["ansible_facts"]["usb_devices"][0][output_field], data[output_field]
@@ -69,9 +68,8 @@ class TestUsbFacts(unittest.TestCase):
             input += f"{data['input']}\n"
         with mock.patch.object(basic.AnsibleModule, "run_command") as mock_run_command:
             mock_run_command.return_value = 0, input, None
-            with self.assertRaises(AnsibleExitJson) as result:
-                with set_module_args({}):
-                    usb_facts.main()
+            with self.assertRaises(AnsibleExitJson) as result, set_module_args({}):
+                usb_facts.main()
             for index in range(0, len(self.testing_data)):
                 for output_field in self.output_fields:
                     self.assertEqual(

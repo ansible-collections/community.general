@@ -41,16 +41,14 @@ class MonitTest(unittest.TestCase):
         return mock.patch.object(self.monit, "get_status", side_effect=side_effect)
 
     def test_change_state_success(self):
-        with self.patch_status([monit.Status.OK, monit.Status.NOT_MONITORED]):
-            with self.assertRaises(AnsibleExitJson):
-                self.monit.stop()
+        with self.patch_status([monit.Status.OK, monit.Status.NOT_MONITORED]), self.assertRaises(AnsibleExitJson):
+            self.monit.stop()
         self.module.fail_json.assert_not_called()
         self.module.run_command.assert_called_with(["monit", "stop", "processX"], check_rc=True)
 
     def test_change_state_fail(self):
-        with self.patch_status([monit.Status.OK] * 3):
-            with self.assertRaises(AnsibleFailJson):
-                self.monit.stop()
+        with self.patch_status([monit.Status.OK] * 3), self.assertRaises(AnsibleFailJson):
+            self.monit.stop()
 
     def test_reload_fail(self):
         self.module.run_command.return_value = (1, "stdout", "stderr")
@@ -59,9 +57,8 @@ class MonitTest(unittest.TestCase):
 
     def test_reload(self):
         self.module.run_command.return_value = (0, "", "")
-        with self.patch_status(monit.Status.OK):
-            with self.assertRaises(AnsibleExitJson):
-                self.monit.reload()
+        with self.patch_status(monit.Status.OK), self.assertRaises(AnsibleExitJson):
+            self.monit.reload()
 
     def test_wait_for_status_to_stop_pending(self):
         status = [
@@ -81,25 +78,24 @@ class MonitTest(unittest.TestCase):
         self.assertEqual(get_status.call_count, 2)
 
     def test_wait_for_status_change_fail(self):
-        with self.patch_status([monit.Status.OK] * 3):
-            with self.assertRaises(AnsibleFailJson):
-                self.monit.wait_for_status_change(monit.Status.OK)
+        with self.patch_status([monit.Status.OK] * 3), self.assertRaises(AnsibleFailJson):
+            self.monit.wait_for_status_change(monit.Status.OK)
 
     def test_monitor(self):
-        with self.patch_status([monit.Status.NOT_MONITORED, monit.Status.OK.pending(), monit.Status.OK]):
-            with self.assertRaises(AnsibleExitJson):
-                self.monit.monitor()
+        with (
+            self.patch_status([monit.Status.NOT_MONITORED, monit.Status.OK.pending(), monit.Status.OK]),
+            self.assertRaises(AnsibleExitJson),
+        ):
+            self.monit.monitor()
 
     def test_monitor_fail(self):
-        with self.patch_status([monit.Status.NOT_MONITORED] * 3):
-            with self.assertRaises(AnsibleFailJson):
-                self.monit.monitor()
+        with self.patch_status([monit.Status.NOT_MONITORED] * 3), self.assertRaises(AnsibleFailJson):
+            self.monit.monitor()
 
     def test_timeout(self):
         self.monit.timeout = 0
-        with self.patch_status(monit.Status.NOT_MONITORED.pending()):
-            with self.assertRaises(AnsibleFailJson):
-                self.monit.wait_for_monit_to_stop_pending()
+        with self.patch_status(monit.Status.NOT_MONITORED.pending()), self.assertRaises(AnsibleFailJson):
+            self.monit.wait_for_monit_to_stop_pending()
 
 
 @pytest.mark.parametrize("status_name", monit.StatusValue.ALL_STATUS)

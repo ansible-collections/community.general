@@ -29,17 +29,18 @@ class TestCampfireModule(ModuleTestCase):
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            self.module.main()
 
     def test_successful_message(self):
         """Test failure message"""
-        with set_module_args({"subscription": "test", "token": "abc", "room": "test", "msg": "test"}):
-            with patch.object(campfire, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": 200})
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with (
+            set_module_args({"subscription": "test", "token": "abc", "room": "test", "msg": "test"}),
+            patch.object(campfire, "fetch_url") as fetch_url_mock,
+        ):
+            fetch_url_mock.return_value = (None, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         assert fetch_url_mock.call_count == 1
         url = fetch_url_mock.call_args[0][1]
@@ -50,11 +51,13 @@ class TestCampfireModule(ModuleTestCase):
 
     def test_successful_message_with_notify(self):
         """Test failure message"""
-        with set_module_args({"subscription": "test", "token": "abc", "room": "test", "msg": "test", "notify": "bell"}):
-            with patch.object(campfire, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": 200})
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with (
+            set_module_args({"subscription": "test", "token": "abc", "room": "test", "msg": "test", "notify": "bell"}),
+            patch.object(campfire, "fetch_url") as fetch_url_mock,
+        ):
+            fetch_url_mock.return_value = (None, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
 
         assert fetch_url_mock.call_count == 2
         notify_call = fetch_url_mock.mock_calls[0]
@@ -73,8 +76,10 @@ class TestCampfireModule(ModuleTestCase):
 
     def test_failure_message(self):
         """Test failure message"""
-        with set_module_args({"subscription": "test", "token": "abc", "room": "test", "msg": "test"}):
-            with patch.object(campfire, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": 403})
-                with self.assertRaises(AnsibleFailJson):
-                    self.module.main()
+        with (
+            set_module_args({"subscription": "test", "token": "abc", "room": "test", "msg": "test"}),
+            patch.object(campfire, "fetch_url") as fetch_url_mock,
+        ):
+            fetch_url_mock.return_value = (None, {"status": 403})
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()

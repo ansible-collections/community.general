@@ -32,9 +32,8 @@ class TestDatadogDowntime(ModuleTestCase):
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            self.module.main()
 
     @patch("ansible_collections.community.general.plugins.modules.datadog_downtime.DowntimesApi")
     def test_create_downtime_when_no_id(self, downtimes_api_mock):

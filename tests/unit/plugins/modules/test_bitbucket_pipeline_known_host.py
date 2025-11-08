@@ -29,8 +29,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
     @patch.object(bitbucket_pipeline_known_host, "get_existing_known_host", return_value=None)
     def test_create_known_host(self, *args):
         with patch.object(self.module, "create_known_host") as create_known_host_mock:
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as exec_info,
+                set_module_args(
                     {
                         "client_id": "ABC",
                         "client_secret": "XXX",
@@ -39,8 +40,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                         "name": "bitbucket.org",
                         "state": "present",
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
 
             self.assertEqual(create_known_host_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)
@@ -49,8 +51,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
     @patch.object(bitbucket_pipeline_known_host, "get_existing_known_host", return_value=None)
     def test_create_known_host_with_key(self, *args):
         with patch.object(self.module, "get_host_key") as get_host_key_mock:
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as exec_info,
+                set_module_args(
                     {
                         "user": "ABC",
                         "password": "XXX",
@@ -60,8 +63,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                         "key": "ssh-rsa public",
                         "state": "present",
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
 
             self.assertEqual(get_host_key_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)
@@ -86,8 +90,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
     )
     def test_dont_create_same_value(self, *args):
         with patch.object(self.module, "create_known_host") as create_known_host_mock:
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as exec_info,
+                set_module_args(
                     {
                         "client_id": "ABC",
                         "client_secret": "XXX",
@@ -96,8 +101,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                         "name": "bitbucket.org",
                         "state": "present",
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
 
             self.assertEqual(create_known_host_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], False)
@@ -107,8 +113,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
     @patch.object(bitbucket_pipeline_known_host, "get_existing_known_host", return_value=None)
     def test_create_known_host_check_mode(self, *args):
         with patch.object(self.module, "create_known_host") as create_known_host_mock:
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as exec_info,
+                set_module_args(
                     {
                         "client_id": "ABC",
                         "client_secret": "XXX",
@@ -118,8 +125,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                         "state": "present",
                         "_ansible_check_mode": True,
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
 
             self.assertEqual(create_known_host_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)
@@ -144,8 +152,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
     )
     def test_delete_known_host(self, *args):
         with patch.object(self.module, "delete_known_host") as delete_known_host_mock:
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as exec_info,
+                set_module_args(
                     {
                         "client_id": "ABC",
                         "client_secret": "XXX",
@@ -154,8 +163,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                         "name": "bitbucket.org",
                         "state": "absent",
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
 
             self.assertEqual(delete_known_host_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)
@@ -165,8 +175,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
     @patch.object(bitbucket_pipeline_known_host, "get_existing_known_host", return_value=None)
     def test_delete_absent_known_host(self, *args):
         with patch.object(self.module, "delete_known_host") as delete_known_host_mock:
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as exec_info,
+                set_module_args(
                     {
                         "client_id": "ABC",
                         "client_secret": "XXX",
@@ -175,8 +186,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                         "name": "bitbucket.org",
                         "state": "absent",
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
 
             self.assertEqual(delete_known_host_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], False)
@@ -201,8 +213,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
     )
     def test_delete_known_host_check_mode(self, *args):
         with patch.object(self.module, "delete_known_host") as delete_known_host_mock:
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as exec_info,
+                set_module_args(
                     {
                         "client_id": "ABC",
                         "client_secret": "XXX",
@@ -212,8 +225,9 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                         "state": "absent",
                         "_ansible_check_mode": True,
                     }
-                ):
-                    self.module.main()
+                ),
+            ):
+                self.module.main()
 
             self.assertEqual(delete_known_host_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)

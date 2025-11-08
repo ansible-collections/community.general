@@ -54,11 +54,10 @@ class TestInterfacesFileModule(unittest.TestCase):
         return flist
 
     def compareFileToBackup(self, path, backup):
-        with open(path) as f1:
-            with open(backup) as f2:
-                diffs = difflib.context_diff(
-                    f1.readlines(), f2.readlines(), fromfile=os.path.basename(path), tofile=os.path.basename(backup)
-                )
+        with open(path) as f1, open(backup) as f2:
+            diffs = difflib.context_diff(
+                f1.readlines(), f2.readlines(), fromfile=os.path.basename(path), tofile=os.path.basename(backup)
+            )
         # Restore backup
         move(backup, path)
         deltas = list(diffs)

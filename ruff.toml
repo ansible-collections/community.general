@@ -39,7 +39,6 @@ ignore = [
     "SIM114",  # if-with-same-arms
     "SIM115",  # open-file-with-context-handler
     "SIM116",  # if-else-block-instead-of-dict-lookup
-    "SIM117",  # multiple-with-statements
     "SIM118",  # in-dict-keys
     "SIM210",  # if-expr-with-true-false
     "SIM401",  # if-else-block-instead-of-dict-get

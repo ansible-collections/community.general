@@ -154,11 +154,13 @@ class TestKeycloakRealmRole(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(side_effect=return_value) as (mock_get_realm_keys_metadata_by_id):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(side_effect=return_value) as (mock_get_realm_keys_metadata_by_id),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         result = exec_info.exception.args[0]
         self.assertIs(result["changed"], False)

@@ -51,16 +51,18 @@ def test_zone_create(mocked_zone_create, capfd):
     """
     test zone creation
     """
-    with set_module_args(
-        {
-            "name": "z1",
-            "state": "installed",
-            "path": "/zones/z1",
-            "_ansible_check_mode": False,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "z1",
+                "state": "installed",
+                "path": "/zones/z1",
+                "_ansible_check_mode": False,
+            }
+        ),
+        pytest.raises(SystemExit),
     ):
-        with pytest.raises(SystemExit):
-            solaris_zone.main()
+        solaris_zone.main()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -72,16 +74,18 @@ def test_zone_delete(mocked_zone_delete, capfd):
     """
     test zone deletion
     """
-    with set_module_args(
-        {
-            "name": "z1",
-            "state": "absent",
-            "path": "/zones/z1",
-            "_ansible_check_mode": False,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "z1",
+                "state": "absent",
+                "path": "/zones/z1",
+                "_ansible_check_mode": False,
+            }
+        ),
+        pytest.raises(SystemExit),
     ):
-        with pytest.raises(SystemExit):
-            solaris_zone.main()
+        solaris_zone.main()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -97,16 +101,18 @@ def test_zone_create_invalid_names(mocked_zone_create, capfd):
     # 2. Zone name > 64 characters.
     # 3. Zone name beginning with non-alphanumeric character.
     for invalid_name in ("foo!bar", "z" * 65, "_zone"):
-        with set_module_args(
-            {
-                "name": invalid_name,
-                "state": "installed",
-                "path": f"/zones/{invalid_name}",
-                "_ansible_check_mode": False,
-            }
+        with (
+            set_module_args(
+                {
+                    "name": invalid_name,
+                    "state": "installed",
+                    "path": f"/zones/{invalid_name}",
+                    "_ansible_check_mode": False,
+                }
+            ),
+            pytest.raises(SystemExit),
         ):
-            with pytest.raises(SystemExit):
-                solaris_zone.main()
+            solaris_zone.main()
 
         out, err = capfd.readouterr()
         results = json.loads(out)

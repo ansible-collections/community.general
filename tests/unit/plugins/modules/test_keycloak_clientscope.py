@@ -51,40 +51,38 @@ def patch_keycloak_api(
     """
 
     obj = keycloak_clientscope.KeycloakAPI
-    with patch.object(
-        obj, "get_clientscope_by_name", side_effect=get_clientscope_by_name
-    ) as mock_get_clientscope_by_name:
-        with patch.object(
+    with (
+        patch.object(
+            obj, "get_clientscope_by_name", side_effect=get_clientscope_by_name
+        ) as mock_get_clientscope_by_name,
+        patch.object(
             obj, "get_clientscope_by_clientscopeid", side_effect=get_clientscope_by_clientscopeid
-        ) as mock_get_clientscope_by_clientscopeid:
-            with patch.object(obj, "create_clientscope", side_effect=create_clientscope) as mock_create_clientscope:
-                with patch.object(
-                    obj, "update_clientscope", return_value=update_clientscope
-                ) as mock_update_clientscope:
-                    with patch.object(
-                        obj,
-                        "get_clientscope_protocolmapper_by_name",
-                        side_effect=get_clientscope_protocolmapper_by_name,
-                    ) as mock_get_clientscope_protocolmapper_by_name:
-                        with patch.object(
-                            obj, "update_clientscope_protocolmappers", side_effect=update_clientscope_protocolmappers
-                        ) as mock_update_clientscope_protocolmappers:
-                            with patch.object(
-                                obj, "create_clientscope_protocolmapper", side_effect=create_clientscope_protocolmapper
-                            ) as mock_create_clientscope_protocolmapper:
-                                with patch.object(
-                                    obj, "delete_clientscope", side_effect=delete_clientscope
-                                ) as mock_delete_clientscope:
-                                    yield (
-                                        mock_get_clientscope_by_name,
-                                        mock_get_clientscope_by_clientscopeid,
-                                        mock_create_clientscope,
-                                        mock_update_clientscope,
-                                        mock_get_clientscope_protocolmapper_by_name,
-                                        mock_update_clientscope_protocolmappers,
-                                        mock_create_clientscope_protocolmapper,
-                                        mock_delete_clientscope,
-                                    )
+        ) as mock_get_clientscope_by_clientscopeid,
+        patch.object(obj, "create_clientscope", side_effect=create_clientscope) as mock_create_clientscope,
+        patch.object(obj, "update_clientscope", return_value=update_clientscope) as mock_update_clientscope,
+        patch.object(
+            obj,
+            "get_clientscope_protocolmapper_by_name",
+            side_effect=get_clientscope_protocolmapper_by_name,
+        ) as mock_get_clientscope_protocolmapper_by_name,
+        patch.object(
+            obj, "update_clientscope_protocolmappers", side_effect=update_clientscope_protocolmappers
+        ) as mock_update_clientscope_protocolmappers,
+        patch.object(
+            obj, "create_clientscope_protocolmapper", side_effect=create_clientscope_protocolmapper
+        ) as mock_create_clientscope_protocolmapper,
+        patch.object(obj, "delete_clientscope", side_effect=delete_clientscope) as mock_delete_clientscope,
+    ):
+        yield (
+            mock_get_clientscope_by_name,
+            mock_get_clientscope_by_clientscopeid,
+            mock_create_clientscope,
+            mock_update_clientscope,
+            mock_get_clientscope_protocolmapper_by_name,
+            mock_update_clientscope_protocolmappers,
+            mock_create_clientscope_protocolmapper,
+            mock_delete_clientscope,
+        )
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -158,20 +156,22 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
-                    mock_get_clientscope_by_name,
-                    mock_get_clientscope_by_clientscopeid,
-                    mock_create_clientscope,
-                    mock_update_clientscope,
-                    mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
-                    mock_create_clientscope_protocolmapper,
-                    mock_delete_clientscope,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
+                mock_get_clientscope_by_name,
+                mock_get_clientscope_by_clientscopeid,
+                mock_create_clientscope,
+                mock_update_clientscope,
+                mock_get_clientscope_protocolmapper_by_name,
+                mock_update_clientscope_protocolmappers,
+                mock_create_clientscope_protocolmapper,
+                mock_delete_clientscope,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(mock_get_clientscope_by_name.call_count, 2)
@@ -206,20 +206,22 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
-                    mock_get_clientscope_by_name,
-                    mock_get_clientscope_by_clientscopeid,
-                    mock_create_clientscope,
-                    mock_update_clientscope,
-                    mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
-                    mock_create_clientscope_protocolmapper,
-                    mock_delete_clientscope,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
+                mock_get_clientscope_by_name,
+                mock_get_clientscope_by_clientscopeid,
+                mock_create_clientscope,
+                mock_update_clientscope,
+                mock_get_clientscope_protocolmapper_by_name,
+                mock_update_clientscope_protocolmappers,
+                mock_create_clientscope_protocolmapper,
+                mock_delete_clientscope,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(mock_get_clientscope_by_name.call_count, 1)
@@ -254,20 +256,22 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
-                    mock_get_clientscope_by_name,
-                    mock_get_clientscope_by_clientscopeid,
-                    mock_create_clientscope,
-                    mock_update_clientscope,
-                    mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
-                    mock_create_clientscope_protocolmapper,
-                    mock_delete_clientscope,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
+                mock_get_clientscope_by_name,
+                mock_get_clientscope_by_clientscopeid,
+                mock_create_clientscope,
+                mock_update_clientscope,
+                mock_get_clientscope_protocolmapper_by_name,
+                mock_update_clientscope_protocolmappers,
+                mock_create_clientscope_protocolmapper,
+                mock_delete_clientscope,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(mock_get_clientscope_by_name.call_count, 1)
@@ -300,20 +304,22 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
-                    mock_get_clientscope_by_name,
-                    mock_get_clientscope_by_clientscopeid,
-                    mock_create_clientscope,
-                    mock_update_clientscope,
-                    mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
-                    mock_create_clientscope_protocolmapper,
-                    mock_delete_clientscope,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
+                mock_get_clientscope_by_name,
+                mock_get_clientscope_by_clientscopeid,
+                mock_create_clientscope,
+                mock_update_clientscope,
+                mock_get_clientscope_protocolmapper_by_name,
+                mock_update_clientscope_protocolmappers,
+                mock_create_clientscope_protocolmapper,
+                mock_delete_clientscope,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(mock_get_clientscope_by_name.call_count, 1)
@@ -435,20 +441,22 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
-                    mock_get_clientscope_by_name,
-                    mock_get_clientscope_by_clientscopeid,
-                    mock_create_clientscope,
-                    mock_update_clientscope,
-                    mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
-                    mock_create_clientscope_protocolmapper,
-                    mock_delete_clientscope,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(get_clientscope_by_name=return_value_get_clientscope_by_name) as (
+                mock_get_clientscope_by_name,
+                mock_get_clientscope_by_clientscopeid,
+                mock_create_clientscope,
+                mock_update_clientscope,
+                mock_get_clientscope_protocolmapper_by_name,
+                mock_update_clientscope_protocolmappers,
+                mock_create_clientscope_protocolmapper,
+                mock_delete_clientscope,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(mock_get_clientscope_by_name.call_count, 2)
@@ -620,23 +628,25 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Run the module
 
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_clientscope_by_name=return_value_get_clientscope_by_name,
-                    get_clientscope_by_clientscopeid=return_value_get_clientscope_by_clientscopeid,
-                ) as (
-                    mock_get_clientscope_by_name,
-                    mock_get_clientscope_by_clientscopeid,
-                    mock_create_clientscope,
-                    mock_update_clientscope,
-                    mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
-                    mock_create_clientscope_protocolmapper,
-                    mock_delete_clientscope,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
+        with (
+            set_module_args(module_args),
+            mock_good_connection(),
+            patch_keycloak_api(
+                get_clientscope_by_name=return_value_get_clientscope_by_name,
+                get_clientscope_by_clientscopeid=return_value_get_clientscope_by_clientscopeid,
+            ) as (
+                mock_get_clientscope_by_name,
+                mock_get_clientscope_by_clientscopeid,
+                mock_create_clientscope,
+                mock_update_clientscope,
+                mock_get_clientscope_protocolmapper_by_name,
+                mock_update_clientscope_protocolmappers,
+                mock_create_clientscope_protocolmapper,
+                mock_delete_clientscope,
+            ),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(mock_get_clientscope_by_name.call_count, 1)

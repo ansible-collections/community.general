@@ -63,9 +63,8 @@ def response_remove_nics():
 
 
 def test_scaleway_private_network_without_arguments(capfd):
-    with set_module_args({}):
-        with pytest.raises(SystemExit):
-            scaleway_compute_private_network.main()
+    with set_module_args({}), pytest.raises(SystemExit):
+        scaleway_compute_private_network.main()
     out, err = capfd.readouterr()
 
     assert not err

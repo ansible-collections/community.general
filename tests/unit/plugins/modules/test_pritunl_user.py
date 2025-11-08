@@ -27,11 +27,13 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 def mock_pritunl_api(func, **kwargs):
     def wrapped(self=None):
-        with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock):
-            with self.patch_get_pritunl_users(side_effect=PritunlListUserMock):
-                with self.patch_add_pritunl_users(side_effect=PritunlPostUserMock):
-                    with self.patch_delete_pritunl_users(side_effect=PritunlDeleteUserMock):
-                        func(self, **kwargs)
+        with (
+            self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock),
+            self.patch_get_pritunl_users(side_effect=PritunlListUserMock),
+            self.patch_add_pritunl_users(side_effect=PritunlPostUserMock),
+            self.patch_delete_pritunl_users(side_effect=PritunlDeleteUserMock),
+        ):
+            func(self, **kwargs)
 
     return wrapped
 
@@ -81,9 +83,8 @@ class TestPritunlUser(ModuleTestCase):
 
     def test_without_parameters(self):
         """Test without parameters"""
-        with set_module_args({}):
-            with self.assertRaises(AnsibleFailJson):
-                self.module.main()
+        with set_module_args({}), self.assertRaises(AnsibleFailJson):
+            self.module.main()
 
     @mock_pritunl_api
     def test_present(self):
@@ -92,20 +93,22 @@ class TestPritunlUser(ModuleTestCase):
             "user_name": "alice",
             "user_email": "alice@company.com",
         }
-        with set_module_args(
-            dict_merge(
-                {
-                    "pritunl_api_token": "token",
-                    "pritunl_api_secret": "secret",
-                    "pritunl_url": "https://pritunl.domain.com",
-                    "organization": "GumGum",
-                },
-                user_params,
-            )
+        with (
+            set_module_args(
+                dict_merge(
+                    {
+                        "pritunl_api_token": "token",
+                        "pritunl_api_secret": "secret",
+                        "pritunl_url": "https://pritunl.domain.com",
+                        "organization": "GumGum",
+                    },
+                    user_params,
+                )
+            ),
+            self.patch_update_pritunl_users(side_effect=PritunlPostUserMock),
+            self.assertRaises(AnsibleExitJson) as create_result,
         ):
-            with self.patch_update_pritunl_users(side_effect=PritunlPostUserMock):
-                with self.assertRaises(AnsibleExitJson) as create_result:
-                    self.module.main()
+            self.module.main()
 
         create_exc = create_result.exception.args[0]
 
@@ -121,20 +124,22 @@ class TestPritunlUser(ModuleTestCase):
             "user_email": "bob@company.com",
             "user_disabled": True,
         }
-        with set_module_args(
-            dict_merge(
-                {
-                    "pritunl_api_token": "token",
-                    "pritunl_api_secret": "secret",
-                    "pritunl_url": "https://pritunl.domain.com",
-                    "organization": "GumGum",
-                },
-                new_user_params,
-            )
+        with (
+            set_module_args(
+                dict_merge(
+                    {
+                        "pritunl_api_token": "token",
+                        "pritunl_api_secret": "secret",
+                        "pritunl_url": "https://pritunl.domain.com",
+                        "organization": "GumGum",
+                    },
+                    new_user_params,
+                )
+            ),
+            self.patch_update_pritunl_users(side_effect=PritunlPutUserMock),
+            self.assertRaises(AnsibleExitJson) as update_result,
         ):
-            with self.patch_update_pritunl_users(side_effect=PritunlPutUserMock):
-                with self.assertRaises(AnsibleExitJson) as update_result:
-                    self.module.main()
+            self.module.main()
 
         update_exc = update_result.exception.args[0]
 
@@ -148,18 +153,20 @@ class TestPritunlUser(ModuleTestCase):
     @mock_pritunl_api
     def test_absent(self):
         """Test user removal from Pritunl."""
-        with set_module_args(
-            {
-                "state": "absent",
-                "pritunl_api_token": "token",
-                "pritunl_api_secret": "secret",
-                "pritunl_url": "https://pritunl.domain.com",
-                "organization": "GumGum",
-                "user_name": "florian",
-            }
+        with (
+            set_module_args(
+                {
+                    "state": "absent",
+                    "pritunl_api_token": "token",
+                    "pritunl_api_secret": "secret",
+                    "pritunl_url": "https://pritunl.domain.com",
+                    "organization": "GumGum",
+                    "user_name": "florian",
+                }
+            ),
+            self.assertRaises(AnsibleExitJson) as result,
         ):
-            with self.assertRaises(AnsibleExitJson) as result:
-                self.module.main()
+            self.module.main()
 
         exc = result.exception.args[0]
 
@@ -169,18 +176,20 @@ class TestPritunlUser(ModuleTestCase):
     @mock_pritunl_api
     def test_absent_failure(self):
         """Test user removal from a non existing organization."""
-        with set_module_args(
-            {
-                "state": "absent",
-                "pritunl_api_token": "token",
-                "pritunl_api_secret": "secret",
-                "pritunl_url": "https://pritunl.domain.com",
-                "organization": "Unknown",
-                "user_name": "floria@company.com",
-            }
+        with (
+            set_module_args(
+                {
+                    "state": "absent",
+                    "pritunl_api_token": "token",
+                    "pritunl_api_secret": "secret",
+                    "pritunl_url": "https://pritunl.domain.com",
+                    "organization": "Unknown",
+                    "user_name": "floria@company.com",
+                }
+            ),
+            self.assertRaises(AnsibleFailJson) as result,
         ):
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.module.main()
+            self.module.main()
 
         exc = result.exception.args[0]
 

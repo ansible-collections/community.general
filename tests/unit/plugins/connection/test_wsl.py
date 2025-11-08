@@ -74,9 +74,11 @@ def test_missing_host_key(connection):
     with patch("ansible.utils.display.Display.prompt_until", return_value="yes"):
         policy.missing_host_key(client, "test.host", key)
 
-    with patch("ansible.utils.display.Display.prompt_until", return_value="no"):
-        with pytest.raises(AnsibleError, match="host connection rejected by user"):
-            policy.missing_host_key(client, "test.host", key)
+    with (
+        patch("ansible.utils.display.Display.prompt_until", return_value="no"),
+        pytest.raises(AnsibleError, match="host connection rejected by user"),
+    ):
+        policy.missing_host_key(client, "test.host", key)
 
 
 def test_set_log_channel(connection):
@@ -458,16 +460,16 @@ def test_close_lock_file_time_out_error_handling(mock_exists, mock_unlink, conne
 
     mock_exists.return_value = False
     matcher = f"writing lock file for {connection.keyfile} ran in to the timeout of {connection.get_option('lock_file_timeout')}s"
-    with pytest.raises(AnsibleError, match=matcher):
-        with (
-            patch("os.getuid", return_value=1000),
-            patch("os.getgid", return_value=1000),
-            patch("os.chmod"),
-            patch("os.chown"),
-            patch("os.rename"),
-            patch.object(FileLock, "lock_file", side_effect=LockTimeout()),
-        ):
-            connection.close()
+    with (
+        pytest.raises(AnsibleError, match=matcher),
+        patch("os.getuid", return_value=1000),
+        patch("os.getgid", return_value=1000),
+        patch("os.chmod"),
+        patch("os.chown"),
+        patch("os.rename"),
+        patch.object(FileLock, "lock_file", side_effect=LockTimeout()),
+    ):
+        connection.close()
 
 
 @patch("ansible_collections.community.general.plugins.module_utils._filelock.FileLock.lock_file")
@@ -539,9 +541,11 @@ def test_close_tempfile_error_handling(mock_exists, mock_lock_file, mock_tempfil
     mock_tempfile_instance.name = "/tmp/mock_tempfile"
     mock_tempfile.return_value.__enter__.return_value = mock_tempfile_instance
 
-    with pytest.raises(AnsibleError, match="error occurred while writing SSH host keys!"):
-        with patch.object(os, "chmod", side_effect=Exception()):
-            connection.close()
+    with (
+        pytest.raises(AnsibleError, match="error occurred while writing SSH host keys!"),
+        patch.object(os, "chmod", side_effect=Exception()),
+    ):
+        connection.close()
     mock_unlink.assert_called_with(missing_ok=True)
 
 

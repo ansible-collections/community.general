@@ -34,9 +34,8 @@ def patch_ipa(**kwargs):
             ...
     """
     obj = ipa_otptoken.OTPTokenIPAClient
-    with patch.object(obj, "login") as mock_login:
-        with patch.object(obj, "_post_json", **kwargs) as mock_post:
-            yield mock_login, mock_post
+    with patch.object(obj, "login") as mock_login, patch.object(obj, "_post_json", **kwargs) as mock_post:
+        yield mock_login, mock_post
 
 
 class TestIPAOTPToken(ModuleTestCase):
@@ -63,11 +62,12 @@ class TestIPAOTPToken(ModuleTestCase):
         changed (bool):
             Whether or not the module is supposed to be marked as changed
         """
-        with set_module_args(module_args):
-            # Run the module
-            with patch_ipa(return_value=return_value) as (mock_login, mock_post):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with (
+            set_module_args(module_args),
+            patch_ipa(return_value=return_value) as (mock_login, mock_post),
+            self.assertRaises(AnsibleExitJson) as exec_info,
+        ):
+            self.module.main()
 
         # Verify that the calls to _post_json match what is expected
         expected_call_count = len(mock_calls)
@@ -439,10 +439,12 @@ class TestIPAOTPToken(ModuleTestCase):
 
     def test_fail_post(self):
         """Fail due to an exception raised from _post_json"""
-        with set_module_args({"uniqueid": "NewToken1"}):
-            with patch_ipa(side_effect=Exception("ERROR MESSAGE")) as (mock_login, mock_post):
-                with self.assertRaises(AnsibleFailJson) as exec_info:
-                    self.module.main()
+        with (
+            set_module_args({"uniqueid": "NewToken1"}),
+            patch_ipa(side_effect=Exception("ERROR MESSAGE")) as (mock_login, mock_post),
+            self.assertRaises(AnsibleFailJson) as exec_info,
+        ):
+            self.module.main()
 
         self.assertEqual(exec_info.exception.args[0]["msg"], "ERROR MESSAGE")
 

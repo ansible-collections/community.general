@@ -31,9 +31,8 @@ class TestCirconusAnnotation(ModuleTestCase):
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            self.module.main()
 
     def test_add_annotation(self):
         """Check that result is changed"""
@@ -67,9 +66,11 @@ class TestCirconusAnnotation(ModuleTestCase):
                 resp.headers = {"X-Circonus-API-Version": "2.00"}
                 return self.build_response(request, resp)
 
-            with patch("requests.adapters.HTTPAdapter.send", autospec=True, side_effect=send) as send:
-                with self.assertRaises(AnsibleExitJson) as result:
-                    self.module.main()
+            with (
+                patch("requests.adapters.HTTPAdapter.send", autospec=True, side_effect=send) as send,
+                self.assertRaises(AnsibleExitJson) as result,
+            ):
+                self.module.main()
 
         self.assertTrue(result.exception.args[0]["changed"])
         self.assertEqual(result.exception.args[0]["annotation"]["_cid"], cid)
@@ -112,9 +113,11 @@ class TestCirconusAnnotation(ModuleTestCase):
                 resp.headers = {"X-Circonus-API-Version": "2.00"}
                 return self.build_response(request, resp)
 
-            with patch("requests.adapters.HTTPAdapter.send", autospec=True, side_effect=send) as send:
-                with self.assertRaises(AnsibleExitJson) as result:
-                    self.module.main()
+            with (
+                patch("requests.adapters.HTTPAdapter.send", autospec=True, side_effect=send) as send,
+                self.assertRaises(AnsibleExitJson) as result,
+            ):
+                self.module.main()
 
         self.assertTrue(result.exception.args[0]["changed"])
         self.assertEqual(result.exception.args[0]["annotation"]["_cid"], cid)
@@ -152,9 +155,11 @@ class TestCirconusAnnotation(ModuleTestCase):
                 resp.headers = {"X-Circonus-API-Version": "2.00"}
                 return self.build_response(request, resp)
 
-            with patch("requests.adapters.HTTPAdapter.send", autospec=True, side_effect=send) as send:
-                with self.assertRaises(AnsibleFailJson) as result:
-                    self.module.main()
+            with (
+                patch("requests.adapters.HTTPAdapter.send", autospec=True, side_effect=send) as send,
+                self.assertRaises(AnsibleFailJson) as result,
+            ):
+                self.module.main()
 
         self.assertTrue(result.exception.args[0]["failed"])
         self.assertTrue(re.match(r"\b403\b", result.exception.args[0]["reason"]))

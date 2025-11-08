@@ -371,15 +371,13 @@ def test_runner_context(runner_input, cmd_execution, expected):
 
     exc = expected.get("exc")
     if exc:
-        with pytest.raises(exc):
-            with runner.context(**runner_input["runner_ctx_args"]) as ctx:
-                results = ctx.run(**cmd_execution["runner_ctx_run_args"])
-                _assert_run(runner_input, cmd_execution, expected, ctx, results)
+        with pytest.raises(exc), runner.context(**runner_input["runner_ctx_args"]) as ctx:
+            results = ctx.run(**cmd_execution["runner_ctx_run_args"])
+            _assert_run(runner_input, cmd_execution, expected, ctx, results)
 
-        with pytest.raises(exc):
-            with runner(**runner_input["runner_ctx_args"]) as ctx2:
-                results2 = ctx2.run(**cmd_execution["runner_ctx_run_args"])
-                _assert_run(runner_input, cmd_execution, expected, ctx2, results2)
+        with pytest.raises(exc), runner(**runner_input["runner_ctx_args"]) as ctx2:
+            results2 = ctx2.run(**cmd_execution["runner_ctx_run_args"])
+            _assert_run(runner_input, cmd_execution, expected, ctx2, results2)
 
     else:
         with runner.context(**runner_input["runner_ctx_args"]) as ctx:

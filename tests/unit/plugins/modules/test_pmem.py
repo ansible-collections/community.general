@@ -326,99 +326,113 @@ class TestPmem(ModuleTestCase):
             self.assertEqual(result["size"], expected[i]["size"])
 
     def test_fail_when_required_args_missing(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                pmem_module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            pmem_module.main()
 
     def test_fail_when_appdirect_only(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "appdirect": 10,
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_MemosyMode_only(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "memorymode": 70,
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_reserved_only(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "reserved": 10,
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_appdirect_memorymode_reserved_total_not_100(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "appdirect": 10,
                     "memorymode": 70,
                     "reserved": 10,
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_when_appdirect_memorymode(self):
-        with set_module_args(
-            {
-                "appdirect": 10,
-                "memorymode": 70,
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "appdirect": 10,
+                    "memorymode": 70,
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[goal_plain, goal, dimmlist],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check(result, False, [25769803776], [188978561024], [328230764544])
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check(result, False, [25769803776], [188978561024], [328230764544])
 
     def test_when_appdirect_memorymode_reserved(self):
-        with set_module_args(
-            {
-                "appdirect": 10,
-                "memorymode": 70,
-                "reserved": 20,
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "appdirect": 10,
+                    "memorymode": 70,
+                    "reserved": 20,
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[goal_plain, goal, dimmlist],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check(result, False, [25769803776], [188978561024], [328230764544])
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check(result, False, [25769803776], [188978561024], [328230764544])
 
     def test_when_appdirect_notinterleaved_memorymode_reserved(self):
-        with set_module_args(
-            {
-                "appdirect": 10,
-                "appdirect_interleaved": False,
-                "memorymode": 70,
-                "reserved": 20,
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "appdirect": 10,
+                    "appdirect_interleaved": False,
+                    "memorymode": 70,
+                    "reserved": 20,
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[goal_plain, goal, dimmlist],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check(result, False, [25769803776], [188978561024], [328230764544])
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check(result, False, [25769803776], [188978561024], [328230764544])
 
     def test_fail_when_socket_id_appdirect(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "socket": [
                         {
@@ -431,12 +445,14 @@ class TestPmem(ModuleTestCase):
                         },
                     ],
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_socket0_id_memorymode_socket1_id_appdirect(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "socket": [
                         {
@@ -449,12 +465,14 @@ class TestPmem(ModuleTestCase):
                         },
                     ],
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_socket0_without_id(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "socket": [
                         {
@@ -468,98 +486,106 @@ class TestPmem(ModuleTestCase):
                         },
                     ],
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_when_socket0_and_1_appdirect_memorymode(self):
-        with set_module_args(
-            {
-                "socket": [
-                    {
-                        "id": 0,
-                        "appdirect": 10,
-                        "memorymode": 70,
-                    },
-                    {
-                        "id": 1,
-                        "appdirect": 10,
-                        "memorymode": 70,
-                    },
-                ],
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "socket": [
+                        {
+                            "id": 0,
+                            "appdirect": 10,
+                            "memorymode": 70,
+                        },
+                        {
+                            "id": 1,
+                            "appdirect": 10,
+                            "memorymode": 70,
+                        },
+                    ],
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[show_skt, goal_plain_sk0, goal_sk0, dimmlist_sk0, goal_plain_sk1, goal_sk1, dimmlist_sk1],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check(
-                    result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272]
-                )
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check(
+                result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272]
+            )
 
     def test_when_socket0_and_1_appdirect_memorymode_reserved(self):
-        with set_module_args(
-            {
-                "socket": [
-                    {
-                        "id": 0,
-                        "appdirect": 10,
-                        "memorymode": 70,
-                        "reserved": 20,
-                    },
-                    {
-                        "id": 1,
-                        "appdirect": 10,
-                        "memorymode": 70,
-                        "reserved": 20,
-                    },
-                ],
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "socket": [
+                        {
+                            "id": 0,
+                            "appdirect": 10,
+                            "memorymode": 70,
+                            "reserved": 20,
+                        },
+                        {
+                            "id": 1,
+                            "appdirect": 10,
+                            "memorymode": 70,
+                            "reserved": 20,
+                        },
+                    ],
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[show_skt, goal_plain_sk0, goal_sk0, dimmlist_sk0, goal_plain_sk1, goal_sk1, dimmlist_sk1],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check(
-                    result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272]
-                )
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check(
+                result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272]
+            )
 
     def test_when_socket0_appdirect_notinterleaved_memorymode_reserved_socket1_appdirect_memorymode_reserved(self):
-        with set_module_args(
-            {
-                "socket": [
-                    {
-                        "id": 0,
-                        "appdirect": 10,
-                        "appdirect_interleaved": False,
-                        "memorymode": 70,
-                        "reserved": 20,
-                    },
-                    {
-                        "id": 1,
-                        "appdirect": 10,
-                        "memorymode": 70,
-                        "reserved": 20,
-                    },
-                ],
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "socket": [
+                        {
+                            "id": 0,
+                            "appdirect": 10,
+                            "appdirect_interleaved": False,
+                            "memorymode": 70,
+                            "reserved": 20,
+                        },
+                        {
+                            "id": 1,
+                            "appdirect": 10,
+                            "memorymode": 70,
+                            "reserved": 20,
+                        },
+                    ],
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[show_skt, goal_plain_sk0, goal_sk0, dimmlist_sk0, goal_plain_sk1, goal_sk1, dimmlist_sk1],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check(
-                    result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272]
-                )
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check(
+                result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272]
+            )
 
     def test_fail_when_namespace_without_mode(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "namespace": [
                         {
@@ -572,12 +598,14 @@ class TestPmem(ModuleTestCase):
                         },
                     ],
                 }
-            ):
-                pmem_module.main()
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_region_is_empty(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "namespace": [
                         {
@@ -587,16 +615,18 @@ class TestPmem(ModuleTestCase):
                         },
                     ],
                 }
-            ):
-                with patch(
-                    "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
-                    side_effect=[ndctl_region_empty],
-                ):
-                    pmem_module.main()
+            ),
+            patch(
+                "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
+                side_effect=[ndctl_region_empty],
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_namespace_invalid_size(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "namespace": [
                         {
@@ -606,127 +636,142 @@ class TestPmem(ModuleTestCase):
                         },
                     ],
                 }
-            ):
-                with patch(
-                    "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
-                    side_effect=[ndctl_region],
-                ):
-                    pmem_module.main()
+            ),
+            patch(
+                "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
+                side_effect=[ndctl_region],
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_size_is_invalid_alignment(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "namespace": [
                         {"size": "400MB", "type": "pmem", "mode": "sector"},
                         {"size": "500MB", "type": "pmem", "mode": "sector"},
                     ],
                 }
-            ):
-                with patch(
-                    "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
-                    side_effect=[ndctl_region],
-                ):
-                    pmem_module.main()
+            ),
+            patch(
+                "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
+                side_effect=[ndctl_region],
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_blk_is_unsupported_type(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "namespace": [
                         {"size": "4GB", "type": "pmem", "mode": "sector"},
                         {"size": "5GB", "type": "blk", "mode": "sector"},
                     ],
                 }
-            ):
-                with patch(
-                    "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
-                    side_effect=[ndctl_region],
-                ):
-                    pmem_module.main()
+            ),
+            patch(
+                "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
+                side_effect=[ndctl_region],
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_size_isnot_set_to_multiple_namespaces(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "namespace": [
                         {"type": "pmem", "mode": "sector"},
                         {"size": "500GB", "type": "blk", "mode": "sector"},
                     ],
                 }
-            ):
-                with patch(
-                    "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
-                    side_effect=[ndctl_region],
-                ):
-                    pmem_module.main()
+            ),
+            patch(
+                "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
+                side_effect=[ndctl_region],
+            ),
+        ):
+            pmem_module.main()
 
     def test_fail_when_size_of_namespace_over_available(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson),
+            set_module_args(
                 {
                     "namespace": [
                         {"size": "400GB", "type": "pmem", "mode": "sector"},
                         {"size": "500GB", "type": "pmem", "mode": "sector"},
                     ],
                 }
-            ):
-                with patch(
-                    "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
-                    side_effect=[ndctl_region],
-                ):
-                    pmem_module.main()
+            ),
+            patch(
+                "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
+                side_effect=[ndctl_region],
+            ),
+        ):
+            pmem_module.main()
 
     def test_when_namespace0_without_size(self):
-        with set_module_args(
-            {
-                "namespace": [
-                    {"type": "pmem", "mode": "sector"},
-                ],
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "namespace": [
+                        {"type": "pmem", "mode": "sector"},
+                    ],
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[ndctl_region, ndctl_create_without_size, ndctl_list_N],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check_ns(result, ndctl_list_N)
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check_ns(result, ndctl_list_N)
 
     def test_when_namespace0_with_namespace_append(self):
-        with set_module_args(
-            {
-                "namespace": [
-                    {"size": "640MB", "type": "pmem", "mode": "raw"},
-                ],
-                "namespace_append": True,
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "namespace": [
+                        {"size": "640MB", "type": "pmem", "mode": "raw"},
+                    ],
+                    "namespace_append": True,
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[ndctl_region, ndctl_create_640M, ndctl_list_N_two_namespaces],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check_ns(result, ndctl_list_N_two_namespaces)
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check_ns(result, ndctl_list_N_two_namespaces)
 
     def test_when_namespace0_1GiB_pmem_sector_namespace1_640MiB_pmem_raw(self):
-        with set_module_args(
-            {
-                "namespace": [
-                    {"size": "1GB", "type": "pmem", "mode": "sector"},
-                    {
-                        "size": "640MB",
-                        "type": "pmem",
-                        "mode": "raw",
-                    },
-                ],
-            }
-        ):
-            with patch(
+        with (
+            set_module_args(
+                {
+                    "namespace": [
+                        {"size": "1GB", "type": "pmem", "mode": "sector"},
+                        {
+                            "size": "640MB",
+                            "type": "pmem",
+                            "mode": "raw",
+                        },
+                    ],
+                }
+            ),
+            patch(
                 "ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command",
                 side_effect=[ndctl_region, ndctl_create_1G, ndctl_create_640M, ndctl_list_N_two_namespaces],
-            ):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    pmem_module.main()
-                self.result_check_ns(result, ndctl_list_N_two_namespaces)
+            ),
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check_ns(result, ndctl_list_N_two_namespaces)

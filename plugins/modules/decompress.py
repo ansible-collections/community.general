@@ -114,9 +114,8 @@ def gzip_decompress(src):
 
 
 def decompress(b_src, b_dest, handler):
-    with handler(b_src) as src_file:
-        with open(b_dest, "wb") as dest_file:
-            shutil.copyfileobj(src_file, dest_file)
+    with handler(b_src) as src_file, open(b_dest, "wb") as dest_file:
+        shutil.copyfileobj(src_file, dest_file)
 
 
 class Decompress(ModuleHelper):

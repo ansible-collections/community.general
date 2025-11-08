@@ -200,10 +200,9 @@ def test_runner_context(runner_input, cmd_execution, expected):
 
     exc = expected.get("exc")
     if exc:
-        with pytest.raises(exc):
-            with runner.context(**runner_input["runner_ctx_args"]) as ctx:
-                results = ctx.run(**cmd_execution["runner_ctx_run_args"])
-                _assert_run(expected, ctx, results)
+        with pytest.raises(exc), runner.context(**runner_input["runner_ctx_args"]) as ctx:
+            results = ctx.run(**cmd_execution["runner_ctx_run_args"])
+            _assert_run(expected, ctx, results)
 
     else:
         with runner.context(**runner_input["runner_ctx_args"]) as ctx:

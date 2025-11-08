@@ -54,9 +54,8 @@ def test_acl_create(api_request_mock, project, prefix):
     if project:
         args["project"] = project
 
-    with pytest.raises(AnsibleExitJson):
-        with set_module_args(args):
-            rundeck_acl_policy.main()
+    with pytest.raises(AnsibleExitJson), set_module_args(args):
+        rundeck_acl_policy.main()
 
     # should have done GET → POST → GET
     assert api_request_mock.call_count == 3
@@ -83,9 +82,8 @@ def test_acl_unchanged(api_request_mock, project, prefix):
     if project:
         args["project"] = project
 
-    with pytest.raises(AnsibleExitJson):
-        with set_module_args(args):
-            rundeck_acl_policy.main()
+    with pytest.raises(AnsibleExitJson), set_module_args(args):
+        rundeck_acl_policy.main()
 
     # only a single GET
     assert api_request_mock.call_count == 1
@@ -115,9 +113,8 @@ def test_acl_remove(api_request_mock, project, prefix):
     if project:
         args["project"] = project
 
-    with pytest.raises(AnsibleExitJson):
-        with set_module_args(args):
-            rundeck_acl_policy.main()
+    with pytest.raises(AnsibleExitJson), set_module_args(args):
+        rundeck_acl_policy.main()
 
     # GET → DELETE
     assert api_request_mock.call_count == 2
@@ -143,9 +140,8 @@ def test_acl_remove_nonexistent(api_request_mock, project, prefix):
     if project:
         args["project"] = project
 
-    with pytest.raises(AnsibleExitJson):
-        with set_module_args(args):
-            rundeck_acl_policy.main()
+    with pytest.raises(AnsibleExitJson), set_module_args(args):
+        rundeck_acl_policy.main()
 
     # only the initial GET
     assert api_request_mock.call_count == 1

@@ -56,17 +56,18 @@ class TestDNSimple_Info(ModuleTestCase):
 
     def test_with_no_parameters(self):
         """Failure must occurs when all parameters are missing"""
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
+        with self.assertRaises(AnsibleFailJson), set_module_args({}):
+            self.module.main()
 
     @with_httmock(zones_resp)
     def test_only_key_and_account(self):
         """key and account will pass, returns domains"""
         account_id = "1234"
-        with self.assertRaises(AnsibleExitJson) as exc_info:
-            with set_module_args({"api_key": "abcd1324", "account_id": account_id}):
-                self.module.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as exc_info,
+            set_module_args({"api_key": "abcd1324", "account_id": account_id}),
+        ):
+            self.module.main()
         result = exc_info.exception.args[0]
         # nothing should change
         self.assertFalse(result["changed"])
@@ -77,9 +78,11 @@ class TestDNSimple_Info(ModuleTestCase):
     def test_only_name_without_record(self):
         """name and no record should not fail, returns the record"""
         name = "example.com"
-        with self.assertRaises(AnsibleExitJson) as exc_info:
-            with set_module_args({"api_key": "abcd1324", "name": "example.com", "account_id": "1234"}):
-                self.module.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as exc_info,
+            set_module_args({"api_key": "abcd1324", "name": "example.com", "account_id": "1234"}),
+        ):
+            self.module.main()
         result = exc_info.exception.args[0]
         # nothing should change
         self.assertFalse(result["changed"])
@@ -90,11 +93,11 @@ class TestDNSimple_Info(ModuleTestCase):
     def test_name_and_record(self):
         """name and record should not fail, returns the record"""
         record = "example"
-        with self.assertRaises(AnsibleExitJson) as exc_info:
-            with set_module_args(
-                {"api_key": "abcd1324", "account_id": "1234", "name": "example.com", "record": "example"}
-            ):
-                self.module.main()
+        with (
+            self.assertRaises(AnsibleExitJson) as exc_info,
+            set_module_args({"api_key": "abcd1324", "account_id": "1234", "name": "example.com", "record": "example"}),
+        ):
+            self.module.main()
         result = exc_info.exception.args[0]
         # nothing should change
         self.assertFalse(result["changed"])

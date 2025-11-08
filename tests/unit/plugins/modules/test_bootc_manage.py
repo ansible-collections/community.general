@@ -24,9 +24,8 @@ class TestBootcManageModule(ModuleTestCase):
 
     def test_switch_without_image(self):
         """Failure if state is 'switch' but no image provided"""
-        with set_module_args({"state": "switch"}):
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.module.main()
+        with set_module_args({"state": "switch"}), self.assertRaises(AnsibleFailJson) as result:
+            self.module.main()
         self.assertEqual(result.exception.args[0]["msg"], "state is switch but all of the following are missing: image")
 
     def test_switch_with_image(self):

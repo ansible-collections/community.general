@@ -94,17 +94,19 @@ def get_instance(instance):
 def test_get_jenkins_instance_with_user_and_token(instance):
     instance.node_exists.return_value = False
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-            "url": "https://localhost:8080",
-            "user": "admin",
-            "token": "password",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+                "url": "https://localhost:8080",
+                "user": "admin",
+                "token": "password",
+            }
+        ),
+        pytest.raises(AnsibleExitJson),
     ):
-        with pytest.raises(AnsibleExitJson):
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.call_args == call("https://localhost:8080", "admin", "password")
 
@@ -112,16 +114,18 @@ def test_get_jenkins_instance_with_user_and_token(instance):
 def test_get_jenkins_instance_with_user(instance):
     instance.node_exists.return_value = False
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-            "url": "https://localhost:8080",
-            "user": "admin",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+                "url": "https://localhost:8080",
+                "user": "admin",
+            }
+        ),
+        pytest.raises(AnsibleExitJson),
     ):
-        with pytest.raises(AnsibleExitJson):
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.call_args == call("https://localhost:8080", "admin")
 
@@ -129,15 +133,17 @@ def test_get_jenkins_instance_with_user(instance):
 def test_get_jenkins_instance_with_no_credential(instance):
     instance.node_exists.return_value = False
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-            "url": "https://localhost:8080",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+                "url": "https://localhost:8080",
+            }
+        ),
+        pytest.raises(AnsibleExitJson),
     ):
-        with pytest.raises(AnsibleExitJson):
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.call_args == call("https://localhost:8080")
 
@@ -150,14 +156,16 @@ def test_state_present_when_absent(get_instance, instance, state):
     instance.node_exists.return_value = False
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": state,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": state,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.create_node.call_args == call("my-node", launcher=jenkins.LAUNCHER_SSH)
 
@@ -170,15 +178,17 @@ def test_state_present_when_absent_check_mode(get_instance, instance, state):
     instance.node_exists.return_value = False
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": state,
-            "_ansible_check_mode": True,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": state,
+                "_ansible_check_mode": True,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.create_node.called
 
@@ -192,14 +202,16 @@ def test_state_present_when_absent_redirect_auth_error_handled(get_instance, ins
     instance.get_node_config.return_value = "<slave />"
     instance.create_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": state,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": state,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.create_node.call_args == call("my-node", launcher=jenkins.LAUNCHER_SSH)
 
@@ -213,14 +225,16 @@ def test_state_present_when_absent_other_error_raised(get_instance, instance, st
     instance.get_node_config.return_value = "<slave />"
     instance.create_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": state,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": state,
+            }
+        ),
+        raises(AnsibleFailJson) as result,
     ):
-        with raises(AnsibleFailJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.create_node.call_args == call("my-node", launcher=jenkins.LAUNCHER_SSH)
 
@@ -231,14 +245,16 @@ def test_state_present_when_present(get_instance, instance):
     instance.node_exists.return_value = True
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.create_node.called
 
@@ -250,14 +266,16 @@ def test_state_absent_when_present(get_instance, instance):
     instance.node_exists.return_value = True
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.delete_node.call_args == call("my-node")
 
@@ -269,15 +287,17 @@ def test_state_absent_when_present_check_mode(get_instance, instance):
     instance.node_exists.return_value = True
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-            "_ansible_check_mode": True,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+                "_ansible_check_mode": True,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.delete_node.called
 
@@ -290,14 +310,16 @@ def test_state_absent_when_present_redirect_auth_error_handled(get_instance, ins
     instance.get_node_config.return_value = "<slave />"
     instance.delete_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.delete_node.call_args == call("my-node")
 
@@ -310,14 +332,16 @@ def test_state_absent_when_present_other_error_raised(get_instance, instance):
     instance.get_node_config.return_value = "<slave />"
     instance.delete_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+            }
+        ),
+        raises(AnsibleFailJson) as result,
     ):
-        with raises(AnsibleFailJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.delete_node.call_args == call("my-node")
 
@@ -328,14 +352,16 @@ def test_state_absent_when_absent(get_instance, instance):
     instance.node_exists.return_value = False
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "absent",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "absent",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.delete_node.called
 
@@ -348,14 +374,16 @@ def test_state_enabled_when_offline(get_instance, instance):
     instance.get_node_config.return_value = "<slave />"
     instance.get_node_info.return_value = {"offline": True}
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "enabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "enabled",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.enable_node.call_args == call("my-node")
 
@@ -368,15 +396,17 @@ def test_state_enabled_when_offline_check_mode(get_instance, instance):
     instance.get_node_config.return_value = "<slave />"
     instance.get_node_info.return_value = {"offline": True}
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "enabled",
-            "_ansible_check_mode": True,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "enabled",
+                "_ansible_check_mode": True,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.enable_node.called
 
@@ -390,14 +420,16 @@ def test_state_enabled_when_offline_redirect_auth_error_handled(get_instance, in
     instance.get_node_info.side_effect = [{"offline": True}, {"offline": False}]
     instance.enable_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "enabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "enabled",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.enable_node.call_args == call("my-node")
 
@@ -411,14 +443,16 @@ def test_state_enabled_when_offline_other_error_raised(get_instance, instance):
     instance.get_node_info.side_effect = [{"offline": True}, {"offline": True}]
     instance.enable_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "enabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "enabled",
+            }
+        ),
+        raises(AnsibleFailJson) as result,
     ):
-        with raises(AnsibleFailJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.enable_node.call_args == call("my-node")
 
@@ -430,14 +464,16 @@ def test_state_enabled_when_not_offline(get_instance, instance):
     instance.get_node_config.return_value = "<slave />"
     instance.get_node_info.return_value = {"offline": False}
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "enabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "enabled",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.enable_node.called
 
@@ -453,14 +489,16 @@ def test_state_disabled_when_not_offline(get_instance, instance):
         "offlineCauseReason": "",
     }
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.disable_node.call_args == call("my-node", "")
 
@@ -483,14 +521,16 @@ def test_state_disabled_when_not_offline_redirect_auth_error_handled(get_instanc
     ]
     instance.disable_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.disable_node.call_args == call("my-node", "")
 
@@ -513,14 +553,16 @@ def test_state_disabled_when_not_offline_other_error_raised(get_instance, instan
     ]
     instance.disable_node.side_effect = jenkins.JenkinsException
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+            }
+        ),
+        raises(AnsibleFailJson) as result,
     ):
-        with raises(AnsibleFailJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.disable_node.call_args == call("my-node", "")
 
@@ -535,15 +577,17 @@ def test_state_disabled_when_not_offline_check_mode(get_instance, instance):
         "offlineCauseReason": "",
     }
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-            "_ansible_check_mode": True,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+                "_ansible_check_mode": True,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.disable_node.called
 
@@ -559,14 +603,16 @@ def test_state_disabled_when_offline(get_instance, instance):
         "offlineCauseReason": "",
     }
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.disable_node.called
 
@@ -578,15 +624,17 @@ def test_configure_num_executors_when_not_configured(get_instance, instance):
     instance.node_exists.return_value = True
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-            "num_executors": 3,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "num_executors": 3,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.reconfig_node.call_args[0][0] == "my-node"
     assert_xml_equal(
@@ -610,15 +658,17 @@ def test_configure_num_executors_when_not_equal(get_instance, instance):
 </slave>
 """
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-            "num_executors": 2,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "num_executors": 2,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert_xml_equal(
         instance.reconfig_node.call_args[0][1],
@@ -641,15 +691,17 @@ def test_configure_num_executors_when_equal(get_instance, instance):
 </slave>
 """
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-            "num_executors": 2,
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "num_executors": 2,
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.reconfig_node.called
 
@@ -661,19 +713,21 @@ def test_configure_labels_when_not_configured(get_instance, instance):
     instance.node_exists.return_value = True
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-            "labels": [
-                "a",
-                "b",
-                "c",
-            ],
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "labels": [
+                    "a",
+                    "b",
+                    "c",
+                ],
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.reconfig_node.call_args[0][0] == "my-node"
     assert_xml_equal(
@@ -697,19 +751,21 @@ def test_configure_labels_when_not_equal(get_instance, instance):
 </slave>
 """
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-            "labels": [
-                "a",
-                "z",
-                "c",
-            ],
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "labels": [
+                    "a",
+                    "z",
+                    "c",
+                ],
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.reconfig_node.call_args[0][0] == "my-node"
     assert_xml_equal(
@@ -733,19 +789,21 @@ def test_configure_labels_when_equal(get_instance, instance):
 </slave>
 """
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-            "labels": [
-                "a",
-                "b",
-                "c",
-            ],
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "labels": [
+                    "a",
+                    "b",
+                    "c",
+                ],
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.reconfig_node.called
 
@@ -757,32 +815,36 @@ def test_configure_labels_fail_when_contains_space(get_instance, instance):
     instance.node_exists.return_value = True
     instance.get_node_config.return_value = "<slave />"
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "present",
-            "labels": [
-                "a error",
-            ],
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "labels": [
+                    "a error",
+                ],
+            }
+        ),
+        raises(AnsibleFailJson),
     ):
-        with raises(AnsibleFailJson):
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.reconfig_node.called
 
 
 @mark.parametrize(["state"], [param(state) for state in ["enabled", "present", "absent"]])
 def test_raises_error_if_offline_message_when_state_not_disabled(get_instance, instance, state):
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": state,
-            "offline_message": "This is a message...",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": state,
+                "offline_message": "This is a message...",
+            }
+        ),
+        raises(AnsibleFailJson),
     ):
-        with raises(AnsibleFailJson):
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.disable_node.called
 
@@ -795,15 +857,17 @@ def test_set_offline_message_when_equal(get_instance, instance):
         "offlineCauseReason": "This is an old message...",
     }
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-            "offline_message": "This is an old message...",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+                "offline_message": "This is an old message...",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.disable_node.called
 
@@ -818,15 +882,17 @@ def test_set_offline_message_when_not_equal_not_offline(get_instance, instance):
         "offlineCauseReason": "This is an old message...",
     }
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-            "offline_message": "This is a new message...",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+                "offline_message": "This is a new message...",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert instance.disable_node.call_args == call("my-node", "This is a new message...")
 
@@ -844,15 +910,17 @@ def test_set_offline_message_when_not_equal_offline(get_instance, instance):
         "offlineCauseReason": "This is an old message...",
     }
 
-    with set_module_args(
-        {
-            "name": "my-node",
-            "state": "disabled",
-            "offline_message": "This is a new message...",
-        }
+    with (
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "disabled",
+                "offline_message": "This is a new message...",
+            }
+        ),
+        raises(AnsibleExitJson) as result,
     ):
-        with raises(AnsibleExitJson) as result:
-            jenkins_node.main()
+        jenkins_node.main()
 
     assert not instance.disable_node.called
 

@@ -104,14 +104,14 @@ class TestOcapiInfo(unittest.TestCase):
         self.addCleanup(self.mock_module_helper.stop)
 
     def test_module_fail_when_required_args_missing(self):
-        with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            with set_module_args({}):
-                module.main()
+        with self.assertRaises(AnsibleFailJson) as ansible_fail_json, set_module_args({}):
+            module.main()
         self.assertIn("missing required arguments:", get_exception_message(ansible_fail_json))
 
     def test_module_fail_when_unknown_category(self):
-        with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson) as ansible_fail_json,
+            set_module_args(
                 {
                     "category": "unknown",
                     "command": "JobStatus",
@@ -119,13 +119,15 @@ class TestOcapiInfo(unittest.TestCase):
                     "password": "PASSW0RD=21",
                     "baseuri": MOCK_BASE_URI,
                 }
-            ):
-                module.main()
+            ),
+        ):
+            module.main()
         self.assertIn("Invalid Category 'unknown", get_exception_message(ansible_fail_json))
 
     def test_module_fail_when_unknown_command(self):
-        with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            with set_module_args(
+        with (
+            self.assertRaises(AnsibleFailJson) as ansible_fail_json,
+            set_module_args(
                 {
                     "category": "Jobs",
                     "command": "unknown",
@@ -133,8 +135,9 @@ class TestOcapiInfo(unittest.TestCase):
                     "password": "PASSW0RD=21",
                     "baseuri": MOCK_BASE_URI,
                 }
-            ):
-                module.main()
+            ),
+        ):
+            module.main()
         self.assertIn("Invalid Command 'unknown", get_exception_message(ansible_fail_json))
 
     def test_job_status_in_progress(self):
@@ -145,8 +148,9 @@ class TestOcapiInfo(unittest.TestCase):
             delete_request=mock_delete_request,
             post_request=mock_post_request,
         ):
-            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as ansible_exit_json,
+                set_module_args(
                     {
                         "category": "Jobs",
                         "command": "JobStatus",
@@ -155,8 +159,9 @@ class TestOcapiInfo(unittest.TestCase):
                         "username": "USERID",
                         "password": "PASSWORD=21",
                     }
-                ):
-                    module.main()
+                ),
+            ):
+                module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
             self.assertEqual(
@@ -189,8 +194,9 @@ class TestOcapiInfo(unittest.TestCase):
             delete_request=mock_delete_request,
             post_request=mock_post_request,
         ):
-            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as ansible_exit_json,
+                set_module_args(
                     {
                         "category": "Jobs",
                         "command": "JobStatus",
@@ -199,8 +205,9 @@ class TestOcapiInfo(unittest.TestCase):
                         "username": "USERID",
                         "password": "PASSWORD=21",
                     }
-                ):
-                    module.main()
+                ),
+            ):
+                module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
             self.assertEqual(
@@ -231,8 +238,9 @@ class TestOcapiInfo(unittest.TestCase):
             delete_request=mock_delete_request,
             post_request=mock_post_request,
         ):
-            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                with set_module_args(
+            with (
+                self.assertRaises(AnsibleExitJson) as ansible_exit_json,
+                set_module_args(
                     {
                         "category": "Jobs",
                         "command": "JobStatus",
@@ -241,8 +249,9 @@ class TestOcapiInfo(unittest.TestCase):
                         "username": "USERID",
                         "password": "PASSWORD=21",
                     }
-                ):
-                    module.main()
+                ),
+            ):
+                module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
             self.assertFalse(response_data["jobExists"])
