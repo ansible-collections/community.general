@@ -161,9 +161,7 @@ class TestPritunlOrg(ModuleTestCase):
             # Switch force=True which should run successfully
             with set_module_args(dict_merge(module_args, {"force": True})):
                 with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock):
-                    with self.patch_delete_pritunl_organization(
-                        side_effect=PritunlDeleteOrganizationMock
-                    ):
+                    with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock):
                         with self.assertRaises(AnsibleExitJson) as delete_result:
                             self.module.main()
 

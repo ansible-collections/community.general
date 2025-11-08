@@ -44,9 +44,7 @@ def test_without_required_parameters_unregistered(mocker, capfd, patch_redhat_su
     """
     Failure must occurs when all parameters are missing
     """
-    mocker.patch.object(
-        basic.AnsibleModule, "run_command", return_value=(1, "This system is not yet registered.", "")
-    )
+    mocker.patch.object(basic.AnsibleModule, "run_command", return_value=(1, "This system is not yet registered.", ""))
 
     with pytest.raises(SystemExit):
         redhat_subscription.main()

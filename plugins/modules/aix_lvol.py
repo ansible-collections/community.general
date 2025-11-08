@@ -272,7 +272,6 @@ def main():
         if state == "absent":
             module.exit_json(changed=False, msg=f"Logical Volume {lv} does not exist.")
 
-
     this_lv = parse_lv(lv_info)
 
     if state == "present" and not size:
