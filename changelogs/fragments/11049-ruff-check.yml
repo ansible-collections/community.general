@@ -60,4 +60,3 @@ bugfixes:
   - xenserver_guest - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
   - xfs_quota - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
   - xml - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
- 
