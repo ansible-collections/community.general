@@ -193,12 +193,7 @@ class ZFSFacts:
             cmd.append(",".join(self.type))
         cmd.extend(["-o", "name,property,value", self.properties, self.name])
 
-        (rc, out, err) = self.module.run_command(cmd)
-
-        if rc != 0:
-            self.module.fail_json(
-                msg=f"Error while trying to get facts about ZFS dataset: {self.name}", stderr=err, rc=rc
-            )
+        (rc, out, err) = self.module.run_command(cmd, check_rc=True)
 
         for line in out.splitlines():
             dataset, property, value = line.split("\t")
