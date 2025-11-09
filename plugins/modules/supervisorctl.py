@@ -113,6 +113,9 @@ EXAMPLES = r"""
     state: restarted
 """
 
+# silly change to trigger CI
+
+
 import os
 from ansible.module_utils.basic import AnsibleModule, is_executable
 
