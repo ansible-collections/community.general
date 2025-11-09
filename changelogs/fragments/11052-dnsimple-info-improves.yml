@@ -1,0 +1,2 @@
+minor_changes:
+  - dnsimple_info - use Ansible construct to validate parameters (https://github.com/ansible-collections/community.general/pull/11052).
