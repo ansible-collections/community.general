@@ -773,7 +773,7 @@ def test_rhsm_repository(mocker, capfd, patch_rhsm_repository, testcase):
 
     # Mock function used for running commands first
     call_results = [item[2] for item in testcase["run_command.calls"]]
-    mock_run_command = mocker.patch.object(basic.AnsibleModule, "run_command", side_effect=call_results)
+    mocker.patch.object(basic.AnsibleModule, "run_command", side_effect=call_results)
 
     # Try to run test case
     with pytest.raises(SystemExit):

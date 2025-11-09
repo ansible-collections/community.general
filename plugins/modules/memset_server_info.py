@@ -246,7 +246,6 @@ def get_facts(args=None):
     """
     retvals, payload = dict(), dict()
     has_changed, has_failed = False, False
-    msg, stderr, memset_api = None, None, None
 
     payload["name"] = args["name"]
 
@@ -266,14 +265,12 @@ def get_facts(args=None):
         return retvals
 
     # we don't want to return the same thing twice
-    msg = None
     memset_api = response.json()
 
     retvals["changed"] = has_changed
     retvals["failed"] = has_failed
-    for val in ["msg", "memset_api"]:
-        if val is not None:
-            retvals[val] = eval(val)
+    retvals["msg"] = None
+    retvals["memset_api"] = memset_api
 
     return retvals
 

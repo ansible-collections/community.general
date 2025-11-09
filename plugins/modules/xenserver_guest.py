@@ -1370,7 +1370,7 @@ class XenServerVM(XenServerObject):
                     # do not support subargument specs.
                     try:
                         num_cpus = int(num_cpus)
-                    except ValueError as e:
+                    except ValueError:
                         self.module.fail_json(msg="VM check hardware.num_cpus: parameter should be an integer value!")
 
                     if num_cpus < 1:
@@ -1392,7 +1392,7 @@ class XenServerVM(XenServerObject):
                     # do not support subargument specs.
                     try:
                         num_cpu_cores_per_socket = int(num_cpu_cores_per_socket)
-                    except ValueError as e:
+                    except ValueError:
                         self.module.fail_json(
                             msg="VM check hardware.num_cpu_cores_per_socket: parameter should be an integer value!"
                         )
@@ -1423,7 +1423,7 @@ class XenServerVM(XenServerObject):
                     # do not support subargument specs.
                     try:
                         memory_mb = int(memory_mb)
-                    except ValueError as e:
+                    except ValueError:
                         self.module.fail_json(msg="VM check hardware.memory_mb: parameter should be an integer value!")
 
                     if memory_mb < 1:

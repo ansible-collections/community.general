@@ -128,7 +128,7 @@ def main():
             res = redis.connection.get(key)
             if res is not None:
                 value = float(res)
-        except ValueError as e:
+        except ValueError:
             msg = f"Value: {res} of key: {key} is not incrementable(int or float)"
             result["msg"] = msg
             module.fail_json(**result)

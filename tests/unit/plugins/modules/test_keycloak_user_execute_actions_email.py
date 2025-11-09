@@ -33,7 +33,6 @@ def _create_wrapper(text_as_string):
 def _build_mocked_request(get_id_user_count, response_dict):
     def _mocked_requests(*args, **kwargs):
         url = args[0]
-        method = kwargs["method"]
         future_response = response_dict.get(url, None)
         if callable(future_response):
             return future_response()

@@ -114,7 +114,7 @@ class TestKeycloakRealmRole(ModuleTestCase):
         with set_module_args(module_args):
             with mock_good_connection():
                 with patch_keycloak_api(get_realm_info_by_id=return_value) as (mock_get_realm_info_by_id):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                    with self.assertRaises(AnsibleExitJson):
                         self.module.main()
 
         self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 1)

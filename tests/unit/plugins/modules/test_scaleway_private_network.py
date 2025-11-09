@@ -74,7 +74,7 @@ def response_delete():
 
 def test_scaleway_private_network_without_arguments(capfd):
     with set_module_args({}):
-        with pytest.raises(SystemExit) as results:
+        with pytest.raises(SystemExit):
             scaleway_private_network.main()
     out, err = capfd.readouterr()
 
@@ -97,7 +97,7 @@ def test_scaleway_create_pn(capfd):
             mock_scw_get.return_value = response_with_zero_network()
             with patch.object(Scaleway, "post") as mock_scw_post:
                 mock_scw_post.return_value = response_create_new()
-                with pytest.raises(SystemExit) as results:
+                with pytest.raises(SystemExit):
                     scaleway_private_network.main()
         mock_scw_post.assert_any_call(
             path="private-networks/",
@@ -124,7 +124,7 @@ def test_scaleway_existing_pn(capfd):
         os.environ["SCW_API_TOKEN"] = "notrealtoken"
         with patch.object(Scaleway, "get") as mock_scw_get:
             mock_scw_get.return_value = response_with_new_network()
-            with pytest.raises(SystemExit) as results:
+            with pytest.raises(SystemExit):
                 scaleway_private_network.main()
     mock_scw_get.assert_any_call(
         "private-networks", params={"name": "new_network_name", "order_by": "name_asc", "page": 1, "page_size": 10}
@@ -152,7 +152,7 @@ def test_scaleway_add_tag_pn(capfd):
             mock_scw_get.return_value = response_with_new_network()
             with patch.object(Scaleway, "patch") as mock_scw_patch:
                 mock_scw_patch.return_value = response_create_new_newtag()
-                with pytest.raises(SystemExit) as results:
+                with pytest.raises(SystemExit):
                     scaleway_private_network.main()
             mock_scw_patch.assert_any_call(
                 path="private-networks/c123b4cd-ef5g-678h-90i1-jk2345678l90",
@@ -184,7 +184,7 @@ def test_scaleway_remove_pn(capfd):
             mock_scw_get.return_value = response_with_new_network()
             with patch.object(Scaleway, "delete") as mock_scw_delete:
                 mock_scw_delete.return_value = response_delete()
-                with pytest.raises(SystemExit) as results:
+                with pytest.raises(SystemExit):
                     scaleway_private_network.main()
         mock_scw_delete.assert_any_call("private-networks/c123b4cd-ef5g-678h-90i1-jk2345678l90")
     mock_scw_get.assert_any_call(
@@ -211,7 +211,7 @@ def test_scaleway_absent_pn_not_exists(capfd):
         os.environ["SCW_API_TOKEN"] = "notrealtoken"
         with patch.object(Scaleway, "get") as mock_scw_get:
             mock_scw_get.return_value = response_with_zero_network()
-            with pytest.raises(SystemExit) as results:
+            with pytest.raises(SystemExit):
                 scaleway_private_network.main()
     mock_scw_get.assert_any_call(
         "private-networks", params={"name": "new_network_name", "order_by": "name_asc", "page": 1, "page_size": 10}

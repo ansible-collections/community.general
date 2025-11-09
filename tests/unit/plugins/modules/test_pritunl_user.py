@@ -103,7 +103,7 @@ class TestPritunlUser(ModuleTestCase):
                 user_params,
             )
         ):
-            with self.patch_update_pritunl_users(side_effect=PritunlPostUserMock) as post_mock:
+            with self.patch_update_pritunl_users(side_effect=PritunlPostUserMock):
                 with self.assertRaises(AnsibleExitJson) as create_result:
                     self.module.main()
 
@@ -132,7 +132,7 @@ class TestPritunlUser(ModuleTestCase):
                 new_user_params,
             )
         ):
-            with self.patch_update_pritunl_users(side_effect=PritunlPutUserMock) as put_mock:
+            with self.patch_update_pritunl_users(side_effect=PritunlPutUserMock):
                 with self.assertRaises(AnsibleExitJson) as update_result:
                     self.module.main()
 

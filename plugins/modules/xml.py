@@ -920,7 +920,6 @@ def main():
     input_type = module.params["input_type"]
     print_match = module.params["print_match"]
     count = module.params["count"]
-    backup = module.params["backup"]
     strip_cdata_tags = module.params["strip_cdata_tags"]
     insertbefore = module.params["insertbefore"]
     insertafter = module.params["insertafter"]

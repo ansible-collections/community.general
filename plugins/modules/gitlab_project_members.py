@@ -177,7 +177,7 @@ class GitLabProjectMembers:
         try:
             project_exists = self._gitlab.projects.get(project_name)
             return project_exists.id
-        except gitlab.exceptions.GitlabGetError as e:
+        except gitlab.exceptions.GitlabGetError:
             project_exists = self._gitlab.projects.list(search=project_name, all=False)
             if project_exists:
                 return project_exists[0].id
@@ -200,7 +200,7 @@ class GitLabProjectMembers:
             member = project.members.get(gitlab_user_id)
             if member:
                 return member
-        except gitlab.exceptions.GitlabGetError as e:
+        except gitlab.exceptions.GitlabGetError:
             return None
 
     # check if the user is a member of the project
@@ -213,7 +213,7 @@ class GitLabProjectMembers:
     # add user to a project
     def add_member_to_project(self, gitlab_user_id, gitlab_project_id, access_level):
         project = self._gitlab.projects.get(gitlab_project_id)
-        add_member = project.members.create({"user_id": gitlab_user_id, "access_level": access_level})
+        project.members.create({"user_id": gitlab_user_id, "access_level": access_level})
 
     # remove user from a project
     def remove_user_from_project(self, gitlab_user_id, gitlab_project_id):
