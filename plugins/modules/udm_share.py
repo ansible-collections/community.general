@@ -36,17 +36,14 @@ options:
       - Name.
     type: str
   host:
-    required: false
     description:
       - Host FQDN (server which provides the share), for example V({{ ansible_fqdn }}). Required if O(state=present).
     type: str
   path:
-    required: false
     description:
       - Directory on the providing server, for example V(/home). Required if O(state=present).
     type: path
   sambaName:
-    required: false
     description:
       - Windows name. Required if O(state=present).
     type: str

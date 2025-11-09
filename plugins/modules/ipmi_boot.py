@@ -43,7 +43,6 @@ options:
   key:
     description:
       - Encryption key to connect to the BMC in hex format.
-    required: false
     type: str
     version_added: 4.1.0
   bootdev:

@@ -44,7 +44,6 @@ options:
     description:
       - User defined data. Typically used with C(cloud-init).
       - Pass your C(cloud-init) script here as a string.
-    required: false
 
   region:
     type: str

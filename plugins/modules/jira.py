@@ -72,36 +72,30 @@ options:
 
   project:
     type: str
-    required: false
     description:
       - The project for this operation. Required for issue creation.
   summary:
     type: str
-    required: false
     description:
       - The issue summary, where appropriate.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   description:
     type: str
-    required: false
     description:
       - The issue description, where appropriate.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   issuetype:
     type: str
-    required: false
     description:
       - The issue type, for issue creation.
   issue:
     type: str
-    required: false
     description:
       - An existing issue key to operate on.
     aliases: ['ticket']
 
   comment:
     type: str
-    required: false
     description:
       - The comment text to add.
       - Note that JIRA may not allow changing field values on specific transitions or states.
@@ -128,20 +122,17 @@ options:
 
   status:
     type: str
-    required: false
     description:
       - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
       - This is mutually exclusive with O(status_id).
   status_id:
     type: str
-    required: false
     description:
       - Only used when O(operation) is V(transition), and refers to the transition ID.
       - This is mutually exclusive with O(status).
     version_added: 10.3.0
   assignee:
     type: str
-    required: false
     description:
       - Sets the assignee when O(operation) is V(create), V(transition), or V(edit).
       - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use O(account_id) instead.
@@ -155,22 +146,18 @@ options:
 
   linktype:
     type: str
-    required: false
     description:
       - Set type of link, when action 'link' selected.
   inwardissue:
     type: str
-    required: false
     description:
       - Set issue from which link is created.
   outwardissue:
     type: str
-    required: false
     description:
       - Set issue to which link is created.
   fields:
     type: dict
-    required: false
     description:
       - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API (possibly
         after merging with other required data, as when passed to create). See examples for more information, and the JIRA
@@ -180,14 +167,12 @@ options:
       - Note that JIRA may not allow changing field values on specific transitions or states.
     default: {}
   jql:
-    required: false
     description:
       - Query JIRA in JQL Syntax, for example V("CMDB Hostname" = test.example.com).
     type: str
     version_added: '0.2.0'
 
   maxresults:
-    required: false
     description:
       - Limit the result of O(operation=search). If no value is specified, the default JIRA limit is used.
       - Used when O(operation=search) only, ignored otherwise.
@@ -196,13 +181,11 @@ options:
 
   timeout:
     type: float
-    required: false
     description:
       - Set timeout, in seconds, on requests to JIRA API.
     default: 10
 
   validate_certs:
-    required: false
     description:
       - Require valid SSL certificates (set to V(false) if you would like to use self-signed certificates).
     default: true

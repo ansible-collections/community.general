@@ -56,7 +56,6 @@ options:
     type: str
     description:
       - A URL with a picture, video or sound clip to send with an MMS (multimedia message) instead of a plain SMS.
-    required: false
 
 author: "Matt Makai (@makaimc)"
 """

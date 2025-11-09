@@ -48,34 +48,28 @@ options:
     description:
       - Name of affected host name. Can be a list.
       - If not specified, it defaults to the remote system's hostname.
-    required: false
     aliases: ['host']
   env:
     type: str
     description:
       - The environment name, typically V(production), V(staging), and so on.
-    required: false
   owner:
     type: str
     description:
       - The person responsible for the deployment.
-    required: false
   description:
     type: str
     description:
       - Free text description of the deployment.
-    required: false
   url:
     type: str
     description:
       - Base URL of the API server.
-    required: false
     default: "https://api.bigpanda.io"
   validate_certs:
     description:
       - If V(false), SSL certificates for the target URL are not validated. This should only be used on personally controlled
         sites using self-signed certificates.
-    required: false
     default: true
     type: bool
   deployment_message:

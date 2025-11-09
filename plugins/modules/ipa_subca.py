@@ -36,7 +36,6 @@ options:
     description:
       - State to ensure.
       - States V(disable) and V(enable) are available for FreeIPA 4.4.2 version and onwards.
-    required: false
     default: present
     choices: ["absent", "disabled", "enabled", "present"]
     type: str

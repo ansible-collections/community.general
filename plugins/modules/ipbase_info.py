@@ -20,23 +20,19 @@ options:
   ip:
     description:
       - The IP you want to get the info for. If not specified the API detects the IP automatically.
-    required: false
     type: str
   apikey:
     description:
       - The API key for the request if you need more requests.
-    required: false
     type: str
   hostname:
     description:
       - If the O(hostname) parameter is set to V(true), the API response contains the hostname of the IP.
-    required: false
     type: bool
     default: false
   language:
     description:
       - An ISO Alpha 2 Language Code for localizing the IP data.
-    required: false
     type: str
     default: "en"
 notes:

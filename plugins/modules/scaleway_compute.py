@@ -86,7 +86,6 @@ options:
     elements: str
     description:
       - List of tags to apply to the instance (5 max).
-    required: false
     default: []
 
   region:
@@ -125,14 +124,12 @@ options:
     type: int
     description:
       - Time to wait for the server to reach the expected state.
-    required: false
     default: 300
 
   wait_sleep_time:
     type: int
     description:
       - Time to wait before every attempt to check the state of the server.
-    required: false
     default: 3
 
   security_group:
@@ -140,7 +137,6 @@ options:
     description:
       - Security group unique identifier.
       - If no value provided, the default security group or current security group is used.
-    required: false
 """
 
 EXAMPLES = r"""

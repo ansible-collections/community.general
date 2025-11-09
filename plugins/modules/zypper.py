@@ -56,19 +56,16 @@ options:
       - V(absent) makes sure the specified package is not installed.
       - V(dist-upgrade) makes sure the latest version of all installed packages from all enabled repositories is installed.
       - When using V(dist-upgrade), O(name) should be V(*).
-    required: false
     choices: [present, latest, absent, dist-upgrade, installed, removed]
     default: "present"
     type: str
   type:
     description:
       - The type of package to be operated on.
-    required: false
     choices: [package, patch, pattern, product, srcpackage, application]
     default: "package"
     type: str
   extra_args_precommand:
-    required: false
     description:
       - Add additional global target options to C(zypper).
       - Options should be supplied in a single line as if given in the command line.
@@ -77,14 +74,12 @@ options:
     description:
       - Whether to disable to GPG signature checking of the package signature being installed. Has an effect only if O(state)
         is V(present) or V(latest).
-    required: false
     default: false
     type: bool
   auto_import_keys:
     description:
       - Whether to automatically import new repository signing keys. Adds C(--gpg-auto-import-keys) option to I(zypper).
       - Is only used when installing.
-    required: false
     default: false
     type: bool
     version_added: 11.3.0
@@ -92,27 +87,23 @@ options:
     description:
       - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior;
         V(false) does install recommended packages.
-    required: false
     default: true
     type: bool
   force:
     description:
       - Adds C(--force) option to I(zypper). Allows to downgrade packages and change vendor or architecture.
-    required: false
     default: false
     type: bool
   force_resolution:
     description:
       - Adds C(--force-resolution) option to I(zypper). Allows to (un)install packages with conflicting requirements (resolver
         chooses a solution).
-    required: false
     default: false
     type: bool
     version_added: '0.2.0'
   update_cache:
     description:
       - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
-    required: false
     default: false
     type: bool
     aliases: ["refresh"]
@@ -120,53 +111,45 @@ options:
     description:
       - Adds C(--oldpackage) option to I(zypper). Allows to downgrade packages with less side-effects than force. This is
         implied as soon as a version is specified as part of the package name.
-    required: false
     default: false
     type: bool
   extra_args:
-    required: false
     description:
       - Add additional options to C(zypper) command.
       - Options should be supplied in a single line as if given in the command line.
     type: str
   allow_vendor_change:
     type: bool
-    required: false
     default: false
     description:
       - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
     version_added: '0.2.0'
   replacefiles:
     type: bool
-    required: false
     default: false
     description:
       - Adds C(--replacefiles) option to I(zypper) install/update command.
     version_added: '0.2.0'
   clean_deps:
     type: bool
-    required: false
     default: false
     description:
       - Adds C(--clean-deps) option to I(zypper) remove command.
     version_added: '4.6.0'
   simple_errors:
     type: bool
-    required: false
     default: false
     description:
       - When set to V(true), provide a simplified error output (parses only the C(<message>) tag text in the XML output).
     version_added: '10.2.0'
   quiet:
     type: bool
-    required: false
     default: true
     description:
       - Adds C(--quiet) option to I(zypper) install/update command.
     version_added: '10.2.0'
   skip_post_errors:
     type: bool
-    required: false
     default: false
     description:
       - When set to V(true), ignore I(zypper) return code 107 (post install script errors).

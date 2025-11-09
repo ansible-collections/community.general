@@ -29,7 +29,6 @@ options:
     type: str
     description:
       - Name of the service (displayed as the "user" in the message).
-    required: false
     default: ansible
   message_content:
     type: str
@@ -41,12 +40,10 @@ options:
     type: str
     description:
       - Service URL for the web client.
-    required: false
   icon_url:
     type: str
     description:
       - Icon for the service.
-    required: false
   validate_certs:
     description:
       - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed

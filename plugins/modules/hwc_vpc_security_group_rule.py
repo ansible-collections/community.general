@@ -51,43 +51,36 @@ options:
       - Provides supplementary information about the security group rule. The value is a string of no more than 255 characters
         that can contain letters and digits.
     type: str
-    required: false
   ethertype:
     description:
       - Specifies the IP protocol version. The value can be IPv4 or IPv6. If you do not set this parameter, IPv4 is used by
         default.
     type: str
-    required: false
   port_range_max:
     description:
       - Specifies the end port number. The value ranges from 1 to 65535. If the protocol is not icmp, the value cannot be
         smaller than the port_range_min value. An empty value indicates all ports.
     type: int
-    required: false
   port_range_min:
     description:
       - Specifies the start port number. The value ranges from 1 to 65535. The value cannot be greater than the port_range_max
         value. An empty value indicates all ports.
     type: int
-    required: false
   protocol:
     description:
       - Specifies the protocol type. The value can be icmp, tcp, or udp. If the parameter is left blank, the security group
         supports all protocols.
     type: str
-    required: false
   remote_group_id:
     description:
       - Specifies the ID of the peer security group. The value is exclusive with parameter remote_ip_prefix.
     type: str
-    required: false
   remote_ip_prefix:
     description:
       - Specifies the remote IP address. If the access control direction is set to egress, the parameter specifies the source
         IP address. If the access control direction is set to ingress, the parameter specifies the destination IP address.
         The value can be in the CIDR format or IP addresses. The parameter is exclusive with parameter remote_group_id.
     type: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

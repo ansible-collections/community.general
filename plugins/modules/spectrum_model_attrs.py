@@ -47,7 +47,6 @@ options:
     description:
       - If V(false), it does not use a proxy, even if one is defined in an environment variable on the target hosts.
     default: true
-    required: false
     type: bool
   name:
     description:
@@ -65,7 +64,6 @@ options:
         and there is no man-in-the-middle attack happening.
     type: bool
     default: true
-    required: false
   attributes:
     description:
       - A list of attribute names and values to enforce.

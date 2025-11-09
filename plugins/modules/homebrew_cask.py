@@ -46,7 +46,6 @@ options:
   sudo_password:
     description:
       - The sudo password to be passed to E(SUDO_ASKPASS).
-    required: false
     type: str
   update_homebrew:
     description:

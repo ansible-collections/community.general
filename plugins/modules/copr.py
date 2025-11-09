@@ -51,13 +51,11 @@ options:
     type: str
   includepkgs:
     description: List of packages to include.
-    required: false
     type: list
     elements: str
     version_added: 9.4.0
   excludepkgs:
     description: List of packages to exclude.
-    required: false
     type: list
     elements: str
     version_added: 9.4.0

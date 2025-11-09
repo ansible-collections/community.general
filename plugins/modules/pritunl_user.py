@@ -46,13 +46,11 @@ options:
       - Name of the user to create or delete from Pritunl.
   user_email:
     type: str
-    required: false
     default:
     description:
       - Email address associated with the user O(user_name).
   user_type:
     type: str
-    required: false
     default: client
     choices:
       - client
@@ -62,19 +60,16 @@ options:
   user_groups:
     type: list
     elements: str
-    required: false
     default:
     description:
       - List of groups associated with the user O(user_name).
   user_disabled:
     type: bool
-    required: false
     default:
     description:
       - Enable/Disable the user O(user_name).
   user_gravatar:
     type: bool
-    required: false
     default:
     description:
       - Enable/Disable Gravatar usage for the user O(user_name).

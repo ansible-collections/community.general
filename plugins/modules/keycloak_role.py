@@ -94,7 +94,6 @@ options:
           - Client ID if the role is a client role. Do not include this option for a REALM role.
           - Use the client ID you can see in the Keycloak console, not the technical ID of the client.
         type: str
-        required: false
         aliases:
           - clientId
       state:

@@ -38,7 +38,6 @@ options:
     type: str
     description:
       - The ip6 address of the network/interface_address object.
-    required: false
   comment:
     type: str
     description:

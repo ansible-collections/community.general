@@ -56,7 +56,6 @@ options:
     description:
       - Specifies the dedicated bandwidth object.
     type: dict
-    required: false
     suboptions:
       charge_mode:
         description:
@@ -87,27 +86,22 @@ options:
     description:
       - Specifies the enterprise project ID.
     type: str
-    required: false
   ip_version:
     description:
       - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this parameter is left blank, an IPv4 address is assigned.
     type: int
-    required: false
   ipv4_address:
     description:
       - Specifies the obtained IPv4 EIP. The system automatically assigns an EIP if you do not specify it.
     type: str
-    required: false
   port_id:
     description:
       - Specifies the port ID. This parameter is returned only when a private IP address is bound with the EIP.
     type: str
-    required: false
   shared_bandwidth_id:
     description:
       - Specifies the ID of shared bandwidth.
     type: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

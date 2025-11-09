@@ -33,7 +33,6 @@ options:
         command.
       - This parameter is mutually exclusive with O(state=clean).
     type: list
-    required: false
     elements: str
     default: []
   raw:

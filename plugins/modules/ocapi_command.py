@@ -40,12 +40,10 @@ options:
     description: For proxied inband requests, the slot number of the IOM. Only applies if O(baseuri) is a proxy server.
     type: int
   update_image_path:
-    required: false
     description:
       - For O(command=FWUpload), the path on the local filesystem of the firmware update image.
     type: str
   job_name:
-    required: false
     description:
       - For O(command=DeleteJob) command, the name of the job to delete.
     type: str

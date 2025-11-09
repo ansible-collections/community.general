@@ -28,7 +28,6 @@ options:
     description:
       - The image to switch to.
       - This is required when O(state=switch).
-    required: false
     type: str
 """
 

@@ -37,12 +37,10 @@ options:
     type: str
     description:
       - The password to assign to the username.
-    required: false
   state:
     type: str
     description:
       - Describe the desired state of the user to be managed.
-    required: false
     default: 'present'
     choices: ['present', 'absent']
 notes:

@@ -70,7 +70,6 @@ options:
     description:
       - The configuration of the User Profile Provider.
     type: dict
-    required: false
     suboptions:
       kc_user_profile_config:
         description:
@@ -242,13 +241,11 @@ options:
                 aliases:
                   - displayDescription
                 type: str
-                required: false
 
               annotations:
                 description:
                   - The annotations included in the group.
                 type: dict
-                required: false
 
           unmanaged_attribute_policy:
             description:
