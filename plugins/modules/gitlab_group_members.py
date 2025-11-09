@@ -197,7 +197,7 @@ class GitLabGroup:
             member = group.members.get(gitlab_user_id)
             if member:
                 return member
-        except gitlab.exceptions.GitlabGetError as e:
+        except gitlab.exceptions.GitlabGetError:
             return None
 
     # check if the user is a member of the group
@@ -210,7 +210,7 @@ class GitLabGroup:
     # add user to a group
     def add_member_to_group(self, gitlab_user_id, gitlab_group_id, access_level):
         group = self._gitlab.groups.get(gitlab_group_id)
-        add_member = group.members.create({"user_id": gitlab_user_id, "access_level": access_level})
+        group.members.create({"user_id": gitlab_user_id, "access_level": access_level})
 
     # remove user from a group
     def remove_user_from_group(self, gitlab_user_id, gitlab_group_id):

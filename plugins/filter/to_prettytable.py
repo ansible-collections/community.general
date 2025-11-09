@@ -229,7 +229,6 @@ def _configure_alignments(table, field_names, column_alignments):
         field_names: List of field names to align
         column_alignments: Dict of column alignments
     """
-    valid_alignments = {"left", "center", "right", "l", "c", "r"}
 
     if not isinstance(column_alignments, dict):
         return

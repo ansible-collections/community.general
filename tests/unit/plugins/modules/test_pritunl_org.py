@@ -73,8 +73,8 @@ class TestPritunlOrg(ModuleTestCase):
             )
         ):
             # Test creation
-            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
-                with self.patch_add_pritunl_organization(side_effect=PritunlPostOrganizationMock) as mock_add:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock):
+                with self.patch_add_pritunl_organization(side_effect=PritunlPostOrganizationMock):
                     with self.assertRaises(AnsibleExitJson) as create_result:
                         self.module.main()
 
@@ -85,8 +85,8 @@ class TestPritunlOrg(ModuleTestCase):
             self.assertEqual(create_exc["response"]["user_count"], 0)
 
             # Test module idempotency
-            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationAfterPostMock) as mock_get:
-                with self.patch_add_pritunl_organization(side_effect=PritunlPostOrganizationMock) as mock_add:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationAfterPostMock):
+                with self.patch_add_pritunl_organization(side_effect=PritunlPostOrganizationMock):
                     with self.assertRaises(AnsibleExitJson) as idempotent_result:
                         self.module.main()
 
@@ -115,8 +115,8 @@ class TestPritunlOrg(ModuleTestCase):
             )
         ):
             # Test deletion
-            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationAfterPostMock) as mock_get:
-                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock) as mock_delete:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationAfterPostMock):
+                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock):
                     with self.assertRaises(AnsibleExitJson) as delete_result:
                         self.module.main()
 
@@ -126,8 +126,8 @@ class TestPritunlOrg(ModuleTestCase):
             self.assertEqual(delete_exc["response"], {})
 
             # Test module idempotency
-            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
-                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock) as mock_add:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock):
+                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock):
                     with self.assertRaises(AnsibleExitJson) as idempotent_result:
                         self.module.main()
 
@@ -149,8 +149,8 @@ class TestPritunlOrg(ModuleTestCase):
         }
         with set_module_args(module_args):
             # Test deletion
-            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
-                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock) as mock_delete:
+            with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock):
+                with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock):
                     with self.assertRaises(AnsibleFailJson) as failure_result:
                         self.module.main()
 
@@ -160,10 +160,8 @@ class TestPritunlOrg(ModuleTestCase):
 
             # Switch force=True which should run successfully
             with set_module_args(dict_merge(module_args, {"force": True})):
-                with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock) as mock_get:
-                    with self.patch_delete_pritunl_organization(
-                        side_effect=PritunlDeleteOrganizationMock
-                    ) as mock_delete:
+                with self.patch_get_pritunl_organizations(side_effect=PritunlListOrganizationMock):
+                    with self.patch_delete_pritunl_organization(side_effect=PritunlDeleteOrganizationMock):
                         with self.assertRaises(AnsibleExitJson) as delete_result:
                             self.module.main()
 

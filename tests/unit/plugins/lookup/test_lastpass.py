@@ -43,7 +43,7 @@ class MockLPass(LPass):
         p = ArgumentParser()
         sp = p.add_subparsers(help="command", dest="subparser_name")
 
-        logout_p = sp.add_parser("logout", parents=[base_options], help="logout")
+        sp.add_parser("logout", parents=[base_options], help="logout")
         show_p = sp.add_parser("show", parents=[base_options], help="show entry details")
 
         field_group = show_p.add_mutually_exclusive_group(required=True)

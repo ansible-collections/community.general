@@ -513,8 +513,6 @@ def main():
     )
 
     service = module.params["name"]
-    rc = 0
-    out = err = ""
     result = {
         "name": service,
         "changed": False,

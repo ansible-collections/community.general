@@ -627,7 +627,6 @@ def main():
 
     # Make it easier to refer to current module parameters
     state = module.params.get("state")
-    enabled = module.params.get("enabled")
     parent_id = module.params.get("parent_id")
     provider_type = module.params.get("provider_type")
     provider_id = module.params.get("provider_id")

@@ -504,7 +504,7 @@ xsi:schemaLocation="http://www.ca.com/spectrum/restful/schema/request ../../../x
                     self.result["msg"] = self.success_msg
                     self.result["changed"] = True
                     continue
-                resp = self.update_model(Model_Handle, {req_name: req_val})
+                self.update_model(Model_Handle, {req_name: req_val})
 
         self.module.exit_json(**self.result)
 

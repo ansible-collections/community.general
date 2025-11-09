@@ -90,7 +90,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                     with patch.object(module.XCCRedfishUtils, "virtual_media_insert") as mock_virtual_media_insert:
                         mock_virtual_media_insert.return_value = {"ret": True, "changed": True, "msg": "success"}
 
-                        with self.assertRaises(AnsibleExitJson) as result:
+                        with self.assertRaises(AnsibleExitJson):
                             module.main()
 
     def test_module_command_VirtualMediaEject_pass(self):
@@ -115,7 +115,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                     with patch.object(module.XCCRedfishUtils, "virtual_media_eject") as mock_virtual_media_eject:
                         mock_virtual_media_eject.return_value = {"ret": True, "changed": True, "msg": "success"}
 
-                        with self.assertRaises(AnsibleExitJson) as result:
+                        with self.assertRaises(AnsibleExitJson):
                             module.main()
 
     def test_module_command_VirtualMediaEject_fail_when_required_args_missing(self):
@@ -144,7 +144,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             with patch.object(module.XCCRedfishUtils, "get_request") as mock_get_request:
                 mock_get_request.return_value = {"ret": True, "data": {"teststr": "xxxx"}}
 
-                with self.assertRaises(AnsibleFailJson) as result:
+                with self.assertRaises(AnsibleFailJson):
                     module.main()
 
     def test_module_command_GetResource_fail_when_get_return_false(self):
@@ -161,7 +161,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             with patch.object(module.XCCRedfishUtils, "get_request") as mock_get_request:
                 mock_get_request.return_value = {"ret": False, "msg": "404 error"}
 
-                with self.assertRaises(AnsibleFailJson) as result:
+                with self.assertRaises(AnsibleFailJson):
                     module.main()
 
     def test_module_command_GetResource_pass(self):
@@ -178,7 +178,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             with patch.object(module.XCCRedfishUtils, "get_request") as mock_get_request:
                 mock_get_request.return_value = {"ret": True, "data": {"teststr": "xxxx"}}
 
-                with self.assertRaises(AnsibleExitJson) as result:
+                with self.assertRaises(AnsibleExitJson):
                     module.main()
 
     def test_module_command_GetCollectionResource_fail_when_required_args_missing(self):
@@ -194,7 +194,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             with patch.object(module.XCCRedfishUtils, "get_request") as mock_get_request:
                 mock_get_request.return_value = {"ret": True, "data": {"teststr": "xxxx"}}
 
-                with self.assertRaises(AnsibleFailJson) as result:
+                with self.assertRaises(AnsibleFailJson):
                     module.main()
 
     def test_module_command_GetCollectionResource_fail_when_get_return_false(self):
@@ -211,7 +211,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             with patch.object(module.XCCRedfishUtils, "get_request") as mock_get_request:
                 mock_get_request.return_value = {"ret": False, "msg": "404 error"}
 
-                with self.assertRaises(AnsibleFailJson) as result:
+                with self.assertRaises(AnsibleFailJson):
                     module.main()
 
     def test_module_command_GetCollectionResource_fail_when_get_not_colection(self):
@@ -228,7 +228,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             with patch.object(module.XCCRedfishUtils, "get_request") as mock_get_request:
                 mock_get_request.return_value = {"ret": True, "data": {"teststr": "xxxx"}}
 
-                with self.assertRaises(AnsibleFailJson) as result:
+                with self.assertRaises(AnsibleFailJson):
                     module.main()
 
     def test_module_command_GetCollectionResource_pass_when_get_empty_collection(self):
@@ -245,7 +245,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             with patch.object(module.XCCRedfishUtils, "get_request") as mock_get_request:
                 mock_get_request.return_value = {"ret": True, "data": {"Members": [], "Members@odata.count": 0}}
 
-                with self.assertRaises(AnsibleExitJson) as result:
+                with self.assertRaises(AnsibleExitJson):
                     module.main()
 
     def test_module_command_GetCollectionResource_pass_when_get_collection(self):
@@ -265,7 +265,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                     "data": {"Members": [{"@odata.id": "/redfish/v1/testuri/1"}], "Members@odata.count": 1},
                 }
 
-                with self.assertRaises(AnsibleExitJson) as result:
+                with self.assertRaises(AnsibleExitJson):
                     module.main()
 
     def test_module_command_PatchResource_fail_when_required_args_missing(self):
@@ -287,7 +287,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "patch_request") as mock_patch_request:
                     mock_patch_request.return_value = {"ret": True, "data": {"teststr": "xxxx"}}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PatchResource_fail_when_required_args_missing_no_requestbody(self):
@@ -310,7 +310,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "patch_request") as mock_patch_request:
                     mock_patch_request.return_value = {"ret": True, "data": {"teststr": "xxxx"}}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PatchResource_fail_when_noexisting_property_in_requestbody(self):
@@ -334,7 +334,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "patch_request") as mock_patch_request:
                     mock_patch_request.return_value = {"ret": True, "data": {"teststr": "xxxx"}}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PatchResource_fail_when_get_return_false(self):
@@ -358,7 +358,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "patch_request") as mock_patch_request:
                     mock_patch_request.return_value = {"ret": False, "msg": "500 internal error"}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PatchResource_pass(self):
@@ -385,7 +385,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                         "data": {"teststr": "yyyy", "@odata.etag": "322e0d45d9572723c98"},
                     }
 
-                    with self.assertRaises(AnsibleExitJson) as result:
+                    with self.assertRaises(AnsibleExitJson):
                         module.main()
 
     def test_module_command_PostResource_fail_when_required_args_missing(self):
@@ -420,7 +420,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": True}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PostResource_fail_when_invalid_resourceuri(self):
@@ -456,7 +456,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": True}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PostResource_fail_when_no_requestbody(self):
@@ -492,7 +492,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": True}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PostResource_fail_when_no_requestbody_2(self):
@@ -528,7 +528,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": True}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PostResource_fail_when_requestbody_mismatch_with_data_from_actioninfo_uri(self):
@@ -566,7 +566,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": True}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PostResource_fail_when_get_return_false(self):
@@ -587,7 +587,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": True}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PostResource_fail_when_post_return_false(self):
@@ -624,7 +624,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": False, "msg": "500 internal error"}
 
-                    with self.assertRaises(AnsibleFailJson) as result:
+                    with self.assertRaises(AnsibleFailJson):
                         module.main()
 
     def test_module_command_PostResource_pass(self):
@@ -661,5 +661,5 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 with patch.object(module.XCCRedfishUtils, "post_request") as mock_post_request:
                     mock_post_request.return_value = {"ret": True, "msg": "post success"}
 
-                    with self.assertRaises(AnsibleExitJson) as result:
+                    with self.assertRaises(AnsibleExitJson):
                         module.main()

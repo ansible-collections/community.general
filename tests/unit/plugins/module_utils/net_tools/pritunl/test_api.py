@@ -613,4 +613,4 @@ class TestPritunlApi:
         api.pritunl_auth_request = get_pritunl_error_mock()
 
         with pytest.raises(api.PritunlException):
-            response = api.list_pritunl_organizations(**pritunl_settings)
+            api.list_pritunl_organizations(**pritunl_settings)

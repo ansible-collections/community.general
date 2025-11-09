@@ -906,7 +906,7 @@ def handle_elastigroup(client, module):
                         grace_period=roll_config.get("grace_period"),
                         health_check_type=roll_config.get("health_check_type"),
                     )
-                    roll_response = client.roll_group(group_roll=eg_roll, group_id=group_id)
+                    client.roll_group(group_roll=eg_roll, group_id=group_id)
                     message = "Updated and started rolling the group successfully."
 
             except SpotinstClientException as exc:

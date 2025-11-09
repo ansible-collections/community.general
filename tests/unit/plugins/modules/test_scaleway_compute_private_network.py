@@ -64,7 +64,7 @@ def response_remove_nics():
 
 def test_scaleway_private_network_without_arguments(capfd):
     with set_module_args({}):
-        with pytest.raises(SystemExit) as results:
+        with pytest.raises(SystemExit):
             scaleway_compute_private_network.main()
     out, err = capfd.readouterr()
 
@@ -91,7 +91,7 @@ def test_scaleway_add_nic(capfd):
             mock_scw_get.return_value = response_without_nics()
             with patch.object(Scaleway, "post") as mock_scw_post:
                 mock_scw_post.return_value = response_when_add_nics()
-                with pytest.raises(SystemExit) as results:
+                with pytest.raises(SystemExit):
                     scaleway_compute_private_network.main()
             mock_scw_post.assert_any_call(path=url, data={"private_network_id": pnid})
         mock_scw_get.assert_any_call(url)
@@ -119,7 +119,7 @@ def test_scaleway_add_existing_nic(capfd):
     ):
         with patch.object(Scaleway, "get") as mock_scw_get:
             mock_scw_get.return_value = response_with_nics()
-            with pytest.raises(SystemExit) as results:
+            with pytest.raises(SystemExit):
                 scaleway_compute_private_network.main()
         mock_scw_get.assert_any_call(url)
 
@@ -150,7 +150,7 @@ def test_scaleway_remove_existing_nic(capfd):
             mock_scw_get.return_value = response_with_nics()
             with patch.object(Scaleway, "delete") as mock_scw_delete:
                 mock_scw_delete.return_value = response_remove_nics()
-                with pytest.raises(SystemExit) as results:
+                with pytest.raises(SystemExit):
                     scaleway_compute_private_network.main()
             mock_scw_delete.assert_any_call(urlremove)
         mock_scw_get.assert_any_call(url)
@@ -179,7 +179,7 @@ def test_scaleway_remove_absent_nic(capfd):
     ):
         with patch.object(Scaleway, "get") as mock_scw_get:
             mock_scw_get.return_value = response_without_nics()
-            with pytest.raises(SystemExit) as results:
+            with pytest.raises(SystemExit):
                 scaleway_compute_private_network.main()
         mock_scw_get.assert_any_call(url)
 

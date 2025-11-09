@@ -179,7 +179,7 @@ def main():
     backend_name = module.params["backend"]
     name = module.params["name"]
     value = module.params["value"]
-    state = module.params["state"]
+    # state = module.params["state"]  TODO - ???
 
     if module.params["password"] is not None:
         password_method = ["-w", password]

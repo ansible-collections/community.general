@@ -157,7 +157,7 @@ try:
     import aerospike
     from time import sleep
     import re
-except ImportError as ie:
+except ImportError:
     LIB_FOUND = False
     LIB_FOUND_ERR = traceback.format_exc()
 else:

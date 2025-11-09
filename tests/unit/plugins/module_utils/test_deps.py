@@ -20,7 +20,7 @@ def module():
 
 
 def test_wrong_name(module):
-    with deps.declare("sys") as sys_dep:
+    with deps.declare("sys"):
         import sys  # noqa: F401, pylint: disable=unused-import
 
     with pytest.raises(KeyError):

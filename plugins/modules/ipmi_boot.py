@@ -176,7 +176,7 @@ def main():
             key = binascii.unhexlify(module.params["key"])
         else:
             key = None
-    except Exception as e:
+    except Exception:
         module.fail_json(msg="Unable to convert 'key' from hex string.")
 
     # --- run command ---

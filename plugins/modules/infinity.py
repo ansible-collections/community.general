@@ -443,7 +443,6 @@ class Infinity:
         add a new LAN network into a given supernet Fusionlayer Infinity via rest api  or default supernet
         required fields=['network_name', 'network_family', 'network_type',  'network_address','network_size' ]
         """
-        method = "post"
         resource_url = "networks"
         response = None
         if network_name is None or network_address is None or network_size is None:

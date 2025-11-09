@@ -1271,7 +1271,6 @@ def create_exact_count_of_vms(
     vm_count_diff = exact_count - len(vm_list)
     changed = vm_count_diff != 0
 
-    new_vms_list = []
     instances_list = []
     tagged_instances_list = vm_list
 

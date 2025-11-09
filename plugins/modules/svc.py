@@ -264,7 +264,7 @@ def main():
 
     svc = Svc(module)
     changed = False
-    orig_state = svc.report()
+    dummy_orig_state = svc.report()  # TODO - is this not needed?
 
     if enabled is not None and enabled != svc.enabled:
         changed = True

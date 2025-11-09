@@ -268,7 +268,6 @@ class Scaleway:
     def fetch_paginated_resources(self, resource_key, **pagination_kwargs):
         response = self.get(path=self.api_path, params=pagination_kwargs)
 
-        status_code = response.status_code
         if not response.ok:
             self.module.fail_json(
                 msg=f"Error getting {resource_key} [{response.status_code}: {response.json['message']}]"

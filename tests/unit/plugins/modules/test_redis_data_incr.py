@@ -24,7 +24,7 @@ if HAS_REDIS_USERNAME_OPTION:
 
 def test_redis_data_incr_without_arguments(capfd):
     with set_module_args({}):
-        with pytest.raises(SystemExit) as results:
+        with pytest.raises(SystemExit):
             redis_data_incr.main()
     out, err = capfd.readouterr()
     assert not err

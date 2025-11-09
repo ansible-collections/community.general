@@ -272,7 +272,7 @@ class ManageIQTenant:
 
         # try to update tenant
         try:
-            result = self.client.post(tenant["href"], action="edit", resource=resource)
+            self.client.post(tenant["href"], action="edit", resource=resource)
         except Exception as e:
             self.module.fail_json(msg=f"failed to update tenant {tenant['name']}: {e}")
 

@@ -86,19 +86,19 @@ class BtrfsCommands:
 
     def subvolume_set_default(self, filesystem_path, subvolume_id):
         command = [self.__btrfs, "subvolume", "set-default", str(subvolume_id), to_bytes(filesystem_path)]
-        result = self.__module.run_command(command, check_rc=True)
+        self.__module.run_command(command, check_rc=True)
 
     def subvolume_create(self, subvolume_path):
         command = [self.__btrfs, "subvolume", "create", to_bytes(subvolume_path)]
-        result = self.__module.run_command(command, check_rc=True)
+        self.__module.run_command(command, check_rc=True)
 
     def subvolume_snapshot(self, snapshot_source, snapshot_destination):
         command = [self.__btrfs, "subvolume", "snapshot", to_bytes(snapshot_source), to_bytes(snapshot_destination)]
-        result = self.__module.run_command(command, check_rc=True)
+        self.__module.run_command(command, check_rc=True)
 
     def subvolume_delete(self, subvolume_path):
         command = [self.__btrfs, "subvolume", "delete", to_bytes(subvolume_path)]
-        result = self.__module.run_command(command, check_rc=True)
+        self.__module.run_command(command, check_rc=True)
 
 
 class BtrfsInfoProvider:
