@@ -42,13 +42,11 @@ options:
   hostname:
     description:
       - A hostname of a device to/from which to assign/remove a subnet.
-    required: false
     type: str
 
   device_id:
     description:
       - UUID of a device to/from which to assign/remove a subnet.
-    required: false
     type: str
 
   project_id:

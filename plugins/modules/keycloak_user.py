@@ -44,33 +44,28 @@ options:
   first_name:
     description:
       - The user's first name.
-    required: false
     type: str
     aliases:
       - firstName
   last_name:
     description:
       - The user's last name.
-    required: false
     type: str
     aliases:
       - lastName
   email:
     description:
       - User email.
-    required: false
     type: str
   federation_link:
     description:
       - Federation Link.
-    required: false
     type: str
     aliases:
       - federationLink
   service_account_client_id:
     description:
       - Description of the client Application.
-    required: false
     type: str
     aliases:
       - serviceAccountClientId
@@ -157,7 +152,6 @@ options:
   attributes:
     description:
       - List of user attributes.
-    required: false
     type: list
     elements: dict
     suboptions:
@@ -179,7 +173,6 @@ options:
   access:
     description:
       - List user access.
-    required: false
     type: dict
   disableable_credential_types:
     description:
@@ -192,12 +185,10 @@ options:
   origin:
     description:
       - User origin.
-    required: false
     type: str
   self:
     description:
       - User self administration.
-    required: false
     type: str
   state:
     description:

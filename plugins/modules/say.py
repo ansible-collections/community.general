@@ -34,7 +34,6 @@ options:
     type: str
     description:
       - What voice to use.
-    required: false
 requirements: [say or espeak or espeak-ng]
 author:
   - "Ansible Core Team"

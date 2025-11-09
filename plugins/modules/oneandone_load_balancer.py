@@ -26,7 +26,6 @@ options:
     description:
       - Define a load balancer state to create, remove, or update.
     type: str
-    required: false
     default: 'present'
     choices: ["present", "absent", "update"]
   auth_token:
@@ -41,7 +40,6 @@ options:
     description:
       - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
-    required: false
   name:
     description:
       - Load balancer name used with present state. Used as identifier (ID or name) when used with absent state. maxLength=128.
@@ -59,12 +57,10 @@ options:
     description:
       - URL to call for checking. Required for HTTP health check. maxLength=1000.
     type: str
-    required: false
   health_check_parse:
     description:
       - Regular expression to check. Required for HTTP health check. maxLength=64.
     type: str
-    required: false
   persistence:
     description:
       - Persistence.
@@ -84,7 +80,6 @@ options:
       - If not specified, it defaults to V(US).
     type: str
     choices: ["US", "ES", "DE", "GB"]
-    required: false
   rules:
     description:
       - A list of rule objects that are set for the load balancer. Each rule must contain protocol, port_balancer, and port_server
@@ -96,20 +91,17 @@ options:
     description:
       - Description of the load balancer. maxLength=256.
     type: str
-    required: false
   add_server_ips:
     description:
       - A list of server identifiers (id or name) to be assigned to a load balancer. Used in combination with O(state=update).
     type: list
     elements: str
-    required: false
     default: []
   remove_server_ips:
     description:
       - A list of server IP IDs to be unassigned from a load balancer. Used in combination with O(state=update).
     type: list
     elements: str
-    required: false
     default: []
   add_rules:
     description:
@@ -117,19 +109,16 @@ options:
         Used in combination with O(state=update).
     type: list
     elements: dict
-    required: false
     default: []
   remove_rules:
     description:
       - A list of rule IDs that are removed from an existing load balancer. Used in combination with O(state=update).
     type: list
     elements: str
-    required: false
     default: []
   wait:
     description:
       - Wait for the instance to be in state 'running' before returning.
-    required: false
     default: true
     type: bool
   wait_timeout:

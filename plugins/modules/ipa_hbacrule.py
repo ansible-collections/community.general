@@ -32,7 +32,6 @@ options:
       - List of host names to assign.
       - If an empty list is passed all hosts are removed from the rule.
       - If option is omitted hosts are not checked or changed.
-    required: false
     type: list
     elements: str
   hostcategory:

@@ -40,23 +40,19 @@ options:
       - When set to V(true), delete all labels which are not mentioned in the task.
     default: false
     type: bool
-    required: false
   project:
     description:
       - The path and name of the project. Either this or O(group) is required.
-    required: false
     type: str
   group:
     description:
       - The path of the group. Either this or O(project) is required.
-    required: false
     type: str
   labels:
     description:
       - A list of dictionaries that represents gitlab project's or group's labels.
     type: list
     elements: dict
-    required: false
     default: []
     suboptions:
       name:
@@ -73,7 +69,6 @@ options:
         description:
           - Integer value to give priority to the label.
         type: int
-        required: false
         default:
       description:
         description:

@@ -39,13 +39,11 @@ options:
       - The optional git URL of the repository to tap. The URL is not assumed to be on GitHub, and the protocol does not have
         to be HTTP. Any location and protocol that git can handle is fine.
       - O(name) option may not be a list of multiple taps (but a single tap instead) when this option is provided.
-    required: false
     type: str
   state:
     description:
       - State of the repository.
     choices: ['present', 'absent']
-    required: false
     default: 'present'
     type: str
   path:

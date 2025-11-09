@@ -29,14 +29,12 @@ options:
       - Required if job does not yet exist.
       - Mutually exclusive with O(enabled).
       - Considered if O(state=present).
-    required: false
   enabled:
     description:
       - Whether the job should be enabled or disabled.
       - Mutually exclusive with O(config).
       - Considered if O(state=present).
     type: bool
-    required: false
   name:
     type: str
     description:
@@ -46,30 +44,25 @@ options:
     type: str
     description:
       - Password to authenticate with the Jenkins server.
-    required: false
   state:
     type: str
     description:
       - Attribute that specifies if the job has to be created or deleted.
-    required: false
     default: present
     choices: ['present', 'absent']
   token:
     type: str
     description:
       - API token used to authenticate alternatively to password.
-    required: false
   url:
     type: str
     description:
       - URL where the Jenkins server is accessible.
-    required: false
     default: http://localhost:8080
   user:
     type: str
     description:
       - User to authenticate with the Jenkins server.
-    required: false
   validate_certs:
     type: bool
     default: true

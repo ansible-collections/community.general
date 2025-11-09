@@ -32,54 +32,45 @@ options:
       - The name of a Node.js library to install.
       - If omitted all packages in package.json are installed.
       - To globally install from local Node.js library. Prepend C(file:) to the path of the Node.js library.
-    required: false
   path:
     type: path
     description:
       - The base path where Node.js installs libraries.
       - This is where the C(node_modules) folder lives.
-    required: false
   version:
     type: str
     description:
       - The version of the library to be installed.
       - Must be in semver format. If "latest" is desired, use O(state) arg instead.
-    required: false
   global:
     description:
       - Install the Node.js library globally.
-    required: false
     default: false
     type: bool
   executable:
     type: path
     description:
       - The executable location for yarn.
-    required: false
   ignore_scripts:
     description:
       - Use the C(--ignore-scripts) flag when installing.
-    required: false
     type: bool
     default: false
   production:
     description:
       - Install dependencies in production mode.
       - C(yarn) ignores any dependencies under devDependencies in C(package.json).
-    required: false
     type: bool
     default: false
   registry:
     type: str
     description:
       - The registry to install modules from.
-    required: false
   state:
     type: str
     description:
       - Installation state of the named Node.js library.
       - If V(absent) is selected, a O(name) option must be provided.
-    required: false
     default: present
     choices: ["present", "absent", "latest"]
 requirements:

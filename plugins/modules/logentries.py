@@ -31,18 +31,15 @@ options:
     description:
       - Following state of the log.
     choices: ['present', 'absent', 'followed', 'unfollowed']
-    required: false
     default: present
   name:
     type: str
     description:
       - Name of the log.
-    required: false
   logtype:
     type: str
     description:
       - Type of the log.
-    required: false
     aliases: [type]
 
 notes:

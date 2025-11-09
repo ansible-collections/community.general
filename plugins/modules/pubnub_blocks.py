@@ -35,21 +35,18 @@ options:
     description:
       - Email from account for which new session should be started.
       - Not required if O(cache) contains result of previous module call (in same play).
-    required: false
     type: str
     default: ''
   password:
     description:
       - Password which match to account to which specified O(email) belong.
       - Not required if O(cache) contains result of previous module call (in same play).
-    required: false
     type: str
     default: ''
   cache:
     description: >-
       In case if single play use blocks management module few times it is preferred to enabled 'caching' by making previous
       module to share gathered artifacts and pass them to this parameter.
-    required: false
     type: dict
     default: {}
   account:
@@ -71,7 +68,6 @@ options:
   state:
     description:
       - Intended block state after event handlers creation / update process is completed.
-    required: false
     default: 'present'
     choices: ['started', 'stopped', 'present', 'absent']
     type: str
@@ -84,7 +80,6 @@ options:
     description:
       - Short block description which is later visible on U(https://admin.pubnub.com).
       - Used only if block does not exists and does not change description for existing block.
-    required: false
     type: str
   event_handlers:
     description:
@@ -99,7 +94,6 @@ options:
       - It is possible to rename event handler by adding C(changes) key to event handler payload and pass dictionary, which
         contains single key C(name), where new name should be passed.
       - To remove particular event handler it is possible to set C(state) for it to C(absent) and it is removed.
-    required: false
     default: []
     type: list
     elements: dict
@@ -107,7 +101,6 @@ options:
     description:
       - List of fields which should be changed by block itself (does not affect any event handlers).
       - 'Possible options for change is: O(name).'
-    required: false
     default: {}
     type: dict
   validate_certs:
@@ -115,7 +108,6 @@ options:
       - This key allow to try skip certificates check when performing REST API calls. Sometimes host may have issues with
         certificates on it and this causes problems to call PubNub REST API.
       - If check should be ignored V(false) should be passed to this parameter.
-    required: false
     default: true
     type: bool
 """

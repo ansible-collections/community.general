@@ -67,7 +67,6 @@ options:
       - Required for V(present) state.
       - Ignored when O(state=absent), O(state=exported) or O(state=restored).
     type: str
-    required: false
 
   database_name:
     description:
@@ -75,7 +74,6 @@ options:
       - Required for V(present) and V(restored) states.
       - Ignored when O(state=absent) or O(state=exported).
     type: str
-    required: false
 
   instance_id:
     description:
@@ -83,14 +81,12 @@ options:
       - Required for V(present) and V(restored) states.
       - Ignored when O(state=absent) or O(state=exported).
     type: str
-    required: false
 
   expires_at:
     description:
       - Expiration datetime of the database backup (ISO 8601 format).
       - Ignored when O(state=absent), O(state=exported) or O(state=restored).
     type: str
-    required: false
 
   wait:
     description:
@@ -102,14 +98,12 @@ options:
     description:
       - Time to wait for the backup to reach the expected state.
     type: int
-    required: false
     default: 300
 
   wait_sleep_time:
     description:
       - Time to wait before every attempt to check the state of the backup.
     type: int
-    required: false
     default: 3
 """
 

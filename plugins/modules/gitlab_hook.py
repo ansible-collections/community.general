@@ -110,7 +110,6 @@ options:
       - Secret token to validate hook messages at the receiver.
       - If this is present it always results in a change as it cannot be retrieved from GitLab.
       - It shows up in the C(X-GitLab-Token) HTTP request header.
-    required: false
     type: str
 """
 

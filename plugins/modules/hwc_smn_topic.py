@@ -36,7 +36,6 @@ options:
       - Topic display name, which is presented as the name of the email sender in an email message. The topic display name
         contains a maximum of 192 bytes.
     type: str
-    required: false
   name:
     description:
       - Name of the topic to be created. The topic name is a string of 1 to 256 characters. It must contain upper- or lower-case

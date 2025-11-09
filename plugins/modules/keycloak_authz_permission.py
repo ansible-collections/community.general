@@ -55,7 +55,6 @@ options:
     description:
       - The description of the authorization permission.
     type: str
-    required: false
   permission_type:
     description:
       - The type of authorization permission.
@@ -71,7 +70,6 @@ options:
       - The decision strategy to use with this permission.
     type: str
     default: UNANIMOUS
-    required: false
     choices:
       - UNANIMOUS
       - AFFIRMATIVE
@@ -84,7 +82,6 @@ options:
     type: list
     elements: str
     default: []
-    required: false
   scopes:
     description:
       - Scope names to attach to this permission.
@@ -92,14 +89,12 @@ options:
     type: list
     elements: str
     default: []
-    required: false
   policies:
     description:
       - Policy names to attach to this permission.
     type: list
     elements: str
     default: []
-    required: false
   client_id:
     description:
       - The clientId of the keycloak client that should have the authorization scope.

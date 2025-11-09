@@ -60,7 +60,6 @@ options:
       - Name of the attribute to be configured.
     type: str
   attribute_value:
-    required: false
     description:
       - Value of the attribute to be configured.
     type: str

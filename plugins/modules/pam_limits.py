@@ -73,7 +73,6 @@ options:
     description:
       - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered
         it incorrectly.
-    required: false
     type: bool
     default: false
   use_min:
@@ -81,7 +80,6 @@ options:
       - If set to V(true), the minimal value is used or conserved.
       - If the specified value is inferior to the value in the file, file content is replaced with the new value, else content
         is not modified.
-    required: false
     type: bool
     default: false
   use_max:
@@ -89,20 +87,17 @@ options:
       - If set to V(true), the maximal value is used or conserved.
       - If the specified value is superior to the value in the file, file content is replaced with the new value, else content
         is not modified.
-    required: false
     type: bool
     default: false
   dest:
     type: str
     description:
       - Modify the limits.conf path.
-    required: false
     default: "/etc/security/limits.conf"
   comment:
     type: str
     description:
       - Comment associated with the limit.
-    required: false
     default: ''
 notes:
   - If O(dest) file does not exist, it is created.

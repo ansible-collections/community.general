@@ -37,7 +37,6 @@ options:
     choices:
       - 'AND'
       - 'OR'
-    required: false
     type: str
   path:
     description:
@@ -45,82 +44,69 @@ options:
     type: list
     elements: str
     default: []
-    required: false
   skip_custom_threats_filters:
     description:
       - A list of threats to be skipped.
     type: list
     elements: str
     default: []
-    required: false
   skip_threats_filter_categories:
     description:
       - Define which categories of threats are skipped.
     type: list
     elements: str
     default: []
-    required: false
   skipav:
     description:
       - Skip the Antivirus Scanning.
     default: false
     type: bool
-    required: false
   skipbadclients:
     description:
       - Block clients with bad reputation.
     default: false
     type: bool
-    required: false
   skipcookie:
     description:
       - Skip the Cookie Signing check.
     default: false
     type: bool
-    required: false
   skipform:
     description:
       - Enable form hardening.
     default: false
     type: bool
-    required: false
   skipform_missingtoken:
     description:
       - Enable form hardening with missing tokens.
     default: false
     type: bool
-    required: false
   skiphtmlrewrite:
     description:
       - Protection against SQL.
     default: false
     type: bool
-    required: false
   skiptft:
     description:
       - Enable true file type control.
     default: false
     type: bool
-    required: false
   skipurl:
     description:
       - Enable static URL hardening.
     default: false
     type: bool
-    required: false
   source:
     description:
       - Define which categories of threats are skipped.
     type: list
     elements: str
     default: []
-    required: false
   status:
     description:
       - Status of the exception rule set.
     default: true
     type: bool
-    required: false
 
 extends_documentation_fragment:
   - community.general.utm

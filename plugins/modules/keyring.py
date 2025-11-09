@@ -41,7 +41,6 @@ options:
     type: str
   user_password:
     description: The password to set.
-    required: false
     type: str
     aliases:
       - password
@@ -51,7 +50,6 @@ options:
     type: str
   state:
     description: Whether the password should exist.
-    required: false
     default: present
     type: str
     choices:

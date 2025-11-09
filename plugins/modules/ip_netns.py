@@ -21,12 +21,10 @@ attributes:
     support: none
 options:
   name:
-    required: false
     description:
       - Name of the namespace.
     type: str
   state:
-    required: false
     default: "present"
     choices: [present, absent]
     description:

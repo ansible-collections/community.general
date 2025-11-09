@@ -62,7 +62,6 @@ options:
     type: str
     description:
       - Specifies the URL of the Sensu monitoring host server.
-    required: false
     default: http://127.0.01:4567
 """
 

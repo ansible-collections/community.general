@@ -193,14 +193,12 @@ options:
   key_name:
     description:
       - The name of key pair which is used to access ECS instance in SSH.
-    required: false
     type: str
     aliases: ['keypair']
   user_data:
     description:
       - User-defined data to customize the startup behaviors of an ECS instance and to pass data into an ECS instance. It
         only takes effect when launching the new ECS instances.
-    required: false
     type: str
   ram_role_name:
     description:

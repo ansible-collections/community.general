@@ -63,7 +63,6 @@ options:
     description:
       - Whether the connection should be reloaded if it was modified.
     type: bool
-    required: false
     default: false
     version_added: 9.5.0
   ifname:

@@ -37,21 +37,18 @@ options:
     description:
       - State of the package.
     choices: ['present', 'latest', 'absent']
-    required: false
     default: present
     type: str
   cached:
     description:
       - Use local package base instead of fetching an updated one.
     type: bool
-    required: false
     default: false
   annotation:
     description:
       - A list of keyvalue-pairs of the form C(<+/-/:><key>[=<value>]). A V(+) denotes adding an annotation, a V(-) denotes
         removing an annotation, and V(:) denotes modifying an annotation. If setting or modifying annotations, a value must
         be provided.
-    required: false
     type: list
     elements: str
   pkgsite:
@@ -59,19 +56,16 @@ options:
       - For C(pkgng) versions before 1.1.4, specify C(packagesite) to use for downloading packages. If not specified, use
         settings from C(/usr/local/etc/pkg.conf).
       - For newer C(pkgng) versions, specify a the name of a repository configured in C(/usr/local/etc/pkg/repos).
-    required: false
     type: str
   rootdir:
     description:
       - For C(pkgng) versions 1.5 and later, pkg installs all packages within the specified root directory.
       - Can not be used together with O(chroot) or O(jail) options.
-    required: false
     type: path
   chroot:
     description:
       - Pkg chroots in the specified environment.
       - Can not be used together with O(rootdir) or O(jail) options.
-    required: false
     type: path
   jail:
     description:
@@ -81,21 +75,18 @@ options:
   autoremove:
     description:
       - Remove automatically installed packages which are no longer needed.
-    required: false
     type: bool
     default: false
   ignore_osver:
     description:
       - Ignore FreeBSD OS version check, useful on C(-STABLE) and C(-CURRENT) branches.
       - Defines the E(IGNORE_OSVERSION) environment variable.
-    required: false
     type: bool
     default: false
     version_added: 1.3.0
   use_globs:
     description:
       - Treat the package names as shell glob patterns.
-    required: false
     type: bool
     default: true
     version_added: 9.3.0

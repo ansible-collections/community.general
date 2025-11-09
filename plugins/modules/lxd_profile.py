@@ -30,7 +30,6 @@ options:
     description:
       - Project of a profile. See U(https://documentation.ubuntu.com/lxd/en/latest/projects/).
     type: str
-    required: false
     version_added: 4.8.0
   description:
     description:
@@ -44,25 +43,21 @@ options:
         U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get)
         are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_put).
       - Not all config values are supported to apply the existing profile. Maybe you need to delete and recreate a profile.
-    required: false
     type: dict
   devices:
     description:
       - 'The devices for the profile (for example V({"rootfs": {"path": "/dev/kvm", "type": "unix-char"})).'
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).
-    required: false
     type: dict
   new_name:
     description:
       - A new name of a profile.
       - If this parameter is specified a profile is renamed to this name.
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_post).
-    required: false
     type: str
   merge_profile:
     description:
       - Merge the configuration of the present profile with the new desired configuration, instead of replacing it.
-    required: false
     default: false
     type: bool
     version_added: 2.1.0
@@ -72,33 +67,28 @@ options:
       - absent
     description:
       - Define the state of a profile.
-    required: false
     default: present
     type: str
   url:
     description:
       - The unix domain socket path or the https URL for the LXD server.
-    required: false
     default: unix:/var/lib/lxd/unix.socket
     type: str
   snap_url:
     description:
       - The unix domain socket path when LXD is installed by snap package manager.
-    required: false
     default: unix:/var/snap/lxd/common/lxd/unix.socket
     type: str
   client_key:
     description:
       - The client certificate key file path.
       - If not specified, it defaults to C($HOME/.config/lxc/client.key).
-    required: false
     aliases: [key_file]
     type: path
   client_cert:
     description:
       - The client certificate file path.
       - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
-    required: false
     aliases: [cert_file]
     type: path
   trust_password:
@@ -107,7 +97,6 @@ options:
       - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
         set core.trust_password <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
       - If O(trust_password) is set, this module send a request for authentication before sending any requests.
-    required: false
     type: str
 notes:
   - Profiles must have a unique name. If you attempt to create a profile with a name that already existed in the users namespace

@@ -48,14 +48,12 @@ options:
     description:
       - The Python path to the application's settings module, such as V(myapp.settings).
     type: path
-    required: false
   pythonpath:
     description:
       - A directory to add to the Python path. Typically used to include the settings module if it is located external to
         the application directory.
       - This would be equivalent to adding O(pythonpath)'s value to the E(PYTHONPATH) environment variable.
     type: path
-    required: false
     aliases: [python_path]
   virtualenv:
     description:
@@ -67,28 +65,23 @@ options:
     description:
       - A list of space-delimited apps to target. Used by the V(test) command.
     type: str
-    required: false
   cache_table:
     description:
       - The name of the table used for database-backed caching. Used by the V(createcachetable) command.
     type: str
-    required: false
   clear:
     description:
       - Clear the existing files before trying to copy or link the original file.
       - Used only with the V(collectstatic) command. The C(--noinput) argument is added automatically.
-    required: false
     default: false
     type: bool
   database:
     description:
       - The database to target. Used by the V(createcachetable), V(flush), V(loaddata), V(syncdb), and V(migrate) commands.
     type: str
-    required: false
   failfast:
     description:
       - Fail the command immediately if a test fails. Used by the V(test) command.
-    required: false
     default: false
     type: bool
     aliases: [fail_fast]
@@ -96,29 +89,24 @@ options:
     description:
       - A space-delimited list of fixture file names to load in the database. B(Required) by the V(loaddata) command.
     type: str
-    required: false
   skip:
     description:
       - Skips over out-of-order missing migrations, you can only use this parameter with V(migrate) command.
-    required: false
     type: bool
   merge:
     description:
       - Runs out-of-order or missing migrations as they are not rollback migrations, you can only use this parameter with
         V(migrate) command.
-    required: false
     type: bool
   link:
     description:
       - Creates links to the files instead of copying them, you can only use this parameter with V(collectstatic) command.
-    required: false
     type: bool
   testrunner:
     description:
       - Controls the test runner class that is used to execute tests.
       - This parameter is passed as-is to C(manage.py).
     type: str
-    required: false
     aliases: [test_runner]
 
 notes:

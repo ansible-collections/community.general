@@ -40,23 +40,19 @@ options:
       - When set to V(true), delete all milestone which are not mentioned in the task.
     default: false
     type: bool
-    required: false
   project:
     description:
       - The path and name of the project. Either this or O(group) is required.
-    required: false
     type: str
   group:
     description:
       - The path of the group. Either this or O(project) is required.
-    required: false
     type: str
   milestones:
     description:
       - A list of dictionaries that represents gitlab project's or group's milestones.
     type: list
     elements: dict
-    required: false
     default: []
     suboptions:
       title:
@@ -68,13 +64,11 @@ options:
         description:
           - Milestone due date in YYYY-MM-DD format.
         type: str
-        required: false
         default: null
       start_date:
         description:
           - Milestone start date in YYYY-MM-DD format.
         type: str
-        required: false
         default: null
       description:
         description:

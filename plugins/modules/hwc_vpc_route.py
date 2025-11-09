@@ -55,7 +55,6 @@ options:
     description:
       - Specifies the type of route.
     type: str
-    required: false
     default: 'peering'
 extends_documentation_fragment:
   - community.general.hwc

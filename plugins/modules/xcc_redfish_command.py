@@ -60,12 +60,10 @@ options:
     default: 10
     type: int
   resource_id:
-    required: false
     description:
       - The ID of the System, Manager or Chassis to modify.
     type: str
   virtual_media:
-    required: false
     description:
       - The options for VirtualMedia commands.
     type: dict
@@ -107,12 +105,10 @@ options:
           - The transfer method to use with the image.
         type: str
   resource_uri:
-    required: false
     description:
       - The resource URI to get or patch or post.
     type: str
   request_body:
-    required: false
     description:
       - The request body to patch or post.
     type: dict

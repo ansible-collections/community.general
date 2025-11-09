@@ -25,7 +25,6 @@ attributes:
     support: partial
 options:
   state:
-    required: false
     default: "present"
     choices: [present, absent]
     description:
@@ -37,24 +36,20 @@ options:
       - Name of the POSIX group.
     type: str
   description:
-    required: false
     description:
       - Group description.
     type: str
   position:
-    required: false
     description:
       - Define the whole LDAP position of the group, for example V(cn=g123m-1A,cn=classes,cn=schueler,cn=groups,ou=schule,dc=example,dc=com).
     type: str
     default: ''
   ou:
-    required: false
     description:
       - LDAP OU, for example V(school) for LDAP OU V(ou=school,dc=example,dc=com).
     type: str
     default: ''
   subpath:
-    required: false
     description:
       - Subpath inside the OU, for example V(cn=classes,cn=students,cn=groups).
     type: str
