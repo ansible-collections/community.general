@@ -59,7 +59,7 @@ options:
   signal:
     type: str
     description:
-      - The signal to send to the program/group, when combined with the 'signalled' state. Required when l(state=signalled).
+      - The signal to send to the program/group, when combined with the V(signalled) state. Required when l(state=signalled).
   supervisorctl_path:
     type: path
     description:
@@ -112,8 +112,6 @@ EXAMPLES = r"""
     name: all
     state: restarted
 """
-
-# silly change to trigger CI
 
 
 import os
