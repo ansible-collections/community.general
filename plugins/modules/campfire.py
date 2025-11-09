@@ -45,7 +45,6 @@ options:
     type: str
     description:
       - Send a notification sound before the message.
-    required: false
     choices:
       - 56k
       - bell

@@ -42,12 +42,10 @@ options:
     description:
       - The record to find.
       - If specified, only this record is returned instead of all records.
-    required: false
     type: str
 
   sandbox:
     description: Whether or not to use sandbox environment.
-    required: false
     default: false
     type: bool
 

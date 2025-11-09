@@ -140,7 +140,6 @@ options:
         cached yet, it may fail unexpectedly. If you still need it, you should consider using V(always) instead - if you deal
         with a checksum, it is better to use it to verify integrity after download.
       - V(always) combines V(download) and V(change).
-    required: false
     default: 'download'
     choices: ['never', 'download', 'change', 'always']
   checksum_alg:

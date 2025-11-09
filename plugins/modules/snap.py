@@ -48,7 +48,6 @@ options:
         that do not use sandboxing mechanisms. This option can only be specified when the task involves a single snap.
       - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
     type: bool
-    required: false
     default: false
   channel:
     description:
@@ -59,7 +58,6 @@ options:
         module assumes the channel to be V(latest/edge).
       - See U(https://snapcraft.io/docs/channels) for more details about snap channels.
     type: str
-    required: false
   options:
     description:
       - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option is applied to that
@@ -68,7 +66,6 @@ options:
       - Options are only applied when C(state) is set to V(present). This is done after the necessary installation or refresh
         (upgrade/downgrade) of all the snaps listed in O(name).
       - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap configuration options.
-    required: false
     type: list
     elements: str
     version_added: 4.4.0
@@ -78,7 +75,6 @@ options:
       - This is useful when installing local snaps that are either unsigned or have signatures that have not been acknowledged.
       - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
     type: bool
-    required: false
     default: false
     version_added: 7.2.0
 notes:

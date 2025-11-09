@@ -27,27 +27,22 @@ options:
   value:
     description:
       - Value that key should be set to.
-    required: false
     type: str
   expiration:
     description:
       - Expiration time in milliseconds. Setting this option always results in a change in the database.
-    required: false
     type: int
   non_existing:
     description:
       - Only set key if it does not already exist.
-    required: false
     type: bool
   existing:
     description:
       - Only set key if it already exists.
-    required: false
     type: bool
   keep_ttl:
     description:
       - Retain the time to live associated with the key.
-    required: false
     type: bool
   state:
     description:

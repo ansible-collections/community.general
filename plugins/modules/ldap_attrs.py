@@ -36,7 +36,6 @@ attributes:
     version_added: 8.5.0
 options:
   state:
-    required: false
     type: str
     choices: [present, absent, exact]
     default: present
@@ -55,7 +54,6 @@ options:
       - Note that when using values that YAML/ansible-core interprets as other types, like V(yes), V(no) (booleans), or V(2.10)
         (float), make sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
   ordered:
-    required: false
     type: bool
     default: false
     description:

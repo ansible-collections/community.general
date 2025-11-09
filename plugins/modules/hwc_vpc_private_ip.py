@@ -47,7 +47,6 @@ options:
       - Specifies the target IP address. The value can be an available IP address in the subnet. If it is not specified, the
         system automatically assigns an IP address. Cannot be changed after creating the private IP.
     type: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

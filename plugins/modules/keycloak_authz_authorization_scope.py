@@ -49,12 +49,10 @@ options:
     description:
       - The display name of the authorization scope.
     type: str
-    required: false
   icon_uri:
     description:
       - The icon URI for the authorization scope.
     type: str
-    required: false
   client_id:
     description:
       - The C(clientId) of the Keycloak client that should have the authorization scope.

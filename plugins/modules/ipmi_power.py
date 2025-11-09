@@ -43,7 +43,6 @@ options:
   key:
     description:
       - Encryption key to connect to the BMC in hex format.
-    required: false
     type: str
     version_added: 4.1.0
   state:
@@ -67,7 +66,6 @@ options:
     description:
       - Provide a list of the remote target address for the bridge IPMI request, and the power status.
       - Either this option or O(state) is required.
-    required: false
     type: list
     elements: dict
     version_added: 4.3.0

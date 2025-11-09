@@ -36,7 +36,6 @@ options:
     description:
       - The URL to the Datadog API.
       - This value can also be set with the E(DATADOG_HOST) environment variable.
-    required: false
     default: https://api.datadoghq.com
     type: str
   app_key:
@@ -47,7 +46,6 @@ options:
   state:
     description:
       - The designated state of the downtime.
-    required: false
     choices: ["present", "absent"]
     default: present
     type: str

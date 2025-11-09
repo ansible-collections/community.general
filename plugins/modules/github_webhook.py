@@ -37,38 +37,32 @@ options:
     description:
       - The media type used to serialize the payloads.
     type: str
-    required: false
     choices: [form, json]
     default: form
   secret:
     description:
       - The shared secret between GitHub and the payload URL.
     type: str
-    required: false
   insecure_ssl:
     description:
       - Flag to indicate that GitHub should skip SSL verification when calling the hook.
-    required: false
     type: bool
     default: false
   events:
     description:
       - A list of GitHub events the hook is triggered for. Events are listed at U(https://developer.github.com/v3/activity/events/types/).
         Required unless O(state=absent).
-    required: false
     type: list
     elements: str
   active:
     description:
       - Whether or not the hook is active.
-    required: false
     type: bool
     default: true
   state:
     description:
       - Whether the hook should be present or absent.
     type: str
-    required: false
     choices: [absent, present]
     default: present
   user:
@@ -80,17 +74,14 @@ options:
     description:
       - Password to authenticate to GitHub with.
     type: str
-    required: false
   token:
     description:
       - Token to authenticate to GitHub with.
     type: str
-    required: false
   github_url:
     description:
       - Base URL of the GitHub API.
     type: str
-    required: false
     default: https://api.github.com
 
 author:

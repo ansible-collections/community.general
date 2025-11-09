@@ -22,14 +22,12 @@ attributes:
     # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
   category:
-    required: false
     description:
       - List of categories to execute on OOB controller.
     default: ['Systems']
     type: list
     elements: str
   command:
-    required: false
     description:
       - List of commands to execute on OOB controller.
     type: list
@@ -64,7 +62,6 @@ options:
     type: int
     default: 60
   update_handle:
-    required: false
     description:
       - Handle to check the status of an update in progress.
     type: str

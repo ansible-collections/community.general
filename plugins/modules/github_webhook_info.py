@@ -33,17 +33,14 @@ options:
     description:
       - Password to authenticate to GitHub with.
     type: str
-    required: false
   token:
     description:
       - Token to authenticate to GitHub with.
     type: str
-    required: false
   github_url:
     description:
       - Base URL of the GitHub API.
     type: str
-    required: false
     default: https://api.github.com
 
 author:

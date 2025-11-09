@@ -43,19 +43,16 @@ options:
     type: int
     description:
       - The the group role ID.
-    required: false
   role:
     type: str
     description:
       - The the group role name.
       - The O(role_id) has precedence over the O(role) when supplied.
-    required: false
     default:
   tenant_id:
     type: int
     description:
       - The tenant for the group identified by the tenant ID.
-    required: false
     default:
   tenant:
     type: str
@@ -63,12 +60,10 @@ options:
       - The tenant for the group identified by the tenant name.
       - The O(tenant_id) has precedence over the O(tenant) when supplied.
       - Tenant names are case sensitive.
-    required: false
     default:
   managed_filters:
     description: The tag values per category.
     type: dict
-    required: false
     default:
   managed_filters_merge_mode:
     type: str
@@ -81,7 +76,6 @@ options:
     description: A list of strings with a reference to the allowed host, cluster or folder.
     type: list
     elements: str
-    required: false
     default:
   belongsto_filters_merge_mode:
     type: str

@@ -27,12 +27,10 @@ options:
       - The name of the organization the user is part of.
   user_name:
     type: str
-    required: false
     description:
       - Name of the user to filter on Pritunl.
   user_type:
     type: str
-    required: false
     default: client
     choices:
       - client

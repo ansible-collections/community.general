@@ -26,7 +26,6 @@ options:
     description:
       - Define a public IP state to create, remove, or update.
     type: str
-    required: false
     default: 'present'
     choices: ["present", "absent", "update"]
   auth_token:
@@ -37,26 +36,22 @@ options:
     description:
       - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
-    required: false
   reverse_dns:
     description:
       - Reverse DNS name. maxLength=256.
     type: str
-    required: false
   datacenter:
     description:
       - ID of the datacenter where the IP is created (only for unassigned IPs).
     type: str
     choices: [US, ES, DE, GB]
     default: US
-    required: false
   type:
     description:
       - Type of IP. Currently, only IPV4 is available.
     type: str
     choices: ["IPV4", "IPV6"]
     default: 'IPV4'
-    required: false
   public_ip_id:
     description:
       - The ID of the public IP used with update and delete states.
@@ -64,7 +59,6 @@ options:
   wait:
     description:
       - Wait for the instance to be in state 'running' before returning.
-    required: false
     default: true
     type: bool
   wait_timeout:

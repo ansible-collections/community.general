@@ -27,14 +27,12 @@ options:
     description:
       - Repository ID, for example V(crb).
     default: []
-    required: false
     type: list
     elements: str
   state:
     description:
       - Whether the repositories should be V(enabled) or V(disabled).
     default: enabled
-    required: false
     type: str
     choices: [enabled, disabled]
 notes:

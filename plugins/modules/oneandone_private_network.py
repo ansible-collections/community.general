@@ -26,7 +26,6 @@ options:
     description:
       - Define a network's state to create, remove, or update.
     type: str
-    required: false
     default: 'present'
     choices: ["present", "absent", "update"]
   auth_token:
@@ -41,7 +40,6 @@ options:
     description:
       - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
-    required: false
   name:
     description:
       - Private network name used with present state. Used as identifier (id or name) when used with absent state.
@@ -78,7 +76,6 @@ options:
   wait:
     description:
       - Wait for the instance to be in state 'running' before returning.
-    required: false
     default: true
     type: bool
   wait_timeout:

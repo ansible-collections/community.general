@@ -30,18 +30,15 @@ options:
     description:
       - The credential name to embed in the encrypted credential data.
     type: str
-    required: false
   not_after:
     description:
       - The time when the credential shall not be used anymore.
       - Takes a timestamp specification in the format described in V(systemd.time(7\)).
     type: str
-    required: false
   pretty:
     description:
       - Pretty print the output so that it may be pasted directly into a unit file.
     type: bool
-    required: false
     default: false
   secret:
     description:
@@ -53,14 +50,12 @@ options:
       - The timestamp to embed into the encrypted credential.
       - Takes a timestamp specification in the format described in V(systemd.time(7\)).
     type: str
-    required: false
   user:
     description:
       - A user name or numeric UID to encrypt the credential for.
       - If set to the special string V(self) it sets the user to the user of the calling process.
       - Requires C(systemd) 256 or later.
     type: str
-    required: false
 notes:
   - C(systemd-creds) requires C(systemd) 250 or later.
 """

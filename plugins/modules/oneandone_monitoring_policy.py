@@ -27,7 +27,6 @@ options:
     description:
       - Define a monitoring policy's state to create, remove, update.
     type: str
-    required: false
     default: present
     choices: ["present", "absent", "update"]
   auth_token:
@@ -38,7 +37,6 @@ options:
     description:
       - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
-    required: false
   name:
     description:
       - Monitoring policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128.
@@ -59,7 +57,6 @@ options:
     description:
       - Monitoring policy description. maxLength=256.
     type: str
-    required: false
   thresholds:
     description:
       - Monitoring policy thresholds. Each of the suboptions have warning and critical, which both have alert and value suboptions.
@@ -135,61 +132,52 @@ options:
       - Ports to add to the monitoring policy.
     type: list
     elements: dict
-    required: false
     default: []
   add_processes:
     description:
       - Processes to add to the monitoring policy.
     type: list
     elements: dict
-    required: false
     default: []
   add_servers:
     description:
       - Servers to add to the monitoring policy.
     type: list
     elements: str
-    required: false
     default: []
   remove_ports:
     description:
       - Ports to remove from the monitoring policy.
     type: list
     elements: str
-    required: false
     default: []
   remove_processes:
     description:
       - Processes to remove from the monitoring policy.
     type: list
     elements: str
-    required: false
     default: []
   remove_servers:
     description:
       - Servers to remove from the monitoring policy.
     type: list
     elements: str
-    required: false
     default: []
   update_ports:
     description:
       - Ports to be updated on the monitoring policy.
     type: list
     elements: dict
-    required: false
     default: []
   update_processes:
     description:
       - Processes to be updated on the monitoring policy.
     type: list
     elements: dict
-    required: false
     default: []
   wait:
     description:
       - Wait for the instance to be in state 'running' before returning.
-    required: false
     default: true
     type: bool
   wait_timeout:

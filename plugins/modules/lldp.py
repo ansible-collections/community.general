@@ -23,7 +23,6 @@ attributes:
 options:
   multivalues:
     description: If lldpctl outputs an attribute multiple time represent all values as a list.
-    required: false
     type: bool
     default: false
 author: "Andy Hill (@andyhky)"

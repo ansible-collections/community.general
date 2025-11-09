@@ -78,7 +78,6 @@ options:
     type: bool
   agentport:
     type: int
-    required: false
     description:
       - UDP port used for SNMP discovery.
     default: 161

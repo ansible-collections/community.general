@@ -26,7 +26,6 @@ options:
     type: int
     description:
       - HTTP connection timeout in seconds.
-    required: false
     default: 10
 
 notes:

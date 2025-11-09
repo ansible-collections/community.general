@@ -43,7 +43,6 @@ options:
     description:
       - Absolute paths for files inside the ISO file that should be removed.
     type: list
-    required: false
     elements: str
     default: []
   add_files:
@@ -51,7 +50,6 @@ options:
       - Allows to add and replace files in the ISO file.
       - It creates intermediate folders inside the ISO file when they do not exist.
     type: list
-    required: false
     elements: dict
     default: []
     suboptions:

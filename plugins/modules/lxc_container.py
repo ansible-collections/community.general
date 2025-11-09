@@ -110,7 +110,6 @@ options:
     description:
       - Set the log level for a container where O(container_log) was set.
     type: str
-    required: false
     default: INFO
   clone_name:
     description:

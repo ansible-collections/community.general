@@ -29,43 +29,36 @@ options:
     type: str
     description:
       - The desired state of the gem. V(latest) ensures that the latest version is installed.
-    required: false
     choices: [present, absent, latest]
     default: present
   gem_source:
     type: path
     description:
       - The path to a local gem used as installation source.
-    required: false
   include_dependencies:
     description:
       - Whether to include dependencies or not.
-    required: false
     type: bool
     default: true
   repository:
     type: str
     description:
       - The repository from which the gem is installed.
-    required: false
     aliases: [source]
   user_install:
     description:
       - Install gem in user's local gems cache or for all users.
-    required: false
     type: bool
     default: true
   executable:
     type: path
     description:
       - Override the path to the gem executable.
-    required: false
   install_dir:
     type: path
     description:
       - Install the gems into a specific directory. These gems are independent from the global installed ones. Specifying
         this requires user_install to be false.
-    required: false
   bindir:
     type: path
     description:
@@ -81,35 +74,29 @@ options:
   env_shebang:
     description:
       - Rewrite the shebang line on installed scripts to use /usr/bin/env.
-    required: false
     default: false
     type: bool
   version:
     type: str
     description:
       - Version of the gem to be installed/removed.
-    required: false
   pre_release:
     description:
       - Allow installation of pre-release versions of the gem.
-    required: false
     default: false
     type: bool
   include_doc:
     description:
       - Install with or without docs.
-    required: false
     default: false
     type: bool
   build_flags:
     type: str
     description:
       - Allow adding build flags for gem compilation.
-    required: false
   force:
     description:
       - Force gem to (un-)install, bypassing dependency checks.
-    required: false
     default: false
     type: bool
 author:
