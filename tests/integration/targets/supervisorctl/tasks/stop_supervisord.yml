@@ -5,3 +5,10 @@
 
 - name: stop supervisord
   command: "supervisorctl -c {{ remote_dir }}/supervisord.conf {% if credentials.username %}-u {{ credentials.username }} -p {{ credentials.password }}{% endif %} shutdown"
+
+- name: wait_for supervisord to stop
+  ansible.builtin.wait_for:
+    port: 9001
+    host: 127.0.0.1
+    timeout: 15
+    state: stopped
