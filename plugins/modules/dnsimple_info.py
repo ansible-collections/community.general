@@ -291,7 +291,6 @@ def main():
             record=dict(type="str"),
             sandbox=dict(type="bool", default=False),
         ),
-        required_one_of=[("account_id", "api_key")],
         supports_check_mode=True,
     )
 
