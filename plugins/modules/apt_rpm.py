@@ -155,7 +155,7 @@ def local_rpm_package_name(path):
     fd = os.open(path, os.O_RDONLY)
     try:
         header = ts.hdrFromFdno(fd)
-    except rpm.error as e:
+    except rpm.error:
         return None
     finally:
         os.close(fd)

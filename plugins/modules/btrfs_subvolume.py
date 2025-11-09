@@ -593,7 +593,7 @@ class BtrfsSubvolumeModule:
 
         mount = self.module.get_bin_path("mount", required=True)
         command = [mount, "-o", f"noatime,subvolid={int(subvolid)}", device, mountpoint]
-        result = self.module.run_command(command, check_rc=True)
+        self.module.run_command(command, check_rc=True)
 
         return mountpoint
 

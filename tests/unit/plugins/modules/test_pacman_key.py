@@ -672,7 +672,7 @@ gpg:               imported: 1
 
 @pytest.fixture
 def patch_get_bin_path(mocker):
-    get_bin_path = mocker.patch.object(
+    mocker.patch.object(
         AnsibleModule,
         "get_bin_path",
         return_value=MOCK_BIN_PATH,
@@ -689,7 +689,7 @@ def patch_get_bin_path(mocker):
 def test_operation(mocker, capfd, patch_get_bin_path, expected):
     # patch run_command invocations with mock data
     if "run_command.calls" in expected:
-        mock_run_command = mocker.patch.object(
+        mocker.patch.object(
             AnsibleModule,
             "run_command",
             side_effect=[item[2] for item in expected["run_command.calls"]],
@@ -697,7 +697,7 @@ def test_operation(mocker, capfd, patch_get_bin_path, expected):
 
     # patch save_key invocations with mock data
     if "save_key_output" in expected:
-        mock_save_key = mocker.patch.object(
+        mocker.patch.object(
             pacman_key.PacmanKey,
             "save_key",
             return_value=expected["save_key_output"],

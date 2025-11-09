@@ -470,8 +470,7 @@ def main():
     service = module.params["name"]
     plist_filename = module.params["plist"]
     action = module.params["state"]
-    rc = 0
-    out = err = ""
+    err = ""
     result = {
         "name": service,
         "changed": False,

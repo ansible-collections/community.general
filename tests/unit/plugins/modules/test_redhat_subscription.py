@@ -44,9 +44,7 @@ def test_without_required_parameters_unregistered(mocker, capfd, patch_redhat_su
     """
     Failure must occurs when all parameters are missing
     """
-    mock_run_command = mocker.patch.object(
-        basic.AnsibleModule, "run_command", return_value=(1, "This system is not yet registered.", "")
-    )
+    mocker.patch.object(basic.AnsibleModule, "run_command", return_value=(1, "This system is not yet registered.", ""))
 
     with pytest.raises(SystemExit):
         redhat_subscription.main()
@@ -63,7 +61,7 @@ def test_without_required_parameters_registered(mocker, capfd, patch_redhat_subs
     System already registered, no parameters required (state=present is the
     default)
     """
-    mock_run_command = mocker.patch.object(
+    mocker.patch.object(
         basic.AnsibleModule,
         "run_command",
         return_value=(0, "system identity: b26df632-25ed-4452-8f89-0308bfd167cb", ""),
@@ -888,7 +886,7 @@ def test_redhat_subscription(mocker, capfd, patch_redhat_subscription, testcase)
 
     # Mock function used for running commands first
     call_results = [item[2] for item in testcase["run_command.calls"]]
-    mock_run_command = mocker.patch.object(basic.AnsibleModule, "run_command", side_effect=call_results)
+    mocker.patch.object(basic.AnsibleModule, "run_command", side_effect=call_results)
 
     # Try to run test case
     with pytest.raises(SystemExit):
@@ -1266,7 +1264,7 @@ def test_redhat_subscription_syspurpose(
 
     # Mock function used for running commands first
     call_results = [item[2] for item in testcase["run_command.calls"]]
-    mock_run_command = mocker.patch.object(basic.AnsibleModule, "run_command", side_effect=call_results)
+    mocker.patch.object(basic.AnsibleModule, "run_command", side_effect=call_results)
 
     mock_syspurpose_file = tmpdir.mkdir("syspurpose").join("syspurpose.json")
     # When there there are some existing syspurpose attributes specified, then

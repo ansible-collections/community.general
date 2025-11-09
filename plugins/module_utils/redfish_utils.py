@@ -186,7 +186,7 @@ class RedfishUtils:
             )
             try:
                 data = json.loads(to_native(resp.read()))
-            except Exception as e:
+            except Exception:
                 # No response data; this is okay in certain cases
                 data = None
                 if not allow_no_resp:
@@ -233,7 +233,7 @@ class RedfishUtils:
             )
             try:
                 data = json.loads(to_native(resp.read()))
-            except Exception as e:
+            except Exception:
                 # No response data; this is okay in many cases
                 data = None
         except HTTPError as e:
@@ -1991,7 +1991,7 @@ class RedfishUtils:
         try:
             with open(image_file, "rb") as f:
                 image_payload = f.read()
-        except Exception as e:
+        except Exception:
             return {"ret": False, "msg": f"Could not read file {image_file}"}
 
         # Check that multipart HTTP push updates are supported
@@ -2409,7 +2409,7 @@ class RedfishUtils:
             return {"ret": False, "msg": "Key BootOrder not found"}
 
         boot = data["Boot"]
-        boot_order = boot["BootOrder"]
+        # boot_order = boot["BootOrder"] - TODO is this needed?
         boot_options_dict = self._get_boot_options_dict(boot)
 
         # Verify the requested boot options are valid
@@ -3742,7 +3742,7 @@ class RedfishUtils:
         response = self.get_request(f"{self.root_uri}/redfish/v1/Managers/{manager}", override_headers=None)
         try:
             result["service_identification"] = response["data"]["ServiceIdentification"]
-        except Exception as e:
+        except Exception:
             self.module.fail_json(msg=f"Service ID not found for manager {manager}")
         result["ret"] = True
         return result
@@ -3826,7 +3826,6 @@ class RedfishUtils:
 
     def get_hpe_thermal_config(self):
         result = {}
-        key = "Thermal"
         # Go through list
         for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
@@ -3840,8 +3839,6 @@ class RedfishUtils:
         return {"ret": False}
 
     def get_hpe_fan_percent_min(self):
-        result = {}
-        key = "Thermal"
         # Go through list
         for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
@@ -3946,17 +3943,6 @@ class RedfishUtils:
 
         # Validate input parameters
         required_parameters = ["RAIDType", "Drives"]
-        allowed_parameters = [
-            "CapacityBytes",
-            "DisplayName",
-            "InitializeMethod",
-            "MediaSpanCount",
-            "Name",
-            "ReadCachePolicy",
-            "StripSizeBytes",
-            "VolumeUsage",
-            "WriteCachePolicy",
-        ]
 
         for parameter in required_parameters:
             if not volume_details.get(parameter):
@@ -4029,7 +4015,6 @@ class RedfishUtils:
         reg_data = reg_resp["data"]
 
         # Get BIOS attribute registry URI
-        lst = []
 
         # Get the location URI
         response = self.check_location_uri(reg_data, reg_uri)

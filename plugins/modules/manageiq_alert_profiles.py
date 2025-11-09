@@ -218,7 +218,7 @@ class ManageIQAlertProfiles:
             # if we have any updated values
             changed = True
             try:
-                result = self.client.post(old_profile["href"], resource=profile_dict, action="edit")
+                self.client.post(old_profile["href"], resource=profile_dict, action="edit")
             except Exception as e:
                 msg = "Updating profile '{name}' failed: {error}"
                 msg = msg.format(name=old_profile["name"], error=e)

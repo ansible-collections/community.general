@@ -155,7 +155,7 @@ class TestPacman:
     def test_success(self, mock_empty_inventory):
         with set_module_args({"update_cache": True}):  # Simplest args to let init go through
             P = pacman.Pacman(pacman.setup_module())
-            with pytest.raises(AnsibleExitJson) as e:
+            with pytest.raises(AnsibleExitJson):
                 P.success()
 
     def test_fail(self, mock_empty_inventory):

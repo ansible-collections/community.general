@@ -320,7 +320,7 @@ def test_xenserver_guest_powerstate_wait(mocker, patch_ansible_module, capfd, Xe
         "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.gather_vm_facts",
         return_value=fake_vm_facts,
     )
-    mocked_set_vm_power_state = mocker.patch(
+    mocker.patch(
         "ansible_collections.community.general.plugins.modules.xenserver_guest_powerstate.set_vm_power_state",
         return_value=(True, "somenewstate"),
     )

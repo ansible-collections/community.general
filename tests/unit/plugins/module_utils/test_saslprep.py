@@ -51,5 +51,5 @@ def test_saslprep_conversions(source, target):
 
 @pytest.mark.parametrize("source,exception", INVALID)
 def test_saslprep_exceptions(source, exception):
-    with pytest.raises(exception) as ex:
+    with pytest.raises(exception):
         saslprep(source)

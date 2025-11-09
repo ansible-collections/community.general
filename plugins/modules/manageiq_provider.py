@@ -808,7 +808,7 @@ class ManageIQProvider:
         """
         try:
             url = f"{self.api_url}/providers/{provider['id']}"
-            result = self.client.post(url, action="refresh")
+            self.client.post(url, action="refresh")
         except Exception as e:
             self.module.fail_json(msg=f"failed to refresh provider {name}: {e}")
 
