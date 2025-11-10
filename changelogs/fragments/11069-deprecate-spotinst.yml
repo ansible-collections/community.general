@@ -1,2 +1,2 @@
 deprecated_features:
-  - spotinst_aws_elastigroup - module relies on Python package supporting Python 2.7 only ().
+  - spotinst_aws_elastigroup - module relies on Python package supporting Python 2.7 only (https://github.com/ansible-collections/community.general/pull/11069).
