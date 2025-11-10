@@ -7,7 +7,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 name: tss
 author: Adam Migus (@amigus) <adam@migus.org>
-short_description: Get secrets from Thycotic Secret Server
+short_description: Get secrets from Delinea Secret Server
 version_added: 1.0.0
 description:
   - Uses the Thycotic Secret Server Python SDK to get Secrets from Secret Server using token authentication with O(username)
@@ -119,14 +119,16 @@ options:
 RETURN = r"""
 _list:
   description:
-    - The JSON responses to C(GET /secrets/{id}).
+    - The JSON responses to C(GET /secrets/{id}) and C(GET /secrets/{path}).
     - See U(https://updates.thycotic.net/secretserver/restapiguide/TokenAuth/#operation--secrets--id--get).
   type: list
   elements: dict
 """
 
 EXAMPLES = r"""
-- hosts: localhost
+# Using Secret Server Authentication
+- name: Lookup secret using Secret Server user credentials
+  hosts: localhost
   vars:
     secret: >-
       {{
@@ -147,7 +149,8 @@ EXAMPLES = r"""
                            value_name='itemValue'))['password']
           }}
 
-- hosts: localhost
+- name: Lookup secret with domain user
+  hosts: localhost
   vars:
     secret: >-
       {{
@@ -169,7 +172,8 @@ EXAMPLES = r"""
                            value_name='itemValue'))['password']
           }}
 
-- hosts: localhost
+- name: Lookup secret using Secret Server token
+  hosts: localhost
   vars:
     secret_password: >-
       {{
@@ -187,7 +191,8 @@ EXAMPLES = r"""
 # Private key stores into certificate file which is attached with secret.
 # If fetch_attachments=True then private key file will be download on specified path
 # and file content will display in debug message.
-- hosts: localhost
+- name: Lookup secret and fetch attachments using Secret Server token
+  hosts: localhost
   vars:
     secret: >-
       {{
@@ -210,7 +215,8 @@ EXAMPLES = r"""
           }}
 
 # If fetch_secret_ids_from_folder=true then secret IDs are in a folder is fetched based on folder ID
-- hosts: localhost
+- name: Lookup secret IDs by folder ID using Secret Server token
+  hosts: localhost
   vars:
     secret: >-
       {{
@@ -230,7 +236,8 @@ EXAMPLES = r"""
           }}
 
 # If secret ID is 0 and secret_path has value then secret is fetched by secret path
-- hosts: localhost
+- name: Lookup secret by secret path using Secret Server user credentials
+  hosts: localhost
   vars:
     secret: >-
       {{
@@ -251,6 +258,45 @@ EXAMPLES = r"""
               | items2dict(key_name='slug',
                            value_name='itemValue'))['password']
           }}
+
+# Using Platform Authentication
+- name: Lookup secret using Platform service user credentials
+  hosts: localhost
+  vars:
+    secret: >-
+      {{
+        lookup(
+          'community.general.tss',
+          102,
+          base_url='https://platform.delinea.app/',
+          username='platform_service_username',
+          password='platform_service_user_password'
+        )
+      }}
+  tasks:
+    - ansible.builtin.debug:
+        msg: >
+          the password is {{
+            (secret['items']
+              | items2dict(key_name='slug',
+                           value_name='itemValue'))['password']
+          }}
+
+- name: Lookup secret using platform token
+  hosts: localhost
+  vars:
+    secret_password: >-
+      {{
+        ((lookup(
+          'community.general.tss',
+          102,
+          base_url='https://platform.delinea.app/',
+          token='delinea_platform_access_token',
+        ) | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password']
+      }}
+  tasks:
+    - ansible.builtin.debug:
+        msg: the password is {{ secret_password }}
 """
 
 import abc
@@ -394,9 +440,7 @@ class TSSClientV1(TSSClient):
     @staticmethod
     def _get_authorizer(**server_parameters):
         if server_parameters.get("token"):
-            return AccessTokenAuthorizer(
-                server_parameters["token"],
-            )
+            return AccessTokenAuthorizer(server_parameters["token"], server_parameters["base_url"])
 
         if server_parameters.get("domain"):
             return DomainPasswordGrantAuthorizer(
