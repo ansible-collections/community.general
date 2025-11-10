@@ -256,6 +256,37 @@ class OpenTelemetrySource:
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
+    def create_import_span(self, result, imported_file, disable_logs, disable_attributes_in_logs):
+        """Create a span for imported playbook as a child of the current trace"""
+
+        # No tracer provider available yet
+        if not hasattr(trace.get_tracer_provider(), 'get_tracer'):
+            return
+
+        tracer = trace.get_tracer(__name__)
+        host_name = result._host.name if hasattr(result, "_host") and result._host else "localhost"
+
+        # Create a span for the imported playbook
+        with tracer.start_as_current_span(
+            f"import_playbook: {basename(imported_file)}",
+            kind=SpanKind.CLIENT
+        ) as span:
+            attributes = {
+                "ansible.import.type": "playbook",
+                "ansible.import.file": imported_file,
+                "ansible.import.host": host_name,
+                "ansible.import.status": "imported"
+            }
+
+            if span:
+                span.set_attributes(attributes)
+                span.set_status(Status(status_code=StatusCode.OK))
+
+                # Add log event if not disabled
+                if not disable_logs:
+                    event_attributes = {} if disable_attributes_in_logs else attributes
+                    span.add_event(f"Imported playbook: {imported_file}", attributes=event_attributes)
+
     def generate_distributed_traces(
         self,
         otel_service_name,
@@ -594,6 +625,10 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_include(self, included_file):
         self.opentelemetry.finish_task(self.tasks_data, "included", included_file, "")
+
+    def v2_playbook_on_import_for_host(self, result, imported_file):
+        """Handle import_playbook to create child spans for imported playbooks"""
+        self.opentelemetry.create_import_span(result, imported_file, self.disable_logs, self.disable_attributes_in_logs)
 
     def v2_playbook_on_stats(self, stats):
         if self.errors == 0:
