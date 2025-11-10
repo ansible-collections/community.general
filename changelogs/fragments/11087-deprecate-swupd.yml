@@ -1,0 +1,2 @@
+deprecated_features:
+  - layman - ClearLinux was made EOL in July 2019.; the module will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/pull/11087).
