@@ -256,36 +256,28 @@ class OpenTelemetrySource:
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def create_import_span(self, result, imported_file, disable_logs, disable_attributes_in_logs):
-        """Create a span for imported playbook as a child of the current trace"""
-
-        # No tracer provider available yet
-        if not hasattr(trace.get_tracer_provider(), 'get_tracer'):
+    def create_import_spans(self, tracer, imported_playbooks, disable_logs, disable_attributes_in_logs):
+        """Create spans for imported playbooks as children of the current span"""
+        if not imported_playbooks:
             return
 
-        tracer = trace.get_tracer(__name__)
-        host_name = result._host.name if hasattr(result, "_host") and result._host else "localhost"
-
-        # Create a span for the imported playbook
-        with tracer.start_as_current_span(
-            f"import_playbook: {basename(imported_file)}",
-            kind=SpanKind.CLIENT
-        ) as span:
-            attributes = {
-                "ansible.import.type": "playbook",
-                "ansible.import.file": imported_file,
-                "ansible.import.host": host_name,
-                "ansible.import.status": "imported"
-            }
-
-            if span:
-                span.set_attributes(attributes)
-                span.set_status(Status(status_code=StatusCode.OK))
+        for imported_playbook in imported_playbooks:
+            with tracer.start_as_current_span(
+                f"import_playbook: {imported_playbook}",
+                kind=SpanKind.CLIENT
+            ) as import_span:
+                attributes = {
+                    "ansible.import.type": "playbook",
+                    "ansible.import.file": imported_playbook,
+                    "ansible.import.status": "imported"
+                }
+                import_span.set_attributes(attributes)
+                import_span.set_status(Status(status_code=StatusCode.OK))
 
                 # Add log event if not disabled
                 if not disable_logs:
                     event_attributes = {} if disable_attributes_in_logs else attributes
-                    span.add_event(f"Imported playbook: {imported_file}", attributes=event_attributes)
+                    import_span.add_event(f"Imported playbook: {imported_playbook}", attributes=event_attributes)
 
     def generate_distributed_traces(
         self,
@@ -298,6 +290,7 @@ class OpenTelemetrySource:
         disable_attributes_in_logs,
         otel_exporter_otlp_traces_protocol,
         store_spans_in_file,
+        imported_playbooks=None,
     ):
         """generate distributed traces from the collected TaskData and HostData"""
 
@@ -339,6 +332,10 @@ class OpenTelemetrySource:
             if self.ip_address is not None:
                 parent.set_attribute("ansible.host.ip", self.ip_address)
             parent.set_attribute("ansible.host.user", self.user)
+
+            # Create import spans for imported playbooks
+            self.create_import_spans(tracer, imported_playbooks, disable_logs, disable_attributes_in_logs)
+
             for task in tasks:
                 for host_uuid, host_data in task.host_data.items():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
@@ -525,8 +522,10 @@ class CallbackModule(CallbackBase):
         self.disable_logs = None
         self.otel_service_name = None
         self.ansible_playbook = None
+        self.main_playbook = None
         self.play_name = None
         self.tasks_data = None
+        self.imported_playbooks = []
         self.errors = 0
         self.disabled = False
         self.traceparent = False
@@ -586,9 +585,25 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
+        if self.main_playbook is None:
+            self.main_playbook = playbook._file_name
 
     def v2_playbook_on_play_start(self, play):
         self.play_name = play.get_name()
+
+        # Check if this play is from an imported playbook
+        if hasattr(play, 'get_path'):
+            play_path = play.get_path()
+
+            # If the play path is different from main playbook, it's imported
+            if play_path and play_path != self.main_playbook:
+                # Extract just the filename without line number
+                play_file = play_path.split(':')[0] if ':' in play_path else play_path
+                imported_playbook_name = basename(play_file)
+
+                # Store for later span creation
+                if imported_playbook_name not in self.imported_playbooks:
+                    self.imported_playbooks.append(imported_playbook_name)
 
     def v2_runner_on_no_hosts(self, task):
         self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
@@ -626,10 +641,6 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_include(self, included_file):
         self.opentelemetry.finish_task(self.tasks_data, "included", included_file, "")
 
-    def v2_playbook_on_import_for_host(self, result, imported_file):
-        """Handle import_playbook to create child spans for imported playbooks"""
-        self.opentelemetry.create_import_span(result, imported_file, self.disable_logs, self.disable_attributes_in_logs)
-
     def v2_playbook_on_stats(self, stats):
         if self.errors == 0:
             status = Status(status_code=StatusCode.OK)
@@ -645,6 +656,7 @@ class CallbackModule(CallbackBase):
             self.disable_attributes_in_logs,
             self.otel_exporter_otlp_traces_protocol,
             self.store_spans_in_file,
+            self.imported_playbooks,
         )
 
         if self.store_spans_in_file:
