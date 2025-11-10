@@ -232,22 +232,10 @@ def main():
 
     start = now()
 
-    ssl_context = None
-    if not validate_certs:
-        try:
-            ssl_context = ssl._create_unverified_context()
-        except AttributeError:
-            # Legacy Python that doesn't verify HTTPS certificates by default
-            pass
-        else:
-            # Handle target environment that doesn't support HTTPS verification
-            ssl._create_default_https_context = ssl._create_unverified_context
+    ssl_context = None if validate_certs or not use_ssl else ssl._create_unverified_context()
 
     url = "{proto}://{host}:{port}/cobbler_api".format(**module.params)
-    if ssl_context:
-        conn = xmlrpc_client.ServerProxy(url, context=ssl_context)
-    else:
-        conn = xmlrpc_client.Server(url)
+    conn = xmlrpc_client.ServerProxy(url, context=ssl_context)
 
     try:
         token = conn.login(username, password)
