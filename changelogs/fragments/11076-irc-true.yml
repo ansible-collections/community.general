@@ -1,0 +1,2 @@
+minor_changes:
+  - irc - use proper boolean value in loops (https://github.com/ansible-collections/community.general/pull/11076).
