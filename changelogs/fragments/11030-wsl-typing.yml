@@ -1,2 +1,0 @@
-bugfixes:
-  - "wsl connection plugin - rename variable to fix type checking (https://github.com/ansible-collections/community.general/pull/11030)."

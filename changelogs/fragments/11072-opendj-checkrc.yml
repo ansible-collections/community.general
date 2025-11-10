@@ -1,2 +1,0 @@
-minor_changes:
-  - opendj_backendprop - use Ansible construct to perform check for external commands (https://github.com/ansible-collections/community.general/pull/11072).

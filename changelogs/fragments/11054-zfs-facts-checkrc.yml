@@ -1,2 +1,0 @@
-minor_changes:
-  - zfs_facts - use Ansible construct to check result of external command (https://github.com/ansible-collections/community.general/pull/11054).
