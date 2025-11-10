@@ -11,6 +11,10 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: swupd
 short_description: Manages updates and bundles in ClearLinux systems
+deprecated:
+  removed_in: 15.0.0
+  why: ClearLinux was made EOL in July 2019.
+  alternative: There is none.
 description:
   - Manages updates and bundles with the swupd bundle manager, which is used by the Clear Linux Project for Intel Architecture.
 author: Alberto Murillo (@albertomurillo)

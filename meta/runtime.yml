@@ -1035,6 +1035,10 @@ plugin_routing:
         warning_text: This module relied on HTTPS APIs that do not exist anymore,
           and any new development in the direction of providing an alternative should
           happen in the context of the google.cloud collection.
+    swupd:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: ClearLinux was made EOL in July 2019.
     typetalk:
       deprecation:
         removal_version: 13.0.0
