@@ -43,7 +43,6 @@ options:
     description:
       - The repository path to install the package from.
       - Its global definition is in C(/etc/opt/csw/pkgutil.conf).
-    required: false
     type: str
   state:
     description:

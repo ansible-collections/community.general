@@ -52,7 +52,6 @@ options:
     type: str
     version_added: 2.3.0
   bios_attributes:
-    required: false
     description:
       - Dictionary of BIOS attributes to update.
     default: {}
@@ -65,7 +64,6 @@ options:
     type: int
     default: 60
   boot_order:
-    required: false
     description:
       - List of BootOptionReference strings specifying the BootOrder.
     default: []
@@ -73,33 +71,28 @@ options:
     elements: str
     version_added: '0.2.0'
   network_protocols:
-    required: false
     description:
       - Setting dict of manager services to update.
     type: dict
     default: {}
     version_added: '0.2.0'
   resource_id:
-    required: false
     description:
       - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
   service_id:
-    required: false
     description:
       - ID of the manager to update.
     type: str
     version_added: '8.4.0'
   nic_addr:
-    required: false
     description:
       - EthernetInterface Address string on OOB controller.
     default: 'null'
     type: str
     version_added: '0.2.0'
   nic_config:
-    required: false
     description:
       - Setting dict of EthernetInterface on OOB controller.
     type: dict
@@ -113,41 +106,35 @@ options:
     default: false
     version_added: 3.7.0
   hostinterface_config:
-    required: false
     description:
       - Setting dict of HostInterface on OOB controller.
     type: dict
     default: {}
     version_added: '4.1.0'
   hostinterface_id:
-    required: false
     description:
       - Redfish HostInterface instance ID if multiple HostInterfaces are present.
     type: str
     version_added: '4.1.0'
   sessions_config:
-    required: false
     description:
       - Setting dict of Sessions.
     type: dict
     default: {}
     version_added: '5.7.0'
   storage_subsystem_id:
-    required: false
     description:
       - ID of the Storage Subsystem on which the volume is to be created.
     type: str
     default: ''
     version_added: '7.3.0'
   storage_none_volume_deletion:
-    required: false
     description:
       - Indicates if all non-RAID volumes are automatically deleted prior to creating the new volume.
     type: bool
     default: false
     version_added: '9.5.0'
   volume_ids:
-    required: false
     description:
       - List of IDs of volumes to be deleted.
     type: list
@@ -155,14 +142,12 @@ options:
     elements: str
     version_added: '7.3.0'
   secure_boot_enable:
-    required: false
     description:
       - Setting parameter to enable or disable SecureBoot.
     type: bool
     default: true
     version_added: '7.5.0'
   volume_details:
-    required: false
     description:
       - Setting dictionary of volume to be created.
       - If C(CapacityBytes) key is not specified in this dictionary, the size of the volume is determined by the Redfish service.

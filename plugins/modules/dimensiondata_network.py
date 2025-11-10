@@ -41,7 +41,6 @@ options:
   description:
     description:
       - Additional description of the network domain.
-    required: false
     type: str
   service_plan:
     description:

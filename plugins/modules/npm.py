@@ -24,23 +24,19 @@ options:
     description:
       - The name of a node.js library to install.
     type: str
-    required: false
   path:
     description:
       - The base path where to install the node.js libraries.
       - When O(global=true), then O(path) is not used to install the packages.
     type: path
-    required: false
   version:
     description:
       - The version to be installed.
     type: str
-    required: false
   global:
     description:
       - Install the node.js library globally.
       - When O(global=true), then O(path) is not used to install the packages.
-    required: false
     default: false
     type: bool
   executable:
@@ -48,11 +44,9 @@ options:
       - The executable location for npm.
       - This is useful if you are using a version manager, such as nvm.
     type: path
-    required: false
   ignore_scripts:
     description:
       - Use the C(--ignore-scripts) flag when installing.
-    required: false
     type: bool
     default: false
   unsafe_perm:
@@ -68,18 +62,15 @@ options:
   production:
     description:
       - Install dependencies in production mode, excluding devDependencies.
-    required: false
     type: bool
     default: false
   registry:
     description:
       - The registry to install modules from.
-    required: false
     type: str
   state:
     description:
       - The state of the node.js library.
-    required: false
     type: str
     default: present
     choices: ["present", "absent", "latest"]
@@ -280,7 +271,7 @@ class Npm:
             if dep:
                 # node.js v0.10.22 changed the `npm outdated` module separator
                 # from "@" to " ". Split on both for backwards compatibility.
-                pkg, other = re.split(r"\s|@", dep, 1)
+                pkg, other = re.split(r"\s|@", dep, maxsplit=1)
                 outdated.append(pkg)
 
         return outdated

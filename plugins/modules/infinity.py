@@ -210,7 +210,7 @@ class Infinity:
         return the details of a given with given network_id or name
         """
         if network_name is None and network_id is None:
-            self.module.exit_json(msg="You must specify  one of the options 'network_name' or 'network_id'.")
+            self.module.exit_json(msg="You must specify one of the options 'network_name' or 'network_id'.")
         method = "get"
         resource_url = ""
         params = {}
@@ -287,12 +287,12 @@ class Infinity:
         resource_url = ""
         response = None
         if ip_address is None or network_id is None:
-            self.module.exit_json(msg="You must specify  those two options: 'network_id' and 'ip_address'.")
+            self.module.exit_json(msg="You must specify those two options: 'network_id' and 'ip_address'.")
 
         resource_url = f"networks/{network_id}/children"
         response = self._get_api_call_ansible_handler(method, resource_url)
         if not response:
-            self.module.exit_json(msg=f"There is an error in release ip {ip_address} from network  {network_id}.")
+            self.module.exit_json(msg=f"There is an error in release ip {ip_address} from network {network_id}.")
 
         ip_list = json.loads(response)
         ip_idlist = []
@@ -407,7 +407,7 @@ class Infinity:
         response = self._get_api_call_ansible_handler(method, resource_url)
         if not response:
             self.module.exit_json(
-                msg=f" there is an error in releasing network {network_id}  from network  {released_network_name}."
+                msg=f"There is an error in releasing network {network_id} from network {released_network_name}."
             )
         if response:
             response = json.loads(response)
@@ -422,7 +422,7 @@ class Infinity:
             response = self._get_api_call_ansible_handler(method, resource_url, stat_codes=[204])
         else:
             self.module.exit_json(
-                msg=f" When release network , could not find the network   {released_network_name} from the given superent {network_id} "
+                msg=f"When release network, could not find the network {released_network_name} from the given superent {network_id} "
             )
 
         return response
@@ -443,12 +443,11 @@ class Infinity:
         add a new LAN network into a given supernet Fusionlayer Infinity via rest api  or default supernet
         required fields=['network_name', 'network_family', 'network_type',  'network_address','network_size' ]
         """
-        method = "post"
         resource_url = "networks"
         response = None
         if network_name is None or network_address is None or network_size is None:
             self.module.exit_json(
-                msg="You must specify  those options 'network_name', 'network_address' and 'network_size'"
+                msg="You must specify those options 'network_name', 'network_address' and 'network_size'"
             )
 
         if not network_family:

@@ -53,13 +53,12 @@ options:
     type: bool
     description:
       - Use O(stop_before_removing=true) to stop the program/group before removing it.
-    required: false
     default: false
     version_added: 7.5.0
   signal:
     type: str
     description:
-      - The signal to send to the program/group, when combined with the 'signalled' state. Required when l(state=signalled).
+      - The signal to send to the program/group, when combined with the V(signalled) state. Required when l(state=signalled).
   supervisorctl_path:
     type: path
     description:
@@ -112,6 +111,7 @@ EXAMPLES = r"""
     name: all
     state: restarted
 """
+
 
 import os
 from ansible.module_utils.basic import AnsibleModule, is_executable

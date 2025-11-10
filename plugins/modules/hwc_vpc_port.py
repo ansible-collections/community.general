@@ -51,11 +51,9 @@ options:
     description:
       - Specifies the administrative state of the port.
     type: bool
-    required: false
   allowed_address_pairs:
     description:
       - Specifies a set of zero or more allowed address pairs.
-    required: false
     type: list
     elements: dict
     suboptions:
@@ -64,45 +62,37 @@ options:
           - Specifies the IP address. It cannot set it to 0.0.0.0. Configure an independent security group for the port if
             a large CIDR block (subnet mask less than 24) is configured for parameter allowed_address_pairs.
         type: str
-        required: false
       mac_address:
         description:
           - Specifies the MAC address.
         type: str
-        required: false
   extra_dhcp_opts:
     description:
       - Specifies the extended option of DHCP.
     type: list
     elements: dict
-    required: false
     suboptions:
       name:
         description:
           - Specifies the option name.
         type: str
-        required: false
       value:
         description:
           - Specifies the option value.
         type: str
-        required: false
   ip_address:
     description:
       - Specifies the port IP address.
     type: str
-    required: false
   name:
     description:
       - Specifies the port name. The value can contain no more than 255 characters.
     type: str
-    required: false
   security_groups:
     description:
       - Specifies the ID of the security group.
     type: list
     elements: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

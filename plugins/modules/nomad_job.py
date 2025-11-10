@@ -163,7 +163,7 @@ def run():
                     if job_id is None:
                         module.fail_json(msg="Cannot retrieve job with ID None")
                     plan = nomad_client.job.plan_job(job_id, job, diff=True)
-                    if not plan["Diff"].get("Type") == "None":
+                    if plan["Diff"].get("Type") != "None":
                         changed = True
                         if not module.check_mode:
                             result = nomad_client.jobs.register_job(job)
@@ -186,7 +186,7 @@ def run():
                 try:
                     job_id = job_json.get("ID")
                     plan = nomad_client.job.plan_job(job_id, job, diff=True)
-                    if not plan["Diff"].get("Type") == "None":
+                    if plan["Diff"].get("Type") != "None":
                         changed = True
                         if not module.check_mode:
                             result = nomad_client.jobs.register_job(job)
@@ -215,7 +215,7 @@ def run():
                         result = nomad_client.jobs.register_job(job)
                     else:
                         result = nomad_client.validate.validate_job(job)
-                        if not result.status_code == 200:
+                        if result.status_code != 200:
                             module.fail_json(msg=to_native(result.text))
                         result = json.loads(result.text)
                     changed = True
@@ -224,7 +224,7 @@ def run():
 
     if module.params.get("state") == "absent":
         try:
-            if not module.params.get("name") is None:
+            if module.params.get("name") is not None:
                 job_name = module.params.get("name")
             else:
                 if module.params.get("content_format") == "hcl":

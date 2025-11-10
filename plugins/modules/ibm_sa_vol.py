@@ -29,7 +29,6 @@ options:
   pool:
     description:
       - Volume pool.
-    required: false
     type: str
   state:
     description:
@@ -40,7 +39,6 @@ options:
   size:
     description:
       - Volume size.
-    required: false
     type: str
 
 extends_documentation_fragment:

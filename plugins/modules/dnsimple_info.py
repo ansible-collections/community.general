@@ -42,12 +42,10 @@ options:
     description:
       - The record to find.
       - If specified, only this record is returned instead of all records.
-    required: false
     type: str
 
   sandbox:
     description: Whether or not to use sandbox environment.
-    required: false
     default: false
     type: bool
 
@@ -281,42 +279,38 @@ def account_info(dnsimple_mod, req_obj):
 
 
 def main():
-    # define available arguments/parameters a user can pass to the module
-    fields = {
-        "account_id": {"required": True, "type": "str"},
-        "api_key": {"required": True, "type": "str", "no_log": True},
-        "name": {"required": False, "type": "str"},
-        "record": {"required": False, "type": "str"},
-        "sandbox": {"required": False, "type": "bool", "default": False},
-    }
-
     result = {"changed": False}
 
-    module = AnsibleModule(argument_spec=fields, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=dict(
+            account_id=dict(required=True, type="str"),
+            api_key=dict(required=True, type="str", no_log=True),
+            name=dict(type="str"),
+            record=dict(type="str"),
+            sandbox=dict(type="bool", default=False),
+        ),
+        supports_check_mode=True,
+    )
 
     params = module.params
     req = build_url(params["account_id"], params["api_key"], params["sandbox"])
 
     deps.validate(module)
 
-    # At minimum we need account and key
-    if params["account_id"] and params["api_key"]:
-        # If we have a record return info on that record
-        if params["name"] and params["record"]:
-            result["dnsimple_record_info"] = record_info(module, req)
-            module.exit_json(**result)
+    # If we have a record return info on that record
+    if params["name"] and params["record"]:
+        result["dnsimple_record_info"] = record_info(module, req)
+        module.exit_json(**result)
 
-            # If we have the account only and domain, return records for the domain
-        elif params["name"]:
-            result["dnsimple_records_info"] = domain_info(module, req)
-            module.exit_json(**result)
+        # If we have the account only and domain, return records for the domain
+    elif params["name"]:
+        result["dnsimple_records_info"] = domain_info(module, req)
+        module.exit_json(**result)
 
-            # If we have the account only, return domains
-        else:
-            result["dnsimple_domain_info"] = account_info(module, req)
-            module.exit_json(**result)
+        # If we have the account only, return domains
     else:
-        module.fail_json(msg="Need at least account_id and api_key")
+        result["dnsimple_domain_info"] = account_info(module, req)
+        module.exit_json(**result)
 
 
 if __name__ == "__main__":

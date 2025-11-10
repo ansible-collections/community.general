@@ -53,7 +53,6 @@ options:
     type: str
     version_added: 2.3.0
   manager_attributes:
-    required: false
     description:
       - Dictionary of iDRAC attribute name and value pairs to update.
     default: {}
@@ -65,7 +64,6 @@ options:
     default: 10
     type: int
   resource_id:
-    required: false
     description:
       - ID of the System, Manager or Chassis to modify.
     type: str

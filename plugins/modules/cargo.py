@@ -41,19 +41,16 @@ options:
     description: The version to install. If O(name) contains multiple values, the module tries to install all of them in this
       version.
     type: str
-    required: false
   locked:
     description:
       - Install with locked dependencies.
       - This is only used when installing packages.
-    required: false
     type: bool
     default: false
     version_added: 7.5.0
   state:
     description:
       - The state of the Rust package.
-    required: false
     type: str
     default: present
     choices: ["present", "absent", "latest"]
@@ -62,7 +59,6 @@ options:
       - Path to the source directory to install the Rust package from.
       - This is only used when installing packages.
     type: path
-    required: false
     version_added: 9.1.0
   features:
     description:
@@ -70,7 +66,6 @@ options:
       - This is only used when installing packages.
     type: list
     elements: str
-    required: false
     default: []
     version_added: 11.0.0
 requirements:

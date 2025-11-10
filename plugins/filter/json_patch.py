@@ -10,7 +10,8 @@ from ansible.errors import AnsibleFilterError
 
 
 if t.TYPE_CHECKING:
-    from typing import Any, Callable, Union
+    from typing import Any
+    from collections.abc import Callable
 
 JSONPATCH_IMPORT_ERROR: ImportError | None
 try:
@@ -60,7 +61,7 @@ class FilterModule:
 
     def json_patch(
         self,
-        inp: Union[str, list, dict, bytes, bytearray],
+        inp: str | list | dict | bytes | bytearray,
         op: str,
         path: str,
         value: Any = None,
@@ -105,7 +106,7 @@ class FilterModule:
 
     def json_patch_recipe(
         self,
-        inp: Union[str, list, dict, bytes, bytearray],
+        inp: str | list | dict | bytes | bytearray,
         operations: list,
         /,
         fail_test: bool = False,
@@ -141,8 +142,8 @@ class FilterModule:
 
     def json_diff(
         self,
-        inp: Union[str, list, dict, bytes, bytearray],
-        target: Union[str, list, dict, bytes, bytearray],
+        inp: str | list | dict | bytes | bytearray,
+        target: str | list | dict | bytes | bytearray,
     ) -> list:
         if not HAS_LIB:
             raise AnsibleFilterError(

@@ -43,7 +43,6 @@ options:
   key:
     description:
       - Encryption key to connect to the BMC in hex format.
-    required: false
     type: str
     version_added: 4.1.0
   bootdev:
@@ -177,7 +176,7 @@ def main():
             key = binascii.unhexlify(module.params["key"])
         else:
             key = None
-    except Exception as e:
+    except Exception:
         module.fail_json(msg="Unable to convert 'key' from hex string.")
 
     # --- run command ---

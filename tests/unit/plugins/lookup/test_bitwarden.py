@@ -226,7 +226,6 @@ class TestLookupModule(unittest.TestCase):
         with patch("ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden", mock_bitwarden):
             record = MOCK_RECORDS[0]
             record_name = record["name"]
-            session = "session"
 
             self.lookup.run([record_name], field=None)
             self.assertIsNone(mock_bitwarden.session)

@@ -112,7 +112,6 @@ def main():
     application_key = module.params.get("application_key")
     application_secret = module.params.get("application_secret")
     consumer_key = module.params.get("consumer_key")
-    project = ""
     instance = ""
     ovh_billing_status = ""
 
@@ -129,7 +128,7 @@ def main():
 
     # Check that the instance exists
     try:
-        project = client.get(f"/cloud/project/{project_id}")
+        client.get(f"/cloud/project/{project_id}")
     except ovh.exceptions.ResourceNotFoundError:
         module.fail_json(msg=f"project {project_id} does not exist")
 

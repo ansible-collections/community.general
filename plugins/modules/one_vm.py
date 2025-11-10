@@ -764,11 +764,11 @@ def get_template(module, client, predicate):
 
 
 def get_template_by_name(module, client, template_name):
-    return get_template(module, client, lambda template: (template.NAME == template_name))
+    return get_template(module, client, lambda template: (template_name == template.NAME))
 
 
 def get_template_by_id(module, client, template_id):
-    return get_template(module, client, lambda template: (template.ID == template_id))
+    return get_template(module, client, lambda template: (template_id == template.ID))
 
 
 def get_template_id(module, client, requested_id, requested_name):
@@ -803,11 +803,11 @@ def get_datastore(module, client, predicate):
 
 
 def get_datastore_by_name(module, client, datastore_name):
-    return get_datastore(module, client, lambda datastore: (datastore.NAME == datastore_name))
+    return get_datastore(module, client, lambda datastore: (datastore_name == datastore.NAME))
 
 
 def get_datastore_by_id(module, client, datastore_id):
-    return get_datastore(module, client, lambda datastore: (datastore.ID == datastore_id))
+    return get_datastore(module, client, lambda datastore: (datastore_id == datastore.ID))
 
 
 def get_datastore_id(module, client, requested_id, requested_name):
@@ -887,7 +887,7 @@ def get_vm_info(client, vm):
 
     # LCM_STATE is VM's sub-state that is relevant only when STATE is ACTIVE
     vm_lcm_state = None
-    if vm.STATE == VM_STATES.index("ACTIVE"):
+    if VM_STATES.index("ACTIVE") == vm.STATE:
         vm_lcm_state = LCM_STATES[vm.LCM_STATE]
 
     vm_labels, vm_attributes = get_vm_labels_and_attributes_dict(client, vm.ID)
@@ -1141,7 +1141,7 @@ def get_all_vms_by_attributes(client, attributes_dict, labels_list):
                 if with_hash and vm.NAME[len(base_name) :].isdigit():
                     # If the name has indexed format and after base_name it has only digits it'll be matched
                     vm_list.append(vm)
-                elif not with_hash and vm.NAME == name:
+                elif not with_hash and name == vm.NAME:
                     # If the name is not indexed it has to be same
                     vm_list.append(vm)
         pool = vm_list
@@ -1271,7 +1271,6 @@ def create_exact_count_of_vms(
     vm_count_diff = exact_count - len(vm_list)
     changed = vm_count_diff != 0
 
-    new_vms_list = []
     instances_list = []
     tagged_instances_list = vm_list
 
@@ -1600,7 +1599,7 @@ def disk_save_as(module, client, vm, disk_saveas, wait_timeout):
     disk_id = disk_saveas.get("disk_id", 0)
 
     if not module.check_mode:
-        if vm.STATE != VM_STATES.index("POWEROFF"):
+        if VM_STATES.index("POWEROFF") != vm.STATE:
             module.fail_json(msg="'disksaveas' option can be used only when the VM is in 'POWEROFF' state")
         try:
             client.vm.disksaveas(vm.ID, disk_id, image_name, "OS", -1)

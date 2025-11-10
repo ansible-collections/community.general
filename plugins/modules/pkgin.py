@@ -274,7 +274,7 @@ def install_packages(module, packages):
 
         rc, out, err = module.run_command(format_pkgin_command(module, "install", package))
 
-        if not module.check_mode and not query_package(module, package) in [
+        if not module.check_mode and query_package(module, package) not in [
             PackageState.PRESENT,
             PackageState.OUTDATED,
         ]:

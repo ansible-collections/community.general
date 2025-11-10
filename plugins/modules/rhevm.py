@@ -452,7 +452,7 @@ class RHEVConn:
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg(f"The disk  {diskname} is ready.")
+            setMsg(f"The disk {diskname} is ready.")
         except Exception as e:
             setFailed()
             setMsg(f"Error getting the state of {diskname}.")
@@ -488,7 +488,7 @@ class RHEVConn:
                 else:
                     attempt += 1
                     time.sleep(2)
-            setMsg(f"The iface  {nicname} is ready.")
+            setMsg(f"The iface {nicname} is ready.")
         except Exception as e:
             setFailed()
             setMsg(f"Error getting the state of {nicname}.")
@@ -739,7 +739,7 @@ class RHEVConn:
                                         ),
                                     )
                                 except Exception as e:
-                                    setMsg(f"Failed to create the bond for  {iface['name']}")
+                                    setMsg(f"Failed to create the bond for {iface['name']}")
                                     setFailed()
                                     setMsg(str(e))
                                     return False
@@ -1078,14 +1078,13 @@ class RHEV:
 
     def setDisks(self, name, disks):
         self.__get_conn()
-        counter = 0
         bootselect = False
         for disk in disks:
             if "bootable" in disk:
                 if disk["bootable"] is True:
                     bootselect = True
 
-        for disk in disks:
+        for counter, disk in enumerate(disks):
             diskname = f"{name}_Disk{counter}_{disk.get('name', '').replace('/', '_')}"
             disksize = disk.get("size", 1)
             diskdomain = disk.get("domain", None)
@@ -1110,7 +1109,6 @@ class RHEV:
             else:
                 self.conn.set_Disk(diskname, disksize, diskinterface, diskboot)
             checkFail()
-            counter += 1
 
         return True
 

@@ -840,7 +840,7 @@ class AIXTimezone(Timezone):
             # The best condition check we can do is to check the value of TZ after making the
             #  change.
             TZ = self.__get_timezone()
-            if TZ != value:
+            if value != TZ:
                 msg = f"TZ value does not match post-change (Actual: {TZ}, Expected: {value})."
                 self.module.fail_json(msg=msg)
 

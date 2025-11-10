@@ -20,7 +20,6 @@ extends_documentation_fragment:
 options:
   organization:
     type: str
-    required: false
     aliases:
       - org
     default: null

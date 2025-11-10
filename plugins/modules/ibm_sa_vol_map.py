@@ -36,22 +36,18 @@ options:
   cluster:
     description:
       - Maps the volume to a cluster.
-    required: false
     type: str
   host:
     description:
       - Maps the volume to a host.
-    required: false
     type: str
   lun:
     description:
       - The LUN identifier.
-    required: false
     type: str
   override:
     description:
       - Overrides the existing volume mapping.
-    required: false
     type: str
 
 extends_documentation_fragment:

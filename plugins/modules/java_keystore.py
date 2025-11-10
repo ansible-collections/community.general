@@ -77,15 +77,12 @@ options:
   owner:
     description:
       - Name of the user that should own jks file.
-    required: false
   group:
     description:
       - Name of the group that should own jks file.
-    required: false
   mode:
     description:
       - Mode the file should be.
-    required: false
   ssl_backend:
     description:
       - Backend for loading private keys and certificates.

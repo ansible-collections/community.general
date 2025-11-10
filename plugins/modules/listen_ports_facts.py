@@ -59,7 +59,7 @@ EXAMPLES = r"""
 
 - name: List TCP ports
   ansible.builtin.debug:
-    msg: "{{ ansible_facts.tcp_listen  | map(attribute='port') | sort | list }}"
+    msg: "{{ ansible_facts.tcp_listen | map(attribute='port') | sort | list }}"
 
 - name: List UDP ports
   ansible.builtin.debug:
@@ -226,7 +226,7 @@ def netStatParse(raw):
             pid_and_name = ""
             process = ""
             formatted_line = line.split()
-            protocol, recv_q, send_q, address, foreign_address, rest = (
+            protocol, _recv_q, _send_q, address, foreign_address, rest = (
                 formatted_line[0],
                 formatted_line[1],
                 formatted_line[2],
@@ -293,7 +293,7 @@ def ss_parse(raw):
         try:
             if len(cells) == 6:
                 # no process column, e.g. due to unprivileged user
-                process = str()
+                process = ""
                 protocol, state, recv_q, send_q, local_addr_port, peer_addr_port = cells
             else:
                 protocol, state, recv_q, send_q, local_addr_port, peer_addr_port, process = cells
@@ -312,7 +312,7 @@ def ss_parse(raw):
         if pids is None:
             # likely unprivileged user, so add empty name & pid
             # as we do in netstat logic to be consistent with output
-            pids = [(str(), 0)]
+            pids = [("", 0)]
 
         address = conns.group(1)
         port = conns.group(2)

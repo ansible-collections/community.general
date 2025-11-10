@@ -148,7 +148,6 @@ options:
     description:
       - Git repository which is imported into gitlab.
       - GitLab server needs read access to this git repository.
-    required: false
     type: str
   infrastructure_access_level:
     description:
@@ -184,7 +183,6 @@ options:
     description:
       - Enable Git large file systems to manages large files such as audio, video, and graphics files.
     type: bool
-    required: false
     default: false
     version_added: "2.0.0"
   merge_method:
@@ -572,7 +570,7 @@ class GitLabProject:
 
                         if all(old_val.get(key) == value for key, value in final_val.items()):
                             continue
-                        setattr(project, "container_expiration_policy_attributes", final_val)
+                        project.container_expiration_policy_attributes = final_val
                     else:
                         setattr(project, arg_key, arg_value)
                     changed = True

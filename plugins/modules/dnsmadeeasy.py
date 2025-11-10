@@ -608,7 +608,7 @@ def main():
     current_record = DME.getMatchingRecord(record_name, record_type, record_value)
     new_record = {"name": record_name}
     for i in ["record_value", "record_type", "record_ttl"]:
-        if not module.params[i] is None:
+        if module.params[i] is not None:
             new_record[i[len("record_") :]] = module.params[i]
     # Special handling for mx record
     if new_record["type"] == "MX":

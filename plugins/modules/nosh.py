@@ -30,7 +30,6 @@ options:
       - Name of the service to manage.
   state:
     type: str
-    required: false
     choices: [started, stopped, reset, restarted, reloaded]
     description:
       - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary.
@@ -38,19 +37,16 @@ options:
       - V(reloaded) sends a SIGHUP or starts the service.
       - V(reset) starts or stops the service according to whether it is enabled or not.
   enabled:
-    required: false
     type: bool
     description:
       - Enable or disable the service, independently of C(*.preset) file preference or running state. Mutually exclusive with
         O(preset). It takes effect prior to O(state=reset).
   preset:
-    required: false
     type: bool
     description:
       - Enable or disable the service according to local preferences in C(*.preset) files. Mutually exclusive with O(enabled).
         Only has an effect if set to true. It takes effect prior to O(state=reset).
   user:
-    required: false
     default: false
     type: bool
     description:
@@ -517,8 +513,6 @@ def main():
     )
 
     service = module.params["name"]
-    rc = 0
-    out = err = ""
     result = {
         "name": service,
         "changed": False,

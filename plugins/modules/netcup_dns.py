@@ -70,12 +70,10 @@ options:
   priority:
     description:
       - Record priority. Required for O(type=MX).
-    required: false
     type: int
   state:
     description:
       - Whether the record should exist or not.
-    required: false
     default: present
     choices: ['present', 'absent']
     type: str
@@ -279,7 +277,7 @@ def main():
                         for r in all_records
                         if r.hostname == record.hostname
                         and r.type == record.type
-                        and not r.destination == record.destination
+                        and r.destination != record.destination
                     ]
 
                     if obsolete_records:

@@ -32,7 +32,6 @@ options:
     description:
       - Project of an instance.
       - See U(https://documentation.ubuntu.com/lxd/en/latest/projects/).
-    required: false
     type: str
     version_added: 4.8.0
   architecture:
@@ -40,7 +39,6 @@ options:
       - The architecture for the instance (for example V(x86_64) or V(i686)).
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
     type: str
-    required: false
   config:
     description:
       - 'The config for the instance (for example V({"limits.cpu": "2"})).'
@@ -50,14 +48,12 @@ options:
         are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_put).
       - The keys starting with C(volatile.) are ignored for this comparison when O(ignore_volatile_options=true).
     type: dict
-    required: false
   ignore_volatile_options:
     description:
       - If set to V(true), options starting with C(volatile.) are ignored. As a result, they are reapplied for each execution.
       - This default behavior can be changed by setting this option to V(false).
       - The default value changed from V(true) to V(false) in community.general 6.0.0.
     type: bool
-    required: false
     default: false
     version_added: 3.7.0
   profiles:
@@ -70,12 +66,10 @@ options:
       - 'The devices for the instance (for example V({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).'
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
     type: dict
-    required: false
   ephemeral:
     description:
       - Whether or not the instance is ephemeral (for example V(true) or V(false)).
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
-    required: false
     type: bool
   source:
     description:
@@ -83,7 +77,6 @@ options:
         "protocol": "simplestreams", "alias": "22.04" })).'
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/) for complete API documentation.
       - 'Note that C(protocol) accepts two choices: V(lxd) or V(simplestreams).'
-    required: false
     type: dict
   state:
     choices:
@@ -94,7 +87,6 @@ options:
       - frozen
     description:
       - Define the state of an instance.
-    required: false
     default: started
     type: str
   target:
@@ -103,20 +95,17 @@ options:
         cluster, then it is not replaced nor moved. The name should respond to same name of the node you see in C(lxc cluster
         list).
     type: str
-    required: false
     version_added: 1.0.0
   timeout:
     description:
       - A timeout for changing the state of the instance.
       - This is also used as a timeout for waiting until IPv4 addresses are set to the all network interfaces in the instance
         after starting or restarting.
-    required: false
     default: 30
     type: int
   type:
     description:
       - Instance type can be either V(virtual-machine) or V(container).
-    required: false
     default: container
     choices:
       - container
@@ -127,7 +116,6 @@ options:
     description:
       - If this is V(true), the C(lxd_container) waits until IPv4 addresses are set to the all network interfaces in the instance
         after starting or restarting.
-    required: false
     default: false
     type: bool
   wait_for_container:
@@ -139,33 +127,28 @@ options:
   force_stop:
     description:
       - If this is V(true), the C(lxd_container) forces to stop the instance when it stops or restarts the instance.
-    required: false
     default: false
     type: bool
   url:
     description:
       - The unix domain socket path or the https URL for the LXD server.
-    required: false
     default: unix:/var/lib/lxd/unix.socket
     type: str
   snap_url:
     description:
       - The unix domain socket path when LXD is installed by snap package manager.
-    required: false
     default: unix:/var/snap/lxd/common/lxd/unix.socket
     type: str
   client_key:
     description:
       - The client certificate key file path.
       - If not specified, it defaults to C(${HOME}/.config/lxc/client.key).
-    required: false
     aliases: [key_file]
     type: path
   client_cert:
     description:
       - The client certificate file path.
       - If not specified, it defaults to C(${HOME}/.config/lxc/client.crt).
-    required: false
     aliases: [cert_file]
     type: path
   trust_password:
@@ -174,7 +157,6 @@ options:
       - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
         set core.trust_password <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
       - If trust_password is set, this module send a request for authentication before sending any requests.
-    required: false
     type: str
 notes:
   - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance
@@ -714,7 +696,7 @@ class LXDContainerManagement:
 
             if self._needs_to_change_instance_config(param):
                 if param == "config":
-                    body_json["config"] = body_json.get("config", None) or {}
+                    body_json["config"] = body_json.get("config") or {}
                     for k, v in self.config["config"].items():
                         body_json["config"][k] = v
                 else:

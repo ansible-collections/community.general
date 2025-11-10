@@ -49,13 +49,11 @@ options:
     description:
       - The ID of the parent tenant. If not supplied the root tenant is used.
       - The O(parent_id) takes president over O(parent) when supplied.
-    required: false
     default:
   parent:
     type: str
     description:
       - The name of the parent tenant. If not supplied and no O(parent_id) is supplied the root tenant is used.
-    required: false
     default:
   quotas:
     type: dict
@@ -68,7 +66,6 @@ options:
       - '- V(storage_allocated) (GB): use null to remove the quota.'
       - '- V(vms_allocated) (int): use null to remove the quota.'
       - '- V(templates_allocated) (int): use null to remove the quota.'
-    required: false
     default: {}
 """
 
@@ -275,7 +272,7 @@ class ManageIQTenant:
 
         # try to update tenant
         try:
-            result = self.client.post(tenant["href"], action="edit", resource=resource)
+            self.client.post(tenant["href"], action="edit", resource=resource)
         except Exception as e:
             self.module.fail_json(msg=f"failed to update tenant {tenant['name']}: {e}")
 

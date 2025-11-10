@@ -271,11 +271,11 @@ class GitlabIssue:
         for key, value in options.items():
             if value is not None:
                 if key == "milestone_id":
-                    old_milestone = getattr(issue, "milestone")["id"] if getattr(issue, "milestone") else ""
+                    old_milestone = issue.milestone["id"] if issue.milestone else ""
                     if value != old_milestone:
                         return True
                 elif key == "assignee_ids":
-                    if value != sorted([user["id"] for user in getattr(issue, "assignees")]):
+                    if value != sorted([user["id"] for user in issue.assignees]):
                         return True
 
                 elif key == "labels":

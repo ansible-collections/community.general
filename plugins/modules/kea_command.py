@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Copyright © Thorsten Glaser <tglaser@b1-systems.de>
@@ -15,7 +14,7 @@ description:
   - This module supports sending arbitrary commands and returns the server response unchecked;
     while it would be possible to write individual modules for specific KEA service commands,
     that approach would not scale, as the FOSS hooks alone provide dozens of commands.
-  - Between sending the command and parsing the result status, RV(ignore:changed) will register as V(true) if an error occurs,
+  - Between sending the command and parsing the result status, RV(ignore:changed) registers as V(true) if an error occurs,
     to err on the safe side.
 version_added: '12.0.0'
 author: Thorsten Glaser (@mirabilos)
@@ -54,7 +53,7 @@ options:
     description:
       - The full pathname of the Unix Domain Socket to connect to.
       - The default value is suitable for C(kea-dhcp4-server) on Debian trixie.
-      - This module directly interfacees via UDS; the HTTP wrappers are not supported.
+      - This module directly interfaces using UDS; the HTTP wrappers are not supported.
     type: path
     default: /run/kea/kea4-ctrl-socket
 extends_documentation_fragment:

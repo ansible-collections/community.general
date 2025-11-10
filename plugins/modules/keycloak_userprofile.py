@@ -70,7 +70,6 @@ options:
     description:
       - The configuration of the User Profile Provider.
     type: dict
-    required: false
     suboptions:
       kc_user_profile_config:
         description:
@@ -242,13 +241,11 @@ options:
                 aliases:
                   - displayDescription
                 type: str
-                required: false
 
               annotations:
                 description:
                   - The annotations included in the group.
                 type: dict
-                required: false
 
           unmanaged_attribute_policy:
             description:
@@ -630,7 +627,6 @@ def main():
 
     # Make it easier to refer to current module parameters
     state = module.params.get("state")
-    enabled = module.params.get("enabled")
     parent_id = module.params.get("parent_id")
     provider_type = module.params.get("provider_type")
     provider_id = module.params.get("provider_id")

@@ -49,13 +49,11 @@ options:
     description:
       - The attribute to increment.
   increment:
-    required: false
     type: int
     default: 1
     description:
       - The value of the increment to apply.
   method:
-    required: false
     type: str
     default: auto
     choices: [auto, rfc4525, legacy]

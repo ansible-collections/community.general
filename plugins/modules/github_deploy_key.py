@@ -26,7 +26,6 @@ options:
   github_url:
     description:
       - The base URL of the GitHub API.
-    required: false
     type: str
     version_added: '0.2.0'
     default: https://api.github.com

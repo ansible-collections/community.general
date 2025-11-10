@@ -33,14 +33,12 @@ options:
     description:
       - State of the package.
     choices: ['present', 'absent']
-    required: false
     default: present
     type: str
   use_packages:
     description:
       - Use packages instead of ports whenever available.
     type: bool
-    required: false
     default: true
 author: "berenddeboer (@berenddeboer)"
 """
@@ -73,13 +71,11 @@ def query_package(module, name):
 
     # Assume that if we have pkg_info, we haven't upgraded to pkgng
     if pkg_info_path:
-        pkgng = False
-        pkg_glob_path = module.get_bin_path("pkg_glob", True)
+        module.get_bin_path("pkg_glob", True)
         # TODO: convert run_comand() argument to list!
         rc, out, err = module.run_command(f"{pkg_info_path} -e `pkg_glob {shlex_quote(name)}`", use_unsafe_shell=True)
         pkg_info_path = [pkg_info_path]
     else:
-        pkgng = True
         pkg_info_path = [module.get_bin_path("pkg", True), "info"]
         rc, out, err = module.run_command(pkg_info_path + [name])
 

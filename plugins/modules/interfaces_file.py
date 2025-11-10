@@ -172,9 +172,6 @@ def optionDict(line, iface, option, value, address_family):
 
 
 def getValueFromLine(s):
-    spaceRe = re.compile(r"\s+")
-    m = list(spaceRe.finditer(s))[-1]
-    valueEnd = m.start()
     option = s.split()[0]
     optionStart = s.find(option)
     optionLen = len(option)

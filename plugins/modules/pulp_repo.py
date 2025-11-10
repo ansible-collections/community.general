@@ -40,7 +40,6 @@ options:
   generate_sqlite:
     description:
       - Boolean flag to indicate whether sqlite files should be generated during a repository publish.
-    required: false
     type: bool
     default: false
   feed_ca_cert:
@@ -72,25 +71,21 @@ options:
   proxy_host:
     description:
       - Proxy URL setting for the pulp repository importer. This is in the format V(scheme://host).
-    required: false
     default:
     type: str
   proxy_port:
     description:
       - Proxy port setting for the pulp repository importer.
-    required: false
     default:
     type: str
   proxy_username:
     description:
       - Proxy username for the pulp repository importer.
-    required: false
     default:
     type: str
   proxy_password:
     description:
       - Proxy password for the pulp repository importer.
-    required: false
     default:
     type: str
   publish_distributor:
@@ -114,7 +109,6 @@ options:
   repoview:
     description:
       - Whether to generate repoview files for a published repository. Setting this to V(true) automatically activates O(generate_sqlite).
-    required: false
     type: bool
     default: false
   serve_http:
@@ -231,7 +225,7 @@ class pulp_server:
                 if key not in distributor["config"].keys():
                     return False
 
-                if not distributor["config"][key] == value:
+                if distributor["config"][key] != value:
                     return False
 
         return True
@@ -245,7 +239,7 @@ class pulp_server:
                     if key not in importer["config"].keys():
                         return False
 
-                    if not importer["config"][key] == value:
+                    if importer["config"][key] != value:
                         return False
 
         return True

@@ -11,7 +11,6 @@ from ansible_collections.community.general.plugins.modules import interfaces_fil
 from shutil import copyfile, move
 import difflib
 import inspect
-import io
 import json
 import os
 import re
@@ -78,10 +77,9 @@ class TestInterfacesFileModule(unittest.TestCase):
         string = json.dumps(ifaces, sort_keys=True, indent=4, separators=(",", ": "))
         if string and not string.endswith("\n"):
             string += "\n"
-        goldenstring = string
         goldenData = ifaces
         if not os.path.isfile(testfilepath):
-            with io.open(testfilepath, "wb") as f:
+            with open(testfilepath, "wb") as f:
                 f.write(string.encode())
         else:
             with open(testfilepath, "r") as goldenfile:
@@ -94,7 +92,7 @@ class TestInterfacesFileModule(unittest.TestCase):
             string += "\n"
         goldenstring = string
         if not os.path.isfile(testfilepath):
-            f = io.open(testfilepath, "wb")
+            f = open(testfilepath, "wb")
             f.write(string.encode())
             f.close()
         else:

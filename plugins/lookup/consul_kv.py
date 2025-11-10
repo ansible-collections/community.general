@@ -120,7 +120,7 @@ try:
     import consul
 
     HAS_CONSUL = True
-except ImportError as e:
+except ImportError:
     HAS_CONSUL = False
 
 

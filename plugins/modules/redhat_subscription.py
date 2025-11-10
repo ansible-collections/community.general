@@ -901,10 +901,10 @@ class RhsmPool:
         return str(self.__getattribute__("_name"))
 
     def get_pool_id(self):
-        return getattr(self, "PoolId", getattr(self, "PoolID"))
+        return getattr(self, "PoolId", self.PoolID)
 
     def get_quantity_used(self):
-        return int(getattr(self, "QuantityUsed"))
+        return int(self.QuantityUsed)
 
     def subscribe(self):
         args = f"subscription-manager attach --pool {self.get_pool_id()}"
@@ -1118,11 +1118,11 @@ def main():
     password = module.params["password"]
     token = module.params["token"]
     server_hostname = module.params["server_hostname"]
-    server_insecure = module.params["server_insecure"]
-    server_prefix = module.params["server_prefix"]
-    server_port = module.params["server_port"]
-    rhsm_baseurl = module.params["rhsm_baseurl"]
-    rhsm_repo_ca_cert = module.params["rhsm_repo_ca_cert"]
+    # TODO - no longer used? module.params["server_insecure"]
+    # TODO - no longer used? module.params["server_prefix"]
+    # TODO - no longer used? module.params["server_port"]
+    # TODO - no longer used? module.params["rhsm_baseurl"]
+    # TODO - no longer used? module.params["rhsm_repo_ca_cert"]
     auto_attach = module.params["auto_attach"]
     activationkey = module.params["activationkey"]
     org_id = module.params["org_id"]
@@ -1142,10 +1142,10 @@ def main():
     consumer_name = module.params["consumer_name"]
     consumer_id = module.params["consumer_id"]
     force_register = module.params["force_register"]
-    server_proxy_hostname = module.params["server_proxy_hostname"]
-    server_proxy_port = module.params["server_proxy_port"]
-    server_proxy_user = module.params["server_proxy_user"]
-    server_proxy_password = module.params["server_proxy_password"]
+    # TODO - no longer used? module.params["server_proxy_hostname"]
+    # TODO - no longer used? module.params["server_proxy_port"]
+    # TODO - no longer used? module.params["server_proxy_user"]
+    # TODO - no longer used? module.params["server_proxy_password"]
     release = module.params["release"]
     syspurpose = module.params["syspurpose"]
 

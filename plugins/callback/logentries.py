@@ -254,7 +254,7 @@ class CallbackModule(CallbackBase):
 
         try:
             self.token = self.get_option("token")
-        except KeyError as e:
+        except KeyError:
             self._display.warning(
                 "Logentries token was not provided, this is required for this callback to operate, disabling"
             )

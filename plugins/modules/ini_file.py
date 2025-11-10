@@ -43,7 +43,6 @@ options:
   section_has_values:
     type: list
     elements: dict
-    required: false
     suboptions:
       option:
         type: str
@@ -254,7 +253,6 @@ EXAMPLES = r"""
     state: present
 """
 
-import io
 import os
 import re
 import tempfile
@@ -351,7 +349,7 @@ def do_ini(
             os.makedirs(destpath)
         ini_lines = []
     else:
-        with io.open(target_filename, "r", encoding="utf-8-sig") as ini_file:
+        with open(target_filename, "r", encoding="utf-8-sig") as ini_file:
             ini_lines = [to_text(line) for line in ini_file.readlines()]
 
     if module._diff:

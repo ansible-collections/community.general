@@ -33,13 +33,11 @@ options:
       - User name to add or remove.
   password:
     type: str
-    required: false
     description:
       - Password associated with user.
       - Must be specified if user does not exist yet.
   hash_scheme:
     type: str
-    required: false
     default: "apr_md5_crypt"
     description:
       - Hashing scheme to be used. As well as the four choices listed here, you can also use any other hash supported by passlib,
@@ -54,13 +52,11 @@ options:
     aliases: [crypt_scheme]
   state:
     type: str
-    required: false
     choices: [present, absent]
     default: "present"
     description:
       - Whether the user entry should be present or not.
   create:
-    required: false
     type: bool
     default: true
     description:

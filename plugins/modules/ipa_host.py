@@ -36,7 +36,6 @@ options:
   force:
     description:
       - Force host name even if not in DNS.
-    required: false
     type: bool
   ip_address:
     description:

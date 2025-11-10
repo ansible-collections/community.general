@@ -58,7 +58,6 @@ options:
     type: str
     version_added: 2.3.0
   id:
-    required: false
     aliases: [account_id]
     description:
       - ID of account to delete/modify.
@@ -66,25 +65,21 @@ options:
         POST request.
     type: str
   new_username:
-    required: false
     aliases: [account_username]
     description:
       - Username of account to add/delete/modify.
     type: str
   new_password:
-    required: false
     aliases: [account_password]
     description:
       - New password of account to add/modify.
     type: str
   roleid:
-    required: false
     aliases: [account_roleid]
     description:
       - Role of account to add/modify.
     type: str
   account_types:
-    required: false
     aliases: [account_accounttypes]
     description:
       - Array of account types to apply to a user account.
@@ -92,7 +87,6 @@ options:
     elements: str
     version_added: '7.2.0'
   oem_account_types:
-    required: false
     aliases: [account_oemaccounttypes]
     description:
       - Array of OEM account types to apply to a user account.
@@ -100,7 +94,6 @@ options:
     elements: str
     version_added: '7.2.0'
   bootdevice:
-    required: false
     description:
       - Boot device when setting boot configuration.
     type: str
@@ -117,55 +110,46 @@ options:
     choices: [Legacy, UEFI]
     version_added: 3.5.0
   uefi_target:
-    required: false
     description:
       - UEFI boot target when bootdevice is "UefiTarget".
     type: str
   boot_next:
-    required: false
     description:
       - BootNext target when bootdevice is "UefiBootNext".
     type: str
   update_username:
-    required: false
     aliases: [account_updatename]
     description:
       - New user name for updating account_username.
     type: str
     version_added: '0.2.0'
   account_properties:
-    required: false
     description:
       - Properties of account service to update.
     type: dict
     default: {}
     version_added: '0.2.0'
   resource_id:
-    required: false
     description:
       - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
   update_image_uri:
-    required: false
     description:
       - URI of the image for the update.
     type: str
     version_added: '0.2.0'
   update_image_file:
-    required: false
     description:
       - Filename, with optional path, of the image for the update.
     type: path
     version_added: '7.1.0'
   update_protocol:
-    required: false
     description:
       - Protocol for the update.
     type: str
     version_added: '0.2.0'
   update_targets:
-    required: false
     description:
       - List of target resource URIs to apply the update to.
     type: list
@@ -173,24 +157,20 @@ options:
     default: []
     version_added: '0.2.0'
   update_creds:
-    required: false
     description:
       - Credentials for retrieving the update image.
     type: dict
     version_added: '0.2.0'
     suboptions:
       username:
-        required: false
         description:
           - Username for retrieving the update image.
         type: str
       password:
-        required: false
         description:
           - Password for retrieving the update image.
         type: str
   update_apply_time:
-    required: false
     description:
       - Time when to apply the update.
     type: str
@@ -202,19 +182,16 @@ options:
       - OnStartUpdateRequest
     version_added: '6.1.0'
   update_oem_params:
-    required: false
     description:
       - Properties for HTTP Multipart Push Updates.
     type: dict
     version_added: '7.5.0'
   update_handle:
-    required: false
     description:
       - Handle to check the status of an update in progress.
     type: str
     version_added: '6.1.0'
   update_custom_oem_header:
-    required: false
     description:
       - Optional OEM header, sent as separate form-data for the Multipart HTTP push update.
       - The header shall start with "Oem" according to DMTF Redfish spec 12.6.2.2.
@@ -223,7 +200,6 @@ options:
     type: str
     version_added: '10.1.0'
   update_custom_oem_params:
-    required: false
     description:
       - Custom OEM properties for HTTP Multipart Push updates.
       - If set, then O(update_custom_oem_header) is required too.
@@ -233,59 +209,49 @@ options:
     type: raw
     version_added: '10.1.0'
   update_custom_oem_mime_type:
-    required: false
     description:
       - MIME Type for custom OEM properties for HTTP Multipart Push updates.
     type: str
     version_added: '10.1.0'
   virtual_media:
-    required: false
     description:
       - Options for VirtualMedia commands.
     type: dict
     version_added: '0.2.0'
     suboptions:
       media_types:
-        required: false
         description:
           - List of media types appropriate for the image.
         type: list
         elements: str
         default: []
       image_url:
-        required: false
         description:
           - URL of the image to insert or eject.
         type: str
       inserted:
-        required: false
         description:
           - Indicates that the image is treated as inserted on command completion.
         type: bool
         default: true
       write_protected:
-        required: false
         description:
           - Indicates that the media is treated as write-protected.
         type: bool
         default: true
       username:
-        required: false
         description:
           - Username for accessing the image URL.
         type: str
       password:
-        required: false
         description:
           - Password for accessing the image URL.
         type: str
       transfer_protocol_type:
-        required: false
         description:
           - Network protocol to use with the image.
         type: str
       transfer_method:
-        required: false
         description:
           - Transfer method to use with the image.
         type: str
@@ -297,7 +263,6 @@ options:
     default: false
     version_added: 3.7.0
   bios_attributes:
-    required: false
     description:
       - BIOS attributes that needs to be verified in the given server.
     type: dict
@@ -309,14 +274,12 @@ options:
     choices: [ResetAll, PreserveNetworkAndUsers, PreserveNetwork]
     version_added: 8.6.0
   wait:
-    required: false
     description:
       - Block until the service is ready again.
     type: bool
     default: false
     version_added: 9.1.0
   wait_timeout:
-    required: false
     description:
       - How long to block until the service is ready again before giving up.
     type: int

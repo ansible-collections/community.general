@@ -42,13 +42,11 @@ options:
       - A new name of a project.
       - If this parameter is specified a project is renamed to this name.
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_post).
-    required: false
     type: str
   merge_project:
     description:
       - Merge the configuration of the present project with the new desired configuration, instead of replacing it. If configuration
         is the same after merged, no change is made.
-    required: false
     default: false
     type: bool
   state:
@@ -57,33 +55,28 @@ options:
       - absent
     description:
       - Define the state of a project.
-    required: false
     default: present
     type: str
   url:
     description:
       - The Unix domain socket path or the https URL for the LXD server.
-    required: false
     default: unix:/var/lib/lxd/unix.socket
     type: str
   snap_url:
     description:
       - The Unix domain socket path when LXD is installed by snap package manager.
-    required: false
     default: unix:/var/snap/lxd/common/lxd/unix.socket
     type: str
   client_key:
     description:
       - The client certificate key file path.
       - If not specified, it defaults to C($HOME/.config/lxc/client.key).
-    required: false
     aliases: [key_file]
     type: path
   client_cert:
     description:
       - The client certificate file path.
       - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
-    required: false
     aliases: [cert_file]
     type: path
   trust_password:
@@ -92,7 +85,6 @@ options:
       - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
         set core.trust_password <some random password>) See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
       - If O(trust_password) is set, this module send a request for authentication before sending any requests.
-    required: false
     type: str
 notes:
   - Projects must have a unique name. If you attempt to create a project with a name that already existed in the users namespace

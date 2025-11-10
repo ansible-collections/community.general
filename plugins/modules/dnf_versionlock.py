@@ -33,7 +33,6 @@ options:
         command.
       - This parameter is mutually exclusive with O(state=clean).
     type: list
-    required: false
     elements: str
     default: []
   raw:
@@ -139,7 +138,7 @@ NEVRA_RE = re.compile(r"^(?P<name>.+)-(?P<epoch>\d+):(?P<version>.+)-(?P<release
 
 
 def do_versionlock(module, command, patterns=None, raw=False):
-    patterns = [] if not patterns else patterns
+    patterns = patterns if patterns else []
     raw_parameter = ["--raw"] if raw else []
     # Call dnf versionlock using a just one full NEVR package-name-spec each
     # time because multiple package-name-spec and globs are not well supported.

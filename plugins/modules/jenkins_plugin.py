@@ -332,7 +332,6 @@ state:
 """
 
 import hashlib
-import io
 import json
 import os
 import tempfile
@@ -553,7 +552,7 @@ class JenkinsPlugin:
             data = urlencode(script_data)
 
             # Send the installation request
-            r = self._get_url_data(
+            self._get_url_data(
                 f"{self.url}/scriptText",
                 msg_status="Cannot install plugin.",
                 msg_exception="Plugin installation has failed.",
@@ -770,7 +769,7 @@ class JenkinsPlugin:
 
         # Open the updates file
         try:
-            f = io.open(tmp_updates_file, encoding="utf-8")
+            f = open(tmp_updates_file, encoding="utf-8")
 
             # Read only the second line
             dummy = f.readline()

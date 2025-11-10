@@ -86,11 +86,9 @@ options:
         description:
           - The secret key for your subdomain.
           - Only required for initial sign in.
-    required: false
   cli_path:
     type: path
     description: Used to specify the exact path to the C(op) command line interface.
-    required: false
     default: 'op'
 """
 
@@ -252,8 +250,8 @@ class OnePasswordInfo:
                 module.fail_json(msg=f"Missing required 'name' field from search term, got: '{term}'")
 
             term["field"] = term.get("field", "password")
-            term["section"] = term.get("section", None)
-            term["vault"] = term.get("vault", None)
+            term["section"] = term.get("section")
+            term["vault"] = term.get("vault")
 
             processed_terms.append(term)
 

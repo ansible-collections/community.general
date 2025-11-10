@@ -29,26 +29,21 @@ options:
       - The name of a Node.js library to install.
       - All packages in C(package.json) are installed if not provided.
     type: str
-    required: false
   alias:
     description:
       - Alias of the Node.js library.
     type: str
-    required: false
   path:
     description:
       - The base path to install the Node.js libraries.
     type: path
-    required: false
   version:
     description:
       - The version of the library to be installed, in semver format.
     type: str
-    required: false
   global:
     description:
       - Install the Node.js library globally.
-    required: false
     default: false
     type: bool
   executable:
@@ -56,37 +51,31 @@ options:
       - The executable location for pnpm.
       - The default location it searches for is E(PATH), fails if not set.
     type: path
-    required: false
   ignore_scripts:
     description:
       - Use the C(--ignore-scripts) flag when installing.
-    required: false
     type: bool
     default: false
   no_optional:
     description:
       - Do not install optional packages, equivalent to C(--no-optional).
-    required: false
     type: bool
     default: false
   production:
     description:
       - Install dependencies in production mode.
       - Pnpm ignores any dependencies under C(devDependencies) in package.json.
-    required: false
     type: bool
     default: false
   dev:
     description:
       - Install dependencies in development mode.
       - Pnpm ignores any regular dependencies in C(package.json).
-    required: false
     default: false
     type: bool
   optional:
     description:
       - Install dependencies in optional mode.
-    required: false
     default: false
     type: bool
   state:
@@ -94,7 +83,6 @@ options:
       - Installation state of the named Node.js library.
       - If V(absent) is selected, a name option must be provided.
     type: str
-    required: false
     default: present
     choices: ["present", "absent", "latest"]
 requirements:

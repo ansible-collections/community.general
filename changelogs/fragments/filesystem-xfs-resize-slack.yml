@@ -1,0 +1,2 @@
+bugfixes:
+  - filesystem - avoid false positive change detection on XFS resize due to unusable slack space (https://github.com/ansible-collections/community.general/pull/11033).

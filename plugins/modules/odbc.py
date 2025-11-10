@@ -89,7 +89,7 @@ try:
     import pyodbc
 
     HAS_PYODBC = True
-except ImportError as e:
+except ImportError:
     HAS_PYODBC = False
 
 
@@ -153,7 +153,7 @@ def main():
                 result["description"].append(description)
 
             result["row_count"] = cursor.rowcount
-        except pyodbc.ProgrammingError as pe:
+        except pyodbc.ProgrammingError:
             pass
         except Exception as e:
             module.fail_json(msg=f"Exception while reading rows: {e}")

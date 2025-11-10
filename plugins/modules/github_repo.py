@@ -26,19 +26,16 @@ options:
       - Username used for authentication.
       - This is only needed when not using O(access_token).
     type: str
-    required: false
   password:
     description:
       - Password used for authentication.
       - This is only needed when not using O(access_token).
     type: str
-    required: false
   access_token:
     description:
       - Token parameter for authentication.
       - This is only needed when not using O(username) and O(password).
     type: str
-    required: false
   name:
     description:
       - Repository name.
@@ -51,7 +48,6 @@ options:
       - Defaults to empty if O(force_defaults=false) when creating a new repository.
       - This is only used when O(state) is V(present).
     type: str
-    required: false
   private:
     description:
       - Whether the repository should be private or not.
@@ -59,20 +55,17 @@ options:
       - Defaults to V(false) if O(force_defaults=false) when creating a new repository.
       - This is only used when O(state=present).
     type: bool
-    required: false
   state:
     description:
       - Whether the repository should exist or not.
     type: str
     default: present
     choices: [absent, present]
-    required: false
   organization:
     description:
       - Organization for the repository.
       - When O(state=present), the repository is created in the current user profile.
     type: str
-    required: false
   api_url:
     description:
       - URL to the GitHub API if not using github.com but you own instance.
@@ -84,7 +77,6 @@ options:
       - If V(true), overwrite current O(description) and O(private) attributes with defaults.
       - V(true) is deprecated for this option and will not be allowed starting in community.general 13.0.0. V(false) will be the default value then.
     type: bool
-    required: false
     version_added: 4.1.0
 requirements:
   - PyGithub>=1.54

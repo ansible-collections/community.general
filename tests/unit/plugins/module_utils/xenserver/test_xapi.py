@@ -73,7 +73,7 @@ def test_xapi_connect_local_session(mocker, fake_ansible_module, XenAPI, xenserv
     """Tests that connection to localhost uses XenAPI.xapi_local() function."""
     mocker.patch("XenAPI.xapi_local")
 
-    xapi_session = xenserver.XAPI.connect(fake_ansible_module)
+    xenserver.XAPI.connect(fake_ansible_module)
 
     XenAPI.xapi_local.assert_called_once()
 
@@ -88,7 +88,7 @@ def test_xapi_connect_local_login(mocker, fake_ansible_module, XenAPI, xenserver
     """Tests that connection to localhost uses empty username and password."""
     mocker.patch.object(XenAPI.Session, "login_with_password", create=True)
 
-    xapi_session = xenserver.XAPI.connect(fake_ansible_module)
+    xenserver.XAPI.connect(fake_ansible_module)
 
     XenAPI.Session.login_with_password.assert_called_once_with("", "", ANSIBLE_VERSION, "Ansible")
 
@@ -100,7 +100,7 @@ def test_xapi_connect_login(mocker, fake_ansible_module, XenAPI, xenserver):
     """
     mocker.patch.object(XenAPI.Session, "login_with_password", create=True)
 
-    xapi_session = xenserver.XAPI.connect(fake_ansible_module)
+    xenserver.XAPI.connect(fake_ansible_module)
 
     username = fake_ansible_module.params["username"]
     password = fake_ansible_module.params["password"]
@@ -119,7 +119,7 @@ def test_xapi_connect_login_failure(mocker, fake_ansible_module, XenAPI, xenserv
     username = fake_ansible_module.params["username"]
 
     with pytest.raises(FailJsonException) as exc_info:
-        xapi_session = xenserver.XAPI.connect(fake_ansible_module)
+        xenserver.XAPI.connect(fake_ansible_module)
 
     assert (
         exc_info.value.kwargs["msg"]
@@ -137,7 +137,7 @@ def test_xapi_connect_remote_scheme(mocker, fake_ansible_module, XenAPI, xenserv
     """Tests that explicit scheme in hostname param is preserved."""
     mocker.patch("XenAPI.Session")
 
-    xapi_session = xenserver.XAPI.connect(fake_ansible_module)
+    xenserver.XAPI.connect(fake_ansible_module)
 
     hostname = fake_ansible_module.params["hostname"]
     ignore_ssl = not fake_ansible_module.params["validate_certs"]
@@ -155,7 +155,7 @@ def test_xapi_connect_remote_no_scheme(mocker, fake_ansible_module, XenAPI, xens
     """Tests that proper scheme is prepended to hostname without scheme."""
     mocker.patch("XenAPI.Session")
 
-    xapi_session = xenserver.XAPI.connect(fake_ansible_module)
+    xenserver.XAPI.connect(fake_ansible_module)
 
     hostname = fake_ansible_module.params["hostname"]
     ignore_ssl = not fake_ansible_module.params["validate_certs"]
@@ -168,11 +168,10 @@ def test_xapi_connect_support_ignore_ssl(mocker, fake_ansible_module, XenAPI, xe
     mocked_session = mocker.patch("XenAPI.Session")
     mocked_session.side_effect = TypeError()
 
-    with pytest.raises(TypeError) as exc_info:
-        xapi_session = xenserver.XAPI.connect(fake_ansible_module)
+    with pytest.raises(TypeError):
+        xenserver.XAPI.connect(fake_ansible_module)
 
     hostname = fake_ansible_module.params["hostname"]
-    ignore_ssl = not fake_ansible_module.params["validate_certs"]
 
     XenAPI.Session.assert_called_with(f"http://{hostname}")
 
@@ -181,7 +180,7 @@ def test_xapi_connect_no_disconnect_atexit(mocker, fake_ansible_module, XenAPI, 
     """Tests skipping registration of atexit disconnect handler."""
     mocker.patch("atexit.register")
 
-    xapi_session = xenserver.XAPI.connect(fake_ansible_module, disconnect_atexit=False)
+    xenserver.XAPI.connect(fake_ansible_module, disconnect_atexit=False)
 
     atexit.register.assert_not_called()
 

@@ -74,20 +74,17 @@ options:
     description:
       - Specifies the AZ to which the subnet belongs. Cannot be changed after creating the subnet.
     type: str
-    required: false
   dhcp_enable:
     description:
       - Specifies whether DHCP is enabled for the subnet. The value can be true (enabled) or false(disabled), and default
         value is true. If this parameter is set to false, newly created ECSs cannot obtain IP addresses, and usernames and
         passwords cannot be injected using Cloud-init.
     type: bool
-    required: false
   dns_address:
     description:
       - Specifies the DNS server addresses for subnet. The address in the head is used first.
     type: list
     elements: str
-    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes

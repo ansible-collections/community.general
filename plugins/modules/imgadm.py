@@ -11,7 +11,7 @@ DOCUMENTATION = r"""
 module: imgadm
 short_description: Manage SmartOS images
 description:
-  - Manage SmartOS virtual machine images through imgadm(1M).
+  - Manage SmartOS virtual machine images through imgadm(8).
 author: Jasper Lievisse Adriaanse (@jasperla)
 extends_documentation_fragment:
   - community.general.attributes
@@ -22,18 +22,15 @@ attributes:
     support: none
 options:
   force:
-    required: false
     type: bool
     description:
-      - Force a given operation (where supported by imgadm(1M)).
+      - Force a given operation (where supported by imgadm(8)).
   pool:
-    required: false
     default: zones
     description:
       - The zpool to import to or delete images from.
     type: str
   source:
-    required: false
     description:
       - URI for the image source.
     type: str
@@ -46,7 +43,6 @@ options:
     type: str
 
   type:
-    required: false
     choices: [imgapi, docker, dsapi]
     default: imgapi
     description:
@@ -54,10 +50,13 @@ options:
     type: str
 
   uuid:
-    required: false
     description:
       - Image UUID. Can either be a full UUID or V(*) for all images.
     type: str
+seealso:
+  - name: imgadm(8)
+    description: Complete manual page for the command C(imgadm).
+    link: https://smartos.org/man/8/imgadm
 """
 
 EXAMPLES = r"""
@@ -120,7 +119,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-# Shortcut for the imgadm(1M) command. While imgadm(1M) supports a
+# Shortcut for the imgadm(8) command. While imgadm(8) supports a
 # -E option to return any errors in JSON, the generated JSON does not play well
 # with the JSON parsers of Python. The returned message contains '\n' as part of
 # the stacktrace, which breaks the parsers.
@@ -165,7 +164,7 @@ class Imgadm:
         if rc != 0:
             self.module.fail_json(msg=f"Failed to update images: {self.errmsg(stderr)}")
 
-        # There is no feedback from imgadm(1M) to determine if anything
+        # There is no feedback from imgadm(8) to determine if anything
         # was actually changed. So treat this as an 'always-changes' operation.
         # Note that 'imgadm -v' produces unparsable JSON...
         self.changed = True
@@ -199,7 +198,7 @@ class Imgadm:
             if re.match(regex, stdout):
                 self.changed = True
         else:
-            # Type is ignored by imgadm(1M) here
+            # Type is ignored by imgadm(8) here
             cmd += f" -d {source}"
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
@@ -274,7 +273,7 @@ def main():
             type=dict(default="imgapi", choices=["imgapi", "docker", "dsapi"]),
             uuid=dict(),
         ),
-        # This module relies largely on imgadm(1M) to enforce idempotency, which does not
+        # This module relies largely on imgadm(8) to enforce idempotency, which does not
         # provide a "noop" (or equivalent) mode to do a dry-run.
         supports_check_mode=False,
     )

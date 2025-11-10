@@ -18,7 +18,7 @@ notes:
   - Uses the Python OVH API U(https://github.com/ovh/python-ovh). You have to create an application (a key and secret) with
     a consumer key as described into U(https://docs.ovh.com/gb/en/customer/first-steps-with-ovh-api/).
 requirements:
-  - ovh >=  0.4.8
+  - ovh >= 0.4.8
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -43,14 +43,12 @@ options:
       - The endpoint to use (for instance V(ovh-eu)).
     type: str
   wait_completion:
-    required: false
     default: true
     type: bool
     description:
       - If V(true), the module waits for the IP address to be moved. If false, exit without waiting. The C(taskId) is returned
         in module output.
   wait_task_completion:
-    required: false
     default: 0
     description:
       - If not V(0), the module waits for this task ID to be completed. Use O(wait_task_completion) if you want to wait for
@@ -73,7 +71,6 @@ options:
       - The consumer key to use.
     type: str
   timeout:
-    required: false
     default: 120
     description:
       - The timeout in seconds used to wait for a task to be completed. Default is 120 seconds.

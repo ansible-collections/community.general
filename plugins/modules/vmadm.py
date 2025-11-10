@@ -22,12 +22,10 @@ attributes:
     support: none
 options:
   archive_on_delete:
-    required: false
     description:
       - When enabled, the zone dataset is mounted on C(/zones/archive) upon removal.
     type: bool
   autoboot:
-    required: false
     description:
       - Whether or not a VM is booted when the system is rebooted.
     type: bool
@@ -38,225 +36,183 @@ options:
       - Type of virtual machine. The V(bhyve) option was added in community.general 0.2.0.
     type: str
   boot:
-    required: false
     description:
       - Set the boot order for KVM VMs.
     type: str
   cpu_cap:
-    required: false
     description:
       - Sets a limit on the amount of CPU time that can be used by a VM. Use V(0) for no cap.
     type: int
   cpu_shares:
-    required: false
     description:
       - Sets a limit on the number of fair share scheduler (FSS) CPU shares for a VM. This limit is relative to all other
         VMs on the system.
     type: int
   cpu_type:
-    required: false
     choices: [qemu64, host]
     default: qemu64
     description:
       - Control the type of virtual CPU exposed to KVM VMs.
     type: str
   customer_metadata:
-    required: false
     description:
       - Metadata to be set and associated with this VM, this contain customer modifiable keys.
     type: dict
   delegate_dataset:
-    required: false
     description:
       - Whether to delegate a ZFS dataset to an OS VM.
     type: bool
   disk_driver:
-    required: false
     description:
       - Default value for a virtual disk model for KVM guests.
     type: str
   disks:
-    required: false
     description:
       - A list of disks to add, valid properties are documented in vmadm(1M).
     type: list
     elements: dict
   dns_domain:
-    required: false
     description:
       - Domain value for C(/etc/hosts).
     type: str
   docker:
-    required: false
     description:
       - Docker images need this flag enabled along with the O(brand) set to C(lx).
     type: bool
   filesystems:
-    required: false
     description:
       - Mount additional filesystems into an OS VM.
     type: list
     elements: dict
   firewall_enabled:
-    required: false
     description:
       - Enables the firewall, allowing fwadm(1M) rules to be applied.
     type: bool
   flexible_disk_size:
-    required: false
     description:
       - This sets an upper bound for the amount of space that a bhyve instance may use for its disks and snapshots of those
         disks (in MiBs).
     type: int
     version_added: 10.5.0
   force:
-    required: false
     description:
       - Force a particular action (in other words, stop or delete a VM).
     type: bool
   fs_allowed:
-    required: false
     description:
       - Comma separated list of filesystem types this zone is allowed to mount.
     type: str
   hostname:
-    required: false
     description:
       - Zone/VM hostname.
     type: str
   image_uuid:
-    required: false
     description:
       - Image UUID.
     type: str
   indestructible_delegated:
-    required: false
     description:
       - Adds an C(@indestructible) snapshot to delegated datasets.
     type: bool
   indestructible_zoneroot:
-    required: false
     description:
       - Adds an C(@indestructible) snapshot to zoneroot.
     type: bool
   internal_metadata:
-    required: false
     description:
       - Metadata to be set and associated with this VM, this contains operator generated keys.
     type: dict
   internal_metadata_namespace:
-    required: false
     description:
       - List of namespaces to be set as C(internal_metadata-only); these namespaces come from O(internal_metadata) rather
         than O(customer_metadata).
     type: str
   kernel_version:
-    required: false
     description:
       - Kernel version to emulate for LX VMs.
     type: str
   limit_priv:
-    required: false
     description:
       - Set (comma separated) list of privileges the zone is allowed to use.
     type: str
   maintain_resolvers:
-    required: false
     description:
       - Resolvers in C(/etc/resolv.conf) are updated when updating the O(resolvers) property.
     type: bool
   max_locked_memory:
-    required: false
     description:
       - Total amount of memory (in MiBs) on the host that can be locked by this VM.
     type: int
   max_lwps:
-    required: false
     description:
       - Maximum number of lightweight processes this VM is allowed to have running.
     type: int
   max_physical_memory:
-    required: false
     description:
       - Maximum amount of memory (in MiBs) on the host that the VM is allowed to use.
     type: int
   max_swap:
-    required: false
     description:
       - Maximum amount of virtual memory (in MiBs) the VM is allowed to use.
     type: int
   mdata_exec_timeout:
-    required: false
     description:
       - Timeout in seconds (or 0 to disable) for the C(svc:/smartdc/mdata:execute) service that runs user-scripts in the zone.
     type: int
   name:
-    required: false
     aliases: [alias]
     description:
       - Name of the VM. vmadm(1M) uses this as an optional name.
     type: str
   nic_driver:
-    required: false
     description:
       - Default value for a virtual NIC model for KVM guests.
     type: str
   nics:
-    required: false
     description:
       - A list of nics to add, valid properties are documented in vmadm(1M).
     type: list
     elements: dict
   nowait:
-    required: false
     description:
       - Consider the provisioning complete when the VM first starts, rather than when the VM has rebooted.
     type: bool
   owner_uuid:
-    required: false
     description:
       - Define the UUID of the owner of the VM.
     type: str
     version_added: 10.5.0
   qemu_opts:
-    required: false
     description:
       - Additional qemu arguments for KVM guests. This overwrites the default arguments provided by vmadm(1M) and should only
         be used for debugging.
     type: str
   qemu_extra_opts:
-    required: false
     description:
       - Additional qemu cmdline arguments for KVM guests.
     type: str
   quota:
-    required: false
     description:
       - Quota on zone filesystems (in MiBs).
     type: int
   ram:
-    required: false
     description:
       - Amount of virtual RAM for a KVM guest (in MiBs).
     type: int
   resolvers:
-    required: false
     description:
       - List of resolvers to be put into C(/etc/resolv.conf).
     type: list
     elements: str
   routes:
-    required: false
     description:
       - Dictionary that maps destinations to gateways, these are set as static routes in the VM.
     type: dict
   spice_opts:
-    required: false
     description:
       - Addition options for SPICE-enabled KVM VMs.
     type: str
   spice_password:
-    required: false
     description:
       - Password required to connect to SPICE. By default no password is set. Please note this can be read from the Global
         Zone.
@@ -271,82 +227,66 @@ options:
         it down.
     type: str
   tmpfs:
-    required: false
     description:
       - Amount of memory (in MiBs) that is available in the VM for the C(/tmp) filesystem.
     type: int
   uuid:
-    required: false
     description:
       - UUID of the VM. Can either be a full UUID or V(*) for all VMs.
     type: str
   vcpus:
-    required: false
     description:
       - Number of virtual CPUs for a KVM guest.
     type: int
   vga:
-    required: false
     description:
       - Specify VGA emulation used by KVM VMs.
     type: str
   virtio_txburst:
-    required: false
     description:
       - Number of packets that can be sent in a single flush of the tx queue of virtio NICs.
     type: int
   virtio_txtimer:
-    required: false
     description:
       - Timeout (in nanoseconds) for the TX timer of virtio NICs.
     type: int
   vnc_password:
-    required: false
     description:
       - Password required to connect to VNC. By default no password is set. Please note this can be read from the Global Zone.
     type: str
   vnc_port:
-    required: false
     description:
       - TCP port to listen of the VNC server. Or set V(0) for random, or V(-1) to disable.
     type: int
   zfs_data_compression:
-    required: false
     description:
       - Specifies compression algorithm used for this VMs data dataset. This option only has effect on delegated datasets.
     type: str
   zfs_data_recsize:
-    required: false
     description:
       - Suggested block size (power of 2) for files in the delegated dataset's filesystem.
     type: int
   zfs_filesystem_limit:
-    required: false
     description:
       - Maximum number of filesystems the VM can have.
     type: int
   zfs_io_priority:
-    required: false
     description:
       - IO throttle priority value relative to other VMs.
     type: int
   zfs_root_compression:
-    required: false
     description:
       - Specifies compression algorithm used for this VMs root dataset. This option only has effect on the zoneroot dataset.
     type: str
   zfs_root_recsize:
-    required: false
     description:
       - Suggested block size (power of 2) for files in the zoneroot dataset's filesystem.
     type: int
   zfs_snapshot_limit:
-    required: false
     description:
       - Number of snapshots the VM can have.
     type: int
   zpool:
-    required: false
     description:
       - ZFS pool the VM's zone dataset is created in.
     type: str
@@ -560,7 +500,7 @@ def create_payload(module, uuid):
 
     try:
         vmdef_json = json.dumps(vmdef)
-    except Exception as e:
+    except Exception:
         module.fail_json(msg="Could not create valid JSON payload", exception=traceback.format_exc())
 
     # Create the temporary file that contains our payload, and set tight

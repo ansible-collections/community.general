@@ -219,7 +219,7 @@ def main():
     elif state in ("poweroff"):
         power_status = ilo.get_host_power_status()
 
-        if not power_status == "OFF":
+        if power_status != "OFF":
             ilo.hold_pwr_btn()
             #            ilo.set_host_power(host_power=False)
             changed = True

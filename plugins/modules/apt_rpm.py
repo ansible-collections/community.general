@@ -155,7 +155,7 @@ def local_rpm_package_name(path):
     fd = os.open(path, os.O_RDONLY)
     try:
         header = ts.hdrFromFdno(fd)
-    except rpm.error as e:
+    except rpm.error:
         return None
     finally:
         os.close(fd)
@@ -215,9 +215,9 @@ def update_package_db(module):
 
 def dir_size(module, path):
     total_size = 0
-    for path, dirs, files in os.walk(path):
+    for cur_path, dirs, files in os.walk(path):
         for f in files:
-            total_size += os.path.getsize(os.path.join(path, f))
+            total_size += os.path.getsize(os.path.join(cur_path, f))
     return total_size
 
 

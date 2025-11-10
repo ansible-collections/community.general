@@ -95,13 +95,13 @@ class GitlabBranch:
     def get_project(self, project):
         try:
             return self.repo.projects.get(project)
-        except Exception as e:
+        except Exception:
             return False
 
     def get_branch(self, branch):
         try:
             return self.project.branches.get(branch)
-        except Exception as e:
+        except Exception:
             return False
 
     def create_branch(self, branch, ref_branch):
@@ -171,7 +171,7 @@ def main():
         try:
             this_gitlab.delete_branch(this_branch)
             module.exit_json(changed=True, msg=f"Branch {branch} deleted.")
-        except Exception as e:
+        except Exception:
             module.fail_json(msg="Error delete branch.", exception=traceback.format_exc())
     else:
         module.exit_json(changed=False, msg="No changes are needed.")

@@ -38,14 +38,12 @@ options:
     description:
       - State of the package, you can use V(installed) as an alias for V(present) and V(removed) as one for V(absent).
     choices: ['present', 'absent', 'latest', 'installed', 'removed']
-    required: false
     default: present
     type: str
 
   update_cache:
     description:
       - Update the package database first.
-    required: false
     default: false
     type: bool
 

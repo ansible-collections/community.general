@@ -30,7 +30,6 @@ options:
   user_password:
     description:
       - Password to be set for the user.
-    required: false
     type: str
   admin:
     description:

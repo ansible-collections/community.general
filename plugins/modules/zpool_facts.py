@@ -23,20 +23,17 @@ options:
       - ZFS pool name.
     type: str
     aliases: ["pool", "zpool"]
-    required: false
   parsable:
     description:
       - Specifies if property values should be displayed in machine friendly format.
     type: bool
     default: false
-    required: false
   properties:
     description:
       - Specifies which dataset properties should be queried in comma-separated format. For more information about dataset
         properties, check zpool(1M) man page.
     type: str
     default: all
-    required: false
 """
 
 EXAMPLES = r"""

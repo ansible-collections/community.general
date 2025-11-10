@@ -40,28 +40,23 @@ options:
     type: str
     description:
       - User who deployed.
-    required: false
   rollbar_user:
     type: str
     description:
       - Rollbar username of the user who deployed.
-    required: false
   comment:
     type: str
     description:
       - Deploy comment (for example what is being deployed).
-    required: false
   url:
     type: str
     description:
       - Optional URL to submit the notification to.
-    required: false
     default: 'https://api.rollbar.com/api/1/deploy/'
   validate_certs:
     description:
       - If V(false), SSL certificates for the target URL are not validated. This should only be used on personally controlled
         sites using self-signed certificates.
-    required: false
     default: true
     type: bool
 """

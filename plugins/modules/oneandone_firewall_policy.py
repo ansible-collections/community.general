@@ -25,7 +25,6 @@ options:
   state:
     description:
       - Define a firewall policy state to create, remove, or update.
-    required: false
     type: str
     default: 'present'
     choices: ["present", "absent", "update"]
@@ -37,7 +36,6 @@ options:
     description:
       - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
-    required: false
   name:
     description:
       - Firewall policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128.
@@ -58,14 +56,12 @@ options:
       - A list of server identifiers (ID or name) to be assigned to a firewall policy. Used in combination with update state.
     type: list
     elements: str
-    required: false
     default: []
   remove_server_ips:
     description:
       - A list of server IP IDs to be unassigned from a firewall policy. Used in combination with update state.
     type: list
     elements: str
-    required: false
     default: []
   add_rules:
     description:
@@ -73,24 +69,20 @@ options:
         Used in combination with update state.
     type: list
     elements: dict
-    required: false
     default: []
   remove_rules:
     description:
       - List of rule IDs that are removed from an existing firewall policy. Used in combination with update state.
     type: list
     elements: str
-    required: false
     default: []
   description:
     description:
       - Firewall policy description. maxLength=256.
     type: str
-    required: false
   wait:
     description:
       - Wait for the instance to be in state 'running' before returning.
-    required: false
     default: true
     type: bool
   wait_timeout:

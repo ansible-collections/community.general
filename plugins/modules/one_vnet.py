@@ -320,10 +320,10 @@ class NetworksModule(OpenNebulaModule):
         return None
 
     def get_template_by_id(self, template_id):
-        return self.get_template(lambda template: (template.ID == template_id))
+        return self.get_template(lambda template: (template_id == template.ID))
 
     def get_template_by_name(self, name):
-        return self.get_template(lambda template: (template.NAME == name))
+        return self.get_template(lambda template: (name == template.NAME))
 
     def get_template_instance(self, requested_id, requested_name):
         if requested_id:
@@ -411,7 +411,7 @@ class NetworksModule(OpenNebulaModule):
             result["changed"] = True
         else:
             # if the previous parsed template data is not equal to the updated one, this has changed
-            result["changed"] = template.TEMPLATE != result["template"]
+            result["changed"] = result["template"] != template.TEMPLATE
 
         return result
 

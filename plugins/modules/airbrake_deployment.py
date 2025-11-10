@@ -43,35 +43,29 @@ options:
   user:
     description:
       - The username of the person doing the deployment.
-    required: false
     type: str
   repo:
     description:
       - URL of the project repository.
-    required: false
     type: str
   revision:
     description:
       - A hash, number, tag, or other identifier showing what revision from version control was deployed.
-    required: false
     type: str
   version:
     description:
       - A string identifying what version was deployed.
-    required: false
     type: str
     version_added: '1.0.0'
   url:
     description:
       - Optional URL to submit the notification to. Use to send notifications to Airbrake-compliant tools like Errbit.
-    required: false
     default: "https://api.airbrake.io/api/v4/projects/"
     type: str
   validate_certs:
     description:
       - If V(false), SSL certificates for the target URL is not validated. This should only be used on personally controlled
         sites using self-signed certificates.
-    required: false
     default: true
     type: bool
 

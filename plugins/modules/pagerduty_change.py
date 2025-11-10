@@ -50,39 +50,32 @@ options:
   repo:
     description:
       - The URL of the project repository.
-    required: false
     type: str
   revision:
     description:
       - An identifier of the revision being deployed, typically a number or SHA from a version control system.
-    required: false
     type: str
   environment:
     description:
       - The environment name, typically V(production), V(staging), and so on.
-    required: false
     type: str
   link_url:
     description:
       - A URL where more information about the deployment can be obtained.
-    required: false
     type: str
   link_text:
     description:
       - Descriptive text for a URL where more information about the deployment can be obtained.
-    required: false
     type: str
   url:
     description:
       - URL to submit the change event to.
-    required: false
     default: https://events.pagerduty.com/v2/change/enqueue
     type: str
   validate_certs:
     description:
       - If V(false), SSL certificates for the target URL are not validated. This should only be used on personally controlled
         sites using self-signed certificates.
-    required: false
     default: true
     type: bool
 """

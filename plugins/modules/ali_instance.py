@@ -193,14 +193,12 @@ options:
   key_name:
     description:
       - The name of key pair which is used to access ECS instance in SSH.
-    required: false
     type: str
     aliases: ['keypair']
   user_data:
     description:
       - User-defined data to customize the startup behaviors of an ECS instance and to pass data into an ECS instance. It
         only takes effect when launching the new ECS instances.
-    required: false
     type: str
   ram_role_name:
     description:
@@ -631,8 +629,8 @@ def get_instances_info(connection, ids):
     if len(instances) > 0:
         for inst in instances:
             volumes = connection.describe_disks(instance_id=inst.id)
-            setattr(inst, "block_device_mappings", volumes)
-            setattr(inst, "user_data", inst.describe_user_data())
+            inst.block_device_mappings = volumes
+            inst.user_data = inst.describe_user_data()
             result.append(inst.read())
     return result
 
@@ -656,7 +654,7 @@ def run_instance(module, ecs, exact_count):
     system_disk_size = module.params["system_disk_size"]
     system_disk_name = module.params["system_disk_name"]
     system_disk_description = module.params["system_disk_description"]
-    allocate_public_ip = module.params["allocate_public_ip"]
+    # allocate_public_ip = module.params["allocate_public_ip"]  TODO - this is unused!
     period = module.params["period"]
     auto_renew = module.params["auto_renew"]
     instance_charge_type = module.params["instance_charge_type"]
@@ -748,7 +746,7 @@ def modify_instance(module, instance):
         password = module.params["password"]
 
     # userdata can be modified only when instance is stopped
-    setattr(instance, "user_data", instance.describe_user_data())
+    instance.user_data = instance.describe_user_data()
     user_data = instance.user_data
     if state == "stopped":
         user_data = module.params["user_data"].encode()

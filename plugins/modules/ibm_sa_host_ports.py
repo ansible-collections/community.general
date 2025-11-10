@@ -35,17 +35,14 @@ options:
   iscsi_name:
     description:
       - The iSCSI initiator name.
-    required: false
     type: str
   fcaddress:
     description:
       - Fiber channel address.
-    required: false
     type: str
   num_of_visible_targets:
     description:
       - Number of visible targets.
-    required: false
     type: str
 
 extends_documentation_fragment:

@@ -38,7 +38,6 @@ options:
     description:
       - The annotation stream name.
       - If the annotation stream does not exist, it creates one automatically.
-    required: false
   title:
     type: str
     description:
@@ -50,25 +49,21 @@ options:
     description:
       - A string which describes the originating source of an annotation when that annotation is tracked across multiple members
         of a population.
-    required: false
   description:
     type: str
     description:
       - The description contains extra metadata about a particular annotation.
       - The description should contain specifics on the individual annotation for example V(Deployed 9b562b2 shipped new feature
         foo!).
-    required: false
   start_time:
     type: int
     description:
       - The unix timestamp indicating the time at which the event referenced by this annotation started.
-    required: false
   end_time:
     type: int
     description:
       - The unix timestamp indicating the time at which the event referenced by this annotation ended.
       - For events that have a duration, this is a useful way to annotate the duration of the event.
-    required: false
   links:
     type: list
     elements: dict

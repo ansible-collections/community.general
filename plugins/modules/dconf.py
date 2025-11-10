@@ -27,7 +27,7 @@ notes:
     specified in Ansible code. C(gi.repository) is likely to be present on most systems which have C(dconf) but may not be
     present everywhere. When it is missing, a simple string comparison between values is used, and there may be false positives,
     that is, Ansible may think that a value is being changed when it is not. This fallback is to be removed in a future version
-    of this module, at which point the module will stop working on hosts without C(gi.repository).
+    of this module, at which point the module C(gi.repository) is going to be required.
   - Detection of existing, running D-Bus session, required to change settings using C(dconf), is not 100% reliable due to
     implementation details of D-Bus daemon itself. This might lead to running applications not picking-up changes on-the-fly
     if options are changed using Ansible and C(dbus-run-session).
@@ -55,7 +55,6 @@ options:
       - A dconf key to modify or read from the dconf database.
   value:
     type: raw
-    required: false
     description:
       - Value to set for the specified dconf key. Value should be specified in GVariant format. Due to complexity of this
         format, it is best to have a look at existing values in the dconf database.
@@ -65,7 +64,6 @@ options:
         is why the type of this parameter is "raw").
   state:
     type: str
-    required: false
     default: present
     choices: ['read', 'present', 'absent']
     description:

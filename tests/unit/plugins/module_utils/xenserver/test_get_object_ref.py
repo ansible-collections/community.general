@@ -14,9 +14,7 @@ from .common import fake_xenapi_ref
 
 def test_get_object_ref_xenapi_failure(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests catching of XenAPI failures."""
-    mocked_xenapi = mocker.patch.object(
-        XenAPI.Session, "xenapi_request", side_effect=XenAPI.Failure("Fake XAPI method call error!")
-    )
+    mocker.patch.object(XenAPI.Session, "xenapi_request", side_effect=XenAPI.Failure("Fake XAPI method call error!"))
 
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.get_object_ref(fake_ansible_module, "name")
@@ -37,9 +35,7 @@ def test_get_object_ref_bad_uuid_and_name(mocker, fake_ansible_module, XenAPI, x
 
 def test_get_object_ref_uuid_not_found(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests when object is not found by uuid."""
-    mocked_xenapi = mocker.patch.object(
-        XenAPI.Session, "xenapi_request", side_effect=XenAPI.Failure("Fake XAPI not found error!")
-    )
+    mocker.patch.object(XenAPI.Session, "xenapi_request", side_effect=XenAPI.Failure("Fake XAPI not found error!"))
 
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.get_object_ref(fake_ansible_module, "name", uuid="fake-uuid", msg_prefix="Test: ")
@@ -52,7 +48,7 @@ def test_get_object_ref_uuid_not_found(mocker, fake_ansible_module, XenAPI, xens
 
 def test_get_object_ref_name_not_found(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests when object is not found by name."""
-    mocked_xenapi = mocker.patch.object(XenAPI.Session, "xenapi_request", return_value=[])
+    mocker.patch.object(XenAPI.Session, "xenapi_request", return_value=[])
 
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.get_object_ref(fake_ansible_module, "name", msg_prefix="Test: ")
@@ -63,9 +59,7 @@ def test_get_object_ref_name_not_found(mocker, fake_ansible_module, XenAPI, xens
 
 def test_get_object_ref_name_multiple_found(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests when multiple objects are found by name."""
-    mocked_xenapi = mocker.patch.object(
-        XenAPI.Session, "xenapi_request", return_value=[fake_xenapi_ref("VM"), fake_xenapi_ref("VM")]
-    )
+    mocker.patch.object(XenAPI.Session, "xenapi_request", return_value=[fake_xenapi_ref("VM"), fake_xenapi_ref("VM")])
 
     error_msg = "Test: multiple VMs with name 'name' found! Please use UUID."
 

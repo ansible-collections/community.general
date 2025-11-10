@@ -48,7 +48,6 @@ options:
     default: 0
     choices: [0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400]
   force:
-    required: false
     default: false
     type: bool
     description:
@@ -273,9 +272,9 @@ def create_or_delete(args=None):
 
     retvals["failed"] = has_failed
     retvals["changed"] = has_changed
-    for val in ["msg", "stderr", "memset_api"]:
-        if val is not None:
-            retvals[val] = eval(val)
+    retvals["msg"] = msg
+    retvals["stderr"] = stderr
+    retvals["memset_api"] = memset_api
 
     return retvals
 
