@@ -1,0 +1,2 @@
+deprecated_features:
+  - layman - Gentoo deprecated ``layman`` in mid-2023 (https://github.com/ansible-collections/community.general/pull/11070).
