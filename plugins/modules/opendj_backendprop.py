@@ -112,11 +112,8 @@ class BackendProp:
             "-X",
             "-s",
         ] + password_method
-        rc, stdout, stderr = self._module.run_command(my_command)
-        if rc == 0:
-            return stdout
-        else:
-            self._module.fail_json(msg=f"Error message: {stderr}")
+        rc, stdout, stderr = self._module.run_command(my_command, check_rc=True)
+        return stdout
 
     def set_property(self, opendj_bindir, hostname, port, username, password_method, backend_name, name, value):
         my_command = [
@@ -135,11 +132,8 @@ class BackendProp:
             "-n",
             "-X",
         ] + password_method
-        rc, stdout, stderr = self._module.run_command(my_command)
-        if rc == 0:
-            return True
-        else:
-            self._module.fail_json(msg=f"Error message: {stderr}")
+        self._module.run_command(my_command, check_rc=True)
+        return True
 
     def validate_data(self, data=None, name=None, value=None):
         for config_line in data.split("\n"):
