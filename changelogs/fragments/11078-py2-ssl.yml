@@ -1,0 +1,4 @@
+minor_changes:
+  - cobbler_sync - remove conditional code handling SSL for unsupported versions of Python (https://github.com/ansible-collections/community.general/pull/11078)..
+  - cobbler_system - remove conditional code handling SSL for unsupported versions of Python (https://github.com/ansible-collections/community.general/pull/11078)..
+  - jenkins_job_info - remove conditional code handling SSL for unsupported versions of Python (https://github.com/ansible-collections/community.general/pull/11078)..
