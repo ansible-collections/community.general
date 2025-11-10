@@ -71,12 +71,12 @@ options:
   channel:
     type: str
     description:
-      - Channel name. One of nick_to or channel needs to be set. When both are set, the message is sent to both of them.
+      - Channel name. One of O(nick_to) or O(channel) needs to be set. When both are set, the message is sent to both of them.
   nick_to:
     type: list
     elements: str
     description:
-      - A list of nicknames to send the message to. One of nick_to or channel needs to be set. When both are defined, the
+      - A list of nicknames to send the message to. One of O(nick_to) or O(channel) needs to be set. When both are defined, the
         message is sent to both of them.
   key:
     type: str
@@ -94,7 +94,7 @@ options:
   use_tls:
     description:
       - Designates whether TLS/SSL should be used when connecting to the IRC server.
-      - O(use_tls) is available since community.general 8.1.0, before the option was exlusively called O(use_ssl). The latter
+      - O(use_tls) is available since community.general 8.1.0, before the option was exclusively called O(use_ssl). The latter
         is now an alias of O(use_tls).
       - B(Note:) for security reasons, you should always set O(use_tls=true) and O(validate_certs=true) whenever possible.
       - The default of this option changed to V(true) in community.general 10.0.0.
@@ -260,7 +260,7 @@ def send_msg(
     irc.send(to_bytes(f"USER {nick} {nick} {nick} :ansible IRC\r\n"))
     motd = ""
     start = time.time()
-    while 1:
+    while True:
         motd += to_native(irc.recv(1024))
         # The server might send back a shorter nick than we specified (due to NICKLEN),
         #  so grab that and use it from now on (assuming we find the 00[1-4] response).
@@ -280,7 +280,7 @@ def send_msg(
 
         join = ""
         start = time.time()
-        while 1:
+        while True:
             join += to_native(irc.recv(1024))
             if re.search(rf"^:\S+ 366 {nick} {channel} :", join, flags=re.M | re.I):
                 break
