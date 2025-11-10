@@ -46,7 +46,7 @@ If you find any inconsistencies or places in this document which can be improved
 
 ## Run sanity or unit locally (with antsibull-nox)
 
-The easiest way to run sanity and unit tests locally is to use [antsibull-nox](https://ansible.readthedocs.io/projects/antsibull-nox/).
+The easiest way to run sanity and unit tests locally is to use [antsibull-nox](https://docs.ansible.com/projects/antsibull-nox/).
 (If you have [nox](https://nox.thea.codes/en/stable/) installed, it will automatically install antsibull-nox in a virtual environment for you.)
 
 ### Sanity tests
