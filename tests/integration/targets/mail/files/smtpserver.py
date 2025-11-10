@@ -41,13 +41,7 @@ keyfile = basename + '.key'
 if len(sys.argv) > 3:
     keyfile = sys.argv[3]
 
-try:
-    ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-except AttributeError:
-    ssl_ctx = None
-    if HAS_TLS:
-        print('Python ssl library does not support SSLContext, hence starttls and TLS are not supported.')
-    import smtpd
+ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 
 if HAS_TLS and ssl_ctx is not None:
     print('Using %s and %s' % (certfile, keyfile))

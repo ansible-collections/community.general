@@ -160,13 +160,8 @@ def get_jenkins_connection(module):
     token = module.params.get("token")
 
     validate_certs = module.params.get("validate_certs")
-    if not validate_certs and hasattr(ssl, "SSLContext"):
+    if not validate_certs:
         ssl._create_default_https_context = ssl._create_unverified_context
-    if validate_certs and not hasattr(ssl, "SSLContext"):
-        module.fail_json(
-            msg="Module does not support changing verification mode with python < 2.7.9."
-            " Either update Python or use validate_certs=false."
-        )
 
     if username and (password or token):
         return jenkins.Jenkins(url, username, password or token)
