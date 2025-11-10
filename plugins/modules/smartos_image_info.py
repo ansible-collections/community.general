@@ -25,8 +25,12 @@ options:
     description:
       - Criteria for selecting image. Can be any value from image manifest and V(published_date), V(published), V(source),
         V(clones), and V(size).
-      - More information can be found at U(https://smartos.org/man/1m/imgadm) under C(imgadm list).
+      - More information can be found at U(https://smartos.org/man/8/imgadm) under C(imgadm list).
     type: str
+seealso:
+  - name: imgadm(8)
+    description: Complete manual page for the command C(imgadm).
+    link: https://smartos.org/man/8/imgadm
 """
 
 EXAMPLES = r"""
