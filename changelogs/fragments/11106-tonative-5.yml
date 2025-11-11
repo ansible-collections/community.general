@@ -14,5 +14,4 @@ minor_changes:
   - packet_volume - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
   - portage - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
   - redhat_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
-  - snap - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
   - xml - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
