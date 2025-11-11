@@ -1,0 +1,2 @@
+minor_changes:
+  - merge_variables - extend type detection failure message to allow users for easier failure debugging (https://github.com/ansible-collections/community.general/pull/11107).
