@@ -266,7 +266,7 @@ class OnePasswordInfo:
             return output
 
         except Exception as e:
-            if re.search(".*not found.*", to_native(e)):
+            if re.search(".*not found.*", f"{e}"):
                 module.fail_json(msg=f"Unable to find an item in 1Password named '{item_id}'.")
             else:
                 module.fail_json(msg=f"Unexpected error attempting to find an item in 1Password named '{item_id}': {e}")

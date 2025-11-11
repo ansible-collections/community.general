@@ -401,7 +401,7 @@ class JenkinsPlugin:
         try:
             json_data = json.loads(to_native(r.read()))
         except Exception as e:
-            self.module.fail_json(msg=f"Cannot parse {what} JSON data.", details=to_native(e))
+            self.module.fail_json(msg=f"Cannot parse {what} JSON data.", details=f"{e}")
 
         return json_data
 
@@ -477,7 +477,7 @@ class JenkinsPlugin:
             if dont_fail:
                 raise FailedInstallingWithPluginManager(e)
             else:
-                self.module.fail_json(msg=msg_exception, details=to_native(e))
+                self.module.fail_json(msg=msg_exception, details=f"{e}")
 
         return response
 
@@ -695,7 +695,7 @@ class JenkinsPlugin:
         except Exception as e:
             if os.path.exists(cache_path):
                 os.remove(cache_path)
-            self.module.fail_json(msg="Failed to parse plugin-versions.json", details=to_native(e))
+            self.module.fail_json(msg="Failed to parse plugin-versions.json", details=f"{e}")
 
         plugin_versions = plugin_data.get("plugins", {}).get(name)
         if not plugin_versions:
@@ -743,7 +743,7 @@ class JenkinsPlugin:
         try:
             updates_file, download_updates = download_updates_file(self.params["updates_expiration"])
         except OSError as e:
-            self.module.fail_json(msg="Cannot create temporal directory.", details=to_native(e))
+            self.module.fail_json(msg="Cannot create temporal directory.", details=f"{e}")
 
         # Download the updates file if needed
         if download_updates:
@@ -762,7 +762,7 @@ class JenkinsPlugin:
                 os.close(tmp_update_fd)
             except IOError as e:
                 self.module.fail_json(
-                    msg=f"Cannot close the tmp updates file {tmp_updates_file}.", details=to_native(e)
+                    msg=f"Cannot close the tmp updates file {tmp_updates_file}.", details=f"{e}"
                 )
         else:
             tmp_updates_file = updates_file
@@ -777,12 +777,12 @@ class JenkinsPlugin:
         except IOError as e:
             self.module.fail_json(
                 msg=f"Cannot open{' temporary' if tmp_updates_file != updates_file else ''} updates file.",
-                details=to_native(e),
+                details=f"{e}",
             )
         except Exception as e:
             self.module.fail_json(
                 msg=f"Cannot load JSON data from the{' temporary' if tmp_updates_file != updates_file else ''} updates file.",
-                details=to_native(e),
+                details=f"{e}",
             )
 
         # Move the updates file to the right place if we could read it
@@ -812,7 +812,7 @@ class JenkinsPlugin:
         try:
             os.close(tmp_f_fd)
         except IOError as e:
-            self.module.fail_json(msg=f"Cannot close the temporal plugin file {tmp_f}.", details=to_native(e))
+            self.module.fail_json(msg=f"Cannot close the temporal plugin file {tmp_f}.", details=f"{e}")
 
         # Move the file onto the right place
         self.module.atomic_move(os.path.abspath(tmp_f), os.path.abspath(f))
@@ -923,7 +923,7 @@ def main():
     try:
         module.params["timeout"] = float(module.params["timeout"])
     except ValueError as e:
-        module.fail_json(msg=f"Cannot convert {module.params['timeout']} to float.", details=to_native(e))
+        module.fail_json(msg=f"Cannot convert {module.params['timeout']} to float.", details=f"{e}")
     # Instantiate the JenkinsPlugin object
     jp = JenkinsPlugin(module)
 

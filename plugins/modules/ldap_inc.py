@@ -115,7 +115,7 @@ rfc4525:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.general.plugins.module_utils.ldap import (
     LdapGeneric,
@@ -222,7 +222,7 @@ def main():
                 module.fail_json(msg="The entry does not exist or does not contain the specified attribute.")
 
     except Exception as e:
-        module.fail_json(msg="Attribute action failed.", details=to_native(e))
+        module.fail_json(msg="Attribute action failed.", details=f"{e}")
 
     module.exit_json(changed=changed, incremented=changed, attribute=mod.attr, value=ret, rfc4525=rfc4525)
 
