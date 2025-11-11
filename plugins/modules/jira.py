@@ -841,7 +841,7 @@ class JIRA(StateModuleHelper):
                         msg.append(to_native(error[key]))
                 if msg:
                     self.module.fail_json(msg=", ".join(msg))
-                self.module.fail_json(msg=to_native(error))
+                self.module.fail_json(msg=f"{error}")
             # Fallback print body, if it can't be decoded
             self.module.fail_json(msg=to_native(info["body"]))
 
