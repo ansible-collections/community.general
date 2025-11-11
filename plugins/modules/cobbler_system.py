@@ -156,7 +156,6 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 IFPROPS_MAPPING = dict(
     bondingopts="bonding_opts",
