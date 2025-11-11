@@ -120,7 +120,6 @@ result:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 import_nomad = None
 
@@ -235,7 +234,7 @@ def run(module):
                     changed = True
 
                 except Exception as e:
-                    module.fail_json(msg=to_native(e))
+                    module.fail_json(msg=f"{e}")
         else:
             try:
                 token_info = {
@@ -261,7 +260,7 @@ def run(module):
                     changed = True
 
             except Exception as e:
-                module.fail_json(msg=to_native(e))
+                module.fail_json(msg=f"{e}")
 
     if module.params.get("state") == "absent":
         if not module.params.get("name"):
@@ -280,7 +279,7 @@ def run(module):
                 msg = f"No token with name '{module.params['name']}' found"
 
         except Exception as e:
-            module.fail_json(msg=to_native(e))
+            module.fail_json(msg=f"{e}")
 
     module.exit_json(changed=changed, msg=msg, result=result)
 

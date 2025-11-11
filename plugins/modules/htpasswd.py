@@ -104,7 +104,6 @@ import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils import deps
-from ansible.module_utils.common.text.converters import to_native
 
 
 with deps.declare("passlib"):
@@ -242,7 +241,7 @@ def main():
         (msg, changed) = check_file_attrs(module, changed, msg)
         module.exit_json(msg=msg, changed=changed)
     except Exception as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
 
 if __name__ == "__main__":

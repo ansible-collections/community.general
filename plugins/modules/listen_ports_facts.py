@@ -189,7 +189,6 @@ ansible_facts:
 
 import re
 import platform
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -418,7 +417,7 @@ def main():
                 elif connection["protocol"].startswith("udp"):
                     result["ansible_facts"]["udp_listen"].append(connection)
     except (KeyError, EnvironmentError) as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
     module.exit_json(**result)
 

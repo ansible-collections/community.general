@@ -66,7 +66,6 @@ query_results:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
 
 
@@ -78,7 +77,7 @@ class AnsibleInfluxDBRead(InfluxDb):
             if rs:
                 return list(rs.get_points())
         except Exception as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=f"{e}")
 
 
 def main():

@@ -365,7 +365,7 @@ def main():
         changed, record = ensure(module, client)
         module.exit_json(changed=changed, record=record)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":

@@ -90,7 +90,6 @@ else:
     pyodbc_found = True
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 class NotSupportedError(Exception):
@@ -227,21 +226,21 @@ def main():
             try:
                 changed = absent(role_facts, cursor, role, assigned_roles)
             except pyodbc.Error as e:
-                module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+                module.fail_json(msg=f"{e}", exception=traceback.format_exc())
         elif state == "present":
             try:
                 changed = present(role_facts, cursor, role, assigned_roles)
             except pyodbc.Error as e:
-                module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+                module.fail_json(msg=f"{e}", exception=traceback.format_exc())
     except NotSupportedError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={"vertica_roles": role_facts})
+        module.fail_json(msg=f"{e}", ansible_facts={"vertica_roles": role_facts})
     except CannotDropError as e:
-        module.fail_json(msg=to_native(e), ansible_facts={"vertica_roles": role_facts})
+        module.fail_json(msg=f"{e}", ansible_facts={"vertica_roles": role_facts})
     except SystemExit:
         # avoid catching this on python 2.4
         raise
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
     module.exit_json(changed=changed, role=role, ansible_facts={"vertica_roles": role_facts})
 

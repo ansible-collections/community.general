@@ -82,7 +82,6 @@ result:
 """
 
 from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM, UTMModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -96,7 +95,7 @@ def main():
         # This is needed because the bool value only accepts int values in the backend
         UTM(module, endpoint, key_to_check_for_changes, info_only=True).execute()
     except Exception as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
 
 if __name__ == "__main__":

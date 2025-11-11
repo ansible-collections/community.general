@@ -144,7 +144,6 @@ list:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.csv import (
     initialize_dialect,
@@ -185,7 +184,7 @@ def main():
     try:
         dialect = initialize_dialect(dialect, **dialect_params)
     except (CustomDialectFailureError, DialectNotAvailableError) as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
     try:
         with open(path, "rb") as f:

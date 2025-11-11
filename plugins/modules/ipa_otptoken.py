@@ -173,7 +173,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, sanitize_keys
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
-from ansible.module_utils.common.text.converters import to_native
 
 
 class OTPTokenIPAClient(IPAClient):
@@ -546,7 +545,7 @@ def main():
         client.login(username=module.params["ipa_user"], password=module.params["ipa_pass"])
         changed, otptoken = ensure(module, client)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
     module.exit_json(changed=changed, otptoken=otptoken)
 
