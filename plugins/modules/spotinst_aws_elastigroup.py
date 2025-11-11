@@ -16,7 +16,7 @@ description:
   - Full documentation available at U(https://help.spotinst.com/hc/en-us/articles/115003530285-Ansible-).
 deprecated:
   removed_in: 13.0.0
-  why: Module Module relies on unsupported Python package.
+  why: Module relies on unsupported Python package.
   alternative: Use the module M(spot.cloud_modules.aws_elastigroup) instead.
 requirements:
   - spotinst_sdk >= 1.0.38
