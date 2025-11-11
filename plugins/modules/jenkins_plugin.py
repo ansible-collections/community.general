@@ -475,7 +475,7 @@ class JenkinsPlugin:
                     self.module.fail_json(msg=msg_status, details=info["msg"])
         except Exception as e:
             if dont_fail:
-                raise FailedInstallingWithPluginManager(e)
+                raise FailedInstallingWithPluginManager(e) from e
             else:
                 self.module.fail_json(msg=msg_exception, details=to_native(e))
 

@@ -56,8 +56,8 @@ def _find_end_quote(identifier, quote_char):
     while True:
         try:
             quote = identifier.index(quote_char)
-        except ValueError:
-            raise UnclosedQuoteError
+        except ValueError as e:
+            raise UnclosedQuoteError from e
         accumulate = accumulate + quote
         try:
             next_char = identifier[quote + 1]
@@ -67,8 +67,8 @@ def _find_end_quote(identifier, quote_char):
             try:
                 identifier = identifier[quote + 2 :]
                 accumulate = accumulate + 2
-            except IndexError:
-                raise UnclosedQuoteError
+            except IndexError as e:
+                raise UnclosedQuoteError from e
         else:
             return accumulate
 

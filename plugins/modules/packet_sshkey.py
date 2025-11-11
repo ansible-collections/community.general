@@ -210,7 +210,7 @@ def act_on_sshkeys(target_state, module, packet_conn):
                 changed = True
             except Exception as e:
                 _msg = f"while trying to remove sshkey {k.label}, id {k.id} {target_state}, got error: {e}"
-                raise Exception(_msg)
+                raise Exception(_msg) from e
 
     return {"changed": changed, "sshkeys": [serialize_sshkey(k) for k in matching_sshkeys]}
 
