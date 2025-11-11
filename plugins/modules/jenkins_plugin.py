@@ -761,9 +761,7 @@ class JenkinsPlugin:
             try:
                 os.close(tmp_update_fd)
             except IOError as e:
-                self.module.fail_json(
-                    msg=f"Cannot close the tmp updates file {tmp_updates_file}.", details=f"{e}"
-                )
+                self.module.fail_json(msg=f"Cannot close the tmp updates file {tmp_updates_file}.", details=f"{e}")
         else:
             tmp_updates_file = updates_file
 

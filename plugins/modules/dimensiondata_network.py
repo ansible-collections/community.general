@@ -222,9 +222,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
                     self.location, self.name, self.module.params["service_plan"], description=self.description
                 )
         except DimensionDataAPIException as e:
-            self.module.fail_json(
-                msg="Failed to create new network: %s" % f"{e}", exception=traceback.format_exc()
-            )
+            self.module.fail_json(msg="Failed to create new network: %s" % f"{e}", exception=traceback.format_exc())
 
         if self.module.params["wait"] is True:
             network = self._wait_for_network_state(network.id, "NORMAL")

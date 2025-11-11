@@ -127,9 +127,7 @@ def sensu_subscription(module, path, name, state="present", backup=False):
         try:
             open(path, "w").write(json.dumps(config, indent=2) + "\n")
         except IOError as e:
-            module.fail_json(
-                msg="Failed to write to file %s: %s" % (path, f"{e}"), exception=traceback.format_exc()
-            )
+            module.fail_json(msg="Failed to write to file %s: %s" % (path, f"{e}"), exception=traceback.format_exc())
 
     return changed, reasons
 
