@@ -102,7 +102,6 @@ import os
 
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 with deps.declare("pycdlib"):
     import pycdlib
@@ -278,7 +277,7 @@ def iso_rebuild(module, src_iso, dest_iso, delete_files_list, add_files_list):
 
         iso.write(dest_iso)
     except Exception as err:
-        msg = f"Failed to rebuild ISO {src_iso} with error: {to_native(err)}"
+        msg = f"Failed to rebuild ISO {src_iso} with error: {err}"
         module.fail_json(msg=msg)
     finally:
         if iso:

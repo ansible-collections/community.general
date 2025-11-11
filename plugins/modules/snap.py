@@ -172,7 +172,6 @@ import re
 import json
 import numbers
 
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.snap import snap_runner, get_version
@@ -263,7 +262,7 @@ class Snap(StateModuleHelper):
                     results_run_info.append(ctx.run_info)
 
         return (
-            "; ".join([to_native(x) for x in results_cmd]),
+            "; ".join([x for x in results_cmd]),
             self._first_non_zero(results_rc),
             "\n".join(results_out),
             "\n".join(results_err),

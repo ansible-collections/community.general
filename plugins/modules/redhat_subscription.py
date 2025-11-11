@@ -1157,7 +1157,7 @@ def main():
         try:
             syspurpose_changed = SysPurpose().update_syspurpose(syspurpose)
         except Exception as err:
-            module.fail_json(msg=f"Failed to update syspurpose attributes: {to_native(err)}")
+            module.fail_json(msg=f"Failed to update syspurpose attributes: {err}")
 
     # Ensure system is registered
     if state == "present":

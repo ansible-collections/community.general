@@ -370,13 +370,14 @@ LXML_IMP_ERR = None
 try:
     from lxml import etree, objectify
 
+    LXML_VERSION_STR = ".".join(str(f) for f in etree.LXML_VERSION)
     HAS_LXML = True
 except ImportError:
     LXML_IMP_ERR = traceback.format_exc()
     HAS_LXML = False
 
 from ansible.module_utils.basic import AnsibleModule, json_dict_bytes_to_unicode, missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 
 _IDENT = r"[a-zA-Z-][a-zA-Z0-9_\-\.]*"
 _NSIDENT = f"{_IDENT}|{_IDENT}:{_IDENT}"
@@ -927,9 +928,9 @@ def main():
     # Check if we have lxml 2.3.0 or newer installed
     if not HAS_LXML:
         module.fail_json(msg=missing_required_lib("lxml"), exception=LXML_IMP_ERR)
-    elif LooseVersion(".".join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion("2.3.0"):
+    elif LooseVersion(LXML_VERSION_STR) < LooseVersion("2.3.0"):
         module.fail_json(msg="The xml ansible module requires lxml 2.3.0 or newer installed on the managed machine")
-    elif LooseVersion(".".join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion("3.0.0"):
+    elif LooseVersion(LXML_VERSION_STR) < LooseVersion("3.0.0"):
         module.warn("Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.")
 
     infile = None

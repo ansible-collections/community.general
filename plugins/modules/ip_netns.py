@@ -49,7 +49,6 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_text
 
 
 class Namespace:
@@ -68,7 +67,7 @@ class Namespace:
         """Check if the namespace already exists"""
         rc, out, err = self.module.run_command(["ip", "netns", "list"])
         if rc != 0:
-            self.module.fail_json(msg=to_text(err))
+            self.module.fail_json(msg=f"{err}")
         return self.name in out
 
     def add(self):
