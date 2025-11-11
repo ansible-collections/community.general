@@ -263,7 +263,6 @@ result:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 import_nomad = None
 try:
@@ -314,7 +313,7 @@ def run():
         for job in job_list:
             result.append(nomad_client.job.get_job(job.get("ID")))
     except Exception as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
     if module.params.get("name"):
         filter = list()
@@ -326,7 +325,7 @@ def run():
             if not filter:
                 module.fail_json(msg=f"Couldn't find Job with id {module.params['name']}")
         except Exception as e:
-            module.fail_json(msg=to_native(e))
+            module.fail_json(msg=f"{e}")
 
     module.exit_json(changed=changed, result=result)
 

@@ -86,7 +86,6 @@ import traceback
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 RELEASE_VER = platform.release()
 MODULES_LOAD_LOCATION = "/etc/modules-load.d"
@@ -260,7 +259,7 @@ class Modprobe:
                             is_loaded = True
                             break
         except (IOError, OSError) as e:
-            self.module.fail_json(msg=to_native(e), exception=traceback.format_exc(), **self.result)
+            self.module.fail_json(msg=f"{e}", exception=traceback.format_exc(), **self.result)
 
         return is_loaded
 

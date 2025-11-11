@@ -172,7 +172,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
-from ansible.module_utils.common.text.converters import to_native
 
 
 class GroupIPAClient(IPAClient):
@@ -358,7 +357,7 @@ def main():
         changed, group = ensure(module, client)
         module.exit_json(changed=changed, group=group)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":

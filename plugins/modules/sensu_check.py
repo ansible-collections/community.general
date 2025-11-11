@@ -184,7 +184,6 @@ import json
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def sensu_check(module, path, name, state="present", backup=False):
@@ -203,7 +202,7 @@ def sensu_check(module, path, name, state="present", backup=False):
                     return changed, reasons
                 config = {}
             else:
-                module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+                module.fail_json(msg=f"{e}", exception=traceback.format_exc())
         except ValueError:
             msg = f"{path} contains invalid JSON"
             module.fail_json(msg=msg)
@@ -325,7 +324,7 @@ def sensu_check(module, path, name, state="present", backup=False):
                 stream = open(path, "w")
                 stream.write(json.dumps(config, indent=2) + "\n")
             except IOError as e:
-                module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+                module.fail_json(msg=f"{e}", exception=traceback.format_exc())
         finally:
             if stream:
                 stream.close()

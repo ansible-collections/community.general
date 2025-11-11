@@ -70,7 +70,6 @@ import struct
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def wakeonlan(module, mac, broadcast, port):
@@ -107,7 +106,7 @@ def wakeonlan(module, mac, broadcast, port):
             sock.sendto(data, (broadcast, port))
         except socket.error as e:
             sock.close()
-            module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
     sock.close()
 
