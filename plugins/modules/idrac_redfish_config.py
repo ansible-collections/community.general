@@ -170,8 +170,7 @@ class IdracRedfishUtils(RedfishUtils):
             check_required_arguments(required_arg_spec, self.module.params)
 
         except TypeError as e:
-            msg = f"{e}"
-            self.module.fail_json(msg=msg)
+            self.module.fail_json(msg=f"{e}")
 
         key = "Attributes"
         command_manager_attributes_uri_map = {
