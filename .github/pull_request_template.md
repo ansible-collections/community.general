@@ -4,7 +4,7 @@
 <!--- HINT: Include "Fixes #nnn" if you are fixing an existing issue -->
 
 <!--- Please do not forget to include a changelog fragment:
-      https://docs.ansible.com/ansible/devel/community/collection_development_process.html#creating-changelog-fragments
+      https://docs.ansible.com/projects/ansible/devel/community/collection_development_process.html#creating-changelog-fragments
       No need to include one for docs-only or test-only PR, and for new plugin/module PRs.
       Read about more details in CONTRIBUTING.md.
       -->

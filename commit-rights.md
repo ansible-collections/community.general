@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 Committers Guidelines for community.general
 ===========================================
 
-This document is based on the [Ansible committer guidelines](https://github.com/ansible/ansible/blob/b57444af14062ec96e0af75fdfc2098c74fe2d9a/docs/docsite/rst/community/committer_guidelines.rst) ([latest version](https://docs.ansible.com/ansible/devel/community/committer_guidelines.html)).
+This document is based on the [Ansible committer guidelines](https://github.com/ansible/ansible/blob/b57444af14062ec96e0af75fdfc2098c74fe2d9a/docs/docsite/rst/community/committer_guidelines.rst) ([latest version](https://docs.ansible.com/projects/ansible/devel/community/committer_guidelines.html)).
 
 These are the guidelines for people with commit privileges on the Ansible Community General Collection GitHub repository. Please read the guidelines before you commit.
 
@@ -45,7 +45,7 @@ Individuals with direct commit access to this collection repository are entruste
   - Do not commit directly.
   - Do not merge your own PRs. Someone else should have a chance to review and approve the PR merge. You have a small amount of leeway here for very minor changes.
   - Do not forget about non-standard / alternate environments. Consider the alternatives. Yes, people have bad/unusual/strange environments (like binaries from multiple init systems installed), but they are the ones who need us the most.
-  - Do not drag your community team members down. Discuss the technical merits of any pull requests you review. Avoid negativity and personal comments. For more guidance on being a good community member, read the [Ansible Community Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
+  - Do not drag your community team members down. Discuss the technical merits of any pull requests you review. Avoid negativity and personal comments. For more guidance on being a good community member, read the [Ansible Community Code of Conduct](https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html).
   - Do not forget about the maintenance burden. High-maintenance features may not be worth adding.
   - Do not break playbooks. Always keep backwards compatibility in mind.
   - Do not forget to keep it simple. Complexity breeds all kinds of problems.
