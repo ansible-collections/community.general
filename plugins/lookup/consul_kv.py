@@ -170,7 +170,7 @@ class LookupModule(LookupBase):
                     else:
                         values.append(to_text(results[1]["Value"]))
         except Exception as e:
-            raise AnsibleError(f"Error locating '{term}' in kv store. Error was {e}")
+            raise AnsibleError(f"Error locating '{term}' in kv store. Error was {e}") from e
 
         return values
 
@@ -194,6 +194,6 @@ class LookupModule(LookupBase):
                         raise AnsibleAssertionError(f"{name} not a valid consul lookup parameter")
                     paramvals[name] = value
         except (ValueError, AssertionError) as e:
-            raise AnsibleError(e)
+            raise AnsibleError(e) from e
 
         return paramvals

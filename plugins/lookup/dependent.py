@@ -174,7 +174,7 @@ class LookupModule(LookupBase):
             try:
                 values = self.__evaluate(expression, templar, variables=vars)
             except Exception as e:
-                raise AnsibleLookupError(f'Caught "{e}" while evaluating {key!r} with item == {current!r}')
+                raise AnsibleLookupError(f'Caught "{e}" while evaluating {key!r} with item == {current!r}') from e
 
         if isinstance(values, Mapping):
             for idx, val in sorted(values.items()):

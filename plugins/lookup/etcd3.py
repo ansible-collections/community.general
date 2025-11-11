@@ -167,7 +167,7 @@ def etcd3_client(client_params):
         etcd = etcd3.client(**client_params)
         etcd.status()
     except Exception as exp:
-        raise AnsibleLookupError(f"Cannot connect to etcd cluster: {exp}")
+        raise AnsibleLookupError(f"Cannot connect to etcd cluster: {exp}") from exp
     return etcd
 
 

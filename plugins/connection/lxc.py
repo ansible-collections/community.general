@@ -173,9 +173,9 @@ class Connection(ConnectionBase):
             raise errors.AnsibleFileNotFound(msg)
         try:
             src_file = open(in_path, "rb")
-        except IOError:
+        except IOError as e:
             traceback.print_exc()
-            raise errors.AnsibleError(f"failed to open input file to {in_path}")
+            raise errors.AnsibleError(f"failed to open input file to {in_path}") from e
         try:
 
             def write_file(args):
@@ -184,10 +184,10 @@ class Connection(ConnectionBase):
 
             try:
                 self.container.attach_wait(write_file, None)
-            except IOError:
+            except IOError as e:
                 traceback.print_exc()
                 msg = f"failed to transfer file to {out_path}"
-                raise errors.AnsibleError(msg)
+                raise errors.AnsibleError(msg) from e
         finally:
             src_file.close()
 
@@ -200,10 +200,10 @@ class Connection(ConnectionBase):
 
         try:
             dst_file = open(out_path, "wb")
-        except IOError:
+        except IOError as e:
             traceback.print_exc()
             msg = f"failed to open output file {out_path}"
-            raise errors.AnsibleError(msg)
+            raise errors.AnsibleError(msg) from e
         try:
 
             def write_file(args):
@@ -217,10 +217,10 @@ class Connection(ConnectionBase):
 
             try:
                 self.container.attach_wait(write_file, None)
-            except IOError:
+            except IOError as e:
                 traceback.print_exc()
                 msg = f"failed to transfer file from {in_path} to {out_path}"
-                raise errors.AnsibleError(msg)
+                raise errors.AnsibleError(msg) from e
         finally:
             dst_file.close()
 

@@ -478,11 +478,11 @@ class Connection(ConnectionBase):
                 except IOError:
                     pass  # file was not found, but not required to function
                 except paramiko.hostkeys.InvalidHostKey as e:
-                    raise AnsibleConnectionFailure(f"Invalid host key: {to_text(e.line)}")
+                    raise AnsibleConnectionFailure(f"Invalid host key: {to_text(e.line)}") from e
             try:
                 ssh.load_system_host_keys()
             except paramiko.hostkeys.InvalidHostKey as e:
-                raise AnsibleConnectionFailure(f"Invalid host key: {to_text(e.line)}")
+                raise AnsibleConnectionFailure(f"Invalid host key: {to_text(e.line)}") from e
 
         ssh_connect_kwargs = self._parse_proxy_command(port)
         ssh.set_missing_host_key_policy(MyAddPolicy(self))
@@ -518,22 +518,24 @@ class Connection(ConnectionBase):
                 **ssh_connect_kwargs,
             )
         except paramiko.ssh_exception.BadHostKeyException as e:
-            raise AnsibleConnectionFailure(f"host key mismatch for {to_text(e.hostname)}")
+            raise AnsibleConnectionFailure(f"host key mismatch for {to_text(e.hostname)}") from e
         except paramiko.ssh_exception.AuthenticationException as e:
             msg = f"Failed to authenticate: {e}"
-            raise AnsibleAuthenticationFailure(msg)
+            raise AnsibleAuthenticationFailure(msg) from e
         except Exception as e:
             msg = to_text(e)
             if "PID check failed" in msg:
-                raise AnsibleError("paramiko version issue, please upgrade paramiko on the machine running ansible")
+                raise AnsibleError(
+                    "paramiko version issue, please upgrade paramiko on the machine running ansible"
+                ) from e
             elif "Private key file is encrypted" in msg:
                 msg = (
                     f"ssh {self.get_option('remote_user')}@{self.get_options('remote_addr')}:{port} : "
                     f"{msg}\nTo connect as a different user, use -u <username>."
                 )
-                raise AnsibleConnectionFailure(msg)
+                raise AnsibleConnectionFailure(msg) from e
             else:
-                raise AnsibleConnectionFailure(msg)
+                raise AnsibleConnectionFailure(msg) from e
         self.ssh = ssh
         self._connected = True
         return self
@@ -609,7 +611,7 @@ class Connection(ConnectionBase):
             msg = "Failed to open session"
             if text_e:
                 msg += f": {text_e}"
-            raise AnsibleConnectionFailure(to_native(msg))
+            raise AnsibleConnectionFailure(to_native(msg)) from e
 
         display.vvv(f"EXEC {cmd}", host=self.get_option("remote_addr"))
 
@@ -665,8 +667,8 @@ class Connection(ConnectionBase):
             elif in_data == b"":
                 chan.shutdown_write()
 
-        except socket.timeout:
-            raise AnsibleError(f"ssh timed out waiting for privilege escalation.\n{to_text(become_output)}")
+        except socket.timeout as e:
+            raise AnsibleError(f"ssh timed out waiting for privilege escalation.\n{to_text(become_output)}") from e
 
         stdout = b"".join(chan.makefile("rb", bufsize))
         stderr = b"".join(chan.makefile_stderr("rb", bufsize))
@@ -699,7 +701,7 @@ class Connection(ConnectionBase):
                     )
                 raise AnsibleError(f"{to_text(stdout)}\n{to_text(stderr)}")
         except Exception as e:
-            raise AnsibleError(f"error occurred while putting file from {in_path} to {out_path}!\n{to_text(e)}")
+            raise AnsibleError(f"error occurred while putting file from {in_path} to {out_path}!\n{to_text(e)}") from e
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
         """save a remote file to the specified path"""
@@ -718,7 +720,7 @@ class Connection(ConnectionBase):
             with open(out_path, "wb") as f:
                 f.write(stdout)
         except Exception as e:
-            raise AnsibleError(f"error occurred while fetching file from {in_path} to {out_path}!\n{to_text(e)}")
+            raise AnsibleError(f"error occurred while fetching file from {in_path} to {out_path}!\n{to_text(e)}") from e
 
     def reset(self) -> None:
         """reset the connection"""
@@ -772,16 +774,16 @@ class Connection(ConnectionBase):
                         self._save_ssh_host_keys(tmp_keyfile_name)
 
                     os.rename(tmp_keyfile_name, self.keyfile)
-            except LockTimeout:
+            except LockTimeout as e:
                 raise AnsibleError(
                     f"writing lock file for {self.keyfile} ran in to the timeout of {self.get_option('lock_file_timeout')}s"
-                )
+                ) from e
             except paramiko.hostkeys.InvalidHostKey as e:
-                raise AnsibleConnectionFailure(f"Invalid host key: {e.line}")
+                raise AnsibleConnectionFailure(f"Invalid host key: {e.line}") from e
             except Exception as e:
                 # unable to save keys, including scenario when key was invalid
                 # and caught earlier
-                raise AnsibleError(f"error occurred while writing SSH host keys!\n{to_text(e)}")
+                raise AnsibleError(f"error occurred while writing SSH host keys!\n{to_text(e)}") from e
             finally:
                 if tmp_keyfile_name is not None:
                     pathlib.Path(tmp_keyfile_name).unlink(missing_ok=True)

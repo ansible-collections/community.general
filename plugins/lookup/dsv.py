@@ -109,8 +109,8 @@ class LookupModule(LookupBase):
         try:
             vault = SecretsVault(**vault_parameters)
             return vault
-        except TypeError:
-            raise AnsibleError("python-dsv-sdk==0.0.1 must be installed to use this plugin")
+        except TypeError as e:
+            raise AnsibleError("python-dsv-sdk==0.0.1 must be installed to use this plugin") from e
 
     def run(self, terms, variables, **kwargs):
         if sdk_is_missing:
@@ -140,5 +140,5 @@ class LookupModule(LookupBase):
                 display.vvv(f"DevOps Secrets Vault GET /secrets/{path}")
                 result.append(vault.get_secret_json(path))
             except SecretsVaultError as error:
-                raise AnsibleError(f"DevOps Secrets Vault lookup failure: {error.message}")
+                raise AnsibleError(f"DevOps Secrets Vault lookup failure: {error.message}") from error
         return result

@@ -96,7 +96,7 @@ class ActionModule(ActionBase):
             display.debug(f"{self._task.action}: distribution: {distribution}")
             return distribution
         except KeyError as ke:
-            raise AnsibleError(f'Failed to get distribution information. Missing "{ke.args[0]}" in output.')
+            raise AnsibleError(f'Failed to get distribution information. Missing "{ke.args[0]}" in output.') from ke
 
     def get_shutdown_command(self, task_vars, distribution):
         def find_command(command, find_search_paths):
@@ -124,10 +124,10 @@ class ActionModule(ActionBase):
             incorrect_type = any(not is_string(x) for x in search_paths)
             if not isinstance(search_paths, list) or incorrect_type:
                 raise TypeError
-        except TypeError:
+        except TypeError as e:
             # Error if we didn't get a list
             err_msg = f"'search_paths' must be a string or flat list of strings, got {search_paths}"
-            raise AnsibleError(err_msg)
+            raise AnsibleError(err_msg) from e
 
         full_path = find_command(shutdown_bin, search_paths)  # find the path to the shutdown command
         if not full_path:  # if we could not find the shutdown command

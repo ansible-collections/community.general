@@ -93,8 +93,8 @@ class Connection(ConnectionBase):
 
         try:
             self._lxc_cmd = get_bin_path("lxc")
-        except ValueError:
-            raise AnsibleError("lxc command not found in PATH")
+        except ValueError as e:
+            raise AnsibleError("lxc command not found in PATH") from e
 
     def _host(self):
         """translate remote_addr to lxd (short) hostname"""

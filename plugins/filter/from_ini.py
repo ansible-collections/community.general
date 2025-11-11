@@ -79,7 +79,7 @@ def from_ini(obj):
     try:
         parser.read_file(StringIO(obj))
     except Exception as ex:
-        raise AnsibleFilterError(f"from_ini failed to parse given string: {ex}", orig_exc=ex)
+        raise AnsibleFilterError(f"from_ini failed to parse given string: {ex}", orig_exc=ex) from ex
 
     return parser.as_dict()
 
