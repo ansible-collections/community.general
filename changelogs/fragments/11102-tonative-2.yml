@@ -1,0 +1,13 @@
+minor_changes:
+  - atomic_container - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - circonus_annotation - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - dimensiondata_network - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - jenkins_plugin - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - ldap_attrs - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - ldap_entry - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - ldap_inc - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - onepassword_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - sensu_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - statusio_maintenance - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+  - vmadm - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
