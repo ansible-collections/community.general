@@ -1,0 +1,6 @@
+minor_changes:
+  - filesize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+  - ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+  - ipa_subca - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+  - jira - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+  - ldap_search - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
