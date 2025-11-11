@@ -278,7 +278,8 @@ def main():
         if system:
             # Update existing entry
             system_id = ""
-            if LooseVersion(str(conn.version())) >= LooseVersion("3.400"):
+            # https://github.com/cobbler/cobbler/blame/v3.3.7/cobbler/api.py#L277
+            if float(conn.version()) >= 3.4:
                 system_id = conn.get_system_handle(name)
             else:
                 system_id = conn.get_system_handle(name, token)
