@@ -13,7 +13,7 @@ module: consul_kv
 short_description: Manipulate entries in the key/value store of a Consul cluster
 description:
   - Allows the retrieval, addition, modification and deletion of key/value entries in a Consul cluster using the agent. The
-    entire contents of the record, including the indices, flags and session are returned as C(value).
+    entire contents of the record, including the indices, flags and session are returned as RV(ignore:value).
   - If the O(key) represents a prefix then note that when a value is removed, the existing value if any is returned as part
     of the results.
   - See http://www.consul.io/docs/agent/http.html#kv for more details.
@@ -34,11 +34,11 @@ options:
   state:
     description:
       - The action to take with the supplied key and value. If the state is V(present) and O(value) is set, the key contents
-        is set to the value supplied and C(changed) is set to V(true) only if the value was different to the current contents.
+        is set to the value supplied and RV(ignore:changed) is set to V(true) only if the value was different to the current contents.
         If the state is V(present) and O(value) is not set, the existing value associated to the key is returned. The state
-        V(absent) is used to remove the key/value pair, again C(changed) is set to V(true) only if the key actually existed
+        V(absent) is used to remove the key/value pair, again RV(ignore:changed) is set to V(true) only if the key actually existed
         prior to the removal. An attempt can be made to obtain or free the lock associated with a key/value pair with the
-        states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt C(changed) is V(true)
+        states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt RV(ignore:changed) is V(true)
         if the attempt is successful, V(false) otherwise.
     type: str
     choices: [absent, acquire, present, release]
