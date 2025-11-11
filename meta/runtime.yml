@@ -1032,7 +1032,7 @@ plugin_routing:
     spotinst_aws_elastigroup:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Module Module relies on unsupported Python package. Use the module spot.cloud_modules.aws_elastigroup instead.
+        warning_text: Module relies on unsupported Python package. Use the module spot.cloud_modules.aws_elastigroup instead.
     stackdriver:
       tombstone:
         removal_version: 9.0.0
