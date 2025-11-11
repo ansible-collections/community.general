@@ -9,7 +9,6 @@ from __future__ import annotations
 import traceback
 from contextlib import contextmanager
 
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import missing_required_lib
 
 
@@ -40,7 +39,7 @@ class _Dependency:
     @property
     def message(self):
         if self.msg:
-            return to_native(self.msg)
+            return self.msg
         else:
             return missing_required_lib(self.name, reason=self.reason, url=self.url)
 

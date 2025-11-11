@@ -200,16 +200,14 @@ def _token_request(module_params, payload):
 
     try:
         r = json.loads(
-            to_native(
-                open_url(
-                    auth_url,
-                    method="POST",
-                    validate_certs=validate_certs,
-                    http_agent=http_agent,
-                    timeout=connection_timeout,
-                    data=urlencode(payload),
-                ).read()
-            )
+            open_url(
+                auth_url,
+                method="POST",
+                validate_certs=validate_certs,
+                http_agent=http_agent,
+                timeout=connection_timeout,
+                data=urlencode(payload),
+            ).read()
         )
 
         return r["access_token"]
@@ -467,7 +465,7 @@ class KeycloakAPI:
         :param data: (optional) data for request
         :return: raw API response
         """
-        return json.loads(to_native(self._request(url, method, data).read()))
+        return json.loads(self._request(url, method, data).read())
 
     def get_realm_info_by_id(self, realm="master"):
         """Obtain realm public info by id

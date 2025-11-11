@@ -12,7 +12,6 @@ from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse
 
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.common.text.converters import to_native
 
 
 GET_HEADERS = {"accept": "application/json"}
@@ -58,7 +57,7 @@ class OcapiUtils:
                 use_proxy=True,
                 timeout=self.timeout,
             )
-            data = json.loads(to_native(resp.read()))
+            data = json.loads(resp.read())
             headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {"ret": False, "msg": f"HTTP Error {e.code} on GET request to '{uri}'", "status": e.code}
@@ -88,7 +87,7 @@ class OcapiUtils:
                 timeout=self.timeout,
             )
             if resp.status != 204:
-                data = json.loads(to_native(resp.read()))
+                data = json.loads(resp.read())
             else:
                 data = ""
             headers = {k.lower(): v for (k, v) in resp.info().items()}
@@ -307,7 +306,7 @@ class OcapiUtils:
         """
         boundary = str(uuid.uuid4())  # Generate a random boundary
         body = f"--{boundary}\r\n"
-        body += f'Content-Disposition: form-data; name="FirmwareFile"; filename="{to_native(os.path.basename(filename))}"\r\n'
+        body += f'Content-Disposition: form-data; name="FirmwareFile"; filename="{os.path.basename(filename)}"\r\n'
         body += "Content-Type: application/octet-stream\r\n\r\n"
         body_bytes = bytearray(body, "utf-8")
         with open(filename, "rb") as f:

@@ -7,12 +7,10 @@ from __future__ import annotations
 
 import typing as t
 
-from ansible.module_utils.common.text.converters import to_native
-
 
 class ModuleHelperException(Exception):
     def __init__(self, msg: str, update_output: dict[str, t.Any] | None = None, *args, **kwargs):
-        self.msg: str = to_native(msg or f"Module failed with exception: {self}")
+        self.msg: str = msg or f"Module failed with exception: {self}"
         if update_output is None:
             update_output = {}
         self.update_output: dict[str, t.Any] = update_output

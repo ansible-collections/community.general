@@ -11,7 +11,6 @@ import random
 import string
 import time
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.common.text.converters import to_bytes
 from urllib.error import URLError, HTTPError
@@ -185,7 +184,7 @@ class RedfishUtils:
                 timeout=timeout,
             )
             try:
-                data = json.loads(to_native(resp.read()))
+                data = json.loads(resp.read())
             except Exception:
                 # No response data; this is okay in certain cases
                 data = None
@@ -232,7 +231,7 @@ class RedfishUtils:
                 force_basic_auth=basic_auth,
             )
             try:
-                data = json.loads(to_native(resp.read()))
+                data = json.loads(resp.read())
             except Exception:
                 # No response data; this is okay in many cases
                 data = None
@@ -406,9 +405,7 @@ class RedfishUtils:
             # Insert the headers (Content-Disposition and Content-Type)
             if "filename" in fields[form]:
                 name = os.path.basename(fields[form]["filename"]).replace('"', '\\"')
-                write_buffer(
-                    body, f'Content-Disposition: form-data; name="{to_text(form)}"; filename="{to_text(name)}"'
-                )
+                write_buffer(body, f'Content-Disposition: form-data; name="{to_text(form)}"; filename="{name}"')
             else:
                 write_buffer(body, f'Content-Disposition: form-data; name="{form}"')
             write_buffer(body, f"Content-Type: {fields[form]['mime_type']}")

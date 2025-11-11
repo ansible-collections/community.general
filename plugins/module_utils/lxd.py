@@ -13,7 +13,6 @@ import json
 from urllib.parse import urlparse
 
 from ansible.module_utils.urls import generic_urlparse
-from ansible.module_utils.common.text.converters import to_text
 
 # httplib/http.client connection using unix domain socket
 HTTPConnection = http_client.HTTPConnection
@@ -98,7 +97,6 @@ class LXDClient:
             self.connection.request(method, url, body=body)
             resp = self.connection.getresponse()
             resp_data = resp.read()
-            resp_data = to_text(resp_data, errors="surrogate_or_strict")
             resp_json = json.loads(resp_data)
             self.logs.append(
                 {
