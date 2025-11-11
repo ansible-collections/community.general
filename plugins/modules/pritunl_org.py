@@ -77,7 +77,6 @@ response:
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api import (
     PritunlException,
@@ -188,7 +187,7 @@ def main():
         elif state == "absent":
             remove_pritunl_organization(module)
     except PritunlException as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
 
 if __name__ == "__main__":

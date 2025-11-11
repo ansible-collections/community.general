@@ -159,7 +159,6 @@ EXAMPLES = r"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class Sudoers:
@@ -311,7 +310,7 @@ def main():
         changed = sudoers.run()
         module.exit_json(changed=changed)
     except Exception as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
 
 if __name__ == "__main__":

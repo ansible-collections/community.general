@@ -250,7 +250,6 @@ except Exception:
     HAS_DATADOG = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -370,7 +369,7 @@ def _post_monitor(module, options):
         else:
             module.exit_json(changed=True, msg=msg)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 def _equal_dicts(a, b, ignore_keys):
@@ -403,7 +402,7 @@ def _update_monitor(module, monitor, options):
         else:
             module.exit_json(changed=True, msg=msg)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 def install_monitor(module):
@@ -448,7 +447,7 @@ def delete_monitor(module):
         msg = api.Monitor.delete(monitor["id"])
         module.exit_json(changed=True, msg=msg)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 def mute_monitor(module):
@@ -471,7 +470,7 @@ def mute_monitor(module):
             msg = api.Monitor.mute(id=monitor["id"], silenced=module.params["silenced"])
         module.exit_json(changed=True, msg=msg)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 def unmute_monitor(module):
@@ -484,7 +483,7 @@ def unmute_monitor(module):
         msg = api.Monitor.unmute(monitor["id"])
         module.exit_json(changed=True, msg=msg)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":

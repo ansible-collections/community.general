@@ -311,7 +311,7 @@ def main():
         check_mutually_exclusive(CATEGORY_COMMANDS_MUTUALLY_EXCLUSIVE[category], dict.fromkeys(command_list, True))
 
     except TypeError as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
     # Organize by Categories / Commands
 

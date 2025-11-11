@@ -155,7 +155,7 @@ def run():
                 try:
                     job_json = json.loads(job_json)
                 except ValueError as e:
-                    module.fail_json(msg=to_native(e))
+                    module.fail_json(msg=f"{e}")
                 job = dict()
                 job["job"] = job_json
                 try:
@@ -172,7 +172,7 @@ def run():
                     else:
                         result = plan
                 except Exception as e:
-                    module.fail_json(msg=to_native(e))
+                    module.fail_json(msg=f"{e}")
 
             if module.params.get("content_format") == "hcl":
                 try:
@@ -195,7 +195,7 @@ def run():
                     else:
                         result = plan
                 except Exception as e:
-                    module.fail_json(msg=to_native(e))
+                    module.fail_json(msg=f"{e}")
 
         if module.params.get("force_start"):
             try:
@@ -220,7 +220,7 @@ def run():
                         result = json.loads(result.text)
                     changed = True
             except Exception as e:
-                module.fail_json(msg=to_native(e))
+                module.fail_json(msg=f"{e}")
 
     if module.params.get("state") == "absent":
         try:
@@ -244,7 +244,7 @@ def run():
                     result = job
                 changed = True
         except Exception as e:
-            module.fail_json(msg=to_native(e))
+            module.fail_json(msg=f"{e}")
 
     module.exit_json(changed=changed, result=result)
 

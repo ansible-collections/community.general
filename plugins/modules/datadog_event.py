@@ -137,7 +137,6 @@ except Exception:
     HAS_DATADOG = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -193,7 +192,7 @@ def _post_event(module):
 
         module.exit_json(changed=True, msg=msg)
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":
