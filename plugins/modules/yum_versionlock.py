@@ -113,9 +113,7 @@ class YumVersionLock:
         if rc == 0:
             return out
         elif rc == 1 and "o such command:" in err:
-            self.module.fail_json(
-                msg=f"Error: Please install rpm package yum-plugin-versionlock : {err}{out}"
-            )
+            self.module.fail_json(msg=f"Error: Please install rpm package yum-plugin-versionlock : {err}{out}")
         self.module.fail_json(msg=f"Error: {err}{out}")
 
     def ensure_state(self, packages, command):
