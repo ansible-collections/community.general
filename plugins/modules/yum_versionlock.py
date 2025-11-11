@@ -88,7 +88,6 @@ state:
 
 import re
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from fnmatch import fnmatch
 
 # on DNF-based distros, yum is a symlink to dnf, so we try to handle their different entry formats.
@@ -114,10 +113,8 @@ class YumVersionLock:
         if rc == 0:
             return out
         elif rc == 1 and "o such command:" in err:
-            self.module.fail_json(
-                msg=f"Error: Please install rpm package yum-plugin-versionlock : {to_native(err)}{to_native(out)}"
-            )
-        self.module.fail_json(msg=f"Error: {to_native(err)}{to_native(out)}")
+            self.module.fail_json(msg=f"Error: Please install rpm package yum-plugin-versionlock : {err}{out}")
+        self.module.fail_json(msg=f"Error: {err}{out}")
 
     def ensure_state(self, packages, command):
         """Ensure packages state"""
@@ -127,7 +124,7 @@ class YumVersionLock:
             self.module.fail_json(msg=out)
         if rc == 0:
             return True
-        self.module.fail_json(msg=f"Error: {to_native(err)}{to_native(out)}")
+        self.module.fail_json(msg=f"Error: {err}{out}")
 
 
 def match(entry, name):
