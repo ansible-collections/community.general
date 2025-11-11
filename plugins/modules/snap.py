@@ -262,7 +262,7 @@ class Snap(StateModuleHelper):
                     results_run_info.append(ctx.run_info)
 
         return (
-            "; ".join([x for x in results_cmd]),
+            "; ".join(results_cmd),
             self._first_non_zero(results_rc),
             "\n".join(results_out),
             "\n".join(results_err),
