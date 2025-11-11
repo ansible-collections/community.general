@@ -69,7 +69,6 @@ except ImportError:
     SEOBJECT_IMP_ERR = traceback.format_exc()
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -96,7 +95,7 @@ def main():
     try:
         permissive_domains = seobject.permissiveRecords(store)
     except ValueError as e:
-        module.fail_json(domain=domain, msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(domain=domain, msg=f"{e}", exception=traceback.format_exc())
 
     # not supported on EL 6
     if "set_reload" in dir(permissive_domains):
@@ -105,7 +104,7 @@ def main():
     try:
         all_domains = permissive_domains.get_all()
     except ValueError as e:
-        module.fail_json(domain=domain, msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(domain=domain, msg=f"{e}", exception=traceback.format_exc())
 
     if permissive:
         if domain not in all_domains:
@@ -113,7 +112,7 @@ def main():
                 try:
                     permissive_domains.add(domain)
                 except ValueError as e:
-                    module.fail_json(domain=domain, msg=to_native(e), exception=traceback.format_exc())
+                    module.fail_json(domain=domain, msg=f"{e}", exception=traceback.format_exc())
             changed = True
     else:
         if domain in all_domains:
@@ -121,7 +120,7 @@ def main():
                 try:
                     permissive_domains.delete(domain)
                 except ValueError as e:
-                    module.fail_json(domain=domain, msg=to_native(e), exception=traceback.format_exc())
+                    module.fail_json(domain=domain, msg=f"{e}", exception=traceback.format_exc())
             changed = True
 
     module.exit_json(changed=changed, store=store, permissive=permissive, domain=domain)

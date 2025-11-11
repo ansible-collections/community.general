@@ -140,7 +140,6 @@ except ImportError:
     HAS_HPILO = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 # Suppress warnings from hpilo
@@ -187,7 +186,7 @@ def main():
         data = ilo.get_host_data()
         power_state = ilo.get_host_power_status()
     except hpilo.IloCommunicationError as e:
-        module.fail_json(msg=to_native(e))
+        module.fail_json(msg=f"{e}")
 
     for entry in data:
         if "type" not in entry:

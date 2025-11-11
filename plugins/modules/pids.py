@@ -199,7 +199,7 @@ class Pids:
             try:
                 self._pids = self._ps.get_pids_by_pattern(self._pattern, self._ignore_case)
             except PSAdapterError as e:
-                self._module.fail_json(msg=to_native(e))
+                self._module.fail_json(msg=f"{e}")
 
         return self._module.exit_json(**self.result)
 

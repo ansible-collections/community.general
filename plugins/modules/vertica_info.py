@@ -70,7 +70,6 @@ else:
     pyodbc_found = True
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 class NotSupportedError(Exception):
@@ -293,12 +292,12 @@ def main():
             vertica_nodes=node_facts,
         )
     except NotSupportedError as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
     except SystemExit:
         # avoid catching this on python 2.4
         raise
     except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":
