@@ -166,9 +166,7 @@ def main():
     offending = [cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
 
     if offending:
-        module.fail_json(
-            msg=to_native(f"Invalid Command(s): '{offending}'. Allowed Commands = {CATEGORY_COMMANDS_ALL[category]}")
-        )
+        module.fail_json(msg=f"Invalid Command(s): '{offending}'. Allowed Commands = {CATEGORY_COMMANDS_ALL[category]}")
 
     if category == "Manager":
         resource = rf_utils._find_managers_resource()
