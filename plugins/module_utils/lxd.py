@@ -116,7 +116,7 @@ class LXDClient:
                 self._raise_err_from_json(resp_json)
             return resp_json
         except socket.error as e:
-            raise LXDClientException("cannot connect to the LXD server", err=e)
+            raise LXDClientException("cannot connect to the LXD server", err=e) from e
 
     def _raise_err_from_json(self, resp_json):
         err_params = {}

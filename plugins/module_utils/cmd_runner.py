@@ -194,7 +194,7 @@ class _CmdRunnerContext:
             except MissingArgumentValue:
                 raise
             except Exception as e:
-                raise FormatError(arg_name, value, runner.arg_formats[arg_name], e)
+                raise FormatError(arg_name, value, runner.arg_formats[arg_name], e) from e
 
         if self.check_mode_skip and module.check_mode:
             return self.check_mode_return

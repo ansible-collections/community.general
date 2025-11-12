@@ -775,7 +775,7 @@ class JIRA(StateModuleHelper):
             try:
                 content = base64.b64decode(content)
             except binascii.Error as e:
-                raise Exception(f"Unable to base64 decode file content: {e}")
+                raise Exception(f"Unable to base64 decode file content: {e}") from e
 
         lines = [
             f"--{boundary}",
