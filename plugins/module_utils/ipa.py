@@ -17,7 +17,7 @@ import socket
 import uuid
 
 import re
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.urls import fetch_url, HAS_GSSAPI
 from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
 from urllib.parse import quote
@@ -91,7 +91,7 @@ class IPAClient:
 
                 self.headers = {"Cookie": info.get("set-cookie")}
             except Exception as e:
-                self._fail("login", to_native(e))
+                self._fail("login", f"{e}")
         if not self.headers:
             self.headers = dict()
         self.headers.update(
@@ -144,7 +144,7 @@ class IPAClient:
             if status_code not in [200, 201, 204]:
                 self._fail(method, info["msg"])
         except Exception as e:
-            self._fail(f"post {method}", to_native(e))
+            self._fail(f"post {method}", f"{e}")
 
         charset = resp.headers.get_content_charset("latin-1")
         resp = json.loads(to_text(resp.read(), encoding=charset))

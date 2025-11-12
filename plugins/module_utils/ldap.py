@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import re
 import traceback
-from ansible.module_utils.common.text.converters import to_native
 
 try:
     import ldap
@@ -78,7 +77,7 @@ class LdapGeneric:
             self.dn = self.module.params["dn"]
 
     def fail(self, msg, exn):
-        self.module.fail_json(msg=msg, details=to_native(exn), exception=traceback.format_exc())
+        self.module.fail_json(msg=msg, details=f"{exn}", exception=traceback.format_exc())
 
     def _find_dn(self):
         dn = self.module.params["dn"]

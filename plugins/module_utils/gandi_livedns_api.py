@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import json
 
-from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
 
 
@@ -70,7 +69,7 @@ class GandiLiveDNSAPI:
 
         if content:
             try:
-                result = json.loads(to_text(content, errors="surrogate_or_strict"))
+                result = json.loads(content)
             except getattr(json, "JSONDecodeError", ValueError) as e:
                 error_msg += f"; Failed to parse API response with error {e}: {content}"
 

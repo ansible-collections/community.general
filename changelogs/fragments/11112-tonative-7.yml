@@ -1,0 +1,15 @@
+minor_changes:
+  - csv module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - deps module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - gandi_livedns_api module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - ibm_sa_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - keycloak module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - ipa module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - ldap module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - lxd module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - exceptions module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - ocapi_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - oneview module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - redfish_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - bitbucket module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+  - utm_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
