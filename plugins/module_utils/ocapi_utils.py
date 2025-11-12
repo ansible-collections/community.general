@@ -12,6 +12,7 @@ from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse
 
 from ansible.module_utils.urls import open_url
+from ansible.module_utils.common.text.converters import to_native
 
 
 GET_HEADERS = {"accept": "application/json"}
@@ -306,7 +307,7 @@ class OcapiUtils:
         """
         boundary = str(uuid.uuid4())  # Generate a random boundary
         body = f"--{boundary}\r\n"
-        body += f'Content-Disposition: form-data; name="FirmwareFile"; filename="{os.path.basename(filename)}"\r\n'
+        body += f'Content-Disposition: form-data; name="FirmwareFile"; filename="{to_native(os.path.basename(filename))}"\r\n'
         body += "Content-Type: application/octet-stream\r\n\r\n"
         body_bytes = bytearray(body, "utf-8")
         with open(filename, "rb") as f:

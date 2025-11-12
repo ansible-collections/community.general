@@ -39,7 +39,7 @@ class _Dependency:
     @property
     def message(self):
         if self.msg:
-            return self.msg
+            return str(self.msg)
         else:
             return missing_required_lib(self.name, reason=self.reason, url=self.url)
 
