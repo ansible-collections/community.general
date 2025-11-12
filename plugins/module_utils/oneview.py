@@ -290,7 +290,7 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
             self.module.exit_json(**result)
 
         except OneViewModuleException as exception:
-            error_msg = "; ".join(to_native(e) for e in exception.args)
+            error_msg = "; ".join(str(e) for e in exception.args)
             self.module.fail_json(msg=error_msg, exception=traceback.format_exc())
 
     def resource_absent(self, resource, method="delete"):

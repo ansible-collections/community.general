@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import json
 
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
@@ -109,7 +108,7 @@ class UTM:
             else:
                 self._info()
         except Exception as e:
-            self.module.fail_json(msg=to_native(e))
+            self.module.fail_json(msg=f"{e}")
 
     def _info(self):
         """

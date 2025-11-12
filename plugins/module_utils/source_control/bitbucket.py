@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import json
 
-from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 
@@ -94,7 +93,7 @@ class BitbucketHelper:
         content = {}
 
         if response is not None:
-            body = to_text(response.read())
+            body = response.read()
             if body:
                 content = json.loads(body)
 
