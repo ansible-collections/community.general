@@ -231,8 +231,7 @@ class RunCommandMock(TestCaseMock):
 
     def setup(self, mocker):
         def _results():
-            for result in [(x["rc"], x["out"], x["err"]) for x in self.mock_specs]:
-                yield result
+            yield from [(x["rc"], x["out"], x["err"]) for x in self.mock_specs]
             raise Exception("testcase has not enough run_command calls")
 
         results = _results()
