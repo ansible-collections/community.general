@@ -226,7 +226,7 @@ def main():
     try:
         core(module)
     except Exception as e:
-        module.fail_json(msg="Unanticipated error running atomic: %s" % f"{e}", exception=traceback.format_exc())
+        module.fail_json(msg=f"Unanticipated error running atomic: {e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":
