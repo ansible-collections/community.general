@@ -189,9 +189,7 @@ def check(schema_facts, schema, usage_roles, create_roles, owner):
         return False
     if sorted(usage_roles) != sorted(schema_facts[schema_key]["usage_roles"]):
         return False
-    if sorted(create_roles) != sorted(schema_facts[schema_key]["create_roles"]):
-        return False
-    return True
+    return sorted(create_roles) == sorted(schema_facts[schema_key]["create_roles"])
 
 
 def present(schema_facts, cursor, schema, usage_roles, create_roles, owner):

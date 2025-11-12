@@ -154,18 +154,12 @@ def query_port(module, port_path, name, state="present"):
     if state == "present":
         rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
-        if rc == 0 and out.strip().startswith(f"{name} "):
-            return True
-
-        return False
+        return rc == 0 and out.strip().startswith(f"{name} ")
 
     elif state == "active":
         rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
-        if rc == 0 and "(active)" in out:
-            return True
-
-        return False
+        return rc == 0 and "(active)" in out
 
 
 def remove_ports(module, port_path, ports, stdout, stderr):

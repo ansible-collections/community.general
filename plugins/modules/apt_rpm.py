@@ -167,10 +167,7 @@ def query_package(module, name):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
     rc, out, err = module.run_command([RPM_PATH, "-q", name])
-    if rc == 0:
-        return True
-    else:
-        return False
+    return rc == 0
 
 
 def check_package_version(module, name):
@@ -181,9 +178,7 @@ def check_package_version(module, name):
     rc, out, err = module.run_command([APT_CACHE, "policy", name], environ_update={"LANG": "C"})
     installed = re.split("\n |: ", out)[2]
     candidate = re.split("\n |: ", out)[4]
-    if installed >= candidate:
-        return True
-    return False
+    return installed >= candidate
 
 
 def query_package_provides(module, name, allow_upgrade=False):

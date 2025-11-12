@@ -139,10 +139,7 @@ def is_valid_ip_prefix(ip_prefix):
 
     ip_prefix_int = int(ip_prefix)
 
-    if ip_prefix_int < 0 or ip_prefix_int > 32:
-        return False
-
-    return True
+    return not (ip_prefix_int < 0 or ip_prefix_int > 32)
 
 
 def ip_prefix_to_netmask(ip_prefix, skip_check=False):
@@ -243,10 +240,7 @@ def is_valid_ip6_prefix(ip6_prefix):
 
     ip6_prefix_int = int(ip6_prefix)
 
-    if ip6_prefix_int < 0 or ip6_prefix_int > 128:
-        return False
-
-    return True
+    return not (ip6_prefix_int < 0 or ip6_prefix_int > 128)
 
 
 def get_object_ref(module, name, uuid=None, obj_type="VM", fail=True, msg_prefix=""):

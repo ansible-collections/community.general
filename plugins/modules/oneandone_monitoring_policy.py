@@ -446,9 +446,7 @@ def _add_ports(module, oneandone_conn, monitoring_policy_id, ports):
             monitoring_policy_ports.append(monitoring_policy_port)
 
         if module.check_mode:
-            if monitoring_policy_ports:
-                return True
-            return False
+            return bool(monitoring_policy_ports)
 
         monitoring_policy = oneandone_conn.add_port(
             monitoring_policy_id=monitoring_policy_id, ports=monitoring_policy_ports
@@ -467,9 +465,7 @@ def _delete_monitoring_policy_port(module, oneandone_conn, monitoring_policy_id,
             monitoring_policy = oneandone_conn.delete_monitoring_policy_port(
                 monitoring_policy_id=monitoring_policy_id, port_id=port_id
             )
-            if monitoring_policy:
-                return True
-            return False
+            return bool(monitoring_policy)
 
         monitoring_policy = oneandone_conn.delete_monitoring_policy_port(
             monitoring_policy_id=monitoring_policy_id, port_id=port_id
@@ -488,9 +484,7 @@ def _modify_port(module, oneandone_conn, monitoring_policy_id, port_id, port):
             cm_port = oneandone_conn.get_monitoring_policy_port(
                 monitoring_policy_id=monitoring_policy_id, port_id=port_id
             )
-            if cm_port:
-                return True
-            return False
+            return bool(cm_port)
 
         monitoring_policy_port = oneandone.client.Port(
             protocol=port["protocol"],
@@ -524,9 +518,7 @@ def _add_processes(module, oneandone_conn, monitoring_policy_id, processes):
 
         if module.check_mode:
             mp_id = get_monitoring_policy(oneandone_conn, monitoring_policy_id)
-            if monitoring_policy_processes and mp_id:
-                return True
-            return False
+            return bool(monitoring_policy_processes and mp_id)
 
         monitoring_policy = oneandone_conn.add_process(
             monitoring_policy_id=monitoring_policy_id, processes=monitoring_policy_processes
@@ -545,9 +537,7 @@ def _delete_monitoring_policy_process(module, oneandone_conn, monitoring_policy_
             process = oneandone_conn.get_monitoring_policy_process(
                 monitoring_policy_id=monitoring_policy_id, process_id=process_id
             )
-            if process:
-                return True
-            return False
+            return bool(process)
 
         monitoring_policy = oneandone_conn.delete_monitoring_policy_process(
             monitoring_policy_id=monitoring_policy_id, process_id=process_id
@@ -566,9 +556,7 @@ def _modify_process(module, oneandone_conn, monitoring_policy_id, process_id, pr
             cm_process = oneandone_conn.get_monitoring_policy_process(
                 monitoring_policy_id=monitoring_policy_id, process_id=process_id
             )
-            if cm_process:
-                return True
-            return False
+            return bool(cm_process)
 
         monitoring_policy_process = oneandone.client.Process(
             process=process["process"], alert_if=process["alert_if"], email_notification=process["email_notification"]
@@ -595,9 +583,7 @@ def _attach_monitoring_policy_server(module, oneandone_conn, monitoring_policy_i
             attach_servers.append(attach_server)
 
         if module.check_mode:
-            if attach_servers:
-                return True
-            return False
+            return bool(attach_servers)
 
         monitoring_policy = oneandone_conn.attach_monitoring_policy_server(
             monitoring_policy_id=monitoring_policy_id, servers=attach_servers
@@ -616,9 +602,7 @@ def _detach_monitoring_policy_server(module, oneandone_conn, monitoring_policy_i
             mp_server = oneandone_conn.get_monitoring_policy_server(
                 monitoring_policy_id=monitoring_policy_id, server_id=server_id
             )
-            if mp_server:
-                return True
-            return False
+            return bool(mp_server)
 
         monitoring_policy = oneandone_conn.detach_monitoring_policy_server(
             monitoring_policy_id=monitoring_policy_id, server_id=server_id

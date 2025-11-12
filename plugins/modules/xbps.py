@@ -216,10 +216,7 @@ def update_package_db(module, xbps_path):
         module.fail_json(msg="Failed to import pubkey for repository")
     if rc != 0:
         module.fail_json(msg="Could not update package db")
-    if "avg rate" in stdout:
-        return True
-    else:
-        return False
+    return "avg rate" in stdout
 
 
 def upgrade_xbps(module, xbps_path, exit_on_success=False):
