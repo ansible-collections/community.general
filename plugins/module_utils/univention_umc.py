@@ -161,8 +161,7 @@ def ldap_search(filter, base=None, attr=None):
             break
         else:
             if result_type is ldap_module().RES_SEARCH_ENTRY:
-                for res in result_data:
-                    yield res
+                yield from result_data
     uldap().lo.lo.abandon(msgid)
 
 
