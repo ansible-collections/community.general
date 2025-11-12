@@ -282,8 +282,8 @@ def absent(user_facts, cursor, user, roles):
         update_roles(user_facts, cursor, user, user_facts[user_key]["roles"], user_facts[user_key]["default_roles"], [])
         try:
             cursor.execute(f"drop user {user_facts[user_key]['name']}")
-        except pyodbc.Error:
-            raise CannotDropError("Dropping user failed due to dependencies.")
+        except pyodbc.Error as e:
+            raise CannotDropError("Dropping user failed due to dependencies.") from e
         del user_facts[user_key]
         return True
     else:

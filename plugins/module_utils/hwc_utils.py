@@ -59,14 +59,14 @@ def session_method_wrapper(f):
             url = self.endpoint + url
             r = f(self, url, *args, **kwargs)
         except Exception as ex:
-            raise HwcClientException(0, f"Sending request failed, error={ex}")
+            raise HwcClientException(0, f"Sending request failed, error={ex}") from ex
 
         result = None
         if r.content:
             try:
                 result = r.json()
             except Exception as ex:
-                raise HwcClientException(0, f"Parsing response to json failed, error: {ex}")
+                raise HwcClientException(0, f"Parsing response to json failed, error: {ex}") from ex
 
         code = r.status_code
         if code not in [200, 201, 202, 203, 204, 205, 206, 207, 208, 226]:
@@ -184,7 +184,7 @@ class Config:
         try:
             url = client.get_endpoint(service_type=service_type, region_name=region, interface="public")
         except Exception as ex:
-            raise HwcClientException(0, f"Getting endpoint failed, error={ex}")
+            raise HwcClientException(0, f"Getting endpoint failed, error={ex}") from ex
 
         if url == "":
             raise HwcClientException(0, f"Cannot find the endpoint for {service_type}")

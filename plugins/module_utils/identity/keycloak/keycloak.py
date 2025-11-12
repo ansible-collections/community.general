@@ -214,11 +214,11 @@ def _token_request(module_params, payload):
 
         return r["access_token"]
     except ValueError as e:
-        raise KeycloakError(f"API returned invalid JSON when trying to obtain access token from {auth_url}: {e}")
-    except KeyError:
-        raise KeycloakError(f"API did not include access_token field in response from {auth_url}")
+        raise KeycloakError(f"API returned invalid JSON when trying to obtain access token from {auth_url}: {e}") from e
+    except KeyError as e:
+        raise KeycloakError(f"API did not include access_token field in response from {auth_url}") from e
     except Exception as e:
-        raise KeycloakError(f"Could not obtain access token from {auth_url}: {e}", authError=e)
+        raise KeycloakError(f"Could not obtain access token from {auth_url}: {e}", authError=e) from e
 
 
 def _request_token_using_credentials(module_params):

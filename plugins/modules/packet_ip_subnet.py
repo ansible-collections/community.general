@@ -212,8 +212,8 @@ def parse_subnet_cidr(cidr):
     addr, prefixlen = cidr.split("/")
     try:
         prefixlen = int(prefixlen)
-    except ValueError:
-        raise Exception(f"Wrong prefix length in CIDR expression {cidr}")
+    except ValueError as e:
+        raise Exception(f"Wrong prefix length in CIDR expression {cidr}") from e
     return addr, prefixlen
 
 

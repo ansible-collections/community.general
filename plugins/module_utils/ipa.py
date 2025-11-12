@@ -37,7 +37,7 @@ def _env_then_dns_fallback(*args, **kwargs):
         try:
             return socket.gethostbyaddr(socket.gethostbyname("ipa-ca"))[0]
         except Exception:
-            raise AnsibleFallbackNotFound
+            raise AnsibleFallbackNotFound from None  # no need to pass the original exception's context since this is basically a special return value
 
 
 class IPAClient:

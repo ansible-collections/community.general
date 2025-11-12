@@ -322,4 +322,4 @@ def pritunl_auth_request(
             validate_certs=validate_certs,
         )
     except Exception as e:
-        raise PritunlException(e)
+        raise PritunlException(e) from e
