@@ -425,11 +425,11 @@ class XCCRedfishUtils(RedfishUtils):
                     return returndict
                 ejected_media_list.append(data.get("Image"))
 
-        if not ejected_media_list:
+        if len(ejected_media_list) == 0:
             # no media inserted: return success but changed=False
             return {"ret": True, "changed": False, "msg": "No VirtualMedia image inserted"}
         else:
-            return {"ret": True, "changed": True, "msg": f"VirtualMedia {ejected_media_list} ejected"}
+            return {"ret": True, "changed": True, "msg": f"VirtualMedia {ejected_media_list!s} ejected"}
 
     def virtual_media_insert(self, options):
         param_map = {
