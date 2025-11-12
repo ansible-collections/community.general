@@ -160,7 +160,7 @@ modlist:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.general.plugins.module_utils.ldap import (
     LdapGeneric,
     gen_specs,
@@ -327,7 +327,7 @@ def main():
             try:
                 ldap.connection.modify_s(ldap.dn, modlist)
             except Exception as e:
-                module.fail_json(msg="Attribute action failed.", details=to_native(e))
+                module.fail_json(msg="Attribute action failed.", details=f"{e}")
 
     module.exit_json(changed=changed, modlist=modlist, diff={"before": old_attrs, "after": new_attrs})
 

@@ -72,7 +72,6 @@ import json
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def sensu_subscription(module, path, name, state="present", backup=False):
@@ -128,9 +127,7 @@ def sensu_subscription(module, path, name, state="present", backup=False):
         try:
             open(path, "w").write(json.dumps(config, indent=2) + "\n")
         except IOError as e:
-            module.fail_json(
-                msg="Failed to write to file %s: %s" % (path, to_native(e)), exception=traceback.format_exc()
-            )
+            module.fail_json(msg=f"Failed to write to file {path}: {e}", exception=traceback.format_exc())
 
     return changed, reasons
 
