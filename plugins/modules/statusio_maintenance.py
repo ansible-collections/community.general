@@ -178,7 +178,6 @@ import datetime
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import open_url
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (
@@ -198,7 +197,7 @@ def get_api_auth_headers(api_id, api_key, url, statuspage):
             auth_headers = headers
             auth_content = data
     except Exception as e:
-        return 1, None, None, to_native(e)
+        return 1, None, None, f"{e}"
     return 0, auth_headers, auth_content, None
 
 
@@ -310,7 +309,7 @@ def create_maintenance(
         if data["status"]["error"] == "yes":
             return 1, None, data["status"]["message"]
     except Exception as e:
-        return 1, None, to_native(e)
+        return 1, None, f"{e}"
     return 0, None, None
 
 
@@ -327,7 +326,7 @@ def delete_maintenance(auth_headers, url, statuspage, maintenance_id):
         if data["status"]["error"] == "yes":
             return 1, None, "Invalid maintenance_id"
     except Exception as e:
-        return 1, None, to_native(e)
+        return 1, None, f"{e}"
     return 0, None, None
 
 

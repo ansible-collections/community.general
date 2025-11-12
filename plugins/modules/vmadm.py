@@ -346,7 +346,6 @@ import traceback
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 # While vmadm(1M) supports a -E option to return any errors in JSON, the
 # generated JSON does not play well with the JSON parsers of Python.
@@ -369,7 +368,7 @@ def get_vm_prop(module, uuid, prop):
     except Exception as e:
         module.fail_json(
             msg=f"Invalid JSON returned by vmadm for uuid lookup of {prop}",
-            details=to_native(e),
+            details=f"{e}",
             exception=traceback.format_exc(),
         )
 
@@ -395,7 +394,7 @@ def get_vm_uuid(module, alias):
     except Exception as e:
         module.fail_json(
             msg=f"Invalid JSON returned by vmadm for uuid lookup of {alias}",
-            details=to_native(e),
+            details=f"{e}",
             exception=traceback.format_exc(),
         )
 
@@ -416,7 +415,7 @@ def get_all_vm_uuids(module):
         stdout_json = json.loads(stdout)
         return [v["uuid"] for v in stdout_json]
     except Exception as e:
-        module.fail_json(msg="Could not retrieve VM UUIDs", details=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg="Could not retrieve VM UUIDs", details=f"{e}", exception=traceback.format_exc())
 
 
 def new_vm(module, uuid, vm_state):

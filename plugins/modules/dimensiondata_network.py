@@ -120,7 +120,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.dimensiondata import HAS_LIBCLOUD, DimensionDataModule
-from ansible.module_utils.common.text.converters import to_native
 
 if HAS_LIBCLOUD:
     from libcloud.compute.base import NodeLocation
@@ -223,9 +222,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
                     self.location, self.name, self.module.params["service_plan"], description=self.description
                 )
         except DimensionDataAPIException as e:
-            self.module.fail_json(
-                msg="Failed to create new network: %s" % to_native(e), exception=traceback.format_exc()
-            )
+            self.module.fail_json(msg=f"Failed to create new network: {e}", exception=traceback.format_exc())
 
         if self.module.params["wait"] is True:
             network = self._wait_for_network_state(network.id, "NORMAL")
@@ -245,7 +242,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
             self.module.fail_json("Unexpected failure deleting network with id %s" % network.id)
 
         except DimensionDataAPIException as e:
-            self.module.fail_json(msg="Failed to delete network: %s" % to_native(e), exception=traceback.format_exc())
+            self.module.fail_json(msg=f"Failed to delete network: {e}", exception=traceback.format_exc())
 
     def _wait_for_network_state(self, net_id, state_to_wait_for):
         try:
@@ -258,7 +255,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
             )
         except DimensionDataAPIException as e:
             self.module.fail_json(
-                msg="Network did not reach % state in time: %s" % (state_to_wait_for, to_native(e)),
+                msg=f"Network did not reach {state_to_wait_for} state in time: {e}",
                 exception=traceback.format_exc(),
             )
 
