@@ -107,7 +107,7 @@ import base64
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.general.plugins.module_utils.ldap import (
     LdapGeneric,
     gen_specs,
@@ -145,7 +145,7 @@ def main():
     try:
         LdapSearch(module).main()
     except Exception as exception:
-        module.fail_json(msg="Attribute action failed.", details=to_native(exception))
+        module.fail_json(msg="Attribute action failed.", details=f"{exception}")
 
 
 def _normalize_string(val, convert_to_base64):
