@@ -418,18 +418,18 @@ class XCCRedfishUtils(RedfishUtils):
 
         # eject all inserted media one by one
         ejected_media_list = []
-        for uri, data in resources.items():
+        for data in resources.values():
             if data.get("Image") and data.get("Inserted", True):
                 returndict = self.virtual_media_eject_one(data.get("Image"))
                 if not returndict["ret"]:
                     return returndict
                 ejected_media_list.append(data.get("Image"))
 
-        if len(ejected_media_list) == 0:
+        if not ejected_media_list:
             # no media inserted: return success but changed=False
             return {"ret": True, "changed": False, "msg": "No VirtualMedia image inserted"}
         else:
-            return {"ret": True, "changed": True, "msg": f"VirtualMedia {ejected_media_list!s} ejected"}
+            return {"ret": True, "changed": True, "msg": f"VirtualMedia {ejected_media_list} ejected"}
 
     def virtual_media_insert(self, options):
         param_map = {

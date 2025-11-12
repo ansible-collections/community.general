@@ -333,7 +333,7 @@ def main():
     if roles is None:
         module.exit_json(msg="Nothing to do (no roles specified).")
     else:
-        for role_index, role in enumerate(roles, start=0):
+        for role in roles:
             if role.get("name") is None and role.get("id") is None:
                 module.fail_json(msg="Either the `name` or `id` has to be specified on each role.")
             # Fetch missing role_id
@@ -373,7 +373,7 @@ def main():
     result["proposed"] = roles
 
     update_roles = []
-    for role_index, role in enumerate(roles, start=0):
+    for role in roles:
         # Fetch roles to assign if state present
         if state == "present":
             for available_role in available_roles_before:

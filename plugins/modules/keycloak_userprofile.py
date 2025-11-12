@@ -664,7 +664,7 @@ def main():
                 )
 
             # Compare top-level parameters
-            for param, value in changeset.items():
+            for param in changeset:
                 before_realm_userprofile[param] = userprofile[param]
 
                 if changeset_copy[param] != userprofile[param] and param != "config":
@@ -674,8 +674,8 @@ def main():
             # Compare parameters under the "config" userprofile
             for p, v in changeset_copy["config"].items():
                 before_realm_userprofile["config"][p] = userprofile["config"][p]
-                if changeset_copy["config"][p] != userprofile["config"][p]:
-                    changes += f"config.{p}: {userprofile['config'][p]} -> {changeset_copy['config'][p]}, "
+                if v != userprofile["config"][p]:
+                    changes += f"config.{p}: {userprofile['config'][p]} -> {v}, "
                     result["changed"] = True
 
     # Check all the possible states of the resource and do what is needed to

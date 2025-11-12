@@ -23,9 +23,9 @@ class Response:
     """
 
     def __init__(self):
-        self.content = None
-        self.status_code = None
-        self.stderr = None
+        self.content: str | None = None
+        self.status_code: int | None = None
+        self.stderr: str | None = None
 
     def json(self):
         return json.loads(self.content)

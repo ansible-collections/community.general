@@ -392,7 +392,7 @@ def main():
             changeset_copy["id"] = key_id
 
             # Compare top-level parameters
-            for param, value in changeset.items():
+            for param in changeset:
                 before_realm_key[param] = key[param]
 
                 if changeset_copy[param] != key[param] and param != "config":
@@ -402,8 +402,8 @@ def main():
             # Compare parameters under the "config" key
             for p, v in changeset_copy["config"].items():
                 before_realm_key["config"][p] = key["config"][p]
-                if changeset_copy["config"][p] != key["config"][p]:
-                    changes += f"config.{p}: {key['config'][p]} -> {changeset_copy['config'][p]}, "
+                if v != key["config"][p]:
+                    changes += f"config.{p}: {key['config'][p]} -> {v}, "
                     result["changed"] = True
 
     # Sanitize linefeeds for the privateKey. Without this the JSON payload
