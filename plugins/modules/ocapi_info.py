@@ -178,21 +178,17 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(
-            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
-        )
+        module.fail_json(msg=f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
 
     # Check that the command is valid
     if command not in CATEGORY_COMMANDS_ALL[category]:
-        module.fail_json(
-            msg=to_native(f"Invalid Command '{command}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
-        )
+        module.fail_json(msg=f"Invalid Command '{command}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
 
     # Organize by Categories / Commands
     if category == "Jobs":
         if command == "JobStatus":
             if module.params.get("job_name") is None:
-                module.fail_json(msg=to_native("job_name required for JobStatus command."))
+                module.fail_json(msg="job_name required for JobStatus command.")
             job_uri = urljoin(base_uri, f"Jobs/{module.params['job_name']}")
             result = ocapi_utils.get_job_status(job_uri)
 

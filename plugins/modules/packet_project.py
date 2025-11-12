@@ -120,7 +120,6 @@ id:
 """
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils.common.text.converters import to_native
 
 HAS_PACKET_SDK = True
 
@@ -163,7 +162,7 @@ def act_on_project(target_state, module, packet_conn):
         result_dict["id"] = matching_projects[0].id
     else:
         if len(matching_projects) > 1:
-            _msg = f"More than projects matched for module call with state = absent: {to_native(matching_projects)}"
+            _msg = f"More than projects matched for module call with state = absent: {matching_projects}"
             module.fail_json(msg=_msg)
 
         if len(matching_projects) == 1:

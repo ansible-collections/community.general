@@ -113,7 +113,6 @@ command:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 
 def add_remote(module, binary, name, flatpakrepo_url, method):
@@ -141,7 +140,7 @@ def remote_exists(module, binary, name, method):
         listed_remote = line.split()
         if len(listed_remote) == 0:
             continue
-        if listed_remote[0] == to_native(name):
+        if listed_remote[0] == name:
             return True
     return False
 
@@ -171,7 +170,7 @@ def remote_enabled(module, binary, name, method):
         listed_remote = line.split()
         if len(listed_remote) == 0:
             continue
-        if listed_remote[0] == to_native(name):
+        if listed_remote[0] == name:
             return len(listed_remote) == 1 or "disabled" not in listed_remote[1].split(",")
     return False
 
@@ -219,7 +218,7 @@ def main():
     if not binary:
         module.fail_json(msg=f"Executable '{executable}' was not found on the system.", **result)
 
-    remote_already_exists = remote_exists(module, binary, to_bytes(name), method)
+    remote_already_exists = remote_exists(module, binary, name, method)
 
     if state == "present" and not remote_already_exists:
         add_remote(module, binary, name, flatpakrepo_url, method)
@@ -227,7 +226,7 @@ def main():
         remove_remote(module, binary, name, method)
 
     if state == "present":
-        remote_already_enabled = remote_enabled(module, binary, to_bytes(name), method)
+        remote_already_enabled = remote_enabled(module, binary, name, method)
 
         if enabled and not remote_already_enabled:
             enable_remote(module, binary, name, method)

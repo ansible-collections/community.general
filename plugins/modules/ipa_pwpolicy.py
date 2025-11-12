@@ -158,7 +158,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
-from ansible.module_utils.common.text.converters import to_native
 
 
 class PwPolicyIPAClient(IPAClient):
@@ -223,7 +222,7 @@ def get_pwpolicy_dict(
 
     for option, value in pwpolicy_options.items():
         if value is not None:
-            pwpolicy[option] = to_native(value)
+            pwpolicy[option] = str(value)
 
     for option, value in pwpolicy_boolean_options.items():
         if value is not None:
