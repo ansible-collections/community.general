@@ -151,7 +151,6 @@ import ssl
 import xmlrpc.client as xmlrpc_client
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
@@ -241,7 +240,7 @@ def main():
     except xmlrpc_client.Fault as e:
         module.fail_json(
             msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(
-                url=url, error=to_text(e), **module.params
+                url=url, error=f"{e}", **module.params
             )
         )
     except Exception as e:
