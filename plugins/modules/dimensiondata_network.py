@@ -255,7 +255,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
             )
         except DimensionDataAPIException as e:
             self.module.fail_json(
-                msg=f"Network did not reach {state_to_wait_for} state in time: {e}"),
+                msg=f"Network did not reach {state_to_wait_for} state in time: {e}",
                 exception=traceback.format_exc(),
             )
 
