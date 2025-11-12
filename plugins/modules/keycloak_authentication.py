@@ -289,7 +289,7 @@ def create_or_update_executions(kc, config, realm="master"):
                 if exec_index != -1:
                     # Remove key that doesn't need to be compared with existing_exec
                     exclude_key = ["flowAlias", "subFlowType"]
-                    for index_key, key in enumerate(new_exec, start=0):
+                    for key in new_exec:
                         if new_exec[key] is None:
                             exclude_key.append(key)
                     # Compare the executions to see if it need changes

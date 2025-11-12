@@ -509,16 +509,14 @@ def expand_create_fixed_ips(d, array_index):
 
     req = []
 
-    n = 1
-    for i in range(n):
-        transformed = dict()
+    transformed = dict()
 
-        v = navigate_value(d, ["ip_address"], new_array_index)
-        if not is_empty_value(v):
-            transformed["ip_address"] = v
+    v = navigate_value(d, ["ip_address"], new_array_index)
+    if not is_empty_value(v):
+        transformed["ip_address"] = v
 
-        if transformed:
-            req.append(transformed)
+    if transformed:
+        req.append(transformed)
 
     return req
 
@@ -1011,17 +1009,15 @@ def expand_list_fixed_ips(d, array_index):
 
     req = []
 
-    n = 1
-    for i in range(n):
-        transformed = dict()
+    transformed = dict()
 
-        v = navigate_value(d, ["ip_address"], new_array_index)
-        transformed["ip_address"] = v
+    v = navigate_value(d, ["ip_address"], new_array_index)
+    transformed["ip_address"] = v
 
-        for v in transformed.values():
-            if v is not None:
-                req.append(transformed)
-                break
+    for v in transformed.values():
+        if v is not None:
+            req.append(transformed)
+            break
 
     return req if req else None
 

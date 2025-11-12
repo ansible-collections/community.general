@@ -292,7 +292,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.get_jails(t_stdout, results)
 
         if get_properties:
-            for hostname, host_vars in results["_meta"]["hostvars"].items():
+            for hostname in results["_meta"]["hostvars"]:
                 cmd_get_properties = cmd.copy()
                 cmd_get_properties.append(self.IOCAGE)
                 cmd_get_properties.append("get")
@@ -335,7 +335,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             except Exception as e:
                 raise AnsibleError(f"Failed to get pool: {e}") from e
 
-            for hostname, host_vars in results["_meta"]["hostvars"].items():
+            for hostname in results["_meta"]["hostvars"]:
                 iocage_hooks = []
                 for hook in hooks_results:
                     path = f"/{iocage_pool}/iocage/jails/{hostname}/root{hook}"

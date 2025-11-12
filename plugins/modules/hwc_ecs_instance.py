@@ -1174,16 +1174,14 @@ def expand_delete_servers(d, array_index):
 
     req = []
 
-    n = 1
-    for i in range(n):
-        transformed = dict()
+    transformed = dict()
 
-        v = expand_delete_servers_id(d, new_ai)
-        if not is_empty_value(v):
-            transformed["id"] = v
+    v = expand_delete_servers_id(d, new_ai)
+    if not is_empty_value(v):
+        transformed["id"] = v
 
-        if transformed:
-            req.append(transformed)
+    if transformed:
+        req.append(transformed)
 
     return req
 

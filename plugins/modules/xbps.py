@@ -286,7 +286,7 @@ def remove_packages(module, xbps_path, packages):
 def install_packages(module, xbps_path, state, packages):
     """Returns true if package install succeeds."""
     toInstall = []
-    for i, package in enumerate(packages):
+    for package in packages:
         """If the package is installed and state == present or state == latest
         and is up-to-date then skip"""
         installed, updated = query_package(module, xbps_path, package)

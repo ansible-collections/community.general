@@ -373,7 +373,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             ip_address_first = None
             ipv6_address = None
             ipv6_address_first = None
-            for iname, ivalue in interfaces.items():
+            for ivalue in interfaces.values():
                 # Set to first interface or management interface if defined or hostname matches dns_name
                 if ivalue["ip_address"] != "":
                     if ip_address_first is None:

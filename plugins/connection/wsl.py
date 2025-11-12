@@ -541,8 +541,8 @@ class Connection(ConnectionBase):
         return self
 
     def _any_keys_added(self) -> bool:
-        for hostname, keys in self.ssh._host_keys.items():  # type: ignore[attr-defined]  # TODO: figure out what _host_keys is!
-            for keytype, key in keys.items():
+        for host_keys in self.ssh._host_keys.values():  # type: ignore[attr-defined]  # TODO: figure out what _host_keys is!
+            for key in host_keys.values():
                 added_this_time = getattr(key, "_added_by_ansible_this_time", False)
                 if added_this_time:
                     return True

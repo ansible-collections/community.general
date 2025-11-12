@@ -2350,7 +2350,7 @@ class KeycloakAPI:
         """
         try:
             if diff > 0:
-                for i in range(diff):
+                for _i in range(diff):
                     self._request(
                         URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
                             url=self.baseurl, realm=realm, id=executionId
@@ -2358,7 +2358,7 @@ class KeycloakAPI:
                         method="POST",
                     )
             elif diff < 0:
-                for i in range(-diff):
+                for _i in range(-diff):
                     self._request(
                         URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
                             url=self.baseurl, realm=realm, id=executionId

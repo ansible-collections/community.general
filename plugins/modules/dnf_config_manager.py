@@ -133,7 +133,7 @@ def get_repo_states(module):
 
     repos = dict()
     last_repo = ""
-    for i, line in enumerate(out.split("\n")):
+    for line in out.split("\n"):
         m = REPO_ID_RE.match(line)
         if m:
             if len(last_repo) > 0:

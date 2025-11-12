@@ -311,10 +311,6 @@ def main():
     if p["name"]:
         pkgs = p["name"].split(",")
 
-        pkg_files = []
-        for i, pkg in enumerate(pkgs):
-            pkg_files.append(None)
-
         if module.check_mode:
             check_packages(module, pkgs, p["state"])
 
