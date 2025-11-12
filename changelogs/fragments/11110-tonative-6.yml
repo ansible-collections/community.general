@@ -1,0 +1,12 @@
+minor_changes:
+  - idrac_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - idrac_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - ilo_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - ilo_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - ocapi_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - wdc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - wdc_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+  - xcc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
