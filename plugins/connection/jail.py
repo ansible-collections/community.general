@@ -79,8 +79,8 @@ class Connection(ConnectionBase):
     def _search_executable(executable):
         try:
             return get_bin_path(executable)
-        except ValueError:
-            raise AnsibleError(f"{executable} command not found in PATH")
+        except ValueError as e:
+            raise AnsibleError(f"{executable} command not found in PATH") from e
 
     def list_jails(self):
         p = subprocess.Popen(
@@ -161,19 +161,19 @@ class Connection(ConnectionBase):
                     count = ""
                 try:
                     p = self._buffered_exec_command(f"dd of={out_path} bs={BUFSIZE}{count}", stdin=in_file)
-                except OSError:
-                    raise AnsibleError("jail connection requires dd command in the jail")
+                except OSError as e:
+                    raise AnsibleError("jail connection requires dd command in the jail") from e
                 try:
                     stdout, stderr = p.communicate()
-                except Exception:
+                except Exception as e:
                     traceback.print_exc()
-                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}") from e
                 if p.returncode != 0:
                     raise AnsibleError(
                         f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}"
                     )
-        except IOError:
-            raise AnsibleError(f"file or module does not exist at: {in_path}")
+        except IOError as e:
+            raise AnsibleError(f"file or module does not exist at: {in_path}") from e
 
     def fetch_file(self, in_path, out_path):
         """fetch a file from jail to local"""
@@ -183,8 +183,8 @@ class Connection(ConnectionBase):
         in_path = shlex_quote(self._prefix_login_path(in_path))
         try:
             p = self._buffered_exec_command(f"dd if={in_path} bs={BUFSIZE}")
-        except OSError:
-            raise AnsibleError("jail connection requires dd command in the jail")
+        except OSError as e:
+            raise AnsibleError("jail connection requires dd command in the jail") from e
 
         with open(to_bytes(out_path, errors="surrogate_or_strict"), "wb+") as out_file:
             try:
@@ -192,9 +192,9 @@ class Connection(ConnectionBase):
                 while chunk:
                     out_file.write(chunk)
                     chunk = p.stdout.read(BUFSIZE)
-            except Exception:
+            except Exception as e:
                 traceback.print_exc()
-                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}") from e
             stdout, stderr = p.communicate()
             if p.returncode != 0:
                 raise AnsibleError(

@@ -37,7 +37,7 @@ def initialize_hashids(**kwargs):
         raise AnsibleFilterError(
             "The provided parameters %s are invalid: %s"
             % (", ".join(["%s=%s" % (k, v) for k, v in params.items()]), to_native(e))
-        )
+        ) from e
 
 
 def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
@@ -60,7 +60,7 @@ def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
     try:
         hashid = hashids.encode(*nums)
     except TypeError as e:
-        raise AnsibleTypeError(f"Data to encode must by a tuple or list of ints: {e}")
+        raise AnsibleTypeError(f"Data to encode must by a tuple or list of ints: {e}") from e
 
     return hashid
 

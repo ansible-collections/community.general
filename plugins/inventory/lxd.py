@@ -213,7 +213,7 @@ class InventoryModule(BaseInventoryPlugin):
             with open(path, "r") as json_file:
                 return json.load(json_file)
         except (IOError, json.decoder.JSONDecodeError) as err:
-            raise AnsibleParserError(f"Could not load the test data from {to_native(path)}: {err}")
+            raise AnsibleParserError(f"Could not load the test data from {to_native(path)}: {err}") from err
 
     def save_json_data(self, path, file_name=None):
         """save data as json
@@ -243,7 +243,7 @@ class InventoryModule(BaseInventoryPlugin):
             with open(os.path.abspath(os.path.join(cwd, *path)), "w") as json_file:
                 json.dump(self.data, json_file)
         except IOError as err:
-            raise AnsibleParserError(f"Could not save data: {err}")
+            raise AnsibleParserError(f"Could not save data: {err}") from err
 
     def verify_file(self, path):
         """Check the config
@@ -602,7 +602,7 @@ class InventoryModule(BaseInventoryPlugin):
             else:
                 path[instance_name][key] = value
         except KeyError as err:
-            raise AnsibleParserError(f"Unable to store Information: {err}")
+            raise AnsibleParserError(f"Unable to store Information: {err}") from err
 
     def extract_information_from_instance_configs(self):
         """Process configuration information
@@ -853,7 +853,7 @@ class InventoryModule(BaseInventoryPlugin):
         except ValueError as err:
             raise AnsibleParserError(
                 f"Error while parsing network range {self.groupby[group_name].get('attribute')}: {err}"
-            )
+            ) from err
 
         for instance_name in self.inventory.hosts:
             if self.data["inventory"][instance_name].get("network_interfaces") is not None:
@@ -1203,6 +1203,6 @@ class InventoryModule(BaseInventoryPlugin):
             self.trust_password = self.get_option("trust_password")
             self.url = self.get_option("url")
         except Exception as err:
-            raise AnsibleParserError(f"All correct options required: {err}")
+            raise AnsibleParserError(f"All correct options required: {err}") from err
         # Call our internal helper to populate the dynamic inventory
         self._populate()

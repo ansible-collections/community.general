@@ -74,7 +74,7 @@ class LookupModule(LookupBase):
 
             except (ValueError, AssertionError) as e:
                 # In case "file" or "key" are not present
-                raise AnsibleError(e)
+                raise AnsibleError(e) from e
 
             key = paramvals["key"]
 

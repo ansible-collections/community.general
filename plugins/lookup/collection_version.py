@@ -122,7 +122,7 @@ class LookupModule(LookupBase):
             try:
                 data = load_collection_meta(collection_pkg, no_version=no_version)
             except Exception as exc:
-                raise AnsibleLookupError(f"Error while loading metadata for {term}: {exc}")
+                raise AnsibleLookupError(f"Error while loading metadata for {term}: {exc}") from exc
 
             result.append(data.get("version", no_version))
 

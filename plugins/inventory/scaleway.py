@@ -143,16 +143,16 @@ def _fetch_information(token, url):
         try:
             response = open_url(paginated_url, headers={"X-Auth-Token": token, "Content-type": "application/json"})
         except Exception as e:
-            raise AnsibleError(f"Error while fetching {url}: {e}")
+            raise AnsibleError(f"Error while fetching {url}: {e}") from e
         try:
             raw_json = json.loads(to_text(response.read()))
-        except ValueError:
-            raise AnsibleError("Incorrect JSON payload")
+        except ValueError as e:
+            raise AnsibleError("Incorrect JSON payload") from e
 
         try:
             results.extend(raw_json["servers"])
-        except KeyError:
-            raise AnsibleError("Incorrect format from the Scaleway API response")
+        except KeyError as e:
+            raise AnsibleError("Incorrect format from the Scaleway API response") from e
 
         link = response.headers["Link"]
         if not link:

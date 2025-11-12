@@ -122,10 +122,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 with open(authfile, "r") as fp:
                     authstring = fp.read().rstrip()
                 username, password = authstring.split(":")
-            except (OSError, IOError):
-                raise AnsibleError(f"Could not find or read ONE_AUTH file at '{authfile}'")
-            except Exception:
-                raise AnsibleError(f"Error occurs when reading ONE_AUTH file at '{authfile}'")
+            except (OSError, IOError) as e:
+                raise AnsibleError(f"Could not find or read ONE_AUTH file at '{authfile}'") from e
+            except Exception as e:
+                raise AnsibleError(f"Error occurs when reading ONE_AUTH file at '{authfile}'") from e
 
         auth_params = namedtuple("auth", ("url", "username", "password"))
 
@@ -167,7 +167,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         try:
             vm_pool = one_client.vmpool.infoextended(-2, -1, -1, 3)
         except Exception as e:
-            raise AnsibleError(f"Something happened during XML-RPC call: {e}")
+            raise AnsibleError(f"Something happened during XML-RPC call: {e}") from e
 
         return vm_pool
 

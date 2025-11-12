@@ -377,8 +377,8 @@ class TSSClient(metaclass=abc.ABCMeta):  # noqa: B024
                             file_content = i["itemValue"].content
                             with open(os.path.join(file_download_path, f"{obj['id']}_{i['slug']}"), "wb") as f:
                                 f.write(file_content)
-                        except ValueError:
-                            raise AnsibleOptionsError(f"Failed to download {i['slug']}")
+                        except ValueError as e:
+                            raise AnsibleOptionsError(f"Failed to download {i['slug']}") from e
                         except AttributeError:
                             display.warning(f"Could not read file content for {i['slug']}")
                         finally:
@@ -403,15 +403,15 @@ class TSSClient(metaclass=abc.ABCMeta):  # noqa: B024
     def _term_to_secret_id(term):
         try:
             return int(term)
-        except ValueError:
-            raise AnsibleOptionsError("Secret ID must be an integer")
+        except ValueError as e:
+            raise AnsibleOptionsError("Secret ID must be an integer") from e
 
     @staticmethod
     def _term_to_folder_id(term):
         try:
             return int(term)
-        except ValueError:
-            raise AnsibleOptionsError("Folder ID must be an integer")
+        except ValueError as e:
+            raise AnsibleOptionsError("Folder ID must be an integer") from e
 
 
 class TSSClientV0(TSSClient):
@@ -493,4 +493,4 @@ class LookupModule(LookupBase):
                     for term in terms
                 ]
         except SecretServerError as error:
-            raise AnsibleError(f"Secret Server lookup failure: {error.message}")
+            raise AnsibleError(f"Secret Server lookup failure: {error.message}") from error

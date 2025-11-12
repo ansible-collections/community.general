@@ -105,7 +105,7 @@ class LookupModule(LookupBase):
                     continue
                 string = ""
             except DNSException as e:
-                raise AnsibleError(f"dns.resolver unhandled exception {e}")
+                raise AnsibleError(f"dns.resolver unhandled exception {e}") from e
 
             ret.append("".join(string))
 
