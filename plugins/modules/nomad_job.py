@@ -181,8 +181,7 @@ def run():
                     job = dict()
                     job["job"] = job_json
                 except nomad.api.exceptions.BadRequestNomadException as err:
-                    msg = f"{err.nomad_resp.reason} {err.nomad_resp.text}"
-                    module.fail_json(msg=to_native(msg))
+                    module.fail_json(msg=f"{err.nomad_resp.reason} {err.nomad_resp.text}")
                 try:
                     job_id = job_json.get("ID")
                     plan = nomad_client.job.plan_job(job_id, job, diff=True)

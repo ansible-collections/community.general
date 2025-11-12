@@ -209,15 +209,11 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(
-            msg=to_native(f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
-        )
+        module.fail_json(msg=f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
 
     # Check that the command is valid
     if command not in CATEGORY_COMMANDS_ALL[category]:
-        module.fail_json(
-            msg=to_native(f"Invalid Command '{command}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
-        )
+        module.fail_json(msg=f"Invalid Command '{command}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
 
     # Organize by Categories / Commands
     if category == "Chassis":
@@ -232,7 +228,7 @@ def main():
         if command == "FWUpload":
             update_image_path = module.params.get("update_image_path")
             if update_image_path is None:
-                module.fail_json(msg=to_native("Missing update_image_path."))
+                module.fail_json(msg="Missing update_image_path.")
             result = ocapi_utils.upload_firmware_image(update_image_path)
         elif command == "FWUpdate":
             result = ocapi_utils.update_firmware_image()

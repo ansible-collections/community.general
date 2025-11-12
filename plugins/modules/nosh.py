@@ -326,7 +326,6 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.service import fail_if_missing
-from ansible.module_utils.common.text.converters import to_native
 
 
 def run_sys_ctl(module, args):
@@ -342,7 +341,7 @@ def get_service_path(module, service):
     if rc != 0:
         fail_if_missing(module, False, service, msg="host")
     else:
-        return to_native(out).strip()
+        return out.strip()
 
 
 def service_is_enabled(module, service_path):
@@ -352,7 +351,7 @@ def service_is_enabled(module, service_path):
 
 def service_is_preset_enabled(module, service_path):
     (rc, out, err) = run_sys_ctl(module, ["preset", "--dry-run", service_path])
-    return to_native(out).strip().startswith("enable")
+    return out.strip().startswith("enable")
 
 
 def service_is_loaded(module, service_path):
@@ -366,7 +365,7 @@ def get_service_status(module, service_path):
     if err is not None and err:
         module.fail_json(msg=err)
     else:
-        json_out = json.loads(to_native(out).strip())
+        json_out = json.loads(out.strip())
         status = json_out[service_path]  # descend past service path header
         return status
 

@@ -249,7 +249,7 @@ def act_on_volume(target_state, module, packet_conn):
 
     else:
         if len(matching_volumes) > 1:
-            _msg = f"More than one volume matches in module call for absent state: {to_native(matching_volumes)}"
+            _msg = f"More than one volume matches in module call for absent state: {matching_volumes}"
             module.fail_json(msg=_msg)
 
         if len(matching_volumes) == 1:
