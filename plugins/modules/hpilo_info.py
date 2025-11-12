@@ -234,7 +234,7 @@ def main():
     if memory_details_summary:
         info["hw_memory_details_summary"] = memory_details_summary
         info["hw_memory_total"] = 0
-        for cpu, details in memory_details_summary.items():
+        for details in memory_details_summary.values():
             cpu_total_memory_size = details.get("total_memory_size")
             if cpu_total_memory_size:
                 ram = re.search(r"(\d+)\s+(\w+)", cpu_total_memory_size)

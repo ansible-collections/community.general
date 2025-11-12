@@ -359,7 +359,7 @@ class HAProxy:
         the expected status in that time, the module will fail. If the service was
         not found, the module will fail.
         """
-        for i in range(1, self.wait_retries):
+        for _i in range(1, self.wait_retries):
             state = self.get_state_for(pxname, svname)
 
             # We can assume there will only be 1 element in state because both svname and pxname are always set when we get here

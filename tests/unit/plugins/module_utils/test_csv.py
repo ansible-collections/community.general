@@ -145,7 +145,7 @@ def test_invalid_csv(data, dialect, dialect_params, fieldnames):
     result = False
 
     try:
-        for row in reader:
+        for _row in reader:
             continue
     except csv.CSVError:
         result = True
