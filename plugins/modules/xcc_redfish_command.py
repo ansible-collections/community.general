@@ -556,7 +556,7 @@ class XCCRedfishUtils(RedfishUtils):
         data = response["data"]
         for key in request_body.keys():
             if key not in data:
-                return {"ret": False, "msg": f"Key {key} not found. Supported key list: {data.keys()}"}
+                return {"ret": False, "msg": f"Key {key} not found. Supported key list: {list(data.keys())}"}
 
         # perform patch
         response = self.patch_request(self.root_uri + resource_uri, request_body)
@@ -735,7 +735,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=f"Invalid Category '{category}'. Valid Categories = {CATEGORY_COMMANDS_ALL.keys()}")
+        module.fail_json(msg=f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
 
     # Check that all commands are valid
     for cmd in command_list:
