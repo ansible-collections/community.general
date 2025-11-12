@@ -21,7 +21,6 @@ ignore = [
     "B905",  # zip-without-explicit-strict - needs Python 3.10+
     "UP045",  # Use `X | None` for type annotations - needs Python 3.10+
     # To fix:
-    "E721",  # Type comparison
     "UP014",  # Convert `xxx` from `NamedTuple` functional to class syntax
     "UP024",  # Replace aliased errors with `OSError`
     "UP028",  # Replace `yield` over `for` loop with `yield from`
