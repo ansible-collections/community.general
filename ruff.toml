@@ -29,7 +29,6 @@ ignore = [
     "UP041",  # Replace aliased errors with `TimeoutError`
     "B015",  # useless-comparison
     "B026",  # star-arg-unpacking-after-keyword-arg
-    "B904",  # raise-without-from-inside-except
     "SIM102",  # collapsible-if
     "SIM110",  # reimplemented-builtin
     "SIM112",  # uncapitalized-environment-variables
