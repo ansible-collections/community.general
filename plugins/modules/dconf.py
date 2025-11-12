@@ -134,7 +134,6 @@ from ansible.module_utils.common.respawn import (
     probe_interpreters_for_module,
     respawn_module,
 )
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils import deps
 
 glib_module_name = "gi.repository.GLib"
@@ -446,7 +445,7 @@ def main():
         if isinstance(module.params["value"], bool):
             module.params["value"] = "true" if module.params["value"] else "false"
         else:
-            module.params["value"] = to_native(module.params["value"], errors="surrogate_or_strict")
+            module.params["value"] = str(module.params["value"])
 
     if Variant is None:
         module.deprecate(

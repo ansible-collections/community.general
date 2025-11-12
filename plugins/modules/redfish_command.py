@@ -1056,7 +1056,7 @@ def main():
         # execute only if we find a System resource
         result = rf_utils._find_systems_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command.startswith("Power"):
@@ -1082,7 +1082,7 @@ def main():
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         led_commands = ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"]
 
@@ -1113,7 +1113,7 @@ def main():
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             # standardize on the Power* commands, but allow the legacy

@@ -117,7 +117,6 @@ CATEGORY_COMMANDS_ALL = {"Manager": ["SetTimeZone", "SetDNSserver", "SetDomainNa
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -171,7 +170,7 @@ def main():
     if category == "Manager":
         resource = rf_utils._find_managers_resource()
         if not resource["ret"]:
-            module.fail_json(msg=to_native(resource["msg"]))
+            module.fail_json(msg=resource["msg"])
 
         dispatch = dict(
             SetTimeZone=rf_utils.set_time_zone,

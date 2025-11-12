@@ -759,7 +759,7 @@ class JIRA(StateModuleHelper):
             return s.replace('"', '\\"')
 
         boundary = "".join(random.choice(string.digits + string.ascii_letters) for dummy in range(30))
-        name = to_native(os.path.basename(filename))
+        name = os.path.basename(filename)
 
         if not mime_type:
             try:
@@ -833,12 +833,12 @@ class JIRA(StateModuleHelper):
                 error = json.loads(info["body"])
             except Exception:
                 msg = f'The request "{method} {url}" returned the unexpected status code {info["status"]} {info["msg"]}\n{info.get("body")}'
-                self.module.fail_json(msg=to_native(msg), exception=traceback.format_exc())
+                self.module.fail_json(msg=msg, exception=traceback.format_exc())
             if error:
                 msg = []
                 for key in ("errorMessages", "errors"):
                     if error.get(key):
-                        msg.append(to_native(error[key]))
+                        msg.append(error[key])
                 if msg:
                     self.module.fail_json(msg=", ".join(msg))
                 self.module.fail_json(msg=f"{error}")
