@@ -224,9 +224,7 @@ class GitLabProjectAccessToken:
             return False
         if self.access_token_object.access_level != ACCESS_LEVELS[self._module.params["access_level"]]:
             return False
-        if self.access_token_object.expires_at != self._module.params["expires_at"]:
-            return False
-        return True
+        return self.access_token_object.expires_at == self._module.params["expires_at"]
 
 
 def main():

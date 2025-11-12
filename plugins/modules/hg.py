@@ -134,10 +134,7 @@ class Hg:
 
     def has_local_mods(self):
         now = self.get_revision()
-        if "+" in now:
-            return True
-        else:
-            return False
+        return "+" in now
 
     def discard(self):
         before = self.has_local_mods()
@@ -177,10 +174,7 @@ class Hg:
             discarded = self.discard()
         if purge:
             purged = self.purge()
-        if discarded or purged:
-            return True
-        else:
-            return False
+        return discarded or purged
 
     def pull(self):
         return self._command(["pull", "-R", self.dest, self.repo])
@@ -207,9 +201,7 @@ class Hg:
         (rc, out, err) = self._command(["--debug", "id", "-i", "-R", self.dest])
         if rc != 0:
             self.module.fail_json(msg=err)
-        if out.startswith(self.revision):
-            return True
-        return False
+        return out.startswith(self.revision)
 
 
 # ===========================================

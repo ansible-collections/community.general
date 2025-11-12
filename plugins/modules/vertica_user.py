@@ -197,12 +197,13 @@ def check(user_facts, user, profile, resource_pool, locked, password, expired, l
         and ldap != (user_facts[user_key]["expired"] == "True")
     ):
         return False
-    if roles and (
-        sorted(roles) != sorted(user_facts[user_key]["roles"])
-        or sorted(roles) != sorted(user_facts[user_key]["default_roles"])
-    ):
-        return False
-    return True
+    return not (
+        roles
+        and (
+            sorted(roles) != sorted(user_facts[user_key]["roles"])
+            or sorted(roles) != sorted(user_facts[user_key]["default_roles"])
+        )
+    )
 
 
 def present(user_facts, cursor, user, profile, resource_pool, locked, password, expired, ldap, roles):

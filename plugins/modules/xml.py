@@ -448,9 +448,7 @@ def is_attribute(tree, xpath, namespaces):
 
 def xpath_matches(tree, xpath, namespaces):
     """Test if a node exists"""
-    if tree.xpath(xpath, namespaces=namespaces):
-        return True
-    return False
+    return bool(tree.xpath(xpath, namespaces=namespaces))
 
 
 def delete_xpath_target(module, tree, xpath, namespaces):

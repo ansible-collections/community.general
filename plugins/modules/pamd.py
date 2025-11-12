@@ -255,9 +255,7 @@ class PamdLine:
 
     @property
     def is_valid(self):
-        if self.line.strip() == "":
-            return True
-        return False
+        return self.line.strip() == ""
 
     def validate(self):
         if not self.is_valid:
@@ -282,9 +280,7 @@ class PamdComment(PamdLine):
 
     @property
     def is_valid(self):
-        if self.line.startswith("#"):
-            return True
-        return False
+        return self.line.startswith("#")
 
 
 class PamdInclude(PamdLine):
@@ -293,9 +289,7 @@ class PamdInclude(PamdLine):
 
     @property
     def is_valid(self):
-        if self.line.startswith("@include"):
-            return True
-        return False
+        return self.line.startswith("@include")
 
 
 class PamdRule(PamdLine):
@@ -399,9 +393,7 @@ class PamdRule(PamdLine):
         except ValueError:
             return False
 
-        if number >= 0:
-            return True
-        return False
+        return number >= 0
 
     @property
     def is_valid(self):
@@ -484,9 +476,7 @@ class PamdService:
         return lines
 
     def has_rule(self, rule_type, rule_control, rule_path):
-        if self.get(rule_type, rule_control, rule_path):
-            return True
-        return False
+        return bool(self.get(rule_type, rule_control, rule_path))
 
     def update_rule(
         self, rule_type, rule_control, rule_path, new_type=None, new_control=None, new_path=None, new_args=None

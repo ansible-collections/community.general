@@ -177,9 +177,7 @@ def _add_servers(module, oneandone_conn, name, members):
         private_network_id = get_private_network(oneandone_conn, name)
 
         if module.check_mode:
-            if private_network_id and members:
-                return True
-            return False
+            return bool(private_network_id and members)
 
         network = oneandone_conn.attach_private_network_servers(
             private_network_id=private_network_id, server_ids=members

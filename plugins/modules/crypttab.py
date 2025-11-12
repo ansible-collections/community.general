@@ -237,9 +237,7 @@ class Line:
         return changed, "updated line"
 
     def _line_valid(self, line):
-        if not line.strip() or line.startswith("#") or len(line.split()) not in (2, 3, 4):
-            return False
-        return True
+        return line.strip() and not line.startswith("#") and len(line.split()) in (2, 3, 4)
 
     def _split_line(self, line):
         fields = line.split()
@@ -259,9 +257,7 @@ class Line:
         return True, "removed line"
 
     def valid(self):
-        if self.name is not None and self.backing_device is not None:
-            return True
-        return False
+        return self.name is not None and self.backing_device is not None
 
     def __str__(self):
         if self.valid():

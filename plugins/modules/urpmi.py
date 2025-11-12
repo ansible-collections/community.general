@@ -93,10 +93,7 @@ def query_package(module, name, root):
     rpm_path = module.get_bin_path("rpm", True)
     cmd = [rpm_path, "-q", name] + root_option(root)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-    if rc == 0:
-        return True
-    else:
-        return False
+    return rc == 0
 
 
 def query_package_provides(module, name, root):

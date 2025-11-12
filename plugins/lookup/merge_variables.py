@@ -163,10 +163,7 @@ class LookupModule(LookupBase):
             return True
 
         group_intersection = [host_group_name for host_group_name in host_groups if host_group_name in self._groups]
-        if group_intersection:
-            return True
-
-        return False
+        return bool(group_intersection)
 
     def _var_matches(self, key, search_pattern):
         if self._pattern_type == "prefix":
