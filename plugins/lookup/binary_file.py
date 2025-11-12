@@ -107,6 +107,6 @@ class LookupModule(LookupBase):
                 with open(path, "rb") as f:
                     result.append(base64.b64encode(f.read()).decode("utf-8"))
             except Exception as exc:
-                raise AnsibleLookupError(f"Error while reading {path}: {exc}")
+                raise AnsibleLookupError(f"Error while reading {path}: {exc}") from exc
 
         return result

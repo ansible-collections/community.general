@@ -98,5 +98,5 @@ class LookupModule(LookupBase):
                 display.vvv(f"Secret Server lookup of Secret with ID {term}")
                 result.append({term: secret_server.get_pam_secret(term)})
             except Exception as error:
-                raise AnsibleError(f"Secret Server lookup failure: {error.message}")
+                raise AnsibleError(f"Secret Server lookup failure: {error.message}") from error
         return result

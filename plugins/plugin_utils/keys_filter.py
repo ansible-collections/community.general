@@ -78,9 +78,9 @@ def _keys_filter_target_str(target, matching_parameter):
                 r = target[0]
         try:
             tt = re.compile(r)
-        except re.error:
+        except re.error as e:
             msg = "The target must be a valid regex if matching_parameter=regex. target is %s"
-            raise AnsibleFilterError(msg % r)
+            raise AnsibleFilterError(msg % r) from e
     elif isinstance(target, str):
         tt = (target,)
     else:
@@ -129,12 +129,12 @@ def _keys_filter_target_dict(target, matching_parameter):
         try:
             tr = map(re.compile, before)
             tz = list(zip(tr, after))
-        except re.error:
+        except re.error as e:
             msg = (
                 "The attributes before must be valid regex if matching_parameter=regex."
                 " Not all items are valid regex in: %s"
             )
-            raise AnsibleFilterError(msg % before)
+            raise AnsibleFilterError(msg % before) from e
     else:
         tz = list(zip(before, after))
 

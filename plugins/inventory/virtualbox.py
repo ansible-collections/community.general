@@ -312,7 +312,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         try:
             self._vbox_path = get_bin_path(self.VBOX)
         except ValueError as e:
-            raise AnsibleParserError(e)
+            raise AnsibleParserError(e) from e
 
         super().parse(inventory, loader, path)
 
@@ -354,7 +354,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 p = Popen(cmd, stdout=PIPE)
             except Exception as e:
-                raise AnsibleParserError(str(e))
+                raise AnsibleParserError(str(e)) from e
 
             source_data = p.stdout.read().splitlines()
 

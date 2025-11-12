@@ -198,13 +198,13 @@ class OnePassCLIBase(metaclass=abc.ABCMeta):
         based on the current version."""
         try:
             bin_path = get_bin_path(cls.bin)
-        except ValueError:
-            raise AnsibleLookupError(f"Unable to locate '{cls.bin}' command line tool")
+        except ValueError as e:
+            raise AnsibleLookupError(f"Unable to locate '{cls.bin}' command line tool") from e
 
         try:
             b_out = subprocess.check_output([bin_path, "--version"], stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as cpe:
-            raise AnsibleLookupError(f"Unable to get the op version: {cpe}")
+            raise AnsibleLookupError(f"Unable to get the op version: {cpe}") from cpe
 
         return to_text(b_out).strip()
 
@@ -653,7 +653,7 @@ class OnePass:
                         self.connect_token,
                     )
                 except TypeError as e:
-                    raise AnsibleLookupError(e)
+                    raise AnsibleLookupError(e) from e
 
         raise AnsibleLookupError(f"op version {version} is unsupported")
 

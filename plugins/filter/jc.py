@@ -149,7 +149,7 @@ def jc_filter(data, parser, quiet=True, raw=False):
             return jc_parser.parse(data, quiet=quiet, raw=raw)
 
     except Exception as e:
-        raise AnsibleFilterError(f"Error in jc filter plugin: {e}")
+        raise AnsibleFilterError(f"Error in jc filter plugin: {e}") from e
 
 
 class FilterModule:

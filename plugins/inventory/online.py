@@ -141,13 +141,13 @@ class InventoryModule(BaseInventoryPlugin):
 
         try:
             raw_data = to_text(response.read(), errors="surrogate_or_strict")
-        except UnicodeError:
-            raise AnsibleError("Incorrect encoding of fetched payload from Online servers")
+        except UnicodeError as e:
+            raise AnsibleError("Incorrect encoding of fetched payload from Online servers") from e
 
         try:
             return json.loads(raw_data)
-        except ValueError:
-            raise AnsibleError("Incorrect JSON payload")
+        except ValueError as e:
+            raise AnsibleError("Incorrect JSON payload") from e
 
     @staticmethod
     def extract_rpn_lookup_cache(rpn_list):

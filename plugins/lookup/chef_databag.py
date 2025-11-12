@@ -77,8 +77,8 @@ class LookupModule(LookupBase):
                     continue
                 parsed = str(arg_raw)
                 setattr(self, arg, parsed)
-            except ValueError:
-                raise AnsibleError(f"can't parse arg {arg}={arg_raw} as string")
+            except ValueError as e:
+                raise AnsibleError(f"can't parse arg {arg}={arg_raw} as string") from e
         if args:
             raise AnsibleError(f"unrecognized arguments to with_sequence: {list(args.keys())!r}")
 

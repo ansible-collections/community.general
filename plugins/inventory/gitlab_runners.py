@@ -124,7 +124,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 # Create groups based on variable values and add the corresponding hosts to it
                 self._add_host_to_keyed_groups(self.get_option("keyed_groups"), host_attrs, host, strict=strict)
         except Exception as e:
-            raise AnsibleParserError(f"Unable to fetch hosts from GitLab API, this was the original exception: {e}")
+            raise AnsibleParserError(
+                f"Unable to fetch hosts from GitLab API, this was the original exception: {e}"
+            ) from e
 
     def verify_file(self, path):
         """Return the possibly of a file being consumable by this plugin."""

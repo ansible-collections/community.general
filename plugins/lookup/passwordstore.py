@@ -309,7 +309,7 @@ class LookupModule(LookupBase):
                 )
                 self.realpass = "pass: the standard unix password manager" in passoutput
             except subprocess.CalledProcessError as e:
-                raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}")
+                raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}") from e
 
         return self.realpass
 
@@ -329,14 +329,14 @@ class LookupModule(LookupBase):
                         raise AnsibleAssertionError(f"{name} not in paramvals")
                     self.paramvals[name] = value
             except (ValueError, AssertionError) as e:
-                raise AnsibleError(e)
+                raise AnsibleError(e) from e
             # check and convert values
             try:
                 for key in ["create", "returnall", "overwrite", "backup", "nosymbols"]:
                     if not isinstance(self.paramvals[key], bool):
                         self.paramvals[key] = boolean(self.paramvals[key])
             except (ValueError, AssertionError) as e:
-                raise AnsibleError(e)
+                raise AnsibleError(e) from e
             if self.paramvals["missing"] not in ["error", "warn", "create", "empty"]:
                 raise AnsibleError(f"{self.paramvals['missing']} is not a valid option for missing")
             if not isinstance(self.paramvals["length"], int):
@@ -395,7 +395,7 @@ class LookupModule(LookupBase):
         except subprocess.CalledProcessError as e:
             # 'not in password store' is the expected error if a password wasn't found
             if "not in the password store" not in e.output:
-                raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}")
+                raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}") from e
 
         if self.paramvals["missing"] == "error":
             raise AnsibleError(f"passwordstore: passname {self.passname} not found and missing=error is set")
@@ -459,7 +459,7 @@ class LookupModule(LookupBase):
         try:
             check_output2([self.pass_cmd, "insert", "-f", "-m", self.passname], input=msg, env=self.env)
         except subprocess.CalledProcessError as e:
-            raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}")
+            raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}") from e
         return newpass
 
     def generate_password(self):
@@ -480,7 +480,7 @@ class LookupModule(LookupBase):
         try:
             check_output2([self.pass_cmd, "insert", "-f", "-m", self.passname], input=msg, env=self.env)
         except subprocess.CalledProcessError as e:
-            raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}")
+            raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}") from e
 
         return newpass
 
