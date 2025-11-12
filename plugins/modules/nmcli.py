@@ -2489,7 +2489,7 @@ class Nmcli:
             if key and len(pair) > 1:
                 raw_value = pair[1].lstrip()
                 if raw_value == "--":
-                    if key_type == list:
+                    if key_type is list:
                         conn_info[key] = []
                     else:
                         conn_info[key] = None
@@ -2504,7 +2504,7 @@ class Nmcli:
                             conn_info[alias_key] = alias_value
                 elif key in ("ipv4.routes", "ipv6.routes"):
                     conn_info[key] = [s.strip() for s in raw_value.split(";")]
-                elif key_type == list:
+                elif key_type is list:
                     conn_info[key] = [s.strip() for s in raw_value.split(",")]
                 else:
                     m_enum = p_enum_value.match(raw_value)
