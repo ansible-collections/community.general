@@ -2913,7 +2913,7 @@ class RedfishUtils:
 
     @staticmethod
     def _virt_media_image_inserted(resources, image_url):
-        for uri, data in resources.items():
+        for data in resources.values():
             if data.get("Image"):
                 if urlparse(image_url) == urlparse(data.get("Image")):
                     if data.get("Inserted", False) and data.get("ImageName"):

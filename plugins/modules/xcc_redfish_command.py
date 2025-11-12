@@ -418,7 +418,7 @@ class XCCRedfishUtils(RedfishUtils):
 
         # eject all inserted media one by one
         ejected_media_list = []
-        for uri, data in resources.items():
+        for data in resources.values():
             if data.get("Image") and data.get("Inserted", True):
                 returndict = self.virtual_media_eject_one(data.get("Image"))
                 if not returndict["ret"]:

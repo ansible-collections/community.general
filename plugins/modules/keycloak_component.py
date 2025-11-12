@@ -254,7 +254,7 @@ def main():
             changeset_copy["id"] = component_id
 
             # Compare top-level parameters
-            for param, value in changeset.items():
+            for param in changeset:
                 before_component[param] = component[param]
 
                 if changeset_copy[param] != component[param] and param != "config":
@@ -266,8 +266,8 @@ def main():
                     before_component["config"][p] = component["config"][p] or []
                 except KeyError:
                     before_component["config"][p] = []
-                if changeset_copy["config"][p] != component["config"][p]:
-                    changes += f"config.{p}: {component['config'][p]} -> {changeset_copy['config'][p]}, "
+                if v != component["config"][p]:
+                    changes += f"config.{p}: {component['config'][p]} -> {v}, "
                     result["changed"] = True
 
     # Check all the possible states of the resource and do what is needed to

@@ -27,7 +27,6 @@ ignore = [
     "UP030",  # Use implicit references for positional format fields
     "UP031",  # Use format specifiers instead of percent format
     "UP041",  # Replace aliased errors with `TimeoutError`
-    "B007",  # unused-loop-control-variable
     "B015",  # useless-comparison
     "B026",  # star-arg-unpacking-after-keyword-arg
     "SIM102",  # collapsible-if

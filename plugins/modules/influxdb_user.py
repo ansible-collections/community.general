@@ -175,7 +175,7 @@ def set_user_grants(module, client, user_name, grants):
     try:
         parsed_grants = []
         # Fix privileges wording
-        for i, v in enumerate(current_grants):
+        for v in current_grants:
             if v["privilege"] != "NO PRIVILEGES":
                 if v["privilege"] == "ALL PRIVILEGES":
                     v["privilege"] = "ALL"

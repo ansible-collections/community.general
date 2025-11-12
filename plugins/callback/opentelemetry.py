@@ -272,7 +272,7 @@ class OpenTelemetrySource:
 
         tasks = []
         parent_start_time = None
-        for task_uuid, task in tasks_data.items():
+        for task in tasks_data.values():
             if parent_start_time is None:
                 parent_start_time = task.start
             tasks.append(task)
@@ -309,7 +309,7 @@ class OpenTelemetrySource:
                 parent.set_attribute("ansible.host.ip", self.ip_address)
             parent.set_attribute("ansible.host.user", self.user)
             for task in tasks:
-                for host_uuid, host_data in task.host_data.items():
+                for host_data in task.host_data.values():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
                         self.update_span_data(task, host_data, span, disable_logs, disable_attributes_in_logs)
 

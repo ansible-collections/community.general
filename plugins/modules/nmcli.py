@@ -2553,7 +2553,7 @@ class Nmcli:
         supported_properties = self.get_supported_properties(setting)
         unsupported_properties = []
 
-        for property, value in getattr(self, setting_key).items():
+        for property in getattr(self, setting_key):
             if property not in supported_properties:
                 unsupported_properties.append(property)
 

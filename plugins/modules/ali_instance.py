@@ -890,7 +890,7 @@ def main():
     if state == "present":
         if not instance_ids:
             if len(instances) > count:
-                for i in range(0, len(instances) - count):
+                for _i in range(0, len(instances) - count):
                     inst = instances[len(instances) - 1]
                     if inst.status != "stopped" and not force:
                         module.fail_json(

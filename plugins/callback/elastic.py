@@ -201,7 +201,7 @@ class ElasticSource:
 
         tasks = []
         parent_start_time = None
-        for task_uuid, task in tasks_data.items():
+        for task in tasks_data.values():
             if parent_start_time is None:
                 parent_start_time = task.start
             tasks.append(task)
@@ -224,7 +224,7 @@ class ElasticSource:
                     label(ansible_host_ip=self.ip_address)
 
                 for task_data in tasks:
-                    for host_uuid, host_data in task_data.host_data.items():
+                    for host_data in task_data.host_data.values():
                         self.create_span_data(apm_cli, task_data, host_data)
 
                 apm_cli.end_transaction(name=__name__, result=status, duration=end_time - parent_start_time)
