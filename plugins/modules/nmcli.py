@@ -2383,12 +2383,13 @@ class Nmcli:
     def down_connection(self):
         cmd = [self.nmcli_bin, "con", "down", self.conn_name]
         return self.execute_command(cmd)
+
     def get_connection_state(self):
         """Get the current state of the connection"""
         cmd = [self.nmcli_bin, "--terse", "--fields", "GENERAL.STATE", "con", "show", self.conn_name]
         (rc, out, err) = self.execute_command(cmd)
         if rc != 0:
-            raise None
+            raise NmcliModuleError(err)
 
         lines = out.strip().split('\n')
         for line in lines:
@@ -2401,6 +2402,7 @@ class Nmcli:
         """Check if the connection is currently active"""
         state = self.get_connection_state()
         return state == "activated"
+        
     def up_connection(self):
         cmd = [self.nmcli_bin, "con", "up", self.conn_name]
         return self.execute_command(cmd)
