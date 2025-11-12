@@ -179,10 +179,7 @@ class Swupd:
             self.failed = True
             self.msg = "Failed to check for filesystem inconsistencies."
 
-        if self.FILES_NOT_MATCH in self.stdout:
-            return True
-
-        return False
+        return self.FILES_NOT_MATCH in self.stdout
 
     def install_bundle(self, bundle):
         """Installs a bundle with `swupd bundle-add bundle`"""

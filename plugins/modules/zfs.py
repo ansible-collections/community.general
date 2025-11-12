@@ -115,9 +115,7 @@ class Zfs:
         version = out.splitlines()[-1].split()[2]
         if version == "-":
             return True
-        if int(version) == 5000:
-            return True
-        return False
+        return int(version) == 5000
 
     def check_enhanced_sharing(self):
         if self.is_solaris and not self.is_openzfs:

@@ -229,9 +229,7 @@ def _add_server_ips(module, oneandone_conn, firewall_id, server_ids):
             attach_servers.append(attach_server)
 
         if module.check_mode:
-            if attach_servers:
-                return True
-            return False
+            return bool(attach_servers)
 
         firewall_policy = oneandone_conn.attach_server_firewall_policy(
             firewall_id=firewall_id, server_ips=attach_servers
@@ -248,9 +246,7 @@ def _remove_firewall_server(module, oneandone_conn, firewall_id, server_ip_id):
     try:
         if module.check_mode:
             firewall_server = oneandone_conn.get_firewall_server(firewall_id=firewall_id, server_ip_id=server_ip_id)
-            if firewall_server:
-                return True
-            return False
+            return bool(firewall_server)
 
         firewall_policy = oneandone_conn.remove_firewall_server(firewall_id=firewall_id, server_ip_id=server_ip_id)
         return firewall_policy
@@ -273,9 +269,7 @@ def _add_firewall_rules(module, oneandone_conn, firewall_id, rules):
 
         if module.check_mode:
             firewall_policy_id = get_firewall_policy(oneandone_conn, firewall_id)
-            if firewall_rules and firewall_policy_id:
-                return True
-            return False
+            return bool(firewall_rules and firewall_policy_id)
 
         firewall_policy = oneandone_conn.add_firewall_policy_rule(
             firewall_id=firewall_id, firewall_policy_rules=firewall_rules
@@ -292,9 +286,7 @@ def _remove_firewall_rule(module, oneandone_conn, firewall_id, rule_id):
     try:
         if module.check_mode:
             rule = oneandone_conn.get_firewall_policy_rule(firewall_id=firewall_id, rule_id=rule_id)
-            if rule:
-                return True
-            return False
+            return bool(rule)
 
         firewall_policy = oneandone_conn.remove_firewall_rule(firewall_id=firewall_id, rule_id=rule_id)
         return firewall_policy

@@ -83,10 +83,7 @@ def query_package(module, slackpkg_path, name):
     pattern = re.compile(f"^{re.escape(name)}-[^-]+-({re.escape(machine)}|noarch|fw)-[^-]+$")
     packages = [f for f in os.listdir("/var/log/packages") if pattern.match(f)]
 
-    if len(packages) > 0:
-        return True
-
-    return False
+    return bool(packages)
 
 
 def remove_packages(module, slackpkg_path, packages):

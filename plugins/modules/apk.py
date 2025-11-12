@@ -208,10 +208,7 @@ def query_toplevel(module, name, world):
 def query_package(module, name):
     cmd = APK_PATH + ["-v", "info", "--installed", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-    if rc == 0:
-        return True
-    else:
-        return False
+    return rc == 0
 
 
 def query_latest(module, name):
@@ -219,18 +216,14 @@ def query_latest(module, name):
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     search_pattern = rf"({re.escape(name)})-[\d\.\w]+-[\d\w]+\s+(.)\s+[\d\.\w]+-[\d\w]+\s+"
     match = re.search(search_pattern, stdout)
-    if match and match.group(2) == "<":
-        return False
-    return True
+    return not (match and match.group(2) == "<")
 
 
 def query_virtual(module, name):
     cmd = APK_PATH + ["-v", "info", "--description", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     search_pattern = rf"^{re.escape(name)}: virtual meta package"
-    if re.search(search_pattern, stdout):
-        return True
-    return False
+    return bool(re.search(search_pattern, stdout))
 
 
 def get_dependencies(module, name):

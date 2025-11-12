@@ -47,6 +47,4 @@ def ismount(path):
         return True  # path/.. on a different device as path
     ino1 = s1.st_ino
     ino2 = s2.st_ino
-    if ino1 == ino2:
-        return True  # path/.. is the same i-node as path
-    return False
+    return ino1 == ino2  # path/.. is the same i-node as path

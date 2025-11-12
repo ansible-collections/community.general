@@ -284,9 +284,7 @@ escape_table = {
 
 
 def is_valid_hex_color(color_choice):
-    if re.match(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", color_choice):
-        return True
-    return False
+    return bool(re.match(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", color_choice))
 
 
 def escape_quotes(text):

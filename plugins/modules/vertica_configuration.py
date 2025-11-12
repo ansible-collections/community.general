@@ -119,9 +119,7 @@ def get_configuration_facts(cursor, parameter_name=""):
 
 def check(configuration_facts, parameter_name, current_value):
     parameter_key = parameter_name.lower()
-    if current_value and current_value.lower() != configuration_facts[parameter_key]["current_value"].lower():
-        return False
-    return True
+    return not (current_value and current_value.lower() != configuration_facts[parameter_key]["current_value"].lower())
 
 
 def present(configuration_facts, cursor, parameter_name, current_value):

@@ -172,9 +172,7 @@ class icinga2_api:
 
     def check_connection(self):
         ret = self.call_url("v1/status")
-        if ret["code"] == 200:
-            return True
-        return False
+        return ret["code"] == 200
 
     def exists(self, hostname):
         data = {

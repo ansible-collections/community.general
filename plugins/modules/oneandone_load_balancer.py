@@ -282,9 +282,7 @@ def _add_server_ips(module, oneandone_conn, load_balancer_id, server_ids):
             attach_servers.append(attach_server)
 
         if module.check_mode:
-            if attach_servers:
-                return True
-            return False
+            return bool(attach_servers)
 
         load_balancer = oneandone_conn.attach_load_balancer_server(
             load_balancer_id=load_balancer_id, server_ips=attach_servers
@@ -303,9 +301,7 @@ def _remove_load_balancer_server(module, oneandone_conn, load_balancer_id, serve
             lb_server = oneandone_conn.get_load_balancer_server(
                 load_balancer_id=load_balancer_id, server_ip_id=server_ip_id
             )
-            if lb_server:
-                return True
-            return False
+            return bool(lb_server)
 
         load_balancer = oneandone_conn.remove_load_balancer_server(
             load_balancer_id=load_balancer_id, server_ip_id=server_ip_id
@@ -333,9 +329,7 @@ def _add_load_balancer_rules(module, oneandone_conn, load_balancer_id, rules):
 
         if module.check_mode:
             lb_id = get_load_balancer(oneandone_conn, load_balancer_id)
-            if load_balancer_rules and lb_id:
-                return True
-            return False
+            return bool(load_balancer_rules and lb_id)
 
         load_balancer = oneandone_conn.add_load_balancer_rule(
             load_balancer_id=load_balancer_id, load_balancer_rules=load_balancer_rules
@@ -353,9 +347,7 @@ def _remove_load_balancer_rule(module, oneandone_conn, load_balancer_id, rule_id
     try:
         if module.check_mode:
             rule = oneandone_conn.get_load_balancer_rule(load_balancer_id=load_balancer_id, rule_id=rule_id)
-            if rule:
-                return True
-            return False
+            return bool(rule)
 
         load_balancer = oneandone_conn.remove_load_balancer_rule(load_balancer_id=load_balancer_id, rule_id=rule_id)
         return load_balancer

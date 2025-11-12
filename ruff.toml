@@ -33,7 +33,6 @@ ignore = [
     "B026",  # star-arg-unpacking-after-keyword-arg
     "B904",  # raise-without-from-inside-except
     "SIM102",  # collapsible-if
-    "SIM103",  # needless-bool
     "SIM110",  # reimplemented-builtin
     "SIM112",  # uncapitalized-environment-variables
     "SIM114",  # if-with-same-arms
