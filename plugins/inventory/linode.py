@@ -160,7 +160,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         try:
             self.instances = self.client.linode.instances()
         except LinodeApiError as exception:
-            raise AnsibleError(f"Linode client raised: {exception}")
+            raise AnsibleError(f"Linode client raised: {exception}") from exception
 
     def _add_groups(self):
         """Add Linode instance groups to the dynamic inventory."""

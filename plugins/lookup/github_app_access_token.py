@@ -116,7 +116,7 @@ class PythonJWT:
             with open(path, "rb") as pem_file:
                 return jwk_from_pem(pem_file.read())
         except Exception as e:
-            raise AnsibleError(f"Error while parsing key file: {e}")
+            raise AnsibleError(f"Error while parsing key file: {e}") from e
 
     @staticmethod
     def encode_jwt(app_id, jwk, exp=600):
@@ -129,7 +129,7 @@ class PythonJWT:
         try:
             return jwt_instance.encode(payload, jwk, alg="RS256")
         except Exception as e:
-            raise AnsibleError(f"Error while encoding jwt: {e}")
+            raise AnsibleError(f"Error while encoding jwt: {e}") from e
 
 
 def read_key(path, private_key=None):
@@ -143,7 +143,7 @@ def read_key(path, private_key=None):
                 key_bytes = pem_file.read()
         return serialization.load_pem_private_key(key_bytes, password=None)
     except Exception as e:
-        raise AnsibleError(f"Error while parsing key file: {e}")
+        raise AnsibleError(f"Error while parsing key file: {e}") from e
 
 
 def encode_jwt(app_id, private_key_obj, exp=600):
@@ -158,7 +158,7 @@ def encode_jwt(app_id, private_key_obj, exp=600):
     try:
         return jwt.encode(payload, private_key_obj, algorithm="RS256")
     except Exception as e:
-        raise AnsibleError(f"Error while encoding jwt: {e}")
+        raise AnsibleError(f"Error while encoding jwt: {e}") from e
 
 
 def post_request(generated_jwt, installation_id, api_base):
@@ -178,15 +178,15 @@ def post_request(generated_jwt, installation_id, api_base):
         except Exception:
             error_body = {}
         if e.code == 404:
-            raise AnsibleError("Github return error. Please confirm your installation_id value is valid")
+            raise AnsibleError("Github return error. Please confirm your installation_id value is valid") from e
         elif e.code == 401:
-            raise AnsibleError("Github return error. Please confirm your private key is valid")
-        raise AnsibleError(f"Unexpected data returned: {e} -- {error_body}")
+            raise AnsibleError("Github return error. Please confirm your private key is valid") from e
+        raise AnsibleError(f"Unexpected data returned: {e} -- {error_body}") from e
     response_body = response.read()
     try:
         json_data = json.loads(response_body.decode("utf-8"))
     except json.decoder.JSONDecodeError as e:
-        raise AnsibleError(f"Error while dencoding JSON respone from github: {e}")
+        raise AnsibleError(f"Error while dencoding JSON respone from github: {e}") from e
     return json_data.get("token")
 
 

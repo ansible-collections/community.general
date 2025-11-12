@@ -72,7 +72,7 @@ def to_ini(obj):
     try:
         ini_parser.read_dict(obj)
     except Exception as ex:
-        raise AnsibleFilterError(f"to_ini failed to parse given dict:{ex}", orig_exc=ex)
+        raise AnsibleFilterError(f"to_ini failed to parse given dict:{ex}", orig_exc=ex) from ex
 
     # catching empty dicts
     if obj == dict():

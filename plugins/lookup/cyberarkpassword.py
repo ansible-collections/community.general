@@ -164,11 +164,11 @@ class CyberarkPassword:
                     result_dict[output_names[i]] = to_native(output_values[i])
 
         except subprocess.CalledProcessError as e:
-            raise AnsibleError(e.output)
+            raise AnsibleError(e.output) from e
         except OSError as e:
             raise AnsibleError(
                 f"ERROR - AIM not installed or clipasswordsdk not in standard location. ERROR=({e.errno}) => {e.strerror} "
-            )
+            ) from e
 
         return [result_dict]
 

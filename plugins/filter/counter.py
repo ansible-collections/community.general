@@ -51,7 +51,7 @@ def counter(sequence):
     except TypeError as e:
         raise AnsibleFilterError(
             f"community.general.counter needs a sequence with hashable elements (int, float or str) - {e}"
-        )
+        ) from e
     return result
 
 

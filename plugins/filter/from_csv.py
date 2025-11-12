@@ -98,7 +98,7 @@ def from_csv(data, dialect="excel", fieldnames=None, delimiter=None, skipinitial
     try:
         dialect = initialize_dialect(dialect, **dialect_params)
     except (CustomDialectFailureError, DialectNotAvailableError) as e:
-        raise AnsibleFilterError(str(e))
+        raise AnsibleFilterError(str(e)) from e
 
     reader = read_csv(data, dialect, fieldnames)
 
@@ -108,7 +108,7 @@ def from_csv(data, dialect="excel", fieldnames=None, delimiter=None, skipinitial
         for row in reader:
             data_list.append(row)
     except CSVError as e:
-        raise AnsibleFilterError(f"Unable to process file: {e}")
+        raise AnsibleFilterError(f"Unable to process file: {e}") from e
 
     return data_list
 

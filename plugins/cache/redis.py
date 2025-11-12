@@ -147,8 +147,10 @@ class CacheModule(BaseCacheModule):
         """
         try:
             from redis.sentinel import Sentinel
-        except ImportError:
-            raise AnsibleError("The 'redis' python module (version 2.9.0 or newer) is required to use redis sentinel.")
+        except ImportError as e:
+            raise AnsibleError(
+                "The 'redis' python module (version 2.9.0 or newer) is required to use redis sentinel."
+            ) from e
 
         if ";" not in uri:
             raise AnsibleError("_uri does not have sentinel syntax.")
@@ -170,7 +172,7 @@ class CacheModule(BaseCacheModule):
         try:
             return scon.master_for(self._sentinel_service_name, socket_timeout=0.2)
         except Exception as exc:
-            raise AnsibleError(f"Could not connect to redis sentinel: {exc}")
+            raise AnsibleError(f"Could not connect to redis sentinel: {exc}") from exc
 
     def _make_key(self, key):
         return self._prefix + key
