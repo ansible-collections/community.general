@@ -270,9 +270,7 @@ class Migrations:
         # if version <4.3 we can't use cluster-stable info cmd
         # regex hack to check for versions beginning with 0-3 or
         # beginning with 4.0,4.1,4.2
-        if re.search(R"^([0-3]\.|4\.[0-2])", min(self._build_list)):
-            return False
-        return True
+        return not re.search(R"^([0-3]\.|4\.[0-2])", min(self._build_list))
 
     def _update_cluster_namespace_list(self):
         """make a unique list of namespaces
@@ -336,9 +334,7 @@ class Migrations:
                 cluster_keys[cluster_key] = 1
             else:
                 cluster_keys[cluster_key] += 1
-        if len(cluster_keys.keys()) == 1 and self._start_cluster_key in cluster_keys:
-            return True
-        return False
+        return bool(len(cluster_keys.keys()) == 1 and self._start_cluster_key in cluster_keys)
 
     def _cluster_migrates_allowed(self):
         """ensure all nodes have 'migrate_allowed' in their stats output"""
@@ -355,9 +351,7 @@ class Migrations:
         for node in self._nodes:
             if self._node_has_migs(node):
                 migs += 1
-        if migs == 0:
-            return False
-        return True
+        return migs != 0
 
     def _has_migs(self, local):
         if local:
@@ -376,9 +370,7 @@ class Migrations:
 
         if (len(sizes)) > 1:  # if we are getting more than 1 size, lets say no
             return False
-        if (min(sizes)) >= self.module.params["min_cluster_size"]:
-            return True
-        return False
+        return min(sizes) >= self.module.params["min_cluster_size"]
 
     def _cluster_stable(self):
         """Added 4.3:
@@ -403,9 +395,7 @@ class Migrations:
                 if "unstable-cluster" in e.msg:
                     return False
                 raise e
-        if len(cluster_key) == 1:
-            return True
-        return False
+        return len(cluster_key) == 1
 
     def _cluster_good_state(self):
         """checks a few things to make sure we're OK to say the cluster

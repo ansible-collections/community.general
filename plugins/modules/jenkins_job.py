@@ -244,9 +244,7 @@ class JenkinsJob:
         self.result["diff"]["after"] = config_file
         self.result["diff"]["before"] = machine_file
 
-        if machine_file != config_file:
-            return True
-        return False
+        return machine_file != config_file
 
     def present_job(self):
         if self.config is None and self.enabled is None:

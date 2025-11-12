@@ -137,9 +137,7 @@ def check(role_facts, role, assigned_roles):
     role_key = role.lower()
     if role_key not in role_facts:
         return False
-    if assigned_roles and sorted(assigned_roles) != sorted(role_facts[role_key]["assigned_roles"]):
-        return False
-    return True
+    return not (assigned_roles and sorted(assigned_roles) != sorted(role_facts[role_key]["assigned_roles"]))
 
 
 def present(role_facts, cursor, role, assigned_roles):

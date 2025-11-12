@@ -364,10 +364,7 @@ class Zone:
     def exists(self):
         cmd = [self.zoneadm_cmd, "-z", self.name, "list"]
         (rc, out, err) = self.module.run_command(cmd)
-        if rc == 0:
-            return True
-        else:
-            return False
+        return rc == 0
 
     def is_running(self):
         return self.status() == "running"

@@ -487,10 +487,7 @@ def check_parted_label(device):
 
     # Older parted versions return a message in the stdout and RC > 0.
     rc, out, err = module.run_command([parted_exec, "-s", "-m", device, "print"])
-    if rc != 0 and "unrecognised disk label" in out.lower():
-        return True
-
-    return False
+    return rc != 0 and "unrecognised disk label" in out.lower()
 
 
 def parse_parted_version(out):

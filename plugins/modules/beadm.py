@@ -194,10 +194,7 @@ class BE:
         (rc, out, dummy) = self._beadm_list()
 
         if rc == 0:
-            if self._find_be_by_name(out):
-                return True
-            else:
-                return False
+            return bool(self._find_be_by_name(out))
         else:
             return False
 

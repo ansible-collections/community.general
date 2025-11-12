@@ -91,10 +91,7 @@ from ansible.module_utils.urls import fetch_url
 def ring_check(module, riak_admin_bin):
     cmd = riak_admin_bin + ["ringready"]
     rc, out, err = module.run_command(cmd)
-    if rc == 0 and "TRUE All nodes agree on the ring" in out:
-        return True
-    else:
-        return False
+    return rc == 0 and "TRUE All nodes agree on the ring" in out
 
 
 def main():
