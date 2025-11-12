@@ -1,0 +1,17 @@
+minor_changes:
+  - filesize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - flatpak_remote - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - hg - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - ipa_pwpolicy - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - iso_customize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - ldap_search - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - nomad_job - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - nosh - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - ocapi_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - ocapi_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - packet_project - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - packet_volume - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - portage - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - redhat_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+  - xml - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).

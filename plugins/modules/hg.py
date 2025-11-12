@@ -90,7 +90,6 @@ EXAMPLES = r"""
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class Hg:
@@ -123,14 +122,14 @@ class Hg:
         if rc != 0:
             self.module.fail_json(msg=err)
         else:
-            return to_native(out).strip("\n")
+            return out.strip("\n")
 
     def get_remote_revision(self):
         (rc, out, err) = self._command(["id", self.repo])
         if rc != 0:
             self.module.fail_json(msg=err)
         else:
-            return to_native(out).strip("\n")
+            return out.strip("\n")
 
     def has_local_mods(self):
         now = self.get_revision()

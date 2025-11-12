@@ -260,7 +260,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.respawn import has_respawned, respawn_module
-from ansible.module_utils.common.text.converters import to_native
 
 
 try:
@@ -407,12 +406,12 @@ def emerge_packages(module, packages):
 
         """Add the --flag=value pair."""
         if isinstance(flag_val, bool):
-            args.extend((arg, to_native("y" if flag_val else "n")))
+            args.extend((arg, "y" if flag_val else "n"))
         elif not flag_val:
             """If the value is 0 or 0.0: add the flag, but not the value."""
             args.append(arg)
         else:
-            args.extend((arg, to_native(flag_val)))
+            args.extend((arg, str(flag_val)))
 
     cmd, (rc, out, err) = run_emerge(module, packages, *args)
     if rc != 0:
