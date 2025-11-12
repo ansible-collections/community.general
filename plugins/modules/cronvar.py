@@ -161,8 +161,8 @@ class CronVar:
             except IOError:
                 # cron file does not exist
                 return
-            except Exception:
-                raise CronVarError("Unexpected error:", sys.exc_info()[0])
+            except Exception as e:
+                raise CronVarError("Unexpected error:", sys.exc_info()[0]) from e
         else:
             # using safely quoted shell for now, but this really should be two non-shell calls instead.  FIXME
             (rc, out, err) = self.module.run_command(self._read_user_execute(), use_unsafe_shell=True)
@@ -218,8 +218,8 @@ class CronVar:
         except OSError:
             # cron file does not exist
             return False
-        except Exception:
-            raise CronVarError("Unexpected error:", sys.exc_info()[0])
+        except Exception as e:
+            raise CronVarError("Unexpected error:", sys.exc_info()[0]) from e
 
     def parse_for_var(self, line):
         lexer = shlex.shlex(line)

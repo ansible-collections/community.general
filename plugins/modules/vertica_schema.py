@@ -242,8 +242,8 @@ def absent(schema_facts, cursor, schema, usage_roles, create_roles):
         )
         try:
             cursor.execute(f"drop schema {schema_facts[schema_key]['name']} restrict")
-        except pyodbc.Error:
-            raise CannotDropError("Dropping schema failed due to dependencies.")
+        except pyodbc.Error as e:
+            raise CannotDropError("Dropping schema failed due to dependencies.") from e
         del schema_facts[schema_key]
         return True
     else:

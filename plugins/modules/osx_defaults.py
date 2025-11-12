@@ -210,8 +210,8 @@ class OSXDefaults:
         elif data_type == "date":
             try:
                 return datetime.strptime(value.split("+")[0].strip(), "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                raise OSXDefaultsException(f"Invalid date value: {value!r}. Required format yyy-mm-dd hh:mm:ss.")
+            except ValueError as e:
+                raise OSXDefaultsException(f"Invalid date value: {value!r}. Required format yyy-mm-dd hh:mm:ss.") from e
         elif data_type in ["int", "integer"]:
             if not OSXDefaults.is_int(value):
                 raise OSXDefaultsException(f"Invalid integer value: {value!r}")
@@ -219,8 +219,8 @@ class OSXDefaults:
         elif data_type == "float":
             try:
                 value = float(value)
-            except ValueError:
-                raise OSXDefaultsException(f"Invalid float value: {value!r}")
+            except ValueError as e:
+                raise OSXDefaultsException(f"Invalid float value: {value!r}") from e
             return value
         elif data_type == "array":
             if not isinstance(value, list):

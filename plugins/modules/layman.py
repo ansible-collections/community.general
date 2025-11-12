@@ -136,7 +136,7 @@ def download_url(module, url, dest):
         with open(dest, "w") as f:
             shutil.copyfileobj(response, f)
     except IOError as e:
-        raise ModuleError(f"Failed to write: {e}")
+        raise ModuleError(f"Failed to write: {e}") from e
 
 
 def install_overlay(module, name, list_url=None):
