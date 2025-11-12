@@ -79,7 +79,6 @@ subca:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -215,7 +214,7 @@ def main():
         changed, record = ensure(module, client)
         module.exit_json(changed=changed, record=record)
     except Exception as exc:
-        module.fail_json(msg=to_native(exc))
+        module.fail_json(msg=f"{exc}")
 
 
 if __name__ == "__main__":
