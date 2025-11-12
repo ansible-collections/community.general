@@ -30,6 +30,7 @@ jobs:
       matrix:
         ansible:
           - '2.16'
+          - '2.17'
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
@@ -63,6 +64,12 @@ jobs:
             python: '3.6'
           - ansible: '2.16'
             python: '3.11'
+          - ansible: '2.17'
+            python: '3.7'
+          - ansible: '2.17'
+            python: '3.10'
+          - ansible: '2.17'
+            python: '3.12'
 
     steps:
       - name: >-
@@ -136,19 +143,43 @@ jobs:
             docker: alpine3
             python: ''
             target: azp/posix/3/
-          # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
-          # - ansible: '2.16'
-          #   docker: default
-          #   python: '2.7'
-          #   target: azp/generic/1/
-          # - ansible: '2.16'
-          #   docker: default
-          #   python: '3.6'
-          #   target: azp/generic/1/
-          # - ansible: '2.16'
-          #   docker: default
-          #   python: '3.11'
-          #   target: azp/generic/1/
+          # 2.17
+          - ansible: '2.17'
+            docker: fedora39
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.17'
+            docker: fedora39
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.17'
+            docker: fedora39
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.17'
+            docker: alpine319
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.17'
+            docker: alpine319
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.17'
+            docker: alpine319
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.17'
+            docker: ubuntu2004
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.17'
+            docker: ubuntu2004
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.17'
+            docker: ubuntu2004
+            python: ''
+            target: azp/posix/3/
 
     steps:
       - name: >-
