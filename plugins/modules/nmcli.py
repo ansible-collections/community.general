@@ -2402,7 +2402,7 @@ class Nmcli:
         """Check if the connection is currently active"""
         state = self.get_connection_state()
         return state == "activated"
-        
+
     def up_connection(self):
         cmd = [self.nmcli_bin, "con", "up", self.conn_name]
         return self.execute_command(cmd)
