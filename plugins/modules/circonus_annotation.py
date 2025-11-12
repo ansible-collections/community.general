@@ -160,7 +160,6 @@ except ImportError:
     HAS_REQUESTS = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def check_requests_dep(module):
@@ -235,7 +234,7 @@ def main():
     try:
         resp = post_annotation(annotation, module.params["api_key"])
     except requests.exceptions.RequestException as e:
-        module.fail_json(msg="Request Failed", reason=to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg="Request Failed", reason=f"{e}", exception=traceback.format_exc())
     module.exit_json(changed=True, annotation=resp.json())
 
 
