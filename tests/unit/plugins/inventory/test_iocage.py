@@ -91,7 +91,7 @@ def test_get_jails(inventory):
 def test_get_properties(inventory):
     results = {"_meta": {"hostvars": {}}}
     inventory.get_jails(inventory.jails, results)
-    for hostname, host_vars in results["_meta"]["hostvars"].items():
+    for hostname in results["_meta"]["hostvars"]:
         inventory.get_properties(inventory.prpts[hostname], results, hostname)
     assert results == inventory.ps_ok
 
@@ -99,7 +99,7 @@ def test_get_properties(inventory):
 def test_populate(inventory, mocker):
     results = {"_meta": {"hostvars": {}}}
     inventory.get_jails(inventory.jails, results)
-    for hostname, host_vars in results["_meta"]["hostvars"].items():
+    for hostname in results["_meta"]["hostvars"]:
         inventory.get_properties(inventory.prpts[hostname], results, hostname)
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory.populate(results)

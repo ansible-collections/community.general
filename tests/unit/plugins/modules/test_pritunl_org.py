@@ -96,9 +96,9 @@ class TestPritunlOrg(ModuleTestCase):
         # except for changed which should be false the second time
         for k, v in idempotent_exc.items():
             if k == "changed":
-                self.assertFalse(idempotent_exc[k])
+                self.assertFalse(v)
             else:
-                self.assertEqual(create_exc[k], idempotent_exc[k])
+                self.assertEqual(create_exc[k], v)
 
     def test_absent(self):
         """Test organization removal from Pritunl."""
