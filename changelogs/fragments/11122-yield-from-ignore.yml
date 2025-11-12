@@ -1,2 +1,2 @@
 minor_changes:
-  - univention_umc module utils - update code to Python 3, enabling sanity test (https://github.com/ansible-collections/community.general/pull/11122).
+  - univention_umc module utils - update code to Python 3 (https://github.com/ansible-collections/community.general/pull/11122).
