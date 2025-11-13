@@ -23,7 +23,7 @@ attributes:
   check_mode:
     support: full
     details:
-      - Check mode simply does nothing except returning C(changed=true) in case the O(url) seems to be correct.
+      - Check mode simply does nothing except returning RV(ignore:changed=true) in case the O(url) seems to be correct.
   diff_mode:
     support: none
 options:

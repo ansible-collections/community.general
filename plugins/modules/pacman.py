@@ -82,7 +82,7 @@ options:
       - Whether or not to refresh the master package lists.
       - This can be run as part of a package installation or as a separate step.
       - If not specified, it defaults to V(false).
-      - Please note that this option only had an influence on the module's C(changed) state if O(name) and O(upgrade) are
+      - Please note that this option only had an influence on the module's RV(ignore:changed) state if O(name) and O(upgrade) are
         not specified before community.general 5.0.0. See the examples for how to keep the old behavior.
     type: bool
 
@@ -128,7 +128,7 @@ notes:
   - 'In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages with the error:
     C(error: target not found: <pkg>). This is caused by an incompatibility of yay with the arguments passed by this module.
     See L(yay bug #1744 report for details, https://github.com/Jguer/yay/issues/1744).'
-  - The common return values C(stdout) and C(stderr) are returned upon success, when needed, since community.general 4.1.0.
+  - The common return values RV(ignore:stdout) and RV(ignore:stderr) are returned upon success, when needed, since community.general 4.1.0.
 """
 
 RETURN = r"""

@@ -69,16 +69,16 @@ options:
       - If V(false), it ensures the dependencies declared as suggests are not installed, overriding any decision made earlier
         in E(PERL_CPANM_OPT).
       - If parameter is not set, C(cpanm) uses its existing defaults.
-      - When these dependencies fail to install, cpanm continues the installation, since they are just suggestion.
+      - When these dependencies fail to install, C(cpanm) continues the installation, since they are just suggestions.
     type: bool
     version_added: 10.3.0
   version:
     description:
-      - Version specification for the perl module. When O(mode) is V(new), C(cpanm) version operators are accepted.
+      - Version specification for the perl module. When O(mode=new), C(cpanm) version operators are accepted.
     type: str
   executable:
     description:
-      - Override the path to the cpanm executable.
+      - Override the path to the C(cpanm) executable.
     type: path
   mode:
     description:

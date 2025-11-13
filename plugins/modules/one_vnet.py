@@ -20,7 +20,7 @@ attributes:
   check_mode:
     support: partial
     details:
-      - Note that check mode always returns C(changed=true) for existing networks, even if the network would not actually
+      - Note that check mode always returns RV(ignore:changed=true) for existing networks, even if the network would not actually
         change.
   diff_mode:
     support: none
