@@ -248,6 +248,8 @@ runner:
   type: dict
 """
 
+import traceback
+
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
@@ -487,12 +489,12 @@ def main():
         try:
             gitlab_project = gitlab_instance.projects.get(project)
         except gitlab.exceptions.GitlabGetError as e:
-            module.fail_json(msg=f"No such a project {project}", exception=e)
+            module.fail_json(msg=f"No such a project {project}: {e}", exception=traceback.format_exc())
     elif group:
         try:
             gitlab_group = gitlab_instance.groups.get(group)
         except gitlab.exceptions.GitlabGetError as e:
-            module.fail_json(msg=f"No such a group {group}", exception=e)
+            module.fail_json(msg=f"No such a group {group}: {e}", exception=traceback.format_exc())
 
     gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_group, gitlab_project)
     runner_exists = gitlab_runner.exists_runner(runner_description)
