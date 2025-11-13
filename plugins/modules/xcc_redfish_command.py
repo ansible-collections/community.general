@@ -735,7 +735,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL.keys())}")
+        module.fail_json(msg=f"Invalid Category '{category}'. Valid Categories = {list(CATEGORY_COMMANDS_ALL)}")
 
     # Check that all commands are valid
     for cmd in command_list:
