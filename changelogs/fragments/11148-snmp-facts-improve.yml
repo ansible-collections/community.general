@@ -1,0 +1,2 @@
+minor_changes:
+  - snmp_facts - use standard Ansible constructs to validate parameters (https://github.com/ansible-collections/community.general/pull/11148).
