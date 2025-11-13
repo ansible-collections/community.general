@@ -1,0 +1,4 @@
+bugfixes:
+  - rundeck moduleutils - ensure the return value ``exception`` contains an exception traceback (https://github.com/ansible-collections/community.general/pull/11149).
+  - gitlab_runner - ensure the return value ``exception`` contains an exception traceback (https://github.com/ansible-collections/community.general/pull/11149).
+  - vmadm - ensure the return value ``exception`` contains an exception traceback (https://github.com/ansible-collections/community.general/pull/11149).
