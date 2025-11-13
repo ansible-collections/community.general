@@ -80,7 +80,7 @@ options:
   secret_environment_variables:
     description:
       - Secret environment variables of the container namespace.
-      - Updating those values does not output a C(changed) state in Ansible.
+      - Updating those values does not output a RV(ignore:changed) state in Ansible.
       - Injected in containers at runtime.
     type: dict
     default: {}

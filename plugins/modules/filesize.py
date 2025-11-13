@@ -66,7 +66,7 @@ options:
   force:
     description:
       - Whether or not to overwrite the file if it exists, in other words, to truncate it from 0. When V(true), the module
-        is not idempotent, that means it always reports C(changed=true).
+        is not idempotent, that means it always reports RV(ignore:changed=true).
       - O(force=true) and O(sparse=true) are mutually exclusive.
     type: bool
     default: false

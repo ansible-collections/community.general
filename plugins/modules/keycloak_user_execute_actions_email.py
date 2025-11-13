@@ -18,7 +18,7 @@ description:
     This sends an email with one or more required actions the user must complete (for example resetting the password).
   - If no O(actions) list is provided, the default action C(UPDATE_PASSWORD) is used.
   - You must supply either the user's O(id) or O(username). Supplying only C(username) causes an extra lookup call.
-  - This module always reports C(changed=true) because sending an email is a side effect and cannot be made idempotent.
+  - This module always reports RV(ignore:changed=true) because sending an email is a side effect and cannot be made idempotent.
 attributes:
   check_mode:
     support: full

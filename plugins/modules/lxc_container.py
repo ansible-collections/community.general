@@ -174,7 +174,7 @@ notes:
     the command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the container does not
     exist it is first created, V(started), the command executed, and then V(stopped). If you use a C(|) in the variable you
     can use common script formatting within the variable itself. The O(container_command) option always execute as C(bash).
-    When using O(container_command), a log file is created in the C(/tmp/) directory which contains both C(stdout) and C(stderr)
+    When using O(container_command), a log file is created in the C(/tmp/) directory which contains both RV(ignore:stdout) and RV(ignore:stderr)
     of any command executed.
   - If O(archive=true) the system attempts to create a compressed tarball of the running container. The O(archive) option
     supports LVM backed containers and creates a snapshot of the running container when creating the archive.

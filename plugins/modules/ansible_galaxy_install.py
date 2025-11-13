@@ -81,7 +81,7 @@ options:
   force:
     description:
       - Force overwriting existing roles and/or collections.
-      - It can be used for upgrading, but the module output always reports C(changed=true).
+      - It can be used for upgrading, but the module output always reports RV(ignore:changed=true).
       - Using O(force=true) is mandatory when downgrading.
     type: bool
     default: false
