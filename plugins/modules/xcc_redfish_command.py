@@ -556,7 +556,7 @@ class XCCRedfishUtils(RedfishUtils):
         data = response["data"]
         for key in request_body.keys():
             if key not in data:
-                return {"ret": False, "msg": f"Key {key} not found. Supported key list: {list(data.keys())}"}
+                return {"ret": False, "msg": f"Key {key} not found. Supported key list: {list(data)}"}
 
         # perform patch
         response = self.patch_request(self.root_uri + resource_uri, request_body)
