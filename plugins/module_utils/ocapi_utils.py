@@ -58,7 +58,7 @@ class OcapiUtils:
                 use_proxy=True,
                 timeout=self.timeout,
             )
-            data = json.loads(to_native(resp.read()))
+            data = json.loads(resp.read())
             headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {"ret": False, "msg": f"HTTP Error {e.code} on GET request to '{uri}'", "status": e.code}
@@ -88,7 +88,7 @@ class OcapiUtils:
                 timeout=self.timeout,
             )
             if resp.status != 204:
-                data = json.loads(to_native(resp.read()))
+                data = json.loads(resp.read())
             else:
                 data = ""
             headers = {k.lower(): v for (k, v) in resp.info().items()}

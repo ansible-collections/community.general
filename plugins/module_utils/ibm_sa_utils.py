@@ -9,7 +9,6 @@ from __future__ import annotations
 import traceback
 
 from functools import wraps
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import missing_required_lib
 
 PYXCLI_INSTALLED = True
@@ -54,7 +53,7 @@ def xcli_wrapper(func):
         try:
             return func(module, *args, **kwargs)
         except errors.CommandExecutionError as e:
-            module.fail_json(msg=to_native(e))
+            module.fail_json(msg=f"{e}")
 
     return wrapper
 
