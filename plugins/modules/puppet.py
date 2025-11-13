@@ -65,7 +65,7 @@ options:
     description:
       - Where the puppet logs should go, if puppet apply is being used.
       - V(all) goes to both C(console) and C(syslog).
-      - V(stdout) is deprecated and replaced by C(console).
+      - V(stdout) is deprecated and replaced by C(console).  # TODO which/where is console?
     type: str
     choices: [all, stdout, syslog]
     default: stdout

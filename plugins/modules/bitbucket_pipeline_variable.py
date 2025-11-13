@@ -55,7 +55,7 @@ options:
     choices: [absent, present]
 notes:
   - Check mode is supported.
-  - For secured values return parameter C(changed) is always V(true).
+  - For secured values return parameter RV(ignore:changed) is always V(true).
 """
 
 EXAMPLES = r"""
