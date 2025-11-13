@@ -68,7 +68,7 @@ EXAMPLES = r"""
 - name: Decompress file compressed with bzip2
   community.general.decompress:
     src: /path/to/file.txt.bz2
-    dest: /path/to/file.bz2
+    dest: /path/to/file.txt
     format: bz2
 
 - name: Decompress file and delete the compressed file afterwards
