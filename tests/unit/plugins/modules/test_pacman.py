@@ -354,7 +354,7 @@ class TestPacman:
 
             with pytest.raises(AnsibleExitJson) as e:
                 P.run()
-        self.mock_run_command.call_count == 0
+        assert self.mock_run_command.call_count == 0
         out = e.value.args[0]
         assert "packages" not in out
         assert out["changed"]
@@ -494,7 +494,7 @@ class TestPacman:
             out = e.value.args[0]
 
         if check_mode_value:
-            self.mock_run_command.call_count == 0
+            assert self.mock_run_command.call_count == 0
 
         if run_command_data and "args" in run_command_data:
             self.mock_run_command.assert_called_with(mock.ANY, run_command_data["args"], check_rc=False)
@@ -672,7 +672,7 @@ class TestPacman:
         assert not out["changed"]
         assert "packages" in out
         assert "diff" not in out
-        self.mock_run_command.call_count == 0
+        assert self.mock_run_command.call_count == 0
 
     @pytest.mark.parametrize(
         "module_args, expected_packages, package_list_out, run_command_data, raises",
