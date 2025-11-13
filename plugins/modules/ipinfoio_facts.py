@@ -95,25 +95,23 @@ class IpinfoioFacts:
         response, info = fetch_url(
             self.module,
             self.url,
-            force=True,  # NOQA
+            force=True,
             timeout=self.timeout,
         )
-        try:
-            info["status"] == 200
-        except AssertionError:
+        if info["status"] != 200:
             self.module.fail_json(msg=f"Could not get {self.url} page, check for connectivity!")
+
+        try:
+            content = response.read()
+            result = self.module.from_json(content)
+        except ValueError:
+            self.module.fail_json(msg=f"Failed to parse the ipinfo.io response: {self.url} {content}")
         else:
-            try:
-                content = response.read()
-                result = self.module.from_json(content.decode("utf8"))
-            except ValueError:
-                self.module.fail_json(msg=f"Failed to parse the ipinfo.io response: {self.url} {content}")
-            else:
-                return result
+            return result
 
 
 def main():
-    module = AnsibleModule(  # NOQA
+    module = AnsibleModule(
         argument_spec=dict(
             http_agent=dict(default=USER_AGENT),
             timeout=dict(type="int", default=10),

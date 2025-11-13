@@ -441,7 +441,7 @@ class TestPritunlApi:
 
         for org in response:
             if org["id"] == org_id:
-                org["user_count"] == org_user_count
+                assert org["user_count"] == org_user_count
 
     @pytest.mark.parametrize(
         "org_filters,org_expected",
