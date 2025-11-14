@@ -1,0 +1,108 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test check mode and diff mode
+
+- name: Create test files for check mode testing
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+    state: touch
+    mode: '0644'
+  loop:
+    - check1.tmp
+    - check2.tmp
+    - check3.txt
+
+- name: Test removal in check mode
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.tmp"
+  check_mode: true
+  register: check_mode_result
+
+- name: Verify check mode reported changes but didn't remove files
+  ansible.builtin.assert:
+    that:
+      - check_mode_result is changed
+      - check_mode_result.files_count == 2
+      - "file_remove_testdir ~ '/check1.tmp' in check_mode_result.removed_files"
+      - "file_remove_testdir ~ '/check2.tmp' in check_mode_result.removed_files"
+
+- name: Verify files still exist after check mode
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+  register: files_after_check
+  loop:
+    - check1.tmp
+    - check2.tmp
+
+- name: Assert files were not actually removed in check mode
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+  loop: "{{ files_after_check.results }}"
+
+- name: Test removal in normal mode with diff
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.tmp"
+  diff: true
+  register: diff_mode_result
+
+- name: Verify diff mode provides before/after information
+  ansible.builtin.assert:
+    that:
+      - diff_mode_result is changed
+      - diff_mode_result.files_count == 2
+      - diff_mode_result.diff is defined
+      - diff_mode_result.diff.before is defined
+      - diff_mode_result.diff.after is defined
+      - diff_mode_result.diff.before.files | length == 2
+      - diff_mode_result.diff.after.files | length == 0
+
+- name: Verify files were actually removed
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+  register: files_after_removal
+  loop:
+    - check1.tmp
+    - check2.tmp
+
+- name: Assert files were removed
+  ansible.builtin.assert:
+    that:
+      - not item.stat.exists
+  loop: "{{ files_after_removal.results }}"
+
+- name: Test idempotency - try to remove already removed files
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.tmp"
+  register: idempotent_result
+
+- name: Verify idempotency (no changes when no files match)
+  ansible.builtin.assert:
+    that:
+      - idempotent_result is not changed
+      - idempotent_result.files_count == 0
+      - idempotent_result.removed_files == []
+
+- name: Test idempotency in check mode
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.tmp"
+  check_mode: true
+  register: idempotent_check_result
+
+- name: Verify idempotency in check mode
+  ansible.builtin.assert:
+    that:
+      - idempotent_check_result is not changed
+      - idempotent_check_result.files_count == 0
+
+- name: Clean up test directory
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: absent

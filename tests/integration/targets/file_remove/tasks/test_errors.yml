@@ -1,0 +1,57 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test error handling
+
+- name: Test with non-existent path
+  community.general.file_remove:
+    path: /this/path/does/not/exist
+    pattern: "*.txt"
+  register: error_result_1
+  ignore_errors: true
+
+- name: Verify that non-existent path fails
+  ansible.builtin.assert:
+    that:
+      - error_result_1 is failed
+      - "'does not exist' in error_result_1.msg"
+
+- name: Create a test file to use as a non-directory path
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/testfile"
+    state: touch
+    mode: '0644'
+
+- name: Test with a file path instead of directory
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}/testfile"
+    pattern: "*.txt"
+  register: error_result_2
+  ignore_errors: true
+
+- name: Verify that non-directory path fails
+  ansible.builtin.assert:
+    that:
+      - error_result_2 is failed
+      - "'not a directory' in error_result_2.msg"
+
+- name: Test with invalid regex pattern
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "[unclosed"
+    use_regex: true
+  register: error_result_3
+  ignore_errors: true
+
+- name: Verify that invalid regex fails
+  ansible.builtin.assert:
+    that:
+      - error_result_3 is failed
+      - "'Invalid regular expression' in error_result_3.msg"
+
+- name: Remove test file
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/testfile"
+    state: absent
