@@ -26,8 +26,12 @@ notes:
   - This module uses the C(gi.repository) Python library when available for accurate comparison of values in C(dconf) to values
     specified in Ansible code. C(gi.repository) is likely to be present on most systems which have C(dconf) but may not be
     present everywhere. When it is missing, a simple string comparison between values is used, and there may be false positives,
-    that is, Ansible may think that a value is being changed when it is not. This fallback is to be removed in a future version
-    of this module, at which point the module C(gi.repository) is going to be required.
+    that is, Ansible may think that a value is being changed when it is not. This fallback is to be removed in version 15.0.0
+    of this collection, at which point the module C(gi.repository) is going to be required.
+  - The library C(gi.repository) is usually provided by operating system packages (C(python3-gi) for Ubuntu/Debian,
+    C(python3-gobject) for Red Hat/Fedora, C(python-gobject) for Archlinux, to mention a few).
+    It is available in PyPI as C(PyGObject) but it only provides bindings for system libraries, so using the system packages
+    is highly recommended over installing it with C(pip).
   - Detection of existing, running D-Bus session, required to change settings using C(dconf), is not 100% reliable due to
     implementation details of D-Bus daemon itself. This might lead to running applications not picking-up changes on-the-fly
     if options are changed using Ansible and C(dbus-run-session).
@@ -445,10 +449,12 @@ def main():
             module.params["value"] = to_native(module.params["value"], errors="surrogate_or_strict")
 
     if Variant is None:
-        module.warn(
-            "WARNING: The gi.repository Python library is not available; "
+        module.deprecate(
+            "The gi.repository Python library is not available; "
             "using string comparison to check value equality. This fallback "
-            "will be deprecated in a future version of community.general."
+            "will be removed in community.general 15.0.0.",
+            version="15.0.0",
+            collection_name="community.general",
         )
 
     deps.validate(module)
