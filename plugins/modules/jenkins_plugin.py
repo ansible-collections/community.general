@@ -342,7 +342,6 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.jenkins import download_updates_file
 
@@ -399,7 +398,7 @@ class JenkinsPlugin:
 
         # Parse the JSON data
         try:
-            json_data = json.loads(to_native(r.read()))
+            json_data = json.loads(r.read())
         except Exception as e:
             self.module.fail_json(msg=f"Cannot parse {what} JSON data.", details=f"{e}")
 
@@ -683,7 +682,7 @@ class JenkinsPlugin:
             now = time.time()
             if now - file_mtime >= 86400:
                 response = self._get_urls_data(plugin_version_urls, what="plugin-versions.json")
-                plugin_data = json.loads(to_native(response.read()), object_pairs_hook=OrderedDict)
+                plugin_data = json.loads(response.read(), object_pairs_hook=OrderedDict)
 
                 # Save it to file for next time
                 with open(cache_path, "w") as f:

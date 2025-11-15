@@ -290,7 +290,7 @@ def main():
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         led_commands = ["IndicatorLedOn", "IndicatorLedOff"]
 
