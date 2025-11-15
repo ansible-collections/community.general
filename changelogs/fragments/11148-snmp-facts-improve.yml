@@ -1,0 +1,2 @@
+minor_changes:
+  - snmp_facts - simplify code by using standard constructs (https://github.com/ansible-collections/community.general/pull/11148).
