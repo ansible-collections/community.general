@@ -36,7 +36,7 @@ options:
     default: present
 
 notes:
-  - Currently the module is B(only supported for Debian, Ubuntu, and Archlinux) systems.
+  - Currently the module is B(only supported for Debian, Ubuntu, and Arch Linux) systems.
   - This module requires the package C(locales) installed in Debian and Ubuntu systems.
   - If C(/etc/locale.gen) exists, the module assumes to be using the B(glibc) mechanism, else if C(/var/lib/locales/supported.d/)
     exists it assumes to be using the B(ubuntu_legacy) mechanism, else it raises an error.
