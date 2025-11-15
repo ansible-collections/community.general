@@ -1,0 +1,2 @@
+bugfixes:
+  - xcc_redfish_command - fix templating of dictionary keys as list (https://github.com/ansible-collections/community.general/pull/11144).
