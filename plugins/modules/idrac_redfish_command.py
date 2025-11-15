@@ -101,7 +101,6 @@ from ansible_collections.community.general.plugins.module_utils.redfish_utils im
     RedfishUtils,
     REDFISH_COMMON_ARGUMENT_SPEC,
 )
-from ansible.module_utils.common.text.converters import to_native
 
 
 class IdracRedfishUtils(RedfishUtils):
@@ -217,14 +216,14 @@ def main():
         result = rf_utils._find_systems_resource()
         rf_utils.data_modification = True
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command == "CreateBiosConfigJob":
                 # execute only if we find a Managers resource
                 result = rf_utils._find_managers_resource()
                 if result["ret"] is False:
-                    module.fail_json(msg=to_native(result["msg"]))
+                    module.fail_json(msg=result["msg"])
                 result = rf_utils.create_bios_config_job()
                 if "job_id" in result:
                     return_values["job_id"] = result["job_id"]
@@ -234,7 +233,7 @@ def main():
         del result["ret"]
         module.exit_json(changed=True, msg="Action was successful", return_values=return_values)
     else:
-        module.fail_json(msg=to_native(result["msg"]))
+        module.fail_json(msg=result["msg"])
 
 
 if __name__ == "__main__":

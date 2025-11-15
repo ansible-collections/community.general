@@ -521,7 +521,7 @@ def main():
         # execute only if we find a System resource
         result = rf_utils._find_systems_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command == "SetBiosDefaultSettings":
@@ -547,7 +547,7 @@ def main():
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command == "SetNetworkProtocols":
@@ -563,7 +563,7 @@ def main():
         # execute only if we find a Sessions resource
         result = rf_utils._find_sessionservice_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command == "SetSessionService":
