@@ -23,6 +23,10 @@ seealso:
     description: XFCE documentation for the Xfconf configuration system.
     link: 'https://docs.xfce.org/xfce/xfconf/start'
 
+  - name: xfce4-settings-editor - Settings Editor
+    description: XFCE documentation for the graphical editor for configuration settings.
+    link: https://docs.xfce.org/xfce/xfce4-settings/editor#change_properties
+
 extends_documentation_fragment:
   - community.general.attributes
 
@@ -69,6 +73,10 @@ options:
       - The action to take upon the property/value.
       - The state V(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info)
         instead.
+      - Xfce4 may, and usually does, have default values that come with the system packages.
+        You can set new values for these default properties and override the their values.
+        However, whey you use O(state=absent), the module executes the command C(xfconf-query reset) for the specified property and
+        that only removes user-configured properties, so those properties are B(not removed), but rather they go back to the default values.
     choices: [present, absent]
     default: "present"
   force_array:
