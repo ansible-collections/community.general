@@ -361,9 +361,7 @@ def get_vm_prop(module, uuid, prop):
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
-        module.fail_json(
-            msg=f"Could not perform lookup of {prop} on {uuid}:\n{stderr}", exception=traceback.format_exc()
-        )
+        module.fail_json(msg=f"Could not perform lookup of {prop} on {uuid}:\n{stderr}")
 
     try:
         stdout_json = json.loads(stdout)
@@ -386,7 +384,7 @@ def get_vm_uuid(module, alias):
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
-        module.fail_json(msg=f"Could not retrieve UUID of {alias}:\n{stderr}", exception=traceback.format_exc())
+        module.fail_json(msg=f"Could not retrieve UUID of {alias}:\n{stderr}")
 
     # If no VM was found matching the given alias, we get back an empty array.
     # That is not an error condition as we might be explicitly checking for its
@@ -411,7 +409,7 @@ def get_all_vm_uuids(module):
     (rc, stdout, stderr) = module.run_command(cmd)
 
     if rc != 0:
-        module.fail_json(msg=f"Failed to get VMs list:\n{stderr}", exception=traceback.format_exc())
+        module.fail_json(msg=f"Failed to get VMs list:\n{stderr}")
 
     try:
         stdout_json = json.loads(stdout)
@@ -427,7 +425,7 @@ def new_vm(module, uuid, vm_state):
 
     if rc != 0:
         changed = False
-        module.fail_json(msg=f"Could not create VM:\n{stderr}", exception=traceback.format_exc())
+        module.fail_json(msg=f"Could not create VM:\n{stderr}")
     else:
         changed = True
         # 'vmadm create' returns all output to stderr...
