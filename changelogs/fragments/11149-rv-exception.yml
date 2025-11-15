@@ -1,3 +1,3 @@
 bugfixes:
-  - rundeck module utils - ensure the return value ``exception`` contains an exception traceback (https://github.com/ansible-collections/community.general/pull/11149).
-  - vmadm - ensure the return value ``exception`` contains an exception traceback (https://github.com/ansible-collections/community.general/pull/11149).
+  - rundeck module utils - improve handling the return value ``exception`` (https://github.com/ansible-collections/community.general/pull/11149).
+  - vmadm - improve handling the return value ``exception`` (https://github.com/ansible-collections/community.general/pull/11149).
