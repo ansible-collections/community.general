@@ -101,7 +101,6 @@ RETURN = r"""
 
 import json
 
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
@@ -129,7 +128,7 @@ def query(module, url, check, subscription):
         module.fail_json(msg="Failed to query silence %s. Reason: %s" % (subscription, info))
 
     try:
-        json_out = json.loads(to_native(response.read()))
+        json_out = json.loads(response.read())
     except Exception:
         json_out = ""
 
@@ -176,7 +175,7 @@ def clear(module, url, check, subscription):
             module.fail_json(msg="Failed to silence %s. Reason: %s" % (subscription, info))
 
         try:
-            json_out = json.loads(to_native(response.read()))
+            json_out = json.loads(response.read())
         except Exception:
             json_out = ""
 
@@ -225,7 +224,7 @@ def create(module, url, check, creator, expire, expire_on_resolve, reason, subsc
             module.fail_json(msg="Failed to silence %s. Reason: %s" % (subscription, info["msg"]))
 
         try:
-            json_out = json.loads(to_native(response.read()))
+            json_out = json.loads(response.read())
         except Exception:
             json_out = ""
 

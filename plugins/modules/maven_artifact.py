@@ -274,7 +274,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 
 def split_pre_existing_dir(dirname):
@@ -601,7 +601,7 @@ class MavenDownloader:
                         errors="strict",
                     )
                 except UnicodeError as e:
-                    return f"Cannot retrieve a valid {checksum_alg} checksum from {remote_url}: {to_native(e)}"
+                    return f"Cannot retrieve a valid {checksum_alg} checksum from {remote_url}: {e}"
                 if not remote_checksum:
                     return f"Cannot find {checksum_alg} checksum from {remote_url}"
             try:

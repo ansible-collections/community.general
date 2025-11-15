@@ -291,7 +291,7 @@ def main():
                 if secure == "always":
                     module.fail_json(
                         rc=1,
-                        msg=f"Unable to start an encrypted session to {host}:{port}: {to_native(e)}",
+                        msg=f"Unable to start an encrypted session to {host}:{port}: {e}",
                         exception=traceback.format_exc(),
                     )
             except Exception:
@@ -302,14 +302,12 @@ def main():
             code, smtpmessage = smtp.connect(host, port)
 
     except smtplib.SMTPException as e:
-        module.fail_json(rc=1, msg=f"Unable to Connect {host}:{port}: {to_native(e)}", exception=traceback.format_exc())
+        module.fail_json(rc=1, msg=f"Unable to Connect {host}:{port}: {e}", exception=traceback.format_exc())
 
     try:
         smtp.ehlo()
     except smtplib.SMTPException as e:
-        module.fail_json(
-            rc=1, msg=f"Helo failed for host {host}:{port}: {to_native(e)}", exception=traceback.format_exc()
-        )
+        module.fail_json(rc=1, msg=f"Helo failed for host {host}:{port}: {e}", exception=traceback.format_exc())
 
     if int(code) > 0:
         if not secure_state and secure in ("starttls", "try"):
@@ -361,7 +359,7 @@ def main():
         for hdr in [x.strip() for x in header.split("|")]:
             try:
                 h_key, h_val = hdr.split("=", 1)
-                h_val = to_native(Header(h_val, charset))
+                h_val = to_native(Header(h_val, charset))  # TODO: use str() instead?
                 msg.add_header(h_key, h_val)
             except Exception:
                 module.warn(f"Skipping header '{hdr}', unable to parse")

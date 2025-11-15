@@ -748,11 +748,11 @@ def main():
         # For virtual media resource locates on Systems service
         result = rf_utils._find_systems_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
         # For virtual media resource locates on Managers service
         result = rf_utils._find_managers_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command == "VirtualMediaInsert":

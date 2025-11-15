@@ -133,7 +133,6 @@ from ansible_collections.community.general.plugins.module_utils.redfish_utils im
     RedfishUtils,
     REDFISH_COMMON_ARGUMENT_SPEC,
 )
-from ansible.module_utils.common.text.converters import to_native
 
 
 class IdracRedfishUtils(RedfishUtils):
@@ -235,7 +234,7 @@ def main():
         # execute only if we find a Manager resource
         result = rf_utils._find_managers_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command == "GetManagerAttributes":
@@ -246,7 +245,7 @@ def main():
         del result["ret"]
         module.exit_json(redfish_facts=result)
     else:
-        module.fail_json(msg=to_native(result["msg"]))
+        module.fail_json(msg=result["msg"])
 
 
 if __name__ == "__main__":

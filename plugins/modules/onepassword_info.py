@@ -300,7 +300,7 @@ class OnePasswordInfo:
                 rc, out, err = self._run(args, command_input=to_bytes(self.auto_login["master_password"]))
                 self.token = out.strip()
             except AnsibleModuleError as e:
-                module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {to_native(e)}")
+                module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {e}")
         else:
             module.fail_json(
                 msg=f"Unable to perform an initial sign in to 1Password. Please run '{self.cli_path} signin' "

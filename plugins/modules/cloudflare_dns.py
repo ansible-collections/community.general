@@ -441,7 +441,7 @@ import json
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
 
 
@@ -587,7 +587,7 @@ class CloudflareAPI:
             try:
                 result = json.loads(to_text(content, errors="surrogate_or_strict"))
             except getattr(json, "JSONDecodeError", ValueError) as e:
-                error_msg += f"; Failed to parse API response with error {to_native(e)}: {content}"
+                error_msg += f"; Failed to parse API response with error {e}: {content}"
 
         # Without a valid/parsed JSON response no more error processing can be done
         if result is None:

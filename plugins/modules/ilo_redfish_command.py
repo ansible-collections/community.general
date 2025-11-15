@@ -97,7 +97,6 @@ CATEGORY_COMMANDS_ALL = {"Systems": ["WaitforiLORebootCompletion"]}
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -153,7 +152,7 @@ def main():
 
         result = rf_utils._find_systems_resource()
         if result["ret"] is False:
-            module.fail_json(msg=to_native(result["msg"]))
+            module.fail_json(msg=result["msg"])
 
         for command in command_list:
             if command == "WaitforiLORebootCompletion":
