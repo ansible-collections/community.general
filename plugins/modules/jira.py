@@ -838,7 +838,7 @@ class JIRA(StateModuleHelper):
                 msg = []
                 for key in ("errorMessages", "errors"):
                     if error.get(key):
-                        msg.append(error[key])
+                        msg.append(str(error[key]))
                 if msg:
                     self.module.fail_json(msg=", ".join(msg))
                 self.module.fail_json(msg=f"{error}")
