@@ -129,7 +129,7 @@ def _verify_and_get_type(variable):
     elif isinstance(variable, dict):
         return "dict"
     else:
-        raise AnsibleError("Not supported type detected, variable must be a list or a dict")
+        raise AnsibleError(f"Not supported type detected, variable must be a list or a dict: '{variable}'")
 
 
 class LookupModule(LookupBase):
