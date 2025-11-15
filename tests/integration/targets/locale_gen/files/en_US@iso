@@ -1,0 +1,120 @@
+comment_char %
+escape_char /
+
+% This file is part of the GNU C Library and contains locale data.
+% The Free Software Foundation does not claim any copyright interest
+% in the locale data contained in this file.  The foregoing does not
+% affect the license of the GNU C Library as a whole.  It does not
+% exempt you from the conditions of the license if your use would
+% otherwise be governed by that license.
+
+LC_IDENTIFICATION
+title      "English locale for the USA with ISO formats"
+language   "American English"
+
+category "i18n:2012";LC_IDENTIFICATION
+category "i18n:2012";LC_CTYPE
+category "i18n:2012";LC_COLLATE
+category "i18n:2012";LC_TIME
+category "i18n:2012";LC_NUMERIC
+category "i18n:2012";LC_MONETARY
+category "i18n:2012";LC_MESSAGES
+category "i18n:2012";LC_PAPER
+category "i18n:2012";LC_NAME
+category "i18n:2012";LC_ADDRESS
+category "i18n:2012";LC_TELEPHONE
+category "i18n:2012";LC_MEASUREMENT
+END LC_IDENTIFICATION
+
+LC_TIME
+day   "Sunday";/
+      "Monday";/
+      "Tuesday";/
+      "Wednesday";/
+      "Thursday";/
+      "Friday";/
+      "Saturday"
+abday "Sun";/
+      "Mon";/
+      "Tue";/
+      "Wed";/
+      "Thu";/
+      "Fri";/
+      "Sat"
+
+mon   "January";/
+      "February";/
+      "March";/
+      "April";/
+      "May";/
+      "June";/
+      "July";/
+      "August";/
+      "September";/
+      "October";/
+      "November";/
+      "December"
+abmon "Jan";/
+      "Feb";/
+      "Mar";/
+      "Apr";/
+      "May";/
+      "Jun";/
+      "Jul";/
+      "Aug";/
+      "Sep";/
+      "Oct";/
+      "Nov";/
+      "Dec"
+
+date_fmt      "%a %d %b %Y %T %Z"
+d_t_fmt       "%a %d %b %Y %T"
+d_fmt         "%Y-%m-%d"
+t_fmt         "%T"
+t_fmt_ampm    ""
+am_pm         "";""
+week          7;19971130;4
+first_weekday 2
+END LC_TIME
+
+LC_CTYPE
+copy "en_US"
+END LC_CTYPE
+
+LC_COLLATE
+copy "en_US"
+END LC_COLLATE
+
+LC_MONETARY
+copy "en_US"
+END LC_MONETARY
+
+LC_NUMERIC
+decimal_point "."
+thousands_sep ","
+grouping      3;3
+END LC_NUMERIC
+
+LC_MESSAGES
+copy "en_US"
+END LC_MESSAGES
+
+LC_PAPER
+copy "i18n"
+END LC_PAPER
+
+LC_TELEPHONE
+copy "en_US"
+END LC_TELEPHONE
+
+LC_MEASUREMENT
+copy "i18n"
+END LC_MEASUREMENT
+
+LC_NAME
+copy "en_US"
+END LC_NAME
+
+LC_ADDRESS
+copy "en_US"
+END LC_ADDRESS
