@@ -34,17 +34,20 @@ options:
       - Whether the locales shall be present.
     choices: [absent, present]
     default: present
+
 notes:
+  - Currently the module is B(only supported for Debian, Ubuntu, and Arch Linux) systems.
+  - This module requires the package C(locales) installed in Debian and Ubuntu systems.
   - If C(/etc/locale.gen) exists, the module assumes to be using the B(glibc) mechanism, else if C(/var/lib/locales/supported.d/)
     exists it assumes to be using the B(ubuntu_legacy) mechanism, else it raises an error.
-  - When using glibc mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
-  - When using ubuntu_legacy mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running
+  - When using V(glibc) mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
+  - When using V(ubuntu_legacy) mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running
     C(locale-gen).
-  - Please note that the code path that uses ubuntu_legacy mechanism has not been tested for a while, because Ubuntu is already
-    using the glibc mechanism. There is no support for that, given our inability to test it. Therefore, that mechanism is
-    B(deprecated) and will be removed in community.general 13.0.0.
-  - Currently the module is B(only supported for Debian and Ubuntu) systems.
-  - This module requires the package C(locales) installed in Debian and Ubuntu systems.
+  - Please note that the module asserts the availability of the locale by checking the files C(/usr/share/i18n/SUPPORTED) and
+    C(/usr/local/share/i18n/SUPPORTED), but the C(/usr/local) one is not supported by Archlinux.
+  - Please note that the code path that uses V(ubuntu_legacy) mechanism has not been tested for a while, because recent versions of
+    Ubuntu is already using the V(glibc) mechanism. There is no support for V(ubuntu_legacy), given our inability to test it.
+    Therefore, that mechanism is B(deprecated) and will be removed in community.general 13.0.0.
 """
 
 EXAMPLES = r"""
@@ -85,7 +88,7 @@ from ansible_collections.community.general.plugins.module_utils.locale_gen impor
 ETC_LOCALE_GEN = "/etc/locale.gen"
 VAR_LIB_LOCALES = "/var/lib/locales/supported.d"
 VAR_LIB_LOCALES_LOCAL = os.path.join(VAR_LIB_LOCALES, "local")
-SUPPORTED_LOCALES = "/usr/share/i18n/SUPPORTED"
+SUPPORTED_LOCALES = ["/usr/share/i18n/SUPPORTED", "/usr/local/share/i18n/SUPPORTED"]
 LOCALE_NORMALIZATION = {
     ".utf8": ".UTF-8",
     ".eucjp": ".EUC-JP",
@@ -111,7 +114,7 @@ class LocaleGen(StateModuleHelper):
     )
 
     def __init_module__(self):
-        self.MECHANISMS = dict(
+        self.mechanisms = dict(
             ubuntu_legacy=dict(
                 available=SUPPORTED_LOCALES,
                 apply_change=self.apply_change_ubuntu_legacy,
@@ -156,19 +159,21 @@ class LocaleGen(StateModuleHelper):
         checking either :
         * if the locale is present in /etc/locales.gen
         * or if the locale is present in /usr/share/i18n/SUPPORTED"""
-        regexp = r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$"
-        locales_available = self.MECHANISMS[self.vars.mechanism]["available"]
 
-        re_compiled = re.compile(regexp)
-        with open(locales_available, "r") as fd:
-            lines = fd.readlines()
-        res = [re_compiled.match(line) for line in lines]
-        self.vars.set("available_lines", lines, verbosity=4)
+        self.vars.set("available_lines", [], verbosity=4)
+        available_locale_entry_re_matches = []
+        for locale_path in self.mechanisms[self.vars.mechanism]["available"]:
+            if os.path.exists(locale_path):
+                with open(locale_path, "r") as fd:
+                    self.vars.available_lines.extend(fd.readlines())
+
+        re_locale_entry = re.compile(r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$")
+        available_locale_entry_re_matches.extend([re_locale_entry.match(line) for line in self.vars.available_lines])
 
         locales_not_found = []
         for locale in self.vars.name:
             # Check if the locale is not found in any of the matches
-            if not any(match and match.group("locale") == locale for match in res):
+            if not any(match and match.group("locale") == locale for match in available_locale_entry_re_matches):
                 locales_not_found.append(locale)
 
         # locale may be installed but not listed in the file, for example C.UTF-8 in some systems
@@ -219,38 +224,41 @@ class LocaleGen(StateModuleHelper):
             re_search = re.compile(search_string)
             locale_regexes.append([re_search, new_string])
 
-        for i in range(len(lines)):
+        def search_replace(line):
             for [search, replace] in locale_regexes:
-                lines[i] = search.sub(replace, lines[i])
+                line = search.sub(replace, line)
+            return line
+
+        lines = [search_replace(line) for line in lines]
 
         # Write the modified content back to the file
         with open(ETC_LOCALE_GEN, "w") as fw:
             fw.writelines(lines)
 
-    def apply_change_glibc(self, targetState, names):
+    def apply_change_glibc(self, target_state, names):
         """Create or remove locale.
 
         Keyword arguments:
-        targetState -- Desired state, either present or absent.
+        target_state -- Desired state, either present or absent.
         names -- Names list including encoding such as de_CH.UTF-8.
         """
 
-        self.set_locale_glibc(names, enabled=(targetState == "present"))
+        self.set_locale_glibc(names, enabled=(target_state == "present"))
 
         runner = locale_gen_runner(self.module)
         with runner() as ctx:
             ctx.run()
 
-    def apply_change_ubuntu_legacy(self, targetState, names):
+    def apply_change_ubuntu_legacy(self, target_state, names):
         """Create or remove locale.
 
         Keyword arguments:
-        targetState -- Desired state, either present or absent.
+        target_state -- Desired state, either present or absent.
         names -- Name list including encoding such as de_CH.UTF-8.
         """
         runner = locale_gen_runner(self.module)
 
-        if targetState == "present":
+        if target_state == "present":
             # Create locale.
             # Ubuntu's patched locale-gen automatically adds the new locale to /var/lib/locales/supported.d/local
             with runner() as ctx:
@@ -273,7 +281,7 @@ class LocaleGen(StateModuleHelper):
     def __state_fallback__(self):
         if self.vars.state_tracking == self.vars.state:
             return
-        self.MECHANISMS[self.vars.mechanism]["apply_change"](self.vars.state, self.vars.name)
+        self.mechanisms[self.vars.mechanism]["apply_change"](self.vars.state, self.vars.name)
 
 
 def main():
