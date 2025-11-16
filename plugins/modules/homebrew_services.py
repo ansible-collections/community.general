@@ -95,12 +95,19 @@ from ansible_collections.community.general.plugins.module_utils.homebrew import 
     parse_brew_path,
 )
 
+
 # Stores validated arguments for an instance of an action.
 # See DOCUMENTATION string for argument-specific information.
-HomebrewServiceArgs = NamedTuple("HomebrewServiceArgs", [("name", str), ("state", str), ("brew_path", str)])
+class HomebrewServiceArgs(NamedTuple):
+    name: str
+    state: str
+    brew_path: str
+
 
 # Stores the state of a Homebrew service.
-HomebrewServiceState = NamedTuple("HomebrewServiceState", [("running", bool), ("pid", Optional[int])])
+class HomebrewServiceState(NamedTuple):
+    running: bool
+    pid: Optional[int]
 
 
 def _brew_service_state(args, module):
