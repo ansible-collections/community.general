@@ -120,7 +120,7 @@ removed_files:
 files_count:
   description: Number of files removed.
   type: int
-  returned: always
+  returned: success
   sample: 2
 
 path:
