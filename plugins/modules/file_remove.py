@@ -217,7 +217,7 @@ def remove_files(module: AnsibleModule, files: list[str]) -> tuple[list[str], li
     return removed_files, failed_files
 
 
-def main():
+def main() -> None:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="path", required=True),
