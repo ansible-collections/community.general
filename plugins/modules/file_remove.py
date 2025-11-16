@@ -208,6 +208,8 @@ def remove_files(module: AnsibleModule, files: list[str]) -> tuple[list[str], li
                 # Actually remove the file
                 os.remove(file_path)
                 removed_files.append(file_path)
+        except FileNotFoundError:
+            pass
         except OSError as e:
             failed_files.append((file_path, str(e)))
 
