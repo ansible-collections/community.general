@@ -196,7 +196,7 @@ def should_include_file(file_path: str, file_type: t.Literal["file", "link", "an
     return False
 
 
-def remove_files(module, files):
+def remove_files(module: AnsibleModule, files: list[str]) -> tuple[list[str], list[str]]:
     """Remove the specified files and return results."""
     removed_files = []
     failed_files = []
