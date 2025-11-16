@@ -171,7 +171,6 @@ description:
 import uuid
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils.common.text.converters import to_native
 
 HAS_PACKET_SDK = True
 
@@ -307,7 +306,7 @@ def main():
         try:
             module.exit_json(**act_on_volume(state, module, packet_conn))
         except Exception as e:
-            module.fail_json(msg=f"failed to set volume state {state}: {to_native(e)}")
+            module.fail_json(msg=f"failed to set volume state {state}: {e}")
     else:
         module.fail_json(msg=f"{state} is not a valid state for this module")
 

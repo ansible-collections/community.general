@@ -94,7 +94,6 @@ import re
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 def _load_dist_subclass(cls, *args, **kwargs):
@@ -159,7 +158,7 @@ class Svc:
             try:
                 os.symlink(self.src_full, self.svc_full)
             except OSError as e:
-                self.module.fail_json(path=self.src_full, msg=f"Error while linking: {to_native(e)}")
+                self.module.fail_json(path=self.src_full, msg=f"Error while linking: {e}")
         else:
             self.module.fail_json(msg=f"Could not find source for service to enable ({self.src_full}).")
 
