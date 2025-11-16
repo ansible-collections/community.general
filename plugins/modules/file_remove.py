@@ -139,7 +139,7 @@ import typing as t
 from ansible.module_utils.basic import AnsibleModule
 
 
-def find_matching_files(path, pattern, use_regex, recursive, file_type):
+def find_matching_files(path: str, pattern: str, use_regex: bool, recursive: bool, file_type: t.Literal["file", "link", "any"]) -> list[str]:
     """Find all files matching the pattern in the given path."""
     matching_files = []
 
