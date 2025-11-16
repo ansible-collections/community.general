@@ -174,7 +174,7 @@ def find_matching_files(path: str, pattern: str, use_regex: bool, recursive: boo
     return sorted(matching_files)
 
 
-def should_include_file(file_path, file_type):
+def should_include_file(file_path: str, file_type: t.Literal["file", "link", "any"]) -> bool:
     """Determine if a file should be included based on its type."""
     # Never include directories
     if os.path.isdir(file_path):
