@@ -21,19 +21,19 @@
     mode: '0755'
 
 - name: Include tasks to test error handling
-  include_tasks: test_errors.yml
+  ansible.builtin.include_tasks: test_errors.yml
 
 - name: Include tasks to test glob pattern matching
-  include_tasks: test_glob.yml
+  ansible.builtin.include_tasks: test_glob.yml
 
 - name: Include tasks to test regex pattern matching
-  include_tasks: test_regex.yml
+  ansible.builtin.include_tasks: test_regex.yml
 
 - name: Include tasks to test recursive removal
-  include_tasks: test_recursive.yml
+  ansible.builtin.include_tasks: test_recursive.yml
 
 - name: Include tasks to test different file types
-  include_tasks: test_file_types.yml
+  ansible.builtin.include_tasks: test_file_types.yml
 
 - name: Include tasks to test check mode and diff mode
-  include_tasks: test_check_diff.yml
+  ansible.builtin.include_tasks: test_check_diff.yml
