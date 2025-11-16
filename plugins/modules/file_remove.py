@@ -126,7 +126,7 @@ files_count:
 path:
   description: The directory path that was searched.
   type: str
-  returned: always
+  returned: success
   sample: /var/log
 """
 
