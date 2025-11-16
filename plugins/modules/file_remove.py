@@ -227,11 +227,11 @@ def main():
         supports_check_mode=True,
     )
 
-    path = module.params["path"]
-    pattern = module.params["pattern"]
-    use_regex = module.params["use_regex"]
-    recursive = module.params["recursive"]
-    file_type = module.params["file_type"]
+    path: str = module.params["path"]
+    pattern: str = module.params["pattern"]
+    use_regex: bool = module.params["use_regex"]
+    recursive: bool = module.params["recursive"]
+    file_type: t.Literal["file", "link", "any"] = module.params["file_type"]
 
     # Validate that the path exists and is a directory
     if not os.path.exists(path):
