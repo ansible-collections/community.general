@@ -139,7 +139,9 @@ import typing as t
 from ansible.module_utils.basic import AnsibleModule
 
 
-def find_matching_files(path: str, pattern: str, use_regex: bool, recursive: bool, file_type: t.Literal["file", "link", "any"]) -> list[str]:
+def find_matching_files(
+    path: str, pattern: str, use_regex: bool, recursive: bool, file_type: t.Literal["file", "link", "any"]
+) -> list[str]:
     """Find all files matching the pattern in the given path."""
     matching_files = []
 
@@ -147,7 +149,7 @@ def find_matching_files(path: str, pattern: str, use_regex: bool, recursive: boo
         # Use regular expression matching
         regex = re.compile(pattern)
         if recursive:
-            for root, dirs, files in os.walk(path, followlinks=False):
+            for root, _dirs, files in os.walk(path, followlinks=False):
                 for filename in files:
                     if regex.match(filename) or regex.search(filename):
                         full_path = os.path.join(root, filename)
@@ -161,7 +163,7 @@ def find_matching_files(path: str, pattern: str, use_regex: bool, recursive: boo
                         if should_include_file(full_path, file_type):
                             matching_files.append(full_path)
             except OSError as e:
-                raise AssertionError(f"Failed to list directory {path}: {e}")
+                raise AssertionError(f"Failed to list directory {path}: {e}") from e
     else:
         # Use glob pattern matching
         if recursive:
@@ -184,19 +186,14 @@ def should_include_file(file_path: str, file_type: t.Literal["file", "link", "an
     is_file = os.path.isfile(file_path)
 
     if file_type == "file":
-        # Only regular files, not symlinks
         return is_file and not is_link
     elif file_type == "link":
-        # Only symbolic links
         return is_link
-    elif file_type == "any":
-        # Both files and symlinks
+    else:
         return is_file or is_link
 
-    return False
 
-
-def remove_files(module: AnsibleModule, files: list[str]) -> tuple[list[str], list[str]]:
+def remove_files(module: AnsibleModule, files: list[str]) -> tuple[list[str], list[tuple[str, str]]]:
     """Remove the specified files and return results."""
     removed_files = []
     failed_files = []
