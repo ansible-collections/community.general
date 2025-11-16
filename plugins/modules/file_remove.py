@@ -134,6 +134,8 @@ path:
 import os
 import re
 import glob
+import typing as t
+
 from ansible.module_utils.basic import AnsibleModule
 
 
