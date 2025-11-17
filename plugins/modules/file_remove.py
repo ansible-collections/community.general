@@ -93,7 +93,7 @@ EXAMPLES = r"""
 - name: Remove files matching a regex pattern
   community.general.file_remove:
     path: /data/backups
-    pattern: 'backup_[0-9]{8}\.tar\.gz'
+    pattern: "backup_[0-9]{8}\\.tar\\.gz"
     use_regex: true
 
 - name: Remove both files and symbolic links
