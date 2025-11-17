@@ -1,0 +1,85 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Arch-less block
+  when: ansible_distribution not in ['Archlinux']
+  block:
+    - name: Is the locale we're going to test against installed?
+      command: locale -a
+      register: initial_state
+
+    - name: Make sure the locale is not available
+      community.general.locale_gen:
+        name: en_US@iso
+        state: absent
+      ignore_errors: true
+      register: not_available
+
+    - name: Ensure /usr/local/share/i18n/
+      ansible.builtin.file:
+        path: /usr/local/share/i18n/locales
+        state: directory
+        mode: '0755'
+
+    - name: Back up /etc/locale.gen
+      ansible.builtin.copy:
+        src: /etc/locale.gen
+        dest: /etc/locale.gen.bkp
+        remote_src: true
+
+    - name: Add line to /etc/locale.gen
+      ansible.builtin.shell: >
+        echo "# en_US@iso UTF-8" >> /etc/locale.gen
+
+    - name: Copy custom locale
+      ansible.builtin.copy:
+        dest: /usr/local/share/i18n/locales/en_US@iso
+        src: en_US@iso
+        mode: '0644'
+
+    - name: Add custom locale to SUPPORTED
+      ansible.builtin.copy:
+        dest: /usr/local/share/i18n/SUPPORTED
+        content: |
+          en_US@iso UTF-8
+        mode: '0644'
+
+    - name: Make sure the locale is available
+      community.general.locale_gen:
+        name: en_US@iso
+        state: absent
+      register: available
+
+    - name: Make sure the locale is installed
+      community.general.locale_gen:
+        name: en_US@iso
+        state: present
+      register: installed
+
+    - name: Check assertions
+      ansible.builtin.assert:
+        that:
+          - not_available is failed
+          - >
+            "locales you have entered are not available on your system: en_US@iso" in not_available.msg
+          - available is not changed
+          - installed is changed
+
+  always:
+    - name: Make sure the locale is not installed
+      community.general.locale_gen:
+        name: en_US@iso
+        state: absent
+
+    - name: Remove /usr/local/share/i18n/
+      ansible.builtin.file:
+        path: /usr/local/share/i18n/
+        state: absent
+
+    - name: Restore /etc/locale.gen
+      ansible.builtin.copy:
+        src: /etc/locale.gen.bkp
+        dest: /etc/locale.gen
+        remote_src: true

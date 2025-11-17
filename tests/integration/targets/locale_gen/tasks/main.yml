@@ -17,3 +17,6 @@
   loop: "{{ locale_list_basic }}"
   loop_control:
     loop_var: locale_basic
+
+- name: Run tests for 11046
+  ansible.builtin.include_tasks: 11046-usrlocal.yml
