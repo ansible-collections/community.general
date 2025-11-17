@@ -185,9 +185,11 @@ class Zfs:
     def set_properties_if_changed(self):
         diff = {"before": {"extra_zfs_properties": {}}, "after": {"extra_zfs_properties": {}}}
         current_properties = self.list_properties()
+        previous_values = {}
         for prop, value in self.extra_zfs_properties.items():
             current_value = self.get_property(prop, current_properties)
             if current_value != value:
+                previous_values[prop] = current_value
                 self.set_property(prop, value)
                 diff["before"]["extra_zfs_properties"][prop] = current_value
                 diff["after"]["extra_zfs_properties"][prop] = value
@@ -198,7 +200,7 @@ class Zfs:
             value = self.get_property(prop, updated_properties)
             if value is None:
                 self.module.fail_json(msg=f"zfsprop was not present after being successfully set: {prop}")
-            if self.get_property(prop, current_properties) != value:
+            if prop in previous_values and previous_values[prop] != value:
                 self.changed = True
             if prop in diff["after"]["extra_zfs_properties"]:
                 diff["after"]["extra_zfs_properties"][prop] = value
