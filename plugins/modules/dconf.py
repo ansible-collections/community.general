@@ -29,7 +29,7 @@ notes:
     that is, Ansible may think that a value is being changed when it is not. This fallback is to be removed in version 15.0.0
     of this collection, at which point the module C(gi.repository) is going to be required.
   - The library C(gi.repository) is usually provided by operating system packages (C(python3-gi) for Ubuntu/Debian,
-    C(python3-gobject) for Red Hat/Fedora, C(python-gobject) for Archlinux, to mention a few).
+    C(python3-gobject) for Red Hat/Fedora, C(python-gobject) for Arch Linux, to mention a few).
     It is available in PyPI as C(PyGObject) but it only provides bindings for system libraries, so using the system packages
     is highly recommended over installing it with C(pip).
   - Detection of existing, running D-Bus session, required to change settings using C(dconf), is not 100% reliable due to
