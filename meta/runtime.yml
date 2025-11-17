@@ -1033,6 +1033,10 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.smartos_image_info instead.
+    spotinst_aws_elastigroup:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Module relies on unsupported Python package. Use the module spot.cloud_modules.aws_elastigroup instead.
     stackdriver:
       tombstone:
         removal_version: 9.0.0
