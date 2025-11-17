@@ -398,6 +398,10 @@ plugin_routing:
       redirect: community.kubevirt.kubevirt_template
     kubevirt_vm:
       redirect: community.kubevirt.kubevirt_vm
+    layman:
+      deprecation:
+        removal_version: 14.0.0
+        warning_text: Gentoo deprecated C(layman) in mid-2023.
     ldap_attr:
       tombstone:
         removal_version: 3.0.0
