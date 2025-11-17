@@ -44,8 +44,7 @@ def _ansible_type(data: t.Any, alias: t.Any, *, use_native_type: bool = False) -
         alias = {}
 
     if not isinstance(alias, Mapping):
-        msg = f"The argument alias must be a dictionary. {alias!r} is {type(alias)}"
-        raise AnsibleFilterError(msg)
+        raise AnsibleFilterError(f"The argument alias must be a dictionary. {alias!r} is {type(alias)}")
 
     data_type = _atype(data, alias, use_native_type=use_native_type)
 
