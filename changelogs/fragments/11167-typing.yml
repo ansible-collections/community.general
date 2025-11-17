@@ -12,3 +12,4 @@ bugfixes:
      and corrected broken formatting during error reporting
      (https://github.com/ansible-collections/community.general/pull/11167)."
   - "ansible_type test plugin - fix parameter checking (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "ansible_type plugin utils - avoid potential concatenation of non-strings when ``alias`` has non-string values (https://github.com/ansible-collections/community.general/pull/11167)."
