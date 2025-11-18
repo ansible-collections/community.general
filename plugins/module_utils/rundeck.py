@@ -5,9 +5,9 @@
 from __future__ import annotations
 
 import json
+import traceback
 
 from ansible.module_utils.urls import fetch_url, url_argument_spec
-from ansible.module_utils.common.text.converters import to_native
 
 
 def api_argument_spec():
@@ -82,6 +82,10 @@ def api_request(module, endpoint, data=None, method="GET", content_type="applica
             json_response = json.loads(content)
             return json_response, info
     except AttributeError as error:
-        module.fail_json(msg="Rundeck API request error", exception=to_native(error), execution_info=info)
+        module.fail_json(
+            msg=f"Rundeck API request error: {error}", exception=traceback.format_exc(), execution_info=info
+        )
     except ValueError as error:
-        module.fail_json(msg="No valid JSON response", exception=to_native(error), execution_info=content)
+        module.fail_json(
+            msg=f"No valid JSON response: {error}", exception=traceback.format_exc(), execution_info=content
+        )
