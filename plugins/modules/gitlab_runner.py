@@ -366,7 +366,7 @@ class GitLabRunner:
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arg_value is not None:
+            if arg_value is not None or arg_key == "maximum_timeout":
                 if isinstance(arg_value, list):
                     list1 = getattr(runner, arg_key)
                     list1.sort()
