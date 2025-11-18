@@ -156,14 +156,11 @@ def find_matching_files(
                         if should_include_file(full_path, file_type):
                             matching_files.append(full_path)
         else:
-            try:
-                for filename in os.listdir(path):
-                    if regex.match(filename) or regex.search(filename):
-                        full_path = os.path.join(path, filename)
-                        if should_include_file(full_path, file_type):
-                            matching_files.append(full_path)
-            except OSError as e:
-                raise AssertionError(f"Failed to list directory {path}: {e}") from e
+            for filename in os.listdir(path):
+                if regex.match(filename) or regex.search(filename):
+                    full_path = os.path.join(path, filename)
+                    if should_include_file(full_path, file_type):
+                        matching_files.append(full_path)
     else:
         # Use glob pattern matching
         if recursive:
@@ -253,7 +250,7 @@ def main() -> None:
     # Find matching files
     try:
         matching_files = find_matching_files(path, pattern, use_regex, recursive, file_type)
-    except AssertionError as e:
+    except OSError as e:
         module.fail_json(msg=str(e))
 
     # Prepare diff information
