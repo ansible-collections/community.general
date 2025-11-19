@@ -21,7 +21,7 @@ That is where ``ModuleHelper`` comes to assistance: a lot of that boilerplate co
 Quickstart
 """"""""""
 
-See the `example from Ansible documentation <https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
+See the `example from Ansible documentation <https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
 written with ``ModuleHelper``.
 But bear in mind that it does not showcase all of MH's features:
 
@@ -550,9 +550,9 @@ The other option is to use the parameter ``value``, in which case the method wil
 References
 ^^^^^^^^^^
 
-- `Ansible Developer Guide <https://docs.ansible.com/ansible/latest/dev_guide/index.html>`_
-- `Creating a module <https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
-- `Returning ansible facts <https://docs.ansible.com/ansible/latest/reference_appendices/common_return_values.html#ansible-facts>`_
+- `Ansible Developer Guide <https://docs.ansible.com/projects/ansible/latest/dev_guide/index.html>`_
+- `Creating a module <https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
+- `Returning ansible facts <https://docs.ansible.com/projects/ansible/latest/reference_appendices/common_return_values.html#ansible-facts>`_
 - :ref:`ansible_collections.community.general.docsite.guide_vardict`
 
 
