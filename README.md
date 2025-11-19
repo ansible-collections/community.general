@@ -6,7 +6,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # Community General Collection
 
-[![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/ansible/devel/collections/community/general/)
+[![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/projects/ansible/devel/collections/community/general/)
 [![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=stable-11)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
 [![EOL CI](https://github.com/ansible-collections/community.general/actions/workflows/ansible-test.yml/badge.svg?branch=stable-11)](https://github.com/ansible-collections/community.general/actions)
 [![Nox CI](https://github.com/ansible-collections/community.general/actions/workflows/nox.yml/badge.svg?branch=stable-11)](https://github.com/ansible-collections/community.general/actions)
@@ -15,15 +15,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 This repository contains the `community.general` Ansible Collection. The collection is a part of the Ansible package and includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
 
-You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
+You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/projects/ansible/latest/collections/community/general/).
 
 Please note that this collection does **not** support Windows targets. Only connection plugins included in this collection might support Windows targets, and will explicitly mention that in their documentation if they do so.
 
 ## Code of Conduct
 
-We follow [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html) in all our interactions within this project.
+We follow [Ansible Code of Conduct](https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html) in all our interactions within this project.
 
-If you encounter abusive behavior violating the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html), please refer to the [policy violations](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html#policy-violations) section of the Code of Conduct for information on how to raise a complaint.
+If you encounter abusive behavior violating the [Ansible Code of Conduct](https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html), please refer to the [policy violations](https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html#policy-violations) section of the Code of Conduct for information on how to raise a complaint.
 
 ## Communication
 
@@ -33,9 +33,9 @@ If you encounter abusive behavior violating the [Ansible Code of Conduct](https:
   * [Social Spaces](https://forum.ansible.com/c/chat/4): gather and interact with fellow enthusiasts.
   * [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide announcements including social events.
 
-* The Ansible [Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn): used to announce releases and important changes.
+* The Ansible [Bullhorn newsletter](https://docs.ansible.com/projects/ansible/devel/community/communication.html#the-bullhorn): used to announce releases and important changes.
 
-For more information about communication, see the [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+For more information about communication, see the [Ansible communication guide](https://docs.ansible.com/projects/ansible/devel/community/communication.html).
 
 ## Tested with Ansible
 
@@ -47,7 +47,7 @@ Some modules and plugins require external libraries. Please check the requiremen
 
 ## Included content
 
-Please check the included content on the [Ansible Galaxy page for this collection](https://galaxy.ansible.com/ui/repo/published/community/general/) or the [documentation on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
+Please check the included content on the [Ansible Galaxy page for this collection](https://galaxy.ansible.com/ui/repo/published/community/general/) or the [documentation on the Ansible docs site](https://docs.ansible.com/projects/ansible/latest/collections/community/general/).
 
 ## Using this collection
 
@@ -76,7 +76,7 @@ You can also install a specific version of the collection, for example, if you n
 ansible-galaxy collection install community.general:==X.Y.Z
 ```
 
-See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
+See [Ansible Using collections](https://docs.ansible.com/projects/ansible/latest/user_guide/collections_using.html) for more details.
 
 ## Contributing to this collection
 
@@ -90,13 +90,13 @@ You don't know how to start? Refer to our [contribution guide](https://github.co
 
 The current maintainers are listed in the [commit-rights.md](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md#people) file. If you have questions or need help, feel free to mention them in the proposals.
 
-You can find more information in the [developer guide for collections](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections), and in the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html).
+You can find more information in the [developer guide for collections](https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections), and in the [Ansible Community Guide](https://docs.ansible.com/projects/ansible/latest/community/index.html).
 
 Also for some notes specific to this collection see [our CONTRIBUTING documentation](https://github.com/ansible-collections/community.general/blob/main/CONTRIBUTING.md).
 
 ### Running tests
 
-See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#testing-collections).
+See [here](https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections.html#testing-collections).
 
 ## Collection maintenance
 
@@ -110,7 +110,7 @@ It is necessary for maintainers of this collection to be subscribed to:
 * The collection itself (the `Watch` button → `All Activity` in the upper right corner of the repository's homepage).
 * The "Changes Impacting Collection Contributors and Maintainers" [issue](https://github.com/ansible-collections/overview/issues/45).
 
-They also should be subscribed to Ansible's [The Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
+They also should be subscribed to Ansible's [The Bullhorn newsletter](https://docs.ansible.com/projects/ansible/devel/community/communication.html#the-bullhorn).
 
 ## Publishing New Version
 
@@ -129,9 +129,9 @@ See [this issue](https://github.com/ansible-collections/community.general/issues
 ## More information
 
 - [Ansible Collection overview](https://github.com/ansible-collections/overview)
-- [Ansible User guide](https://docs.ansible.com/ansible/latest/user_guide/index.html)
-- [Ansible Developer guide](https://docs.ansible.com/ansible/latest/dev_guide/index.html)
-- [Ansible Community code of conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html)
+- [Ansible User guide](https://docs.ansible.com/projects/ansible/latest/user_guide/index.html)
+- [Ansible Developer guide](https://docs.ansible.com/projects/ansible/latest/dev_guide/index.html)
+- [Ansible Community code of conduct](https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html)
 
 ## Licensing
 
