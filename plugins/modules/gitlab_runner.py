@@ -250,7 +250,6 @@ runner:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.validation import check_type_int
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec,
@@ -477,9 +476,9 @@ def main():
     runner_locked = module.params["locked"]
     access_level = module.params["access_level"]
     if module.params["maximum_timeout"] == 0:
-      maximum_timeout = None
+        maximum_timeout = None
     else:
-      maximum_timeout = module.params["maximum_timeout"]
+        maximum_timeout = module.params["maximum_timeout"]
     registration_token = module.params["registration_token"]
     project = module.params["project"]
     group = module.params["group"]
