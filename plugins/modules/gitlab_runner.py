@@ -131,9 +131,9 @@ options:
     version_added: 6.3.0
   maximum_timeout:
     description:
-      - The maximum time that a runner has to complete a specific job. Use V(null) to set to None.
+      - The maximum time that a runner has to complete a specific job. Use 0 to set to None.
     default: 3600
-    type: raw
+    type: int
   run_untagged:
     description:
       - Run untagged jobs or not.
@@ -435,7 +435,7 @@ def main():
             locked=dict(type="bool", default=False),
             access_level=dict(type="str", choices=["not_protected", "ref_protected"]),
             access_level_on_creation=dict(type="bool", default=True),
-            maximum_timeout=dict(type="raw", default=3600),
+            maximum_timeout=dict(type="int", default=3600),
             registration_token=dict(type="str", no_log=True),
             project=dict(type="str"),
             group=dict(type="str"),
@@ -476,14 +476,10 @@ def main():
     run_untagged = module.params["run_untagged"]
     runner_locked = module.params["locked"]
     access_level = module.params["access_level"]
-    maximum_timeout = module.params["maximum_timeout"]
-    if maximum_timeout is not None:
-        try:
-            maximum_timeout = check_type_int(maximum_timeout)
-        except TypeError as te:
-            module.fail_json(
-                msg=f"argument 'maximum_timeout' is of type {type(maximum_timeout)} and we were unable to convert to int: {te}"
-            )
+    if module.params["maximum_timeout"] == 0:
+      maximum_timeout = None
+    else:
+      maximum_timeout = module.params["maximum_timeout"]
     registration_token = module.params["registration_token"]
     project = module.params["project"]
     group = module.params["group"]
