@@ -80,7 +80,7 @@ EXAMPLES = r"""
     webhook_token: "XXXYYY"
     content: "This is a message from ansible"
     username: Ansible
-    avatar_url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+    avatar_url: "https://docs.ansible.com/favicon/favicon-32x32.png"
 
 - name: Send a embedded message to the Discord channel
   community.general.discord:
@@ -92,7 +92,7 @@ EXAMPLES = r"""
         footer:
           text: "Author: Ansible"
         image:
-          url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+          url: "https://docs.ansible.com/favicon/favicon-32x32.png"
 
 - name: Send two embedded messages
   community.general.discord:
@@ -104,12 +104,12 @@ EXAMPLES = r"""
         footer:
           text: "Author: Ansible"
         image:
-          url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+          url: "https://docs.ansible.com/favicon/favicon-32x32.png"
       - title: "Second message"
         description: "This is my first second message"
         footer:
           text: "Author: Ansible"
-          icon_url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+          icon_url: "https://docs.ansible.com/favicon/favicon-32x32.png"
         fields:
           - name: "Field 1"
             value: "Value of my first field"
