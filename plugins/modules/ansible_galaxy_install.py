@@ -23,7 +23,7 @@ notes:
 seealso:
   - name: C(ansible-galaxy) command manual page
     description: Manual page for the command.
-    link: https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html
+    link: https://docs.ansible.com/projects/ansible/latest/cli/ansible-galaxy.html
 
 requirements:
   - ansible-core 2.11 or newer
