@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - mas - Parse CLI output correctly when listing installed apps (https://github.com/ansible-collections/community.general/pull/11179).
