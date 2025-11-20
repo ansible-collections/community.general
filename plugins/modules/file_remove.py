@@ -202,7 +202,7 @@ def remove_files(module: AnsibleModule, files: list[str]) -> tuple[list[str], li
                 if os.path.exists(file_path):
                     removed_files.append(file_path)
                 else:
-                    module.warn(f"File not found (removed by other process): {file_path}")
+                    raise FileNotFoundError()
             else:
                 # Actually remove the file
                 os.remove(file_path)
