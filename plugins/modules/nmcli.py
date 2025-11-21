@@ -530,6 +530,10 @@ options:
     description:
       - This is only used with VXLAN - VXLAN destination IP address.
     type: str
+  vxlan_parent:
+    description:
+      - This is only used with VXLAN - VXLAN parent device (required when using a multicast remote address)
+    type: str
   vxlan_local:
     description:
       - This is only used with VXLAN - VXLAN local IP address.
@@ -1454,6 +1458,17 @@ EXAMPLES = r"""
         vxlan_local: 192.168.1.2
         vxlan_remote: 192.168.1.5
 
+    - name: Add VxLan via multicast on a bridge
+      community.general.nmcli:
+        type: vxlan
+        conn_name: vxlan_test2
+        vxlan_id: 17
+        vxlan_parent: eth1
+        vxlan_local: 192.168.1.2
+        vxlan_remote: 239.192.0.17
+        slave_type: bridge
+        master: br0
+
     - name: Add gre
       community.general.nmcli:
         type: gre
@@ -1784,6 +1799,7 @@ class Nmcli:
         self.ingress = module.params["ingress"]
         self.egress = module.params["egress"]
         self.vxlan_id = module.params["vxlan_id"]
+        self.vxlan_parent = module.params["vxlan_parent"]
         self.vxlan_local = module.params["vxlan_local"]
         self.vxlan_remote = module.params["vxlan_remote"]
         self.ip_tunnel_dev = module.params["ip_tunnel_dev"]
@@ -2041,6 +2057,7 @@ class Nmcli:
             options.update(
                 {
                     "vxlan.id": self.vxlan_id,
+                    "vxlan.parent": self.vxlan_parent,
                     "vxlan.local": self.vxlan_local,
                     "vxlan.remote": self.vxlan_remote,
                 }
@@ -2256,6 +2273,7 @@ class Nmcli:
             "infiniband",
             "ovs-port",
             "ovs-interface",
+            "vxlan",
         )
 
     @property
@@ -2825,6 +2843,7 @@ def main():
             egress=dict(type="str"),
             # vxlan specific vars
             vxlan_id=dict(type="int"),
+            vxlan_parent=dict(type="str"),
             vxlan_local=dict(type="str"),
             vxlan_remote=dict(type="str"),
             # ip-tunnel specific vars
