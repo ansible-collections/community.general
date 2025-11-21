@@ -131,7 +131,7 @@ options:
     version_added: 6.3.0
   maximum_timeout:
     description:
-      - The maximum time that a runner has to complete a specific job.
+      - The maximum time that a runner has to complete a specific job. Use V(0) to disable the timeout.
     default: 3600
     type: int
   run_untagged:
@@ -365,7 +365,7 @@ class GitLabRunner:
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arg_value is not None:
+            if arg_value is not None or arg_key == "maximum_timeout":
                 if isinstance(arg_value, list):
                     list1 = getattr(runner, arg_key)
                     list1.sort()
@@ -475,7 +475,10 @@ def main():
     run_untagged = module.params["run_untagged"]
     runner_locked = module.params["locked"]
     access_level = module.params["access_level"]
-    maximum_timeout = module.params["maximum_timeout"]
+    if module.params["maximum_timeout"] == 0:
+        maximum_timeout = None
+    else:
+        maximum_timeout = module.params["maximum_timeout"]
     registration_token = module.params["registration_token"]
     project = module.params["project"]
     group = module.params["group"]
