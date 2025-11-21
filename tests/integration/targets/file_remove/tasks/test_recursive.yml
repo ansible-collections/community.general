@@ -1,0 +1,127 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test recursive removal
+
+- name: Create nested directory structure
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - subdir1
+    - subdir2
+    - subdir1/nested1
+    - subdir2/nested2
+    - subdir2/nested2/deep
+
+- name: Create test files in nested directories
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+    state: touch
+    mode: '0644'
+  loop:
+    - temp1.log
+    - temp2.log
+    - subdir1/temp3.log
+    - subdir1/data.txt
+    - subdir1/nested1/temp4.log
+    - subdir2/temp5.log
+    - subdir2/nested2/temp6.log
+    - subdir2/nested2/deep/temp7.log
+    - subdir2/nested2/deep/file.txt
+
+- name: Remove .log files non-recursively (should only remove root level)
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.log"
+    recursive: false
+  register: recursive_result_1
+
+- name: Verify only root level .log files were removed
+  ansible.builtin.assert:
+    that:
+      - recursive_result_1 is changed
+      - recursive_result_1.files_count == 2
+      - "file_remove_testdir ~ '/temp1.log' in recursive_result_1.removed_files"
+      - "file_remove_testdir ~ '/temp2.log' in recursive_result_1.removed_files"
+
+- name: Verify nested .log files still exist
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+  register: nested_files_exist
+  loop:
+    - subdir1/temp3.log
+    - subdir1/nested1/temp4.log
+    - subdir2/temp5.log
+    - subdir2/nested2/temp6.log
+    - subdir2/nested2/deep/temp7.log
+
+- name: Assert nested .log files still exist
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+  loop: "{{ nested_files_exist.results }}"
+
+- name: Remove .log files recursively (should remove all .log files)
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.log"
+    recursive: true
+  register: recursive_result_2
+
+- name: Verify all .log files were removed recursively
+  ansible.builtin.assert:
+    that:
+      - recursive_result_2 is changed
+      - recursive_result_2.files_count == 5
+      - "file_remove_testdir ~ '/subdir1/temp3.log' in recursive_result_2.removed_files"
+      - "file_remove_testdir ~ '/subdir1/nested1/temp4.log' in recursive_result_2.removed_files"
+      - "file_remove_testdir ~ '/subdir2/temp5.log' in recursive_result_2.removed_files"
+      - "file_remove_testdir ~ '/subdir2/nested2/temp6.log' in recursive_result_2.removed_files"
+      - "file_remove_testdir ~ '/subdir2/nested2/deep/temp7.log' in recursive_result_2.removed_files"
+
+- name: Verify .txt files still exist
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+  register: txt_files_exist
+  loop:
+    - subdir1/data.txt
+    - subdir2/nested2/deep/file.txt
+
+- name: Assert .txt files still exist
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+  loop: "{{ txt_files_exist.results }}"
+
+- name: Verify directories still exist (directories should never be removed)
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+  register: dirs_exist
+  loop:
+    - subdir1
+    - subdir2
+    - subdir1/nested1
+    - subdir2/nested2
+    - subdir2/nested2/deep
+
+- name: Assert directories still exist
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+      - item.stat.isdir
+  loop: "{{ dirs_exist.results }}"
+
+- name: Clean up for next test
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: absent
+
+- name: Recreate test directory
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: directory
+    mode: '0755'
