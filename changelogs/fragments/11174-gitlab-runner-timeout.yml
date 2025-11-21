@@ -1,2 +1,2 @@
 minor_changes:
-  - gitlab_runner - Convert ``maximum_timeout`` to ``None`` when set to 0 (https://github.com/ansible-collections/community.general/pull/11174).
+  - gitlab_runner - allow maximum timeout to be disabled by passing ``0`` to ``maximum_timeout``  (https://github.com/ansible-collections/community.general/pull/11174).

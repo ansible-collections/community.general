@@ -131,7 +131,7 @@ options:
     version_added: 6.3.0
   maximum_timeout:
     description:
-      - The maximum time that a runner has to complete a specific job. Use 0 to set to None.
+      - The maximum time that a runner has to complete a specific job. Use V(0) to disable the timeout.
     default: 3600
     type: int
   run_untagged:
