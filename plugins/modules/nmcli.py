@@ -2389,7 +2389,7 @@ class Nmcli:
         cmd = [self.nmcli_bin, "--terse", "--fields", "GENERAL.STATE", "con", "show", self.conn_name]
         (rc, out, err) = self.execute_command(cmd)
         if rc != 0:
-            raise None
+            raise NmcliModuleError(err)
 
         lines = out.strip().split("\n")
         for line in lines:
