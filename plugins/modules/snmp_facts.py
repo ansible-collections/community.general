@@ -15,7 +15,7 @@ short_description: Retrieve facts for a device using SNMP
 description:
   - Retrieve facts for a device using SNMP. The facts are inserted to the RV(ansible_facts) key.
 requirements:
-  - pysnmp
+  - pysnmp < 6.2.4 - that version removed components used by this module.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.facts
