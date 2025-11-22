@@ -1,0 +1,15 @@
+minor_changes:
+  - "iptables_state action plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "shutdown action plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "ansible_type plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "keys_filter.py plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "unsafe.py plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "a_module test plugin - add proper parameter checking and type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "ansible_type test plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "fqdn_valid test plugin - add proper parameter checking, and add type hints (https://github.com/ansible-collections/community.general/pull/11167)."
+bugfixes:
+  - "keys_filter.py plugin utils - fixed requirements check so that other sequences than lists and strings are checked,
+     and corrected broken formatting during error reporting
+     (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "ansible_type test plugin - fix parameter checking (https://github.com/ansible-collections/community.general/pull/11167)."
+  - "ansible_type plugin utils - avoid potential concatenation of non-strings when ``alias`` has non-string values (https://github.com/ansible-collections/community.general/pull/11167)."

@@ -222,19 +222,21 @@ _value:
   type: bool
 """
 
-from collections.abc import Sequence
+import typing as t
+from collections.abc import Callable, Sequence
 
 from ansible.errors import AnsibleFilterError
 from ansible_collections.community.general.plugins.plugin_utils.ansible_type import _ansible_type
 
 
-def ansible_type(data, dtype, alias=None):
+def ansible_type(data: t.Any, dtype: t.Any, alias: t.Any = None) -> bool:
     """Validates data type"""
 
     if not isinstance(dtype, Sequence):
-        msg = "The argument dtype must be a string or a list. dtype is %s."
-        raise AnsibleFilterError(msg % (dtype, type(dtype)))
+        msg = f"The argument dtype must be a string or a list. dtype is {dtype!r} of type {type(dtype)}."
+        raise AnsibleFilterError(msg)
 
+    data_types: Sequence
     if isinstance(dtype, str):
         data_types = [dtype]
     else:
@@ -245,5 +247,5 @@ def ansible_type(data, dtype, alias=None):
 
 
 class TestModule:
-    def tests(self):
+    def tests(self) -> dict[str, Callable]:
         return {"ansible_type": ansible_type}

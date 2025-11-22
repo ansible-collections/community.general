@@ -6,12 +6,17 @@
 from __future__ import annotations
 
 import re
+import typing as t
 
-from ansible.errors import AnsibleFilterError
 from collections.abc import Mapping, Sequence
 
+from ansible.errors import AnsibleFilterError
+from ansible.module_utils.common.collections import is_sequence
 
-def _keys_filter_params(data, matching_parameter):
+
+def _keys_filter_params(
+    data: t.Any, matching_parameter: t.Any
+) -> tuple[Sequence[Mapping[str, t.Any]], t.Literal["equal", "starts_with", "ends_with", "regex"]]:
     """test parameters:
     * data must be a list of dictionaries. All keys must be strings.
     * matching_parameter is member of a list.
@@ -21,27 +26,27 @@ def _keys_filter_params(data, matching_parameter):
     ml = ["equal", "starts_with", "ends_with", "regex"]
 
     if not isinstance(data, Sequence):
-        msg = "First argument must be a list. %s is %s"
-        raise AnsibleFilterError(msg % (data, type(data)))
+        msg = f"First argument must be a list. {data!r} is {type(data)}"
+        raise AnsibleFilterError(msg)
 
     for elem in data:
         if not isinstance(elem, Mapping):
-            msg = "The data items must be dictionaries. %s is %s"
-            raise AnsibleFilterError(msg % (elem, type(elem)))
+            msg = f"The data items must be dictionaries. {elem} is {type(elem)}"
+            raise AnsibleFilterError(msg)
 
     for elem in data:
         if not all(isinstance(item, str) for item in elem.keys()):
-            msg = "Top level keys must be strings. keys: %s"
-            raise AnsibleFilterError(msg % elem.keys())
+            msg = f"Top level keys must be strings. keys: {list(elem.keys())}"
+            raise AnsibleFilterError(msg)
 
     if mp not in ml:
-        msg = "The matching_parameter must be one of %s. matching_parameter=%s"
-        raise AnsibleFilterError(msg % (ml, mp))
+        msg = f"The matching_parameter must be one of {ml}. matching_parameter={mp!r}"
+        raise AnsibleFilterError(msg)
 
-    return
+    return data, mp
 
 
-def _keys_filter_target_str(target, matching_parameter):
+def _keys_filter_target_str(target: t.Any, matching_parameter: t.Any) -> tuple[str, ...] | re.Pattern:
     """
     Test:
     * target is a non-empty string or list.
@@ -54,18 +59,18 @@ def _keys_filter_target_str(target, matching_parameter):
     """
 
     if not isinstance(target, Sequence):
-        msg = "The target must be a string or a list. target is %s."
-        raise AnsibleFilterError(msg % type(target))
+        msg = f"The target must be a string or a list. target is {type(target)}."
+        raise AnsibleFilterError(msg)
 
     if len(target) == 0:
         msg = "The target can't be empty."
         raise AnsibleFilterError(msg)
 
-    if isinstance(target, list):
+    if is_sequence(target):
         for elem in target:
             if not isinstance(elem, str):
-                msg = "The target items must be strings. %s is %s"
-                raise AnsibleFilterError(msg % (elem, type(elem)))
+                msg = f"The target items must be strings. {elem!r} is {type(elem)}"
+                raise AnsibleFilterError(msg)
 
     if matching_parameter == "regex":
         if isinstance(target, str):
@@ -77,19 +82,19 @@ def _keys_filter_target_str(target, matching_parameter):
             else:
                 r = target[0]
         try:
-            tt = re.compile(r)
+            return re.compile(r)
         except re.error as e:
-            msg = "The target must be a valid regex if matching_parameter=regex. target is %s"
-            raise AnsibleFilterError(msg % r) from e
+            msg = f"The target must be a valid regex if matching_parameter=regex. target is {r}"
+            raise AnsibleFilterError(msg) from e
     elif isinstance(target, str):
-        tt = (target,)
+        return (target,)
     else:
-        tt = tuple(set(target))
-
-    return tt
+        return tuple(set(target))
 
 
-def _keys_filter_target_dict(target, matching_parameter):
+def _keys_filter_target_dict(
+    target: t.Any, matching_parameter: t.Any
+) -> list[tuple[str, str]] | list[tuple[re.Pattern, str]]:
     """
     Test:
     * target is a list of dictionaries with attributes 'after' and 'before'.
@@ -101,8 +106,8 @@ def _keys_filter_target_dict(target, matching_parameter):
     """
 
     if not isinstance(target, list):
-        msg = "The target must be a list. target is %s."
-        raise AnsibleFilterError(msg % (target, type(target)))
+        msg = f"The target must be a list. target is {target!r} of type {type(target)}."
+        raise AnsibleFilterError(msg)
 
     if len(target) == 0:
         msg = "The target can't be empty."
@@ -110,25 +115,25 @@ def _keys_filter_target_dict(target, matching_parameter):
 
     for elem in target:
         if not isinstance(elem, Mapping):
-            msg = "The target items must be dictionaries. %s is %s"
-            raise AnsibleFilterError(msg % (elem, type(elem)))
+            msg = f"The target items must be dictionaries. {elem!r}%s is {type(elem)}"
+            raise AnsibleFilterError(msg)
         if not all(k in elem for k in ("before", "after")):
             msg = "All dictionaries in target must include attributes: after, before."
             raise AnsibleFilterError(msg)
         if not isinstance(elem["before"], str):
-            msg = "The attributes before must be strings. %s is %s"
-            raise AnsibleFilterError(msg % (elem["before"], type(elem["before"])))
+            msg = f"The attributes before must be strings. {elem['before']!r} is {type(elem['before'])}"
+            raise AnsibleFilterError(msg)
         if not isinstance(elem["after"], str):
-            msg = "The attributes after must be strings. %s is %s"
-            raise AnsibleFilterError(msg % (elem["after"], type(elem["after"])))
+            msg = f"The attributes after must be strings. {elem['after']!r} is {type(elem['after'])}"
+            raise AnsibleFilterError(msg)
 
-    before = [d["before"] for d in target]
-    after = [d["after"] for d in target]
+    before: list[str] = [d["before"] for d in target]
+    after: list[str] = [d["after"] for d in target]
 
     if matching_parameter == "regex":
         try:
             tr = map(re.compile, before)
-            tz = list(zip(tr, after))
+            return list(zip(tr, after))
         except re.error as e:
             msg = (
                 "The attributes before must be valid regex if matching_parameter=regex."
@@ -136,6 +141,4 @@ def _keys_filter_target_dict(target, matching_parameter):
             )
             raise AnsibleFilterError(msg % before) from e
     else:
-        tz = list(zip(before, after))
-
-    return tz
+        return list(zip(before, after))
