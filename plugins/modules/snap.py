@@ -339,7 +339,7 @@ class Snap(StateModuleHelper):
 
             if "warning: no snap found" in check_error:
                 self.do_raise(
-                    "Snaps not found: {0}.".format(
+                    "Snaps not found: {}.".format(
                         [x.split()[-1] for x in out.split("\n") if x.startswith("warning: no snap found")]
                     )
                 )
