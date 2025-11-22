@@ -249,9 +249,7 @@ def decode_mac(hexstring):
 
 def lookup_adminstatus(int_adminstatus):
     adminstatus_options = {1: "up", 2: "down", 3: "testing"}
-    if int_adminstatus in adminstatus_options:
-        return adminstatus_options[int_adminstatus]
-    return ""
+    return adminstatus_options.get(int_adminstatus, "")
 
 
 def lookup_operstatus(int_operstatus):
@@ -264,9 +262,7 @@ def lookup_operstatus(int_operstatus):
         6: "notPresent",
         7: "lowerLayerDown",
     }
-    if int_operstatus in operstatus_options:
-        return operstatus_options[int_operstatus]
-    return ""
+    return operstatus_options.get(int_operstatus, "")
 
 
 def main():
@@ -288,6 +284,11 @@ def main():
             ["username", "level", "integrity", "authkey"],
             ["privacy", "privkey"],
         ),
+        required_if=[
+            ("version", "v2", ["community"]),
+            ("version", "v2c", ["community"]),
+            ("version", "v3", ["username", "authkey", "level"]),
+        ],
         supports_check_mode=True,
     )
 
@@ -298,17 +299,9 @@ def main():
     cmdGen = cmdgen.CommandGenerator()
     transport_opts = {k: m_args[k] for k in ("timeout", "retries") if m_args[k] is not None}
 
-    # Verify that we receive a community when using snmp v2
-    if m_args["version"] in ("v2", "v2c"):
-        if m_args["community"] is None:
-            module.fail_json(msg="Community not set when using snmp version 2")
-
     integrity_proto = None
     privacy_proto = None
     if m_args["version"] == "v3":
-        if m_args["username"] is None:
-            module.fail_json(msg="Username not set when using snmp version 3")
-
         if m_args["level"] == "authPriv" and m_args["privacy"] is None:
             module.fail_json(msg="Privacy algorithm not set when using authPriv")
 
