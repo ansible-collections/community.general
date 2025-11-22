@@ -28,7 +28,6 @@ ignore = [
     "B026",  # star-arg-unpacking-after-keyword-arg
     "SIM102",  # collapsible-if
     "SIM110",  # reimplemented-builtin
-    "SIM112",  # uncapitalized-environment-variables
     "SIM114",  # if-with-same-arms
     "SIM115",  # open-file-with-context-handler
     "SIM116",  # if-else-block-instead-of-dict-lookup

@@ -587,7 +587,7 @@ class Connection(ConnectionBase):
             args.extend(["--user", wsl_user])
         args.extend(["--"])
         args.extend(shlex.split(cmd))
-        if os.getenv("_ANSIBLE_TEST_WSL_CONNECTION_PLUGIN_Waeri5tepheeSha2fae8"):
+        if os.getenv("_ANSIBLE_TEST_WSL_CONNECTION_PLUGIN_WAERI5TEPHEESHA2FAE8"):
             return shlex.join(args)
         return list2cmdline(args)  # see https://github.com/python/cpython/blob/3.11/Lib/subprocess.py#L576
 
