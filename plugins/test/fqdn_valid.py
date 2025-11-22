@@ -63,7 +63,10 @@ _value:
   type: bool
 """
 
-from ansible.errors import AnsibleError
+import typing as t
+from collections.abc import Callable
+
+from ansible.errors import AnsibleFilterError
 
 ANOTHER_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
@@ -74,7 +77,7 @@ else:
     ANOTHER_LIBRARY_IMPORT_ERROR = None
 
 
-def fqdn_valid(name, min_labels=1, allow_underscores=False):
+def fqdn_valid(name: t.Any, min_labels: t.Any = 1, allow_underscores: t.Any = False) -> bool:
     """
     Example:
       - 'srv.example.com' is community.general.fqdn_valid
@@ -82,7 +85,22 @@ def fqdn_valid(name, min_labels=1, allow_underscores=False):
     """
 
     if ANOTHER_LIBRARY_IMPORT_ERROR:
-        raise AnsibleError("Python package fqdn must be installed to use this test.") from ANOTHER_LIBRARY_IMPORT_ERROR
+        raise AnsibleFilterError(
+            "Python package fqdn must be installed to use this test."
+        ) from ANOTHER_LIBRARY_IMPORT_ERROR
+
+    if not isinstance(name, str):
+        raise AnsibleFilterError(f"The name parameter must be a string, got {name!r} of type {type(name)}")
+
+    if not isinstance(min_labels, int):
+        raise AnsibleFilterError(
+            f"The min_labels parameter must be an integer, got {min_labels!r} of type {type(min_labels)}"
+        )
+
+    if not isinstance(allow_underscores, bool):
+        raise AnsibleFilterError(
+            f"The allow_underscores parameter must be a boolean, got {allow_underscores!r} of type {type(allow_underscores)}"
+        )
 
     fobj = FQDN(name, min_labels=min_labels, allow_underscores=allow_underscores)
     return fobj.is_valid
@@ -93,7 +111,7 @@ class TestModule:
     https://pypi.org/project/fqdn/
     """
 
-    def tests(self):
+    def tests(self) -> dict[str, Callable]:
         return {
             "fqdn_valid": fqdn_valid,
         }

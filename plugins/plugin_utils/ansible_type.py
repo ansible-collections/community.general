@@ -4,8 +4,10 @@
 
 from __future__ import annotations
 
-from ansible.errors import AnsibleFilterError
+import typing as t
 from collections.abc import Mapping
+
+from ansible.errors import AnsibleFilterError
 
 try:
     # Introduced with Data Tagging (https://github.com/ansible/ansible/pull/84621):
@@ -16,7 +18,7 @@ except ImportError:
     HAS_NATIVE_TYPE_NAME = False
 
 
-def _atype(data, alias, *, use_native_type: bool = False):
+def _atype(data: t.Any, alias: Mapping, *, use_native_type: bool = False) -> str:
     """
     Returns the name of the type class.
     """
@@ -30,10 +32,10 @@ def _atype(data, alias, *, use_native_type: bool = False):
         data_type = "dict"
     elif data_type == "_AnsibleLazyTemplateList":
         data_type = "list"
-    return alias.get(data_type, data_type)
+    return str(alias.get(data_type, data_type))
 
 
-def _ansible_type(data, alias, *, use_native_type: bool = False):
+def _ansible_type(data: t.Any, alias: t.Any, *, use_native_type: bool = False) -> str:
     """
     Returns the Ansible data type.
     """
@@ -42,21 +44,20 @@ def _ansible_type(data, alias, *, use_native_type: bool = False):
         alias = {}
 
     if not isinstance(alias, Mapping):
-        msg = "The argument alias must be a dictionary. %s is %s"
-        raise AnsibleFilterError(msg % (alias, type(alias)))
+        raise AnsibleFilterError(f"The argument alias must be a dictionary. {alias!r} is {type(alias)}")
 
     data_type = _atype(data, alias, use_native_type=use_native_type)
 
     if data_type == "list" and len(data) > 0:
-        items = [_atype(i, alias, use_native_type=use_native_type) for i in data]
-        items_type = "|".join(sorted(set(items)))
+        items = {_atype(i, alias, use_native_type=use_native_type) for i in data}
+        items_type = "|".join(sorted(items))
         return f"{data_type}[{items_type}]"
 
     if data_type == "dict" and len(data) > 0:
-        keys = [_atype(i, alias, use_native_type=use_native_type) for i in data.keys()]
-        vals = [_atype(i, alias, use_native_type=use_native_type) for i in data.values()]
-        keys_type = "|".join(sorted(set(keys)))
-        vals_type = "|".join(sorted(set(vals)))
+        keys = {_atype(i, alias, use_native_type=use_native_type) for i in data.keys()}
+        vals = {_atype(i, alias, use_native_type=use_native_type) for i in data.values()}
+        keys_type = "|".join(sorted(keys))
+        vals_type = "|".join(sorted(vals))
         return f"{data_type}[{keys_type}, {vals_type}]"
 
     return data_type

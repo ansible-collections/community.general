@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import time
+import typing as t
 
 from ansible.plugins.action import ActionBase
 from ansible.errors import AnsibleActionFail, AnsibleConnectionFailure
@@ -20,7 +21,7 @@ class ActionModule(ActionBase):
     DEFAULT_SUDOABLE = True
 
     @staticmethod
-    def msg_error__async_and_poll_not_zero(task_poll, task_async, max_timeout):
+    def msg_error__async_and_poll_not_zero(task_poll, task_async, max_timeout) -> str:
         return (
             "This module doesn't support async>0 and poll>0 when its 'state' param "
             "is set to 'restored'. To enable its rollback feature (that needs the "
@@ -30,7 +31,7 @@ class ActionModule(ActionBase):
         )
 
     @staticmethod
-    def msg_warning__no_async_is_no_rollback(task_poll, task_async, max_timeout):
+    def msg_warning__no_async_is_no_rollback(task_poll, task_async, max_timeout) -> str:
         return (
             "Attempts to restore iptables state without rollback in case of mistake "
             "may lead the ansible controller to loose access to the hosts and never "
@@ -41,7 +42,7 @@ class ActionModule(ActionBase):
         )
 
     @staticmethod
-    def msg_warning__async_greater_than_timeout(task_poll, task_async, max_timeout):
+    def msg_warning__async_greater_than_timeout(task_poll, task_async, max_timeout) -> str:
         return (
             "You attempt to restore iptables state with rollback in case of mistake, "
             "but with settings that will lead this rollback to happen AFTER that the "
@@ -50,7 +51,9 @@ class ActionModule(ActionBase):
             f"'ansible_timeout' (={max_timeout}) (recommended)."
         )
 
-    def _async_result(self, async_status_args, task_vars, timeout):
+    def _async_result(
+        self, async_status_args: dict[str, t.Any], task_vars: dict[str, t.Any], timeout: int
+    ) -> dict[str, t.Any]:
         """
         Retrieve results of the asynchronous task, and display them in place of
         the async wrapper results (those with the ansible_job_id key).
@@ -81,9 +84,12 @@ class ActionModule(ActionBase):
 
         return async_result
 
-    def run(self, tmp=None, task_vars=None):
+    def run(self, tmp: str | None = None, task_vars: dict[str, t.Any] | None = None) -> dict[str, t.Any]:
         self._supports_check_mode = True
         self._supports_async = True
+
+        if task_vars is None:
+            task_vars = {}
 
         result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
