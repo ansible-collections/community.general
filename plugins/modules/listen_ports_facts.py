@@ -305,10 +305,10 @@ def ss_parse(raw):
 
         conns = regex_conns.search(local_addr_port)
         pids = regex_pid.findall(process)
-        if conns is None and pids is None:
+        if conns is None and not pids:
             continue
 
-        if pids is None:
+        if not pids:
             # likely unprivileged user, so add empty name & pid
             # as we do in netstat logic to be consistent with output
             pids = [("", 0)]

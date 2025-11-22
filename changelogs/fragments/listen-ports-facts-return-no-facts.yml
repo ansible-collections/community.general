@@ -1,0 +1,2 @@
+bugfixes:
+  - Fixed an issue where the `listen_ports_facts` module returned no facts when using ss with podman. The bug was due to findall function that returns an empty list if nothing was found instead of None. The module now checks if the list is evaluated as truthy and returns listening port information as expected.
