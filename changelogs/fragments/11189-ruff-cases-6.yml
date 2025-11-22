@@ -1,0 +1,4 @@
+minor_changes:
+  - dependent lookup plugin - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+  - oci_utils module utils - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+  - snap - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
