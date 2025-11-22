@@ -338,11 +338,8 @@ class Snap(StateModuleHelper):
                 process_ = process_many
 
             if "warning: no snap found" in check_error:
-                self.do_raise(
-                    "Snaps not found: {0}.".format(
-                        [x.split()[-1] for x in out.split("\n") if x.startswith("warning: no snap found")]
-                    )
-                )
+                snaps_not_found = [x.split()[-1] for x in out.split("\n") if x.startswith("warning: no snap found")]
+                self.do_raise(f"Snaps not found: {snaps_not_found}.")
             return process_(rc, out, err)
 
         names = []
