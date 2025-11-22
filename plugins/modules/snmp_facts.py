@@ -287,7 +287,7 @@ def main():
         required_if=[
             ("version", "v2", ["community"]),
             ("version", "v2c", ["community"]),
-            ("version", "v3", ["username", "authkey"]),
+            ("version", "v3", ["username", "authkey", "level"]),
         ],
         supports_check_mode=True,
     )
