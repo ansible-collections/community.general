@@ -1,0 +1,2 @@
+minor_changes:
+  - wsl connection plugin - adjust variable name for integration tests (https://github.com/ansible-collections/community.general/pull/11190).
