@@ -104,7 +104,7 @@ USER_AGENT = "ansible-ip2locationio-module/0.0.1"
 
 
 class Ip2locationioFacts:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.url = "https://api.ip2location.io/"
         self.timeout = module.params.get("timeout")
         self.module = module
