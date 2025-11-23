@@ -12,7 +12,7 @@ module: ip2locationio_facts
 short_description: Retrieve IP geolocation facts of a host's IP address
 version_added: 13.1.0
 description:
-  - Gather IP geolocation facts of a host's IP address using the keyless api.ip2location.io API.
+  - Gather IP geolocation facts of a host's IP address using the keyless U(api.ip2location.io) API.
 author: "IP2Location (@ip2location)"
 extends_documentation_fragment:
   - community.general.attributes
