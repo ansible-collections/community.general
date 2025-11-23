@@ -231,12 +231,12 @@ def get_oci_config(module, service_client_class=None):
         "OCI_IDENTITY_DO_NOT_REDIRECT_TO_HOME_REGION"
     )
     if service_client_class == IdentityClient and not do_not_redirect:
-        _debug("Region passed for module invocation - {0} ".format(config["region"]))
+        _debug(f"Region passed for module invocation - {config['region']} ")
         identity_client = IdentityClient(config)
         region_subscriptions = identity_client.list_region_subscriptions(config["tenancy"]).data
         # Replace the region in the config with the home region.
         [config["region"]] = [rs.region_name for rs in region_subscriptions if rs.is_home_region is True]
-        _debug("Setting region in the config to home region - {0} ".format(config["region"]))
+        _debug(f"Setting region in the config to home region - {config['region']} ")
 
     return config
 
@@ -1282,7 +1282,7 @@ def wait_for_resource_lifecycle_state(
             _debug(f"Waiting for resource to reach READY state. get_args: {kwargs_get}")
             response_get = call_with_backoff(get_fn, **kwargs_get)
         else:
-            _debug("Waiting for resource with id {0} to reach READY state.".format(resource["id"]))
+            _debug(f"Waiting for resource with id {resource['id']} to reach READY state.")
             response_get = call_with_backoff(get_fn, **{get_param: resource["id"]})
         if states is None:
             states = module.params.get("wait_until") or DEFAULT_READY_STATES
