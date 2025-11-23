@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - mas - parse CLI output correctly when listing installed apps with mas 3.0.0+ (https://github.com/ansible-collections/community.general/pull/11179).
