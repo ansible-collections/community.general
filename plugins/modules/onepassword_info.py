@@ -191,7 +191,7 @@ class OnePasswordInfo:
             args += [to_bytes("--session=") + self.token]
 
         command = [self.cli_path] + args
-        rc, out, err = module.run_command(command, data=command_input, check_rc=False)
+        rc, out, err = module.run_command(command, data=command_input, check_rc=False, binary_data=True, encoding=None)
         if not ignore_errors and rc != expected_rc:
             raise AnsibleModuleError(to_native(err))
         return rc, out, err
