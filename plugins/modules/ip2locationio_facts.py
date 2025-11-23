@@ -31,7 +31,7 @@ options:
     type: str
 notes:
   - This module uses the keyless endpoint which has usage limits.
-  - Check U(https://www.ip2location.io/ip2location-documentation) for more information.
+    Check U(https://www.ip2location.io/ip2location-documentation) for more information.
 """
 
 EXAMPLES = r"""
