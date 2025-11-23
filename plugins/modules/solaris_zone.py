@@ -309,12 +309,15 @@ class Zone:
             Wait until the zone's console login is running; once that's running, consider the zone booted.
             """
 
+            zone_booted_re = re.compile(r"ttymon.*-d /dev/console")
+            cmd_ps = ["ps", "-z", self.name, "-o", "args"]
+
             elapsed = 0
             while True:
                 if elapsed > self.timeout:
                     self.module.fail_json(msg="timed out waiting for zone to boot")
-                rc = os.system(f'ps -z {self.name} -o args|grep "ttymon.*-d /dev/console" > /dev/null 2>/dev/null')
-                if rc == 0:
+                rc, out, err = self.module.run_command(cmd_ps, check_rc=False)
+                if any(zone_booted_re.match(x) for x in out.splitlines()):
                     break
                 time.sleep(10)
                 elapsed += 10
