@@ -123,7 +123,7 @@ class Ip2locationioFacts:
             content = response.read()
             result = self.module.from_json(content)
         except Exception as exc:
-            self.module.fail_json(msg=f"Failed to parse the ip2location.io response: {self.url} {content}")
+            self.module.fail_json(msg=f"Failed to parse the ip2location.io response from {self.url}: {exc}", read_content=content)
         else:
             return result
 
