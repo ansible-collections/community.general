@@ -109,7 +109,7 @@ class Ip2locationioFacts:
         self.timeout = module.params.get("timeout")
         self.module = module
 
-    def get_geo_data(self):
+    def get_geo_data(self) -> dict[str, t.Any]:
         response, info = fetch_url(
             self.module,
             self.url,
