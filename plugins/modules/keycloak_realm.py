@@ -738,7 +738,7 @@ options:
     aliases:
       - webAuthnPolicyPasswordlessPasskeysEnabled
     type: bool
-    version_added: 12.x.x
+    version_added: 12.1.0
 
 extends_documentation_fragment:
   - community.general.keycloak
