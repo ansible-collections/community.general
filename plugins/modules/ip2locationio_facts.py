@@ -102,6 +102,7 @@ from ansible.module_utils.urls import fetch_url
 
 USER_AGENT = "ansible-ip2locationio-module/0.0.1"
 
+
 class Ip2locationioFacts:
     def __init__(self, module: AnsibleModule) -> None:
         self.url = "https://api.ip2location.io/"
@@ -116,13 +117,17 @@ class Ip2locationioFacts:
             timeout=self.timeout,
         )
         if info["status"] != 200:
-            self.module.fail_json(msg=f"Could not get {self.url} page, check for connectivity! HTTP Status: {info['status']}")
+            self.module.fail_json(
+                msg=f"Could not get {self.url} page, check for connectivity! HTTP Status: {info['status']}"
+            )
 
         try:
             content = response.read()
             result = self.module.from_json(content)
         except Exception as exc:
-            self.module.fail_json(msg=f"Failed to parse the ip2location.io response from {self.url}: {exc}", read_content=content)
+            self.module.fail_json(
+                msg=f"Failed to parse the ip2location.io response from {self.url}: {exc}", read_content=content
+            )
         else:
             return result
 
