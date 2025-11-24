@@ -525,7 +525,7 @@ popd
 """
 
 
-def create_script(command, module):
+def create_script(command: str, module: AnsibleModule) -> None:
     """Write out a script onto a target.
 
     This method should be backward compatible with Python when executing
