@@ -159,8 +159,6 @@ import json
 import os
 import re
 
-from subprocess import Popen, PIPE
-
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.module_utils.basic import AnsibleModule
 
@@ -193,9 +191,7 @@ class OnePasswordInfo:
             args += [to_bytes("--session=") + self.token]
 
         command = [self.cli_path] + args
-        p = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
-        out, err = p.communicate(input=command_input)
-        rc = p.wait()
+        rc, out, err = module.run_command(command, data=command_input, check_rc=False, binary_data=True, encoding=None)
         if not ignore_errors and rc != expected_rc:
             raise AnsibleModuleError(to_native(err))
         return rc, out, err
