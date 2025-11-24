@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import typing as t
 
 DOCUMENTATION = r"""
 module: ip2locationio_facts
