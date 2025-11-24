@@ -517,11 +517,11 @@ pushd "$(getent passwd $(whoami)|cut -f6 -d':')"
 popd
 
 # User defined command
-%(container_command)s
+{}
 """
 
 
-def create_script(command, module):
+def create_script(command: str, module: AnsibleModule) -> None:
     """Write out a script onto a target.
 
     This method should be backward compatible with Python when executing
@@ -529,25 +529,27 @@ def create_script(command, module):
 
     :param command: command to run, this can be a script and can use spacing
                     with newlines as separation.
-    :type command: ``str``
     :param module: AnsibleModule to run commands with.
-    :type module: ``AnsibleModule``
     """
 
-    script_file = None
-    with tempfile.NamedTemporaryFile(prefix="lxc-attach-script", delete_on_close=False, mode="wb") as f:
-        f.write(to_bytes(ATTACH_TEMPLATE % {"container_command": command}, errors="surrogate_or_strict"))
+    script_file = ""
+    try:
+        f = tempfile.NamedTemporaryFile(prefix="lxc-attach-script", delete=False, mode="wb")
+        f.write(to_bytes(ATTACH_TEMPLATE.format(command), errors="surrogate_or_strict"))
         script_file = f.name
         f.flush()
         f.close()
 
-        os.chmod(script_file, int("0700", 8))
+        os.chmod(script_file, 0o0700)
 
         with tempfile.NamedTemporaryFile(prefix="lxc-attach-script-log", delete=False, mode="ab") as stdout_file:
             with tempfile.NamedTemporaryFile(prefix="lxc-attach-script-err", delete=False, mode="ab") as stderr_file:
-                rc, out, err = module.run_command([script_file], binary_data=True, encoding=None)
+                rc, out, err = module.run_command([script_file], encoding=None)
                 stdout_file.write(out)
                 stderr_file.write(err)
+    finally:
+        if script_file:
+            os.remove(script_file)
 
 
 class LxcContainerManagement:
