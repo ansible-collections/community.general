@@ -401,7 +401,10 @@ class Pacman:
                 # When installing from URLs, pacman can also output a 'nothing to do' message. strip that too.
                 if "loading packages" in p or "there is nothing to do" in p or "Avoid running" in p:
                     continue
-                name, version = p.split()
+                name_version = p.split()
+                if len(name_version) != 2:
+                    self.fail("Found unexpected name-version pair: {0!r}".format(name_version), stdout=stdout, stderr=stderr)
+                name, version = name_version
                 if name in self.inventory["installed_pkgs"]:
                     before.append(
                         f"{name}-{self.inventory['installed_pkgs'][name]}-{self.inventory['pkg_reasons'][name]}"
@@ -719,7 +722,10 @@ class Pacman:
             l = l.strip()
             if not l:
                 continue
-            repo, pkg, ver = l.split()[:3]
+            parts = l.split()
+            if len(parts) < 3:
+                self.fail("Found unexpected database line: {0!r}".format(l), database=database)
+            repo, pkg, ver = parts[:3]
             available_pkgs[pkg] = ver
 
         available_groups = defaultdict(set)
