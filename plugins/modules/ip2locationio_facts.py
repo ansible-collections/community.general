@@ -6,8 +6,6 @@
 
 from __future__ import annotations
 
-import typing as t
-
 DOCUMENTATION = r"""
 module: ip2locationio_facts
 short_description: Retrieve IP geolocation facts of a host's IP address
@@ -96,13 +94,13 @@ ansible_facts:
       type: bool
       sample: false
 """
-from ansible.module_utils.basic import AnsibleModule
 
+import typing as t
+
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-
 USER_AGENT = "ansible-ip2locationio-module/0.0.1"
-
 
 class Ip2locationioFacts:
     def __init__(self, module: AnsibleModule) -> None:
