@@ -11,7 +11,7 @@ set -eux
 # NB while running integration tests, the mock wsl.exe implementation is actually
 #    running on unix, instead of on running windows, so the wsl.exe command line
 #    construction must use unix rules instead of windows rules.
-export _ANSIBLE_TEST_WSL_CONNECTION_PLUGIN_Waeri5tepheeSha2fae8=1
+export _ANSIBLE_TEST_WSL_CONNECTION_PLUGIN_WAERI5TEPHEESHA2FAE8=1
 
 ANSIBLE_ROLES_PATH=../ \
     ansible-playbook dependencies.yml -v "$@"

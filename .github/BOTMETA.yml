@@ -592,6 +592,8 @@ files:
   $modules/filesystem.py:
     labels: filesystem
     maintainers: pilou- abulimov quidame
+  $modules/file_remove.py:
+    maintainers: shahargolshani
   $modules/flatpak.py:
     maintainers: $team_flatpak
   $modules/flatpak_remote.py:
