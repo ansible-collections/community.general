@@ -533,9 +533,7 @@ def create_script(command: str, module: AnsibleModule) -> None:
 
     :param command: command to run, this can be a script and can use spacing
                     with newlines as separation.
-    :type command: ``str``
     :param module: AnsibleModule to run commands with.
-    :type module: ``AnsibleModule``
     """
 
     script_file = None
