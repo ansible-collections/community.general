@@ -1,0 +1,3 @@
+bugfixes:
+  - "datetime module utils - fix bug in ``fromtimestamp()`` that caused the function to crash.
+     This function is not used in community.general (https://github.com/ansible-collections/community.general/pull/11206)."
