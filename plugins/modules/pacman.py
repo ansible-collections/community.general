@@ -403,7 +403,7 @@ class Pacman:
                     continue
                 name_version = p.split()
                 if len(name_version) != 2:
-                    self.fail("Found unexpected name-version pair: {0!r}".format(name_version), stdout=stdout, stderr=stderr)
+                    self.fail("Found unexpected name-version pair: {0!r}".format(name_version))
                 name, version = name_version
                 if name in self.inventory["installed_pkgs"]:
                     before.append(
@@ -724,7 +724,7 @@ class Pacman:
                 continue
             parts = l.split()
             if len(parts) < 3:
-                self.fail("Found unexpected database line: {0!r}".format(l), database=database)
+                self.fail("Found unexpected database line: {0!r}".format(l))
             repo, pkg, ver = parts[:3]
             available_pkgs[pkg] = ver
 
