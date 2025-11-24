@@ -1,0 +1,2 @@
+minor_changes:
+  - add support to incus connection plugin for Windows virtual machine (https://github.com/ansible-collections/community.general/pull/11199).

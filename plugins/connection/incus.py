@@ -13,6 +13,9 @@ short_description: Run tasks in Incus instances using the Incus CLI
 description:
   - Run commands or put/fetch files to an existing Incus instance using Incus CLI.
 version_added: "8.2.0"
+notes:
+  - When using this collection for Windows virtual machines, set C(ansible_shell_type) to C(powershell) or C(cmd) as a variable to the host in
+    the inventory.
 options:
   remote_addr:
     description:
@@ -75,6 +78,7 @@ options:
 """
 
 import os
+import shlex
 from subprocess import call, Popen, PIPE
 
 from ansible.errors import AnsibleError, AnsibleConnectionFailure, AnsibleFileNotFound
@@ -97,6 +101,12 @@ class Connection(ConnectionBase):
         if not self._incus_cmd:
             raise AnsibleError("incus command not found in PATH")
 
+        if getattr(self._shell, "_IS_WINDOWS", False):
+            self.has_native_async = True
+            self.always_pipeline_modules = True
+            self.module_implementation_preferences = (".ps1", ".exe", "")
+            self.allow_executable = False
+
     def _connect(self):
         """connect to Incus (nothing to do here)"""
         super()._connect()
@@ -115,19 +125,23 @@ class Connection(ConnectionBase):
             "--project",
             self.get_option("project"),
             "exec",
+            *(["-T"] if getattr(self._shell, "_IS_WINDOWS", False) else []),
             f"{self.get_option('remote')}:{self._instance()}",
             "--",
         ]
 
-        if self.get_option("remote_user") != "root":
-            self._display.vvv(
-                f"INFO: Running as non-root user: {self.get_option('remote_user')}, \
-                trying to run 'incus exec' with become method: {self.get_option('incus_become_method')}",
-                host=self._instance(),
-            )
-            exec_cmd.extend([self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"])
+        if getattr(self._shell, "_IS_WINDOWS", False):
+            exec_cmd.extend(shlex.split(cmd))
+        else:
+            if self.get_option("remote_user") != "root":
+                self._display.vvv(
+                    f"INFO: Running as non-root user: {self.get_option('remote_user')}, \
+                  trying to run 'incus exec' with become method: {self.get_option('incus_become_method')}",
+                    host=self._instance(),
+                )
+                exec_cmd.extend([self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"])
 
-        exec_cmd.extend([self.get_option("executable"), "-c", cmd])
+            exec_cmd.extend([self.get_option("executable"), "-c", cmd])
 
         return exec_cmd
 
@@ -200,7 +214,7 @@ class Connection(ConnectionBase):
         if not os.path.isfile(to_bytes(in_path, errors="surrogate_or_strict")):
             raise AnsibleFileNotFound(f"input path is not a file: {in_path}")
 
-        if self.get_option("remote_user") != "root":
+        if not getattr(self._shell, "_IS_WINDOWS", False) and self.get_option("remote_user") != "root":
             uid, gid = self._get_remote_uid_gid()
             local_cmd = [
                 self._incus_cmd,
