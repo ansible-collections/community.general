@@ -682,10 +682,9 @@ class LXDContainerManagement:
             return self.config[key] != old_configs
 
     def _needs_to_apply_instance_configs(self):
-        for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
-            if self._needs_to_change_instance_config(param):
-                return True
-        return False
+        return any(
+            self._needs_to_change_instance_config(param) for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS)
+        )
 
     def _apply_instance_configs(self):
         old_metadata = copy.deepcopy(self.old_instance_json).get("metadata", None) or {}

@@ -507,10 +507,7 @@ def is_dictionary_subset(sub, super_dict):
     :param super_dict: super dictionary, for example resources_attr_value.
     :return: True if sub is contained in super.
     """
-    for key in sub:
-        if sub[key] != super_dict[key]:
-            return False
-    return True
+    return all(sub[key] == super_dict[key] for key in sub)
 
 
 def are_lists_equal(s, t):
@@ -533,10 +530,7 @@ def are_lists_equal(s, t):
         # `service_id` is provided by the user in the update call.
         sorted_s = sort_list_of_dictionary(s)
         sorted_t = sort_list_of_dictionary(t)
-        for index, d in enumerate(sorted_s):
-            if not is_dictionary_subset(d, sorted_t[index]):
-                return False
-        return True
+        return all(is_dictionary_subset(d, sorted_t[index]) for index, d in enumerate(sorted_s))
     else:
         # Handle lists of primitive types.
         try:

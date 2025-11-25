@@ -269,11 +269,7 @@ class _DictComparison:
         if set(dict1.keys()) != set(dict2.keys()):
             return False
 
-        for k in dict1:
-            if not self._compare_value(dict1.get(k), dict2.get(k)):
-                return False
-
-        return True
+        return all(self._compare_value(dict1[k], dict2[k]) for k in dict1)
 
     def _compare_lists(self, list1, list2):
         """Takes in two lists and compares them."""
@@ -283,11 +279,7 @@ class _DictComparison:
         if len(list1) != len(list2):
             return False
 
-        for i in range(len(list1)):
-            if not self._compare_value(list1[i], list2[i]):
-                return False
-
-        return True
+        return all(self._compare_value(l1, l2) for l1, l2 in zip(list1, list2))
 
     def _compare_value(self, value1, value2):
         """
