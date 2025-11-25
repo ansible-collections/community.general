@@ -195,8 +195,14 @@ class Mas:
             rows = []
         apps = []
         for r in rows:
-            # Format: "123456789 App Name"
-            r = r.split(" ", 1)
+            # mas 2.3.0 and older:
+            # 123456789  App Name         (version)
+            # 4567890    App Name Longer  (version)
+            #
+            # mas 3.0.0 and newer:
+            # 123456789  App Name         (version)
+            #   4567890  App Name Longer  (version)
+            r = r.strip().split(" ", 1)
             if len(r) == 2:
                 apps.append(int(r[0]))
 
