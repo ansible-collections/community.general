@@ -1,0 +1,13 @@
+minor_changes:
+  - database module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - hwc_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - known_hosts module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - oci_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - utm_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - xenserver module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - aix_filesystem - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - composer - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - flatpak - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - gitlab_group_members - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - gitlab_project_members - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+  - lxd_container - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
