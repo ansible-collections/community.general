@@ -159,11 +159,7 @@ def is_input_dangerous(string):
     if not string:
         return False
 
-    for pattern in (PATTERN_1, PATTERN_2, PATTERN_3):
-        if re.search(pattern, string):
-            return True
-
-    return False
+    return any(pattern.search(string) for pattern in (PATTERN_1, PATTERN_2, PATTERN_3))
 
 
 def check_input(module, *args):

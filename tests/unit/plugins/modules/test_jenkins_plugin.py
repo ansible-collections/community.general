@@ -188,10 +188,7 @@ def test__new_fallback_urls(mocker):
 
 def isInList(l, i):
     print(f"checking if {i} in {l}")
-    for item in l:
-        if item == i:
-            return True
-    return False
+    return any(item == i for item in l)  # TODO: check if return `i in l` works
 
 
 @patch("ansible_collections.community.general.plugins.modules.jenkins_plugin.fetch_url")

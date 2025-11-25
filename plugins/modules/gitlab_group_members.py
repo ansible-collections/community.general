@@ -202,10 +202,7 @@ class GitLabGroup:
 
     # check if the user is a member of the group
     def is_user_a_member(self, members, gitlab_user_id):
-        for member in members:
-            if member.id == gitlab_user_id:
-                return True
-        return False
+        return any(member.id == gitlab_user_id for member in members)
 
     # add user to a group
     def add_member_to_group(self, gitlab_user_id, gitlab_group_id, access_level):
