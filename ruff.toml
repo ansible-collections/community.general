@@ -26,7 +26,6 @@ ignore = [
     "UP041",  # Replace aliased errors with `TimeoutError`
     "B026",  # star-arg-unpacking-after-keyword-arg
     "SIM102",  # collapsible-if
-    "SIM110",  # reimplemented-builtin
     "SIM114",  # if-with-same-arms
     "SIM115",  # open-file-with-context-handler
     "SIM116",  # if-else-block-instead-of-dict-lookup
