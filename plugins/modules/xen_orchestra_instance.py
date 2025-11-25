@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2025 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: xen_orchestra_instance
 short_description: Management of instances on Xen Orchestra
 description:
   - Allows you to create/delete/restart/stop instances on Xen Orchestra.
-version_added: 11.0.0
+version_added: 11.2.0
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -152,7 +148,7 @@ OBJECT_NOT_FOUND = 1
 VM_STATE_ERROR = 13
 
 
-class XenOrchestra(object):
+class XenOrchestra():
     CALL_TIMEOUT = 100
     '''Number of 1/10ths of a second to wait before method call times out.'''
 
@@ -177,7 +173,7 @@ class XenOrchestra(object):
 
         sslopt = None if validate_certs else {'cert_reqs': ssl.CERT_NONE}
         self.conn = create_connection(
-            '{0}://{1}/api/'.format(proto, xoa_api_host), sslopt=sslopt)
+            f'{proto}://{xoa_api_host}/api/', sslopt=sslopt)
 
     def call(self, method, params):
         '''Calls a method on the XO server with the provided parameters.'''
@@ -199,7 +195,7 @@ class XenOrchestra(object):
                 waited += 1
 
         raise self.module.fail_json(
-            'Method call {method} timed out after {timeout} seconds.'.format(method=method, timeout=self.CALL_TIMEOUT / 10))
+            f'Method call {method} timed out after {self.CALL_TIMEOUT / 10} seconds.')
 
     def login(self, user, password):
         answer = self.call('session.signIn', {
@@ -208,7 +204,7 @@ class XenOrchestra(object):
 
         if 'error' in answer:
             raise self.module.fail_json(
-                'Could not connect: {0}'.format(answer['error']))
+                f"Could not connect: {answer['error']}")
 
         return answer['result']
 
@@ -227,7 +223,7 @@ class XenOrchestra(object):
 
         if 'error' in answer:
             raise self.module.fail_json(
-                'Could not create vm: {0}'.format(answer['error']))
+                f"Could not create vm: {answer['error']}")
 
         return answer['result']
 
@@ -236,7 +232,7 @@ class XenOrchestra(object):
 
         if 'error' in answer:
             raise self.module.fail_json(
-                'Could not restart vm: {0}'.format(answer['error']))
+                f"Could not restart vm: {answer['error']}")
 
         return answer['result']
 
@@ -248,7 +244,7 @@ class XenOrchestra(object):
             if answer['error']['code'] == VM_STATE_ERROR:
                 return False
             raise self.module.fail_json(
-                'Could not stop vm: {0}'.format(answer['error']))
+                f"Could not stop vm: {answer['error']}")
 
         return answer['result']
 
@@ -260,7 +256,7 @@ class XenOrchestra(object):
             if answer['error']['code'] == VM_STATE_ERROR:
                 return False
             raise self.module.fail_json(
-                'Could not start vm: {0}'.format(answer['error']))
+                f"Could not start vm: {answer['error']}")
 
         return answer['result']
 
@@ -271,7 +267,7 @@ class XenOrchestra(object):
             if answer['error']['code'] == OBJECT_NOT_FOUND:
                 return False
             raise self.module.fail_json(
-                'Could not delete vm: {0}'.format(answer['error']))
+                f"Could not delete vm: {answer['error']}")
 
         return answer['result']
 
