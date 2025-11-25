@@ -22,8 +22,8 @@ def ensure_timezone_info(value):
 
 def fromtimestamp(value):
     if _USE_TIMEZONE:
-        return _datetime.fromtimestamp(value, tz=_datetime.timezone.utc)
-    return _datetime.utcfromtimestamp(value)
+        return _datetime.datetime.fromtimestamp(value, tz=_datetime.timezone.utc)
+    return _datetime.datetime.utcfromtimestamp(value)
 
 
 def now():
