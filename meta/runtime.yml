@@ -1146,6 +1146,14 @@ plugin_routing:
         warning_text: This doc fragment was used by rax modules, that relied on the deprecated
           package pyrax.
   module_utils:
+    cloud:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
+    database:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
     dimensiondata:
       deprecation:
         removal_version: 13.0.0
@@ -1162,6 +1170,10 @@ plugin_routing:
       redirect: community.google.gcp
     hetzner:
       redirect: community.hrobot.robot
+    known_hosts:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
     kubevirt:
       redirect: community.kubevirt.kubevirt
     net_tools.nios.api:
@@ -1193,6 +1205,10 @@ plugin_routing:
       redirect: dellemc.openmanage.dellemc_idrac
     remote_management.dellemc.ome:
       redirect: dellemc.openmanage.ome
+    saslprep:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
   inventory:
     docker_machine:
       redirect: community.docker.docker_machine

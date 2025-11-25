@@ -1,0 +1,9 @@
+deprecated_features:
+  - "cloud module utils - this module utils is not used by community.general and will thus be removed from community.general 13.0.0.
+     If you are using it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205)."
+  - "database module utils - this module utils is not used by community.general and will thus be removed from community.general 13.0.0.
+     If you are using it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205)."
+  - "known_hosts module utils - this module utils is not used by community.general and will thus be removed from community.general 13.0.0.
+     If you are using it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205)."
+  - "saslprep module utils - this module utils is not used by community.general and will thus be removed from community.general 13.0.0.
+     If you are using it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205)."
