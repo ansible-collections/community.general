@@ -15,7 +15,7 @@ def ensure_timezone_info(value):
 
 
 def fromtimestamp(value):
-    return _datetime.fromtimestamp(value, tz=_datetime.timezone.utc)
+    return _datetime.datetime.fromtimestamp(value, tz=_datetime.timezone.utc)
 
 
 def now():
