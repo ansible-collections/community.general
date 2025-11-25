@@ -78,7 +78,7 @@ options:
 """
 
 import os
-import shlex
+import re
 from subprocess import call, Popen, PIPE
 
 from ansible.errors import AnsibleError, AnsibleConnectionFailure, AnsibleFileNotFound
@@ -102,6 +102,17 @@ class Connection(ConnectionBase):
             raise AnsibleError("incus command not found in PATH")
 
         if getattr(self._shell, "_IS_WINDOWS", False):
+            # Initializing regular expression patterns to match on a PowerShell or cmd command line.
+            self.powershell_regex_pattern = re.compile(
+                r"^(?P<executable>(\"?([a-z]:)?[a-z0-9 ()\\.]+)?powershell(\.exe)?\"?|(([a-z]:)?[a-z0-9()\\.]+)?powershell(\.exe)?)\s+.*(?P<command>-c(ommand)?)\s+",  # noqa: E501
+                re.IGNORECASE,
+            )
+            self.cmd_regex_pattern = re.compile(
+                r"^(?P<executable>(\"?([a-z]:)?[a-z0-9 ()\\.]+)?cmd(\.exe)?\"?|(([a-z]:)?[a-z0-9()\\.]+)?cmd(\.exe)?)\s+.*(?P<command>/c)\s+",
+                re.IGNORECASE,
+            )
+
+            # Basic setup for a Windows host.
             self.has_native_async = True
             self.always_pipeline_modules = True
             self.module_implementation_preferences = (".ps1", ".exe", "")
@@ -131,7 +142,32 @@ class Connection(ConnectionBase):
         ]
 
         if getattr(self._shell, "_IS_WINDOWS", False):
-            exec_cmd.extend(shlex.split(cmd))
+            if ((regex_match := self.powershell_regex_pattern.match(cmd)) and (regex_pattern := self.powershell_regex_pattern)) or (
+                (regex_match := self.cmd_regex_pattern.match(cmd)) and (regex_pattern := self.cmd_regex_pattern)
+            ):
+                self._display.vvvvvv(
+                    f'Found keyword: "{regex_match.group("command")}" based on regex: {regex_pattern.pattern}',
+                    host=self._instance(),
+                )
+
+                # Split the command on the argument -c(ommand) for PowerShell or /c for cmd.
+                before_command_argument, after_command_argument = cmd.split(regex_match.group("command"))
+
+                exec_cmd.extend(
+                    [
+                        # To avoid splitting on a space contained in the path, set the executable as the first argument.
+                        regex_match.group("executable").strip('"'),
+                        # Remove the executable path and split the rest by space.
+                        *(before_command_argument[len(regex_match.group("executable")) :].lstrip().split(" ")),
+                        # Set the command argument depending on cmd or powershell.
+                        regex_match.group("command"),
+                        # Add the rest of the command at the end.
+                        after_command_argument,
+                    ]
+                )
+            else:
+                # For anything else using -EncodedCommand or else, just split on space.
+                exec_cmd.extend(cmd.split(" "))
         else:
             if self.get_option("remote_user") != "root":
                 self._display.vvv(
