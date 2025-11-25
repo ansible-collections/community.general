@@ -219,11 +219,7 @@ def is_valid_ip6_addr(ip6_addr):
 
     ip6_addr_hextet_regex = re.compile("^[0-9a-f]{1,4}$")
 
-    for ip6_addr_hextet in ip6_addr_split:
-        if not bool(ip6_addr_hextet_regex.match(ip6_addr_hextet)):
-            return False
-
-    return True
+    return all(bool(ip6_addr_hextet_regex.match(ip6_addr_hextet)) for ip6_addr_hextet in ip6_addr_split)
 
 
 def is_valid_ip6_prefix(ip6_prefix):

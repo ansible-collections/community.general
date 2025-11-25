@@ -205,11 +205,7 @@ def _check_nfs_device(module, nfs_host, device):
         module.fail_json(msg=f"Failed to run showmount. Error message: {err}")
     else:
         showmount_data = showmount_out.splitlines()
-        for line in showmount_data:
-            if line.split(":")[1] == device:
-                return True
-
-        return False
+        return any(line.split(":")[1] == device for line in showmount_data)
 
 
 def _validate_vg(module, vg):

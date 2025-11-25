@@ -30,10 +30,7 @@ def is_ssh_url(url):
 
     if "@" in url and "://" not in url:
         return True
-    for scheme in "ssh://", "git+ssh://", "ssh+git://":
-        if url.startswith(scheme):
-            return True
-    return False
+    return any(url.startswith(scheme) for scheme in ("ssh://", "git+ssh://", "ssh+git://"))
 
 
 def get_fqdn_and_port(repo_url):

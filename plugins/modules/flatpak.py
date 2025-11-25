@@ -313,10 +313,7 @@ def _is_flatpak_id(part):
     domain = sections[0]
     if not domain.islower():
         return False
-    for section in sections[1:]:
-        if not section.isalnum():
-            return False
-    return True
+    return all(section.isalnum() for section in sections[1:])
 
 
 def _parse_flatpak_name(name):

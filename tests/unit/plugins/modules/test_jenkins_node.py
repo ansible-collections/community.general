@@ -45,11 +45,7 @@ def xml_equal(x, y):
     if len(x_children) != len(y_children):
         return False
 
-    for x, y in zip(x_children, y_children):
-        if not xml_equal(x, y):
-            return False
-
-    return True
+    return all(xml_equal(x, y) for x, y in zip(x_children, y_children))
 
 
 def assert_xml_equal(x, y):

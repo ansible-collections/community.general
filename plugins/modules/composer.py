@@ -150,11 +150,10 @@ def parse_out(string):
 
 
 def has_changed(string):
-    for no_change in ["Nothing to install or update", "Nothing to install, update or remove"]:
-        if no_change in string:
-            return False
-
-    return True
+    return all(
+        no_change not in string
+        for no_change in ["Nothing to install or update", "Nothing to install, update or remove"]
+    )
 
 
 def get_available_options(module, command="install"):

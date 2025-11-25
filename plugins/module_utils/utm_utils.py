@@ -230,7 +230,4 @@ class UTM:
         :param result: The result from the query
         :return:
         """
-        for key in keys:
-            if module.params.get(key) != result[key]:
-                return True
-        return False
+        return any(module.params.get(key) != result[key] for key in keys)
