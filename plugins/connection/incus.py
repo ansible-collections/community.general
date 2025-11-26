@@ -151,7 +151,7 @@ class Connection(ConnectionBase):
                 )
 
                 # Split the command on the argument -c(ommand) for PowerShell or /c for cmd.
-                before_command_argument, after_command_argument = cmd.split(regex_match.group("command"))
+                before_command_argument, after_command_argument = cmd.split(regex_match.group("command"), 1)
 
                 exec_cmd.extend(
                     [
