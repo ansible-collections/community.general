@@ -12,6 +12,7 @@ import typing as t
 from urllib import error as urllib_error
 from urllib.parse import urlencode
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 
 
@@ -120,7 +121,7 @@ class _ConsulModule:
     operational_attributes: set[str] = set()
     params: dict[str, t.Any] = {}
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self._module = module
         self.params = _normalize_params(module.params, module.argument_spec)
         self.api_params = {

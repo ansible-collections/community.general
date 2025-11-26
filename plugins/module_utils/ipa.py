@@ -19,7 +19,7 @@ import uuid
 import re
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.urls import fetch_url, HAS_GSSAPI
-from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
+from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound, AnsibleModule
 from urllib.parse import quote
 
 
@@ -41,7 +41,7 @@ def _env_then_dns_fallback(*args, **kwargs):
 
 
 class IPAClient:
-    def __init__(self, module, host, port, protocol):
+    def __init__(self, module: AnsibleModule, host, port, protocol):
         self.host = host
         self.port = port
         self.protocol = protocol

@@ -12,7 +12,7 @@ import time
 import traceback
 from urllib.parse import urlencode
 
-from ansible.module_utils.basic import env_fallback, missing_required_lib
+from ansible.module_utils.basic import env_fallback, missing_required_lib, AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (
@@ -169,7 +169,7 @@ class Response:
 
 
 class Scaleway:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.headers = {
             "X-Auth-Token": self.module.params.get("api_token"),

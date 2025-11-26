@@ -11,7 +11,7 @@ from __future__ import annotations
 import os
 
 
-def determine_config_file(user, config_file):
+def determine_config_file(user: str | None, config_file: str | None) -> str:
     if user:
         config_file = os.path.join(os.path.expanduser(f"~{user}"), ".ssh", "config")
     elif config_file is None:

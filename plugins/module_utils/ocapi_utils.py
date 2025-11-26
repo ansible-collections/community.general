@@ -12,6 +12,7 @@ from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse
 
 from ansible.module_utils.urls import open_url
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -24,7 +25,7 @@ HEALTH_OK = 5
 
 
 class OcapiUtils:
-    def __init__(self, creds, base_uri, proxy_slot_number, timeout, module):
+    def __init__(self, creds, base_uri, proxy_slot_number, timeout, module: AnsibleModule):
         self.root_uri = base_uri
         self.proxy_slot_number = proxy_slot_number
         self.creds = creds

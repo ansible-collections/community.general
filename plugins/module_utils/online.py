@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import sys
 
-from ansible.module_utils.basic import env_fallback
+from ansible.module_utils.basic import env_fallback, AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
@@ -60,7 +60,7 @@ class Response:
 
 
 class Online:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.headers = {
             "Authorization": f"Bearer {self.module.params.get('api_token')}",

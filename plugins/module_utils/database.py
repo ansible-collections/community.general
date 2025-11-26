@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import re
 
+from ansible.module_utils.basic import AnsibleModule
+
 
 # Input patterns for is_input_dangerous function:
 #
@@ -162,7 +164,7 @@ def is_input_dangerous(string):
     return any(pattern.search(string) for pattern in (PATTERN_1, PATTERN_2, PATTERN_3))
 
 
-def check_input(module, *args):
+def check_input(module: AnsibleModule, *args) -> None:
     """Wrapper for is_input_dangerous function."""
     needs_to_check = args
 

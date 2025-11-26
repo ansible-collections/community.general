@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import re
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 __state_map = {"present": "--install", "absent": "--uninstall"}
@@ -21,7 +23,7 @@ def __map_channel(channel_name):
     return __channel_map[channel_name]
 
 
-def sdkmanager_runner(module, **kwargs):
+def sdkmanager_runner(module: AnsibleModule, **kwargs):
     return CmdRunner(
         module,
         command="sdkmanager",
@@ -78,7 +80,7 @@ class AndroidSdkManager:
         r"the packages they depend on were not accepted"
     )
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.runner = sdkmanager_runner(module)
 
     def get_installed_packages(self):

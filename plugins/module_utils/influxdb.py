@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import traceback
 
-from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.basic import missing_required_lib, AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -32,7 +32,7 @@ except ImportError:
 
 
 class InfluxDb:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.params = self.module.params
         self.check_lib()

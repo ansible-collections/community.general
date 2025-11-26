@@ -15,8 +15,9 @@ from __future__ import annotations
 
 import os
 import traceback
+import typing as t
 
-from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.basic import missing_required_lib, AnsibleModule
 
 CLIENT_IMP_ERR = None
 try:
@@ -43,24 +44,25 @@ def manageiq_argument_spec():
     )
 
 
-def check_client(module):
+def check_client(module: AnsibleModule) -> None:
     if not HAS_CLIENT:
         module.fail_json(msg=missing_required_lib("manageiq-client"), exception=CLIENT_IMP_ERR)
 
 
-def validate_connection_params(module):
-    params = module.params["manageiq_connection"]
+def validate_connection_params(module: AnsibleModule) -> dict[str, t.Any]:
+    params: dict[str, t.Any] = module.params["manageiq_connection"]
     error_str = "missing required argument: manageiq_connection[{}]"
-    url = params["url"]
-    token = params["token"]
-    username = params["username"]
-    password = params["password"]
+    url: str | None = params["url"]
+    token: str | None = params["token"]
+    username: str | None = params["username"]
+    password: str | None = params["password"]
 
     if (url and username and password) or (url and token):
         return params
     for arg in ["url", "username", "password"]:
         if params[arg] in (None, ""):
             module.fail_json(msg=error_str.format(arg))
+    raise AssertionError("should be unreachable")
 
 
 def manageiq_entities():
@@ -87,7 +89,7 @@ class ManageIQ:
     class encapsulating ManageIQ API client.
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         # handle import errors
         check_client(module)
 
@@ -111,7 +113,7 @@ class ManageIQ:
             self.module.fail_json(msg=f"failed to open connection ({url}): {e}")
 
     @property
-    def module(self):
+    def module(self) -> AnsibleModule:
         """Ansible module module
 
         Returns:
@@ -192,7 +194,7 @@ class ManageIQPolicies:
     Object to execute policies management operations of manageiq resources.
     """
 
-    def __init__(self, manageiq, resource_type, resource_id):
+    def __init__(self, manageiq: ManageIQ, resource_type, resource_id):
         self.manageiq = manageiq
 
         self.module = self.manageiq.module
@@ -330,7 +332,7 @@ class ManageIQTags:
     Object to execute tags management operations of manageiq resources.
     """
 
-    def __init__(self, manageiq, resource_type, resource_id):
+    def __init__(self, manageiq: ManageIQ, resource_type, resource_id):
         self.manageiq = manageiq
 
         self.module = self.manageiq.module

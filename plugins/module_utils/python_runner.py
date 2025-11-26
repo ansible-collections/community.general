@@ -6,13 +6,15 @@ from __future__ import annotations
 
 import os
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, _ensure_list
 
 
 class PythonRunner(CmdRunner):
     def __init__(
         self,
-        module,
+        module: AnsibleModule,
         command,
         arg_formats=None,
         default_args_order=(),

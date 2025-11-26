@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils import deps
 
 
@@ -13,7 +15,7 @@ with deps.declare("packaging"):
 
 
 class PackageRequirement:
-    def __init__(self, module, name):
+    def __init__(self, module: AnsibleModule, name) -> None:
         self.module = module
         self.parsed_name, self.requirement = self._parse_spec(name)
 

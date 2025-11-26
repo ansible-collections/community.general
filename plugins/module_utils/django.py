@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import typing as t
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
@@ -81,7 +82,7 @@ _args_menu = dict(
 
 
 class _DjangoRunner(PythonRunner):
-    def __init__(self, module, arg_formats=None, **kwargs):
+    def __init__(self, module: AnsibleModule, arg_formats=None, **kwargs) -> None:
         arg_fmts = dict(arg_formats) if arg_formats else {}
         arg_fmts.update(_django_std_arg_fmts)
 

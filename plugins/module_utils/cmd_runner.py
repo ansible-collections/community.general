@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import os
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.common.locale import get_best_parsable_locale
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
@@ -77,7 +78,7 @@ class CmdRunner:
 
     def __init__(
         self,
-        module,
+        module: AnsibleModule,
         command,
         arg_formats=None,
         default_args_order=(),

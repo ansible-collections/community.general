@@ -165,7 +165,7 @@ def ldap_search(filter, base=None, attr=None):
     uldap().lo.lo.abandon(msgid)
 
 
-def module_by_name(module_name_):
+def module_by_name(module_name_: str):
     """Returns an initialized UMC module, identified by the given name.
 
     The module is a module specification according to the udm commandline.
@@ -202,7 +202,7 @@ def get_umc_admin_objects():
     return univention.admin.objects
 
 
-def umc_module_for_add(module, container_dn, superordinate=None):
+def umc_module_for_add(module: str, container_dn, superordinate=None):
     """Returns an UMC module object prepared for creating a new entry.
 
     The module is a module specification according to the udm commandline.
@@ -226,7 +226,7 @@ def umc_module_for_add(module, container_dn, superordinate=None):
     return obj
 
 
-def umc_module_for_edit(module, object_dn, superordinate=None):
+def umc_module_for_edit(module: str, object_dn, superordinate=None):
     """Returns an UMC module object prepared for editing an existing entry.
 
     The module is a module specification according to the udm commandline.

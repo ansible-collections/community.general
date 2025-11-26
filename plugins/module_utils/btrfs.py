@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 import re
 import os
@@ -28,9 +29,9 @@ class BtrfsCommands:
     Provides access to a subset of the Btrfs command line
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.__module = module
-        self.__btrfs = self.__module.get_bin_path("btrfs", required=True)
+        self.__btrfs: str = self.__module.get_bin_path("btrfs", required=True)
 
     def filesystem_show(self):
         command = f"{self.__btrfs} filesystem show -d"
@@ -106,10 +107,10 @@ class BtrfsInfoProvider:
     Utility providing details of the currently available btrfs filesystems
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.__module = module
         self.__btrfs_api = BtrfsCommands(module)
-        self.__findmnt_path = self.__module.get_bin_path("findmnt", required=True)
+        self.__findmnt_path: str = self.__module.get_bin_path("findmnt", required=True)
 
     def get_filesystems(self):
         filesystems = self.__btrfs_api.filesystem_show()
@@ -255,7 +256,7 @@ class BtrfsFilesystem:
     Wrapper class providing convenience methods for inspection of a btrfs filesystem
     """
 
-    def __init__(self, info, provider, module):
+    def __init__(self, info, provider, module: AnsibleModule) -> None:
         self.__provider = provider
 
         # constant for module execution
@@ -415,7 +416,7 @@ class BtrfsFilesystemsProvider:
     Provides methods to query available btrfs filesystems
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.__module = module
         self.__provider = BtrfsInfoProvider(module)
         self.__filesystems = None
