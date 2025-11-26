@@ -14,6 +14,10 @@ module: pushbullet
 short_description: Sends notifications to Pushbullet
 description:
   - This module sends push notifications through Pushbullet to channels or devices.
+deprecated:
+  removed_in: 13.0.0
+  why: Module relies on Python package pushbullet.py which is not maintained and supports only up to Python 3.2.
+  alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
