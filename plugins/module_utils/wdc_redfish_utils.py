@@ -11,6 +11,7 @@ import tarfile
 import os
 from urllib.parse import urlparse, urlunparse
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_file
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 
@@ -41,7 +42,7 @@ class WdcRedfishUtils(RedfishUtils):
     CHASSIS_LOCATE = "#Chassis.Locate"
     CHASSIS_POWER_MODE = "#Chassis.PowerMode"
 
-    def __init__(self, creds, root_uris, timeout, module, resource_id, data_modification):
+    def __init__(self, creds, root_uris, timeout, module: AnsibleModule, resource_id, data_modification):
         super().__init__(
             creds=creds,
             root_uri=root_uris[0],

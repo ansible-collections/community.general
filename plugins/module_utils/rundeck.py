@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import traceback
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 
 
@@ -27,7 +28,7 @@ def api_argument_spec():
     return api_argument_spec
 
 
-def api_request(module, endpoint, data=None, method="GET", content_type="application/json"):
+def api_request(module: AnsibleModule, endpoint, data=None, method="GET", content_type="application/json"):
     """Manages Rundeck API requests via HTTP(S)
 
     :arg module:   The AnsibleModule (used to get url, api_version, api_token, etc).

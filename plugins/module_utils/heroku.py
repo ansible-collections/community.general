@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import traceback
 
-from ansible.module_utils.basic import env_fallback, missing_required_lib
+from ansible.module_utils.basic import env_fallback, missing_required_lib, AnsibleModule
 
 HAS_HEROKU = False
 HEROKU_IMP_ERR = None
@@ -19,7 +19,7 @@ except ImportError:
 
 
 class HerokuHelper:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.check_lib()
         self.api_key = module.params["api_key"]

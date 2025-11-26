@@ -75,7 +75,7 @@ class UTMModule(AnsibleModule):
 
 
 class UTM:
-    def __init__(self, module, endpoint, change_relevant_keys, info_only=False):
+    def __init__(self, module: UTMModule, endpoint, change_relevant_keys, info_only=False):
         """
         Initialize UTM Class
         :param module: The Ansible module

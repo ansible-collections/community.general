@@ -10,6 +10,8 @@ from __future__ import annotations
 import re
 import traceback
 
+from ansible.module_utils.basic import AnsibleModule
+
 try:
     import ldap
     import ldap.dn
@@ -52,7 +54,7 @@ def ldap_required_together():
 
 
 class LdapGeneric:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         # Shortcuts
         self.module = module
         self.bind_dn = self.module.params["bind_dn"]

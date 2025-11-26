@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
@@ -22,7 +24,7 @@ _state_map = dict(
 )
 
 
-def snap_runner(module, **kwargs):
+def snap_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     runner = CmdRunner(
         module,
         "snap",
@@ -47,7 +49,7 @@ def snap_runner(module, **kwargs):
     return runner
 
 
-def get_version(runner):
+def get_version(runner: CmdRunner):
     with runner("version") as ctx:
         rc, out, err = ctx.run()
     return dict(x.split() for x in out.splitlines() if len(x.split()) == 2)

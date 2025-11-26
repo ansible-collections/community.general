@@ -5,10 +5,12 @@
 
 from __future__ import annotations
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
-def xdg_mime_runner(module, **kwargs):
+def xdg_mime_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     return CmdRunner(
         module,
         command=["xdg-mime"],
@@ -23,7 +25,7 @@ def xdg_mime_runner(module, **kwargs):
     )
 
 
-def xdg_mime_get(runner, mime_type):
+def xdg_mime_get(runner: CmdRunner, mime_type):
     def process(rc, out, err):
         if not out.strip():
             return None

@@ -9,7 +9,7 @@ from __future__ import annotations
 import traceback
 
 from functools import wraps
-from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.basic import missing_required_lib, AnsibleModule
 
 PYXCLI_INSTALLED = True
 PYXCLI_IMP_ERR = None
@@ -49,7 +49,7 @@ def xcli_wrapper(func):
     """Catch xcli errors and return a proper message"""
 
     @wraps(func)
-    def wrapper(module, *args, **kwargs):
+    def wrapper(module: AnsibleModule, *args, **kwargs):
         try:
             return func(module, *args, **kwargs)
         except errors.CommandExecutionError as e:
@@ -59,7 +59,7 @@ def xcli_wrapper(func):
 
 
 @xcli_wrapper
-def connect_ssl(module):
+def connect_ssl(module: AnsibleModule):
     endpoints = module.params["endpoints"]
     username = module.params["username"]
     password = module.params["password"]
@@ -82,7 +82,7 @@ def spectrum_accelerate_spec():
 
 
 @xcli_wrapper
-def execute_pyxcli_command(module, xcli_command, xcli_client):
+def execute_pyxcli_command(module: AnsibleModule, xcli_command, xcli_client):
     pyxcli_args = build_pyxcli_command(module.params)
     getattr(xcli_client.cmd, xcli_command)(**(pyxcli_args))
     return True
@@ -99,6 +99,6 @@ def build_pyxcli_command(fields):
     return pyxcli_args
 
 
-def is_pyxcli_installed(module):
+def is_pyxcli_installed(module: AnsibleModule):
     if not PYXCLI_INSTALLED:
         module.fail_json(msg=missing_required_lib("pyxcli"), exception=PYXCLI_IMP_ERR)

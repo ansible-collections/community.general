@@ -10,6 +10,7 @@ import os
 import random
 import string
 import time
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
@@ -52,7 +53,7 @@ class RedfishUtils:
         creds,
         root_uri,
         timeout,
-        module,
+        module: AnsibleModule,
         resource_id=None,
         data_modification=False,
         strip_etag_quotes=False,

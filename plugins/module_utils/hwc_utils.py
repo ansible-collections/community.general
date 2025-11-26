@@ -7,6 +7,7 @@ from __future__ import annotations
 import re
 import time
 import traceback
+import typing as t
 
 THIRD_LIBRARIES_IMP_ERR = None
 try:
@@ -135,18 +136,18 @@ class _ServiceClient:
 
 
 class Config:
-    def __init__(self, module, product):
+    def __init__(self, module: AnsibleModule, product):
         self._project_client = None
         self._domain_client = None
         self._module = module
         self._product = product
-        self._endpoints = {}
+        self._endpoints: dict[str, t.Any] = {}
 
         self._validate()
         self._gen_provider_client()
 
     @property
-    def module(self):
+    def module(self) -> AnsibleModule:
         return self._module
 
     def client(self, region, service_type, service_level):
@@ -380,7 +381,7 @@ def navigate_value(data, index, array_index=None):
     return d
 
 
-def build_path(module, path, kv=None):
+def build_path(module: AnsibleModule, path, kv=None):
     if kv is None:
         kv = dict()
 
@@ -400,7 +401,7 @@ def build_path(module, path, kv=None):
     return path.format(**v)
 
 
-def get_region(module):
+def get_region(module: AnsibleModule):
     if module.params["region"]:
         return module.params["region"]
 

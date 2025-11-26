@@ -12,7 +12,7 @@ try:
 except ImportError:
     HAS_VEXATAPI = False
 
-from ansible.module_utils.basic import env_fallback
+from ansible.module_utils.basic import env_fallback, AnsibleModule
 
 VXOS_VERSION = None
 
@@ -31,7 +31,7 @@ def get_version(iocs_json):
     return tuple(ver)
 
 
-def get_array(module):
+def get_array(module: AnsibleModule):
     """Return storage array object or fail"""
     global VXOS_VERSION
     array = module.params["array"]
