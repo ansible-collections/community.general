@@ -399,10 +399,10 @@ def main():
             rawdata = content
         elif file_exists:
             with open(path, "r") as config_object:
-                rawdata = config_object.read()
+                rawdata = config_object.read().replace("\n", "")
 
         # Wrap the XML documents in a <root> element
-        xmldata = lxml.etree.fromstring(f"<root>{rawdata.replace('\n', '')}</root>")
+        xmldata = lxml.etree.fromstring(f"<root>{rawdata}</root>")
 
         # Handle each XML document separately in the same session
         for xmldoc in list(xmldata):
