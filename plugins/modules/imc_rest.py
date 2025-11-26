@@ -402,7 +402,7 @@ def main():
                 rawdata = config_object.read()
 
         # Wrap the XML documents in a <root> element
-        xmldata = lxml.etree.fromstring("<root>%s</root>" % rawdata.replace("\n", ""))
+        xmldata = lxml.etree.fromstring(f"<root>{rawdata.replace('\n', '')}</root>")
 
         # Handle each XML document separately in the same session
         for xmldoc in list(xmldata):

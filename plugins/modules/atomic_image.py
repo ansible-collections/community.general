@@ -107,14 +107,14 @@ def core(module):
 
     if backend:
         if state == "present" or state == "latest":
-            args = [atomic_bin, "pull", "--storage=%s" % backend, image]
+            args = [atomic_bin, "pull", f"--storage={backend}", image]
             rc, out, err = module.run_command(args, check_rc=False)
             if rc < 0:
                 module.fail_json(rc=rc, msg=err)
             else:
                 out_run = ""
                 if started:
-                    args = [atomic_bin, "run", "--storage=%s" % backend, image]
+                    args = [atomic_bin, "run", f"--storage={backend}", image]
                     rc, out_run, err = module.run_command(args, check_rc=False)
                     if rc < 0:
                         module.fail_json(rc=rc, msg=err)
@@ -122,7 +122,7 @@ def core(module):
                 changed = "Extracting" in out or "Copying blob" in out
                 module.exit_json(msg=(out + out_run), changed=changed)
         elif state == "absent":
-            args = [atomic_bin, "images", "delete", "--storage=%s" % backend, image]
+            args = [atomic_bin, "images", "delete", f"--storage={backend}", image]
             rc, out, err = module.run_command(args, check_rc=False)
             if rc < 0:
                 module.fail_json(rc=rc, msg=err)
