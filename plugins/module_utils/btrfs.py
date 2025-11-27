@@ -8,6 +8,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 import re
 import os
+import typing as t
 
 
 def normalize_subvolume_path(path):
@@ -44,6 +45,8 @@ class BtrfsCommands:
                 current = self.__parse_filesystem(line)
                 filesystems.append(current)
             elif line.startswith("devid"):
+                if current is None:
+                    raise ValueError("Found 'devid' line without previous 'Label' line")
                 current["devices"].append(self.__parse_filesystem_device(line))
         return filesystems
 
