@@ -25,7 +25,7 @@ HEALTH_OK = 5
 
 
 class OcapiUtils:
-    def __init__(self, creds, base_uri, proxy_slot_number, timeout, module: AnsibleModule):
+    def __init__(self, creds, base_uri, proxy_slot_number, timeout, module: AnsibleModule) -> None:
         self.root_uri = base_uri
         self.proxy_slot_number = proxy_slot_number
         self.creds = creds

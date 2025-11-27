@@ -33,7 +33,7 @@ class BtrfsCommands:
         self.__module = module
         self.__btrfs: str = self.__module.get_bin_path("btrfs", required=True)
 
-    def filesystem_show(self):
+    def filesystem_show(self) -> list[dict[str, t.Any]]:
         command = f"{self.__btrfs} filesystem show -d"
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.strip() for x in result[1].splitlines()]
