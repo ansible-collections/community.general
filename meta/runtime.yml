@@ -837,6 +837,10 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use purestorage.flashblade.purefb_info instead.
+    pushbullet:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Module relies on Python package pushbullet.py which is not maintained and supports only up to Python 3.2.
     python_requirements_facts:
       tombstone:
         removal_version: 3.0.0
