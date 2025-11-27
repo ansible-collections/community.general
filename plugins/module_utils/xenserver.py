@@ -20,8 +20,11 @@ except ImportError:
     HAS_XENAPI = False
     XENAPI_IMP_ERR = traceback.format_exc()
 
-from ansible.module_utils.basic import env_fallback, missing_required_lib, AnsibleModule
+from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def xenserver_common_argument_spec():

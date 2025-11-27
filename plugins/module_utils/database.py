@@ -14,8 +14,10 @@
 from __future__ import annotations
 
 import re
+import typing as t
 
-from ansible.module_utils.basic import AnsibleModule
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 # Input patterns for is_input_dangerous function:

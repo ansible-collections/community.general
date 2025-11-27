@@ -5,9 +5,13 @@
 
 from __future__ import annotations
 
+import traceback
+import typing as t
+
 from ansible.module_utils.basic import missing_required_lib, AnsibleModule
 
-import traceback
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 REDIS_IMP_ERR: str | None = None
 try:

@@ -6,9 +6,12 @@ from __future__ import annotations
 
 import json
 import traceback
+import typing as t
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, url_argument_spec
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def api_argument_spec():

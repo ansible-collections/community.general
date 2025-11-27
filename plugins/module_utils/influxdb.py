@@ -5,10 +5,14 @@
 from __future__ import annotations
 
 import traceback
+import typing as t
 
-from ansible.module_utils.basic import missing_required_lib, AnsibleModule
+from ansible.module_utils.basic import missing_required_lib
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 REQUESTS_IMP_ERR = None
 try:

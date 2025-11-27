@@ -7,9 +7,13 @@ from __future__ import annotations
 
 
 import traceback
+import typing as t
 from contextlib import contextmanager
 
-from ansible.module_utils.basic import missing_required_lib, AnsibleModule
+from ansible.module_utils.basic import missing_required_lib
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 _deps = dict()
