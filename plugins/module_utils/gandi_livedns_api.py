@@ -5,9 +5,12 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 class GandiLiveDNSAPI:

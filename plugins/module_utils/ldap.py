@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import re
 import traceback
+import typing as t
 
-from ansible.module_utils.basic import AnsibleModule
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 try:
     import ldap

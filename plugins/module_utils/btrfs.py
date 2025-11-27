@@ -4,11 +4,13 @@
 
 from __future__ import annotations
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 import re
 import os
 import typing as t
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def normalize_subvolume_path(path):

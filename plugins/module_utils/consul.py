@@ -12,8 +12,10 @@ import typing as t
 from urllib import error as urllib_error
 from urllib.parse import urlencode
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def get_consul_url(configuration):

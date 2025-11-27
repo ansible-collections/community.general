@@ -7,13 +7,13 @@ from __future__ import annotations
 import os
 import typing as t
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.common.locale import get_best_parsable_locale
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def _ensure_list(value):

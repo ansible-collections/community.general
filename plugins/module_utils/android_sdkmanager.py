@@ -6,10 +6,13 @@ from __future__ import annotations
 
 
 import re
-
-from ansible.module_utils.basic import AnsibleModule
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 __state_map = {"present": "--install", "absent": "--uninstall"}
 

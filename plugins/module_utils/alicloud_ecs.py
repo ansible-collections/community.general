@@ -14,7 +14,12 @@ from __future__ import annotations
 import os
 import json
 import traceback
-from ansible.module_utils.basic import env_fallback, AnsibleModule
+import typing as t
+
+from ansible.module_utils.basic import env_fallback
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 try:
     import footmark

@@ -13,14 +13,18 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import uuid
+import typing as t
+from urllib.parse import quote
 
-import re
+from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.urls import fetch_url, HAS_GSSAPI
-from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound, AnsibleModule
-from urllib.parse import quote
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def _env_then_dns_fallback(*args, **kwargs):

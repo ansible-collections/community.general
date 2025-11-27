@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import typing as t
 
 HAS_VEXATAPI = True
 try:
@@ -12,7 +13,11 @@ try:
 except ImportError:
     HAS_VEXATAPI = False
 
-from ansible.module_utils.basic import env_fallback, AnsibleModule
+from ansible.module_utils.basic import env_fallback
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 VXOS_VERSION = None
 

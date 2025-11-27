@@ -4,9 +4,12 @@
 
 from __future__ import annotations
 
-from ansible.module_utils.basic import AnsibleModule
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils import deps
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 with deps.declare("packaging"):

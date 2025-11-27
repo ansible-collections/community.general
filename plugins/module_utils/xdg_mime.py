@@ -5,9 +5,12 @@
 
 from __future__ import annotations
 
-from ansible.module_utils.basic import AnsibleModule
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def xdg_mime_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
