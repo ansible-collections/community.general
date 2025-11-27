@@ -23,7 +23,7 @@ def __map_channel(channel_name):
     return __channel_map[channel_name]
 
 
-def sdkmanager_runner(module: AnsibleModule, **kwargs):
+def sdkmanager_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     return CmdRunner(
         module,
         command="sdkmanager",
