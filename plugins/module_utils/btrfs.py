@@ -50,11 +50,11 @@ class BtrfsCommands:
                 current["devices"].append(self.__parse_filesystem_device(line))
         return filesystems
 
-    def __parse_filesystem(self, line):
+    def __parse_filesystem(self, line) -> dict[str, t.Any]:
         label = re.sub(r"\s*uuid:.*$", "", re.sub(r"^Label:\s*", "", line))
         id = re.sub(r"^.*uuid:\s*", "", line)
 
-        filesystem = {}
+        filesystem: dict[str, t.Any] = {}
         filesystem["label"] = label.strip("'") if label != "none" else None
         filesystem["uuid"] = id
         filesystem["devices"] = []
@@ -63,10 +63,10 @@ class BtrfsCommands:
         filesystem["default_subvolid"] = None
         return filesystem
 
-    def __parse_filesystem_device(self, line):
+    def __parse_filesystem_device(self, line: str) -> str:
         return re.sub(r"^.*path\s", "", line)
 
-    def subvolumes_list(self, filesystem_path):
+    def subvolumes_list(self, filesystem_path: str) -> list[dict[str, t.Any]]:
         command = f"{self.__btrfs} subvolume list -tap {filesystem_path}"
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.split("\t") for x in result[1].splitlines()]
