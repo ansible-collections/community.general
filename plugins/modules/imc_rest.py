@@ -396,7 +396,7 @@ def main():
     try:
         # Prepare request data
         if content:
-            rawdata = content
+            rawdata = content.replace("\n", "")
         elif file_exists:
             with open(path, "r") as config_object:
                 rawdata = config_object.read().replace("\n", "")
