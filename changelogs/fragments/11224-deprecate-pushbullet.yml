@@ -1,0 +1,2 @@
+deprecated_features:
+  - pushbullet - module relies on Python package supporting Python 3.2 only; the module will be removed from community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/11224).
