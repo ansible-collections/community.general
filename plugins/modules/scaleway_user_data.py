@@ -104,7 +104,7 @@ def delete_user_data(compute_api, server_id, key):
     response = compute_api.delete(path=f"servers/{server_id}/user_data/{key}")
 
     if not response.ok:
-        msg = (f"Error during user_data deleting: ({response.status_code}) {response.body}")
+        msg = f"Error during user_data deleting: ({response.status_code}) {response.body}"
         compute_api.module.fail_json(msg=msg)
 
     return response
