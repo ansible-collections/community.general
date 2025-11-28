@@ -29,7 +29,6 @@ options:
       - Name of the storage pool to query for volumes.
       - This parameter is required.
     type: str
-    required: true
   name:
     description:
       - Name of a specific storage volume to retrieve information about.
@@ -78,9 +77,6 @@ options:
       - If O(trust_password) is set, this module sends a request for
         authentication before sending any requests.
     type: str
-notes:
-  - This module is read-only and does not modify any storage volumes.
-  - The O(pool) parameter is required as volumes are always associated with a storage pool.
 """
 
 EXAMPLES = """
@@ -192,7 +188,6 @@ logs:
   ]
 """
 
-# ruff: noqa: E402
 import os
 from urllib.parse import quote, urlencode
 
@@ -293,7 +288,8 @@ class LXDStorageVolumeInfo:
 
         if resp_json["type"] == "error":
             self.module.fail_json(
-                msg=f'Failed to retrieve volumes from pool "{self.pool}": {resp_json.get("error", "Unknown error")}'
+                msg=f'Failed to retrieve volumes from pool "{self.pool}": {resp_json.get("error", "Unknown error")}',
+                error_code=resp_json.get("error_code"),
             )
 
         # The response contains a list of volume URLs like

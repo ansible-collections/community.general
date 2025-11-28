@@ -184,7 +184,6 @@ logs:
   ]
 """
 
-# ruff: noqa: E402
 import os
 from urllib.parse import urlencode
 
@@ -271,7 +270,8 @@ class LXDStoragePoolInfo:
 
         if resp_json["type"] == "error":
             self.module.fail_json(
-                msg=f"Failed to retrieve storage pools: {resp_json.get('error', 'Unknown error')}"
+                msg=f"Failed to retrieve storage pools: {resp_json.get('error', 'Unknown error')}",
+                error_code=resp_json.get("error_code"),
             )
 
         # The response contains a list of pool URLs like ['/1.0/storage-pools/default']
@@ -290,7 +290,8 @@ class LXDStoragePoolInfo:
                 self.module.fail_json(msg=f'Storage pool "{pool_name}" not found')
             else:
                 self.module.fail_json(
-                    msg=f'Failed to retrieve storage pool "{pool_name}": {resp_json.get("error", "Unknown error")}'
+                    msg=f'Failed to retrieve storage pool "{pool_name}": {resp_json.get("error", "Unknown error")}',
+                    error_code=resp_json.get("error_code"),
                 )
 
         return resp_json.get("metadata", {})
@@ -312,9 +313,7 @@ class LXDStoragePoolInfo:
 
         # Filter by type if specified
         if self.pool_type:
-            storage_pools = [
-                pool for pool in storage_pools if pool.get("driver") in self.pool_type
-            ]
+            storage_pools = [pool for pool in storage_pools if pool.get("driver") in self.pool_type]
 
         return storage_pools
 
@@ -342,9 +341,7 @@ def main() -> None:
             type=dict(type="list", elements="str", default=[]),
             project=dict(type="str"),
             url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_URL),
-            snap_url=dict(
-                type="str", default="unix:/var/snap/lxd/common/lxd/unix.socket"
-            ),
+            snap_url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_URL),
             client_key=dict(type="path", aliases=["key_file"]),
             client_cert=dict(type="path", aliases=["cert_file"]),
             trust_password=dict(type="str", no_log=True),
