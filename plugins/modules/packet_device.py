@@ -423,7 +423,7 @@ def get_hostname_list(module):
         if re.search(r"%\d{0,2}d", hostname_spec):
             hostnames = [hostname_spec % i for i in count_range]
         elif count > 1:
-            hostname_spec = "%s%%02d" % hostname_spec
+            hostname_spec = "%s%%02d" % hostname_spec  # noqa
             hostnames = [hostname_spec % i for i in count_range]
 
     for hn in hostnames:

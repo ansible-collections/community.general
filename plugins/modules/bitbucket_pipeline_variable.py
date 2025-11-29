@@ -89,10 +89,10 @@ error_messages = {
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    "pipeline-variable-list": "%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/variables/"
-    % BitbucketHelper.BITBUCKET_API_URL,
-    "pipeline-variable-detail": "%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/variables/{variable_uuid}"
-    % BitbucketHelper.BITBUCKET_API_URL,
+    "pipeline-variable-list": f"{BitbucketHelper.BITBUCKET_API_URL}/2.0/repositories/{{workspace}}/{{repo_slug}}/pipelines_config/variables/",
+    "pipeline-variable-detail": (
+        f"{BitbucketHelper.BITBUCKET_API_URL}/2.0/repositories/{{workspace}}/{{repo_slug}}/pipelines_config/variables/{{variable_uuid}}"
+    ),
 }
 
 

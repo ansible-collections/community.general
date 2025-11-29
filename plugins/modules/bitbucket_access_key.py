@@ -83,9 +83,8 @@ error_messages = {
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    "deploy-key-list": "%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/" % BitbucketHelper.BITBUCKET_API_URL,
-    "deploy-key-detail": "%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}"
-    % BitbucketHelper.BITBUCKET_API_URL,
+    "deploy-key-list": f"{BitbucketHelper.BITBUCKET_API_URL}/2.0/repositories/{{workspace}}/{{repo_slug}}/deploy-keys/",
+    "deploy-key-detail": f"{BitbucketHelper.BITBUCKET_API_URL}/2.0/repositories/{{workspace}}/{{repo_slug}}/deploy-keys/{{key_id}}",
 }
 
 

@@ -125,7 +125,7 @@ def query(module, url, check, subscription):
     response, info = fetch_url(module, url, method="GET", headers=headers, data=json.dumps(request_data))
 
     if info["status"] == 500:
-        module.fail_json(msg="Failed to query silence %s. Reason: %s" % (subscription, info))
+        module.fail_json(msg=f"Failed to query silence {subscription}. Reason: {info}")
 
     try:
         json_out = json.loads(response.read())
@@ -172,7 +172,7 @@ def clear(module, url, check, subscription):
         response, info = fetch_url(module, url, method="POST", headers=headers, data=json.dumps(request_data))
 
         if info["status"] != 204:
-            module.fail_json(msg="Failed to silence %s. Reason: %s" % (subscription, info))
+            module.fail_json(msg=f"Failed to silence {subscription}. Reason: {info}")
 
         try:
             json_out = json.loads(response.read())
@@ -221,7 +221,7 @@ def create(module, url, check, creator, expire, expire_on_resolve, reason, subsc
         response, info = fetch_url(module, url, method="POST", headers=headers, data=json.dumps(request_data))
 
         if info["status"] != 201:
-            module.fail_json(msg="Failed to silence %s. Reason: %s" % (subscription, info["msg"]))
+            module.fail_json(msg=f"Failed to silence {subscription}. Reason: {info['msg']}")
 
         try:
             json_out = json.loads(response.read())

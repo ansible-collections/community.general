@@ -52,8 +52,7 @@ def test_sudosu(mocker, parser, reset_cli_args):
     print(cmd)
     assert (
         re.match(
-            """%s %s -p "%s" su -l %s %s -c 'echo %s; %s'"""
-            % (
+            """{} {} -p "{}" su -l {} {} -c 'echo {}; {}'""".format(
                 sudo_exe,
                 sudo_flags.replace("-n", ""),
                 r"\[sudo via ansible, key=.+?\] password:",
