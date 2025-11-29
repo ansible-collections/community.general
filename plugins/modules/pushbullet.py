@@ -159,9 +159,8 @@ def main():
         if device in devices_by_nickname:
             target = devices_by_nickname[device]
         else:
-            module.fail_json(
-                msg="Device '%s' not found. Available devices: '%s'" % (device, "', '".join(devices_by_nickname.keys()))
-            )
+            str_devices_by_nickname = "', '".join(devices_by_nickname)
+            module.fail_json(msg=f"Device '{device}' not found. Available devices: '{str_devices_by_nickname}'")
 
     # Search for given channel
     if channel is not None:
@@ -172,9 +171,8 @@ def main():
         if channel in channels_by_tag:
             target = channels_by_tag[channel]
         else:
-            module.fail_json(
-                msg="Channel '%s' not found. Available channels: '%s'" % (channel, "', '".join(channels_by_tag.keys()))
-            )
+            str_channels_by_tag = "', '".join(channels_by_tag)
+            module.fail_json(msg=f"Channel '{channel}' not found. Available channels: '{str_channels_by_tag}'")
 
     # If in check mode, exit saying that we succeeded
     if module.check_mode:

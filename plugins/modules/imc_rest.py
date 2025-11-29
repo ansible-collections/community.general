@@ -396,13 +396,13 @@ def main():
     try:
         # Prepare request data
         if content:
-            rawdata = content
+            rawdata = content.replace("\n", "")
         elif file_exists:
             with open(path, "r") as config_object:
-                rawdata = config_object.read()
+                rawdata = config_object.read().replace("\n", "")
 
         # Wrap the XML documents in a <root> element
-        xmldata = lxml.etree.fromstring("<root>%s</root>" % rawdata.replace("\n", ""))
+        xmldata = lxml.etree.fromstring(f"<root>{rawdata}</root>")
 
         # Handle each XML document separately in the same session
         for xmldoc in list(xmldata):

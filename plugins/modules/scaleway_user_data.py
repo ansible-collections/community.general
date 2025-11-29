@@ -104,7 +104,7 @@ def delete_user_data(compute_api, server_id, key):
     response = compute_api.delete(path=f"servers/{server_id}/user_data/{key}")
 
     if not response.ok:
-        msg = "Error during user_data deleting: (%s) %s" % response.status_code, response.body
+        msg = f"Error during user_data deleting: ({response.status_code}) {response.body}"
         compute_api.module.fail_json(msg=msg)
 
     return response
@@ -133,7 +133,7 @@ def core(module):
 
     user_data_list = compute_api.get(path=f"servers/{server_id}/user_data")
     if not user_data_list.ok:
-        msg = "Error during user_data fetching: %s %s" % user_data_list.status_code, user_data_list.body
+        msg = f"Error during user_data fetching: {user_data_list.status_code} {user_data_list.body}"
         compute_api.module.fail_json(msg=msg)
 
     present_user_data_keys = user_data_list.json["user_data"]

@@ -2562,7 +2562,8 @@ class Nmcli:
             for property in unsupported_properties:
                 msg_options.append(f"{setting_key}.{property}")
 
-            msg = 'Invalid or unsupported option(s): "%s"' % '", "'.join(msg_options)
+            str_msg_options = '", "'.join(msg_options)
+            msg = f'Invalid or unsupported option(s): "{str_msg_options}"'
             if self.ignore_unsupported_suboptions:
                 self.module.warn(msg)
             else:

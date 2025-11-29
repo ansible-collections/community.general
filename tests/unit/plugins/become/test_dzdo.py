@@ -65,8 +65,7 @@ def test_dzdo(mocker, parser, reset_cli_args):
     print(cmd)
     assert (
         re.match(
-            """%s %s -p %s -u %s %s -c 'echo %s; %s'"""
-            % (
+            """{} {} -p {} -u {} {} -c 'echo {}; {}'""".format(
                 dzdo_exe,
                 dzdo_flags,
                 r"\"\[dzdo via ansible, key=.+?\] password:\"",
@@ -115,8 +114,7 @@ def test_dzdo_varoptions(mocker, parser, reset_cli_args):
     print(cmd)
     assert (
         re.match(
-            """%s %s -p %s -u %s %s -c 'echo %s; %s'"""
-            % (
+            """{} {} -p {} -u {} {} -c 'echo {}; {}'""".format(
                 dzdo_exe,
                 dzdo_flags,
                 r"\"\[dzdo via ansible, key=.+?\] password:\"",

@@ -78,8 +78,7 @@ error_messages = {
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    "ssh-key-pair": "%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair"
-    % BitbucketHelper.BITBUCKET_API_URL,
+    "ssh-key-pair": f"{BitbucketHelper.BITBUCKET_API_URL}/2.0/repositories/{{workspace}}/{{repo_slug}}/pipelines_config/ssh/key_pair",
 }
 
 
