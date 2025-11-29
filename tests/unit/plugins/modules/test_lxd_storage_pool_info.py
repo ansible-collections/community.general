@@ -51,8 +51,10 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
             ("GET", "/1.0/storage-pools/fast"): {"type": "sync", "metadata": {"name": "fast", "driver": "zfs"}},
         }
 
-        with patch.object(self.module, "LXDClient", FakeLXDClient), \
-             patch.object(self.module.os.path, "exists", return_value=False):
+        with (
+            patch.object(self.module, "LXDClient", FakeLXDClient),
+            patch.object(self.module.os.path, "exists", return_value=False),
+        ):
             with self.assertRaises(AnsibleExitJson) as exc:
                 with set_module_args({}):
                     self.module.main()
@@ -69,8 +71,10 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
             ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default", "driver": "dir"}},
         }
 
-        with patch.object(self.module, "LXDClient", FakeLXDClient), \
-             patch.object(self.module.os.path, "exists", return_value=False):
+        with (
+            patch.object(self.module, "LXDClient", FakeLXDClient),
+            patch.object(self.module.os.path, "exists", return_value=False),
+        ):
             with self.assertRaises(AnsibleExitJson) as exc:
                 with set_module_args({"name": "default"}):
                     self.module.main()
@@ -91,8 +95,10 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
             ("GET", "/1.0/storage-pools/fast"): {"type": "sync", "metadata": {"name": "fast", "driver": "zfs"}},
         }
 
-        with patch.object(self.module, "LXDClient", FakeLXDClient), \
-             patch.object(self.module.os.path, "exists", return_value=False):
+        with (
+            patch.object(self.module, "LXDClient", FakeLXDClient),
+            patch.object(self.module.os.path, "exists", return_value=False),
+        ):
             with self.assertRaises(AnsibleExitJson) as exc:
                 with set_module_args({"type": ["zfs"]}):
                     self.module.main()
@@ -112,8 +118,10 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
             }
         }
 
-        with patch.object(self.module, "LXDClient", FakeLXDClient), \
-             patch.object(self.module.os.path, "exists", return_value=False):
+        with (
+            patch.object(self.module, "LXDClient", FakeLXDClient),
+            patch.object(self.module.os.path, "exists", return_value=False),
+        ):
             with self.assertRaises(AnsibleFailJson) as exc:
                 with set_module_args({}):
                     self.module.main()
@@ -121,4 +129,3 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
         result = exc.exception.args[0]
         assert result["error_code"] == 503
         assert "Failed to retrieve storage pools" in result["msg"]
-
