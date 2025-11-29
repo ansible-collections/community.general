@@ -149,4 +149,3 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
         result = exc.exception.args[0]
         assert result["error_code"] == 503
         assert "Failed to retrieve volumes from pool" in result["msg"]
-```
