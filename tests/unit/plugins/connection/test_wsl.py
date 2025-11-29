@@ -5,18 +5,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-import pytest
+from io import StringIO
+from pathlib import Path
+from unittest.mock import MagicMock, mock_open, patch
 
-from ansible_collections.community.general.plugins.connection.wsl import authenticity_msg, MyAddPolicy
-from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
-from ansible.errors import AnsibleError, AnsibleAuthenticationFailure, AnsibleConnectionFailure
+import pytest
+from ansible.errors import AnsibleAuthenticationFailure, AnsibleConnectionFailure, AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
-from io import StringIO
-from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
-
+from ansible_collections.community.general.plugins.connection.wsl import MyAddPolicy, authenticity_msg
+from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
 
 paramiko = pytest.importorskip("paramiko")
 
@@ -459,15 +458,13 @@ def test_close_lock_file_time_out_error_handling(mock_exists, mock_unlink, conne
     mock_exists.return_value = False
     matcher = f"writing lock file for {connection.keyfile} ran in to the timeout of {connection.get_option('lock_file_timeout')}s"
     with pytest.raises(AnsibleError, match=matcher):
-        with (
-            patch("os.getuid", return_value=1000),
-            patch("os.getgid", return_value=1000),
-            patch("os.chmod"),
-            patch("os.chown"),
-            patch("os.rename"),
-            patch.object(FileLock, "lock_file", side_effect=LockTimeout()),
-        ):
-            connection.close()
+        with patch("os.getuid", return_value=1000):
+            with patch("os.getgid", return_value=1000):
+                with patch("os.chmod"):
+                    with patch("os.chown"):
+                        with patch("os.rename"):
+                            with patch.object(FileLock, "lock_file", side_effect=LockTimeout()):
+                                connection.close()
 
 
 @patch("ansible_collections.community.general.plugins.module_utils._filelock.FileLock.lock_file")

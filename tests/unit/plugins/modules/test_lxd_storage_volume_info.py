@@ -61,13 +61,11 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
             ): {"type": "sync", "metadata": {"name": "web", "type": "container"}},
         }
 
-        with (
-            patch.object(self.module, "LXDClient", FakeLXDClient),
-            patch.object(self.module.os.path, "exists", return_value=False),
-        ):
-            with self.assertRaises(AnsibleExitJson) as exc:
-                with set_module_args({"pool": "default"}):
-                    self.module.main()
+        with patch.object(self.module, "LXDClient", FakeLXDClient):
+            with patch.object(self.module.os.path, "exists", return_value=False):
+                with self.assertRaises(AnsibleExitJson) as exc:
+                    with set_module_args({"pool": "default"}):
+                        self.module.main()
 
         result = exc.exception.args[0]
         assert result["storage_volumes"] == [
@@ -92,13 +90,11 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
             ): {"type": "sync", "metadata": {"name": "data", "type": "custom"}},
         }
 
-        with (
-            patch.object(self.module, "LXDClient", FakeLXDClient),
-            patch.object(self.module.os.path, "exists", return_value=False),
-        ):
-            with self.assertRaises(AnsibleExitJson) as exc:
-                with set_module_args({"pool": "default", "name": "data"}):
-                    self.module.main()
+        with patch.object(self.module, "LXDClient", FakeLXDClient):
+            with patch.object(self.module.os.path, "exists", return_value=False):
+                with self.assertRaises(AnsibleExitJson) as exc:
+                    with set_module_args({"pool": "default", "name": "data"}):
+                        self.module.main()
 
         result = exc.exception.args[0]
         assert result["storage_volumes"] == [
@@ -122,13 +118,11 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
             ): {"type": "sync", "metadata": {"name": "web", "type": "container"}},
         }
 
-        with (
-            patch.object(self.module, "LXDClient", FakeLXDClient),
-            patch.object(self.module.os.path, "exists", return_value=False),
-        ):
-            with self.assertRaises(AnsibleExitJson) as exc:
-                with set_module_args({"pool": "default", "type": "container"}):
-                    self.module.main()
+        with patch.object(self.module, "LXDClient", FakeLXDClient):
+            with patch.object(self.module.os.path, "exists", return_value=False):
+                with self.assertRaises(AnsibleExitJson) as exc:
+                    with set_module_args({"pool": "default", "type": "container"}):
+                        self.module.main()
 
         result = exc.exception.args[0]
         assert result["storage_volumes"] == [
@@ -146,13 +140,11 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
             },
         }
 
-        with (
-            patch.object(self.module, "LXDClient", FakeLXDClient),
-            patch.object(self.module.os.path, "exists", return_value=False),
-        ):
-            with self.assertRaises(AnsibleFailJson) as exc:
-                with set_module_args({"pool": "default"}):
-                    self.module.main()
+        with patch.object(self.module, "LXDClient", FakeLXDClient):
+            with patch.object(self.module.os.path, "exists", return_value=False):
+                with self.assertRaises(AnsibleFailJson) as exc:
+                    with set_module_args({"pool": "default"}):
+                        self.module.main()
 
         result = exc.exception.args[0]
         assert result["error_code"] == 503
