@@ -4,8 +4,6 @@
 
 from __future__ import annotations
 
-__metaclass__ = type
-
 DOCUMENTATION = """
 ---
 module: lxd_storage_pool_info
@@ -341,7 +339,7 @@ def main() -> None:
             type=dict(type="list", elements="str", default=[]),
             project=dict(type="str"),
             url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_URL),
-            snap_url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_URL),
+            snap_url=dict(type="str", default="unix:/var/snap/lxd/common/lxd/unix.socket"),
             client_key=dict(type="path", aliases=["key_file"]),
             client_cert=dict(type="path", aliases=["cert_file"]),
             trust_password=dict(type="str", no_log=True),
