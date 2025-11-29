@@ -50,6 +50,27 @@
       - volume_info_container.storage_volumes is defined
   when: volume_info_container is not failed
 
+- name: Test fetching specific volume by name
+  community.general.lxd_storage_volume_info:
+    pool: default
+    name: "{{ volume_info_all.storage_volumes[0].name }}"
+  register: volume_info_specific
+  ignore_errors: true
+  when:
+    - volume_info_all is not failed
+    - volume_info_all.storage_volumes | length > 0
+
+- name: Verify specific volume retrieval
+  assert:
+    that:
+      - volume_info_specific is not changed
+      - volume_info_specific.storage_volumes | length == 1
+      - volume_info_specific.storage_volumes[0].name == volume_info_all.storage_volumes[0].name
+  when:
+    - volume_info_all is not failed
+    - volume_info_all.storage_volumes | length > 0
+    - volume_info_specific is not failed
+
 - name: Test with non-existent pool (should fail)
   community.general.lxd_storage_volume_info:
     pool: nonexistent-pool-12345
