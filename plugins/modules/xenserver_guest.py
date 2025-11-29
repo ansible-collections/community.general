@@ -2091,9 +2091,9 @@ class XenServerVM(XenServerObject):
             if unit in disk_units:
                 return int(size * (1024 ** disk_units[unit]))
             else:
+                str_supported_units = "', '".join(sorted(disk_units.keys(), key=lambda key: disk_units[key]))
                 self.module.fail_json(
-                    msg="%s'%s' is not a supported unit for disk size! Supported units are ['%s']."
-                    % (msg_prefix, unit, "', '".join(sorted(disk_units.keys(), key=lambda key: disk_units[key])))
+                    msg=f"{msg_prefix}'{unit}' is not a supported unit for disk size! Supported units are ['{str_supported_units}']."
                 )
         else:
             return None

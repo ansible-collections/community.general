@@ -163,7 +163,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
 
         self.module.exit_json(
             changed=True,
-            msg='Created network "%s" in datacenter "%s".' % (self.name, self.location),
+            msg=f'Created network "{self.name}" in datacenter "{self.location}".',
             network=self._network_to_dict(network),
         )
 
@@ -172,7 +172,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
 
         if not network:
             self.module.exit_json(
-                changed=False, msg='Network "%s" does not exist' % self.name, network=self._network_to_dict(network)
+                changed=False, msg=f'Network "{self.name}" does not exist', network=self._network_to_dict(network)
             )
 
         self._delete_network(network)
@@ -237,9 +237,9 @@ class DimensionDataNetworkModule(DimensionDataModule):
                 deleted = self.driver.ex_delete_network_domain(network)
 
             if deleted:
-                self.module.exit_json(changed=True, msg="Deleted network with id %s" % network.id)
+                self.module.exit_json(changed=True, msg=f"Deleted network with id {network.id}")
 
-            self.module.fail_json("Unexpected failure deleting network with id %s" % network.id)
+            self.module.fail_json(f"Unexpected failure deleting network with id {network.id}")
 
         except DimensionDataAPIException as e:
             self.module.fail_json(msg=f"Failed to delete network: {e}", exception=traceback.format_exc())

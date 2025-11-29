@@ -543,8 +543,8 @@ class JenkinsPlugin:
 
             if self.params["with_dependencies"]:
                 install_script = (
-                    'Jenkins.instance.updateCenter.getPlugin("%s")'
-                    ".getNeededDependencies().each{it.deploy()}; %s" % (self.params["name"], install_script)
+                    f'Jenkins.instance.updateCenter.getPlugin("{self.params["name"]}")'
+                    f".getNeededDependencies().each{{it.deploy()}}; {install_script}"
                 )
 
             script_data = {"script": install_script}

@@ -9,7 +9,6 @@ from ansible.errors import (
     AnsibleFilterError,
 )
 
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.collections import is_sequence
 
 try:
@@ -34,10 +33,8 @@ def initialize_hashids(**kwargs):
     try:
         return Hashids(**params)
     except TypeError as e:
-        raise AnsibleFilterError(
-            "The provided parameters %s are invalid: %s"
-            % (", ".join(["%s=%s" % (k, v) for k, v in params.items()]), to_native(e))
-        ) from e
+        str_params = ", ".join([f"{k}={v}" for k, v in params.items()])
+        raise AnsibleFilterError(f"The provided parameters {str_params} are invalid: {e}") from e
 
 
 def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
