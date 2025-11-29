@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = """
 ---
 module: lxd_storage_volume_info
@@ -319,32 +318,11 @@ class LXDStorageVolumeInfo:
         # Split the URL and filter out empty parts from leading/trailing slashes
         parts = [part for part in volume_url.split("/") if part]
 
-        # Validate we have the minimum expected number of parts
-        # We need at least: 1.0, storage-pools, {pool}, volumes, {type}, {name}
-        if len(parts) < 6:
-            self.module.fail_json(
-                msg=f'Unexpected volume URL format from LXD API: "{volume_url}". '
-                f"Expected at least 6 parts but got {len(parts)}. "
-                f"Expected format: /1.0/storage-pools/{{pool}}/volumes/{{type}}/{{name}}"
-            )
-
         # Verify the URL structure matches expected pattern
         if parts[0] != "1.0":
             self.module.fail_json(
                 msg=f'Unexpected volume URL format from LXD API: "{volume_url}". '
                 f'Expected API version "1.0" but got "{parts[0]}"'
-            )
-
-        if parts[1] != "storage-pools":
-            self.module.fail_json(
-                msg=f'Unexpected volume URL format from LXD API: "{volume_url}". '
-                f'Expected "storage-pools" at position 1 but got "{parts[1]}"'
-            )
-
-        if parts[3] != "volumes":
-            self.module.fail_json(
-                msg=f'Unexpected volume URL format from LXD API: "{volume_url}". '
-                f'Expected "volumes" at position 3 but got "{parts[3]}"'
             )
 
         vol_type = parts[4]
