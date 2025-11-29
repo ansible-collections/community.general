@@ -732,6 +732,13 @@ options:
     type: list
     version_added: 11.3.0
     elements: str
+  web_authn_policy_passwordless_passkeys_enabled:
+    description:
+      - Enable passkeys (conditional UI) authentication in the username forms.
+    aliases:
+      - webAuthnPolicyPasswordlessPasskeysEnabled
+    type: bool
+    version_added: 12.1.0
 
 extends_documentation_fragment:
   - community.general.keycloak
@@ -1004,6 +1011,9 @@ def main():
         ),
         web_authn_policy_passwordless_extra_origins=dict(
             type="list", elements="str", aliases=["webAuthnPolicyPasswordlessExtraOrigins"], no_log=False
+        ),
+        web_authn_policy_passwordless_passkeys_enabled=dict(
+            type="bool", aliases=["webAuthnPolicyPasswordlessPasskeysEnabled"]
         ),
     )
 
