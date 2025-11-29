@@ -26,6 +26,7 @@ options:
     description:
       - Name of the storage pool to query for volumes.
       - This parameter is required.
+    required: true
     type: str
   name:
     description:
