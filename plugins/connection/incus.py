@@ -13,6 +13,9 @@ short_description: Run tasks in Incus instances using the Incus CLI
 description:
   - Run commands or put/fetch files to an existing Incus instance using Incus CLI.
 version_added: "8.2.0"
+notes:
+  - When using this collection for Windows virtual machines, set C(ansible_shell_type) to C(powershell) or C(cmd) as a variable to the host in
+    the inventory.
 options:
   remote_addr:
     description:
@@ -75,6 +78,7 @@ options:
 """
 
 import os
+import re
 from subprocess import call, Popen, PIPE
 
 from ansible.errors import AnsibleError, AnsibleConnectionFailure, AnsibleFileNotFound
@@ -97,6 +101,23 @@ class Connection(ConnectionBase):
         if not self._incus_cmd:
             raise AnsibleError("incus command not found in PATH")
 
+        if getattr(self._shell, "_IS_WINDOWS", False):
+            # Initializing regular expression patterns to match on a PowerShell or cmd command line.
+            self.powershell_regex_pattern = re.compile(
+                r"^(?P<executable>(\"?([a-z]:)?[a-z0-9 ()\\.]+)?powershell(\.exe)?\"?|(([a-z]:)?[a-z0-9()\\.]+)?powershell(\.exe)?)\s+.*(?P<command>-c(ommand)?)\s+",  # noqa: E501
+                re.IGNORECASE,
+            )
+            self.cmd_regex_pattern = re.compile(
+                r"^(?P<executable>(\"?([a-z]:)?[a-z0-9 ()\\.]+)?cmd(\.exe)?\"?|(([a-z]:)?[a-z0-9()\\.]+)?cmd(\.exe)?)\s+.*(?P<command>/c)\s+",
+                re.IGNORECASE,
+            )
+
+            # Basic setup for a Windows host.
+            self.has_native_async = True
+            self.always_pipeline_modules = True
+            self.module_implementation_preferences = (".ps1", ".exe", "")
+            self.allow_executable = False
+
     def _connect(self):
         """connect to Incus (nothing to do here)"""
         super()._connect()
@@ -115,19 +136,49 @@ class Connection(ConnectionBase):
             "--project",
             self.get_option("project"),
             "exec",
+            *(["-T"] if getattr(self._shell, "_IS_WINDOWS", False) else []),
             f"{self.get_option('remote')}:{self._instance()}",
             "--",
         ]
 
-        if self.get_option("remote_user") != "root":
-            self._display.vvv(
-                f"INFO: Running as non-root user: {self.get_option('remote_user')}, \
-                trying to run 'incus exec' with become method: {self.get_option('incus_become_method')}",
-                host=self._instance(),
-            )
-            exec_cmd.extend([self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"])
+        if getattr(self._shell, "_IS_WINDOWS", False):
+            if (
+                (regex_match := self.powershell_regex_pattern.match(cmd))
+                and (regex_pattern := self.powershell_regex_pattern)
+            ) or ((regex_match := self.cmd_regex_pattern.match(cmd)) and (regex_pattern := self.cmd_regex_pattern)):
+                self._display.vvvvvv(
+                    f'Found keyword: "{regex_match.group("command")}" based on regex: {regex_pattern.pattern}',
+                    host=self._instance(),
+                )
 
-        exec_cmd.extend([self.get_option("executable"), "-c", cmd])
+                # Split the command on the argument -c(ommand) for PowerShell or /c for cmd.
+                before_command_argument, after_command_argument = cmd.split(regex_match.group("command"), 1)
+
+                exec_cmd.extend(
+                    [
+                        # To avoid splitting on a space contained in the path, set the executable as the first argument.
+                        regex_match.group("executable").strip('"'),
+                        # Remove the executable path and split the rest by space.
+                        *(before_command_argument[len(regex_match.group("executable")) :].lstrip().split(" ")),
+                        # Set the command argument depending on cmd or powershell.
+                        regex_match.group("command"),
+                        # Add the rest of the command at the end.
+                        after_command_argument,
+                    ]
+                )
+            else:
+                # For anything else using -EncodedCommand or else, just split on space.
+                exec_cmd.extend(cmd.split(" "))
+        else:
+            if self.get_option("remote_user") != "root":
+                self._display.vvv(
+                    f"INFO: Running as non-root user: {self.get_option('remote_user')}, \
+                  trying to run 'incus exec' with become method: {self.get_option('incus_become_method')}",
+                    host=self._instance(),
+                )
+                exec_cmd.extend([self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"])
+
+            exec_cmd.extend([self.get_option("executable"), "-c", cmd])
 
         return exec_cmd
 
@@ -200,7 +251,7 @@ class Connection(ConnectionBase):
         if not os.path.isfile(to_bytes(in_path, errors="surrogate_or_strict")):
             raise AnsibleFileNotFound(f"input path is not a file: {in_path}")
 
-        if self.get_option("remote_user") != "root":
+        if not getattr(self._shell, "_IS_WINDOWS", False) and self.get_option("remote_user") != "root":
             uid, gid = self._get_remote_uid_gid()
             local_cmd = [
                 self._incus_cmd,
