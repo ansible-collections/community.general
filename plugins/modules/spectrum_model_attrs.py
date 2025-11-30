@@ -348,7 +348,7 @@ class spectrum_model_attrs:
         rqstd_attrs = ""
         for ra in ret_attrs:
             _id = self.attr_id(ra) or ra
-            rqstd_attrs += '<rs:requested-attribute id="%s" />' % (self.attr_id(ra) or ra)
+            rqstd_attrs = f'{rqstd_attrs}<rs:requested-attribute id="{_id}" />'
 
         # Build the complete XML search query for HTTP POST.
         xml = f"""<?xml version="1.0" encoding="UTF-8"?>
