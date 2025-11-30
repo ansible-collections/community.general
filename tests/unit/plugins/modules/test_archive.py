@@ -7,7 +7,6 @@ from __future__ import annotations
 import pytest
 from unittest.mock import Mock, patch
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     ModuleTestCase,
     set_module_args,

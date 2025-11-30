@@ -13,7 +13,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     ModuleTestCase,
     set_module_args,
 )
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule  # noqa: F401 # pylint: disable=unused-import
 from ansible_collections.community.general.plugins.modules.java_keystore import JavaKeystore, create_module
 
 
