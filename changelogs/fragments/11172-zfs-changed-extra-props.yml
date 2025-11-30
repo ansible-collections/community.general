@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zfs - mark change correctly when updating properties whose current value differs, even if they already have a non-default value (https://github.com/ansible-collections/community.general/issues/11019, https://github.com/ansible-collections/community.general/pull/11172).
