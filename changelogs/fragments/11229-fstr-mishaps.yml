@@ -1,4 +1,3 @@
-
 bugfixes:
   - pam_limits - remove ``%`` templating no longer used in f-string (https://github.com/ansible-collections/community.general/pull/11229).
 minor_changes:
