@@ -158,7 +158,7 @@ def _assert_is_valid_value(module, item, value, prefix=""):
         module.fail_json(
             msg=f"{prefix} Value of {value!r} for item {item!r} is invalid. Value must either be 'unlimited', 'infinity' or -1, all of "
             "which indicate no limit, or a limit of 0 or larger. Refer to the limits.conf(5) manual pages for "
-            "more details." % (prefix, value, item)
+            "more details."
         )
 
 
