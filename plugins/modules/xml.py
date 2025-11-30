@@ -583,7 +583,6 @@ def split_xpath_last(xpath):
 def nsnameToClark(name, namespaces):
     if ":" in name:
         (nsname, rawname) = name.split(":")
-        # return "{{%s}}%s" % (namespaces[nsname], rawname)
         return f"{{{namespaces[nsname]}}}{rawname}"
 
     # no namespace name here
