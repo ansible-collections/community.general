@@ -18,6 +18,10 @@ extends_documentation_fragment:
   - community.general.attributes.facts
   - community.general.attributes.facts_module
 options:
+  ip:
+    description:
+      - IP address to retrieve geolocation facts for.
+    type: str
   timeout:
     description:
       - HTTP connection timeout in seconds.

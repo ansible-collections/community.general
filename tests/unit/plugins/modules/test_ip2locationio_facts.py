@@ -23,7 +23,7 @@ IP2LOCATION_DATA = {
     "time_zone": "-07:00",
     "asn": "15169",
     "as": "Google LLC",
-    "is_proxy": False
+    "is_proxy": False,
 }
 
 
@@ -33,7 +33,9 @@ class TestIp2locationioFacts(unittest.TestCase):
         module.params = {"timeout": 10, "ip": "8.8.8.8"}
         module.from_json.side_effect = json.loads
 
-        with patch("ansible_collections.community.general.plugins.modules.ip2locationio_facts.fetch_url") as mock_fetch_url:
+        with patch(
+            "ansible_collections.community.general.plugins.modules.ip2locationio_facts.fetch_url"
+        ) as mock_fetch_url:
             mock_response = Mock()
             mock_response.read.return_value = json.dumps(IP2LOCATION_DATA)
             mock_fetch_url.return_value = (mock_response, {"status": 200})
@@ -41,5 +43,7 @@ class TestIp2locationioFacts(unittest.TestCase):
             ip2locationio = Ip2locationioFacts(module)
             result = ip2locationio.get_geo_data()
 
-            self.assertEqual(result['country_code'], 'US')
-            mock_fetch_url.assert_called_once_with(module, "https://api.ip2location.io/?ip=8.8.8.8", force=True, timeout=10)
+            self.assertEqual(result["country_code"], "US")
+            mock_fetch_url.assert_called_once_with(
+                module, "https://api.ip2location.io/?ip=8.8.8.8", force=True, timeout=10
+            )
