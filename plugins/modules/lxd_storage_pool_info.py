@@ -195,6 +195,7 @@ from ansible_collections.community.general.plugins.module_utils.lxd import (
 
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = "unix:/var/lib/lxd/unix.socket"
+ANSIBLE_LXD_DEFAULT_SNAP_URL = "unix:/var/snap/lxd/common/lxd/unix.socket"
 
 
 class LXDStoragePoolInfo:
@@ -339,7 +340,7 @@ def main() -> None:
             type=dict(type="list", elements="str", default=[]),
             project=dict(type="str"),
             url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_URL),
-            snap_url=dict(type="str", default="unix:/var/snap/lxd/common/lxd/unix.socket"),
+            snap_url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_SNAP_URL),
             client_key=dict(type="path", aliases=["key_file"]),
             client_cert=dict(type="path", aliases=["cert_file"]),
             trust_password=dict(type="str", no_log=True),

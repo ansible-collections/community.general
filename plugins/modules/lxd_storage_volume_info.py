@@ -200,6 +200,11 @@ from ansible_collections.community.general.plugins.module_utils.lxd import (
 
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = "unix:/var/lib/lxd/unix.socket"
+ANSIBLE_LXD_DEFAULT_SNAP_URL = "unix:/var/snap/lxd/common/lxd/unix.socket"
+
+# API endpoints
+LXD_API_VERSION = "1.0"
+LXD_API_STORAGE_POOLS_ENDPOINT = f"/{LXD_API_VERSION}/storage-pools"
 
 
 class LXDStorageVolumeInfo:
@@ -269,7 +274,7 @@ class LXDStorageVolumeInfo:
 
     def _check_pool_exists(self) -> None:
         """Verify that the storage pool exists."""
-        url = self._build_url(f"/1.0/storage-pools/{quote(self.pool, safe='')}")
+        url = self._build_url(f"{LXD_API_STORAGE_POOLS_ENDPOINT}/{quote(self.pool, safe='')}")
         resp_json = self.client.do("GET", url, ok_error_codes=[404])
 
         if resp_json["type"] == "error":
@@ -282,7 +287,7 @@ class LXDStorageVolumeInfo:
 
     def _get_volume_list(self) -> list[str]:
         """Get list of all volume URLs in the storage pool."""
-        url = self._build_url(f"/1.0/storage-pools/{quote(self.pool, safe='')}/volumes")
+        url = self._build_url(f"{LXD_API_STORAGE_POOLS_ENDPOINT}/{quote(self.pool, safe='')}/volumes")
         resp_json = self.client.do("GET", url, ok_error_codes=[])
 
         if resp_json["type"] == "error":
@@ -299,11 +304,11 @@ class LXDStorageVolumeInfo:
     def _parse_volume_url(self, volume_url: str) -> tuple[str, str]:
         """Parse volume URL to extract type and name.
 
-        Expected URL format: /1.0/storage-pools/{pool}/volumes/{type}/{name}
+        Expected URL format: /{LXD_API_VERSION}/storage-pools/{pool}/volumes/{type}/{name}
 
         The URL is split and empty parts (from leading/trailing slashes) are filtered out.
         After normalization, the expected positions are:
-        - Index 0: "1.0"
+        - Index 0: API version (e.g., "1.0")
         - Index 1: "storage-pools"
         - Index 2: pool name
         - Index 3: "volumes"
@@ -320,10 +325,10 @@ class LXDStorageVolumeInfo:
         parts = [part for part in volume_url.split("/") if part]
 
         # Verify the URL structure matches expected pattern
-        if parts[0] != "1.0":
+        if parts[0] != LXD_API_VERSION:
             self.module.fail_json(
                 msg=f'Unexpected volume URL format from LXD API: "{volume_url}". '
-                f'Expected API version "1.0" but got "{parts[0]}"'
+                f'Expected API version "{LXD_API_VERSION}" but got "{parts[0]}"'
             )
 
         vol_type = parts[4]
@@ -334,7 +339,7 @@ class LXDStorageVolumeInfo:
     def _get_volume_info(self, volume_type: str, volume_name: str) -> dict:
         """Get detailed information about a specific storage volume."""
         url = self._build_url(
-            f"/1.0/storage-pools/{quote(self.pool, safe='')}/volumes/{quote(volume_type, safe='')}/{quote(volume_name, safe='')}"
+            f"{LXD_API_STORAGE_POOLS_ENDPOINT}/{quote(self.pool, safe='')}/volumes/{quote(volume_type, safe='')}/{quote(volume_name, safe='')}"
         )
         resp_json = self.client.do("GET", url, ok_error_codes=[404])
 
@@ -415,7 +420,7 @@ def main() -> None:
             type=dict(type="str"),
             project=dict(type="str"),
             url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_URL),
-            snap_url=dict(type="str", default="unix:/var/snap/lxd/common/lxd/unix.socket"),
+            snap_url=dict(type="str", default=ANSIBLE_LXD_DEFAULT_SNAP_URL),
             client_key=dict(type="path", aliases=["key_file"]),
             client_cert=dict(type="path", aliases=["cert_file"]),
             trust_password=dict(type="str", no_log=True),
