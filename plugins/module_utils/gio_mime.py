@@ -26,7 +26,7 @@ def gio_mime_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     )
 
 
-def gio_mime_get(runner, mime_type):
+def gio_mime_get(runner: CmdRunner, mime_type):
     def process(rc, out, err):
         if err.startswith("No default applications for"):
             return None

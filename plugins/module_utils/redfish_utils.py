@@ -55,15 +55,15 @@ REDFISH_COMMON_ARGUMENT_SPEC = {
 class RedfishUtils:
     def __init__(
         self,
-        creds,
-        root_uri,
+        creds: dict[str, str],
+        root_uri: str,
         timeout,
         module: AnsibleModule,
         resource_id=None,
-        data_modification=False,
-        strip_etag_quotes=False,
-        ciphers=None,
-    ):
+        data_modification: bool = False,
+        strip_etag_quotes: bool = False,
+        ciphers: str | None = None,
+    ) -> None:
         self.root_uri = root_uri
         self.creds = creds
         self.timeout = timeout
@@ -79,7 +79,7 @@ class RedfishUtils:
         self.validate_certs = module.params.get("validate_certs", False)
         self.ca_path = module.params.get("ca_path")
 
-    def _auth_params(self, headers):
+    def _auth_params(self, headers: dict[str, str]) -> tuple[str | None, str | None, bool]:
         """
         Return tuple of required authentication params based on the presence
         of a token in the self.creds dict. If using a token, set the
@@ -157,7 +157,7 @@ class RedfishUtils:
             resp["msg"] = f"Properties in {uri} are already set"
         return resp
 
-    def _request(self, uri, **kwargs):
+    def _request(self, uri: str, **kwargs):
         kwargs.setdefault("validate_certs", self.validate_certs)
         kwargs.setdefault("follow_redirects", "all")
         kwargs.setdefault("use_proxy", True)
@@ -169,7 +169,9 @@ class RedfishUtils:
         return resp, headers
 
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri, override_headers=None, allow_no_resp=False, timeout=None):
+    def get_request(
+        self, uri: str, override_headers: dict[str, str] | None = None, allow_no_resp: bool = False, timeout=None
+    ):
         req_headers = dict(GET_HEADERS)
         if override_headers:
             req_headers.update(override_headers)
@@ -212,7 +214,7 @@ class RedfishUtils:
             return {"ret": False, "msg": f"Failed GET request to '{uri}': '{e}'"}
         return {"ret": True, "data": data, "headers": headers, "resp": resp}
 
-    def post_request(self, uri, pyld, multipart=False):
+    def post_request(self, uri: str, pyld, multipart: bool = False):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
@@ -257,7 +259,7 @@ class RedfishUtils:
             return {"ret": False, "msg": f"Failed POST request to '{uri}': '{e}'"}
         return {"ret": True, "data": data, "headers": headers, "resp": resp}
 
-    def patch_request(self, uri, pyld, check_pyld=False):
+    def patch_request(self, uri: str, pyld, check_pyld: bool = False):
         req_headers = dict(PATCH_HEADERS)
         r = self.get_request(uri)
         if r["ret"]:
@@ -309,7 +311,7 @@ class RedfishUtils:
             return {"ret": False, "changed": False, "msg": f"Failed PATCH request to '{uri}': '{e}'"}
         return {"ret": True, "changed": True, "resp": resp, "msg": f"Modified {uri}"}
 
-    def put_request(self, uri, pyld):
+    def put_request(self, uri: str, pyld):
         req_headers = dict(PUT_HEADERS)
         r = self.get_request(uri)
         if r["ret"]:
@@ -347,7 +349,7 @@ class RedfishUtils:
             return {"ret": False, "msg": f"Failed PUT request to '{uri}': '{e}'"}
         return {"ret": True, "resp": resp}
 
-    def delete_request(self, uri, pyld=None):
+    def delete_request(self, uri: str, pyld=None):
         req_headers = dict(DELETE_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:

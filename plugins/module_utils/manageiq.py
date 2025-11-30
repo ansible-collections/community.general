@@ -32,7 +32,7 @@ except ImportError:
     HAS_CLIENT = False
 
 
-def manageiq_argument_spec():
+def manageiq_argument_spec() -> dict[str, t.Any]:
     options = dict(
         url=dict(default=os.environ.get("MIQ_URL", None)),
         username=dict(default=os.environ.get("MIQ_USERNAME", None)),
@@ -68,7 +68,7 @@ def validate_connection_params(module: AnsibleModule) -> dict[str, t.Any]:
     raise AssertionError("should be unreachable")
 
 
-def manageiq_entities():
+def manageiq_entities() -> dict[str, str]:
     return {
         "provider": "providers",
         "host": "hosts",
@@ -125,7 +125,7 @@ class ManageIQ:
         return self._module
 
     @property
-    def api_url(self):
+    def api_url(self) -> str:
         """Base ManageIQ API
 
         Returns:

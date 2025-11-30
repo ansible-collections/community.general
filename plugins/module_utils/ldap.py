@@ -30,7 +30,7 @@ except ImportError:
     HAS_LDAP = False
 
 
-def gen_specs(**specs):
+def gen_specs(**specs: t.Any) -> dict[str, t.Any]:
     specs.update(
         {
             "bind_dn": dict(),
@@ -51,7 +51,7 @@ def gen_specs(**specs):
     return specs
 
 
-def ldap_required_together():
+def ldap_required_together() -> list[list[str]]:
     return [["client_cert", "client_key"]]
 
 
@@ -80,11 +80,11 @@ class LdapGeneric:
         else:
             self.dn = self.module.params["dn"]
 
-    def fail(self, msg, exn):
+    def fail(self, msg: str, exn: str | Exception) -> t.NoReturn:
         self.module.fail_json(msg=msg, details=f"{exn}", exception=traceback.format_exc())
 
-    def _find_dn(self):
-        dn = self.module.params["dn"]
+    def _find_dn(self) -> str:
+        dn: str = self.module.params["dn"]
 
         explode_dn = ldap.dn.explode_dn(dn)
 
@@ -134,7 +134,7 @@ class LdapGeneric:
 
         return connection
 
-    def _xorder_dn(self):
+    def _xorder_dn(self) -> bool:
         # match X_ORDERed DNs
         regex = r".+\{\d+\}.+"
         explode_dn = ldap.dn.explode_dn(self.module.params["dn"])

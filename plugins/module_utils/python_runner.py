@@ -20,20 +20,20 @@ class PythonRunner(CmdRunner):
         command,
         arg_formats=None,
         default_args_order=(),
-        check_rc=False,
-        force_lang="C",
-        path_prefix=None,
-        environ_update=None,
-        python="python",
-        venv=None,
-    ):
+        check_rc: bool = False,
+        force_lang: str = "C",
+        path_prefix: list[str] | None = None,
+        environ_update: dict[str, str] | None = None,
+        python: str = "python",
+        venv: str | None = None,
+    ) -> None:
         self.python = python
         self.venv = venv
         self.has_venv = venv is not None
 
         if os.path.isabs(python) or "/" in python:
             self.python = python
-        elif self.has_venv:
+        elif venv is not None:
             if path_prefix is None:
                 path_prefix = []
             path_prefix.append(os.path.join(venv, "bin"))

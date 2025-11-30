@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
 
-def _determine_list_all_kwargs(version) -> dict[str, t.Any]:
+def _determine_list_all_kwargs(version: str) -> dict[str, t.Any]:
     gitlab_version = LooseVersion(version)
     if gitlab_version >= LooseVersion("4.0.0"):
         # 4.0.0 removed 'as_list'
@@ -43,7 +43,7 @@ except Exception:
     list_all_kwargs = {}
 
 
-def auth_argument_spec(spec=None):
+def auth_argument_spec(spec: dict[str, t.Any] | None = None) -> dict[str, t.Any]:
     arg_spec = dict(
         ca_path=dict(type="str"),
         api_token=dict(type="str", no_log=True),
@@ -138,7 +138,7 @@ def gitlab_authentication(module: AnsibleModule, min_version=None) -> gitlab.Git
     return gitlab_instance
 
 
-def filter_returned_variables(gitlab_variables):
+def filter_returned_variables(gitlab_variables) -> list[dict[str, t.Any]]:
     # pop properties we don't know
     existing_variables = [dict(x.attributes) for x in gitlab_variables]
     KNOWN = [
@@ -159,9 +159,11 @@ def filter_returned_variables(gitlab_variables):
     return existing_variables
 
 
-def vars_to_variables(vars, module: AnsibleModule):
+def vars_to_variables(
+    vars: dict[str, str | int | float | dict[str, t.Any]], module: AnsibleModule
+) -> list[dict[str, t.Any]]:
     # transform old vars to new variables structure
-    variables = list()
+    variables = []
     for item, value in vars.items():
         if isinstance(value, (str, int, float)):
             variables.append(

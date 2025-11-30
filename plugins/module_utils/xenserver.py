@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
 
-def xenserver_common_argument_spec():
+def xenserver_common_argument_spec() -> dict[str, t.Any]:
     return dict(
         hostname=dict(
             type="str",
@@ -45,7 +45,7 @@ def xenserver_common_argument_spec():
     )
 
 
-def xapi_to_module_vm_power_state(power_state):
+def xapi_to_module_vm_power_state(power_state: str) -> str | None:
     """Maps XAPI VM power states to module VM power states."""
     module_power_state_map = {
         "running": "poweredon",
@@ -57,7 +57,7 @@ def xapi_to_module_vm_power_state(power_state):
     return module_power_state_map.get(power_state)
 
 
-def module_to_xapi_vm_power_state(power_state):
+def module_to_xapi_vm_power_state(power_state: str) -> str | None:
     """Maps module VM power states to XAPI VM power states."""
     vm_power_state_map = {
         "poweredon": "running",
@@ -71,7 +71,7 @@ def module_to_xapi_vm_power_state(power_state):
     return vm_power_state_map.get(power_state)
 
 
-def is_valid_ip_addr(ip_addr):
+def is_valid_ip_addr(ip_addr: str) -> bool:
     """Validates given string as IPv4 address for given string.
 
     Args:
@@ -97,7 +97,7 @@ def is_valid_ip_addr(ip_addr):
     return True
 
 
-def is_valid_ip_netmask(ip_netmask):
+def is_valid_ip_netmask(ip_netmask: str) -> bool:
     """Validates given string as IPv4 netmask.
 
     Args:
@@ -129,7 +129,7 @@ def is_valid_ip_netmask(ip_netmask):
     return True
 
 
-def is_valid_ip_prefix(ip_prefix):
+def is_valid_ip_prefix(ip_prefix: str) -> bool:
     """Validates given string as IPv4 prefix.
 
     Args:
@@ -146,7 +146,7 @@ def is_valid_ip_prefix(ip_prefix):
     return not (ip_prefix_int < 0 or ip_prefix_int > 32)
 
 
-def ip_prefix_to_netmask(ip_prefix, skip_check=False):
+def ip_prefix_to_netmask(ip_prefix: str, skip_check: bool = False) -> str:
     """Converts IPv4 prefix to netmask.
 
     Args:
@@ -169,7 +169,7 @@ def ip_prefix_to_netmask(ip_prefix, skip_check=False):
         return ""
 
 
-def ip_netmask_to_prefix(ip_netmask, skip_check=False):
+def ip_netmask_to_prefix(ip_netmask: str, skip_check: bool = False) -> str:
     """Converts IPv4 netmask to prefix.
 
     Args:
@@ -192,7 +192,7 @@ def ip_netmask_to_prefix(ip_netmask, skip_check=False):
         return ""
 
 
-def is_valid_ip6_addr(ip6_addr):
+def is_valid_ip6_addr(ip6_addr: str) -> bool:
     """Validates given string as IPv6 address.
 
     Args:
@@ -226,7 +226,7 @@ def is_valid_ip6_addr(ip6_addr):
     return all(ip6_addr_hextet_regex.match(ip6_addr_hextet) for ip6_addr_hextet in ip6_addr_split)
 
 
-def is_valid_ip6_prefix(ip6_prefix):
+def is_valid_ip6_prefix(ip6_prefix: str) -> bool:
     """Validates given string as IPv6 prefix.
 
     Args:

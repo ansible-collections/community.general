@@ -52,7 +52,7 @@ def snap_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     return runner
 
 
-def get_version(runner: CmdRunner):
+def get_version(runner: CmdRunner) -> dict[str, list[str]]:
     with runner("version") as ctx:
         rc, out, err = ctx.run()
     return dict(x.split() for x in out.splitlines() if len(x.split()) == 2)

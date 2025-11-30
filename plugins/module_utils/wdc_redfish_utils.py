@@ -45,7 +45,7 @@ class WdcRedfishUtils(RedfishUtils):
     CHASSIS_LOCATE = "#Chassis.Locate"
     CHASSIS_POWER_MODE = "#Chassis.PowerMode"
 
-    def __init__(self, creds, root_uris, timeout, module: AnsibleModule, resource_id, data_modification):
+    def __init__(self, creds, root_uris, timeout, module: AnsibleModule, resource_id, data_modification) -> None:
         super().__init__(
             creds=creds,
             root_uri=root_uris[0],

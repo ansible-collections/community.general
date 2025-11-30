@@ -47,7 +47,7 @@ def fail_imports(module: AnsibleModule, needs_certifi: bool = True) -> None:
         module.fail_json(msg="\n".join(errors), traceback="\n".join(traceback))
 
 
-def redis_auth_argument_spec(tls_default=True):
+def redis_auth_argument_spec(tls_default: bool = True) -> dict[str, t.Any]:
     return dict(
         login_host=dict(
             type="str",
@@ -64,7 +64,7 @@ def redis_auth_argument_spec(tls_default=True):
     )
 
 
-def redis_auth_params(module: AnsibleModule):
+def redis_auth_params(module: AnsibleModule) -> dict[str, t.Any]:
     login_host = module.params["login_host"]
     login_user = module.params["login_user"]
     login_password = module.params["login_password"]
@@ -100,9 +100,8 @@ class RedisAnsible:
         self.module = module
         self.connection = self._connect()
 
-    def _connect(self):
+    def _connect(self) -> Redis:
         try:
             return Redis(**redis_auth_params(self.module))
         except Exception as e:
             self.module.fail_json(msg=f"{e}")
-        return None

@@ -47,7 +47,7 @@ class InfluxDb:
         self.password = self.params["password"]
         self.database_name = self.params.get("database_name")
 
-    def check_lib(self):
+    def check_lib(self) -> None:
         if not HAS_REQUESTS:
             self.module.fail_json(msg=missing_required_lib("requests"), exception=REQUESTS_IMP_ERR)
 
@@ -55,7 +55,7 @@ class InfluxDb:
             self.module.fail_json(msg=missing_required_lib("influxdb"), exception=INFLUXDB_IMP_ERR)
 
     @staticmethod
-    def influxdb_argument_spec():
+    def influxdb_argument_spec() -> dict[str, t.Any]:
         return dict(
             hostname=dict(type="str", default="localhost"),
             port=dict(type="int", default=8086),
@@ -71,7 +71,7 @@ class InfluxDb:
             udp_port=dict(type="int", default=4444),
         )
 
-    def connect_to_influxdb(self):
+    def connect_to_influxdb(self) -> InfluxDBClient:
         args = dict(
             host=self.hostname,
             port=self.port,

@@ -12,7 +12,7 @@ from ansible.module_utils.common.locale import get_best_parsable_locale
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Mapping, Sequence
     from ansible.module_utils.basic import AnsibleModule
 
 
@@ -84,7 +84,7 @@ class CmdRunner:
         self,
         module: AnsibleModule,
         command,
-        arg_formats: dict[str, Callable] | None = None,
+        arg_formats: Mapping[str, Callable | cmd_runner_fmt._ArgFormat] | None = None,
         default_args_order: str | Sequence[str] = (),
         check_rc: bool = False,
         force_lang: str = "C",

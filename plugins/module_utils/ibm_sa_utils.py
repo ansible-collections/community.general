@@ -76,7 +76,7 @@ def connect_ssl(module: AnsibleModule):
         module.fail_json(msg=f"Connection with Spectrum Accelerate system has failed: {e}.")
 
 
-def spectrum_accelerate_spec():
+def spectrum_accelerate_spec() -> dict[str, t.Any]:
     """Return arguments spec for AnsibleModule"""
     return dict(
         endpoints=dict(required=True),
@@ -103,6 +103,6 @@ def build_pyxcli_command(fields):
     return pyxcli_args
 
 
-def is_pyxcli_installed(module: AnsibleModule):
+def is_pyxcli_installed(module: AnsibleModule) -> None:
     if not PYXCLI_INSTALLED:
         module.fail_json(msg=missing_required_lib("pyxcli"), exception=PYXCLI_IMP_ERR)

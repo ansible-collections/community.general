@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
 
-def online_argument_spec():
+def online_argument_spec() -> dict[str, t.Any]:
     return dict(
         api_token=dict(
             required=True,
@@ -32,7 +32,7 @@ def online_argument_spec():
 
 
 class OnlineException(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
 
 
