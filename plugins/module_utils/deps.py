@@ -7,9 +7,13 @@ from __future__ import annotations
 
 
 import traceback
+import typing as t
 from contextlib import contextmanager
 
 from ansible.module_utils.basic import missing_required_lib
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 _deps = dict()
@@ -47,7 +51,7 @@ class _Dependency:
     def failed(self):
         return self.state == 1
 
-    def validate(self, module):
+    def validate(self, module: AnsibleModule) -> None:
         if self.failed:
             module.fail_json(msg=self.message, exception=self.trace)
 
@@ -86,14 +90,14 @@ def _select_names(spec):
     return dep_names
 
 
-def validate(module, spec=None):
+def validate(module: AnsibleModule, spec=None) -> None:
     for dep in _select_names(spec):
         _deps[dep].validate(module)
 
 
-def failed(spec=None):
+def failed(spec=None) -> bool:
     return any(_deps[d].failed for d in _select_names(spec))
 
 
-def clear():
+def clear() -> None:
     _deps.clear()

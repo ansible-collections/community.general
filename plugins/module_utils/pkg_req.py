@@ -4,7 +4,12 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible_collections.community.general.plugins.module_utils import deps
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 with deps.declare("packaging"):
@@ -13,7 +18,7 @@ with deps.declare("packaging"):
 
 
 class PackageRequirement:
-    def __init__(self, module, name):
+    def __init__(self, module: AnsibleModule, name) -> None:
         self.module = module
         self.parsed_name, self.requirement = self._parse_spec(name)
 

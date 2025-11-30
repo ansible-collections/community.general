@@ -11,9 +11,13 @@ from __future__ import annotations
 
 
 import os
+import stat
 
 
-def ismount(path):
+# TODO: replace by os.path.ismount(), workaround should be no longer needed
+
+
+def ismount(path: str | bytes) -> bool:
     """Test whether a path is a mount point
     This is a copy of the upstream version of ismount(). Originally this was copied here as a workaround
     until Python issue 2466 was fixed. Now it is here so this will work on older versions of Python
@@ -28,9 +32,10 @@ def ismount(path):
         return False
     else:
         # A symlink can never be a mount point
-        if os.path.stat.S_ISLNK(s1.st_mode):
+        if stat.S_ISLNK(s1.st_mode):
             return False
 
+    parent: bytes | str
     if isinstance(path, bytes):
         parent = os.path.join(path, b"..")
     else:

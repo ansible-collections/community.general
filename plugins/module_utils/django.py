@@ -12,7 +12,8 @@ from ansible_collections.community.general.plugins.module_utils.python_runner im
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
 if t.TYPE_CHECKING:
-    from .cmd_runner_fmt import ArgFormatType
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.general.plugins.module_utils.cmd_runner_fmt import ArgFormatType
 
 
 django_std_args = dict(
@@ -81,7 +82,7 @@ _args_menu = dict(
 
 
 class _DjangoRunner(PythonRunner):
-    def __init__(self, module, arg_formats=None, **kwargs):
+    def __init__(self, module: AnsibleModule, arg_formats=None, **kwargs) -> None:
         arg_fmts = dict(arg_formats) if arg_formats else {}
         arg_fmts.update(_django_std_arg_fmts)
 

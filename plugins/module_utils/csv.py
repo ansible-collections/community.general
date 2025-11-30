@@ -6,9 +6,24 @@
 from __future__ import annotations
 
 import csv
+import typing as t
 from io import StringIO
 
 from ansible.module_utils.common.text.converters import to_native
+
+
+if t.TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    class DialectParamsOrNone(t.TypedDict):
+        delimiter: t.NotRequired[str | None]
+        doublequote: t.NotRequired[bool | None]
+        escapechar: t.NotRequired[str | None]
+        lineterminator: t.NotRequired[str | None]
+        quotechar: t.NotRequired[str | None]
+        quoting: t.NotRequired[int | None]
+        skipinitialspace: t.NotRequired[bool | None]
+        strict: t.NotRequired[bool | None]
 
 
 class CustomDialectFailureError(Exception):
@@ -22,7 +37,7 @@ class DialectNotAvailableError(Exception):
 CSVError = csv.Error
 
 
-def initialize_dialect(dialect, **kwargs):
+def initialize_dialect(dialect: str, **kwargs: t.Unpack[DialectParamsOrNone]) -> str:
     # Add Unix dialect from Python 3
     class unix_dialect(csv.Dialect):
         """Describe the usual properties of Unix-generated CSV files."""
@@ -43,7 +58,7 @@ def initialize_dialect(dialect, **kwargs):
     dialect_params = {k: v for k, v in kwargs.items() if v is not None}
     if dialect_params:
         try:
-            csv.register_dialect("custom", dialect, **dialect_params)
+            csv.register_dialect("custom", dialect, **dialect_params)  # type: ignore
         except TypeError as e:
             raise CustomDialectFailureError(f"Unable to create custom dialect: {e}") from e
         dialect = "custom"
@@ -51,7 +66,7 @@ def initialize_dialect(dialect, **kwargs):
     return dialect
 
 
-def read_csv(data, dialect, fieldnames=None):
+def read_csv(data: str, dialect: str, fieldnames: Sequence[str] | None = None) -> csv.DictReader:
     BOM = "\ufeff"
     data = to_native(data, errors="surrogate_or_strict")
     if data.startswith(BOM):

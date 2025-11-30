@@ -10,12 +10,18 @@ import os
 import random
 import string
 import time
+import typing as t
+
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.common.text.converters import to_bytes
 from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 GET_HEADERS = {"accept": "application/json", "OData-Version": "4.0"}
 POST_HEADERS = {"content-type": "application/json", "accept": "application/json", "OData-Version": "4.0"}
@@ -52,7 +58,7 @@ class RedfishUtils:
         creds,
         root_uri,
         timeout,
-        module,
+        module: AnsibleModule,
         resource_id=None,
         data_modification=False,
         strip_etag_quotes=False,

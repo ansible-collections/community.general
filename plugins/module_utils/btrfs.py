@@ -7,6 +7,10 @@ from __future__ import annotations
 from ansible.module_utils.common.text.converters import to_bytes
 import re
 import os
+import typing as t
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def normalize_subvolume_path(path):
@@ -28,11 +32,11 @@ class BtrfsCommands:
     Provides access to a subset of the Btrfs command line
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.__module = module
-        self.__btrfs = self.__module.get_bin_path("btrfs", required=True)
+        self.__btrfs: str = self.__module.get_bin_path("btrfs", required=True)
 
-    def filesystem_show(self):
+    def filesystem_show(self) -> list[dict[str, t.Any]]:
         command = f"{self.__btrfs} filesystem show -d"
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.strip() for x in result[1].splitlines()]
@@ -43,14 +47,16 @@ class BtrfsCommands:
                 current = self.__parse_filesystem(line)
                 filesystems.append(current)
             elif line.startswith("devid"):
+                if current is None:
+                    raise ValueError("Found 'devid' line without previous 'Label' line")
                 current["devices"].append(self.__parse_filesystem_device(line))
         return filesystems
 
-    def __parse_filesystem(self, line):
+    def __parse_filesystem(self, line) -> dict[str, t.Any]:
         label = re.sub(r"\s*uuid:.*$", "", re.sub(r"^Label:\s*", "", line))
         id = re.sub(r"^.*uuid:\s*", "", line)
 
-        filesystem = {}
+        filesystem: dict[str, t.Any] = {}
         filesystem["label"] = label.strip("'") if label != "none" else None
         filesystem["uuid"] = id
         filesystem["devices"] = []
@@ -59,10 +65,10 @@ class BtrfsCommands:
         filesystem["default_subvolid"] = None
         return filesystem
 
-    def __parse_filesystem_device(self, line):
+    def __parse_filesystem_device(self, line: str) -> str:
         return re.sub(r"^.*path\s", "", line)
 
-    def subvolumes_list(self, filesystem_path):
+    def subvolumes_list(self, filesystem_path: str) -> list[dict[str, t.Any]]:
         command = f"{self.__btrfs} subvolume list -tap {filesystem_path}"
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.split("\t") for x in result[1].splitlines()]
@@ -106,10 +112,10 @@ class BtrfsInfoProvider:
     Utility providing details of the currently available btrfs filesystems
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.__module = module
         self.__btrfs_api = BtrfsCommands(module)
-        self.__findmnt_path = self.__module.get_bin_path("findmnt", required=True)
+        self.__findmnt_path: str = self.__module.get_bin_path("findmnt", required=True)
 
     def get_filesystems(self):
         filesystems = self.__btrfs_api.filesystem_show()
@@ -255,7 +261,7 @@ class BtrfsFilesystem:
     Wrapper class providing convenience methods for inspection of a btrfs filesystem
     """
 
-    def __init__(self, info, provider, module):
+    def __init__(self, info, provider, module: AnsibleModule) -> None:
         self.__provider = provider
 
         # constant for module execution
@@ -415,7 +421,7 @@ class BtrfsFilesystemsProvider:
     Provides methods to query available btrfs filesystems
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.__module = module
         self.__provider = BtrfsInfoProvider(module)
         self.__filesystems = None

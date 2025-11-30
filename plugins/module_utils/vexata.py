@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import typing as t
 
 HAS_VEXATAPI = True
 try:
@@ -13,6 +14,10 @@ except ImportError:
     HAS_VEXATAPI = False
 
 from ansible.module_utils.basic import env_fallback
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 VXOS_VERSION = None
 
@@ -31,7 +36,7 @@ def get_version(iocs_json):
     return tuple(ver)
 
 
-def get_array(module):
+def get_array(module: AnsibleModule):
     """Return storage array object or fail"""
     global VXOS_VERSION
     array = module.params["array"]

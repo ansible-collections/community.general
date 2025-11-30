@@ -24,7 +24,6 @@ import os
 import re
 import traceback
 
-# (TODO: remove AnsibleModule from next line!)
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib  # noqa: F401, pylint: disable=unused-import
 from os.path import expanduser
 from uuid import UUID
@@ -57,7 +56,7 @@ class DimensionDataModule:
     The base class containing common functionality used by Dimension Data modules for Ansible.
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         """
         Create a new DimensionDataModule.
 

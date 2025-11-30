@@ -5,8 +5,13 @@
 from __future__ import annotations
 
 import re
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 _state_map = {
     "present": "create",
@@ -46,7 +51,7 @@ def fmt_resource_argument(value):
     return ["--group" if value["argument_action"] == "group" else value["argument_action"]] + value["argument_option"]
 
 
-def get_pacemaker_maintenance_mode(runner):
+def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
     with runner("cli_action config") as ctx:
         rc, out, err = ctx.run(cli_action="property")
         maint_mode_re = re.compile(r"maintenance-mode.*true", re.IGNORECASE)
@@ -54,7 +59,7 @@ def get_pacemaker_maintenance_mode(runner):
         return bool(maintenance_mode_output)
 
 
-def pacemaker_runner(module, **kwargs):
+def pacemaker_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     runner_command = ["pcs"]
     runner = CmdRunner(
         module,

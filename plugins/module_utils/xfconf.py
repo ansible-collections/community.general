@@ -4,8 +4,13 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 @cmd_runner_fmt.unpack_args
@@ -18,7 +23,7 @@ def _values_fmt(values, value_types):
     return result
 
 
-def xfconf_runner(module, **kwargs):
+def xfconf_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     runner = CmdRunner(
         module,
         command="xfconf-query",
@@ -37,7 +42,7 @@ def xfconf_runner(module, **kwargs):
     return runner
 
 
-def get_xfconf_version(runner):
+def get_xfconf_version(runner: CmdRunner) -> str:
     with runner("version") as ctx:
         rc, out, err = ctx.run()
         return out.splitlines()[0].split()[1]

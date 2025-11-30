@@ -10,6 +10,7 @@ import sys
 import datetime
 import time
 import traceback
+import typing as t
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
@@ -18,6 +19,9 @@ from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 SCALEWAY_SECRET_IMP_ERR: str | None = None
 try:
@@ -169,7 +173,7 @@ class Response:
 
 
 class Scaleway:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.headers = {
             "X-Auth-Token": self.module.params.get("api_token"),

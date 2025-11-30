@@ -4,10 +4,15 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
-def locale_runner(module):
+
+def locale_runner(module: AnsibleModule) -> CmdRunner:
     runner = CmdRunner(
         module,
         command=["locale", "-a"],
@@ -16,7 +21,7 @@ def locale_runner(module):
     return runner
 
 
-def locale_gen_runner(module):
+def locale_gen_runner(module: AnsibleModule) -> CmdRunner:
     runner = CmdRunner(
         module,
         command="locale-gen",

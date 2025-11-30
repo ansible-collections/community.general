@@ -4,11 +4,15 @@
 
 from __future__ import annotations
 
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
-def systemd_runner(module, command, **kwargs):
+
+def systemd_runner(module: AnsibleModule, command, **kwargs) -> CmdRunner:
     arg_formats = dict(
         version=cmd_runner_fmt.as_fixed("--version"),
         list_units=cmd_runner_fmt.as_fixed(["list-units", "--no-pager"]),

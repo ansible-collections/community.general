@@ -5,15 +5,16 @@
 
 from __future__ import annotations
 
+import traceback
 import typing as t
+from urllib.parse import urljoin
 
 from ansible.module_utils.basic import missing_required_lib
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-from urllib.parse import urljoin
-
-import traceback
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 def _determine_list_all_kwargs(version) -> dict[str, t.Any]:
@@ -76,7 +77,7 @@ def find_group(gitlab_instance, identifier):
     return group
 
 
-def ensure_gitlab_package(module, min_version=None):
+def ensure_gitlab_package(module: AnsibleModule, min_version=None) -> None:
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(
             msg=missing_required_lib("python-gitlab", url="https://python-gitlab.readthedocs.io/en/stable/"),
@@ -92,7 +93,7 @@ def ensure_gitlab_package(module, min_version=None):
         )
 
 
-def gitlab_authentication(module, min_version=None):
+def gitlab_authentication(module: AnsibleModule, min_version=None) -> gitlab.Gitlab:
     ensure_gitlab_package(module, min_version=min_version)
 
     gitlab_url = module.params["api_url"]
@@ -121,7 +122,7 @@ def gitlab_authentication(module, min_version=None):
             private_token=gitlab_token,
             oauth_token=gitlab_oauth_token,
             job_token=gitlab_job_token,
-            api_version=4,
+            api_version="4",
         )
         gitlab_instance.auth()
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
@@ -158,7 +159,7 @@ def filter_returned_variables(gitlab_variables):
     return existing_variables
 
 
-def vars_to_variables(vars, module):
+def vars_to_variables(vars, module: AnsibleModule):
     # transform old vars to new variables structure
     variables = list()
     for item, value in vars.items():

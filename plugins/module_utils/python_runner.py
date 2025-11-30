@@ -5,14 +5,18 @@
 from __future__ import annotations
 
 import os
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, _ensure_list
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 class PythonRunner(CmdRunner):
     def __init__(
         self,
-        module,
+        module: AnsibleModule,
         command,
         arg_formats=None,
         default_args_order=(),
