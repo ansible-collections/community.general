@@ -421,10 +421,11 @@ def get_hostname_list(module):
         hostname_spec = hostnames[0]
         count_range = range(count_offset, count_offset + count)
         if re.search(r"%\d{0,2}d", hostname_spec):
-            hostnames = [hostname_spec % i for i in count_range]
+            hostname_spec = re.sub(r"%(\d{0,2})d", r"{:\1}", hostname_spec, count=0)
+            hostnames = [hostname_spec.format(i) for i in count_range]
         elif count > 1:
-            hostname_spec = "%s%%02d" % hostname_spec  # noqa
-            hostnames = [hostname_spec % i for i in count_range]
+            hostname_spec = f"{hostname_spec}{{:02}}"
+            hostnames = [hostname_spec.format(i) for i in count_range]
 
     for hn in hostnames:
         if not is_valid_hostname(hn):
@@ -500,9 +501,8 @@ def wait_for_devices_active(module, packet_conn, watched_devices):
         if all(d.state == "active" for d in refreshed):
             return refreshed
         time.sleep(5)
-    raise Exception(
-        'Waiting for state "active" timed out for devices: %s' % [d.hostname for d in refreshed if d.state != "active"]
-    )
+    timed_out_devices = [d.hostname for d in refreshed if d.state != "active"]
+    raise Exception(f'Waiting for state "active" timed out for devices: {timed_out_devices}')
 
 
 def wait_for_public_IPv(module, packet_conn, created_devices):

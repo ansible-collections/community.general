@@ -203,6 +203,7 @@ servers:
 """
 
 import os
+import re
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
@@ -553,9 +554,15 @@ def _auto_increment_hostname(count, hostname):
     name-02, name-03, and so forth.
     """
     if "%" not in hostname:
-        hostname = "%s-%%01d" % hostname  # noqa
+        hostname = f"{hostname}-%01d"
 
-    return [hostname % i for i in range(1, count + 1)]
+    hostname_re = re.compile(r"^(.*)%(0\d+)d$")
+
+    if not hostname_re.match(hostname):
+        raise ValueError("Hostname numbering format must be pattern `%0<n>d` with <n> being the number digits wanted")
+
+    hostname_template = hostname_re.sub(r"\1{:\2}", hostname)
+    return [hostname_template.format(i) for i in range(1, count + 1)]
 
 
 def _auto_increment_description(count, description):
@@ -564,7 +571,13 @@ def _auto_increment_description(count, description):
     string formatting (%) operator. Otherwise, repeat the same description.
     """
     if "%" in description:
-        return [description % i for i in range(1, count + 1)]
+        description_re = re.compile(r"^(.*)%(0\d+)d$")
+        if not description_re.match(description):
+            raise ValueError(
+                "Hostname numbering format (in description) must be pattern `%0<n>d` with <n> being the number digits wanted"
+            )
+        description = description_re.sub(r"\1{:\2}\3", description)
+        return [description.format(i) for i in range(1, count + 1)]
     else:
         return [description] * count
 
