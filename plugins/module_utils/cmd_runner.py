@@ -84,7 +84,7 @@ class CmdRunner:
         self,
         module: AnsibleModule,
         command,
-        arg_formats: Mapping[str, Callable | cmd_runner_fmt._ArgFormat] | None = None,
+        arg_formats: Mapping[str, Callable[[t.Any], Sequence[t.Any]] | cmd_runner_fmt._ArgFormat] | None = None,
         default_args_order: str | Sequence[str] = (),
         check_rc: bool = False,
         force_lang: str = "C",
