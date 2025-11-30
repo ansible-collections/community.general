@@ -107,18 +107,23 @@ class Ip2locationioFacts:
     def __init__(self, module: AnsibleModule) -> None:
         self.url = "https://api.ip2location.io/"
         self.timeout = module.params.get("timeout")
+        self.ip = module.params.get("ip")
         self.module = module
 
     def get_geo_data(self) -> dict[str, t.Any]:
+        url = self.url
+        if self.ip:
+            url += f"?ip={self.ip}"
+
         response, info = fetch_url(
             self.module,
-            self.url,
+            url,
             force=True,
             timeout=self.timeout,
         )
         if info["status"] != 200:
             self.module.fail_json(
-                msg=f"Could not get {self.url} page, check for connectivity! HTTP Status: {info['status']}"
+                msg=f"Could not get {url} page, check for connectivity! HTTP Status: {info['status']}"
             )
 
         try:
@@ -126,7 +131,7 @@ class Ip2locationioFacts:
             result = self.module.from_json(content)
         except Exception as exc:
             self.module.fail_json(
-                msg=f"Failed to parse the ip2location.io response from {self.url}: {exc}", read_content=content
+                msg=f"Failed to parse the ip2location.io response from {url}: {exc}", read_content=content
             )
         else:
             return result
@@ -137,6 +142,7 @@ def main():
         argument_spec=dict(
             http_agent=dict(default=USER_AGENT),
             timeout=dict(type="int", default=10),
+            ip=dict(type="str"),
         ),
         supports_check_mode=True,
     )
