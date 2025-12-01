@@ -15,8 +15,7 @@ description:
 author: "IP2Location (@ip2location)"
 extends_documentation_fragment:
   - community.general.attributes
-  - community.general.attributes.facts
-  - community.general.attributes.facts_module
+  - community.general.attributes.info_module
 options:
   ip:
     description:
