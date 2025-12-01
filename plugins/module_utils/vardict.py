@@ -204,7 +204,7 @@ class VarDict:
     def output(self, verbosity: int = 0) -> dict[str, t.Any]:
         return {n: v.value for n, v in self.__vars__.items() if v.output and v.is_visible(verbosity)}
 
-    def diff(self, verbosity: int = 0) -> dict[str, t.Any] | None:
+    def diff(self, verbosity: int = 0) -> dict[str, dict[str, t.Any]] | None:
         diff_results = [
             (n, v.diff_result) for n, v in self.__vars__.items() if v.diff_result and v.is_visible(verbosity)
         ]

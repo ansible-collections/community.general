@@ -13,7 +13,7 @@ from ansible.module_utils.common.collections import is_sequence
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
 
-    ArgFormatType = Callable[[t.Any], list[str]]
+    ArgFormatType = Callable[[t.Any], Sequence[t.Any]]
     _T = t.TypeVar("_T")
 
 

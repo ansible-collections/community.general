@@ -88,7 +88,7 @@ class CmdRunner:
         default_args_order: str | Sequence[str] = (),
         check_rc: bool = False,
         force_lang: str = "C",
-        path_prefix: list[str] | None = None,
+        path_prefix: Sequence[str] | None = None,
         environ_update: dict[str, str] | None = None,
     ):
         self.module = module
@@ -128,9 +128,9 @@ class CmdRunner:
     def __call__(
         self,
         args_order: str | Sequence[str] | None = None,
-        output_process=None,
+        output_process: Callable[[int, str, str], t.Any] | None = None,
         check_mode_skip: bool = False,
-        check_mode_return=None,
+        check_mode_return: t.Any | None = None,
         **kwargs,
     ):
         if output_process is None:
@@ -162,9 +162,9 @@ class _CmdRunnerContext:
         self,
         runner: CmdRunner,
         args_order: tuple[str, ...],
-        output_process,
+        output_process: Callable[[int, str, str], t.Any],
         check_mode_skip: bool,
-        check_mode_return,
+        check_mode_return: t.Any,
         **kwargs,
     ) -> None:
         self.runner = runner

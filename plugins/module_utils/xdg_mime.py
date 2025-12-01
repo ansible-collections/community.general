@@ -28,8 +28,8 @@ def xdg_mime_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     )
 
 
-def xdg_mime_get(runner: CmdRunner, mime_type):
-    def process(rc, out, err):
+def xdg_mime_get(runner: CmdRunner, mime_type) -> str | None:
+    def process(rc, out, err) -> str | None:
         if not out.strip():
             return None
         out = out.splitlines()[0]
