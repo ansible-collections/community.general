@@ -2675,8 +2675,7 @@ class Nmcli:
         return self._compare_conn_params(self.show_connection(), options)
 
 
-def main():
-    # Parsing argument file
+def create_module() -> AnsibleModule:
     module = AnsibleModule(
         argument_spec=dict(
             ignore_unsupported_suboptions=dict(type="bool", default=False),
@@ -2870,6 +2869,12 @@ def main():
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
+    return module
+
+
+def main():
+    # Parsing argument file
+    module = create_module()
 
     nmcli = Nmcli(module)
 

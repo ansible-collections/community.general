@@ -589,7 +589,7 @@ def get_archive(module):
         return TarArchive(module)
 
 
-def main():
+def create_module() -> AnsibleModule:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="list", elements="path", required=True),
@@ -603,6 +603,11 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
+    return module
+
+
+def main():
+    module = create_module()
 
     check_mode = module.check_mode
 

@@ -13,25 +13,8 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     ModuleTestCase,
     set_module_args,
 )
-from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules.java_keystore import JavaKeystore
-
-
-module_argument_spec = dict(
-    name=dict(type="str", required=True),
-    dest=dict(type="path", required=True),
-    certificate=dict(type="str", no_log=True),
-    certificate_path=dict(type="path"),
-    private_key=dict(type="str", no_log=True),
-    private_key_path=dict(type="path", no_log=False),
-    private_key_passphrase=dict(type="str", no_log=True),
-    password=dict(type="str", required=True, no_log=True),
-    ssl_backend=dict(type="str", default="openssl", choices=["openssl", "cryptography"]),
-    keystore_type=dict(type="str", choices=["jks", "pkcs12"]),
-    force=dict(type="bool", default=False),
-)
-module_supports_check_mode = True
-module_choose_between = (["certificate", "certificate_path"], ["private_key", "private_key_path"])
+from ansible.module_utils.basic import AnsibleModule  # noqa: F401 # pylint: disable=unused-import
+from ansible_collections.community.general.plugins.modules.java_keystore import JavaKeystore, create_module
 
 
 class TestCreateJavaKeystore(ModuleTestCase):
@@ -96,12 +79,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         with patch("os.remove", return_value=True):
             self.create_path.side_effect = ["/tmp/tmpgrzm2ah7"]
@@ -139,12 +117,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -189,12 +162,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -237,12 +205,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -315,12 +278,7 @@ class TestCertChanged(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         with patch("os.remove", return_value=True):
             self.create_file.side_effect = ["/tmp/placeholder", ""]
@@ -341,12 +299,7 @@ class TestCertChanged(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         with patch("os.remove", return_value=True):
             self.create_file.side_effect = ["/tmp/placeholder", ""]
@@ -367,12 +320,7 @@ class TestCertChanged(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         with patch("os.remove", return_value=True):
             self.create_file.side_effect = ["/tmp/placeholder", ""]
@@ -395,12 +343,7 @@ class TestCertChanged(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         with patch("os.remove", return_value=True):
             self.create_file.side_effect = ["/tmp/placeholder", ""]
@@ -423,12 +366,7 @@ class TestCertChanged(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -457,12 +395,7 @@ class TestCertChanged(ModuleTestCase):
                 password="changeit",
             )
         ):
-            module = AnsibleModule(
-                argument_spec=module_argument_spec,
-                supports_check_mode=module_supports_check_mode,
-                mutually_exclusive=module_choose_between,
-                required_one_of=module_choose_between,
-            )
+            module = create_module()
 
         module.exit_json = Mock()
         module.fail_json = Mock(return_value=True)
