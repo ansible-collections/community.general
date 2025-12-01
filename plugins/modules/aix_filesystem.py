@@ -165,7 +165,7 @@ EXAMPLES = r"""
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils._mount import ismount
+from os.path import ismount
 import re
 
 
