@@ -6,6 +6,29 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.2
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Minor Changes
+-------------
+
+- tss lookup plugin - fixed ``AccessTokenAuthorizer`` initialization to include ``base_url`` parameter for proper token authentication (https://github.com/ansible-collections/community.general/pull/11031).
+
+Bugfixes
+--------
+
+- cobbler_system - compare the version as a float which is the type returned by the Cobbler API (https://github.com/ansible-collections/community.general/issues/11044).
+- datetime module utils - fix bug in ``fromtimestamp()`` that caused the function to crash. This function is not used in community.general (https://github.com/ansible-collections/community.general/pull/11206).
+- filesystem - avoid false positive change detection on XFS resize due to unusable slack space (https://github.com/ansible-collections/community.general/pull/11033).
+- mas - parse CLI output correctly when listing installed apps with mas 3.0.0+ (https://github.com/ansible-collections/community.general/pull/11179).
+- xfconf - fix handling of empty array properties (https://github.com/ansible-collections/community.general/pull/11026).
+- xfconf_info - fix handling of empty array properties (https://github.com/ansible-collections/community.general/pull/11026).
+
 v11.4.1
 =======
 
