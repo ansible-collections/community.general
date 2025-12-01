@@ -1,0 +1,2 @@
+minor_changes:
+  - btrfs module utils - make execution of external commands safer by passing arguments as list (https://github.com/ansible-collections/community.general/pull/11240).
