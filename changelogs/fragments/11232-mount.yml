@@ -1,0 +1,6 @@
+bugfixes:
+  - "aix_filesystem - remove compatibility code for ancient Python versions (https://github.com/ansible-collections/community.general/pull/11232)."
+minor_changes:
+  - "The last code included in the collection that was licensed under the PSF 2.0 license was removed form the collection.
+     This means that now all code is either GPLv3+ licensed, MIT licensed, or BSD-2-clause licensed
+     (https://github.com/ansible-collections/community.general/pull/11232)."
