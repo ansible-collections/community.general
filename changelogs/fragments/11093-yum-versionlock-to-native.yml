@@ -1,2 +1,0 @@
-minor_changes:
-  - yum_versionlock - remove redundant conversion to unicode in command output (https://github.com/ansible-collections/community.general/pull/11093).

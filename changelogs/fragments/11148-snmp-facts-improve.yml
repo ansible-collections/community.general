@@ -1,2 +1,0 @@
-minor_changes:
-  - snmp_facts - simplify and improve code using standard Ansible validations (https://github.com/ansible-collections/community.general/pull/11148).

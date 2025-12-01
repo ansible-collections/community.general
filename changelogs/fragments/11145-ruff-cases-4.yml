@@ -1,2 +1,0 @@
-bugfixes:
-  - ipinfoio_facts - fix handling of HTTP errors consulting the service (https://github.com/ansible-collections/community.general/pull/11145).

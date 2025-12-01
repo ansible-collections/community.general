@@ -2,35 +2,425 @@
 
 **Topics**
 
-- <a href="#v12-0-1">v12\.0\.1</a>
+- <a href="#v12-1-0">v12\.1\.0</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes">Bugfixes</a>
-- <a href="#v12-0-0">v12\.0\.0</a>
+    - <a href="#new-modules">New Modules</a>
+- <a href="#v12-0-1">v12\.0\.1</a>
     - <a href="#release-summary-1">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
+- <a href="#v12-0-0">v12\.0\.0</a>
+    - <a href="#release-summary-2">Release Summary</a>
+    - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
-    - <a href="#deprecated-features">Deprecated Features</a>
+    - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes-1">Bugfixes</a>
+    - <a href="#bugfixes-2">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#callback">Callback</a>
         - <a href="#filter">Filter</a>
         - <a href="#inventory">Inventory</a>
         - <a href="#lookup">Lookup</a>
-    - <a href="#new-modules">New Modules</a>
+    - <a href="#new-modules-1">New Modules</a>
 This changelog describes changes after version 11\.0\.0\.
 
-<a id="v12-0-1"></a>
-## v12\.0\.1
+<a id="v12-1-0"></a>
+## v12\.1\.0
 
 <a id="release-summary"></a>
 ### Release Summary
 
-Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
+Regular bugfix and feature release\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* The last code included in the collection that was licensed under the PSF 2\.0 license was removed form the collection\. This means that now all code is either GPLv3\+ licensed\, MIT licensed\, or BSD\-2\-clause licensed \([https\://github\.com/ansible\-collections/community\.general/pull/11232](https\://github\.com/ansible\-collections/community\.general/pull/11232)\)\.
+* \_mount module utils \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* \_stormssh module utils \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* a\_module test plugin \- add proper parameter checking and type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* aerospike\_migrations \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* aix\_filesystem \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* ali\_instance \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* ansible\_type plugin utils \- add type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* ansible\_type test plugin \- add type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* apk \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* apt\_rpm \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* apt\_rpm \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* atomic\_container \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* atomic\_container modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* atomic\_host \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* atomic\_image \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* atomic\_image modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* awall \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* beadm \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* bigpanda \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* binary\_file lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* bitbucket module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* bitbucket\_access\_key modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* bitbucket\_pipeline\_key\_pair modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* bitbucket\_pipeline\_known\_host modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* bitbucket\_pipeline\_variable modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* chef\_databag lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* chroot connection plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* circonus\_annotation \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* cloudflare\_dns \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* cmd\_runner module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* cobbler inventory plugin \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* cobbler\_sync \- remove conditional code handling SSL for unsupported versions of Python \([https\://github\.com/ansible\-collections/community\.general/pull/11078](https\://github\.com/ansible\-collections/community\.general/pull/11078)\)\.
+* cobbler\_sync \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11105](https\://github\.com/ansible\-collections/community\.general/pull/11105)\)\.
+* cobbler\_system \- remove conditional code handling SSL for unsupported versions of Python \([https\://github\.com/ansible\-collections/community\.general/pull/11078](https\://github\.com/ansible\-collections/community\.general/pull/11078)\)\.
+* cobbler\_system \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11105](https\://github\.com/ansible\-collections/community\.general/pull/11105)\)\.
+* collection\_version lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* composer \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* consul\_kv lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* counter filter plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* credstash lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* cronvar \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* crypttab \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* csv module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* csv module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* cyberarkpassword lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* database module utils \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* database module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* datadog\_event \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* datadog\_monitor \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* dconf \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* dependent lookup plugin \- improve templating of strings \([https\://github\.com/ansible\-collections/community\.general/pull/11189](https\://github\.com/ansible\-collections/community\.general/pull/11189)\)\.
+* dependent lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* deps module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* dig lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* dimensiondata\_network \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* dimensiondata\_network modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* dnf\_config\_manager \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* dnstxt lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* dsv lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* elastic callback plugin \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* etcd3 lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* exceptions module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* filesize \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11104](https\://github\.com/ansible\-collections/community\.general/pull/11104)\)\.
+* filesize \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* flatpak \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* flatpak\_remote \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* fqdn\_valid test plugin \- add proper parameter checking\, and add type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* from\_csv filter plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* from\_ini filter plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* gandi\_livedns\_api module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* github\_app\_access\_token lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* gitlab\_group\_access\_token \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* gitlab\_group\_members \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* gitlab\_project\_access\_token \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* gitlab\_project\_members \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* gitlab\_runner \- allow maximum timeout to be disabled by passing <code>0</code> to <code>maximum\_timeout</code>  \([https\://github\.com/ansible\-collections/community\.general/pull/11174](https\://github\.com/ansible\-collections/community\.general/pull/11174)\)\.
+* gitlab\_runners inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* haproxy \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* hashids filter \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* hashids filter plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* hg \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* hg \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* hpilo\_info \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* hpilo\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* htpasswd \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* hwc\_ecs\_instance \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* hwc\_utils module utils \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* hwc\_utils module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* hwc\_vpc\_port \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* ibm\_sa\_utils module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* icinga2 inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* icinga2\_host \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* identity\.keycloak\.keycloak module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* idrac\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* idrac\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* idrac\_redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* idrac\_redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* idrac\_redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* idrac\_redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* idrac\_redfish\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* idrac\_redfish\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* ilo\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* ilo\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* ilo\_redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* ilo\_redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* imc\_rest modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* incus connection plugin \- add support for Windows virtual machines \([https\://github\.com/ansible\-collections/community\.general/pull/11199](https\://github\.com/ansible\-collections/community\.general/pull/11199)\)\.
+* influxdb\_query \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* influxdb\_user \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* influxdb\_user \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* influxdb\_write \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* iocage inventory plugin \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* ip\_netns \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11104](https\://github\.com/ansible\-collections/community\.general/pull/11104)\)\.
+* ip\_netns \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11105](https\://github\.com/ansible\-collections/community\.general/pull/11105)\)\.
+* ip\_netns \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* ipa module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* ipa module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* ipa\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_dnsrecord \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_dnszone \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_group \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_hbacrule \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_host \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_hostgroup \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_otpconfig \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_otptoken \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_pwpolicy \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_pwpolicy \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* ipa\_role \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_service \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_subca \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11104](https\://github\.com/ansible\-collections/community\.general/pull/11104)\)\.
+* ipa\_sudocmd \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_sudocmdgroup \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_sudorule \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_user \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* ipa\_vault \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* iptables\_state action plugin \- add type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* iso\_customize \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* jail connection plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* jc filter plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* jenkins\_job \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* jenkins\_job\_info \- remove conditional code handling SSL for unsupported versions of Python \([https\://github\.com/ansible\-collections/community\.general/pull/11078](https\://github\.com/ansible\-collections/community\.general/pull/11078)\)\.
+* jenkins\_plugin \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* jenkins\_plugin \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* jenkins\_plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* jenkins\_plugin modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* jenkins\_script \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* jira \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11104](https\://github\.com/ansible\-collections/community\.general/pull/11104)\)\.
+* jira \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* jira \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* json\_query filter plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* keycloak module utils \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keycloak module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* keycloak module\_utils \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* keycloak\_authentication \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keycloak\_client\_rolemapping \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keycloak\_component \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keycloak\_realm \- add <code>webAuthnPolicyPasswordlessPasskeysEnabled</code> parameter \([https\://github\.com/ansible\-collections/community\.general/pull/11197](https\://github\.com/ansible\-collections/community\.general/pull/11197)\)\.
+* keycloak\_realm\_key \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keycloak\_realm\_rolemapping \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keycloak\_user\_rolemapping \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keycloak\_userprofile \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* keys\_filter plugin\_utils plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* keys\_filter\.py plugin utils \- add type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* known\_hosts module utils \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* layman \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* ldap module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* ldap\_attrs \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* ldap\_entry \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* ldap\_inc \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* ldap\_search \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11104](https\://github\.com/ansible\-collections/community\.general/pull/11104)\)\.
+* ldap\_search \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* linode inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* listen\_ports\_facts \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* listen\_ports\_facts \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* lmdb\_kv lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* locale\_gen \- extend the search for available locales to include <code>/usr/local/share/i18n/SUPPORTED</code> in Debian and Ubuntu systems \([https\://github\.com/ansible\-collections/community\.general/issues/10964](https\://github\.com/ansible\-collections/community\.general/issues/10964)\, [https\://github\.com/ansible\-collections/community\.general/pull/11046](https\://github\.com/ansible\-collections/community\.general/pull/11046)\)\.
+* logentries \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* lxc connection plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* lxd connection plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* lxd inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* lxd module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* lxd module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* lxd\_container \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* macports \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* mail \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* maven\_artifact \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* merge\_variables \- extend type detection failure message to allow users for easier failure debugging \([https\://github\.com/ansible\-collections/community\.general/pull/11107](https\://github\.com/ansible\-collections/community\.general/pull/11107)\)\.
+* merge\_variables lookup plugin \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* modprobe \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* net\_tools\.pritunl\.api module utils \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* nmap inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* nmcli \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* nmcli \- fix comparison of type \([https\://github\.com/ansible\-collections/community\.general/pull/11121](https\://github\.com/ansible\-collections/community\.general/pull/11121)\)\.
+* nmcli modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* nomad\_job \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* nomad\_job \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* nomad\_job\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* nomad\_token \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* nosh \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* ocapi\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* ocapi\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* ocapi\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* ocapi\_utils module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* oci\_utils module utils \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* oci\_utils module utils \- improve templating of strings \([https\://github\.com/ansible\-collections/community\.general/pull/11189](https\://github\.com/ansible\-collections/community\.general/pull/11189)\)\.
+* oneandone\_firewall\_policy \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* oneandone\_load\_balancer \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* oneandone\_monitoring\_policy \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* oneandone\_private\_network \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* oneandone\_server \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11231](https\://github\.com/ansible\-collections/community\.general/pull/11231)\)\.
+* oneandone\_server modules \- mark <code>\%</code> templating as <code>noqa</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* onepassword lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* onepassword\_info \- execute external commands using Ansible construct \([https\://github\.com/ansible\-collections/community\.general/pull/11193](https\://github\.com/ansible\-collections/community\.general/pull/11193)\)\.
+* onepassword\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* onepassword\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* oneview module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* online inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* opennebula inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* opentelemetry callback plugin \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* osx\_defaults \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* packet\_device \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11231](https\://github\.com/ansible\-collections/community\.general/pull/11231)\)\.
+* packet\_device modules \- mark <code>\%</code> templating as <code>noqa</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* packet\_ip\_subnet \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* packet\_project \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* packet\_sshkey \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* packet\_volume \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* packet\_volume \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* pamd \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* parted \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* passwordstore lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* pear \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* pids \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* pids \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* portage \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* pritunl\_org \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* pritunl\_org\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* pritunl\_user \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* pritunl\_user\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* pushbullet modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* read\_csv \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* redfish\_config \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* redfish\_utils module utils \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* redfish\_utils module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* redhat\_subscription \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* redhat\_subscription \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* redis cache plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* redis lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* revbitspss lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* rhevm \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* riak \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* rundeck module utils \- improve handling the return value <code>exception</code>\. It now contains the full stack trace of the exception\, while the message is included in <code>msg</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11149](https\://github\.com/ansible\-collections/community\.general/pull/11149)\)\.
+* scaleway inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* scaleway\_user\_data modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* selinux\_permissive \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* sensu\_check \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* sensu\_silence \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* sensu\_silence modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* sensu\_subscription \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* sensu\_subscription \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* shelvefile lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* shutdown action plugin \- add type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* shutdown action plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* slack \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* slackpkg \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* snap \- improve templating of strings \([https\://github\.com/ansible\-collections/community\.general/pull/11189](https\://github\.com/ansible\-collections/community\.general/pull/11189)\)\.
+* snmp\_facts \- simplify and improve code using standard Ansible validations \([https\://github\.com/ansible\-collections/community\.general/pull/11148](https\://github\.com/ansible\-collections/community\.general/pull/11148)\)\.
+* solaris\_zone \- execute external commands using Ansible construct \([https\://github\.com/ansible\-collections/community\.general/pull/11192](https\://github\.com/ansible\-collections/community\.general/pull/11192)\)\.
+* solaris\_zone \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* spectrum\_model\_attrs \- convert <code>\%</code> templating to f\-string \([https\://github\.com/ansible\-collections/community\.general/pull/11229](https\://github\.com/ansible\-collections/community\.general/pull/11229)\)\.
+* statusio\_maintenance \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* sudoers \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* svc \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* svr4pkg \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* swupd \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* to\_ini filter plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* tss lookup plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* univention\_umc module utils \- update code to Python 3 \([https\://github\.com/ansible\-collections/community\.general/pull/11122](https\://github\.com/ansible\-collections/community\.general/pull/11122)\)\.
+* unsafe\.py plugin utils \- add type hints \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* urpmi \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* utm\_aaa\_group \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_aaa\_group\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_ca\_host\_key\_cert \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_ca\_host\_key\_cert\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_dns\_host \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_network\_interface\_address \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_network\_interface\_address\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_proxy\_auth\_profile \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_proxy\_exception \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_proxy\_frontend \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_proxy\_frontend\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_proxy\_location \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_proxy\_location\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* utm\_utils module utils \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* utm\_utils module utils \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11112](https\://github\.com/ansible\-collections/community\.general/pull/11112)\)\.
+* vertica\_configuration \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* vertica\_configuration \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* vertica\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* vertica\_role \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* vertica\_role \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* vertica\_schema \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* vertica\_schema \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* vertica\_schema \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* vertica\_user \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* vertica\_user \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* vertica\_user \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11097](https\://github\.com/ansible\-collections/community\.general/pull/11097)\)\.
+* virtualbox inventory plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* vmadm \- in case of failure\, the module no longer returns the stderr output as <code>exception</code>\, but instead as <code>stderr</code>\. Other information \(<code>stdout</code>\, <code>rc</code>\) is now also returned \([https\://github\.com/ansible\-collections/community\.general/pull/11149](https\://github\.com/ansible\-collections/community\.general/pull/11149)\)\.
+* vmadm \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11102](https\://github\.com/ansible\-collections/community\.general/pull/11102)\)\.
+* wakeonlan \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11098](https\://github\.com/ansible\-collections/community\.general/pull/11098)\)\.
+* wdc\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* wdc\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* wdc\_redfish\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* wdc\_redfish\_info \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* wsl connection plugin \- adjust variable name for integration tests \([https\://github\.com/ansible\-collections/community\.general/pull/11190](https\://github\.com/ansible\-collections/community\.general/pull/11190)\)\.
+* wsl connection plugin \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* wsl connection plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+* xbps \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* xbps \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* xcc\_redfish\_command \- fix cases of unused variables in loops \([https\://github\.com/ansible\-collections/community\.general/pull/11115](https\://github\.com/ansible\-collections/community\.general/pull/11115)\)\.
+* xcc\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11110](https\://github\.com/ansible\-collections/community\.general/pull/11110)\)\.
+* xcc\_redfish\_command \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/1114](https\://github\.com/ansible\-collections/community\.general/pull/1114)\)\.
+* xenserver module utils \- improve code by using native Python construct \([https\://github\.com/ansible\-collections/community\.general/pull/11215](https\://github\.com/ansible\-collections/community\.general/pull/11215)\)\.
+* xenserver module utils \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* xenserver\_guest modules \- replace <code>\%</code> templating with f\-strings or <code>format\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11223](https\://github\.com/ansible\-collections/community\.general/pull/11223)\)\.
+* xml \- remove redundant conversions to unicode \([https\://github\.com/ansible\-collections/community\.general/pull/11106](https\://github\.com/ansible\-collections/community\.general/pull/11106)\)\.
+* xml \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* yum\_versionlock \- remove redundant conversion to unicode in command output \([https\://github\.com/ansible\-collections/community\.general/pull/11093](https\://github\.com/ansible\-collections/community\.general/pull/11093)\)\.
+* zfs \- simplify return of boolean values in functions \([https\://github\.com/ansible\-collections/community\.general/pull/11119](https\://github\.com/ansible\-collections/community\.general/pull/11119)\)\.
+* zone connection plugin \- use <code>raise \.\.\. from \.\.\.</code> when passing on exceptions \([https\://github\.com/ansible\-collections/community\.general/pull/11095](https\://github\.com/ansible\-collections/community\.general/pull/11095)\)\.
+
+<a id="deprecated-features"></a>
+### Deprecated Features
+
+* cloud module utils \- this module utils is not used by community\.general and will thus be removed from community\.general 13\.0\.0\. If you are using it from another collection\, please copy it over \([https\://github\.com/ansible\-collections/community\.general/pull/11205](https\://github\.com/ansible\-collections/community\.general/pull/11205)\)\.
+* database module utils \- this module utils is not used by community\.general and will thus be removed from community\.general 13\.0\.0\. If you are using it from another collection\, please copy it over \([https\://github\.com/ansible\-collections/community\.general/pull/11205](https\://github\.com/ansible\-collections/community\.general/pull/11205)\)\.
+* dconf \- deprecate fallback mechanism when <code>gi\.repository</code> is not available\; fallback will be removed in community\.general 15\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11088](https\://github\.com/ansible\-collections/community\.general/pull/11088)\)\.
+* known\_hosts module utils \- this module utils is not used by community\.general and will thus be removed from community\.general 13\.0\.0\. If you are using it from another collection\, please copy it over \([https\://github\.com/ansible\-collections/community\.general/pull/11205](https\://github\.com/ansible\-collections/community\.general/pull/11205)\)\.
+* layman \- ClearLinux was made EOL in July 2025\.\; the module will be removed from community\.general 15\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11087](https\://github\.com/ansible\-collections/community\.general/pull/11087)\)\.
+* layman \- Gentoo deprecated <code>layman</code> in mid\-2023\; the module will be removed from community\.general 14\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11070](https\://github\.com/ansible\-collections/community\.general/pull/11070)\)\.
+* pushbullet \- module relies on Python package supporting Python 3\.2 only\; the module will be removed from community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11224](https\://github\.com/ansible\-collections/community\.general/pull/11224)\)\.
+* saslprep module utils \- this module utils is not used by community\.general and will thus be removed from community\.general 13\.0\.0\. If you are using it from another collection\, please copy it over \([https\://github\.com/ansible\-collections/community\.general/pull/11205](https\://github\.com/ansible\-collections/community\.general/pull/11205)\)\.
+* spotinst\_aws\_elastigroup \- module relies on Python package supporting Python 2\.7 only\; the module will be removed from community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11069](https\://github\.com/ansible\-collections/community\.general/pull/11069)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* \_filelock module utils \- add type hints\. Fix bug if <code>set\_lock\(\)</code> is called with <code>lock\_timeout\=None</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11222](https\://github\.com/ansible\-collections/community\.general/pull/11222)\)\.
+* aix\_filesystem \- remove compatibility code for ancient Python versions \([https\://github\.com/ansible\-collections/community\.general/pull/11232](https\://github\.com/ansible\-collections/community\.general/pull/11232)\)\.
+* ansible\_type plugin utils \- avoid potential concatenation of non\-strings when <code>alias</code> has non\-string values \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* ansible\_type test plugin \- fix parameter checking \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* cobbler\_system \- compare the version as a float which is the type returned by the Cobbler API \([https\://github\.com/ansible\-collections/community\.general/issues/11044](https\://github\.com/ansible\-collections/community\.general/issues/11044)\)\.
+* datetime module utils \- fix bug in <code>fromtimestamp\(\)</code> that caused the function to crash\. This function is not used in community\.general \([https\://github\.com/ansible\-collections/community\.general/pull/11206](https\://github\.com/ansible\-collections/community\.general/pull/11206)\)\.
+* gitlab module utils \- add type hints\. Pass API version to python\-gitlab as string and not as integer \([https\://github\.com/ansible\-collections/community\.general/pull/11222](https\://github\.com/ansible\-collections/community\.general/pull/11222)\)\.
+* homebrew\_service \- slightly refactor code \([https\://github\.com/ansible\-collections/community\.general/pull/11168](https\://github\.com/ansible\-collections/community\.general/pull/11168)\)\.
+* ipinfoio\_facts \- fix handling of HTTP errors consulting the service \([https\://github\.com/ansible\-collections/community\.general/pull/11145](https\://github\.com/ansible\-collections/community\.general/pull/11145)\)\.
+* keys\_filter\.py plugin utils \- fixed requirements check so that other sequences than lists and strings are checked\, and corrected broken formatting during error reporting \([https\://github\.com/ansible\-collections/community\.general/pull/11167](https\://github\.com/ansible\-collections/community\.general/pull/11167)\)\.
+* mas \- parse CLI output correctly when listing installed apps with mas 3\.0\.0\+ \([https\://github\.com/ansible\-collections/community\.general/pull/11179](https\://github\.com/ansible\-collections/community\.general/pull/11179)\)\.
+* pam\_limits \- remove <code>\%</code> templating no longer used in f\-string \([https\://github\.com/ansible\-collections/community\.general/pull/11229](https\://github\.com/ansible\-collections/community\.general/pull/11229)\)\.
+* xcc\_redfish\_command \- fix templating of dictionary keys as list \([https\://github\.com/ansible\-collections/community\.general/pull/11144](https\://github\.com/ansible\-collections/community\.general/pull/11144)\)\.
+* zfs \- mark change correctly when updating properties whose current value differs\, even if they already have a non\-default value \([https\://github\.com/ansible\-collections/community\.general/issues/11019](https\://github\.com/ansible\-collections/community\.general/issues/11019)\, [https\://github\.com/ansible\-collections/community\.general/pull/11172](https\://github\.com/ansible\-collections/community\.general/pull/11172)\)\.
+
+<a id="new-modules"></a>
+### New Modules
+
+* community\.general\.file\_remove \- Remove files matching a pattern from a directory\.
+* community\.general\.lxd\_storage\_pool\_info \- Retrieve information about LXD storage pools\.
+* community\.general\.lxd\_storage\_volume\_info \- Retrieve information about LXD storage volumes\.
+
+<a id="v12-0-1"></a>
+## v12\.0\.1
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * datetime module utils \- remove code for unsupported Python version \([https\://github\.com/ansible\-collections/community\.general/pull/11048](https\://github\.com/ansible\-collections/community\.general/pull/11048)\)\.
@@ -45,7 +435,7 @@ Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 * tss lookup plugin \- fixed <code>AccessTokenAuthorizer</code> initialization to include <code>base\_url</code> parameter for proper token authentication \([https\://github\.com/ansible\-collections/community\.general/pull/11031](https\://github\.com/ansible\-collections/community\.general/pull/11031)\)\.
 * zfs\_facts \- use Ansible construct to check result of external command \([https\://github\.com/ansible\-collections/community\.general/pull/11054](https\://github\.com/ansible\-collections/community\.general/pull/11054)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * \_filelock module utils \- improve Python code \([https\://github\.com/ansible\-collections/community\.general/pull/11043](https\://github\.com/ansible\-collections/community\.general/pull/11043)\)\.
@@ -178,12 +568,12 @@ Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 <a id="v12-0-0"></a>
 ## v12\.0\.0
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-11\-03\.
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * Modernize code for Python 3\.7\+\. This includes code reformatting\, and adding new checks to CI\, including a type checker \(mypy\)\. Most of the code does not have type hints yet\, but now it is possible to add typing hints and have these validated \([https\://github\.com/ansible\-collections/community\.general/pull/10285](https\://github\.com/ansible\-collections/community\.general/pull/10285)\, [https\://github\.com/ansible\-collections/community\.general/pull/10886](https\://github\.com/ansible\-collections/community\.general/pull/10886)\, [https\://github\.com/ansible\-collections/community\.general/pull/10891](https\://github\.com/ansible\-collections/community\.general/pull/10891)\, [https\://github\.com/ansible\-collections/community\.general/pull/10892](https\://github\.com/ansible\-collections/community\.general/pull/10892)\, [https\://github\.com/ansible\-collections/community\.general/pull/10897](https\://github\.com/ansible\-collections/community\.general/pull/10897)\, [https\://github\.com/ansible\-collections/community\.general/pull/10899](https\://github\.com/ansible\-collections/community\.general/pull/10899)\, [https\://github\.com/ansible\-collections/community\.general/pull/10902](https\://github\.com/ansible\-collections/community\.general/pull/10902)\, [https\://github\.com/ansible\-collections/community\.general/pull/10903](https\://github\.com/ansible\-collections/community\.general/pull/10903)\, [https\://github\.com/ansible\-collections/community\.general/pull/10904](https\://github\.com/ansible\-collections/community\.general/pull/10904)\, [https\://github\.com/ansible\-collections/community\.general/pull/10907](https\://github\.com/ansible\-collections/community\.general/pull/10907)\, [https\://github\.com/ansible\-collections/community\.general/pull/10908](https\://github\.com/ansible\-collections/community\.general/pull/10908)\, [https\://github\.com/ansible\-collections/community\.general/pull/10909](https\://github\.com/ansible\-collections/community\.general/pull/10909)\, [https\://github\.com/ansible\-collections/community\.general/pull/10939](https\://github\.com/ansible\-collections/community\.general/pull/10939)\, [https\://github\.com/ansible\-collections/community\.general/pull/10940](https\://github\.com/ansible\-collections/community\.general/pull/10940)\, [https\://github\.com/ansible\-collections/community\.general/pull/10941](https\://github\.com/ansible\-collections/community\.general/pull/10941)\, [https\://github\.com/ansible\-collections/community\.general/pull/10942](https\://github\.com/ansible\-collections/community\.general/pull/10942)\, [https\://github\.com/ansible\-collections/community\.general/pull/10945](https\://github\.com/ansible\-collections/community\.general/pull/10945)\, [https\://github\.com/ansible\-collections/community\.general/pull/10947](https\://github\.com/ansible\-collections/community\.general/pull/10947)\, [https\://github\.com/ansible\-collections/community\.general/pull/10958](https\://github\.com/ansible\-collections/community\.general/pull/10958)\, [https\://github\.com/ansible\-collections/community\.general/pull/10959](https\://github\.com/ansible\-collections/community\.general/pull/10959)\, [https\://github\.com/ansible\-collections/community\.general/pull/10968](https\://github\.com/ansible\-collections/community\.general/pull/10968)\, [https\://github\.com/ansible\-collections/community\.general/pull/10969](https\://github\.com/ansible\-collections/community\.general/pull/10969)\, [https\://github\.com/ansible\-collections/community\.general/pull/10970](https\://github\.com/ansible\-collections/community\.general/pull/10970)\, [https\://github\.com/ansible\-collections/community\.general/pull/10971](https\://github\.com/ansible\-collections/community\.general/pull/10971)\, [https\://github\.com/ansible\-collections/community\.general/pull/10973](https\://github\.com/ansible\-collections/community\.general/pull/10973)\, [https\://github\.com/ansible\-collections/community\.general/pull/10974](https\://github\.com/ansible\-collections/community\.general/pull/10974)\, [https\://github\.com/ansible\-collections/community\.general/pull/10975](https\://github\.com/ansible\-collections/community\.general/pull/10975)\, [https\://github\.com/ansible\-collections/community\.general/pull/10976](https\://github\.com/ansible\-collections/community\.general/pull/10976)\, [https\://github\.com/ansible\-collections/community\.general/pull/10977](https\://github\.com/ansible\-collections/community\.general/pull/10977)\, [https\://github\.com/ansible\-collections/community\.general/pull/10978](https\://github\.com/ansible\-collections/community\.general/pull/10978)\, [https\://github\.com/ansible\-collections/community\.general/pull/10979](https\://github\.com/ansible\-collections/community\.general/pull/10979)\, [https\://github\.com/ansible\-collections/community\.general/pull/10980](https\://github\.com/ansible\-collections/community\.general/pull/10980)\, [https\://github\.com/ansible\-collections/community\.general/pull/10981](https\://github\.com/ansible\-collections/community\.general/pull/10981)\, [https\://github\.com/ansible\-collections/community\.general/pull/10992](https\://github\.com/ansible\-collections/community\.general/pull/10992)\, [https\://github\.com/ansible\-collections/community\.general/pull/10993](https\://github\.com/ansible\-collections/community\.general/pull/10993)\, [https\://github\.com/ansible\-collections/community\.general/pull/10997](https\://github\.com/ansible\-collections/community\.general/pull/10997)\, [https\://github\.com/ansible\-collections/community\.general/pull/10999](https\://github\.com/ansible\-collections/community\.general/pull/10999)\, [https\://github\.com/ansible\-collections/community\.general/pull/11015](https\://github\.com/ansible\-collections/community\.general/pull/11015)\, [https\://github\.com/ansible\-collections/community\.general/pull/11016](https\://github\.com/ansible\-collections/community\.general/pull/11016)\, [https\://github\.com/ansible\-collections/community\.general/pull/11017](https\://github\.com/ansible\-collections/community\.general/pull/11017)\)\.
@@ -474,7 +864,7 @@ This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-
 * oneview module utils \- remove import of standard library <code>os</code> \([https\://github\.com/ansible\-collections/community\.general/pull/10644](https\://github\.com/ansible\-collections/community\.general/pull/10644)\)\.
 * slack \- the default of <code>prepend\_hash</code> changed from <code>auto</code> to <code>never</code> \([https\://github\.com/ansible\-collections/community\.general/pull/10883](https\://github\.com/ansible\-collections/community\.general/pull/10883)\)\.
 
-<a id="deprecated-features"></a>
+<a id="deprecated-features-1"></a>
 ### Deprecated Features
 
 * catapult \- module is deprecated and will be removed in community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/issues/10318](https\://github\.com/ansible\-collections/community\.general/issues/10318)\, [https\://github\.com/ansible\-collections/community\.general/pull/10329](https\://github\.com/ansible\-collections/community\.general/pull/10329)\)\.
@@ -520,7 +910,7 @@ This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-
 
 * keycloak\_user \- the parameter <code>credentials\[\]\.value</code> is now marked as <code>no\_log\=true</code>\. Before it was logged by Ansible\, unless the task was marked as <code>no\_log\: true</code>\. Since this parameter can be used for passwords\, this resulted in credential leaking \([https\://github\.com/ansible\-collections/community\.general/issues/11000](https\://github\.com/ansible\-collections/community\.general/issues/11000)\, [https\://github\.com/ansible\-collections/community\.general/pull/11005](https\://github\.com/ansible\-collections/community\.general/pull/11005)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * Avoid deprecated functionality in ansible\-core 2\.20 \([https\://github\.com/ansible\-collections/community\.general/pull/10687](https\://github\.com/ansible\-collections/community\.general/pull/10687)\)\.
@@ -606,7 +996,7 @@ This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-
 
 * community\.general\.binary\_file \- Read binary file and return it Base64 encoded\.
 
-<a id="new-modules"></a>
+<a id="new-modules-1"></a>
 ### New Modules
 
 * community\.general\.django\_dumpdata \- Wrapper for <code>django\-admin dumpdata</code>\.

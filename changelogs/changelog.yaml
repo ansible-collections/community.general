@@ -1001,3 +1001,550 @@ releases:
       - 12.0.1.yml
       - filesystem-xfs-resize-slack.yml
     release_date: '2025-11-10'
+  12.1.0:
+    changes:
+      bugfixes:
+        - _filelock module utils - add type hints. Fix bug if ``set_lock()`` is called
+          with ``lock_timeout=None`` (https://github.com/ansible-collections/community.general/pull/11222).
+        - aix_filesystem - remove compatibility code for ancient Python versions (https://github.com/ansible-collections/community.general/pull/11232).
+        - ansible_type plugin utils - avoid potential concatenation of non-strings
+          when ``alias`` has non-string values (https://github.com/ansible-collections/community.general/pull/11167).
+        - ansible_type test plugin - fix parameter checking (https://github.com/ansible-collections/community.general/pull/11167).
+        - cobbler_system - compare the version as a float which is the type returned
+          by the Cobbler API (https://github.com/ansible-collections/community.general/issues/11044).
+        - datetime module utils - fix bug in ``fromtimestamp()`` that caused the function
+          to crash. This function is not used in community.general (https://github.com/ansible-collections/community.general/pull/11206).
+        - gitlab module utils - add type hints. Pass API version to python-gitlab
+          as string and not as integer (https://github.com/ansible-collections/community.general/pull/11222).
+        - homebrew_service - slightly refactor code (https://github.com/ansible-collections/community.general/pull/11168).
+        - ipinfoio_facts - fix handling of HTTP errors consulting the service (https://github.com/ansible-collections/community.general/pull/11145).
+        - keys_filter.py plugin utils - fixed requirements check so that other sequences
+          than lists and strings are checked, and corrected broken formatting during
+          error reporting (https://github.com/ansible-collections/community.general/pull/11167).
+        - mas - parse CLI output correctly when listing installed apps with mas 3.0.0+
+          (https://github.com/ansible-collections/community.general/pull/11179).
+        - pam_limits - remove ``%`` templating no longer used in f-string (https://github.com/ansible-collections/community.general/pull/11229).
+        - xcc_redfish_command - fix templating of dictionary keys as list (https://github.com/ansible-collections/community.general/pull/11144).
+        - zfs - mark change correctly when updating properties whose current value
+          differs, even if they already have a non-default value (https://github.com/ansible-collections/community.general/issues/11019,
+          https://github.com/ansible-collections/community.general/pull/11172).
+      deprecated_features:
+        - cloud module utils - this module utils is not used by community.general
+          and will thus be removed from community.general 13.0.0. If you are using
+          it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205).
+        - database module utils - this module utils is not used by community.general
+          and will thus be removed from community.general 13.0.0. If you are using
+          it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205).
+        - dconf - deprecate fallback mechanism when ``gi.repository`` is not available;
+          fallback will be removed in community.general 15.0.0 (https://github.com/ansible-collections/community.general/pull/11088).
+        - known_hosts module utils - this module utils is not used by community.general
+          and will thus be removed from community.general 13.0.0. If you are using
+          it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205).
+        - layman - ClearLinux was made EOL in July 2025.; the module will be removed
+          from community.general 15.0.0 (https://github.com/ansible-collections/community.general/pull/11087).
+        - layman - Gentoo deprecated ``layman`` in mid-2023; the module will be removed
+          from community.general 14.0.0 (https://github.com/ansible-collections/community.general/pull/11070).
+        - pushbullet - module relies on Python package supporting Python 3.2 only;
+          the module will be removed from community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/11224).
+        - saslprep module utils - this module utils is not used by community.general
+          and will thus be removed from community.general 13.0.0. If you are using
+          it from another collection, please copy it over (https://github.com/ansible-collections/community.general/pull/11205).
+        - spotinst_aws_elastigroup - module relies on Python package supporting Python
+          2.7 only; the module will be removed from community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/11069).
+      minor_changes:
+        - The last code included in the collection that was licensed under the PSF
+          2.0 license was removed form the collection. This means that now all code
+          is either GPLv3+ licensed, MIT licensed, or BSD-2-clause licensed (https://github.com/ansible-collections/community.general/pull/11232).
+        - _mount module utils - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - _stormssh module utils - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - a_module test plugin - add proper parameter checking and type hints (https://github.com/ansible-collections/community.general/pull/11167).
+        - aerospike_migrations - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - aix_filesystem - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - ali_instance - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - ansible_type plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+        - ansible_type test plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+        - apk - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - apt_rpm - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - apt_rpm - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - atomic_container - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - atomic_container modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - atomic_host - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - atomic_image - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - atomic_image modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - awall - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - beadm - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - bigpanda - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - binary_file lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - bitbucket module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - bitbucket_access_key modules - replace ``%`` templating with f-strings or
+          ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - bitbucket_pipeline_key_pair modules - replace ``%`` templating with f-strings
+          or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - bitbucket_pipeline_known_host modules - replace ``%`` templating with f-strings
+          or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - bitbucket_pipeline_variable modules - replace ``%`` templating with f-strings
+          or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - chef_databag lookup plugin - use ``raise ... from ...`` when passing on
+          exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - chroot connection plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - circonus_annotation - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - cloudflare_dns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - cmd_runner module utils - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - cobbler inventory plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - cobbler_sync - remove conditional code handling SSL for unsupported versions
+          of Python (https://github.com/ansible-collections/community.general/pull/11078).
+        - cobbler_sync - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
+        - cobbler_system - remove conditional code handling SSL for unsupported versions
+          of Python (https://github.com/ansible-collections/community.general/pull/11078).
+        - cobbler_system - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
+        - collection_version lookup plugin - use ``raise ... from ...`` when passing
+          on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - composer - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - consul_kv lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - counter filter plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - credstash lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - cronvar - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - crypttab - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - csv module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - csv module utils - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - cyberarkpassword lookup plugin - use ``raise ... from ...`` when passing
+          on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - database module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - database module utils - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - datadog_event - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - datadog_monitor - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - dconf - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - dependent lookup plugin - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+        - dependent lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - deps module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - dig lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - dimensiondata_network - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - dimensiondata_network modules - replace ``%`` templating with f-strings
+          or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - dnf_config_manager - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - dnstxt lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - dsv lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - elastic callback plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - etcd3 lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - exceptions module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - filesize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+        - filesize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - flatpak - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - flatpak_remote - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - fqdn_valid test plugin - add proper parameter checking, and add type hints
+          (https://github.com/ansible-collections/community.general/pull/11167).
+        - from_csv filter plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - from_ini filter plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - gandi_livedns_api module utils - remove redundant conversions to unicode
+          (https://github.com/ansible-collections/community.general/pull/11112).
+        - github_app_access_token lookup plugin - use ``raise ... from ...`` when
+          passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - gitlab_group_access_token - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - gitlab_group_members - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - gitlab_project_access_token - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - gitlab_project_members - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - gitlab_runner - allow maximum timeout to be disabled by passing ``0`` to
+          ``maximum_timeout``  (https://github.com/ansible-collections/community.general/pull/11174).
+        - gitlab_runners inventory plugin - use ``raise ... from ...`` when passing
+          on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - haproxy - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - hashids filter - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - hashids filter plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - hg - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - hg - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - hpilo_info - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - hpilo_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - htpasswd - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - hwc_ecs_instance - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - hwc_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - hwc_utils module utils - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - hwc_vpc_port - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - ibm_sa_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - icinga2 inventory plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - icinga2_host - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - identity.keycloak.keycloak module utils - use ``raise ... from ...`` when
+          passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - idrac_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - idrac_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - idrac_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - idrac_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - ilo_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - ilo_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - ilo_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - ilo_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - imc_rest modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - incus connection plugin - add support for Windows virtual machines (https://github.com/ansible-collections/community.general/pull/11199).
+        - influxdb_query - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - influxdb_user - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - influxdb_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - influxdb_write - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - iocage inventory plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+        - ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
+        - ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - ipa module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - ipa module utils - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - ipa_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_dnsrecord - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_dnszone - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_group - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_hbacrule - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_host - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_hostgroup - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_otpconfig - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_otptoken - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_pwpolicy - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_pwpolicy - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - ipa_role - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_service - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_subca - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+        - ipa_sudocmd - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_sudocmdgroup - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_sudorule - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - ipa_vault - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - iptables_state action plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+        - iso_customize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - jail connection plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - jc filter plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - jenkins_job - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - jenkins_job_info - remove conditional code handling SSL for unsupported
+          versions of Python (https://github.com/ansible-collections/community.general/pull/11078).
+        - jenkins_plugin - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - jenkins_plugin - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - jenkins_plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - jenkins_plugin modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - jenkins_script - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - jira - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+        - jira - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - jira - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - json_query filter plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - keycloak module utils - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keycloak module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - keycloak module_utils - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - keycloak_authentication - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keycloak_client_rolemapping - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keycloak_component - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keycloak_realm - add ``webAuthnPolicyPasswordlessPasskeysEnabled`` parameter
+          (https://github.com/ansible-collections/community.general/pull/11197).
+        - keycloak_realm_key - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keycloak_realm_rolemapping - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keycloak_user_rolemapping - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keycloak_userprofile - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - keys_filter plugin_utils plugin - use ``raise ... from ...`` when passing
+          on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - keys_filter.py plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+        - known_hosts module utils - improve code by using native Python construct
+          (https://github.com/ansible-collections/community.general/pull/11215).
+        - layman - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - ldap module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - ldap_attrs - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - ldap_entry - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - ldap_inc - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - ldap_search - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+        - ldap_search - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - linode inventory plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - listen_ports_facts - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - listen_ports_facts - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - lmdb_kv lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - locale_gen - extend the search for available locales to include ``/usr/local/share/i18n/SUPPORTED``
+          in Debian and Ubuntu systems (https://github.com/ansible-collections/community.general/issues/10964,
+          https://github.com/ansible-collections/community.general/pull/11046).
+        - logentries - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - lxc connection plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - lxd connection plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - lxd inventory plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - lxd module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - lxd module utils - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - lxd_container - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - macports - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - mail - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - maven_artifact - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - merge_variables - extend type detection failure message to allow users for
+          easier failure debugging (https://github.com/ansible-collections/community.general/pull/11107).
+        - merge_variables lookup plugin - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - modprobe - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - net_tools.pritunl.api module utils - use ``raise ... from ...`` when passing
+          on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - nmap inventory plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - nmcli - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - nmcli - fix comparison of type (https://github.com/ansible-collections/community.general/pull/11121).
+        - nmcli modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - nomad_job - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - nomad_job - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - nomad_job_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - nomad_token - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - nosh - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - ocapi_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - ocapi_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - ocapi_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - ocapi_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - oci_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - oci_utils module utils - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+        - oneandone_firewall_policy - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - oneandone_load_balancer - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - oneandone_monitoring_policy - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - oneandone_private_network - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - oneandone_server - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11231).
+        - oneandone_server modules - mark ``%`` templating as ``noqa`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - onepassword lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - onepassword_info - execute external commands using Ansible construct (https://github.com/ansible-collections/community.general/pull/11193).
+        - onepassword_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - onepassword_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - oneview module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - online inventory plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - opennebula inventory plugin - use ``raise ... from ...`` when passing on
+          exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - opentelemetry callback plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - osx_defaults - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - packet_device - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11231).
+        - packet_device modules - mark ``%`` templating as ``noqa`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - packet_ip_subnet - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11097).
+        - packet_project - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - packet_sshkey - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - packet_volume - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - packet_volume - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - pamd - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - parted - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - passwordstore lookup plugin - use ``raise ... from ...`` when passing on
+          exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - pear - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - pids - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - pids - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - portage - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - pritunl_org - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - pritunl_org_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - pritunl_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - pritunl_user_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - pushbullet modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - read_csv - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - redfish_utils module utils - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - redfish_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - redhat_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - redhat_subscription - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - redis cache plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - redis lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - revbitspss lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - rhevm - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - riak - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - rundeck module utils - improve handling the return value ``exception``.
+          It now contains the full stack trace of the exception, while the message
+          is included in ``msg`` (https://github.com/ansible-collections/community.general/pull/11149).
+        - scaleway inventory plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - scaleway_user_data modules - replace ``%`` templating with f-strings or
+          ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+        - selinux_permissive - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - sensu_check - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - sensu_silence - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - sensu_silence modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - sensu_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - sensu_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - shelvefile lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - shutdown action plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+        - shutdown action plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - slack - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - slackpkg - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - snap - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+        - snmp_facts - simplify and improve code using standard Ansible validations
+          (https://github.com/ansible-collections/community.general/pull/11148).
+        - solaris_zone - execute external commands using Ansible construct (https://github.com/ansible-collections/community.general/pull/11192).
+        - solaris_zone - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - spectrum_model_attrs - convert ``%`` templating to f-string (https://github.com/ansible-collections/community.general/pull/11229).
+        - statusio_maintenance - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - sudoers - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - svc - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - svr4pkg - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - swupd - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - to_ini filter plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - tss lookup plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - univention_umc module utils - update code to Python 3 (https://github.com/ansible-collections/community.general/pull/11122).
+        - unsafe.py plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+        - urpmi - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - utm_aaa_group - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_aaa_group_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_ca_host_key_cert - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_ca_host_key_cert_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_dns_host - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_network_interface_address - remove redundant conversions to unicode
+          (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_network_interface_address_info - remove redundant conversions to unicode
+          (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_proxy_auth_profile - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_proxy_exception - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_proxy_frontend - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_proxy_frontend_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_proxy_location - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_proxy_location_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - utm_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - utm_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+        - vertica_configuration - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - vertica_configuration - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - vertica_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - vertica_role - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - vertica_role - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - vertica_schema - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - vertica_schema - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - vertica_schema - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - vertica_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - vertica_user - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - vertica_user - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+        - virtualbox inventory plugin - use ``raise ... from ...`` when passing on
+          exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+        - vmadm - in case of failure, the module no longer returns the stderr output
+          as ``exception``, but instead as ``stderr``. Other information (``stdout``,
+          ``rc``) is now also returned (https://github.com/ansible-collections/community.general/pull/11149).
+        - vmadm - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+        - wakeonlan - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+        - wdc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - wdc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - wdc_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - wdc_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - wsl connection plugin - adjust variable name for integration tests (https://github.com/ansible-collections/community.general/pull/11190).
+        - wsl connection plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - wsl connection plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+        - xbps - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - xbps - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - xcc_redfish_command - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+        - xcc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+        - xcc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+        - xenserver module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+        - xenserver module utils - simplify return of boolean values in functions
+          (https://github.com/ansible-collections/community.general/pull/11119).
+        - xenserver_guest modules - replace ``%`` templating with f-strings or ``format()``
+          (https://github.com/ansible-collections/community.general/pull/11223).
+        - xml - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+        - xml - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - yum_versionlock - remove redundant conversion to unicode in command output
+          (https://github.com/ansible-collections/community.general/pull/11093).
+        - zfs - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+        - zone connection plugin - use ``raise ... from ...`` when passing on exceptions
+          (https://github.com/ansible-collections/community.general/pull/11095).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+      - 11045-check-cobbler-version.yml
+      - 11046-locale-gen-usrlocal.yml
+      - 11069-deprecate-spotinst.yml
+      - 11070-deprecate-layman.yml
+      - 11078-py2-ssl.yml
+      - 11087-deprecate-swupd.yml
+      - 11088-deprecate-dconf-fallback.yml
+      - 11093-yum-versionlock-to-native.yml
+      - 11095-raise-from.yml
+      - 11097-raise-from.yml
+      - 11098-tonative-1.yml
+      - 11102-tonative-2.yml
+      - 11104-tonative-3.yml
+      - 11105-tonative-4.yml
+      - 11106-tonative-5.yml
+      - 11107-extend-merge-variables-failure-message.yml
+      - 11110-tonative-6.yml
+      - 11112-tonative-7.yml
+      - 11115-ruff-cases-1.yml
+      - 11119-ruff-cases-2.yml
+      - 11121-ruff-cases-3.yml
+      - 11122-yield-from-ignore.yml
+      - 11143-tonative-8.yml
+      - 11144-xcc-redfish-command-listkeys.yml
+      - 11145-ruff-cases-4.yml
+      - 11148-snmp-facts-improve.yml
+      - 11149-rv-exception.yml
+      - 11167-typing.yml
+      - 11168-homebrew_service.yml
+      - 11172-zfs-changed-extra-props.yml
+      - 11174-gitlab-runner-timeout.yml
+      - 11179-mas-list-parsing.yml
+      - 11189-ruff-cases-6.yml
+      - 11190-ruff-cases-7.yml
+      - 11192-solaris-zone-os-system.yml
+      - 11193-onepassword-info-popen.yml
+      - 11197-keycloak-realm-webauthnpolicypasswordlesspasskeysenabled.yml
+      - 11199-incus-windows.yml
+      - 11205-module_utils.yml
+      - 11206-datetime.yml
+      - 11215-ruff-cases-8.yml
+      - 11222-typing.yml
+      - 11223-ruff-cases-9.yml
+      - 11224-deprecate-pushbullet.yml
+      - 11229-fstr-mishaps.yml
+      - 11231-perc-format.yml
+      - 11232-mount.yml
+      - 12.1.0.yml
+    modules:
+      - description: Remove files matching a pattern from a directory.
+        name: file_remove
+        namespace: ''
+      - description: Retrieve information about LXD storage pools.
+        name: lxd_storage_pool_info
+        namespace: ''
+      - description: Retrieve information about LXD storage volumes.
+        name: lxd_storage_volume_info
+        namespace: ''
+    release_date: '2025-12-01'

@@ -1,2 +1,0 @@
-bugfixes:
-  - cobbler_system - compare the version as a float which is the type returned by the Cobbler API (https://github.com/ansible-collections/community.general/issues/11044).

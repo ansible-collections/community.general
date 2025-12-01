@@ -1,2 +1,0 @@
-minor_changes:
-  - locale_gen - extend the search for available locales to include ``/usr/local/share/i18n/SUPPORTED`` in Debian and Ubuntu systems (https://github.com/ansible-collections/community.general/issues/10964, https://github.com/ansible-collections/community.general/pull/11046).
