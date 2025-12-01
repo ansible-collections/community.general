@@ -197,6 +197,10 @@ from ansible_collections.community.general.plugins.module_utils.lxd import (
 ANSIBLE_LXD_DEFAULT_URL = "unix:/var/lib/lxd/unix.socket"
 ANSIBLE_LXD_DEFAULT_SNAP_URL = "unix:/var/snap/lxd/common/lxd/unix.socket"
 
+# API endpoints
+LXD_API_VERSION = "1.0"
+LXD_API_STORAGE_POOLS_ENDPOINT = f"/{LXD_API_VERSION}/storage-pools"
+
 
 class LXDStoragePoolInfo:
     def __init__(self, module: AnsibleModule) -> None:
@@ -262,9 +266,18 @@ class LXDStoragePoolInfo:
             return f"{endpoint}?{urlencode({'project': self.project})}"
         return endpoint
 
-    def _get_storage_pool_list(self) -> list[str]:
-        """Get list of all storage pool names."""
-        url = self._build_url("/1.0/storage-pools")
+    def _get_storage_pool_list(self, recursion: int = 0) -> list:
+        """Get list of all storage pools.
+
+        :param recursion: API recursion level (0 for URLs only, 1 for full objects)
+        :type recursion: int
+        :return: List of pool names (recursion=0) or pool objects (recursion=1)
+        :rtype: list
+        """
+        endpoint = LXD_API_STORAGE_POOLS_ENDPOINT
+        if recursion > 0:
+            endpoint = f"{endpoint}?recursion={recursion}"
+        url = self._build_url(endpoint)
         resp_json = self.client.do("GET", url, ok_error_codes=[])
 
         if resp_json["type"] == "error":
@@ -273,15 +286,19 @@ class LXDStoragePoolInfo:
                 error_code=resp_json.get("error_code"),
             )
 
-        # The response contains a list of pool URLs like ['/1.0/storage-pools/default']
-        # We need to extract the pool names
-        pool_urls = resp_json.get("metadata", [])
-        pool_names = [url.split("/")[-1] for url in pool_urls]
-        return pool_names
+        metadata = resp_json.get("metadata", [])
+
+        if recursion == 0:
+            # With recursion=0: list of pool URLs like ['/1.0/storage-pools/default']
+            # Extract the pool names from URLs
+            return [url.split("/")[-1] for url in metadata]
+        else:
+            # With recursion=1: list of pool objects with full metadata
+            return metadata
 
     def _get_storage_pool_info(self, pool_name: str) -> dict:
         """Get detailed information about a specific storage pool."""
-        url = self._build_url(f"/1.0/storage-pools/{pool_name}")
+        url = self._build_url(f"{LXD_API_STORAGE_POOLS_ENDPOINT}/{pool_name}")
         resp_json = self.client.do("GET", url, ok_error_codes=[404])
 
         if resp_json["type"] == "error":
@@ -304,11 +321,9 @@ class LXDStoragePoolInfo:
             pool_info = self._get_storage_pool_info(self.name)
             storage_pools.append(pool_info)
         else:
-            # Get information about all storage pools
-            pool_names = self._get_storage_pool_list()
-            for pool_name in pool_names:
-                pool_info = self._get_storage_pool_info(pool_name)
-                storage_pools.append(pool_info)
+            # Get information about all storage pools using recursion
+            # This retrieves all pool details in a single API call instead of one call per pool
+            storage_pools = self._get_storage_pool_list(recursion=1)
 
         # Filter by type if specified
         if self.pool_type:

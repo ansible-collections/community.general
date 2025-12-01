@@ -41,14 +41,15 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
         self.module = module
 
     def test_returns_storage_pools(self):
-        """Pool metadata from the API is returned unchanged."""
+        """Pool metadata from the API is returned unchanged using recursion."""
         FakeLXDClient.responses = {
-            ("GET", "/1.0/storage-pools"): {
+            ("GET", "/1.0/storage-pools?recursion=1"): {
                 "type": "sync",
-                "metadata": ["/1.0/storage-pools/default", "/1.0/storage-pools/fast"],
+                "metadata": [
+                    {"name": "default", "driver": "dir"},
+                    {"name": "fast", "driver": "zfs"},
+                ],
             },
-            ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default", "driver": "dir"}},
-            ("GET", "/1.0/storage-pools/fast"): {"type": "sync", "metadata": {"name": "fast", "driver": "zfs"}},
         }
 
         with patch.object(self.module, "LXDClient", FakeLXDClient):
@@ -81,14 +82,15 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
         ]
 
     def test_filters_storage_pools_by_type(self):
-        """Pools can be filtered by driver type."""
+        """Pools can be filtered by driver type using recursion."""
         FakeLXDClient.responses = {
-            ("GET", "/1.0/storage-pools"): {
+            ("GET", "/1.0/storage-pools?recursion=1"): {
                 "type": "sync",
-                "metadata": ["/1.0/storage-pools/default", "/1.0/storage-pools/fast"],
+                "metadata": [
+                    {"name": "default", "driver": "dir"},
+                    {"name": "fast", "driver": "zfs"},
+                ],
             },
-            ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default", "driver": "dir"}},
-            ("GET", "/1.0/storage-pools/fast"): {"type": "sync", "metadata": {"name": "fast", "driver": "zfs"}},
         }
 
         with patch.object(self.module, "LXDClient", FakeLXDClient):
@@ -105,7 +107,7 @@ class TestLXDStoragePoolInfo(ModuleTestCase):
     def test_error_code_returned_on_failure(self):
         """Failures surface the LXD error code for easier debugging."""
         FakeLXDClient.responses = {
-            ("GET", "/1.0/storage-pools"): {
+            ("GET", "/1.0/storage-pools?recursion=1"): {
                 "type": "error",
                 "error": "unavailable",
                 "error_code": 503,
