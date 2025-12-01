@@ -4,29 +4,32 @@
 
 from __future__ import annotations
 
-
 import os
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 _PUPPET_PATH_PREFIX = ["/opt/puppetlabs/bin"]
 
 
-def get_facter_dir():
+def get_facter_dir() -> str:
     if os.getuid() == 0:
         return "/etc/facter/facts.d"
     else:
         return os.path.expanduser("~/.facter/facts.d")
 
 
-def _puppet_cmd(module):
+def _puppet_cmd(module: AnsibleModule) -> str | None:
     return module.get_bin_path("puppet", False, _PUPPET_PATH_PREFIX)
 
 
 # If the `timeout` CLI command feature is removed,
 # Then we could add this as a fixed param to `puppet_runner`
-def ensure_agent_enabled(module):
+def ensure_agent_enabled(module: AnsibleModule) -> None:
     runner = CmdRunner(
         module,
         command="puppet",
@@ -44,7 +47,7 @@ def ensure_agent_enabled(module):
         module.fail_json(msg="Puppet agent state could not be determined.")
 
 
-def puppet_runner(module):
+def puppet_runner(module: AnsibleModule) -> CmdRunner:
     # Keeping backward compatibility, allow for running with the `timeout` CLI command.
     # If this can be replaced with ansible `timeout` parameter in playbook,
     # then this function could be removed.

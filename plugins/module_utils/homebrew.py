@@ -7,9 +7,13 @@ from __future__ import annotations
 
 import os
 import re
+import typing as t
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
-def _create_regex_group_complement(s):
+def _create_regex_group_complement(s: str) -> re.Pattern:
     lines = (line.strip() for line in s.split("\n") if line.strip())
     chars = [_f for _f in (line.split("#")[0].strip() for line in lines) if _f]
     group = rf"[^{''.join(chars)}]"
@@ -52,7 +56,7 @@ class HomebrewValidate:
 
     # class validations -------------------------------------------- {{{
     @classmethod
-    def valid_path(cls, path):
+    def valid_path(cls, path: list[str] | str) -> bool:
         """
         `path` must be one of:
          - list of paths
@@ -77,7 +81,7 @@ class HomebrewValidate:
             return all(cls.valid_brew_path(path_) for path_ in paths)
 
     @classmethod
-    def valid_brew_path(cls, brew_path):
+    def valid_brew_path(cls, brew_path: str | None) -> bool:
         """
         `brew_path` must be one of:
          - None
@@ -95,7 +99,7 @@ class HomebrewValidate:
         return isinstance(brew_path, str) and not cls.INVALID_BREW_PATH_REGEX.search(brew_path)
 
     @classmethod
-    def valid_package(cls, package):
+    def valid_package(cls, package: str | None) -> bool:
         """A valid package is either None or alphanumeric."""
 
         if package is None:
@@ -104,8 +108,7 @@ class HomebrewValidate:
         return isinstance(package, str) and not cls.INVALID_PACKAGE_REGEX.search(package)
 
 
-def parse_brew_path(module):
-    # type: (...) -> str
+def parse_brew_path(module: AnsibleModule) -> str:
     """Attempt to find the Homebrew executable path.
 
     Requires:

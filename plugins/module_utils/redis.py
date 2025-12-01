@@ -5,11 +5,15 @@
 
 from __future__ import annotations
 
-from ansible.module_utils.basic import missing_required_lib
-
 import traceback
+import typing as t
 
-REDIS_IMP_ERR = None
+from ansible.module_utils.basic import missing_required_lib, AnsibleModule
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+REDIS_IMP_ERR: str | None = None
 try:
     from redis import Redis
     from redis import __version__ as redis_version
@@ -20,30 +24,30 @@ except ImportError:
     REDIS_IMP_ERR = traceback.format_exc()
     HAS_REDIS_PACKAGE = False
 
+CERTIFI_IMPORT_ERROR: str | None = None
 try:
     import certifi
 
     HAS_CERTIFI_PACKAGE = True
-    CERTIFI_IMPORT_ERROR = None
 except ImportError:
     CERTIFI_IMPORT_ERROR = traceback.format_exc()
     HAS_CERTIFI_PACKAGE = False
 
 
-def fail_imports(module, needs_certifi=True):
-    errors = []
-    traceback = []
+def fail_imports(module: AnsibleModule, needs_certifi: bool = True) -> None:
+    errors: list[str] = []
+    traceback: list[str] = []
     if not HAS_REDIS_PACKAGE:
         errors.append(missing_required_lib("redis"))
-        traceback.append(REDIS_IMP_ERR)
+        traceback.append(REDIS_IMP_ERR)  # type: ignore
     if not HAS_CERTIFI_PACKAGE and needs_certifi:
         errors.append(missing_required_lib("certifi"))
-        traceback.append(CERTIFI_IMPORT_ERROR)
+        traceback.append(CERTIFI_IMPORT_ERROR)  # type: ignore
     if errors:
         module.fail_json(msg="\n".join(errors), traceback="\n".join(traceback))
 
 
-def redis_auth_argument_spec(tls_default=True):
+def redis_auth_argument_spec(tls_default: bool = True) -> dict[str, t.Any]:
     return dict(
         login_host=dict(
             type="str",
@@ -60,7 +64,7 @@ def redis_auth_argument_spec(tls_default=True):
     )
 
 
-def redis_auth_params(module):
+def redis_auth_params(module: AnsibleModule) -> dict[str, t.Any]:
     login_host = module.params["login_host"]
     login_user = module.params["login_user"]
     login_password = module.params["login_password"]
@@ -92,13 +96,12 @@ def redis_auth_params(module):
 class RedisAnsible:
     """Base class for Redis module"""
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.connection = self._connect()
 
-    def _connect(self):
+    def _connect(self) -> Redis:
         try:
             return Redis(**redis_auth_params(self.module))
         except Exception as e:
             self.module.fail_json(msg=f"{e}")
-        return None

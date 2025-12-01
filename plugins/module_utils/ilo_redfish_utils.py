@@ -4,13 +4,15 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 import time
+import typing as t
+
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 
 
 class iLORedfishUtils(RedfishUtils):
-    def get_ilo_sessions(self):
-        result = {}
+    def get_ilo_sessions(self) -> dict[str, t.Any]:
+        result: dict[str, t.Any] = {}
         # listing all users has always been slower than other operations, why?
         session_list = []
         sessions_results = []
@@ -48,8 +50,8 @@ class iLORedfishUtils(RedfishUtils):
         result["ret"] = True
         return result
 
-    def set_ntp_server(self, mgr_attributes):
-        result = {}
+    def set_ntp_server(self, mgr_attributes) -> dict[str, t.Any]:
+        result: dict[str, t.Any] = {}
         setkey = mgr_attributes["mgr_attr_name"]
 
         nic_info = self.get_manager_ethernet_uri()
@@ -60,7 +62,7 @@ class iLORedfishUtils(RedfishUtils):
             return response
         result["ret"] = True
         data = response["data"]
-        payload = {"DHCPv4": {"UseNTPServers": ""}}
+        payload: dict[str, t.Any] = {"DHCPv4": {"UseNTPServers": ""}}
 
         if data["DHCPv4"]["UseNTPServers"]:
             payload["DHCPv4"]["UseNTPServers"] = False
@@ -97,7 +99,7 @@ class iLORedfishUtils(RedfishUtils):
 
         return {"ret": True, "changed": True, "msg": f"Modified {mgr_attributes['mgr_attr_name']}"}
 
-    def set_time_zone(self, attr):
+    def set_time_zone(self, attr) -> dict[str, t.Any]:
         key = attr["mgr_attr_name"]
 
         uri = f"{self.manager_uri}DateTime/"
@@ -124,7 +126,7 @@ class iLORedfishUtils(RedfishUtils):
 
         return {"ret": True, "changed": True, "msg": f"Modified {attr['mgr_attr_name']}"}
 
-    def set_dns_server(self, attr):
+    def set_dns_server(self, attr) -> dict[str, t.Any]:
         key = attr["mgr_attr_name"]
         nic_info = self.get_manager_ethernet_uri()
         uri = nic_info["nic_addr"]
@@ -148,7 +150,7 @@ class iLORedfishUtils(RedfishUtils):
 
         return {"ret": True, "changed": True, "msg": f"Modified {attr['mgr_attr_name']}"}
 
-    def set_domain_name(self, attr):
+    def set_domain_name(self, attr) -> dict[str, t.Any]:
         key = attr["mgr_attr_name"]
 
         nic_info = self.get_manager_ethernet_uri()
@@ -160,7 +162,7 @@ class iLORedfishUtils(RedfishUtils):
 
         data = response["data"]
 
-        payload = {"DHCPv4": {"UseDomainName": ""}}
+        payload: dict[str, t.Any] = {"DHCPv4": {"UseDomainName": ""}}
 
         if data["DHCPv4"]["UseDomainName"]:
             payload["DHCPv4"]["UseDomainName"] = False
@@ -185,7 +187,7 @@ class iLORedfishUtils(RedfishUtils):
             return response
         return {"ret": True, "changed": True, "msg": f"Modified {attr['mgr_attr_name']}"}
 
-    def set_wins_registration(self, mgrattr):
+    def set_wins_registration(self, mgrattr) -> dict[str, t.Any]:
         Key = mgrattr["mgr_attr_name"]
 
         nic_info = self.get_manager_ethernet_uri()
@@ -198,7 +200,7 @@ class iLORedfishUtils(RedfishUtils):
             return response
         return {"ret": True, "changed": True, "msg": f"Modified {mgrattr['mgr_attr_name']}"}
 
-    def get_server_poststate(self):
+    def get_server_poststate(self) -> dict[str, t.Any]:
         # Get server details
         response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
@@ -210,7 +212,7 @@ class iLORedfishUtils(RedfishUtils):
         else:
             return {"ret": True, "server_poststate": server_data["Oem"]["Hp"]["PostState"]}
 
-    def wait_for_ilo_reboot_completion(self, polling_interval=60, max_polling_time=1800):
+    def wait_for_ilo_reboot_completion(self, polling_interval=60, max_polling_time=1800) -> dict[str, t.Any]:
         # This method checks if OOB controller reboot is completed
         time.sleep(10)
 

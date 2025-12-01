@@ -6,33 +6,41 @@
 from __future__ import annotations
 
 import copy
+import typing as t
 
 
 class _Variable:
     NOTHING = object()
 
-    def __init__(self, diff=False, output=True, change=None, fact=False, verbosity=0):
+    def __init__(
+        self,
+        diff: bool = False,
+        output: bool = True,
+        change: bool | None = None,
+        fact: bool = False,
+        verbosity: int = 0,
+    ):
         self.init = False
-        self.initial_value = None
-        self.value = None
+        self.initial_value: t.Any = None
+        self.value: t.Any = None
 
-        self.diff = None
-        self._change = None
-        self.output = None
-        self.fact = None
-        self._verbosity = None
+        self.diff: bool = None  # type: ignore # will be changed in set_meta() call
+        self._change: bool | None = None
+        self.output: bool = None  # type: ignore # will be changed in set_meta() call
+        self.fact: bool = None  # type: ignore # will be changed in set_meta() call
+        self._verbosity: int = None  # type: ignore # will be changed in set_meta() call
         self.set_meta(output=output, diff=diff, change=change, fact=fact, verbosity=verbosity)
 
-    def getchange(self):
+    def getchange(self) -> bool:
         return self.diff if self._change is None else self._change
 
-    def setchange(self, value):
+    def setchange(self, value: bool | None) -> None:
         self._change = value
 
-    def getverbosity(self):
+    def getverbosity(self) -> int:
         return self._verbosity
 
-    def setverbosity(self, v):
+    def setverbosity(self, v: int) -> None:
         if not (0 <= v <= 4):
             raise ValueError("verbosity must be an int in the range 0 to 4")
         self._verbosity = v
@@ -40,7 +48,15 @@ class _Variable:
     change = property(getchange, setchange)
     verbosity = property(getverbosity, setverbosity)
 
-    def set_meta(self, output=None, diff=None, change=None, fact=None, initial_value=NOTHING, verbosity=None):
+    def set_meta(
+        self,
+        output: bool | None = None,
+        diff: bool | None = None,
+        change: bool | None = None,
+        fact: bool | None = None,
+        initial_value: t.Any = NOTHING,
+        verbosity: int | None = None,
+    ) -> None:
         """Set the metadata for the variable
 
         Args:
@@ -64,7 +80,7 @@ class _Variable:
         if verbosity is not None:
             self.verbosity = verbosity
 
-    def as_dict(self, meta_only=False):
+    def as_dict(self, meta_only: bool = False) -> dict[str, t.Any]:
         d = {
             "diff": self.diff,
             "change": self.change,
@@ -77,27 +93,27 @@ class _Variable:
             d["value"] = self.value
         return d
 
-    def set_value(self, value):
+    def set_value(self, value: t.Any) -> t.Self:
         if not self.init:
             self.initial_value = copy.deepcopy(value)
             self.init = True
         self.value = value
         return self
 
-    def is_visible(self, verbosity):
+    def is_visible(self, verbosity: int) -> bool:
         return self.verbosity <= verbosity
 
     @property
-    def has_changed(self):
+    def has_changed(self) -> bool:
         return self.change and (self.initial_value != self.value)
 
     @property
-    def diff_result(self):
+    def diff_result(self) -> dict[str, t.Any] | None:
         if self.diff and self.has_changed:
             return {"before": self.initial_value, "after": self.value}
-        return
+        return None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"<Variable: value={self.value!r}, initial={self.initial_value!r}, diff={self.diff}, "
             f"output={self.output}, change={self.change}, verbosity={self.verbosity}>"
@@ -119,34 +135,34 @@ class VarDict:
         "as_dict",
     )
 
-    def __init__(self):
-        self.__vars__ = dict()
+    def __init__(self) -> None:
+        self.__vars__: dict[str, _Variable] = dict()
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str):
         return self.__vars__[item].value
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value) -> None:
         self.set(key, value)
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str):
         try:
             return self.__vars__[item].value
         except KeyError:
             return getattr(super(), item)
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key: str, value) -> None:
         if key == "__vars__":
             super().__setattr__(key, value)
         else:
             self.set(key, value)
 
-    def _var(self, name):
+    def _var(self, name: str) -> _Variable:
         return self.__vars__[name]
 
-    def var(self, name):
+    def var(self, name: str) -> dict[str, t.Any]:
         return self._var(name).as_dict()
 
-    def set_meta(self, name, **kwargs):
+    def set_meta(self, name: str, **kwargs):
         """Set the metadata for the variable
 
         Args:
@@ -160,10 +176,10 @@ class VarDict:
         """
         self._var(name).set_meta(**kwargs)
 
-    def get_meta(self, name):
+    def get_meta(self, name: str) -> dict[str, t.Any]:
         return self._var(name).as_dict(meta_only=True)
 
-    def set(self, name, value, **kwargs):
+    def set(self, name: str, value, **kwargs) -> None:
         """Set the value and optionally metadata for a variable. The variable is not required to exist prior to calling `set`.
 
         For details on the accepted metada see the documentation for method `set_meta`.
@@ -185,10 +201,10 @@ class VarDict:
         var.set_value(value)
         self.__vars__[name] = var
 
-    def output(self, verbosity=0):
+    def output(self, verbosity: int = 0) -> dict[str, t.Any]:
         return {n: v.value for n, v in self.__vars__.items() if v.output and v.is_visible(verbosity)}
 
-    def diff(self, verbosity=0):
+    def diff(self, verbosity: int = 0) -> dict[str, dict[str, t.Any]] | None:
         diff_results = [
             (n, v.diff_result) for n, v in self.__vars__.items() if v.diff_result and v.is_visible(verbosity)
         ]
@@ -198,13 +214,13 @@ class VarDict:
             return {"before": before, "after": after}
         return None
 
-    def facts(self, verbosity=0):
+    def facts(self, verbosity: int = 0) -> dict[str, t.Any] | None:
         facts_result = {n: v.value for n, v in self.__vars__.items() if v.fact and v.is_visible(verbosity)}
         return facts_result if facts_result else None
 
     @property
-    def has_changed(self):
+    def has_changed(self) -> bool:
         return any(var.has_changed for var in self.__vars__.values())
 
-    def as_dict(self):
+    def as_dict(self) -> dict[str, t.Any]:
         return {name: var.value for name, var in self.__vars__.items()}

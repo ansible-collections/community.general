@@ -7,56 +7,60 @@ from __future__ import annotations
 
 
 import traceback
+import typing as t
 from contextlib import contextmanager
 
 from ansible.module_utils.basic import missing_required_lib
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
-_deps = dict()
+
+_deps: dict[str, _Dependency] = dict()
 
 
 class _Dependency:
     _states = ["pending", "failure", "success"]
 
-    def __init__(self, name, reason=None, url=None, msg=None):
+    def __init__(self, name: str, reason: str | None = None, url: str | None = None, msg: str | None = None) -> None:
         self.name = name
         self.reason = reason
         self.url = url
         self.msg = msg
 
         self.state = 0
-        self.trace = None
-        self.exc = None
+        self.trace: str | None = None
+        self.exc: Exception | None = None
 
-    def succeed(self):
+    def succeed(self) -> None:
         self.state = 2
 
-    def fail(self, exc, trace):
+    def fail(self, exc: Exception, trace: str) -> None:
         self.state = 1
         self.exc = exc
         self.trace = trace
 
     @property
-    def message(self):
+    def message(self) -> str:
         if self.msg:
             return str(self.msg)
         else:
             return missing_required_lib(self.name, reason=self.reason, url=self.url)
 
     @property
-    def failed(self):
+    def failed(self) -> bool:
         return self.state == 1
 
-    def validate(self, module):
+    def validate(self, module: AnsibleModule) -> None:
         if self.failed:
             module.fail_json(msg=self.message, exception=self.trace)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<dependency: {self.name} [{self._states[self.state]}]>"
 
 
 @contextmanager
-def declare(name, *args, **kwargs):
+def declare(name: str, *args, **kwargs) -> t.Generator[_Dependency]:
     dep = _Dependency(name, *args, **kwargs)
     try:
         yield dep
@@ -68,7 +72,7 @@ def declare(name, *args, **kwargs):
         _deps[name] = dep
 
 
-def _select_names(spec):
+def _select_names(spec: str | None) -> list[str]:
     dep_names = sorted(_deps)
 
     if spec:
@@ -86,14 +90,14 @@ def _select_names(spec):
     return dep_names
 
 
-def validate(module, spec=None):
+def validate(module: AnsibleModule, spec: str | None = None) -> None:
     for dep in _select_names(spec):
         _deps[dep].validate(module)
 
 
-def failed(spec=None):
+def failed(spec: str | None = None) -> bool:
     return any(_deps[d].failed for d in _select_names(spec))
 
 
-def clear():
+def clear() -> None:
     _deps.clear()

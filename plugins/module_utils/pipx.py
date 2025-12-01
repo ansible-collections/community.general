@@ -4,11 +4,13 @@
 
 from __future__ import annotations
 
-
 import json
-
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 pipx_common_argspec = {
@@ -36,7 +38,7 @@ _state_map = dict(
 )
 
 
-def pipx_runner(module, command, **kwargs):
+def pipx_runner(module: AnsibleModule, command, **kwargs) -> CmdRunner:
     arg_formats = dict(
         state=cmd_runner_fmt.as_map(_state_map),
         name=cmd_runner_fmt.as_list(),

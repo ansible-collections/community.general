@@ -11,36 +11,46 @@ from functools import wraps
 from ansible.module_utils.common.collections import is_sequence
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Mapping, Sequence
 
-    ArgFormatType = Callable[[t.Any], list[str]]
+    ArgFormatType = Callable[[t.Any], Sequence[t.Any]]
+    _T = t.TypeVar("_T")
 
 
-def _ensure_list(value):
-    return list(value) if is_sequence(value) else [value]
+def _ensure_list(value: _T | Sequence[_T]) -> list[_T]:
+    return list(value) if is_sequence(value) else [value]  # type: ignore # TODO need type assertion for is_sequence
 
 
 class _ArgFormat:
-    def __init__(self, func, ignore_none=True, ignore_missing_value=False):
+    def __init__(
+        self,
+        func: ArgFormatType,
+        ignore_none: bool | None = True,
+        ignore_missing_value: bool = False,
+    ) -> None:
         self.func = func
         self.ignore_none = ignore_none
         self.ignore_missing_value = ignore_missing_value
 
-    def __call__(self, value):
+    def __call__(self, value: t.Any | None) -> list[str]:
         ignore_none = self.ignore_none if self.ignore_none is not None else True
         if value is None and ignore_none:
             return []
         f = self.func
         return [str(x) for x in f(value)]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<ArgFormat: func={self.func}, ignore_none={self.ignore_none}, ignore_missing_value={self.ignore_missing_value}>"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
 
-def as_bool(args_true, args_false=None, ignore_none=None):
+def as_bool(
+    args_true: Sequence[t.Any] | t.Any,
+    args_false: Sequence[t.Any] | t.Any | None = None,
+    ignore_none: bool | None = None,
+) -> _ArgFormat:
     if args_false is not None:
         if ignore_none is None:
             ignore_none = False
@@ -51,24 +61,24 @@ def as_bool(args_true, args_false=None, ignore_none=None):
     )
 
 
-def as_bool_not(args):
+def as_bool_not(args: Sequence[t.Any] | t.Any) -> _ArgFormat:
     return as_bool([], args, ignore_none=False)
 
 
-def as_optval(arg, ignore_none=None):
+def as_optval(arg, ignore_none: bool | None = None) -> _ArgFormat:
     return _ArgFormat(lambda value: [f"{arg}{value}"], ignore_none=ignore_none)
 
 
-def as_opt_val(arg, ignore_none=None):
+def as_opt_val(arg: str, ignore_none: bool | None = None) -> _ArgFormat:
     return _ArgFormat(lambda value: [arg, value], ignore_none=ignore_none)
 
 
-def as_opt_eq_val(arg, ignore_none=None):
+def as_opt_eq_val(arg: str, ignore_none: bool | None = None) -> _ArgFormat:
     return _ArgFormat(lambda value: [f"{arg}={value}"], ignore_none=ignore_none)
 
 
-def as_list(ignore_none=None, min_len=0, max_len=None):
-    def func(value):
+def as_list(ignore_none: bool | None = None, min_len: int = 0, max_len: int | None = None) -> _ArgFormat:
+    def func(value: t.Any) -> list[t.Any]:
         value = _ensure_list(value)
         if len(value) < min_len:
             raise ValueError(f"Parameter must have at least {min_len} element(s)")
@@ -79,17 +89,21 @@ def as_list(ignore_none=None, min_len=0, max_len=None):
     return _ArgFormat(func, ignore_none=ignore_none)
 
 
-def as_fixed(*args):
+def as_fixed(*args: t.Any) -> _ArgFormat:
     if len(args) == 1 and is_sequence(args[0]):
         args = args[0]
     return _ArgFormat(lambda value: _ensure_list(args), ignore_none=False, ignore_missing_value=True)
 
 
-def as_func(func, ignore_none=None):
+def as_func(func: ArgFormatType, ignore_none: bool | None = None) -> _ArgFormat:
     return _ArgFormat(func, ignore_none=ignore_none)
 
 
-def as_map(_map, default=None, ignore_none=None):
+def as_map(
+    _map: Mapping[t.Any, Sequence[t.Any] | t.Any],
+    default: Sequence[t.Any] | t.Any | None = None,
+    ignore_none: bool | None = None,
+) -> _ArgFormat:
     if default is None:
         default = []
     return _ArgFormat(lambda value: _ensure_list(_map.get(value, default)), ignore_none=ignore_none)
@@ -126,5 +140,5 @@ def stack(fmt):
     return wrapper
 
 
-def is_argformat(fmt):
+def is_argformat(fmt: object) -> t.TypeGuard[_ArgFormat]:
     return isinstance(fmt, _ArgFormat)

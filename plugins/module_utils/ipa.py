@@ -13,17 +13,21 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import uuid
-
-import re
-from ansible.module_utils.common.text.converters import to_bytes, to_text
-from ansible.module_utils.urls import fetch_url, HAS_GSSAPI
-from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
+import typing as t
 from urllib.parse import quote
 
+from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
+from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.urls import fetch_url, HAS_GSSAPI
 
-def _env_then_dns_fallback(*args, **kwargs):
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+
+def _env_then_dns_fallback(*args, **kwargs) -> str:
     """Load value from environment or DNS in that order"""
     try:
         result = env_fallback(*args, **kwargs)
@@ -41,7 +45,7 @@ def _env_then_dns_fallback(*args, **kwargs):
 
 
 class IPAClient:
-    def __init__(self, module, host, port, protocol):
+    def __init__(self, module: AnsibleModule, host, port, protocol):
         self.host = host
         self.port = port
         self.protocol = protocol
@@ -50,10 +54,10 @@ class IPAClient:
         self.timeout = module.params.get("ipa_timeout")
         self.use_gssapi = False
 
-    def get_base_url(self):
+    def get_base_url(self) -> str:
         return f"{self.protocol}://{self.host}/ipa"
 
-    def get_json_url(self):
+    def get_json_url(self) -> str:
         return f"{self.get_base_url()}/session/json"
 
     def login(self, username, password):
@@ -98,7 +102,7 @@ class IPAClient:
             {"referer": self.get_base_url(), "Content-Type": "application/json", "Accept": "application/json"}
         )
 
-    def _fail(self, msg, e):
+    def _fail(self, msg: str, e) -> t.NoReturn:
         if "message" in e:
             err_string = e.get("message")
         else:
@@ -205,7 +209,7 @@ class IPAClient:
         return changed
 
 
-def ipa_argument_spec():
+def ipa_argument_spec() -> dict[str, t.Any]:
     return dict(
         ipa_prot=dict(type="str", default="https", choices=["http", "https"], fallback=(env_fallback, ["IPA_PROT"])),
         ipa_host=dict(type="str", default="ipa.example.com", fallback=(_env_then_dns_fallback, ["IPA_HOST"])),

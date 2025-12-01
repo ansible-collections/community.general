@@ -6,12 +6,16 @@ from __future__ import annotations
 
 import json
 import sys
+import typing as t
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
-def online_argument_spec():
+
+def online_argument_spec() -> dict[str, t.Any]:
     return dict(
         api_token=dict(
             required=True,
@@ -28,7 +32,7 @@ def online_argument_spec():
 
 
 class OnlineException(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
 
 
@@ -60,7 +64,7 @@ class Response:
 
 
 class Online:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.headers = {
             "Authorization": f"Bearer {self.module.params.get('api_token')}",

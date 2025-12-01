@@ -14,6 +14,9 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.urls import open_url
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 def get_consul_url(configuration):
     return f"{configuration.scheme}://{configuration.host}:{configuration.port}/v1"
@@ -120,7 +123,7 @@ class _ConsulModule:
     operational_attributes: set[str] = set()
     params: dict[str, t.Any] = {}
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self._module = module
         self.params = _normalize_params(module.params, module.argument_spec)
         self.api_params = {

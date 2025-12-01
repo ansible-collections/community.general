@@ -5,10 +5,18 @@
 from __future__ import annotations
 
 import os
+import typing as t
 
 from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.common.locale import get_best_parsable_locale
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from collections.abc import Callable, Mapping, Sequence
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.general.plugins.module_utils.cmd_runner_fmt import ArgFormatType
+
+    ArgFormatter = t.Union[ArgFormatType, cmd_runner_fmt._ArgFormat]  # noqa: UP007
 
 
 def _ensure_list(value):
@@ -24,7 +32,7 @@ class CmdRunnerException(Exception):
 
 
 class MissingArgumentFormat(CmdRunnerException):
-    def __init__(self, arg, args_order, args_formats):
+    def __init__(self, arg, args_order: tuple[str, ...], args_formats) -> None:
         self.args_order = args_order
         self.arg = arg
         self.args_formats = args_formats
@@ -37,7 +45,7 @@ class MissingArgumentFormat(CmdRunnerException):
 
 
 class MissingArgumentValue(CmdRunnerException):
-    def __init__(self, args_order, arg):
+    def __init__(self, args_order: tuple[str, ...], arg) -> None:
         self.args_order = args_order
         self.arg = arg
 
@@ -72,19 +80,19 @@ class CmdRunner:
     """
 
     @staticmethod
-    def _prepare_args_order(order):
-        return tuple(order) if is_sequence(order) else tuple(order.split())
+    def _prepare_args_order(order: str | Sequence[str]) -> tuple[str, ...]:
+        return tuple(order) if is_sequence(order) else tuple(order.split())  # type: ignore
 
     def __init__(
         self,
-        module,
+        module: AnsibleModule,
         command,
-        arg_formats=None,
-        default_args_order=(),
-        check_rc=False,
-        force_lang="C",
-        path_prefix=None,
-        environ_update=None,
+        arg_formats: Mapping[str, ArgFormatter] | None = None,
+        default_args_order: str | Sequence[str] = (),
+        check_rc: bool = False,
+        force_lang: str = "C",
+        path_prefix: Sequence[str] | None = None,
+        environ_update: dict[str, str] | None = None,
     ):
         self.module = module
         self.command = _ensure_list(command)
@@ -117,10 +125,17 @@ class CmdRunner:
         )
 
     @property
-    def binary(self):
+    def binary(self) -> str:
         return self.command[0]
 
-    def __call__(self, args_order=None, output_process=None, check_mode_skip=False, check_mode_return=None, **kwargs):
+    def __call__(
+        self,
+        args_order: str | Sequence[str] | None = None,
+        output_process: Callable[[int, str, str], t.Any] | None = None,
+        check_mode_skip: bool = False,
+        check_mode_return: t.Any | None = None,
+        **kwargs,
+    ):
         if output_process is None:
             output_process = _process_as_is
         if args_order is None:
@@ -146,7 +161,15 @@ class CmdRunner:
 
 
 class _CmdRunnerContext:
-    def __init__(self, runner, args_order, output_process, check_mode_skip, check_mode_return, **kwargs):
+    def __init__(
+        self,
+        runner: CmdRunner,
+        args_order: tuple[str, ...],
+        output_process: Callable[[int, str, str], t.Any],
+        check_mode_skip: bool,
+        check_mode_return: t.Any,
+        **kwargs,
+    ) -> None:
         self.runner = runner
         self.args_order = tuple(args_order)
         self.output_process = output_process
@@ -204,7 +227,7 @@ class _CmdRunnerContext:
         return self.results_processed
 
     @property
-    def run_info(self):
+    def run_info(self) -> dict[str, t.Any]:
         return dict(
             check_rc=self.check_rc,
             environ_update=self.environ_update,

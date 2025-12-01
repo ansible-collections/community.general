@@ -10,6 +10,7 @@ import sys
 import datetime
 import time
 import traceback
+import typing as t
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
@@ -18,6 +19,10 @@ from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+    from ansible.module_utils.basic import AnsibleModule
 
 SCALEWAY_SECRET_IMP_ERR: str | None = None
 try:
@@ -29,7 +34,7 @@ except Exception:
     HAS_SCALEWAY_SECRET_PACKAGE = False
 
 
-def scaleway_argument_spec():
+def scaleway_argument_spec() -> dict[str, t.Any]:
     return dict(
         api_token=dict(
             required=True,
@@ -59,7 +64,7 @@ def payload_from_object(scw_object):
 
 
 class ScalewayException(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
 
 
@@ -70,7 +75,7 @@ R_LINK_HEADER = r"""<[^>]+>;\srel="(first|previous|next|last)"
 R_RELATION = r'</?(?P<target_IRI>[^>]+)>; rel="(?P<relation>first|previous|next|last)"'
 
 
-def parse_pagination_link(header):
+def parse_pagination_link(header: str) -> dict[str, str]:
     if not re.match(R_LINK_HEADER, header, re.VERBOSE):
         raise ScalewayException("Scaleway API answered with an invalid Link pagination header")
     else:
@@ -86,7 +91,7 @@ def parse_pagination_link(header):
         return parsed_relations
 
 
-def filter_sensitive_attributes(container, attributes):
+def filter_sensitive_attributes(container: dict[str, t.Any], attributes: Iterable[str]) -> dict[str, t.Any]:
     """
     WARNING: This function is effectively private, **do not use it**!
     It will be removed or renamed once changing its name no longer triggers a pylint bug.
@@ -99,7 +104,7 @@ def filter_sensitive_attributes(container, attributes):
 
 class SecretVariables:
     @staticmethod
-    def ensure_scaleway_secret_package(module):
+    def ensure_scaleway_secret_package(module: AnsibleModule) -> None:
         if not HAS_SCALEWAY_SECRET_PACKAGE:
             module.fail_json(
                 msg=missing_required_lib("passlib[argon2]", url="https://passlib.readthedocs.io/en/stable/"),
@@ -169,7 +174,7 @@ class Response:
 
 
 class Scaleway:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.headers = {
             "X-Auth-Token": self.module.params.get("api_token"),
@@ -224,8 +229,9 @@ class Scaleway:
         return Response(resp, info)
 
     @staticmethod
-    def get_user_agent_string(module):
-        return f"ansible {module.ansible_version} Python {sys.version.split(' ', 1)[0]}"
+    def get_user_agent_string(module: AnsibleModule) -> str:
+        ansible_version = module.ansible_version  # type: ignore # For some reason this isn't documented in AnsibleModule
+        return f"ansible {ansible_version} Python {sys.version.split(' ', 1)[0]}"
 
     def get(self, path, data=None, headers=None, params=None):
         return self.send(method="GET", path=path, data=data, headers=headers, params=params)
@@ -245,7 +251,7 @@ class Scaleway:
     def update(self, path, data=None, headers=None, params=None):
         return self.send(method="UPDATE", path=path, data=data, headers=headers, params=params)
 
-    def warn(self, x):
+    def warn(self, x) -> None:
         self.module.warn(str(x))
 
     def fetch_state(self, resource):

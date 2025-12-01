@@ -9,6 +9,7 @@ import atexit
 import time
 import re
 import traceback
+import typing as t
 
 XENAPI_IMP_ERR = None
 try:
@@ -22,8 +23,11 @@ except ImportError:
 from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
-def xenserver_common_argument_spec():
+
+def xenserver_common_argument_spec() -> dict[str, t.Any]:
     return dict(
         hostname=dict(
             type="str",
@@ -41,7 +45,7 @@ def xenserver_common_argument_spec():
     )
 
 
-def xapi_to_module_vm_power_state(power_state):
+def xapi_to_module_vm_power_state(power_state: str) -> str | None:
     """Maps XAPI VM power states to module VM power states."""
     module_power_state_map = {
         "running": "poweredon",
@@ -53,7 +57,7 @@ def xapi_to_module_vm_power_state(power_state):
     return module_power_state_map.get(power_state)
 
 
-def module_to_xapi_vm_power_state(power_state):
+def module_to_xapi_vm_power_state(power_state: str) -> str | None:
     """Maps module VM power states to XAPI VM power states."""
     vm_power_state_map = {
         "poweredon": "running",
@@ -67,7 +71,7 @@ def module_to_xapi_vm_power_state(power_state):
     return vm_power_state_map.get(power_state)
 
 
-def is_valid_ip_addr(ip_addr):
+def is_valid_ip_addr(ip_addr: str) -> bool:
     """Validates given string as IPv4 address for given string.
 
     Args:
@@ -93,7 +97,7 @@ def is_valid_ip_addr(ip_addr):
     return True
 
 
-def is_valid_ip_netmask(ip_netmask):
+def is_valid_ip_netmask(ip_netmask: str) -> bool:
     """Validates given string as IPv4 netmask.
 
     Args:
@@ -125,7 +129,7 @@ def is_valid_ip_netmask(ip_netmask):
     return True
 
 
-def is_valid_ip_prefix(ip_prefix):
+def is_valid_ip_prefix(ip_prefix: str) -> bool:
     """Validates given string as IPv4 prefix.
 
     Args:
@@ -142,7 +146,7 @@ def is_valid_ip_prefix(ip_prefix):
     return not (ip_prefix_int < 0 or ip_prefix_int > 32)
 
 
-def ip_prefix_to_netmask(ip_prefix, skip_check=False):
+def ip_prefix_to_netmask(ip_prefix: str, skip_check: bool = False) -> str:
     """Converts IPv4 prefix to netmask.
 
     Args:
@@ -165,7 +169,7 @@ def ip_prefix_to_netmask(ip_prefix, skip_check=False):
         return ""
 
 
-def ip_netmask_to_prefix(ip_netmask, skip_check=False):
+def ip_netmask_to_prefix(ip_netmask: str, skip_check: bool = False) -> str:
     """Converts IPv4 netmask to prefix.
 
     Args:
@@ -188,7 +192,7 @@ def ip_netmask_to_prefix(ip_netmask, skip_check=False):
         return ""
 
 
-def is_valid_ip6_addr(ip6_addr):
+def is_valid_ip6_addr(ip6_addr: str) -> bool:
     """Validates given string as IPv6 address.
 
     Args:
@@ -222,7 +226,7 @@ def is_valid_ip6_addr(ip6_addr):
     return all(ip6_addr_hextet_regex.match(ip6_addr_hextet) for ip6_addr_hextet in ip6_addr_split)
 
 
-def is_valid_ip6_prefix(ip6_prefix):
+def is_valid_ip6_prefix(ip6_prefix: str) -> bool:
     """Validates given string as IPv6 prefix.
 
     Args:
@@ -239,7 +243,7 @@ def is_valid_ip6_prefix(ip6_prefix):
     return not (ip6_prefix_int < 0 or ip6_prefix_int > 128)
 
 
-def get_object_ref(module, name, uuid=None, obj_type="VM", fail=True, msg_prefix=""):
+def get_object_ref(module: AnsibleModule, name, uuid=None, obj_type="VM", fail=True, msg_prefix=""):
     """Finds and returns a reference to arbitrary XAPI object.
 
     An object is searched by using either name (name_label) or UUID
@@ -305,7 +309,7 @@ def get_object_ref(module, name, uuid=None, obj_type="VM", fail=True, msg_prefix
     return obj_ref
 
 
-def gather_vm_params(module, vm_ref):
+def gather_vm_params(module: AnsibleModule, vm_ref):
     """Gathers all VM parameters available in XAPI database.
 
     Args:
@@ -395,7 +399,7 @@ def gather_vm_params(module, vm_ref):
     return vm_params
 
 
-def gather_vm_facts(module, vm_params):
+def gather_vm_facts(module: AnsibleModule, vm_params):
     """Gathers VM facts.
 
     Args:
@@ -502,7 +506,7 @@ def gather_vm_facts(module, vm_params):
     return vm_facts
 
 
-def set_vm_power_state(module, vm_ref, power_state, timeout=300):
+def set_vm_power_state(module: AnsibleModule, vm_ref, power_state, timeout=300):
     """Controls VM power state.
 
     Args:
@@ -608,7 +612,7 @@ def set_vm_power_state(module, vm_ref, power_state, timeout=300):
     return (state_changed, vm_power_state_resulting)
 
 
-def wait_for_task(module, task_ref, timeout=300):
+def wait_for_task(module: AnsibleModule, task_ref, timeout=300):
     """Waits for async XAPI task to finish.
 
     Args:
@@ -667,7 +671,7 @@ def wait_for_task(module, task_ref, timeout=300):
     return result
 
 
-def wait_for_vm_ip_address(module, vm_ref, timeout=300):
+def wait_for_vm_ip_address(module: AnsibleModule, vm_ref, timeout=300):
     """Waits for VM to acquire an IP address.
 
     Args:
@@ -730,7 +734,7 @@ def wait_for_vm_ip_address(module, vm_ref, timeout=300):
     return vm_guest_metrics
 
 
-def get_xenserver_version(module):
+def get_xenserver_version(module: AnsibleModule):
     """Returns XenServer version.
 
     Args:
@@ -758,10 +762,10 @@ def get_xenserver_version(module):
 class XAPI:
     """Class for XAPI session management."""
 
-    _xapi_session = None
+    _xapi_session: t.Any | None = None
 
     @classmethod
-    def connect(cls, module, disconnect_atexit=True):
+    def connect(cls, module: AnsibleModule, disconnect_atexit=True):
         """Establishes XAPI connection and returns session reference.
 
         If no existing session is available, establishes a new one
@@ -837,7 +841,7 @@ class XenServerObject:
             minor version.
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         """Inits XenServerObject using common module parameters.
 
         Args:
