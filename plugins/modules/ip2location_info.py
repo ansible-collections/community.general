@@ -9,7 +9,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: ip2location_info
 short_description: Retrieve IP geolocation facts of a host's IP address
-version_added: 13.1.0
+version_added: 12.2.0
 description:
   - Gather IP geolocation facts of a host's IP address using the keyless U(api.ip2location.io) API.
 author: "IP2Location (@ip2location)"
