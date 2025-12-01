@@ -152,7 +152,8 @@ def main():
     )
 
     ip2location_info = Ip2LocationInfo(module)
-    ip2location_info_result = dict(changed=False, ansible_facts=ip2location_info.get_geo_data())
+    ip2location_info_result = {"changed": False}
+    ip2location_info_result.update(ip2location_info.get_geo_data())
     module.exit_json(**ip2location_info_result)
 
 
