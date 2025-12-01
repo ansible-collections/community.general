@@ -8,7 +8,7 @@ import json
 import unittest
 from unittest.mock import Mock, patch
 
-from ansible_collections.community.general.plugins.modules.ip2locationio_facts import Ip2locationioFacts
+from ansible_collections.community.general.plugins.modules.ip2location_info import Ip2LocationInfo
 
 
 IP2LOCATION_DATA = {
@@ -27,21 +27,21 @@ IP2LOCATION_DATA = {
 }
 
 
-class TestIp2locationioFacts(unittest.TestCase):
+class TestIp2LocationInfo(unittest.TestCase):
     def test_get_geo_data_with_ip(self):
         module = Mock()
         module.params = {"timeout": 10, "ip": "8.8.8.8"}
         module.from_json.side_effect = json.loads
 
         with patch(
-            "ansible_collections.community.general.plugins.modules.ip2locationio_facts.fetch_url"
+            "ansible_collections.community.general.plugins.modules.ip2location_info.fetch_url"
         ) as mock_fetch_url:
             mock_response = Mock()
             mock_response.read.return_value = json.dumps(IP2LOCATION_DATA)
             mock_fetch_url.return_value = (mock_response, {"status": 200})
 
-            ip2locationio = Ip2locationioFacts(module)
-            result = ip2locationio.get_geo_data()
+            ip2location_info = Ip2LocationInfo(module)
+            result = ip2location_info.get_geo_data()
 
             self.assertEqual(result["country_code"], "US")
             mock_fetch_url.assert_called_once_with(

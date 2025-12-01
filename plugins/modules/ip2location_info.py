@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: ip2locationio_facts
+module: ip2location_info
 short_description: Retrieve IP geolocation facts of a host's IP address
 version_added: 13.1.0
 description:
@@ -30,7 +30,7 @@ options:
   http_agent:
     description:
       - Set http user agent.
-    default: "ansible-ip2locationio-module/0.0.1"
+    default: "ansible-ip2location-info-module/0.0.1"
     type: str
 notes:
   - This module uses the keyless endpoint which has usage limits.
@@ -40,7 +40,7 @@ notes:
 EXAMPLES = r"""
 # Retrieve geolocation data of a host's IP address
 - name: Get IP geolocation data
-  community.general.ip2locationio_facts:
+  community.general.ip2location_info:
 """
 
 RETURN = r"""
@@ -104,10 +104,10 @@ import typing as t
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-USER_AGENT = "ansible-ip2locationio-module/0.0.1"
+USER_AGENT = "ansible-ip2location-info-module/0.0.1"
 
 
-class Ip2locationioFacts:
+class Ip2LocationInfo:
     def __init__(self, module: AnsibleModule) -> None:
         self.url = "https://api.ip2location.io/"
         self.timeout = module.params.get("timeout")
@@ -151,9 +151,9 @@ def main():
         supports_check_mode=True,
     )
 
-    ip2locationio = Ip2locationioFacts(module)
-    ip2locationio_result = dict(changed=False, ansible_facts=ip2locationio.get_geo_data())
-    module.exit_json(**ip2locationio_result)
+    ip2location_info = Ip2LocationInfo(module)
+    ip2location_info_result = dict(changed=False, ansible_facts=ip2location_info.get_geo_data())
+    module.exit_json(**ip2location_info_result)
 
 
 if __name__ == "__main__":
