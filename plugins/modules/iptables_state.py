@@ -265,10 +265,10 @@ def write_state(b_path, lines, changed):
     Write given contents to the given path, and return changed status.
     """
     # Populate a temporary file
-    tmpfd, tmpfile = tempfile.mkstemp()
-    with os.fdopen(tmpfd, "w") as f:
+    with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         joined_lines = "\n".join(lines)
         f.write(f"{joined_lines}\n")
+        tmpfile = f.name
 
     # Prepare to copy temporary file to the final destination
     if not os.path.exists(b_path):
@@ -536,12 +536,11 @@ def main():
             )
 
     if module.check_mode:
-        tmpfd, tmpfile = tempfile.mkstemp()
-        with os.fdopen(tmpfd, "w") as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
             joined_initial_state = "\n".join(initial_state)
             f.write(f"{joined_initial_state}\n")
 
-        if filecmp.cmp(tmpfile, b_path):
+        if filecmp.cmp(f.name, b_path):
             restored_state = initial_state
         else:
             restored_state = state_to_restore
