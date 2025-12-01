@@ -10,43 +10,40 @@
 - name: Get information about all storage pools
   community.general.lxd_storage_pool_info:
   register: pool_info_all
-  ignore_errors: true
 
 - name: Verify pools information was retrieved
   assert:
     that:
       - pool_info_all is not changed
+      - pool_info_all is success
       - pool_info_all.storage_pools is defined
       - pool_info_all.storage_pools is iterable
-  when: pool_info_all is not failed
 
 - name: Get information about default pool
   community.general.lxd_storage_pool_info:
     name: default
   register: pool_info_default
-  ignore_errors: true
 
 - name: Verify default pool information
   assert:
     that:
       - pool_info_default is not changed
+      - pool_info_default is success
       - pool_info_default.storage_pools | length == 1
       - pool_info_default.storage_pools[0].name == 'default'
-  when: pool_info_default is not failed
 
 - name: Test filtering by pool type (dir)
   community.general.lxd_storage_pool_info:
     type:
       - dir
   register: pool_info_dir
-  ignore_errors: true
 
 - name: Verify type filtering works
   assert:
     that:
       - pool_info_dir is not changed
+      - pool_info_dir is success
       - pool_info_dir.storage_pools is defined
-  when: pool_info_dir is not failed
 
 - name: Test with non-existent pool (should fail)
   community.general.lxd_storage_pool_info:
@@ -63,11 +60,10 @@
   community.general.lxd_storage_pool_info:
   check_mode: true
   register: pool_info_check
-  ignore_errors: true
 
 - name: Verify check mode works
   assert:
     that:
       - pool_info_check is not changed
+      - pool_info_check is success
       - pool_info_check.storage_pools is defined
-  when: pool_info_check is not failed
