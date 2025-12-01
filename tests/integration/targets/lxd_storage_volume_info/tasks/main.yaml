@@ -11,65 +11,57 @@
   community.general.lxd_storage_volume_info:
     pool: default
   register: volume_info_all
-  ignore_errors: true
 
 - name: Verify volumes information was retrieved
   assert:
     that:
       - volume_info_all is not changed
+      - volume_info_all is success
       - volume_info_all.storage_volumes is defined
       - volume_info_all.storage_volumes is iterable
-  when: volume_info_all is not failed
 
 - name: Test filtering by volume type (custom)
   community.general.lxd_storage_volume_info:
     pool: default
     type: custom
   register: volume_info_custom
-  ignore_errors: true
 
 - name: Verify type filtering works
   assert:
     that:
       - volume_info_custom is not changed
+      - volume_info_custom is success
       - volume_info_custom.storage_volumes is defined
       - volume_info_custom.storage_volumes is iterable
-  when: volume_info_custom is not failed
 
 - name: Test filtering by volume type (container)
   community.general.lxd_storage_volume_info:
     pool: default
     type: container
   register: volume_info_container
-  ignore_errors: true
 
 - name: Verify container type filtering works
   assert:
     that:
       - volume_info_container is not changed
+      - volume_info_container is success
       - volume_info_container.storage_volumes is defined
-  when: volume_info_container is not failed
 
 - name: Test fetching specific volume by name
   community.general.lxd_storage_volume_info:
     pool: default
     name: "{{ volume_info_all.storage_volumes[0].name }}"
   register: volume_info_specific
-  ignore_errors: true
-  when:
-    - volume_info_all is not failed
-    - volume_info_all.storage_volumes | length > 0
+  when: volume_info_all.storage_volumes | length > 0
 
 - name: Verify specific volume retrieval
   assert:
     that:
       - volume_info_specific is not changed
+      - volume_info_specific is success
       - volume_info_specific.storage_volumes | length == 1
       - volume_info_specific.storage_volumes[0].name == volume_info_all.storage_volumes[0].name
-  when:
-    - volume_info_all is not failed
-    - volume_info_all.storage_volumes | length > 0
-    - volume_info_specific is not failed
+  when: volume_info_all.storage_volumes | length > 0
 
 - name: Test with non-existent pool (should fail)
   community.general.lxd_storage_volume_info:
@@ -100,11 +92,10 @@
     pool: default
   check_mode: true
   register: volume_info_check
-  ignore_errors: true
 
 - name: Verify check mode works
   assert:
     that:
       - volume_info_check is not changed
+      - volume_info_check is success
       - volume_info_check.storage_volumes is defined
-  when: volume_info_check is not failed
