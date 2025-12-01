@@ -421,11 +421,9 @@ def get_hostname_list(module):
         hostname_spec = hostnames[0]
         count_range = range(count_offset, count_offset + count)
         if re.search(r"%\d{0,2}d", hostname_spec):
-            hostname_spec = re.sub(r"%(\d{0,2})d", r"{:\1}", hostname_spec, count=0)
-            hostnames = [hostname_spec.format(i) for i in count_range]
+            hostnames = [hostname_spec % i for i in count_range]
         elif count > 1:
-            hostname_spec = f"{hostname_spec}{{:02}}"
-            hostnames = [hostname_spec.format(i) for i in count_range]
+            hostnames = [f"{hostname_spec}{i:02}" for i in count_range]
 
     for hn in hostnames:
         if not is_valid_hostname(hn):
