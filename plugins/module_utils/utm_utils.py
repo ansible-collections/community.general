@@ -12,18 +12,19 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
 class UTMModuleConfigurationError(Exception):
-    def __init__(self, msg, **args):
+    def __init__(self, msg: str, **args):
         super().__init__(self, msg)
         self.msg = msg
         self.module_fail_args = args
 
-    def do_fail(self, module):
+    def do_fail(self, module: AnsibleModule) -> t.NoReturn:
         module.fail_json(msg=self.msg, other=self.module_fail_args)
 
 
@@ -75,7 +76,7 @@ class UTMModule(AnsibleModule):
 
 
 class UTM:
-    def __init__(self, module, endpoint, change_relevant_keys, info_only=False):
+    def __init__(self, module: UTMModule, endpoint, change_relevant_keys, info_only=False):
         """
         Initialize UTM Class
         :param module: The Ansible module

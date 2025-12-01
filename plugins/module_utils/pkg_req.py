@@ -4,7 +4,12 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from ansible_collections.community.general.plugins.module_utils import deps
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 with deps.declare("packaging"):
@@ -13,11 +18,11 @@ with deps.declare("packaging"):
 
 
 class PackageRequirement:
-    def __init__(self, module, name):
+    def __init__(self, module: AnsibleModule, name: str) -> None:
         self.module = module
         self.parsed_name, self.requirement = self._parse_spec(name)
 
-    def _parse_spec(self, name):
+    def _parse_spec(self, name: str) -> tuple[str, Requirement | None]:
         """
         Parse a package name that may include version specifiers using PEP 508.
         Returns a tuple of (name, requirement) where requirement is of type packaging.requirements.Requirement and it may be None.
@@ -49,7 +54,7 @@ class PackageRequirement:
         except Exception as e:
             raise ValueError(f"Invalid package specification for '{name}': {e}") from e
 
-    def matches_version(self, version):
+    def matches_version(self, version: str):
         """
         Check if a version string fulfills a version specifier.
 

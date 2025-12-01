@@ -188,6 +188,7 @@ logs:
 """
 
 import os
+import typing as t
 from urllib.parse import quote, urlencode
 
 from ansible.module_utils.basic import AnsibleModule
@@ -252,19 +253,16 @@ class LXDStorageVolumeInfo:
 
         self.trust_password = self.module.params["trust_password"]
 
-    def _fail_from_lxd_exception(self, exception: LXDClientException) -> None:
+    def _fail_from_lxd_exception(self, exception: LXDClientException) -> t.NoReturn:
         """Build failure parameters from LXDClientException and fail.
 
         :param exception: The LXDClientException instance
         :type exception: LXDClientException
         """
-        fail_params = {
-            "msg": exception.msg,
-            "changed": False,
-        }
+        fail_params = {}
         if self.client.debug and "logs" in exception.kwargs:
             fail_params["logs"] = exception.kwargs["logs"]
-        self.module.fail_json(**fail_params)
+        self.module.fail_json(msg=exception.msg, changed=False, **fail_params)
 
     def _build_url(self, endpoint: str) -> str:
         """Build URL with project parameter if specified."""

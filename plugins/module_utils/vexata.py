@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import typing as t
 
 HAS_VEXATAPI = True
 try:
@@ -14,10 +15,14 @@ except ImportError:
 
 from ansible.module_utils.basic import env_fallback
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
+
 VXOS_VERSION = None
 
 
-def get_version(iocs_json):
+def get_version(iocs_json) -> tuple[int, ...]:
     if not iocs_json:
         raise Exception("Invalid IOC json")
     active = next((x for x in iocs_json if x["mgmtRole"]), None)
@@ -31,7 +36,7 @@ def get_version(iocs_json):
     return tuple(ver)
 
 
-def get_array(module):
+def get_array(module: AnsibleModule):
     """Return storage array object or fail"""
     global VXOS_VERSION
     array = module.params["array"]
@@ -60,7 +65,7 @@ def get_array(module):
         module.fail_json(msg=f"Vexata API access failed: {e}")
 
 
-def argument_spec():
+def argument_spec() -> dict[str, t.Any]:
     """Return standard base dictionary used for the argument_spec argument in AnsibleModule"""
     return dict(
         array=dict(type="str", required=True),
@@ -70,20 +75,20 @@ def argument_spec():
     )
 
 
-def required_together():
+def required_together() -> list[list[str]]:
     """Return the default list used for the required_together argument to AnsibleModule"""
     return [["user", "password"]]
 
 
-def size_to_MiB(size):
+def size_to_MiB(size: str) -> int:
     """Convert a '<integer>[MGT]' string to MiB, return -1 on error."""
     quant = size[:-1]
     exponent = size[-1]
     if not quant.isdigit() or exponent not in "MGT":
         return -1
-    quant = int(quant)
+    quant_int = int(quant)
     if exponent == "G":
-        quant <<= 10
+        quant_int <<= 10
     elif exponent == "T":
-        quant <<= 20
-    return quant
+        quant_int <<= 20
+    return quant_int

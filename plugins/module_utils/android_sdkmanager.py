@@ -6,8 +6,13 @@ from __future__ import annotations
 
 
 import re
+import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 __state_map = {"present": "--install", "absent": "--uninstall"}
 
@@ -15,13 +20,13 @@ __state_map = {"present": "--install", "absent": "--uninstall"}
 __channel_map = {"stable": 0, "beta": 1, "dev": 2, "canary": 3}
 
 
-def __map_channel(channel_name):
+def __map_channel(channel_name: str) -> int:
     if channel_name not in __channel_map:
         raise ValueError(f"Unknown channel name '{channel_name}'")
     return __channel_map[channel_name]
 
 
-def sdkmanager_runner(module, **kwargs):
+def sdkmanager_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     return CmdRunner(
         module,
         command="sdkmanager",
@@ -40,18 +45,18 @@ def sdkmanager_runner(module, **kwargs):
 
 
 class Package:
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         if not isinstance(other, Package):
             return True
         return self.name != other.name
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Package):
             return False
 
@@ -78,20 +83,20 @@ class AndroidSdkManager:
         r"the packages they depend on were not accepted"
     )
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.runner = sdkmanager_runner(module)
 
-    def get_installed_packages(self):
+    def get_installed_packages(self) -> set[Package]:
         with self.runner("installed sdk_root channel") as ctx:
             rc, stdout, stderr = ctx.run()
             return self._parse_packages(stdout, self._RE_INSTALLED_PACKAGES_HEADER, self._RE_INSTALLED_PACKAGE)
 
-    def get_updatable_packages(self):
+    def get_updatable_packages(self) -> set[Package]:
         with self.runner("list newer sdk_root channel") as ctx:
             rc, stdout, stderr = ctx.run()
             return self._parse_packages(stdout, self._RE_UPDATABLE_PACKAGES_HEADER, self._RE_UPDATABLE_PACKAGE)
 
-    def apply_packages_changes(self, packages, accept_licenses=False):
+    def apply_packages_changes(self, packages: list[Package], accept_licenses: bool = False) -> tuple[int, str, str]:
         """Install or delete packages, depending on the `module.vars.state` parameter"""
         if len(packages) == 0:
             return 0, "", ""
@@ -113,7 +118,7 @@ class AndroidSdkManager:
                     return rc, stdout, stderr
         return 0, "", ""
 
-    def _try_parse_stderr(self, stderr):
+    def _try_parse_stderr(self, stderr: str) -> None:
         data = stderr.splitlines()
         for line in data:
             unknown_package_regex = self._RE_UNKNOWN_PACKAGE.match(line)
@@ -122,15 +127,15 @@ class AndroidSdkManager:
                 raise SdkManagerException(f"Unknown package {package}")
 
     @staticmethod
-    def _parse_packages(stdout, header_regexp, row_regexp):
+    def _parse_packages(stdout: str, header_regexp: re.Pattern, row_regexp: re.Pattern) -> set[Package]:
         data = stdout.splitlines()
 
-        section_found = False
+        section_found: bool = False
         packages = set()
 
         for line in data:
             if not section_found:
-                section_found = header_regexp.match(line)
+                section_found = bool(header_regexp.match(line))
                 continue
             else:
                 p = row_regexp.match(line)

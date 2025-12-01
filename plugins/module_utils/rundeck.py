@@ -6,11 +6,15 @@ from __future__ import annotations
 
 import json
 import traceback
+import typing as t
 
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
-def api_argument_spec():
+
+def api_argument_spec() -> dict[str, t.Any]:
     """
     Creates an argument spec that can be used with any module
     that will be requesting content via Rundeck API
@@ -27,7 +31,13 @@ def api_argument_spec():
     return api_argument_spec
 
 
-def api_request(module, endpoint, data=None, method="GET", content_type="application/json"):
+def api_request(
+    module: AnsibleModule,
+    endpoint: str,
+    data: t.Any | None = None,
+    method: str = "GET",
+    content_type: str = "application/json",
+) -> tuple[t.Any, dict[str, t.Any]]:
     """Manages Rundeck API requests via HTTP(S)
 
     :arg module:   The AnsibleModule (used to get url, api_version, api_token, etc).
