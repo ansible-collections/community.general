@@ -8,10 +8,10 @@ from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: ip2location_info
-short_description: Retrieve IP geolocation facts of a host's IP address
+short_description: Retrieve IP geolocation information of a host's IP address
 version_added: 12.2.0
 description:
-  - Gather IP geolocation facts of a host's IP address using the keyless U(api.ip2location.io) API.
+  - Gather IP geolocation information of a host's IP address using the keyless U(api.ip2location.io) API.
 author: "IP2Location (@ip2location)"
 extends_documentation_fragment:
   - community.general.attributes
@@ -19,7 +19,7 @@ extends_documentation_fragment:
 options:
   ip:
     description:
-      - IP address to retrieve geolocation facts for.
+      - IP address to retrieve geolocation information.
     type: str
   timeout:
     description:
@@ -43,8 +43,8 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-ansible_facts:
-  description: "Dictionary of IP geolocation facts for a host's IP address."
+record:
+  description: Dictionary of IP geolocation information for the IP address.
   returned: changed
   type: complex
   contains:
