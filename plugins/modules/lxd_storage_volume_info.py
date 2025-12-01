@@ -285,9 +285,18 @@ class LXDStorageVolumeInfo:
                     msg=f'Failed to retrieve storage pool "{self.pool}": {resp_json.get("error", "Unknown error")}'
                 )
 
-    def _get_volume_list(self) -> list[str]:
-        """Get list of all volume URLs in the storage pool."""
-        url = self._build_url(f"{LXD_API_STORAGE_POOLS_ENDPOINT}/{quote(self.pool, safe='')}/volumes")
+    def _get_volume_list(self, recursion: int = 0) -> list:
+        """Get list of all volumes in the storage pool.
+
+        :param recursion: API recursion level (0 for URLs only, 1 for full objects)
+        :type recursion: int
+        :return: List of volume URLs (recursion=0) or volume objects (recursion=1)
+        :rtype: list
+        """
+        endpoint = f"{LXD_API_STORAGE_POOLS_ENDPOINT}/{quote(self.pool, safe='')}/volumes"
+        if recursion > 0:
+            endpoint = f"{endpoint}?recursion={recursion}"
+        url = self._build_url(endpoint)
         resp_json = self.client.do("GET", url, ok_error_codes=[])
 
         if resp_json["type"] == "error":
@@ -296,45 +305,9 @@ class LXDStorageVolumeInfo:
                 error_code=resp_json.get("error_code"),
             )
 
-        # The response contains a list of volume URLs like
-        # ['/1.0/storage-pools/default/volumes/custom/my-volume']
-        volume_urls = resp_json.get("metadata", [])
-        return volume_urls
-
-    def _parse_volume_url(self, volume_url: str) -> tuple[str, str]:
-        """Parse volume URL to extract type and name.
-
-        Expected URL format: /{LXD_API_VERSION}/storage-pools/{pool}/volumes/{type}/{name}
-
-        The URL is split and empty parts (from leading/trailing slashes) are filtered out.
-        After normalization, the expected positions are:
-        - Index 0: API version (e.g., "1.0")
-        - Index 1: "storage-pools"
-        - Index 2: pool name
-        - Index 3: "volumes"
-        - Index 4: volume type (e.g., "custom", "container", "virtual-machine", "image")
-        - Index 5: volume name
-
-        :param volume_url: The volume URL string from the LXD API
-        :type volume_url: str
-        :return: Tuple of (volume_type, volume_name)
-        :rtype: tuple[str, str]
-        :raises: Fails the module if the URL format is unexpected
-        """
-        # Split the URL and filter out empty parts from leading/trailing slashes
-        parts = [part for part in volume_url.split("/") if part]
-
-        # Verify the URL structure matches expected pattern
-        if parts[0] != LXD_API_VERSION:
-            self.module.fail_json(
-                msg=f'Unexpected volume URL format from LXD API: "{volume_url}". '
-                f'Expected API version "{LXD_API_VERSION}" but got "{parts[0]}"'
-            )
-
-        vol_type = parts[4]
-        vol_name = parts[5]
-
-        return vol_type, vol_name
+        # With recursion=0: list of volume URLs like ['/1.0/storage-pools/default/volumes/custom/my-volume']
+        # With recursion=1: list of volume objects with full metadata
+        return resp_json.get("metadata", [])
 
     def _get_volume_info(self, volume_type: str, volume_name: str) -> dict:
         """Get detailed information about a specific storage volume."""
@@ -369,29 +342,27 @@ class LXDStorageVolumeInfo:
                 volume_info = self._get_volume_info(self.volume_type, self.name)
                 storage_volumes.append(volume_info)
             else:
-                # Try to find the volume by iterating through all volumes
-                volume_urls = self._get_volume_list()
+                # Try to find the volume by name using recursion for efficiency
+                # This gets all volume objects in a single API call
+                volumes = self._get_volume_list(recursion=1)
                 found = False
-                for volume_url in volume_urls:
-                    vol_type, vol_name = self._parse_volume_url(volume_url)
-                    if vol_name == self.name:
-                        volume_info = self._get_volume_info(vol_type, vol_name)
-                        storage_volumes.append(volume_info)
+                for volume in volumes:
+                    if volume.get("name") == self.name:
+                        storage_volumes.append(volume)
                         found = True
                         break
 
                 if not found:
                     self.module.fail_json(msg=f'Storage volume "{self.name}" not found in pool "{self.pool}"')
         else:
-            # Get information about all volumes in the pool
-            volume_urls = self._get_volume_list()
-            for volume_url in volume_urls:
-                vol_type, vol_name = self._parse_volume_url(volume_url)
+            # Get information about all volumes in the pool using recursion
+            # This retrieves all volume details in a single API call instead of one call per volume
+            volumes = self._get_volume_list(recursion=1)
+            for volume in volumes:
                 # Apply type filter if specified
-                if self.volume_type and vol_type != self.volume_type:
+                if self.volume_type and volume.get("type") != self.volume_type:
                     continue
-                volume_info = self._get_volume_info(vol_type, vol_name)
-                storage_volumes.append(volume_info)
+                storage_volumes.append(volume)
 
         return storage_volumes
 

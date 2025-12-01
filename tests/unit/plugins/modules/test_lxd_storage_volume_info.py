@@ -41,24 +41,16 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
         self.module = module
 
     def test_returns_all_volumes_for_pool(self):
-        """Volume metadata is returned for every volume in the pool."""
+        """Volume metadata is returned for every volume in the pool using recursion."""
         FakeLXDClient.responses = {
             ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default"}},
-            ("GET", "/1.0/storage-pools/default/volumes"): {
+            ("GET", "/1.0/storage-pools/default/volumes?recursion=1"): {
                 "type": "sync",
                 "metadata": [
-                    "/1.0/storage-pools/default/volumes/custom/data",
-                    "/1.0/storage-pools/default/volumes/container/web",
+                    {"name": "data", "type": "custom"},
+                    {"name": "web", "type": "container"},
                 ],
             },
-            (
-                "GET",
-                "/1.0/storage-pools/default/volumes/custom/data",
-            ): {"type": "sync", "metadata": {"name": "data", "type": "custom"}},
-            (
-                "GET",
-                "/1.0/storage-pools/default/volumes/container/web",
-            ): {"type": "sync", "metadata": {"name": "web", "type": "container"}},
         }
 
         with patch.object(self.module, "LXDClient", FakeLXDClient):
@@ -74,20 +66,16 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
         ]
 
     def test_returns_specific_storage_volume(self):
-        """When name is specified, only that volume is returned."""
+        """When name is specified without type, recursion is used to find it."""
         FakeLXDClient.responses = {
             ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default"}},
-            ("GET", "/1.0/storage-pools/default/volumes"): {
+            ("GET", "/1.0/storage-pools/default/volumes?recursion=1"): {
                 "type": "sync",
                 "metadata": [
-                    "/1.0/storage-pools/default/volumes/custom/data",
-                    "/1.0/storage-pools/default/volumes/container/web",
+                    {"name": "data", "type": "custom"},
+                    {"name": "web", "type": "container"},
                 ],
             },
-            (
-                "GET",
-                "/1.0/storage-pools/default/volumes/custom/data",
-            ): {"type": "sync", "metadata": {"name": "data", "type": "custom"}},
         }
 
         with patch.object(self.module, "LXDClient", FakeLXDClient):
@@ -102,20 +90,16 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
         ]
 
     def test_filters_storage_volumes_by_type(self):
-        """Volumes can be filtered by type."""
+        """Volumes can be filtered by type using recursion."""
         FakeLXDClient.responses = {
             ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default"}},
-            ("GET", "/1.0/storage-pools/default/volumes"): {
+            ("GET", "/1.0/storage-pools/default/volumes?recursion=1"): {
                 "type": "sync",
                 "metadata": [
-                    "/1.0/storage-pools/default/volumes/custom/data",
-                    "/1.0/storage-pools/default/volumes/container/web",
+                    {"name": "data", "type": "custom"},
+                    {"name": "web", "type": "container"},
                 ],
             },
-            (
-                "GET",
-                "/1.0/storage-pools/default/volumes/container/web",
-            ): {"type": "sync", "metadata": {"name": "web", "type": "container"}},
         }
 
         with patch.object(self.module, "LXDClient", FakeLXDClient):
@@ -129,11 +113,32 @@ class TestLXDStorageVolumeInfo(ModuleTestCase):
             {"name": "web", "type": "container"},
         ]
 
+    def test_returns_specific_volume_with_type_using_direct_request(self):
+        """When both name and type are specified, a direct API call is made (no recursion)."""
+        FakeLXDClient.responses = {
+            ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default"}},
+            ("GET", "/1.0/storage-pools/default/volumes/custom/data"): {
+                "type": "sync",
+                "metadata": {"name": "data", "type": "custom", "config": {"size": "10GiB"}},
+            },
+        }
+
+        with patch.object(self.module, "LXDClient", FakeLXDClient):
+            with patch.object(self.module.os.path, "exists", return_value=False):
+                with self.assertRaises(AnsibleExitJson) as exc:
+                    with set_module_args({"pool": "default", "name": "data", "type": "custom"}):
+                        self.module.main()
+
+        result = exc.exception.args[0]
+        assert result["storage_volumes"] == [
+            {"name": "data", "type": "custom", "config": {"size": "10GiB"}},
+        ]
+
     def test_error_code_returned_when_listing_volumes_fails(self):
         """Errors from LXD are surfaced with the numeric code."""
         FakeLXDClient.responses = {
             ("GET", "/1.0/storage-pools/default"): {"type": "sync", "metadata": {"name": "default"}},
-            ("GET", "/1.0/storage-pools/default/volumes"): {
+            ("GET", "/1.0/storage-pools/default/volumes?recursion=1"): {
                 "type": "error",
                 "error": "service unavailable",
                 "error_code": 503,
