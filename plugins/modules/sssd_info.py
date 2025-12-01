@@ -111,7 +111,15 @@ error:
 
 
 from ansible.module_utils.basic import AnsibleModule
-import dbus
+
+
+DBUS_IMP_ERR = None
+HAS_DBUS = False
+try:
+    import dbus
+    HAS_DBUS = True
+except Exception:
+    DBUS_IMP_ERR = traceback.format_exc()
 
 
 class SSSDHandler:
@@ -240,6 +248,12 @@ def main() -> None:
         ]
     )
     
+    if not HAS_DBUS:
+        module.fail_json(
+            msg=missing_required_lib('dbus-python'),
+            exception=DBUS_IMP_ERR
+        )
+            
     action = module.params['action']
     domain = module.params.get('domain')
     server_type = module.params.get('server_type')
