@@ -931,6 +931,10 @@ files:
     maintainers: conloos
   $modules/lxd_project.py:
     maintainers: we10710aa
+  $modules/lxd_storage_pool_info.py:
+    maintainers: smcavoy
+  $modules/lxd_storage_volume_info.py:
+    maintainers: smcavoy
   $modules/macports.py:
     ignore: ryansb
     keywords: brew cask darwin homebrew macosx macports osx
