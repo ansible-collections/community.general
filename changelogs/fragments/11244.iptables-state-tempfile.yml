@@ -1,2 +1,2 @@
-mionr_changes:
+minor_changes:
   - iptables_state - simplify handling of temporary files (https://github.com/ansible-collections/community.general/pull/11244).
