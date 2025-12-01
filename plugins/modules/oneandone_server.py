@@ -553,7 +553,7 @@ def _auto_increment_hostname(count, hostname):
     name-02, name-03, and so forth.
     """
     if "%" not in hostname:
-        hostname = "%s-%%01d" % hostname  # noqa
+        hostname = f"{hostname}-%01d"
 
     return [hostname % i for i in range(1, count + 1)]
 
