@@ -510,7 +510,7 @@ def create_file(content):
     return tmpfile
 
 
-def main():
+def create_module() -> AnsibleModule:
     choose_between = (["certificate", "certificate_path"], ["private_key", "private_key_path"])
 
     module = AnsibleModule(
@@ -533,6 +533,11 @@ def main():
         add_file_common_args=True,
     )
     module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C")
+    return module
+
+
+def main():
+    module = create_module()
 
     result = dict()
     jks = JavaKeystore(module)
