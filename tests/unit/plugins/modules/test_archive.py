@@ -7,12 +7,11 @@ from __future__ import annotations
 import pytest
 from unittest.mock import Mock, patch
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     ModuleTestCase,
     set_module_args,
 )
-from ansible_collections.community.general.plugins.modules.archive import get_archive, common_path
+from ansible_collections.community.general.plugins.modules.archive import get_archive, common_path, create_module
 
 
 class TestArchive(ModuleTestCase):
@@ -27,19 +26,7 @@ class TestArchive(ModuleTestCase):
 
     def test_archive_removal_safety(self):
         with set_module_args(dict(path=["/foo", "/bar", "/baz"], dest="/foo/destination.tgz", remove=True)):
-            module = AnsibleModule(
-                argument_spec=dict(
-                    path=dict(type="list", elements="path", required=True),
-                    format=dict(type="str", default="gz", choices=["bz2", "gz", "tar", "xz", "zip"]),
-                    dest=dict(type="path"),
-                    exclude_path=dict(type="list", elements="path", default=[]),
-                    exclusion_patterns=dict(type="list", elements="path"),
-                    force_archive=dict(type="bool", default=False),
-                    remove=dict(type="bool", default=False),
-                ),
-                add_file_common_args=True,
-                supports_check_mode=True,
-            )
+            module = create_module()
 
         self.os_path_isdir.side_effect = [True, False, False, True]
 
