@@ -1,0 +1,101 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get information about all volumes in default pool
+  community.general.lxd_storage_volume_info:
+    pool: default
+  register: volume_info_all
+
+- name: Verify volumes information was retrieved
+  assert:
+    that:
+      - volume_info_all is not changed
+      - volume_info_all is success
+      - volume_info_all.storage_volumes is defined
+      - volume_info_all.storage_volumes is iterable
+
+- name: Test filtering by volume type (custom)
+  community.general.lxd_storage_volume_info:
+    pool: default
+    type: custom
+  register: volume_info_custom
+
+- name: Verify type filtering works
+  assert:
+    that:
+      - volume_info_custom is not changed
+      - volume_info_custom is success
+      - volume_info_custom.storage_volumes is defined
+      - volume_info_custom.storage_volumes is iterable
+
+- name: Test filtering by volume type (container)
+  community.general.lxd_storage_volume_info:
+    pool: default
+    type: container
+  register: volume_info_container
+
+- name: Verify container type filtering works
+  assert:
+    that:
+      - volume_info_container is not changed
+      - volume_info_container is success
+      - volume_info_container.storage_volumes is defined
+
+- name: Test fetching specific volume by name
+  community.general.lxd_storage_volume_info:
+    pool: default
+    name: "{{ volume_info_all.storage_volumes[0].name }}"
+  register: volume_info_specific
+  when: volume_info_all.storage_volumes | length > 0
+
+- name: Verify specific volume retrieval
+  assert:
+    that:
+      - volume_info_specific is not changed
+      - volume_info_specific is success
+      - volume_info_specific.storage_volumes | length == 1
+      - volume_info_specific.storage_volumes[0].name == volume_info_all.storage_volumes[0].name
+  when: volume_info_all.storage_volumes | length > 0
+
+- name: Test with non-existent pool (should fail)
+  community.general.lxd_storage_volume_info:
+    pool: nonexistent-pool-12345
+  register: volume_info_nonexistent_pool
+  ignore_errors: true
+
+- name: Verify error handling for non-existent pool
+  assert:
+    that:
+      - volume_info_nonexistent_pool is failed
+
+- name: Test with non-existent volume name (should fail)
+  community.general.lxd_storage_volume_info:
+    pool: default
+    name: nonexistent-volume-12345
+  register: volume_info_nonexistent_volume
+  ignore_errors: true
+
+- name: Verify error handling for non-existent volume
+  assert:
+    that:
+      - volume_info_nonexistent_volume is failed
+  when: volume_info_nonexistent_volume is defined
+
+- name: Test check mode
+  community.general.lxd_storage_volume_info:
+    pool: default
+  check_mode: true
+  register: volume_info_check
+
+- name: Verify check mode works
+  assert:
+    that:
+      - volume_info_check is not changed
+      - volume_info_check is success
+      - volume_info_check.storage_volumes is defined
