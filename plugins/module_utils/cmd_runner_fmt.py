@@ -24,7 +24,7 @@ def _ensure_list(value: _T | Sequence[_T]) -> list[_T]:
 class _ArgFormat:
     def __init__(
         self,
-        func: Callable[[t.Any], Sequence[t.Any]],
+        func: ArgFormatType,
         ignore_none: bool | None = True,
         ignore_missing_value: bool = False,
     ) -> None:
@@ -95,7 +95,7 @@ def as_fixed(*args: t.Any) -> _ArgFormat:
     return _ArgFormat(lambda value: _ensure_list(args), ignore_none=False, ignore_missing_value=True)
 
 
-def as_func(func: Callable[[t.Any], Sequence[t.Any]], ignore_none: bool | None = None) -> _ArgFormat:
+def as_func(func: ArgFormatType, ignore_none: bool | None = None) -> _ArgFormat:
     return _ArgFormat(func, ignore_none=ignore_none)
 
 

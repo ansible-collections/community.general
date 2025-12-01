@@ -14,6 +14,9 @@ from ansible_collections.community.general.plugins.module_utils import cmd_runne
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.general.plugins.module_utils.cmd_runner_fmt import ArgFormatType
+
+    ArgFormatter = t.Union[ArgFormatType, cmd_runner_fmt._ArgFormat]
 
 
 def _ensure_list(value):
@@ -84,7 +87,7 @@ class CmdRunner:
         self,
         module: AnsibleModule,
         command,
-        arg_formats: Mapping[str, Callable[[t.Any], Sequence[t.Any]] | cmd_runner_fmt._ArgFormat] | None = None,
+        arg_formats: Mapping[str, ArgFormatter] | None = None,
         default_args_order: str | Sequence[str] = (),
         check_rc: bool = False,
         force_lang: str = "C",
