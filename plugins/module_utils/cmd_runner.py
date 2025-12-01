@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
     from ansible_collections.community.general.plugins.module_utils.cmd_runner_fmt import ArgFormatType
 
-    ArgFormatter = t.Union[ArgFormatType, cmd_runner_fmt._ArgFormat]
+    ArgFormatter = ArgFormatType | cmd_runner_fmt._ArgFormat
 
 
 def _ensure_list(value):
