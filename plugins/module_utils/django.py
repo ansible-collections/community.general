@@ -12,7 +12,8 @@ from ansible_collections.community.general.plugins.module_utils.python_runner im
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
 if t.TYPE_CHECKING:
-    from .cmd_runner_fmt import ArgFormatType
+    from ansible.module_utils.basic import AnsibleModule
+    from ansible_collections.community.general.plugins.module_utils.cmd_runner import ArgFormatter
 
 
 django_std_args = dict(
@@ -36,7 +37,7 @@ _pks = dict(
     primary_keys=dict(type="list", elements="str"),
 )
 
-_django_std_arg_fmts: dict[str, ArgFormatType] = dict(
+_django_std_arg_fmts: dict[str, ArgFormatter] = dict(
     all=cmd_runner_fmt.as_bool("--all"),
     app=cmd_runner_fmt.as_opt_val("--app"),
     apps=cmd_runner_fmt.as_list(),
@@ -81,7 +82,7 @@ _args_menu = dict(
 
 
 class _DjangoRunner(PythonRunner):
-    def __init__(self, module, arg_formats=None, **kwargs):
+    def __init__(self, module: AnsibleModule, arg_formats=None, **kwargs) -> None:
         arg_fmts = dict(arg_formats) if arg_formats else {}
         arg_fmts.update(_django_std_arg_fmts)
 
@@ -108,12 +109,12 @@ class _DjangoRunner(PythonRunner):
 class DjangoModuleHelper(ModuleHelper):
     module = {}
     django_admin_cmd: str | None = None
-    arg_formats: dict[str, ArgFormatType] = {}
+    arg_formats: dict[str, ArgFormatter] = {}
     django_admin_arg_order: tuple[str, ...] | str = ()
     _django_args: list[str] = []
     _check_mode_arg: str = ""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.module["argument_spec"], self.arg_formats = self._build_args(
             self.module.get("argument_spec", {}), self.arg_formats, *(["std"] + self._django_args)
         )
@@ -122,9 +123,9 @@ class DjangoModuleHelper(ModuleHelper):
             self.vars.command = self.django_admin_cmd
 
     @staticmethod
-    def _build_args(arg_spec, arg_format, *names):
-        res_arg_spec = {}
-        res_arg_fmts = {}
+    def _build_args(arg_spec, arg_format, *names) -> tuple[dict[str, t.Any], dict[str, ArgFormatter]]:
+        res_arg_spec: dict[str, t.Any] = {}
+        res_arg_fmts: dict[str, ArgFormatter] = {}
         for name in names:
             args, fmts = _args_menu[name]
             res_arg_spec = dict_merge(res_arg_spec, args)

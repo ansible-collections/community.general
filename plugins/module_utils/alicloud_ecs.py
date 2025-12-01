@@ -14,7 +14,12 @@ from __future__ import annotations
 import os
 import json
 import traceback
+import typing as t
+
 from ansible.module_utils.basic import env_fallback
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 try:
     import footmark
@@ -200,7 +205,7 @@ def get_profile(params):
     return params
 
 
-def ecs_connect(module):
+def ecs_connect(module: AnsibleModule):
     """Return an ecs connection"""
     ecs_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -214,7 +219,7 @@ def ecs_connect(module):
     return ecs
 
 
-def slb_connect(module):
+def slb_connect(module: AnsibleModule):
     """Return an slb connection"""
     slb_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -228,7 +233,7 @@ def slb_connect(module):
     return slb
 
 
-def dns_connect(module):
+def dns_connect(module: AnsibleModule):
     """Return an dns connection"""
     dns_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -242,7 +247,7 @@ def dns_connect(module):
     return dns
 
 
-def vpc_connect(module):
+def vpc_connect(module: AnsibleModule):
     """Return an vpc connection"""
     vpc_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -256,7 +261,7 @@ def vpc_connect(module):
     return vpc
 
 
-def rds_connect(module):
+def rds_connect(module: AnsibleModule):
     """Return an rds connection"""
     rds_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -270,7 +275,7 @@ def rds_connect(module):
     return rds
 
 
-def ess_connect(module):
+def ess_connect(module: AnsibleModule):
     """Return an ess connection"""
     ess_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -284,7 +289,7 @@ def ess_connect(module):
     return ess
 
 
-def sts_connect(module):
+def sts_connect(module: AnsibleModule):
     """Return an sts connection"""
     sts_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -298,7 +303,7 @@ def sts_connect(module):
     return sts
 
 
-def ram_connect(module):
+def ram_connect(module: AnsibleModule):
     """Return an ram connection"""
     ram_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
@@ -312,7 +317,7 @@ def ram_connect(module):
     return ram
 
 
-def market_connect(module):
+def market_connect(module: AnsibleModule):
     """Return an market connection"""
     market_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.

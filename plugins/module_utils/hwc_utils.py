@@ -7,6 +7,7 @@ from __future__ import annotations
 import re
 import time
 import traceback
+import typing as t
 
 THIRD_LIBRARIES_IMP_ERR = None
 try:
@@ -24,37 +25,37 @@ from ansible.module_utils.common.text.converters import to_text
 
 
 class HwcModuleException(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         super().__init__()
 
         self._message = message
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"[HwcClientException] message={self._message}"
 
 
 class HwcClientException(Exception):
-    def __init__(self, code, message):
+    def __init__(self, code: int, message: str) -> None:
         super().__init__()
 
         self._code = code
         self._message = message
 
-    def __str__(self):
+    def __str__(self) -> str:
         msg = f" code={self._code}," if self._code != 0 else ""
         return f"[HwcClientException]{msg} message={self._message}"
 
 
 class HwcClientException404(HwcClientException):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         super().__init__(404, message)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"[HwcClientException404] message={self._message}"
 
 
 def session_method_wrapper(f):
-    def _wrap(self, url, *args, **kwargs):
+    def _wrap(self, url: str, *args, **kwargs):
         try:
             url = self.endpoint + url
             r = f(self, url, *args, **kwargs)
@@ -91,7 +92,7 @@ def session_method_wrapper(f):
 
 
 class _ServiceClient:
-    def __init__(self, client, endpoint, product):
+    def __init__(self, client, endpoint: str, product):
         self._client = client
         self._endpoint = endpoint
         self._default_header = {
@@ -100,30 +101,30 @@ class _ServiceClient:
         }
 
     @property
-    def endpoint(self):
+    def endpoint(self) -> str:
         return self._endpoint
 
     @endpoint.setter
-    def endpoint(self, e):
+    def endpoint(self, e: str) -> None:
         self._endpoint = e
 
     @session_method_wrapper
-    def get(self, url, body=None, header=None, timeout=None):
+    def get(self, url: str, body=None, header: dict[str, t.Any] | None = None, timeout=None):
         return self._client.get(url, json=body, timeout=timeout, headers=self._header(header))
 
     @session_method_wrapper
-    def post(self, url, body=None, header=None, timeout=None):
+    def post(self, url: str, body=None, header: dict[str, t.Any] | None = None, timeout=None):
         return self._client.post(url, json=body, timeout=timeout, headers=self._header(header))
 
     @session_method_wrapper
-    def delete(self, url, body=None, header=None, timeout=None):
+    def delete(self, url: str, body=None, header: dict[str, t.Any] | None = None, timeout=None):
         return self._client.delete(url, json=body, timeout=timeout, headers=self._header(header))
 
     @session_method_wrapper
-    def put(self, url, body=None, header=None, timeout=None):
+    def put(self, url: str, body=None, header: dict[str, t.Any] | None = None, timeout=None):
         return self._client.put(url, json=body, timeout=timeout, headers=self._header(header))
 
-    def _header(self, header):
+    def _header(self, header: dict[str, t.Any] | None) -> dict[str, t.Any]:
         if header and isinstance(header, dict):
             for k, v in self._default_header.items():
                 if k not in header:
@@ -135,18 +136,18 @@ class _ServiceClient:
 
 
 class Config:
-    def __init__(self, module, product):
+    def __init__(self, module: AnsibleModule, product) -> None:
         self._project_client = None
         self._domain_client = None
         self._module = module
         self._product = product
-        self._endpoints = {}
+        self._endpoints: dict[str, t.Any] = {}
 
         self._validate()
         self._gen_provider_client()
 
     @property
-    def module(self):
+    def module(self) -> AnsibleModule:
         return self._module
 
     def client(self, region, service_type, service_level):
@@ -380,7 +381,7 @@ def navigate_value(data, index, array_index=None):
     return d
 
 
-def build_path(module, path, kv=None):
+def build_path(module: AnsibleModule, path, kv=None):
     if kv is None:
         kv = dict()
 
@@ -400,7 +401,7 @@ def build_path(module, path, kv=None):
     return path.format(**v)
 
 
-def get_region(module):
+def get_region(module: AnsibleModule):
     if module.params["region"]:
         return module.params["region"]
 

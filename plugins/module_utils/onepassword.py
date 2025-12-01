@@ -14,11 +14,11 @@ class OnePasswordConfig:
         "~/.config/.op/config",
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._config_file_path = ""
 
     @property
-    def config_file_path(self):
+    def config_file_path(self) -> str | None:
         if self._config_file_path:
             return self._config_file_path
 
@@ -27,3 +27,5 @@ class OnePasswordConfig:
             if os.path.exists(realpath):
                 self._config_file_path = realpath
                 return self._config_file_path
+
+        return None

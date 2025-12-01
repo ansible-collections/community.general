@@ -10,7 +10,7 @@ import os
 import time
 
 
-def download_updates_file(updates_expiration):
+def download_updates_file(updates_expiration: int | float) -> tuple[str, bool]:
     updates_filename = "jenkins-plugin-cache.json"
     updates_dir = os.path.expanduser("~/.ansible/tmp")
     updates_file = os.path.join(updates_dir, updates_filename)
