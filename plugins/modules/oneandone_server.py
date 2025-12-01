@@ -203,7 +203,6 @@ servers:
 """
 
 import os
-import re
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
