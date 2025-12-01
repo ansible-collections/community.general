@@ -110,7 +110,9 @@ error:
 '''
 
 
-from ansible.module_utils.basic import AnsibleModule
+import traceback
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 DBUS_IMP_ERR = None
@@ -137,10 +139,10 @@ class SSSDHandler:
 
     def _get_domain_path(self, domain: str) -> str:
         """Convert domain name to D-Bus path format.
-        
+
         Args:
             domain: Domain name to convert.
-            
+
         Returns:
             D-Bus path for the domain.
         """
@@ -148,13 +150,13 @@ class SSSDHandler:
 
     def _get_domain_object(self, domain: str) -> dbus.proxies.ProxyObject:
         """Get D-Bus object for domain.
-        
+
         Args:
             domain: Domain name to get object for.
-            
+
         Returns:
             D-Bus proxy object for the domain.
-            
+
         Raises:
             Exception: If domain is not found.
         """
@@ -166,10 +168,10 @@ class SSSDHandler:
 
     def check_domain_status(self, domain: str) -> str:
         """Check if domain is online.
-        
+
         Args:
             domain: Domain name to check.
-            
+
         Returns:
             'online' if domain is online, 'offline' otherwise.
         """
@@ -179,11 +181,11 @@ class SSSDHandler:
 
     def get_active_servers(self, domain: str, server_type: str) -> dict:
         """Get active servers for domain.
-        
+
         Args:
             domain: Domain name to get servers for.
             server_type: Type of servers ('IPA' or 'AD').
-            
+
         Returns:
             Dictionary with server types as keys and server names as values.
         """
@@ -202,11 +204,11 @@ class SSSDHandler:
 
     def list_servers(self, domain: str, server_type: str) -> list:
         """List all servers for domain.
-        
+
         Args:
             domain: Domain name to list servers for.
             server_type: Type of servers ('IPA' or 'AD').
-            
+
         Returns:
             List of server names.
         """
@@ -220,7 +222,7 @@ class SSSDHandler:
 
     def get_domain_list(self) -> list:
         """Get list of all domains.
-        
+
         Returns:
             List of domain names.
         """
@@ -247,13 +249,13 @@ def main() -> None:
             ('action', 'active_servers', ['domain', 'server_type'])
         ]
     )
-    
+
     if not HAS_DBUS:
         module.fail_json(
             msg=missing_required_lib('dbus-python'),
             exception=DBUS_IMP_ERR
         )
-            
+
     action = module.params['action']
     domain = module.params.get('domain')
     server_type = module.params.get('server_type')
