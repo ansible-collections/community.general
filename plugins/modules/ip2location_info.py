@@ -28,7 +28,7 @@ options:
     type: int
   http_agent:
     description:
-      - Set http user agent.
+      - Set HTTP user agent.
     default: "ansible-ip2location-info-module/0.0.1"
     type: str
 notes:
