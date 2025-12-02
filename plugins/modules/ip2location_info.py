@@ -40,6 +40,11 @@ EXAMPLES = r"""
 # Retrieve geolocation data of a host's IP address
 - name: Get IP geolocation data
   community.general.ip2location_info:
+  register: result
+
+- name: Show some information
+  ansible.builtin.debug:
+    msg: "{{ result.ip }} is located in {{ result.country_code }} ({{ result.country_name }})"
 """
 
 RETURN = r"""
