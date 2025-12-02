@@ -52,7 +52,7 @@ EXAMPLES = r"""
 import time
 import re
 
-from collections import namedtuple
+from enum import Enum
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -68,38 +68,53 @@ STATE_COMMAND_MAP = {
 MONIT_SERVICES = ["Process", "File", "Fifo", "Filesystem", "Directory", "Remote host", "System", "Program", "Network"]
 
 
-class StatusValue(namedtuple("Status", "value, is_pending")):
+class StatusValue(Enum):
     MISSING = "missing"
     OK = "ok"
     NOT_MONITORED = "not_monitored"
     INITIALIZING = "initializing"
     DOES_NOT_EXIST = "does_not_exist"
     EXECUTION_FAILED = "execution_failed"
-    ALL_STATUS = [MISSING, OK, NOT_MONITORED, INITIALIZING, DOES_NOT_EXIST, EXECUTION_FAILED]
 
-    def __new__(cls, value, is_pending=False):
-        return super().__new__(cls, value, is_pending)
+
+class Status:
+    """Represents a monit status with optional pending state."""
+
+    def __init__(self, status_val: str | StatusValue, is_pending: bool = False):
+        if isinstance(status_val, StatusValue):
+            self.state = status_val
+        else:
+            self.state = getattr(StatusValue, status_val)
+        self.is_pending = is_pending
+
+    @property
+    def value(self):
+        return self.state.value
 
     def pending(self):
-        return StatusValue(self.value, True)
+        """Return a new Status instance with is_pending=True."""
+        return Status(self.state, is_pending=True)
 
     def __getattr__(self, item):
-        if item in (f"is_{status}" for status in self.ALL_STATUS):
-            return self.value == getattr(self, item[3:].upper())
+        if item.startswith("is_"):
+            status_name = item[3:].upper()
+            if hasattr(StatusValue, status_name):
+                return self.value == getattr(StatusValue, status_name).value
         raise AttributeError(item)
+
+    def __eq__(self, other):
+        if not isinstance(other, Status):
+            return False
+        return self.state == other.state and self.is_pending == other.is_pending
 
     def __str__(self):
         return f"{self.value}{' (pending)' if self.is_pending else ''}"
 
+    def __repr__(self):
+        return f"<{self}>"
 
-class Status:
-    MISSING = StatusValue(StatusValue.MISSING)
-    OK = StatusValue(StatusValue.OK)
-    RUNNING = StatusValue(StatusValue.OK)
-    NOT_MONITORED = StatusValue(StatusValue.NOT_MONITORED)
-    INITIALIZING = StatusValue(StatusValue.INITIALIZING)
-    DOES_NOT_EXIST = StatusValue(StatusValue.DOES_NOT_EXIST)
-    EXECUTION_FAILED = StatusValue(StatusValue.EXECUTION_FAILED)
+
+# Initialize convenience class attributes
 
 
 class Monit:
@@ -143,7 +158,7 @@ class Monit:
     def command_args(self):
         return ["-B"] if self.monit_version() > (5, 18) else []
 
-    def get_status(self, validate=False):
+    def get_status(self, validate=False) -> Status:
         """Return the status of the process in monit.
 
         :@param validate: Force monit to re-check the status of the process
@@ -154,35 +169,38 @@ class Monit:
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
         return self._parse_status(out, err)
 
-    def _parse_status(self, output, err):
+    def _parse_status(self, output, err) -> Status:
         escaped_monit_services = "|".join([re.escape(x) for x in MONIT_SERVICES])
         pattern = f"({escaped_monit_services}) '{re.escape(self.process_name)}'"
         if not re.search(pattern, output, re.IGNORECASE):
-            return Status.MISSING
+            return Status("MISSING")
 
-        status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
-        if not status_val:
+        status_val_find = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
+        if not status_val_find:
             self.exit_fail("Unable to find process status", stdout=output, stderr=err)
 
-        status_val = status_val[0].strip().upper()
+        status_val = status_val_find[0].strip().upper()
         if " | " in status_val:
             status_val = status_val.split(" | ")[0]
         if " - " not in status_val:
             status_val = status_val.replace(" ", "_")
+            # Normalize RUNNING to OK (monit reports both, they mean the same thing)
+            if status_val == "RUNNING":
+                status_val = "OK"
             try:
-                return getattr(Status, status_val)
+                return Status(status_val)
             except AttributeError:
                 self.module.warn(f"Unknown monit status '{status_val}', treating as execution failed")
-                return Status.EXECUTION_FAILED
+                return Status("EXECUTION_FAILED")
         else:
             status_val, substatus = status_val.split(" - ")
             action, state = substatus.split()
             if action in ["START", "INITIALIZING", "RESTART", "MONITOR"]:
-                status = Status.OK
+                status = Status("OK")
             else:
-                status = Status.NOT_MONITORED
+                status = Status("NOT_MONITORED")
 
-            if state == "pending":
+            if state == "PENDING":
                 status = status.pending()
             return status
 
@@ -225,7 +243,7 @@ class Monit:
             StatusValue.INITIALIZING,
             StatusValue.DOES_NOT_EXIST,
         ]
-        while current_status.is_pending or (current_status.value in waiting_status):
+        while current_status.is_pending or (current_status.state in waiting_status):
             if time.time() >= timeout_time:
                 self.exit_fail('waited too long for "pending", or "initiating" status to go away', current_status)
 
@@ -251,12 +269,12 @@ class Monit:
 
         self.exit_success(state="present")
 
-    def change_state(self, state, expected_status, invert_expected=None):
+    def change_state(self, state: str, expected_status: StatusValue, invert_expected: bool | None = None):
         current_status = self.get_status()
         self.run_command(STATE_COMMAND_MAP[state])
         status = self.wait_for_status_change(current_status)
         status = self.wait_for_monit_to_stop_pending(status)
-        status_match = status.value == expected_status.value
+        status_match = status.state == expected_status
         if invert_expected:
             status_match = not status_match
         if status_match:
@@ -264,19 +282,19 @@ class Monit:
         self.exit_fail(f"{self.process_name} process not {state}", status)
 
     def stop(self):
-        self.change_state("stopped", Status.NOT_MONITORED)
+        self.change_state("stopped", expected_status=StatusValue.NOT_MONITORED)
 
     def unmonitor(self):
-        self.change_state("unmonitored", Status.NOT_MONITORED)
+        self.change_state("unmonitored", expected_status=StatusValue.NOT_MONITORED)
 
     def restart(self):
-        self.change_state("restarted", Status.OK)
+        self.change_state("restarted", expected_status=StatusValue.OK)
 
     def start(self):
-        self.change_state("started", Status.OK)
+        self.change_state("started", expected_status=StatusValue.OK)
 
     def monitor(self):
-        self.change_state("monitored", Status.NOT_MONITORED, invert_expected=True)
+        self.change_state("monitored", expected_status=StatusValue.NOT_MONITORED, invert_expected=True)
 
 
 def main():
