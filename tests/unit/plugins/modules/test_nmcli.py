@@ -843,6 +843,34 @@ vxlan.local:                            192.168.225.5
 vxlan.remote:                           192.168.225.6
 """
 
+TESTCASE_VXLAN_MULTICAST = [
+    {
+        "type": "vxlan",
+        "conn_name": "vxlan_multicast_test",
+        "ifname": "vxlan-device",
+        "vxlan_id": 17,
+        "vxlan_parent": "eth1",
+        "vxlan_local": "192.168.1.2",
+        "vxlan_remote": "239.192.0.17",
+        "slave_type": "bridge",
+        "master": "br0",
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_VXLAN_MULTICAST_SHOW_OUTPUT = """\
+connection.id:                          vxlan_multicast_test
+connection.interface-name:              vxlan-device
+connection.autoconnect:                 yes
+connection.slave-type:                  bridge
+connection.master:                      br0
+vxlan.id:                               17
+vxlan.parent:                           eth1
+vxlan.local:                            192.168.1.2
+vxlan.remote:                           239.192.0.17
+"""
+
 TESTCASE_GRE = [
     {
         "type": "gre",
@@ -2910,6 +2938,51 @@ def test_vxlan_connection_unchanged(mocked_vxlan_connection_unchanged, capfd):
     results = json.loads(out)
     assert not results.get("failed")
     assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_VXLAN_MULTICAST, indirect=["patch_ansible_module"])
+def test_create_vxlan_multicast(mocked_generic_connection_create, capfd):
+    """
+    Test if vxlan with multicast and parent device created
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == "/usr/bin/nmcli"
+    assert args[0][1] == "con"
+    assert args[0][2] == "add"
+    assert args[0][3] == "type"
+    assert args[0][4] == "vxlan"
+    assert args[0][5] == "con-name"
+    assert args[0][6] == "vxlan_multicast_test"
+
+    args_text = list(map(to_text, args[0]))
+    for param in [
+        "connection.interface-name",
+        "vxlan-device",
+        "vxlan.local",
+        "192.168.1.2",
+        "vxlan.remote",
+        "239.192.0.17",
+        "vxlan.id",
+        "17",
+        "vxlan.parent",
+        "eth1",
+        "connection.slave-type",
+        "bridge",
+        "connection.master",
+        "br0",
+    ]:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_IPIP, indirect=["patch_ansible_module"])
