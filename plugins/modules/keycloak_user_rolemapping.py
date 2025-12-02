@@ -351,7 +351,9 @@ def main():
             # Fetch missing role_name
             else:
                 if cid is None:
-                    role["name"] = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get("id"), realm=realm)["name"]
+                    role_rep = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get("id"), realm=realm)
+                    if role_rep is not None:
+                      role["name"] = role_rep["name"]
                 else:
                     role["name"] = kc.get_client_user_rolemapping_by_id(
                         uid=uid, cid=cid, rid=role.get("id"), realm=realm
