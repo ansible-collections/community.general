@@ -9,6 +9,7 @@ from __future__ import annotations
 import traceback
 import typing as t
 from contextlib import contextmanager
+from enum import Enum
 
 from ansible.module_utils.basic import missing_required_lib
 
@@ -19,24 +20,28 @@ if t.TYPE_CHECKING:
 _deps: dict[str, _Dependency] = dict()
 
 
-class _Dependency:
-    _states = ["pending", "failure", "success"]
+class _State(Enum):
+    PENDING = "pending"
+    FAILURE = "failure"
+    SUCCESS = "success"
 
+
+class _Dependency:
     def __init__(self, name: str, reason: str | None = None, url: str | None = None, msg: str | None = None) -> None:
         self.name = name
         self.reason = reason
         self.url = url
         self.msg = msg
 
-        self.state = 0
+        self.state = _State.PENDING
         self.trace: str | None = None
         self.exc: Exception | None = None
 
     def succeed(self) -> None:
-        self.state = 2
+        self.state = _State.SUCCESS
 
     def fail(self, exc: Exception, trace: str) -> None:
-        self.state = 1
+        self.state = _State.FAILURE
         self.exc = exc
         self.trace = trace
 
@@ -49,14 +54,14 @@ class _Dependency:
 
     @property
     def failed(self) -> bool:
-        return self.state == 1
+        return self.state == _State.FAILURE
 
     def validate(self, module: AnsibleModule) -> None:
         if self.failed:
             module.fail_json(msg=self.message, exception=self.trace)
 
     def __str__(self) -> str:
-        return f"<dependency: {self.name} [{self._states[self.state]}]>"
+        return f"<dependency: {self.name} [{self.state.value}]>"
 
 
 @contextmanager
