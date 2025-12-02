@@ -187,7 +187,7 @@ class Monit(object):
             else:
                 status = Status.NOT_MONITORED
 
-            if state == 'pending':
+            if state == 'PENDING':
                 status = status.pending()
             return status
 
