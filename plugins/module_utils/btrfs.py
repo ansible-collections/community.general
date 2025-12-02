@@ -37,7 +37,7 @@ class BtrfsCommands:
         self.__btrfs: str = self.__module.get_bin_path("btrfs", required=True)
 
     def filesystem_show(self) -> list[dict[str, t.Any]]:
-        command = f"{self.__btrfs} filesystem show -d"
+        command = [self.__btrfs, "filesystem", "show", "-d"]
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.strip() for x in result[1].splitlines()]
         filesystems = []
@@ -69,7 +69,7 @@ class BtrfsCommands:
         return re.sub(r"^.*path\s", "", line)
 
     def subvolumes_list(self, filesystem_path: str) -> list[dict[str, t.Any]]:
-        command = f"{self.__btrfs} subvolume list -tap {filesystem_path}"
+        command = [self.__btrfs, "subvolume", "list", "-tap", to_bytes(filesystem_path)]
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.split("\t") for x in result[1].splitlines()]
         subvolumes: list[dict[str, t.Any]] = [{"id": 5, "parent": None, "path": "/"}]
@@ -148,7 +148,7 @@ class BtrfsInfoProvider:
         return [m for m in mountpoints if (m["device"] in devices)]
 
     def __find_mountpoints(self) -> list[dict[str, t.Any]]:
-        command = f"{self.__findmnt_path} -t btrfs -nvP"
+        command = [self.__findmnt_path, "-t", "btrfs", "-nvP"]
         result = self.__module.run_command(command)
         mountpoints = []
         if result[0] == 0:
