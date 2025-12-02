@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli module - add ``vxlan_parent`` option required for multicast ``vxlan_remote`` addresses; add ``vxlan`` to list of bridgeable devices (https://github.com/ansible-collections/community.general/pull/11182).
