@@ -1,0 +1,4 @@
+bugfixes:
+  - monit - internal state was not reflecting when operation is "pending" in ``monit`` (https://github.com/ansible-collections/community.general/pull/11245).
+minor_changes:
+  - monit - use ``Enum`` to represent the possible states (https://github.com/ansible-collections/community.general/pull/11245).
