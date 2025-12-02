@@ -175,11 +175,11 @@ class Monit:
         if not re.search(pattern, output, re.IGNORECASE):
             return Status("MISSING")
 
-        status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
-        if not status_val:
+        status_val_find = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
+        if not status_val_find:
             self.exit_fail("Unable to find process status", stdout=output, stderr=err)
 
-        status_val = status_val[0].strip().upper()
+        status_val = status_val_find[0].strip().upper()
         if " | " in status_val:
             status_val = status_val.split(" | ")[0]
         if " - " not in status_val:
