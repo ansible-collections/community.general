@@ -9,6 +9,7 @@ from __future__ import annotations
 DOCUMENTATION = r'''
 ---
 module: sssd_info
+version_added: 12.1.0
 short_description: Check SSSD domain status using D-Bus
 description:
     - Check the online status of SSSD domains, list domains, and retrieve active servers using D-Bus.
@@ -114,14 +115,16 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-
-DBUS_IMP_ERR = None
-HAS_DBUS = False
 try:
-    import dbus
+    from ansible_collections.community.general.plugins.module_utils import deps
+    
+    with deps.declare("dbus-python"):
+        import dbus
     HAS_DBUS = True
-except Exception:
-    DBUS_IMP_ERR = traceback.format_exc()
+    DBUS_IMP_ERR = None
+except Exception as e:
+    HAS_DBUS = False
+    DBUS_IMP_ERR = e
 
 
 class SSSDHandler:
@@ -164,7 +167,7 @@ class SSSDHandler:
         try:
             return self.bus.get_object(self.BUS_NAME, domain_path)
         except dbus.exceptions.DBusException as e:
-            raise Exception(f'Domain not found: {domain}. Error: {str(e)}')
+            raise Exception(f'Domain not found: {domain}. Error: {e}')
 
     def check_domain_status(self, domain: str) -> str:
         """Check if domain is online.
@@ -250,11 +253,13 @@ def main() -> None:
         ]
     )
 
-    if not HAS_DBUS:
-        module.fail_json(
-            msg=missing_required_lib('dbus-python'),
-            exception=DBUS_IMP_ERR
-        )
+    try:
+        from ansible_collections.community.general.plugins.module_utils import deps
+        deps.validate(module)
+    except ImportError:
+        if not HAS_DBUS:
+            from ansible.module_utils.basic import missing_required_lib
+            module.fail_json(msg=missing_required_lib('dbus-python'))
 
     action = module.params['action']
     domain = module.params.get('domain')
@@ -282,11 +287,11 @@ def main() -> None:
         elif dbus_error_name == 'org.freedesktop.DBus.Error.UnknownMethod':
             module.fail_json(msg=f'Method not supported for domain: {domain}', **result)
         elif 'org.freedesktop.DBus.Error.InvalidArgs' in dbus_error_name:
-            module.fail_json(msg=f'Invalid arguments for method: {str(e)}', **result)
+            module.fail_json(msg=f'Invalid arguments for method: {e}', **result)
         else:
-            module.fail_json(msg=f'D-Bus error (name: {dbus_error_name}): {str(e)}', **result)
+            module.fail_json(msg=f'D-Bus error (name: {dbus_error_name}): {e}', **result)
     except Exception as e:
-        module.fail_json(msg=f'Unexpected error: {str(e)}', **result)
+        module.fail_json(msg=f'Unexpected error: {e}', **result)
 
     module.exit_json(**result)
 
