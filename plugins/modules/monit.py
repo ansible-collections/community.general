@@ -152,7 +152,12 @@ class Monit:
         self.module.fail_json(**kwargs)
 
     def exit_success(self, state):
-        self.module.exit_json(changed=True, name=self.process_name, state=state)
+        self.module.exit_json(
+            changed=True,
+            name=self.process_name,
+            monit_version=self._raw_version,
+            state=state,
+        )
 
     @property
     def command_args(self):
