@@ -31,7 +31,7 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
         super().__init__(module)
 
         self.vars = VarDict()
-        for name, value in self.module.params.items():  # type: ignore[union-attr]
+        for name, value in self._module.params.items():
             self.vars.set(
                 name,
                 value,
