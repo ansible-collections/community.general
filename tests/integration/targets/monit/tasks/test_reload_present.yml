@@ -52,6 +52,10 @@
     name: monit
     state: restarted
 
+- name: wait for monit to be fully ready after restart
+  pause:
+    seconds: 3
+
 - name: test process present again
   monit:
     name: httpd_echo
