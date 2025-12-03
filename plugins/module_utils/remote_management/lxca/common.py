@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import traceback
+import typing as t
 
 try:
     from pylxca import connect, disconnect
@@ -22,11 +23,14 @@ try:
 except ImportError:
     HAS_PYLXCA = False
 
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
+
 
 PYLXCA_REQUIRED = "Lenovo xClarity Administrator Python Client (Python package 'pylxca') is required for this module."
 
 
-def has_pylxca(module):
+def has_pylxca(module: AnsibleModule) -> None:
     """
     Check pylxca is installed
     :param module:
@@ -43,17 +47,17 @@ LXCA_COMMON_ARGS = dict(
 
 
 class connection_object:
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
 
     def __enter__(self):
         return setup_conn(self.module)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         close_conn()
 
 
-def setup_conn(module):
+def setup_conn(module: AnsibleModule):
     """
     this function create connection to LXCA
     :param module:
@@ -70,7 +74,7 @@ def setup_conn(module):
     return lxca_con
 
 
-def close_conn():
+def close_conn() -> None:
     """
     this function close connection to LXCA
     :param module:

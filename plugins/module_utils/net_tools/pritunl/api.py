@@ -14,15 +14,19 @@ import hmac
 import json
 import time
 import uuid
+import typing as t
 
 from ansible.module_utils.urls import open_url
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 class PritunlException(Exception):
     pass
 
 
-def pritunl_argument_spec():
+def pritunl_argument_spec() -> dict[str, t.Any]:
     return dict(
         pritunl_url=dict(required=True, type="str"),
         pritunl_api_token=dict(required=True, type="str", no_log=False),
@@ -31,7 +35,7 @@ def pritunl_argument_spec():
     )
 
 
-def get_pritunl_settings(module):
+def get_pritunl_settings(module: AnsibleModule) -> dict[str, t.Any]:
     """
     Helper function to set required Pritunl request params from module arguments.
     """
@@ -43,7 +47,7 @@ def get_pritunl_settings(module):
     }
 
 
-def _get_pritunl_organizations(api_token, api_secret, base_url, validate_certs=True):
+def _get_pritunl_organizations(api_token, api_secret, base_url: str, validate_certs: bool = True):
     return pritunl_auth_request(
         base_url=base_url,
         api_token=api_token,
@@ -54,7 +58,9 @@ def _get_pritunl_organizations(api_token, api_secret, base_url, validate_certs=T
     )
 
 
-def _delete_pritunl_organization(api_token, api_secret, base_url, organization_id, validate_certs=True):
+def _delete_pritunl_organization(
+    api_token, api_secret, base_url: str, organization_id: str, validate_certs: bool = True
+):
     return pritunl_auth_request(
         base_url=base_url,
         api_token=api_token,
@@ -65,7 +71,9 @@ def _delete_pritunl_organization(api_token, api_secret, base_url, organization_i
     )
 
 
-def _post_pritunl_organization(api_token, api_secret, base_url, organization_data, validate_certs=True):
+def _post_pritunl_organization(
+    api_token, api_secret, base_url: str, organization_data: object, validate_certs: bool = True
+):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -78,7 +86,7 @@ def _post_pritunl_organization(api_token, api_secret, base_url, organization_dat
     )
 
 
-def _get_pritunl_users(api_token, api_secret, base_url, organization_id, validate_certs=True):
+def _get_pritunl_users(api_token, api_secret, base_url: str, organization_id: str, validate_certs: bool = True):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -89,7 +97,9 @@ def _get_pritunl_users(api_token, api_secret, base_url, organization_id, validat
     )
 
 
-def _delete_pritunl_user(api_token, api_secret, base_url, organization_id, user_id, validate_certs=True):
+def _delete_pritunl_user(
+    api_token, api_secret, base_url: str, organization_id: str, user_id: str, validate_certs: bool = True
+):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -100,7 +110,9 @@ def _delete_pritunl_user(api_token, api_secret, base_url, organization_id, user_
     )
 
 
-def _post_pritunl_user(api_token, api_secret, base_url, organization_id, user_data, validate_certs=True):
+def _post_pritunl_user(
+    api_token, api_secret, base_url: str, organization_id: str, user_data: object, validate_certs=True
+):
     return pritunl_auth_request(
         api_token=api_token,
         api_secret=api_secret,
@@ -116,11 +128,11 @@ def _post_pritunl_user(api_token, api_secret, base_url, organization_id, user_da
 def _put_pritunl_user(
     api_token,
     api_secret,
-    base_url,
-    organization_id,
-    user_id,
-    user_data,
-    validate_certs=True,
+    base_url: str,
+    organization_id: str,
+    user_id: str,
+    user_data: object,
+    validate_certs: bool = True,
 ):
     return pritunl_auth_request(
         api_token=api_token,
@@ -134,7 +146,9 @@ def _put_pritunl_user(
     )
 
 
-def list_pritunl_organizations(api_token, api_secret, base_url, validate_certs=True, filters=None):
+def list_pritunl_organizations(
+    api_token, api_secret, base_url: str, validate_certs: bool = True, filters: dict[str, t.Any] | None = None
+) -> list:
     orgs = []
 
     response = _get_pritunl_organizations(
@@ -158,7 +172,14 @@ def list_pritunl_organizations(api_token, api_secret, base_url, validate_certs=T
     return orgs
 
 
-def list_pritunl_users(api_token, api_secret, base_url, organization_id, validate_certs=True, filters=None):
+def list_pritunl_users(
+    api_token,
+    api_secret,
+    base_url: str,
+    organization_id: str,
+    validate_certs: bool = True,
+    filters: dict[str, t.Any] | None = None,
+):
     users = []
 
     response = _get_pritunl_users(
@@ -187,9 +208,9 @@ def list_pritunl_users(api_token, api_secret, base_url, organization_id, validat
 def post_pritunl_organization(
     api_token,
     api_secret,
-    base_url,
-    organization_name,
-    validate_certs=True,
+    base_url: str,
+    organization_name: str,
+    validate_certs: bool = True,
 ):
     response = _post_pritunl_organization(
         api_token=api_token,
@@ -208,11 +229,11 @@ def post_pritunl_organization(
 def post_pritunl_user(
     api_token,
     api_secret,
-    base_url,
-    organization_id,
-    user_data,
-    user_id=None,
-    validate_certs=True,
+    base_url: str,
+    organization_id: str,
+    user_data: object,
+    user_id: str | None = None,
+    validate_certs: bool = True,
 ):
     # If user_id is provided will do PUT otherwise will do POST
     if user_id is None:
@@ -247,7 +268,9 @@ def post_pritunl_user(
         return json.loads(response.read())
 
 
-def delete_pritunl_organization(api_token, api_secret, base_url, organization_id, validate_certs=True):
+def delete_pritunl_organization(
+    api_token, api_secret, base_url: str, organization_id: str, validate_certs: bool = True
+):
     response = _delete_pritunl_organization(
         api_token=api_token,
         api_secret=api_secret,
@@ -262,7 +285,9 @@ def delete_pritunl_organization(api_token, api_secret, base_url, organization_id
     return json.loads(response.read())
 
 
-def delete_pritunl_user(api_token, api_secret, base_url, organization_id, user_id, validate_certs=True):
+def delete_pritunl_user(
+    api_token, api_secret, base_url: str, organization_id: str, user_id: str, validate_certs: bool = True
+):
     response = _delete_pritunl_user(
         api_token=api_token,
         api_secret=api_secret,
@@ -281,12 +306,12 @@ def delete_pritunl_user(api_token, api_secret, base_url, organization_id, user_i
 def pritunl_auth_request(
     api_token,
     api_secret,
-    base_url,
-    method,
-    path,
-    validate_certs=True,
-    headers=None,
-    data=None,
+    base_url: str,
+    method: str,
+    path: str,
+    validate_certs: bool = True,
+    headers: dict[str, str] | None = None,
+    data: bytes | str | None = None,
 ):
     """
     Send an API call to a Pritunl server.

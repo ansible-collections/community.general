@@ -9,7 +9,7 @@ import typing as t
 
 
 class ModuleHelperException(Exception):
-    def __init__(self, msg: str, update_output: dict[str, t.Any] | None = None, *args, **kwargs):
+    def __init__(self, msg: str, update_output: dict[str, t.Any] | None = None, *args, **kwargs) -> None:
         self.msg: str = msg or f"Module failed with exception: {self}"
         if update_output is None:
             update_output = {}

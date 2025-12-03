@@ -13,7 +13,9 @@ from ansible_collections.community.general.plugins.module_utils.mh.deco import m
 
 
 class ModuleHelperBase:
-    module: dict[str, t.Any] | None = None  # TODO: better spec using t.TypedDict
+    # The type of module should be AnsibleModule, not something else.
+    # TODO: Rename the property of type dict[str, t.Any] | None to something like module_spec instead
+    module: dict[str, t.Any] | AnsibleModule | None = None  # TODO: better spec using t.TypedDict
     ModuleHelperException = _MHE
     _delegated_to_module: tuple[str, ...] = (
         "check_mode",
@@ -22,25 +24,32 @@ class ModuleHelperBase:
         "deprecate",
         "debug",
     )
+    _module: AnsibleModule  # TODO: remove once module has proper type
 
-    def __init__(self, module=None):
+    def __init__(self, module: AnsibleModule | dict[str, t.Any] | None = None) -> None:
         self._changed = False
 
         if module:
             self.module = module
 
         if not isinstance(self.module, AnsibleModule):
-            self.module = AnsibleModule(**self.module)
+            if self.module is None:
+                raise TypeError("module or module spec must be provided")
+            module = AnsibleModule(**self.module)
+            self.module = module  # type: ignore
+            self._module = module
+        else:
+            self._module = self.module
 
     @property
-    def diff_mode(self):
-        return self.module._diff
+    def diff_mode(self) -> bool:
+        return self._module._diff
 
     @property
-    def verbosity(self):
-        return self.module._verbosity
+    def verbosity(self) -> int:
+        return self._module._verbosity
 
-    def do_raise(self, *args, **kwargs):
+    def do_raise(self, *args, **kwargs) -> t.NoReturn:
         raise _MHE(*args, **kwargs)
 
     def __getattr__(self, attr):
@@ -61,14 +70,14 @@ class ModuleHelperBase:
         raise NotImplementedError()
 
     @property
-    def changed(self):
+    def changed(self) -> bool:
         try:
             return self.__changed__()
         except NotImplementedError:
             return self._changed
 
     @changed.setter
-    def changed(self, value):
+    def changed(self, value: bool) -> None:
         self._changed = value
 
     def has_changed(self):

@@ -14,12 +14,12 @@ import logging
 import logging.config
 import os
 import tempfile
+import time
+import typing as t
 
 # (TODO: remove next line!)
 from datetime import datetime  # noqa: F401, pylint: disable=unused-import
 from operator import eq
-
-import time
 
 try:
     import yaml  # noqa: F401, pylint: disable=unused-import
@@ -47,6 +47,9 @@ except ImportError:
 
 
 from ansible.module_utils.common.text.converters import to_bytes
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 __version__ = "1.6.0-dev"
 
@@ -81,7 +84,7 @@ DEFAULT_READY_STATES = [
 DEFAULT_TERMINATED_STATES = ["TERMINATED", "DETACHED", "DELETED"]
 
 
-def get_common_arg_spec(supports_create=False, supports_wait=False):
+def get_common_arg_spec(supports_create: bool = False, supports_wait: bool = False) -> dict[str, t.Any]:
     """
     Return the common set of module arguments for all OCI cloud modules.
     :param supports_create: Variable to decide whether to add options related to idempotency of create operation.
@@ -125,7 +128,7 @@ def get_common_arg_spec(supports_create=False, supports_wait=False):
     return common_args
 
 
-def get_facts_module_arg_spec(filter_by_name=False):
+def get_facts_module_arg_spec(filter_by_name: bool = False) -> dict[str, t.Any]:
     # Note: This method is used by most OCI ansible fact modules during initialization. When making changes to this
     # method, ensure that no `oci` python sdk dependencies are introduced in this method. This ensures that the modules
     # can check for absence of OCI Python SDK and fail with an appropriate message. Introducing an OCI dependency in
@@ -138,7 +141,7 @@ def get_facts_module_arg_spec(filter_by_name=False):
     return facts_module_arg_spec
 
 
-def get_oci_config(module, service_client_class=None):
+def get_oci_config(module: AnsibleModule, service_client_class=None):
     """Return the OCI configuration to use for all OCI API calls. The effective OCI configuration is derived by merging
     any overrides specified for configuration attributes through Ansible module options or environment variables. The
     order of precedence for deriving the effective configuration dict is:
@@ -241,7 +244,7 @@ def get_oci_config(module, service_client_class=None):
     return config
 
 
-def create_service_client(module, service_client_class):
+def create_service_client(module: AnsibleModule, service_client_class):
     """
     Creates a service client using the common module options provided by the user.
     :param module: An AnsibleModule that represents user provided options for a Task
@@ -275,7 +278,7 @@ def create_service_client(module, service_client_class):
     return client
 
 
-def _is_instance_principal_auth(module):
+def _is_instance_principal_auth(module: AnsibleModule):
     # check if auth type is overridden via module params
     instance_principal_auth = "auth_type" in module.params and module.params["auth_type"] == "instance_principal"
     if not instance_principal_auth:
@@ -285,7 +288,9 @@ def _is_instance_principal_auth(module):
     return instance_principal_auth
 
 
-def _merge_auth_option(config, module, module_option_name, env_var_name, config_attr_name):
+def _merge_auth_option(
+    config, module: AnsibleModule, module_option_name: str, env_var_name: str, config_attr_name: str
+) -> None:
     """Merge the values for an authentication attribute from ansible module options and
     environment variables with the values specified in a configuration file"""
     _debug(f"Merging {module_option_name}")
@@ -305,7 +310,7 @@ def _merge_auth_option(config, module, module_option_name, env_var_name, config_
         config.update({config_attr_name: auth_attribute})
 
 
-def bucket_details_factory(bucket_details_type, module):
+def bucket_details_factory(bucket_details_type: t.Literal["create", "update"], module: AnsibleModule):
     bucket_details = None
     if bucket_details_type == "create":
         bucket_details = CreateBucketDetails()
@@ -320,7 +325,7 @@ def bucket_details_factory(bucket_details_type, module):
     return bucket_details
 
 
-def filter_resources(all_resources, filter_params):
+def filter_resources(all_resources, filter_params) -> list:
     if not filter_params:
         return all_resources
     filtered_resources = []
@@ -335,7 +340,7 @@ def filter_resources(all_resources, filter_params):
     return filtered_resources
 
 
-def list_all_resources(target_fn, **kwargs):
+def list_all_resources(target_fn, **kwargs) -> list:
     """
     Return all resources after paging through all results returned by target_fn. If a `display_name` or `name` is
     provided as a kwarg, then only resources matching the specified name are returned.
@@ -371,17 +376,17 @@ def list_all_resources(target_fn, **kwargs):
     return filter_resources(existing_resources, filter_params)
 
 
-def _debug(s):
+def _debug(s) -> None:
     get_logger("oci_utils").debug(s)
 
 
-def get_logger(module_name):
+def get_logger(module_name: str):
     oci_logging = setup_logging()
     return oci_logging.getLogger(module_name)
 
 
 def setup_logging(
-    default_level="INFO",
+    default_level: str = "INFO",
 ):
     """Setup logging configuration"""
     env_log_path = "LOG_PATH"
@@ -396,7 +401,7 @@ def setup_logging(
     return logging
 
 
-def check_and_update_attributes(target_instance, attr_name, input_value, existing_value, changed):
+def check_and_update_attributes(target_instance, attr_name: str, input_value, existing_value, changed: bool) -> bool:
     """
     This function checks the difference between two resource attributes of literal types and sets the attribute
     value in the target instance type holding the attribute.
@@ -422,13 +427,13 @@ def check_and_update_resource(
     update_fn,
     primitive_params_update,
     kwargs_non_primitive_update,
-    module,
+    module: AnsibleModule,
     update_attributes,
     client=None,
     sub_attributes_of_update_model=None,
     wait_applicable=True,
     states=None,
-):
+) -> dict[str, t.Any]:
     """
     This function handles update operation on a resource. It checks whether update is required and accordingly returns
     the resource and the changed status.
@@ -481,10 +486,10 @@ def check_and_update_resource(
 def get_kwargs_update(
     attributes_to_update,
     kwargs_non_primitive_update,
-    module,
+    module: AnsibleModule,
     primitive_params_update,
     sub_attributes_of_update_model=None,
-):
+) -> dict[str, t.Any]:
     kwargs_update = dict()
     for param in primitive_params_update:
         kwargs_update[param] = module.params[param]
@@ -500,7 +505,7 @@ def get_kwargs_update(
     return kwargs_update
 
 
-def is_dictionary_subset(sub, super_dict):
+def is_dictionary_subset(sub: dict, super_dict: dict) -> bool:
     """
     This function checks if `sub` dictionary is a subset of `super` dictionary.
     :param sub: subset dictionary, for example user_provided_attr_value.
@@ -510,7 +515,7 @@ def is_dictionary_subset(sub, super_dict):
     return all(sub[key] == super_dict[key] for key in sub)
 
 
-def are_lists_equal(s, t):
+def are_lists_equal(s: list | None, t: list | None):
     if s is None and t is None:
         return True
 
@@ -541,7 +546,7 @@ def are_lists_equal(s, t):
         return not t
 
 
-def get_attr_to_update(get_fn, kwargs_get, module, update_attributes):
+def get_attr_to_update(get_fn, kwargs_get, module: AnsibleModule, update_attributes) -> tuple:
     try:
         resource = call_with_backoff(get_fn, **kwargs_get).data
     except ServiceError as ex:
@@ -569,7 +574,7 @@ def get_attr_to_update(get_fn, kwargs_get, module, update_attributes):
     return attributes_to_update, resource
 
 
-def get_taggable_arg_spec(supports_create=False, supports_wait=False):
+def get_taggable_arg_spec(supports_create: bool = False, supports_wait: bool = False) -> dict[str, t.Any]:
     """
     Returns an arg_spec that is valid for taggable OCI resources.
     :return: A dict that represents an ansible arg spec that builds over the common_arg_spec and adds free-form and
@@ -580,7 +585,7 @@ def get_taggable_arg_spec(supports_create=False, supports_wait=False):
     return tag_arg_spec
 
 
-def add_tags_to_model_from_module(model, module):
+def add_tags_to_model_from_module(model, module: AnsibleModule):
     """
     Adds free-form and defined tags from an ansible module to a resource model
     :param model: A resource model instance that supports 'freeform_tags' and 'defined_tags' as attributes
@@ -620,7 +625,7 @@ def check_and_create_resource(
     kwargs_create,
     list_fn,
     kwargs_list,
-    module,
+    module: AnsibleModule,
     model,
     existing_resources=None,
     exclude_attributes=None,
@@ -709,7 +714,7 @@ def check_and_create_resource(
     return result
 
 
-def _get_attributes_to_consider(exclude_attributes, model, module):
+def _get_attributes_to_consider(exclude_attributes, model, module: AnsibleModule):
     """
     Determine the attributes to detect if an existing resource already matches the requested resource state
     :param exclude_attributes: Attributes to not consider for matching
@@ -770,7 +775,7 @@ def is_attr_assigned_default(default_attribute_values, attr, assigned_value):
         return True
 
 
-def create_resource(resource_type, create_fn, kwargs_create, module):
+def create_resource(resource_type, create_fn, kwargs_create, module: AnsibleModule):
     """
     Create an OCI resource
     :param resource_type: Type of the resource to be created. e.g.: "vcn"
@@ -791,7 +796,7 @@ def create_resource(resource_type, create_fn, kwargs_create, module):
 
 def does_existing_resource_match_user_inputs(
     existing_resource,
-    module,
+    module: AnsibleModule,
     attributes_to_compare,
     exclude_attributes,
     default_attribute_values=None,
@@ -858,13 +863,13 @@ def does_existing_resource_match_user_inputs(
     return True
 
 
-def tuplize(d):
+def tuplize(d) -> list[tuple]:
     """
     This function takes a dictionary and converts it to a list of tuples recursively.
     :param d: A dictionary.
     :return: List of tuples.
     """
-    list_of_tuples = []
+    list_of_tuples: list[tuple] = []
     key_list = sorted(list(d.keys()))
     for key in key_list:
         if isinstance(d[key], list):
@@ -887,18 +892,18 @@ def tuplize(d):
     return list_of_tuples
 
 
-def get_key_for_comparing_dict(d):
+def get_key_for_comparing_dict(d) -> list[tuple]:
     tuple_form_of_d = tuplize(d)
     return tuple_form_of_d
 
 
-def sort_dictionary(d):
+def sort_dictionary(d: dict) -> dict:
     """
     This function sorts values of a dictionary recursively.
     :param d: A dictionary.
     :return: Dictionary with sorted elements.
     """
-    sorted_d = {}
+    sorted_d: dict = {}
     for key in d:
         if isinstance(d[key], list):
             if d[key] and isinstance(d[key][0], dict):
@@ -913,7 +918,7 @@ def sort_dictionary(d):
     return sorted_d
 
 
-def sort_list_of_dictionary(list_of_dict):
+def sort_list_of_dictionary(list_of_dict: list[dict]) -> list[dict]:
     """
     This functions sorts a list of dictionaries. It first sorts each value of the dictionary and then sorts the list of
     individually sorted dictionaries. For sorting, each dictionary's tuple equivalent is used.
@@ -1103,7 +1108,7 @@ def create_and_wait(
     kwargs_create,
     get_fn,
     get_param,
-    module,
+    module: AnsibleModule,
     states=None,
     wait_applicable=True,
     kwargs_get=None,
@@ -1151,7 +1156,7 @@ def update_and_wait(
     kwargs_update,
     get_fn,
     get_param,
-    module,
+    module: AnsibleModule,
     states=None,
     wait_applicable=True,
     kwargs_get=None,
@@ -1196,7 +1201,7 @@ def create_or_update_resource_and_wait(
     resource_type,
     function,
     kwargs_function,
-    module,
+    module: AnsibleModule,
     wait_applicable,
     get_fn,
     get_param,
@@ -1240,7 +1245,7 @@ def create_or_update_resource_and_wait(
 
 def wait_for_resource_lifecycle_state(
     client,
-    module,
+    module: AnsibleModule,
     wait_applicable,
     kwargs_get,
     get_fn,
@@ -1291,7 +1296,7 @@ def wait_for_resource_lifecycle_state(
     return resource
 
 
-def wait_on_work_request(client, response, module):
+def wait_on_work_request(client, response, module: AnsibleModule):
     try:
         if module.params.get("wait", None):
             _debug(f"Waiting for work request with id {response.data.id} to reach SUCCEEDED state.")
@@ -1325,11 +1330,11 @@ def delete_and_wait(
     kwargs_get,
     delete_fn,
     kwargs_delete,
-    module,
+    module: AnsibleModule,
     states=None,
     wait_applicable=True,
     process_work_request=False,
-):
+) -> dict[str, t.Any]:
     """A utility function to delete a resource and wait for the resource to get into the state as specified in the
     module options.
     :param wait_applicable: Specifies if wait for delete is applicable for this resource
@@ -1348,7 +1353,7 @@ def delete_and_wait(
     """
 
     states_set = set(["DETACHING", "DETACHED", "DELETING", "DELETED", "TERMINATING", "TERMINATED"])
-    result = dict(changed=False)
+    result: dict[str, t.Any] = dict(changed=False)
     result[resource_type] = dict()
     try:
         resource = to_dict(call_with_backoff(get_fn, **kwargs_get).data)
@@ -1412,7 +1417,7 @@ def delete_and_wait(
     return result
 
 
-def are_attrs_equal(current_resource, module, attributes):
+def are_attrs_equal(current_resource, module: AnsibleModule, attributes):
     """
     Check if the specified attributes are equal in the specified 'model' and 'module'. This is used to check if an OCI
     Model instance already has the values specified by an Ansible user while invoking an OCI Ansible module and if a
@@ -1440,7 +1445,7 @@ def are_attrs_equal(current_resource, module, attributes):
     return True
 
 
-def _get_user_provided_value(module, attribute_name):
+def _get_user_provided_value(module: AnsibleModule, attribute_name):
     """
     Returns the user provided value for "attribute_name". We consider aliases in the module.
     """
@@ -1456,7 +1461,7 @@ def _get_user_provided_value(module, attribute_name):
     return user_provided_value
 
 
-def update_model_with_user_options(curr_model, update_model, module):
+def update_model_with_user_options(curr_model, update_model, module: AnsibleModule):
     """
     Update the 'update_model' with user provided values in 'module' for the specified 'attributes' if they are different
     from the values in the 'curr_model'.
@@ -1520,7 +1525,7 @@ def call_with_backoff(fn, **kwargs):
             raise
 
 
-def generic_hash(obj):
+def generic_hash(obj) -> int:
     """
     Compute a hash of all the fields in the object
     :param obj: Object whose hash needs to be computed
@@ -1540,7 +1545,7 @@ def generic_hash(obj):
     return sum
 
 
-def generic_eq(s, other):
+def generic_eq(s, other) -> bool:
     if other is None:
         return False
     return s.__dict__ == other.__dict__
@@ -1640,7 +1645,7 @@ def update_class_type_attr_difference(update_class_details, existing_instance, a
     return changed
 
 
-def get_existing_resource(target_fn, module, **kwargs):
+def get_existing_resource(target_fn, module: AnsibleModule, **kwargs):
     """
     Returns the requested resource if it exists based on the input arguments.
     :param target_fn The function which should be used to find the requested resource
@@ -1659,7 +1664,9 @@ def get_existing_resource(target_fn, module, **kwargs):
     return existing_resource
 
 
-def get_attached_instance_info(module, lookup_attached_instance, list_attachments_fn, list_attachments_args):
+def get_attached_instance_info(
+    module: AnsibleModule, lookup_attached_instance, list_attachments_fn, list_attachments_args
+):
     config = get_oci_config(module)
     identity_client = create_service_client(module, IdentityClient)
 
@@ -1747,12 +1754,12 @@ def get_component_list_difference(input_component_list, existing_components, pur
     return None, False
 
 
-def write_to_file(path, content):
+def write_to_file(path: str | bytes, content: bytes) -> None:
     with open(to_bytes(path), "wb") as dest_file:
         dest_file.write(content)
 
 
-def get_target_resource_from_list(module, list_resource_fn, target_resource_id=None, **kwargs):
+def get_target_resource_from_list(module: AnsibleModule, list_resource_fn, target_resource_id=None, **kwargs):
     """
     Returns a resource filtered by identifier from a list of resources. This method should be
     used as an alternative of 'get resource' method when 'get resource' is nor provided by
