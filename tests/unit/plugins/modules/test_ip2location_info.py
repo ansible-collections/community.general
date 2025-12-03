@@ -45,5 +45,5 @@ class TestIp2LocationInfo(unittest.TestCase):
 
             self.assertEqual(result["country_code"], "US")
             mock_fetch_url.assert_called_once_with(
-                module, "https://api.ip2location.io/?ip=8.8.8.8", force=True, timeout=10
+                module, "https://api.ip2location.io/?ip=8.8.8.8", timeout=10
             )

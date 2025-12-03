@@ -126,7 +126,6 @@ class Ip2LocationInfo:
         response, info = fetch_url(
             self.module,
             url,
-            force=True,
             timeout=self.timeout,
         )
         if info["status"] != 200:
