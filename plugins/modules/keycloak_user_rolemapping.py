@@ -117,7 +117,7 @@ EXAMPLES = r"""
     auth_username: USERNAME
     auth_password: PASSWORD
     state: present
-    user_id: user1Id
+    uid: user_uid
     roles:
       - name: role_name1
         id: role_id1
@@ -135,7 +135,7 @@ EXAMPLES = r"""
     auth_password: PASSWORD
     state: present
     client_id: client1
-    user_id: user1Id
+    uid: user_uid
     roles:
       - name: role_name1
         id: role_id1
