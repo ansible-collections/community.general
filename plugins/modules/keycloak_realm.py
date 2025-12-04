@@ -45,8 +45,7 @@ options:
 
   id:
     description:
-      - Unique identifier for the realm.
-      - This field is required when creating a new realm but can be omitted otherwise.
+      - The realm to create.
     required: true
     type: str
   realm:
@@ -761,7 +760,6 @@ EXAMPLES = r"""
     auth_password: PASSWORD
     realm: unique_realm_name
     state: present
-    id: '1'
 
 - name: Delete a Keycloak realm
   community.general.keycloak_realm:
