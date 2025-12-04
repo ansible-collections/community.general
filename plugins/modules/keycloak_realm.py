@@ -46,7 +46,6 @@ options:
   id:
     description:
       - The realm to create.
-    required: true
     type: str
   realm:
     description:
