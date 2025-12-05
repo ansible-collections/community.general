@@ -47,7 +47,6 @@ options:
     description:
       - Unique identifier for the realm.
       - This field is required when creating a new realm but can be omitted otherwise.
-    required: true
     type: str
   realm:
     description:
