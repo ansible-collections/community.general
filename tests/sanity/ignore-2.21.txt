@@ -7,7 +7,6 @@ plugins/modules/interfaces_file.py validate-modules:bad-return-value-key  # TODO
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
 plugins/modules/keycloak_realm_info.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
 plugins/modules/keycloak_realm_keys_metadata_info.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
-plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/nosh.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
 plugins/modules/omapi_host.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
