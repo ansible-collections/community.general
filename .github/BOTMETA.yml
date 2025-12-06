@@ -745,6 +745,8 @@ files:
     maintainers: obourdon hryamzik
   $modules/ip_netns.py:
     maintainers: bregman-arie
+  $modules/ip2location_info.py:
+    maintainers: ip2location
   $modules/ipa_:
     maintainers: $team_ipa
     ignore: fxfitz
