@@ -5,20 +5,24 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url, basic_auth_header
+
+if t.TYPE_CHECKING:
+    from ansible.module_utils.basic import AnsibleModule
 
 
 class BitbucketHelper:
     BITBUCKET_API_URL = "https://api.bitbucket.org"
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-        self.access_token = None
+        self.access_token: str | None = None
 
     @staticmethod
-    def bitbucket_argument_spec():
+    def bitbucket_argument_spec() -> dict[str, t.Any]:
         return dict(
             client_id=dict(type="str", fallback=(env_fallback, ["BITBUCKET_CLIENT_ID"])),
             client_secret=dict(type="str", no_log=True, fallback=(env_fallback, ["BITBUCKET_CLIENT_SECRET"])),
@@ -30,14 +34,14 @@ class BitbucketHelper:
         )
 
     @staticmethod
-    def bitbucket_required_one_of():
+    def bitbucket_required_one_of() -> list[list[str]]:
         return [["client_id", "client_secret", "user", "password"]]
 
     @staticmethod
-    def bitbucket_required_together():
+    def bitbucket_required_together() -> list[list[str]]:
         return [["client_id", "client_secret"], ["user", "password"]]
 
-    def fetch_access_token(self):
+    def fetch_access_token(self) -> None:
         if self.module.params["client_id"] and self.module.params["client_secret"]:
             headers = {
                 "Authorization": basic_auth_header(
@@ -57,7 +61,9 @@ class BitbucketHelper:
             else:
                 self.module.fail_json(msg=f"Failed to retrieve access token: {info}")
 
-    def request(self, api_url, method, data=None, headers=None):
+    def request(
+        self, api_url: str, method: str, data: bytes | str | dict | None = None, headers: dict[str, str] | None = None
+    ):
         headers = headers or {}
 
         if self.access_token:

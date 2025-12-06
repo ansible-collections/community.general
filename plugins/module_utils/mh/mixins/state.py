@@ -5,16 +5,18 @@
 
 from __future__ import annotations
 
+import typing as t
+
 
 class StateMixin:
     state_param: str = "state"
     default_state: str | None = None
 
-    def _state(self):
-        state = self.module.params.get(self.state_param)
+    def _state(self) -> str:
+        state: str = self.module.params.get(self.state_param)  # type: ignore[attr-defined]
         return self.default_state if state is None else state
 
-    def _method(self, state):
+    def _method(self, state: str) -> str:
         return f"{self.state_param}_{state}"
 
     def __run__(self):
@@ -34,5 +36,5 @@ class StateMixin:
         func = getattr(self, method)
         return func()
 
-    def __state_fallback__(self):
+    def __state_fallback__(self) -> t.NoReturn:
         raise ValueError(f"Cannot find method: {self._method(self._state())}")

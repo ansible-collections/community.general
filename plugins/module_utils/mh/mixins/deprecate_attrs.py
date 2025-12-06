@@ -5,12 +5,15 @@
 
 from __future__ import annotations
 
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
 
 class DeprecateAttrsMixin:
-    def _deprecate_setup(self, attr, target, module):
+    def _deprecate_setup(
+        self, attr: str, target: object | None, module: AnsibleModule | None
+    ) -> tuple[object, AnsibleModule, dict[str, t.Any], dict[str, t.Any]]:
         if target is None:
             target = self
         if not hasattr(target, attr):
@@ -37,8 +40,16 @@ class DeprecateAttrsMixin:
         return target, module, value_dict, trigger_dict
 
     def _deprecate_attr(
-        self, attr, msg, version=None, date=None, collection_name=None, target=None, value=None, module=None
-    ):
+        self,
+        attr: str,
+        msg: str,
+        version: str | None = None,
+        date: str | None = None,
+        collection_name: str | None = None,
+        target: object | None = None,
+        value=None,
+        module: AnsibleModule | None = None,
+    ) -> None:
         target, module, value_dict, trigger_dict = self._deprecate_setup(attr, target, module)
 
         value_dict[attr] = getattr(target, attr, value)

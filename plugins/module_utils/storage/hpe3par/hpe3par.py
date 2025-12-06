@@ -4,11 +4,12 @@
 
 from __future__ import annotations
 
+import typing as t
 
 from ansible.module_utils import basic
 
 
-def convert_to_binary_multiple(size_with_unit):
+def convert_to_binary_multiple(size_with_unit: str | None) -> int:
     if size_with_unit is None:
         return -1
     valid_units = ["MiB", "GiB", "TiB"]
@@ -35,7 +36,7 @@ storage_system_spec = {
 }
 
 
-def cpg_argument_spec():
+def cpg_argument_spec() -> dict[str, t.Any]:
     spec = {
         "state": {"required": True, "choices": ["present", "absent"], "type": "str"},
         "cpg_name": {"required": True, "type": "str"},
