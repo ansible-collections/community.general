@@ -117,7 +117,7 @@ EXAMPLES = r"""
     auth_username: USERNAME
     auth_password: PASSWORD
     state: present
-    user_id: user1Id
+    uid: user_uid
     roles:
       - name: role_name1
         id: role_id1
@@ -135,7 +135,7 @@ EXAMPLES = r"""
     auth_password: PASSWORD
     state: present
     client_id: client1
-    user_id: user1Id
+    uid: user_uid
     roles:
       - name: role_name1
         id: role_id1
@@ -351,7 +351,9 @@ def main():
             # Fetch missing role_name
             else:
                 if cid is None:
-                    role["name"] = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get("id"), realm=realm)["name"]
+                    role_rep = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get("id"), realm=realm)
+                    if role_rep is not None:
+                        role["name"] = role_rep["name"]
                 else:
                     role["name"] = kc.get_client_user_rolemapping_by_id(
                         uid=uid, cid=cid, rid=role.get("id"), realm=realm
