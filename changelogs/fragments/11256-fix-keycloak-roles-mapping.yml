@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - keycloak_user_rolemapping module - fixed crash when assigning roles to users
+    without an existing role (https://github.com/ansible-collections/community.general/issues/10960, https://github.com/ansible-collections/community.general/pull/11256).
