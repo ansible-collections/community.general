@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - keycloak_realm - fixed crash in ``sanitize_cr()`` when ``realmrep`` was ``None`` (https://github.com/ansible-collections/community.general/pull/11260).
