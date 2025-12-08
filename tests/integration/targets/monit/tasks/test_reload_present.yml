@@ -53,7 +53,7 @@
     state: restarted
 
 - name: wait for monit daemon to be responsive after restart
-  command: monit status
+  command: monit status -B httpd_echo
   register: monit_status_check
   changed_when: false
   until: monit_status_check.rc == 0
