@@ -60,6 +60,10 @@
   retries: 60
   delay: 0.5
 
+- name: give monit a moment to stabilize after initial query
+  pause:
+    seconds: 1
+
 - name: test process present again
   monit:
     name: httpd_echo
