@@ -846,6 +846,9 @@ def sanitize_cr(realmrep):
     :param realmrep: the realmrep dict to be sanitized
     :return: sanitized realmrep dict
     """
+    if not realmrep:
+        return realmrep
+
     result = realmrep.copy()
     if "secret" in result:
         result["secret"] = "********"
