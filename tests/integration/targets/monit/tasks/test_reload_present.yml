@@ -52,9 +52,13 @@
     name: monit
     state: restarted
 
-- name: wait for monit to be fully ready after restart
-  pause:
-    seconds: 3
+- name: wait for monit daemon to be responsive after restart
+  command: monit status
+  register: monit_status_check
+  changed_when: false
+  until: monit_status_check.rc == 0
+  retries: 60
+  delay: 0.5
 
 - name: test process present again
   monit:
