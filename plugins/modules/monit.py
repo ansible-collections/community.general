@@ -277,6 +277,9 @@ class Monit:
     def change_state(self, state: str, expected_status: StatusValue, invert_expected: bool | None = None):
         current_status = self.get_status()
         self.run_command(STATE_COMMAND_MAP[state])
+        # Give monit daemon a moment to process the command before checking status
+        # to avoid race condition where HTTP interface may be temporarily unresponsive
+        time.sleep(0.5)
         status = self.wait_for_status_change(current_status)
         status = self.wait_for_monit_to_stop_pending(status)
         status_match = status.state == expected_status
