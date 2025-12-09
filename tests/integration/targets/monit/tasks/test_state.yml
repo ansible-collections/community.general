@@ -13,6 +13,9 @@
     name: httpd_echo
     state: "{{ state }}"
   register: result
+  until: result is not failed or result.rc != -15
+  retries: 3
+  delay: 2
 
 - name: check that state changed
   assert:
