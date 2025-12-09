@@ -86,6 +86,18 @@
     - include_tasks: test.yml
 
   always:
+    - name: capture monit log for debugging
+      become: true
+      slurp:
+        src: /var/log/monit.log
+      register: monit_log
+      ignore_errors: true
+
+    - name: display monit log
+      debug:
+        msg: "{{ monit_log.content | b64decode }}"
+      when: monit_log is success
+
     - name: stop monit
       become: true
       service:
