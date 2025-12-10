@@ -89,6 +89,13 @@
           - less
           - nano
           - vim
+          - bash
+          - bash-completion
+          - bash-completion-doc
+          - zsh
+          - zsh-calendar
+          - zsh-completions
+          - zsh-doc
         state: present
       register: results
 
@@ -96,7 +103,7 @@
       ansible.builtin.assert:
         that:
           - results is changed
-          - (results.packages | length) >= 3
+          - (results.packages | length) >= 10
 
     - name: Install a bunch of packages again
       community.general.apk:
