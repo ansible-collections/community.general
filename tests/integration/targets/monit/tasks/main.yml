@@ -77,42 +77,9 @@
         - setuptools==44
         - python-daemon
 
-    - name: enable verbose logging in monit service
-      become: true
-      lineinfile:
-        path: /lib/systemd/system/monit.service
-        regexp: '^ExecStart='
-        line: 'ExecStart=/usr/bin/monit -I -v'
-        backrefs: false
-      ignore_errors: true
-
-    - name: reload systemd daemon
-      become: true
-      systemd:
-        daemon_reload: true
-      ignore_errors: true
-
-    - name: restart monit
-      become: true
-      service:
-        name: monit
-        state: restarted
-
     - include_tasks: test.yml
 
   always:
-    - name: capture monit log for debugging
-      become: true
-      slurp:
-        src: /var/log/monit.log
-      register: monit_log
-      ignore_errors: true
-
-    - name: display monit log
-      debug:
-        msg: "{{ monit_log.content | b64decode }}"
-      when: monit_log is success
-
     - name: stop monit
       become: true
       service:
