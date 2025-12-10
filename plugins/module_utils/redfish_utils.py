@@ -270,7 +270,7 @@ class RedfishUtils:
             if etag:
                 if self.strip_etag_quotes:
                     etag = etag.strip('"')
-                req_headers["If-Match"] = etag
+                req_headers["ETag"] = etag
 
         if check_pyld:
             # Check the payload with the current settings to see if changes
