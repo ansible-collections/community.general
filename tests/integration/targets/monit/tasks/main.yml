@@ -26,23 +26,18 @@
         - /var/run/monit
         - "{{ process_root }}"
 
-    - name: Install monit
+    - name: install monit
       become: true
       package:
         name: monit
         state: present
 
-    - include_vars: "{{ item }}"
+    - include_vars: '{{ item }}'
       with_first_found:
         - files:
             - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
-            - "{{ ansible_os_family }}.yml"
-            - "defaults.yml"
-
-    - name: Get monit version
-      command: monit -V
-      register: monit_version_output
-      changed_when: false
+            - '{{ ansible_os_family }}.yml'
+            - 'defaults.yml'
 
     - name: monit config
       become: true
@@ -76,6 +71,12 @@
       loop:
         - setuptools==44
         - python-daemon
+
+    - name: restart monit
+      become: true
+      service:
+        name: monit
+        state: restarted
 
     - include_tasks: test.yml
 
