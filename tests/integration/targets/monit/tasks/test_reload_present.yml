@@ -57,7 +57,7 @@
   register: monit_status_check
   changed_when: false
   until: monit_status_check.rc == 0
-  retries: 60
+  retries: 10
   delay: 0.5
 
 - name: test process present again
