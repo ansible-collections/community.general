@@ -1,0 +1,2 @@
+bugfixes:
+  - redfish_utils module utils - fix PATCH request header to `ETag` (https://github.com/ansible-collections/community.general/pull/11270).
