@@ -160,6 +160,41 @@ options:
                       - Validation to ensure the attribute matches one of the provided options.
                     type: dict
 
+                  integer:
+                    description:
+                      - The integer validation for the attribute.
+                    type: dict
+
+                  double:
+                    description:
+                      - The double validation for the attribute.
+                    type: dict
+
+                  iso-date:
+                    description:
+                      - The iso-date validation for the attribute.
+                    type: dict
+
+                  local-date:
+                    description:
+                      - The local-date validation for the attribute.
+                    type: dict
+
+                  multivalued:
+                    description:
+                      - The multivalued validation for the attribute.
+                    type: dict
+                    suboptions:
+                      min:
+                        description:
+                          - The minimum amount of values of the attribute.
+                        type: int
+                      max:
+                        description:
+                          - The maximum amount of values of the attribute.
+                        type: int
+                        required: true
+
               annotations:
                 description:
                   - Annotations for the attribute.
@@ -488,6 +523,20 @@ def main():
                                         "uri": dict(type="dict"),
                                         "pattern": dict(type="dict"),
                                         "options": dict(type="dict"),
+                                        "integer": dict(type="dict"),
+                                        "double": dict(type="dict"),
+                                        "iso-date": dict(type="dict"),
+                                        "local-date": dict(type="dict"),
+                                        "multivalued": dict(
+                                            type="dict",
+                                            options={
+                                                "min": dict(
+                                                    type="int", required=False
+                                                ), "max": dict(
+                                                    type="int", required=True
+                                                )
+                                            },
+                                        ),
                                     },
                                 ),
                                 "annotations": dict(type="dict"),
