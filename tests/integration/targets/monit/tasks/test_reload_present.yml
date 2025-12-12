@@ -52,6 +52,14 @@
     name: monit
     state: restarted
 
+- name: wait for monit daemon to be responsive after restart
+  command: monit status -B httpd_echo
+  register: monit_status_check
+  changed_when: false
+  until: monit_status_check.rc == 0
+  retries: 10
+  delay: 0.5
+
 - name: test process present again
   monit:
     name: httpd_echo
