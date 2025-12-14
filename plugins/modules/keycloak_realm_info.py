@@ -1,4 +1,4 @@
-q#!/usr/bin/python
+#!/usr/bin/python
 
 # Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
