@@ -37,7 +37,7 @@ options:
     default: 0
 extends_documentation_fragment:
   - community.general.rundeck
-  - url
+  - ansible.builtin.url
   - community.general.attributes
   - community.general.attributes.info_module
 """

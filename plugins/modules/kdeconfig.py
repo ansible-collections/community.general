@@ -59,7 +59,7 @@ options:
     type: bool
     default: false
 extends_documentation_fragment:
-  - files
+  - ansible.builtin.files
   - community.general.attributes
 attributes:
   check_mode:
