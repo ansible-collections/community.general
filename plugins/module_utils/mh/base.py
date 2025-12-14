@@ -40,7 +40,7 @@ class ModuleHelperBase:
     def verbosity(self):
         return self.module._verbosity
 
-    def do_raise(self, *args, **kwargs):
+    def do_raise(self, *args, **kwargs) -> t.NoReturn:
         raise _MHE(*args, **kwargs)
 
     def __getattr__(self, attr):
@@ -61,14 +61,14 @@ class ModuleHelperBase:
         raise NotImplementedError()
 
     @property
-    def changed(self):
+    def changed(self) -> bool:
         try:
             return self.__changed__()
         except NotImplementedError:
             return self._changed
 
     @changed.setter
-    def changed(self, value):
+    def changed(self, value: bool) -> None:
         self._changed = value
 
     def has_changed(self):
