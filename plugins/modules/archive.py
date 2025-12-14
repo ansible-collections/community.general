@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: archive
 short_description: Creates a compressed archive of one or more files or trees
 extends_documentation_fragment:
-  - files
+  - ansible.builtin.files
   - community.general.attributes
 description:
   - Creates or extends an archive.

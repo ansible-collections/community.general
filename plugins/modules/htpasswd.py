@@ -70,7 +70,7 @@ notes:
 requirements: [passlib>=1.6]
 author: "Ansible Core Team"
 extends_documentation_fragment:
-  - files
+  - ansible.builtin.files
   - community.general.attributes
 """
 
