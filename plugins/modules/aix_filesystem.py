@@ -103,7 +103,7 @@ options:
       - Specifies an existing volume group (VG).
     type: str
 notes:
-  - For more O(attributes), please check "crfs" AIX manual.
+  - For more O(attributes), please check C(crfs) AIX manual.
 """
 
 EXAMPLES = r"""
