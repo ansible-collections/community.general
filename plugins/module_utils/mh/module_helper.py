@@ -16,6 +16,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprec
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
+    from ansible.module_utils.basic import AnsibleModule
 
 
 class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
@@ -25,11 +26,11 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
     change_params: Sequence[str] = ()
     facts_params: Sequence[str] = ()
 
-    def __init__(self, module=None):
+    def __init__(self, module: AnsibleModule | dict[str, t.Any] | None = None) -> None:
         super().__init__(module)
 
         self.vars = VarDict()
-        for name, value in self.module.params.items():
+        for name, value in self.module.params.items():  # type: ignore[union-attr]
             self.vars.set(
                 name,
                 value,
@@ -39,26 +40,26 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
                 fact=name in self.facts_params,
             )
 
-    def update_vars(self, meta=None, **kwargs):
+    def update_vars(self, meta: dict[str, t.Any] | None = None, **kwargs: t.Any) -> None:
         if meta is None:
             meta = {}
         for k, v in kwargs.items():
             self.vars.set(k, v, **meta)
 
-    def update_output(self, **kwargs):
+    def update_output(self, **kwargs: t.Any) -> None:
         self.update_vars(meta={"output": True}, **kwargs)
 
-    def update_facts(self, **kwargs):
+    def update_facts(self, **kwargs: t.Any) -> None:
         self.update_vars(meta={"fact": True}, **kwargs)
 
-    def _vars_changed(self):
+    def _vars_changed(self) -> bool:
         return self.vars.has_changed
 
-    def has_changed(self):
+    def has_changed(self) -> bool:
         return self.changed or self._vars_changed()
 
     @property
-    def output(self):
+    def output(self) -> dict[str, t.Any]:
         result = dict(self.vars.output())
         if self.facts_name:
             facts = self.vars.facts()
