@@ -174,11 +174,15 @@ options:
                     description:
                       - The iso-date validation for the attribute.
                     type: dict
+                    aliases:
+                      - isoDate
 
                   local_date:
                     description:
                       - The local-date validation for the attribute.
                     type: dict
+                    aliases:
+                      - localDate
 
                   multivalued:
                     description:
@@ -376,6 +380,22 @@ EXAMPLES = r"""
                   - user
                 edit: []
               multivalued: false
+            - name: testAttribute
+              displayName: ${testAttribute}
+              validations:
+                integer:
+                  min: 0
+                  max: 255
+              annotations: {}
+              required:
+                roles:
+                  - user
+              permissions:
+                view:
+                  - admin
+                  - user
+                edit: []
+              multivalued: false
           groups:
             - name: user-metadata
               displayHeader: User metadata
@@ -525,8 +545,8 @@ def main():
                                         "options": dict(type="dict"),
                                         "integer": dict(type="dict"),
                                         "double": dict(type="dict"),
-                                        "iso_date": dict(type="dict"),
-                                        "local_date": dict(type="dict"),
+                                        "iso_date": dict(type="dict", aliases=["isoDate"]),
+                                        "local_date": dict(type="dict", aliases=["localDate"]),
                                         "multivalued": dict(
                                             type="dict",
                                             options={
@@ -659,6 +679,14 @@ def main():
                                         attribute["validations"]["person-name-prohibited-characters"] = attribute[
                                             "validations"
                                         ].pop("personNameProhibitedCharacters")
+                                    if "isoDate" in attribute["validations"]:
+                                        attribute["validations"]["iso-date"] = attribute[
+                                            "validations"
+                                        ].pop("isoDate")
+                                    if "localDate" in attribute["validations"]:
+                                        attribute["validations"]["local-date"] = attribute[
+                                            "validations"
+                                        ].pop("localDate")
                         changeset[camel(component_param)][config_param].append(kc_user_profile_config[0])
                 # usual camelCase parameters
                 else:
