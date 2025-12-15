@@ -91,7 +91,7 @@ EXAMPLES = r"""
     auth_realm: "master"
     auth_username: "admin"
     realm: "master"
-    required_action:
+    required_actions:
       - alias: "TERMS_AND_CONDITIONS"
         name: "Terms and conditions"
         providerId: "TERMS_AND_CONDITIONS"
@@ -106,7 +106,7 @@ EXAMPLES = r"""
     auth_realm: "master"
     auth_username: "admin"
     realm: "master"
-    required_action:
+    required_actions:
       - alias: "TERMS_AND_CONDITIONS"
         enabled: false
     state: "present"
@@ -119,7 +119,7 @@ EXAMPLES = r"""
     auth_realm: "master"
     auth_username: "admin"
     realm: "master"
-    required_action:
+    required_actions:
       - alias: "TERMS_AND_CONDITIONS"
     state: "absent"
 """
