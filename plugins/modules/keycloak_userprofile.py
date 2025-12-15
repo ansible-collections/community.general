@@ -170,12 +170,12 @@ options:
                       - The double validation for the attribute.
                     type: dict
 
-                  iso-date:
+                  iso_date:
                     description:
                       - The iso-date validation for the attribute.
                     type: dict
 
-                  local-date:
+                  local_date:
                     description:
                       - The local-date validation for the attribute.
                     type: dict
@@ -525,8 +525,8 @@ def main():
                                         "options": dict(type="dict"),
                                         "integer": dict(type="dict"),
                                         "double": dict(type="dict"),
-                                        "iso-date": dict(type="dict"),
-                                        "local-date": dict(type="dict"),
+                                        "iso_date": dict(type="dict"),
+                                        "local_date": dict(type="dict"),
                                         "multivalued": dict(
                                             type="dict",
                                             options={
