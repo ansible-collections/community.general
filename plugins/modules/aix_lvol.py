@@ -13,7 +13,7 @@ author:
 module: aix_lvol
 short_description: Configure AIX LVM logical volumes
 description:
-  - This module creates, removes or resizes AIX logical volumes. Inspired by lvol module.
+  - This module creates, removes or resizes AIX logical volumes. Inspired by M(community.general.lvol) module.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -69,7 +69,7 @@ options:
     default: ''
   pvs:
     description:
-      - A list of physical volumes, for example V(hdisk1,hdisk2).
+      - A list of physical volumes, for example V([hdisk1, hdisk2]).
     type: list
     elements: str
     default: []

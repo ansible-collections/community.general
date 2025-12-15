@@ -34,7 +34,7 @@ options:
     required: true
   action:
     description:
-      - Action what the init has to do with this entry.
+      - Action the C(init) process performs for this entry.
     type: str
     choices:
       - boot
@@ -51,25 +51,23 @@ options:
       - wait
   command:
     description:
-      - What command has to run.
+      - Command to be executed.
     type: str
     required: true
   insertafter:
     description:
-      - After which inittabline should the new entry inserted.
+      - After which C(inittab) line should the new entry inserted.
     type: str
   state:
     description:
-      - Whether the entry should be present or absent in the inittab file.
+      - Whether the entry should be present or absent in the C(inittab) file.
     type: str
     choices: [absent, present]
     default: present
 notes:
   - The changes are persistent across reboots.
-  - You need root rights to read or adjust the inittab with the C(lsitab), C(chitab), C(mkitab) or C(rmitab) commands.
+  - You need root rights to read or adjust the C(inittab) with the C(lsitab), C(chitab), C(mkitab) or C(rmitab) commands.
   - Tested on AIX 7.1.
-requirements:
-  - itertools
 """
 
 EXAMPLES = r"""
@@ -114,9 +112,6 @@ name:
 
 
 from ansible.module_utils.basic import AnsibleModule
-
-# end import modules
-# start defining the functions
 
 
 def check_current_entry(module):
