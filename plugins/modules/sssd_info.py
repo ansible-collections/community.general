@@ -6,15 +6,14 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: sssd_info
 version_added: 12.1.0
 short_description: Check SSSD domain status using D-Bus
 description:
     - Check the online status of SSSD domains, list domains, and retrieve active servers using D-Bus.
-author:
-    - Aleksandr Gabidullin (@MikeyTide)
+author: "Aleksandr Gabidullin (@MikeyTide)"
 requirements:
     - dbus-python
 attributes:
@@ -49,9 +48,9 @@ options:
         choices: ['IPA', 'AD']
 extends_documentation_fragment:
     - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Check SSSD domain status
   community.general.sssd_info:
     action: domain_status
@@ -76,9 +75,9 @@ EXAMPLES = r'''
     domain: example.com
     server_type: AD
   register: list_servers_result
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 online:
     description: The online status of the SSSD domain.
     type: str
@@ -108,12 +107,10 @@ error:
     type: str
     returned: on error
     sample: 'Domain not found: winad.test'
-'''
+"""
 
 
-import traceback
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
 try:
     from ansible_collections.community.general.plugins.module_utils import deps
@@ -259,7 +256,7 @@ def main() -> None:
     except ImportError:
         if not HAS_DBUS:
             from ansible.module_utils.basic import missing_required_lib
-            module.fail_json(msg=missing_required_lib('dbus-python'))
+            module.fail_json(msg=missing_required_lib('dbus-python'), exception=DBUS_IMP_ERR)
 
     action = module.params['action']
     domain = module.params.get('domain')
