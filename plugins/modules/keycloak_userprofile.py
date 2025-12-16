@@ -164,11 +164,13 @@ options:
                     description:
                       - The integer validation for the attribute.
                     type: dict
+                    version_added: 12.2.0
 
                   double:
                     description:
                       - The double validation for the attribute.
                     type: dict
+                    version_added: 12.2.0
 
                   iso_date:
                     description:
@@ -176,6 +178,7 @@ options:
                     type: dict
                     aliases:
                       - isoDate
+                    version_added: 12.2.0
 
                   local_date:
                     description:
@@ -183,6 +186,7 @@ options:
                     type: dict
                     aliases:
                       - localDate
+                    version_added: 12.2.0
 
                   multivalued:
                     description:
@@ -198,6 +202,7 @@ options:
                           - The maximum amount of values of the attribute.
                         type: int
                         required: true
+                    version_added: 12.2.0
 
               annotations:
                 description:
