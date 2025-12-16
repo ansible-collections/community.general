@@ -112,10 +112,11 @@ error:
 
 from ansible.module_utils.basic import AnsibleModule
 
+# Try to import dbus with error handling using module_utils.deps
 try:
     from ansible_collections.community.general.plugins.module_utils import deps
     
-    with deps.declare("dbus-python"):
+    with deps.declare("dbus"):
         import dbus
     HAS_DBUS = True
     DBUS_IMP_ERR = None
@@ -250,13 +251,15 @@ def main() -> None:
         ]
     )
 
+    # Check for required library using deps if available
     try:
         from ansible_collections.community.general.plugins.module_utils import deps
         deps.validate(module)
     except ImportError:
+        # Fallback if deps module is not available
         if not HAS_DBUS:
             from ansible.module_utils.basic import missing_required_lib
-            module.fail_json(msg=missing_required_lib('dbus-python'), exception=DBUS_IMP_ERR)
+            module.fail_json(msg=missing_required_lib('dbus'), exception=DBUS_IMP_ERR)
 
     action = module.params['action']
     domain = module.params.get('domain')
