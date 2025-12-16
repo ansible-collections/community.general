@@ -555,11 +555,8 @@ def main():
                                         "multivalued": dict(
                                             type="dict",
                                             options={
-                                                "min": dict(
-                                                    type="int", required=False
-                                                ), "max": dict(
-                                                    type="int", required=True
-                                                )
+                                                "min": dict(type="int", required=False),
+                                                "max": dict(type="int", required=True),
                                             },
                                         ),
                                     },
@@ -685,13 +682,11 @@ def main():
                                             "validations"
                                         ].pop("personNameProhibitedCharacters")
                                     if "isoDate" in attribute["validations"]:
-                                        attribute["validations"]["iso-date"] = attribute[
-                                            "validations"
-                                        ].pop("isoDate")
+                                        attribute["validations"]["iso-date"] = attribute["validations"].pop("isoDate")
                                     if "localDate" in attribute["validations"]:
-                                        attribute["validations"]["local-date"] = attribute[
-                                            "validations"
-                                        ].pop("localDate")
+                                        attribute["validations"]["local-date"] = attribute["validations"].pop(
+                                            "localDate"
+                                        )
                         changeset[camel(component_param)][config_param].append(kc_user_profile_config[0])
                 # usual camelCase parameters
                 else:
