@@ -307,7 +307,7 @@ class Connection(ConnectionBase):
     _log_channel: str | None = None
 
     def _cache_key(self) -> str:
-        return "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))
+        return f"{self.get_option('remote_addr')}__{self.get_option('remote_user')}__"
 
     def _connect(self) -> Connection:
         cache_key = self._cache_key()
@@ -337,7 +337,7 @@ class Connection(ConnectionBase):
                 proxy_command = proxy_command.replace(find, str(replace))
             try:
                 sock_kwarg = {'sock': paramiko.ProxyCommand(proxy_command)}
-                display.vvv("CONFIGURE PROXY COMMAND FOR CONNECTION: %s" % proxy_command, host=self.get_option('remote_addr'))
+                display.vvv(f"CONFIGURE PROXY COMMAND FOR CONNECTION: {proxy_command}", host=self.get_option('remote_addr'))
             except AttributeError:
                 display.warning('Paramiko ProxyCommand support unavailable. '
                                 'Please upgrade to Paramiko 1.9.0 or newer. '
@@ -349,10 +349,10 @@ class Connection(ConnectionBase):
         """ activates the connection object """
 
         if paramiko is None:
-            raise AnsibleError("paramiko is not installed: %s" % to_native(PARAMIKO_IMPORT_ERR))
+            raise AnsibleError(f"paramiko is not installed: {PARAMIKO_IMPORT_ERR}")
 
         port = self.get_option('port')
-        display.vvv("ESTABLISH PARAMIKO SSH CONNECTION FOR USER: %s on PORT %s TO %s" % (self.get_option('remote_user'), port, self.get_option('remote_addr')),
+        display.vvv(f"ESTABLISH PARAMIKO SSH CONNECTION FOR USER: {self.get_option('remote_user')} on PORT {port} TO {self.get_option('remote_addr')}",
                     host=self.get_option('remote_addr'))
 
         ssh = paramiko.SSHClient()
@@ -423,7 +423,7 @@ class Connection(ConnectionBase):
                 **ssh_connect_kwargs,
             )
         except paramiko.ssh_exception.BadHostKeyException as e:
-            raise AnsibleConnectionFailure('host key mismatch for %s' % e.hostname)
+            raise AnsibleConnectionFailure(f'host key mismatch for {e.hostname}')
         except paramiko.ssh_exception.AuthenticationException as ex:
             raise AnsibleAuthenticationFailure() from ex
         except Exception as ex:
@@ -431,8 +431,10 @@ class Connection(ConnectionBase):
             if u"PID check failed" in msg:
                 raise AnsibleError("paramiko version issue, please upgrade paramiko on the machine running ansible") from ex
             elif u"Private key file is encrypted" in msg:
-                msg = 'ssh %s@%s:%s : %s\nTo connect as a different user, use -u <username>.' % (
-                    self.get_option('remote_user'), self.get_options('remote_addr'), port, msg)
+                msg = (
+                    f"ssh {self.get_option('remote_user')}@{self.get_options('remote_addr')}:{port}"
+                    "\nTo connect as a different user, use -u <username>."
+                )
                 raise AnsibleConnectionFailure(msg) from ex
             else:
                 raise AnsibleConnectionFailure(msg) from ex
@@ -456,7 +458,7 @@ class Connection(ConnectionBase):
             text_e = to_text(e)
             msg = u"Failed to open session"
             if text_e:
-                msg += u": %s" % text_e
+                msg += f": {text_e}"
             raise AnsibleConnectionFailure(to_native(msg))
 
         # sudo usually requires a PTY (cf. requiretty option), therefore
@@ -465,7 +467,7 @@ class Connection(ConnectionBase):
         if self.get_option('pty') and sudoable:
             chan.get_pty(term=os.getenv('TERM', 'vt100'), width=int(os.getenv('COLUMNS', 0)), height=int(os.getenv('LINES', 0)))
 
-        display.vvv("EXEC %s" % cmd, host=self.get_option('remote_addr'))
+        display.vvv(f"EXEC {cmd}", host=self.get_option('remote_addr'))
 
         cmd = to_bytes(cmd, errors='surrogate_or_strict')
 
@@ -482,11 +484,11 @@ class Connection(ConnectionBase):
                     display.debug('Waiting for Privilege Escalation input')
 
                     chunk = chan.recv(bufsize)
-                    display.debug("chunk is: %r" % chunk)
+                    display.debug(f"chunk is: {chunk!r}")
                     if not chunk:
                         if b'unknown user' in become_output:
                             n_become_user = to_native(self.become.get_option('become_user'))
-                            raise AnsibleError('user %s does not exist' % n_become_user)
+                            raise AnsibleError(f'user {n_become_user} does not exist')
                         else:
                             break
                             # raise AnsibleError('ssh connection closed waiting for password prompt')
@@ -524,15 +526,15 @@ class Connection(ConnectionBase):
 
         super(Connection, self).put_file(in_path, out_path)
 
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
+        display.vvv(f"PUT {in_path} TO {out_path}", host=self.get_option('remote_addr'))
 
         if not os.path.exists(to_bytes(in_path, errors='surrogate_or_strict')):
-            raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise AnsibleFileNotFound(f"file or module does not exist: {in_path}")
 
         try:
             self.sftp = self.ssh.open_sftp()
         except Exception as e:
-            raise AnsibleError("failed to open a SFTP connection (%s)" % e)
+            raise AnsibleError(f"failed to open a SFTP connection ({e})")
 
         try:
             self.sftp.put(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
@@ -541,11 +543,10 @@ class Connection(ConnectionBase):
 
     def _connect_sftp(self) -> paramiko.sftp_client.SFTPClient:
 
-        cache_key = "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))
-        if cache_key in SFTP_CONNECTION_CACHE:
-            return SFTP_CONNECTION_CACHE[cache_key]
+        if self._cache_key in SFTP_CONNECTION_CACHE:
+            return SFTP_CONNECTION_CACHE[self._cache_key]
         else:
-            result = SFTP_CONNECTION_CACHE[cache_key] = self._connect().ssh.open_sftp()
+            result = SFTP_CONNECTION_CACHE[self._cache_key] = self._connect().ssh.open_sftp()
             return result
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
@@ -553,12 +554,12 @@ class Connection(ConnectionBase):
 
         super(Connection, self).fetch_file(in_path, out_path)
 
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
+        display.vvv(f"FETCH {in_path} TO {out_path}", host=self.get_option('remote_addr'))
 
         try:
             self.sftp = self._connect_sftp()
         except Exception as e:
-            raise AnsibleError("failed to open a SFTP connection (%s)" % to_native(e))
+            raise AnsibleError(f"failed to open a SFTP connection ({e})")
 
         try:
             self.sftp.get(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
@@ -595,14 +596,14 @@ class Connection(ConnectionBase):
                     # was f.write
                     added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                     if not added_this_time:
-                        f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+                        f.write(f"{hostname} {keytype} {key.get_base64()}\n")
 
             for hostname, keys in self.ssh._host_keys.items():
 
                 for keytype, key in keys.items():
                     added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                     if added_this_time:
-                        f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+                        f.write(f"{hostname} {keytype} {key.get_base64()}\n")
 
     def reset(self) -> None:
         if not self._connected:
