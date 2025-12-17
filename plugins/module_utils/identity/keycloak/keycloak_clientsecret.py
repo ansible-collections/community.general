@@ -5,13 +5,17 @@
 
 from __future__ import annotations
 
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import keycloak_argument_spec
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    keycloak_argument_spec,
+    KeycloakAPI,
+)
 
 
-def keycloak_clientsecret_module():
+def keycloak_clientsecret_module() -> AnsibleModule:
     """
     Returns an AnsibleModule definition for modules that interact with a client
     secret.
@@ -44,7 +48,7 @@ def keycloak_clientsecret_module():
     return module
 
 
-def keycloak_clientsecret_module_resolve_params(module, kc):
+def keycloak_clientsecret_module_resolve_params(module: AnsibleModule, kc: KeycloakAPI) -> tuple[str, dict[str, t.Any]]:
     """
     Given an AnsibleModule definition for keycloak_clientsecret_*, and a
     KeycloakAPI client, resolve the params needed to interact with the Keycloak
