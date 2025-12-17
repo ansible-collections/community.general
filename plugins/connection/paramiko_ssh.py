@@ -363,7 +363,7 @@ class Connection(ConnectionBase):
         paramiko_preferred_pubkeys = getattr(paramiko.Transport, '_preferred_pubkeys', ())
         paramiko_preferred_hostkeys = getattr(paramiko.Transport, '_preferred_keys', ())
         use_rsa_sha2_algorithms = self.get_option('use_rsa_sha2_algorithms')
-        disabled_algorithms: t.Dict[str, t.Iterable[str]] = {}
+        disabled_algorithms: dict[str, t.Iterable[str]] = {}
         if not use_rsa_sha2_algorithms:
             if paramiko_preferred_pubkeys:
                 disabled_algorithms['pubkeys'] = tuple(a for a in paramiko_preferred_pubkeys if 'rsa-sha2' in a)
@@ -423,14 +423,14 @@ class Connection(ConnectionBase):
                 **ssh_connect_kwargs,
             )
         except paramiko.ssh_exception.BadHostKeyException as e:
-            raise AnsibleConnectionFailure(f'host key mismatch for {e.hostname}')
+            raise AnsibleConnectionFailure(f'host key mismatch for {e.hostname}') from e
         except paramiko.ssh_exception.AuthenticationException as ex:
             raise AnsibleAuthenticationFailure() from ex
         except Exception as ex:
             msg = str(ex)
-            if u"PID check failed" in msg:
+            if "PID check failed" in msg:
                 raise AnsibleError("paramiko version issue, please upgrade paramiko on the machine running ansible") from ex
-            elif u"Private key file is encrypted" in msg:
+            elif "Private key file is encrypted" in msg:
                 msg = (
                     f"ssh {self.get_option('remote_user')}@{self.get_options('remote_addr')}:{port}"
                     "\nTo connect as a different user, use -u <username>."
@@ -444,7 +444,7 @@ class Connection(ConnectionBase):
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         """ run a command on the remote host """
 
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         if in_data:
             raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -456,10 +456,10 @@ class Connection(ConnectionBase):
             chan = self.ssh.get_transport().open_session()
         except Exception as e:
             text_e = to_text(e)
-            msg = u"Failed to open session"
+            msg = "Failed to open session"
             if text_e:
                 msg += f": {text_e}"
-            raise AnsibleConnectionFailure(to_native(msg))
+            raise AnsibleConnectionFailure(to_native(msg)) from e
 
         # sudo usually requires a PTY (cf. requiretty option), therefore
         # we give it one by default (pty=True in ansible.cfg), and we try
@@ -514,7 +514,7 @@ class Connection(ConnectionBase):
                     no_prompt_out += become_output
                     no_prompt_err += become_output
         except socket.timeout:
-            raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
+            raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output)) from None
 
         stdout = b''.join(chan.makefile('rb', bufsize))
         stderr = b''.join(chan.makefile_stderr('rb', bufsize))
@@ -524,7 +524,7 @@ class Connection(ConnectionBase):
     def put_file(self, in_path: str, out_path: str) -> None:
         """ transfer a file from local to remote """
 
-        super(Connection, self).put_file(in_path, out_path)
+        super().put_file(in_path, out_path)
 
         display.vvv(f"PUT {in_path} TO {out_path}", host=self.get_option('remote_addr'))
 
@@ -534,7 +534,7 @@ class Connection(ConnectionBase):
         try:
             self.sftp = self.ssh.open_sftp()
         except Exception as e:
-            raise AnsibleError(f"failed to open a SFTP connection ({e})")
+            raise AnsibleError(f"failed to open a SFTP connection ({e})") from e
 
         try:
             self.sftp.put(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
@@ -552,14 +552,14 @@ class Connection(ConnectionBase):
     def fetch_file(self, in_path: str, out_path: str) -> None:
         """ save a remote file to the specified path """
 
-        super(Connection, self).fetch_file(in_path, out_path)
+        super().fetch_file(in_path, out_path)
 
         display.vvv(f"FETCH {in_path} TO {out_path}", host=self.get_option('remote_addr'))
 
         try:
             self.sftp = self._connect_sftp()
         except Exception as e:
-            raise AnsibleError(f"failed to open a SFTP connection ({e})")
+            raise AnsibleError(f"failed to open a SFTP connection ({e})") from e
 
         try:
             self.sftp.get(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
@@ -568,8 +568,8 @@ class Connection(ConnectionBase):
 
     def _any_keys_added(self) -> bool:
 
-        for hostname, keys in self.ssh._host_keys.items():
-            for keytype, key in keys.items():
+        for _hostname, keys in self.ssh._host_keys.items():
+            for _keytype, key in keys.items():
                 added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                 if added_this_time:
                     return True
