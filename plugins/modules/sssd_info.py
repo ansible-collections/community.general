@@ -115,7 +115,7 @@ from ansible.module_utils.basic import AnsibleModule
 # Try to import dbus with error handling using module_utils.deps
 try:
     from ansible_collections.community.general.plugins.module_utils import deps
-    
+
     with deps.declare("dbus"):
         import dbus
     HAS_DBUS = True
