@@ -9,7 +9,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 ---
 module: sssd_info
-version_added: 12.1.0
+version_added: 12.2.0
 short_description: Check SSSD domain status using D-Bus
 description:
     - Check the online status of SSSD domains, list domains, and retrieve active servers using D-Bus.
