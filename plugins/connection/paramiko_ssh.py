@@ -5,7 +5,7 @@ from __future__ import annotations
 
 DOCUMENTATION = """
     author: Ansible Core Team
-    name: paramiko
+    name: paramiko_ssh
     short_description: Run tasks via Python SSH (paramiko)
     description:
         - Use the Python SSH implementation (Paramiko) to connect to targets
@@ -15,7 +15,7 @@ DOCUMENTATION = """
           Thus paramiko is faster for most users on these platforms.
           Users with ControlPersist capability can consider using -c ssh or configuring the transport in the configuration file.
         - This plugin also borrows a lot of settings from the ssh plugin as they both cover the same protocol.
-    version_added: "0.1"
+    version_added: "12.2.0"
     options:
       remote_addr:
         description:
@@ -36,16 +36,13 @@ DOCUMENTATION = """
               key: remote_port
             - section: paramiko_connection
               key: remote_port
-              version_added: '2.15'
           env:
             - name: ANSIBLE_REMOTE_PORT
             - name: ANSIBLE_REMOTE_PARAMIKO_PORT
-              version_added: '2.15'
           vars:
             - name: ansible_port
             - name: ansible_ssh_port
             - name: ansible_paramiko_port
-              version_added: '2.15'
           keyword:
             - name: port
       remote_user:
@@ -60,13 +57,11 @@ DOCUMENTATION = """
         env:
             - name: ANSIBLE_REMOTE_USER
             - name: ANSIBLE_PARAMIKO_REMOTE_USER
-              version_added: '2.5'
         ini:
             - section: defaults
               key: remote_user
             - section: paramiko_connection
               key: remote_user
-              version_added: '2.5'
         keyword:
             - name: remote_user
       password:
@@ -80,7 +75,6 @@ DOCUMENTATION = """
             - name: ansible_ssh_password
             - name: ansible_paramiko_pass
             - name: ansible_paramiko_password
-              version_added: '2.5'
       use_rsa_sha2_algorithms:
         description:
             - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys
@@ -94,7 +88,6 @@ DOCUMENTATION = """
             - {name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS}
         default: True
         type: boolean
-        version_added: '2.14'
       host_key_auto_add:
         description: 'Automatically add host keys'
         env: [{name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD}]
@@ -118,7 +111,6 @@ DOCUMENTATION = """
           - {key: proxy_command, section: paramiko_connection}
         vars:
           - name: ansible_paramiko_proxy_command
-            version_added: '2.15'
       pty:
         default: True
         description: 'SUDO usually requires a PTY, True to give a PTY and False to not give a PTY.'
@@ -143,22 +135,16 @@ DOCUMENTATION = """
         env:
           - name: ANSIBLE_HOST_KEY_CHECKING
           - name: ANSIBLE_SSH_HOST_KEY_CHECKING
-            version_added: '2.5'
           - name: ANSIBLE_PARAMIKO_HOST_KEY_CHECKING
-            version_added: '2.5'
         ini:
           - section: defaults
             key: host_key_checking
           - section: paramiko_connection
             key: host_key_checking
-            version_added: '2.5'
         vars:
           - name: ansible_host_key_checking
-            version_added: '2.5'
           - name: ansible_ssh_host_key_checking
-            version_added: '2.5'
           - name: ansible_paramiko_host_key_checking
-            version_added: '2.5'
       use_persistent_connections:
         description: 'Toggles the use of persistence for connections'
         type: boolean
@@ -171,7 +157,6 @@ DOCUMENTATION = """
       banner_timeout:
         type: float
         default: 30
-        version_added: '2.14'
         description:
           - Configures, in seconds, the amount of time to wait for the SSH
             banner to be presented. This option is supported by paramiko
@@ -190,21 +175,15 @@ DOCUMENTATION = """
             key: timeout
           - section: ssh_connection
             key: timeout
-            version_added: '2.11'
           - section: paramiko_connection
             key: timeout
-            version_added: '2.15'
         env:
           - name: ANSIBLE_TIMEOUT
           - name: ANSIBLE_SSH_TIMEOUT
-            version_added: '2.11'
           - name: ANSIBLE_PARAMIKO_TIMEOUT
-            version_added: '2.15'
         vars:
           - name: ansible_ssh_timeout
-            version_added: '2.11'
           - name: ansible_paramiko_timeout
-            version_added: '2.15'
         cli:
           - name: timeout
       private_key_file:
@@ -216,16 +195,13 @@ DOCUMENTATION = """
               key: private_key_file
             - section: paramiko_connection
               key: private_key_file
-              version_added: '2.15'
           env:
             - name: ANSIBLE_PRIVATE_KEY_FILE
             - name: ANSIBLE_PARAMIKO_PRIVATE_KEY_FILE
-              version_added: '2.15'
           vars:
             - name: ansible_private_key_file
             - name: ansible_ssh_private_key_file
             - name: ansible_paramiko_private_key_file
-              version_added: '2.15'
           cli:
             - name: private_key_file
               option: '--private-key'
