@@ -226,11 +226,13 @@ from ansible.errors import (
 )
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.compat.paramiko import _PARAMIKO_IMPORT_ERR as PARAMIKO_IMPORT_ERR, _paramiko as paramiko
 from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
-from ansible.module_utils._internal import _deprecator
+from ansible_collections.community.general.plugins.module_utils.paramiko import (
+    _PARAMIKO_IMPORT_ERR as PARAMIKO_IMPORT_ERR,
+    _paramiko as paramiko,
+)
 
 display = Display()
 
@@ -303,15 +305,6 @@ class Connection(ConnectionBase):
 
     transport = 'paramiko'
     _log_channel: str | None = None
-
-    def __init__(self, *args, **kwargs):
-        display.deprecated(  # pylint: disable=ansible-deprecated-unnecessary-collection-name
-            msg='The paramiko connection plugin is deprecated.',
-            version='2.21',
-            deprecator=_deprecator.ANSIBLE_CORE_DEPRECATOR,  # entire plugin being removed; this improves the messaging
-        )
-
-        super().__init__(*args, **kwargs)
 
     def _cache_key(self) -> str:
         return "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))

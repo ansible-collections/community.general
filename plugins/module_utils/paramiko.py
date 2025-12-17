@@ -6,8 +6,6 @@ from __future__ import annotations as _annotations
 
 import warnings as _warnings
 
-from ansible.module_utils.common.warnings import deprecate as _deprecate
-
 _PARAMIKO_IMPORT_ERR = None
 
 try:
@@ -25,13 +23,3 @@ try:
 except Exception as err:
     _paramiko = None  # type: ignore[no-redef]
     _PARAMIKO_IMPORT_ERR = err
-
-
-def __getattr__(name: str) -> object:
-    """Dynamic lookup to issue deprecation warnings for external import of deprecated items."""
-    if (res := globals().get(f'_{name}', ...)) is not ...:
-        _deprecate(f'The {name!r} compat import is deprecated.', version='2.21')
-
-        return res
-
-    raise AttributeError(name)
