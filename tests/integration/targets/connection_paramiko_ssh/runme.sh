@@ -2,6 +2,6 @@
 
 set -eux
 
-source ../setup_paramiko/setup.sh
+ansible localhost -m include_role -a 'name=../setup_paramiko'
 
 ./test.sh
