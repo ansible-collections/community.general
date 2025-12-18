@@ -96,7 +96,7 @@ servers:
     description: Active servers for the specified domain and type.
     type: dict
     returned: when O(action=active_servers)
-    sample: |
+    sample:
         {
             'Global Catalog': 'server1.winad.test',
             'Domain Server': 'server2.winad.test'
@@ -106,11 +106,6 @@ list_servers:
     type: list
     returned: when O(action=list_servers)
     sample: ['server1.winad.test', 'server2.winad.test']
-error:
-    description: Error message if operation failed.
-    type: str
-    returned: on error
-    sample: 'Domain not found: winad.test'
 """
 
 
@@ -224,7 +219,7 @@ class SSSDHandler:
             List of domain names.
         """
         response = self.infopipe_iface.ListDomains()
-        return [str(domain).rsplit('/', maxsplit=1)[-1].replace('_2e', '.') for domain in response]
+        return [domain.rsplit('/', maxsplit=1)[-1].replace('_2e', '.') for domain in response]
 
 
 def main() -> None:
@@ -244,7 +239,7 @@ def main() -> None:
             ('action', 'domain_status', ['domain']),
             ('action', 'list_servers', ['domain', 'server_type']),
             ('action', 'active_servers', ['domain', 'server_type']),
-        ],        
+        ],
     )
 
     deps.validate(module)
