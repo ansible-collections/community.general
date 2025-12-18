@@ -178,8 +178,8 @@ class TestSssdInfo(unittest.TestCase):
             mock_module.exit_json = Mock()
             mock_module_class.return_value = mock_module
 
-            # Mock the exception in _get_domain_object
-            with patch.object(sssd_info.SSSDHandler, '_get_domain_object') as mock_get_domain:
+            # Mock the exception in domain_object
+            with patch.object(sssd_info.SSSDHandler, 'domain_object') as mock_get_domain:
                 mock_get_domain.side_effect = Exception('Domain not found: nonexistent.com. Error: Domain not found')
 
                 # Run the module
