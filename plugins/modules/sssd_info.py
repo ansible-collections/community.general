@@ -129,22 +129,22 @@ class SSSDHandler:
         self.sssd_obj = self.bus.get_object(self.BUS_NAME, '/org/freedesktop/sssd/infopipe')
         self.infopipe_iface = dbus.Interface(self.sssd_obj, dbus_interface=self.INFOPIPE_INTERFACE)
 
-    def _get_domain_path(self, domain: str) -> str:
+    def domain_path(self, domain: str) -> str:
         return f'/org/freedesktop/sssd/infopipe/Domains/{domain.replace(".", "_2e")}'
 
-    def _get_domain_object(self, domain: str) -> dbus.proxies.ProxyObject:
-        domain_path = self._get_domain_path(domain)
+    def domain_object(self, domain: str) -> dbus.proxies.ProxyObject:
+        domain_path = self.domain_path(domain)
         try:
             return self.bus.get_object(self.BUS_NAME, domain_path)
         except dbus.exceptions.DBusException as e:
             raise Exception(f'Domain not found: {domain}. Error: {e}') from e
 
     def check_domain_status(self, domain: str) -> str:
-        domain_obj = self._get_domain_object(domain)
+        domain_obj = self.domain_object(domain)
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
         return 'online' if iface.IsOnline() else 'offline'
 
-    def get_active_servers(self, domain: str, server_type: str) -> dict:
+    def active_servers(self, domain: str, server_type: str) -> dict:
         """Get active servers for domain.
 
         Args:
@@ -154,7 +154,7 @@ class SSSDHandler:
         Returns:
             Dictionary with server types as keys and server names as values.
         """
-        domain_obj = self._get_domain_object(domain)
+        domain_obj = self.domain_object(domain)
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
 
         if server_type == 'IPA':
@@ -177,7 +177,7 @@ class SSSDHandler:
         Returns:
             List of server names.
         """
-        domain_obj = self._get_domain_object(domain)
+        domain_obj = self.domain_object(domain)
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
         if server_type == 'IPA':
             return iface.ListServers(server_type)
@@ -185,7 +185,7 @@ class SSSDHandler:
             return iface.ListServers(f'sd_{domain}')
         return []
 
-    def get_domain_list(self) -> list:
+    def domain_list(self) -> list:
         """Get list of all domains.
 
         Returns:
@@ -228,9 +228,9 @@ def main() -> None:
         if action == 'domain_status':
             result['online'] = sssd.check_domain_status(domain)
         elif action == 'domain_list':
-            result['domain_list'] = sssd.get_domain_list()
+            result['domain_list'] = sssd.domain_list()
         elif action == 'active_servers':
-            result['servers'] = sssd.get_active_servers(domain, server_type)
+            result['servers'] = sssd.active_servers(domain, server_type)
         elif action == 'list_servers':
             result['list_servers'] = sssd.list_servers(domain, server_type)
 
