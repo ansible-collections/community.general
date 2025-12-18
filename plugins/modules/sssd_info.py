@@ -15,7 +15,7 @@ description:
     - Check the online status of SSSD domains, list domains, and retrieve active servers using D-Bus.
 author: "Aleksandr Gabidullin (@MikeyTide)"
 requirements:
-    - dbus-python
+    - dbus
 attributes:
     check_mode:
         support: full
@@ -39,11 +39,15 @@ options:
     domain:
         description:
             - Domain name to check.
-            - Required for O(action=domain_status), O(action=active_servers) and O(action=list_servers).
+            - Required unless O(action=domain_list).
+            - When O(action=domain_list), this parameter is ignored and the module returns a list of all configured domains.
         type: str
     server_type:
         description:
-            - The type of server to retrieve for the O(action=active_servers) and O(action=list_servers).
+            - Required parameter when O(action=active_servers) and O(action=list_servers).
+            - Optional and ignored for all other actions.
+            - Valid values depend on your SSSD configuration, but typically include C(IPA), C(AD).
+            - This determines which type of authentication/identity servers to query (e.g., IPA servers for FreeIPA domains).
         type: str
         choices: ['IPA', 'AD']
 extends_documentation_fragment:
@@ -112,17 +116,9 @@ error:
 
 from ansible.module_utils.basic import AnsibleModule
 
-# Try to import dbus with error handling using module_utils.deps
-try:
-    from ansible_collections.community.general.plugins.module_utils import deps
-
-    with deps.declare("dbus"):
-        import dbus
-    HAS_DBUS = True
-    DBUS_IMP_ERR = None
-except Exception as e:
-    HAS_DBUS = False
-    DBUS_IMP_ERR = e
+from ansible_collections.community.general.plugins.module_utils import deps
+with deps.declare("dbus"):
+    import dbus
 
 
 class SSSDHandler:
@@ -165,7 +161,7 @@ class SSSDHandler:
         try:
             return self.bus.get_object(self.BUS_NAME, domain_path)
         except dbus.exceptions.DBusException as e:
-            raise Exception(f'Domain not found: {domain}. Error: {e}')
+            raise Exception(f'Domain not found: {domain}. Error: {e}') from e
 
     def check_domain_status(self, domain: str) -> str:
         """Check if domain is online.
@@ -251,15 +247,7 @@ def main() -> None:
         ]
     )
 
-    # Check for required library using deps if available
-    try:
-        from ansible_collections.community.general.plugins.module_utils import deps
-        deps.validate(module)
-    except ImportError:
-        # Fallback if deps module is not available
-        if not HAS_DBUS:
-            from ansible.module_utils.basic import missing_required_lib
-            module.fail_json(msg=missing_required_lib('dbus'), exception=DBUS_IMP_ERR)
+    deps.validate(module)
 
     action = module.params['action']
     domain = module.params.get('domain')
