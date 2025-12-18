@@ -130,28 +130,9 @@ class SSSDHandler:
         self.infopipe_iface = dbus.Interface(self.sssd_obj, dbus_interface=self.INFOPIPE_INTERFACE)
 
     def _get_domain_path(self, domain: str) -> str:
-        """Convert domain name to D-Bus path format.
-
-        Args:
-            domain: Domain name to convert.
-
-        Returns:
-            D-Bus path for the domain.
-        """
         return f'/org/freedesktop/sssd/infopipe/Domains/{domain.replace(".", "_2e")}'
 
     def _get_domain_object(self, domain: str) -> dbus.proxies.ProxyObject:
-        """Get D-Bus object for domain.
-
-        Args:
-            domain: Domain name to get object for.
-
-        Returns:
-            D-Bus proxy object for the domain.
-
-        Raises:
-            Exception: If domain is not found.
-        """
         domain_path = self._get_domain_path(domain)
         try:
             return self.bus.get_object(self.BUS_NAME, domain_path)
@@ -159,14 +140,6 @@ class SSSDHandler:
             raise Exception(f'Domain not found: {domain}. Error: {e}') from e
 
     def check_domain_status(self, domain: str) -> str:
-        """Check if domain is online.
-
-        Args:
-            domain: Domain name to check.
-
-        Returns:
-            'online' if domain is online, 'offline' otherwise.
-        """
         domain_obj = self._get_domain_object(domain)
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
         return 'online' if iface.IsOnline() else 'offline'
