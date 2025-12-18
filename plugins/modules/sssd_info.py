@@ -230,21 +230,21 @@ class SSSDHandler:
 def main() -> None:
     """Main function for the Ansible module."""
     module = AnsibleModule(
-        argument_spec={
-            'action': {
-                'type': 'str',
-                'required': True,
-                'choices': ['domain_status', 'domain_list', 'active_servers', 'list_servers']
-            },
-            'domain': {'type': 'str'},
-            'server_type': {'type': 'str', 'choices': ['IPA', 'AD']}
-        },
+        argument_spec=dict(
+            action=dict(
+                type='str',
+                required=True,
+                choices=['domain_status', 'domain_list', 'active_servers', 'list_servers'],
+            ),
+            domain=dict(type='str'),
+            server_type=dict(type='str', choices=['IPA', 'AD']),
+        ),
         supports_check_mode=True,
         required_if=[
             ('action', 'domain_status', ['domain']),
             ('action', 'list_servers', ['domain', 'server_type']),
-            ('action', 'active_servers', ['domain', 'server_type'])
-        ]
+            ('action', 'active_servers', ['domain', 'server_type']),
+        ],        
     )
 
     deps.validate(module)
