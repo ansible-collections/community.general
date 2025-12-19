@@ -46,10 +46,9 @@ options:
         description:
             - Required parameter when O(action=active_servers) and O(action=list_servers).
             - Optional and ignored for all other actions.
-            - The module has been tested and officially supports C(IPA) and C(AD) server types.
-            - Other server types may work, but are not officially supported at this time.
+            - The value should match a server type configured in your SSSD configuration.
+            - Common values include C(IPA) for FreeIPA servers and C(AD) for Active Directory.
         type: str
-        choices: ['IPA', 'AD']
 extends_documentation_fragment:
     - community.general.attributes
 """
@@ -205,7 +204,7 @@ def main() -> None:
                 choices=['domain_status', 'domain_list', 'active_servers', 'list_servers'],
             ),
             domain=dict(type='str'),
-            server_type=dict(type='str', choices=['IPA', 'AD']),
+            server_type=dict(type='str'),
         ),
         supports_check_mode=True,
         required_if=[
