@@ -1,0 +1,4 @@
+---
+bugfixes:
+- keycloak_clientscope - fixed `normalise_cr()` to properly convert string "true"/"false" values to Python booleans.
+  Before boolean-like strings caused Ansible to always report `changed=True` even when the configuration hadn't actually changed.
