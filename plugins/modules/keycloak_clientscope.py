@@ -303,14 +303,14 @@ def normalise_boolean(obj):
     Recursive fonction to traverse the obj and unify the boolean values.
     """
     if isinstance(obj, dict):
-      return {k: normalise_boolean(v) for k, v in obj.items()}
+        return {k: normalise_boolean(v) for k, v in obj.items()}
     elif isinstance(obj, list):
-      return [normalise_boolean(v) for v in obj]
+        return [normalise_boolean(v) for v in obj]
     elif isinstance(obj, str):
-      if obj.lower() == "true":
-        return True
-      elif obj.lower() == "false":
-        return False
+        if obj.lower() == "true":
+            return True
+        elif obj.lower() == "false":
+            return False
     return obj
 
 
@@ -335,7 +335,7 @@ def normalise_cr(clientscoperep, remove_ids=False):
                 mapper.pop("id", None)
 
             for key, value in mapper.items():
-              mapper[key] = normalise_boolean(value)
+                mapper[key] = normalise_boolean(value)
 
             # Set to a default value.
             mapper["consentRequired"] = mapper.get("consentRequired", False)
