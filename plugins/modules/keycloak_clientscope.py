@@ -298,6 +298,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 )
 from ansible.module_utils.basic import AnsibleModule
 
+
 def normalise_boolean(obj):
     """
     Recursive fonction to traverse the obj and unify the boolean values.
