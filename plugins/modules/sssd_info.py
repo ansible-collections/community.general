@@ -46,8 +46,8 @@ options:
         description:
             - Required parameter when O(action=active_servers) and O(action=list_servers).
             - Optional and ignored for all other actions.
-            - Valid values depend on your SSSD configuration, but typically include C(IPA), C(AD).
-            - This determines which type of authentication/identity servers to query (e.g., IPA servers for FreeIPA domains).
+            - The module has been tested and officially supports C(IPA) and C(AD) server types.
+            - Other server types may work, but are not officially supported at this time.
         type: str
         choices: ['IPA', 'AD']
 extends_documentation_fragment:
