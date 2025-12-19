@@ -143,7 +143,7 @@ class SSSDHandler:
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
         return 'online' if iface.IsOnline() else 'offline'
 
-    def active_servers(self, domain: str, server_type: str) -> dict:
+    def active_servers(self, domain: str, server_type: str) -> dict[str, str]:
         """Get active servers for domain.
 
         Args:
@@ -166,7 +166,7 @@ class SSSDHandler:
             }
         return {}
 
-    def list_servers(self, domain: str, server_type: str) -> list:
+    def list_servers(self, domain: str, server_type: str) -> list[str]:
         """List all servers for domain.
 
         Args:
@@ -184,7 +184,7 @@ class SSSDHandler:
             return iface.ListServers(f'sd_{domain}')
         return []
 
-    def domain_list(self) -> list:
+    def domain_list(self) -> list[str]:
         """Get list of all domains.
 
         Returns:
