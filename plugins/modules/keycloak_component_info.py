@@ -55,7 +55,7 @@ EXAMPLES = r"""
 - name: Retrive info of a UserStorageProvider named myldap
   community.general.keycloak_component_info:
     auth_keycloak_url: http://localhost:8080/auth
-    auth_sername: admin
+    auth_username: admin
     auth_password: password
     auth_realm: master
     realm: myrealm
@@ -65,7 +65,7 @@ EXAMPLES = r"""
 - name: Retrive key info component
   community.general.keycloak_component_info:
     auth_keycloak_url: http://localhost:8080/auth
-    auth_sername: admin
+    auth_username: admin
     auth_password: password
     auth_realm: master
     realm: myrealm
@@ -75,7 +75,7 @@ EXAMPLES = r"""
 - name: Retrive all component from realm master
   community.general.keycloak_component_info:
     auth_keycloak_url: http://localhost:8080/auth
-    auth_sername: admin
+    auth_username: admin
     auth_password: password
     auth_realm: master
     realm: myrealm
@@ -83,7 +83,7 @@ EXAMPLES = r"""
 - name: Retrive all sub components of parent component filter by type
   community.general.keycloak_component_info:
     auth_keycloak_url: http://localhost:8080/auth
-    auth_sername: admin
+    auth_username: admin
     auth_password: password
     auth_realm: master
     realm: myrealm
