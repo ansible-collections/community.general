@@ -188,7 +188,7 @@ class TestSssdInfo(unittest.TestCase):
                 # Verify fail_json was called with error message
                 mock_module.fail_json.assert_called_once()
                 error_msg = mock_module.fail_json.call_args[1].get('msg', '')
-                self.assertIn('Unexpected error', error_msg)
+                self.assertIn('Domain not found: nonexistent.com', error_msg)
 
 
 if __name__ == '__main__':

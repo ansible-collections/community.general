@@ -214,8 +214,6 @@ def main() -> None:
     server_type = module.params.get('server_type')
 
     sssd = SSSDHandler()
-    result: dict[str, object] = {}
-
     result = {}
 
     try:
