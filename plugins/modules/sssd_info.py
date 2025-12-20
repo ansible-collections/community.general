@@ -221,7 +221,7 @@ def main() -> None:
     server_type = module.params.get('server_type')
 
     sssd = SSSDHandler()
-    result = {}
+    result: dict[str, Any] = {}
 
     try:
         if action == 'domain_status':
