@@ -45,9 +45,9 @@ options:
     description:
       - Required parameter when O(action=active_servers) and O(action=list_servers).
       - Optional and ignored for all other actions.
-      - The value should match a server type configured in your SSSD configuration.
-      - Common values include C(IPA) for FreeIPA servers and C(AD) for Active Directory.
+      - At this point, the module supports ONLY the types C(IPA) for FreeIPA servers and C(AD)
     type: str
+    choices: ['IPA', 'AD']
 extends_documentation_fragment:
   - community.general.attributes
 """
@@ -154,12 +154,11 @@ class SSSDHandler:
         if server_type == 'IPA':
             server_name = f'{server_type} Server'
             return {server_name: iface.ActiveServer(server_type)}
-        elif server_type == 'AD':
+        else:
             return {
                 'AD Global Catalog': iface.ActiveServer(f'sd_gc_{domain}'),
                 'AD Domain Controller': iface.ActiveServer(f'sd_{domain}')
             }
-        return {}
 
     def list_servers(self, domain: str, server_type: str) -> list[str]:
         """List all servers for domain.
@@ -175,9 +174,8 @@ class SSSDHandler:
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
         if server_type == 'IPA':
             return iface.ListServers(server_type)
-        elif server_type == 'AD':
+        else:
             return iface.ListServers(f'sd_{domain}')
-        return []
 
     def domain_list(self) -> list[str]:
         """Get list of all domains.
@@ -199,7 +197,7 @@ def main() -> None:
                 choices=['domain_status', 'domain_list', 'active_servers', 'list_servers'],
             ),
             domain=dict(type='str'),
-            server_type=dict(type='str'),
+            server_type=dict(type='str', choices=['IPA', 'AD']),
         ),
         supports_check_mode=True,
         required_if=[
