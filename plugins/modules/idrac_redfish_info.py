@@ -137,11 +137,9 @@ class IdracRedfishUtils(RedfishUtils):
         properties = ['Attributes', 'Id']
 
         if len(self.manager_uris) == 1:
-            response = self.get_request(self.root_uri + self.manager_uri)
+            response = self.get_request(f"{self.root_uri}{self.manager_uri}")
         elif len(self.manager_uris) > 1:
-            response = self.get_request(self.root_uri + '/redfish/v1/Managers/iDRAC.Embedded.1', override_headers=None)
-        elif len(self.manager_uris) == 0:
-            self.module.fail_json(msg="No managers were found")
+            response = self.get_request(f"{self.root_uri}/redfish/v1/Managers/iDRAC.Embedded.1", override_headers=None)
 
         if response['ret'] is False:
             return response
