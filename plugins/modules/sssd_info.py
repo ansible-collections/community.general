@@ -7,50 +7,49 @@ from __future__ import annotations
 
 
 DOCUMENTATION = r"""
----
 module: sssd_info
 version_added: 12.2.0
 short_description: Check SSSD domain status using D-Bus
 description:
-    - Check the online status of SSSD domains, list domains, and retrieve active servers using D-Bus.
+  - Check the online status of SSSD domains, list domains, and retrieve active servers using D-Bus.
 author: "Aleksandr Gabidullin (@agabidullin63)"
 requirements:
-    - dbus
+  - dbus
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
-    platform:
-        platforms: posix
-        description: This action requires a system with D-Bus and SSSD running.
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  platform:
+    platforms: posix
+    description: This action requires a system with D-Bus and SSSD running.
+    support: full
 options:
-    action:
-        description:
-            - The action to perform.
-            - V(domain_status) - Check if domain is online.
-            - V(domain_list) - List all configured domains.
-            - V(active_servers) - Get active servers for domain.
-            - V(list_servers) - List all servers for domain.
-        type: str
-        required: true
-        choices: ['domain_status', 'domain_list', 'active_servers', 'list_servers']
-    domain:
-        description:
-            - Domain name to check.
-            - Required unless O(action=domain_list).
-            - When O(action=domain_list), this parameter is ignored and the module returns a list of all configured domains.
-        type: str
-    server_type:
-        description:
-            - Required parameter when O(action=active_servers) and O(action=list_servers).
-            - Optional and ignored for all other actions.
-            - The value should match a server type configured in your SSSD configuration.
-            - Common values include C(IPA) for FreeIPA servers and C(AD) for Active Directory.
-        type: str
+  action:
+    description:
+      - The action to perform.
+      - V(domain_status) - Check if domain is online.
+      - V(domain_list) - List all configured domains.
+      - V(active_servers) - Get active servers for domain.
+      - V(list_servers) - List all servers for domain.
+    type: str
+    required: true
+    choices: ['domain_status', 'domain_list', 'active_servers', 'list_servers']
+  domain:
+    description:
+      - Domain name to check.
+      - Required unless O(action=domain_list).
+      - When O(action=domain_list), this parameter is ignored and the module returns a list of all configured domains.
+    type: str
+  server_type:
+    description:
+      - Required parameter when O(action=active_servers) and O(action=list_servers).
+      - Optional and ignored for all other actions.
+      - The value should match a server type configured in your SSSD configuration.
+      - Common values include C(IPA) for FreeIPA servers and C(AD) for Active Directory.
+    type: str
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 """
 
 EXAMPLES = r"""
@@ -82,29 +81,25 @@ EXAMPLES = r"""
 
 RETURN = r"""
 online:
-    description: The online status of the SSSD domain.
-    type: str
-    returned: when O(action=domain_status)
-    sample: online
+  description: The online status of the SSSD domain.
+  type: str
+  returned: when O(action=domain_status)
+  sample: online
 domain_list:
-    description: List of SSSD domains.
-    type: list
-    returned: when O(action=domain_list)
-    sample: ['ipa.domain', 'winad.test']
+  description: List of SSSD domains.
+  type: list
+  returned: when O(action=domain_list)
+  sample: ["ipa.domain", "winad.test"]
 servers:
-    description: Active servers for the specified domain and type.
-    type: dict
-    returned: when O(action=active_servers)
-    sample:
-        {
-            'Global Catalog': 'server1.winad.test',
-            'Domain Server': 'server2.winad.test'
-        }
+  description: Active servers for the specified domain and type.
+  type: dict
+  returned: when O(action=active_servers)
+  sample: {"Global Catalog": "server1.winad.test", "Domain Server": "server2.winad.test"}
 list_servers:
-    description: List of servers for the specified domain.
-    type: list
-    returned: when O(action=list_servers)
-    sample: ['server1.winad.test', 'server2.winad.test']
+  description: List of servers for the specified domain.
+  type: list
+  returned: when O(action=list_servers)
+  sample: ["server1.winad.test", "server2.winad.test"]
 """
 
 
