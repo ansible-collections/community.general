@@ -132,6 +132,7 @@ class IdracRedfishUtils(RedfishUtils):
 
     def get_manager_attributes(self):
         result = {}
+        response = {}
         manager_attributes = []
         properties = ['Attributes', 'Id']
 
