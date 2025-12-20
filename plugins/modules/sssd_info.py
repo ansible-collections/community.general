@@ -45,7 +45,7 @@ options:
     description:
       - Required parameter when O(action=active_servers) and O(action=list_servers).
       - Optional and ignored for all other actions.
-      - At this point, the module supports ONLY the types C(IPA) for FreeIPA servers and C(AD)
+      - At this point, the module supports ONLY the types C(IPA) for FreeIPA servers and C(AD).
     type: str
     choices: ['IPA', 'AD']
 extends_documentation_fragment:
