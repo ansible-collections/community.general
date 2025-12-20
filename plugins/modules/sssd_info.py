@@ -216,6 +216,8 @@ def main() -> None:
     sssd = SSSDHandler()
     result: dict[str, object] = {}
 
+    result = {}
+
     try:
         if action == 'domain_status':
             result['online'] = sssd.check_domain_status(domain)
@@ -226,20 +228,8 @@ def main() -> None:
         elif action == 'list_servers':
             result['list_servers'] = sssd.list_servers(domain, server_type)
 
-    except dbus.exceptions.DBusException as e:
-        dbus_error_name = e.get_dbus_name()
-        if dbus_error_name == 'org.freedesktop.DBus.Error.UnknownObject':
-            module.fail_json(msg=f'Domain not found: {domain}')
-        elif dbus_error_name == 'org.freedesktop.DBus.Error.UnknownInterface':
-            module.fail_json(msg=f'Interface not found for domain: {domain}')
-        elif dbus_error_name == 'org.freedesktop.DBus.Error.UnknownMethod':
-            module.fail_json(msg=f'Method not supported for domain: {domain}')
-        elif 'org.freedesktop.DBus.Error.InvalidArgs' in dbus_error_name:
-            module.fail_json(msg=f'Invalid arguments for method: {e}')
-        else:
-            module.fail_json(msg=f'D-Bus error (name: {dbus_error_name}): {e}')
     except Exception as e:
-        module.fail_json(msg=f'Unexpected error: {e}')
+        module.fail_json(msg=f"Error: {e}")
 
     module.exit_json(**result)
 
