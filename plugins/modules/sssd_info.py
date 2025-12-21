@@ -106,6 +106,7 @@ list_servers:
 from ansible.module_utils.basic import AnsibleModule
 from typing import Any
 from ansible_collections.community.general.plugins.module_utils import deps
+
 with deps.declare("dbus"):
     import dbus
 
@@ -113,30 +114,30 @@ with deps.declare("dbus"):
 class SSSDHandler:
     """SSSD D-Bus handler"""
 
-    BUS_NAME = 'org.freedesktop.sssd.infopipe'
-    DOMAIN_INTERFACE = 'org.freedesktop.sssd.infopipe.Domains.Domain'
-    INFOPIPE_INTERFACE = 'org.freedesktop.sssd.infopipe'
+    BUS_NAME = "org.freedesktop.sssd.infopipe"
+    DOMAIN_INTERFACE = "org.freedesktop.sssd.infopipe.Domains.Domain"
+    INFOPIPE_INTERFACE = "org.freedesktop.sssd.infopipe"
 
     def __init__(self) -> None:
         """Initialize SSSD D-Bus connection."""
         self.bus = dbus.SystemBus()
-        self.sssd_obj = self.bus.get_object(self.BUS_NAME, '/org/freedesktop/sssd/infopipe')
+        self.sssd_obj = self.bus.get_object(self.BUS_NAME, "/org/freedesktop/sssd/infopipe")
         self.infopipe_iface = dbus.Interface(self.sssd_obj, dbus_interface=self.INFOPIPE_INTERFACE)
 
     def domain_path(self, domain: str) -> str:
-        return f'/org/freedesktop/sssd/infopipe/Domains/{domain.replace(".", "_2e")}'
+        return f"/org/freedesktop/sssd/infopipe/Domains/{domain.replace('.', '_2e')}"
 
     def domain_object(self, domain: str) -> dbus.proxies.ProxyObject:
         domain_path = self.domain_path(domain)
         try:
             return self.bus.get_object(self.BUS_NAME, domain_path)
         except dbus.exceptions.DBusException as e:
-            raise Exception(f'Domain not found: {domain}. Error: {e}') from e
+            raise Exception(f"Domain not found: {domain}. Error: {e}") from e
 
     def check_domain_status(self, domain: str) -> str:
         domain_obj = self.domain_object(domain)
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
-        return 'online' if iface.IsOnline() else 'offline'
+        return "online" if iface.IsOnline() else "offline"
 
     def active_servers(self, domain: str, server_type: str) -> dict[str, str]:
         """Get active servers for domain.
@@ -151,13 +152,13 @@ class SSSDHandler:
         domain_obj = self.domain_object(domain)
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
 
-        if server_type == 'IPA':
-            server_name = f'{server_type} Server'
+        if server_type == "IPA":
+            server_name = f"{server_type} Server"
             return {server_name: iface.ActiveServer(server_type)}
         else:
             return {
-                'AD Global Catalog': iface.ActiveServer(f'sd_gc_{domain}'),
-                'AD Domain Controller': iface.ActiveServer(f'sd_{domain}')
+                "AD Global Catalog": iface.ActiveServer(f"sd_gc_{domain}"),
+                "AD Domain Controller": iface.ActiveServer(f"sd_{domain}"),
             }
 
     def list_servers(self, domain: str, server_type: str) -> list[str]:
@@ -172,10 +173,10 @@ class SSSDHandler:
         """
         domain_obj = self.domain_object(domain)
         iface = dbus.Interface(domain_obj, dbus_interface=self.DOMAIN_INTERFACE)
-        if server_type == 'IPA':
+        if server_type == "IPA":
             return iface.ListServers(server_type)
         else:
-            return iface.ListServers(f'sd_{domain}')
+            return iface.ListServers(f"sd_{domain}")
 
     def domain_list(self) -> list[str]:
         """Get list of all domains.
@@ -184,7 +185,7 @@ class SSSDHandler:
             List of domain names.
         """
         response = self.infopipe_iface.ListDomains()
-        return [domain.rsplit('/', maxsplit=1)[-1].replace('_2e', '.') for domain in response]
+        return [domain.rsplit("/", maxsplit=1)[-1].replace("_2e", ".") for domain in response]
 
 
 def main() -> None:
@@ -192,39 +193,39 @@ def main() -> None:
     module = AnsibleModule(
         argument_spec=dict(
             action=dict(
-                type='str',
+                type="str",
                 required=True,
-                choices=['domain_status', 'domain_list', 'active_servers', 'list_servers'],
+                choices=["domain_status", "domain_list", "active_servers", "list_servers"],
             ),
-            domain=dict(type='str'),
-            server_type=dict(type='str', choices=['IPA', 'AD']),
+            domain=dict(type="str"),
+            server_type=dict(type="str", choices=["IPA", "AD"]),
         ),
         supports_check_mode=True,
         required_if=[
-            ('action', 'domain_status', ['domain']),
-            ('action', 'list_servers', ['domain', 'server_type']),
-            ('action', 'active_servers', ['domain', 'server_type']),
+            ("action", "domain_status", ["domain"]),
+            ("action", "list_servers", ["domain", "server_type"]),
+            ("action", "active_servers", ["domain", "server_type"]),
         ],
     )
 
     deps.validate(module)
 
-    action = module.params['action']
-    domain = module.params.get('domain')
-    server_type = module.params.get('server_type')
+    action = module.params["action"]
+    domain = module.params.get("domain")
+    server_type = module.params.get("server_type")
 
     sssd = SSSDHandler()
     result: dict[str, Any] = {}
 
     try:
-        if action == 'domain_status':
-            result['online'] = sssd.check_domain_status(domain)
-        elif action == 'domain_list':
-            result['domain_list'] = sssd.domain_list()
-        elif action == 'active_servers':
-            result['servers'] = sssd.active_servers(domain, server_type)
-        elif action == 'list_servers':
-            result['list_servers'] = sssd.list_servers(domain, server_type)
+        if action == "domain_status":
+            result["online"] = sssd.check_domain_status(domain)
+        elif action == "domain_list":
+            result["domain_list"] = sssd.domain_list()
+        elif action == "active_servers":
+            result["servers"] = sssd.active_servers(domain, server_type)
+        elif action == "list_servers":
+            result["list_servers"] = sssd.list_servers(domain, server_type)
 
     except Exception as e:
         module.fail_json(msg=f"Error: {e}")
@@ -232,5 +233,5 @@ def main() -> None:
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

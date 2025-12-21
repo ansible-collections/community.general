@@ -24,7 +24,7 @@ class TestSssdInfo(unittest.TestCase):
         class MockDBusException(Exception):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args)
-                self._dbus_error_name = kwargs.get('dbus_error_name', 'org.freedesktop.DBus.Error.UnknownObject')
+                self._dbus_error_name = kwargs.get("dbus_error_name", "org.freedesktop.DBus.Error.UnknownObject")
 
             def get_dbus_name(self):
                 return self._dbus_error_name
@@ -33,19 +33,19 @@ class TestSssdInfo(unittest.TestCase):
         cls.mock_dbus.exceptions.DBusException = MockDBusException
 
         # Mock the dbus module in sys.modules
-        sys.modules['dbus'] = cls.mock_dbus
+        sys.modules["dbus"] = cls.mock_dbus
 
     @classmethod
     def tearDownClass(cls):
         """Clean up after all tests."""
         # Remove the mocked dbus module
-        if 'dbus' in sys.modules and sys.modules['dbus'] == cls.mock_dbus:
-            del sys.modules['dbus']
+        if "dbus" in sys.modules and sys.modules["dbus"] == cls.mock_dbus:
+            del sys.modules["dbus"]
 
     def setUp(self):
         """Set up test fixtures."""
         # Ensure the mocked dbus is in sys.modules
-        sys.modules['dbus'] = self.mock_dbus
+        sys.modules["dbus"] = self.mock_dbus
 
         # Reset all mocks
         self.mock_dbus.reset_mock()
@@ -65,9 +65,9 @@ class TestSssdInfo(unittest.TestCase):
 
         # Fix the Interface mock to accept dbus_interface parameter
         def interface_side_effect(obj, dbus_interface=None):
-            if dbus_interface == 'org.freedesktop.sssd.infopipe':
+            if dbus_interface == "org.freedesktop.sssd.infopipe":
                 return self.mock_infopipe_iface
-            elif dbus_interface == 'org.freedesktop.sssd.infopipe.Domains.Domain':
+            elif dbus_interface == "org.freedesktop.sssd.infopipe.Domains.Domain":
                 return self.mock_domain_iface
             return Mock()
 
@@ -76,23 +76,23 @@ class TestSssdInfo(unittest.TestCase):
     def tearDown(self):
         """Clean up after test."""
         # Restore the mocked dbus module in sys.modules
-        sys.modules['dbus'] = self.mock_dbus
+        sys.modules["dbus"] = self.mock_dbus
 
     def test_domain_list_success(self):
         """Test successful retrieval of domain list."""
         # Mock the ListDomains response
         self.mock_infopipe_iface.ListDomains.return_value = [
-            '/org/freedesktop/sssd/infopipe/Domains/ipa_2eexample_2ecom',
-            '/org/freedesktop/sssd/infopipe/Domains/ad_2eexample_2ecom'
+            "/org/freedesktop/sssd/infopipe/Domains/ipa_2eexample_2ecom",
+            "/org/freedesktop/sssd/infopipe/Domains/ad_2eexample_2ecom",
         ]
 
         # Import the module (dbus is already mocked in sys.modules)
         from ansible_collections.community.general.plugins.modules import sssd_info
 
         # Mock AnsibleModule
-        with patch.object(sssd_info, 'AnsibleModule') as mock_module_class:
+        with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
             mock_module = Mock()
-            mock_module.params = {'action': 'domain_list'}
+            mock_module.params = {"action": "domain_list"}
             mock_module.fail_json = Mock(side_effect=Exception("fail_json called"))
             mock_module.exit_json = Mock()
             mock_module_class.return_value = mock_module
@@ -102,10 +102,14 @@ class TestSssdInfo(unittest.TestCase):
 
             # Verify exit_json was called with correct results
             mock_module.exit_json.assert_called_once()
-            result = mock_module.exit_json.call_args[0][0] if mock_module.exit_json.call_args[0] else mock_module.exit_json.call_args[1]
+            result = (
+                mock_module.exit_json.call_args[0][0]
+                if mock_module.exit_json.call_args[0]
+                else mock_module.exit_json.call_args[1]
+            )
 
-            self.assertIn('domain_list', result)
-            self.assertEqual(result['domain_list'], ['ipa.example.com', 'ad.example.com'])
+            self.assertIn("domain_list", result)
+            self.assertEqual(result["domain_list"], ["ipa.example.com", "ad.example.com"])
 
     def test_domain_status_online(self):
         """Test checking online domain status."""
@@ -119,9 +123,9 @@ class TestSssdInfo(unittest.TestCase):
         from ansible_collections.community.general.plugins.modules import sssd_info
 
         # Mock AnsibleModule
-        with patch.object(sssd_info, 'AnsibleModule') as mock_module_class:
+        with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
             mock_module = Mock()
-            mock_module.params = {'action': 'domain_status', 'domain': 'example.com'}
+            mock_module.params = {"action": "domain_status", "domain": "example.com"}
             mock_module.fail_json = Mock(side_effect=Exception("fail_json called"))
             mock_module.exit_json = Mock()
             mock_module_class.return_value = mock_module
@@ -131,10 +135,14 @@ class TestSssdInfo(unittest.TestCase):
 
             # Verify exit_json was called with correct results
             mock_module.exit_json.assert_called_once()
-            result = mock_module.exit_json.call_args[0][0] if mock_module.exit_json.call_args[0] else mock_module.exit_json.call_args[1]
+            result = (
+                mock_module.exit_json.call_args[0][0]
+                if mock_module.exit_json.call_args[0]
+                else mock_module.exit_json.call_args[1]
+            )
 
-            self.assertIn('online', result)
-            self.assertEqual(result['online'], 'online')
+            self.assertIn("online", result)
+            self.assertEqual(result["online"], "online")
 
     def test_domain_status_offline(self):
         """Test checking offline domain status."""
@@ -148,9 +156,9 @@ class TestSssdInfo(unittest.TestCase):
         from ansible_collections.community.general.plugins.modules import sssd_info
 
         # Mock AnsibleModule
-        with patch.object(sssd_info, 'AnsibleModule') as mock_module_class:
+        with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
             mock_module = Mock()
-            mock_module.params = {'action': 'domain_status', 'domain': 'example.com'}
+            mock_module.params = {"action": "domain_status", "domain": "example.com"}
             mock_module.fail_json = Mock(side_effect=Exception("fail_json called"))
             mock_module.exit_json = Mock()
             mock_module_class.return_value = mock_module
@@ -160,10 +168,14 @@ class TestSssdInfo(unittest.TestCase):
 
             # Verify exit_json was called with correct results
             mock_module.exit_json.assert_called_once()
-            result = mock_module.exit_json.call_args[0][0] if mock_module.exit_json.call_args[0] else mock_module.exit_json.call_args[1]
+            result = (
+                mock_module.exit_json.call_args[0][0]
+                if mock_module.exit_json.call_args[0]
+                else mock_module.exit_json.call_args[1]
+            )
 
-            self.assertIn('online', result)
-            self.assertEqual(result['online'], 'offline')
+            self.assertIn("online", result)
+            self.assertEqual(result["online"], "offline")
 
     def test_domain_not_found(self):
         """Test error when domain is not found."""
@@ -171,25 +183,25 @@ class TestSssdInfo(unittest.TestCase):
         from ansible_collections.community.general.plugins.modules import sssd_info
 
         # Mock AnsibleModule
-        with patch.object(sssd_info, 'AnsibleModule') as mock_module_class:
+        with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
             mock_module = Mock()
-            mock_module.params = {'action': 'domain_status', 'domain': 'nonexistent.com'}
+            mock_module.params = {"action": "domain_status", "domain": "nonexistent.com"}
             mock_module.fail_json = Mock()
             mock_module.exit_json = Mock()
             mock_module_class.return_value = mock_module
 
             # Mock the exception in domain_object
-            with patch.object(sssd_info.SSSDHandler, 'domain_object') as mock_get_domain:
-                mock_get_domain.side_effect = Exception('Domain not found: nonexistent.com. Error: Domain not found')
+            with patch.object(sssd_info.SSSDHandler, "domain_object") as mock_get_domain:
+                mock_get_domain.side_effect = Exception("Domain not found: nonexistent.com. Error: Domain not found")
 
                 # Run the module
                 sssd_info.main()
 
                 # Verify fail_json was called with error message
                 mock_module.fail_json.assert_called_once()
-                error_msg = mock_module.fail_json.call_args[1].get('msg', '')
-                self.assertIn('Domain not found: nonexistent.com', error_msg)
+                error_msg = mock_module.fail_json.call_args[1].get("msg", "")
+                self.assertIn("Domain not found: nonexistent.com", error_msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
