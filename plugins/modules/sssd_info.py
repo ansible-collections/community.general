@@ -104,7 +104,7 @@ list_servers:
 
 
 from ansible.module_utils.basic import AnsibleModule
-
+from typing import Any
 from ansible_collections.community.general.plugins.module_utils import deps
 with deps.declare("dbus"):
     import dbus
@@ -214,7 +214,7 @@ def main() -> None:
     server_type = module.params.get('server_type')
 
     sssd = SSSDHandler()
-    result = {}
+    result: dict[str, Any] = {}
 
     try:
         if action == 'domain_status':
