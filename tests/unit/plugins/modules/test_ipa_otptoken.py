@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import unittest
 from contextlib import contextmanager
 from unittest.mock import call, patch
 
@@ -445,7 +444,3 @@ class TestIPAOTPToken(ModuleTestCase):
                     self.module.main()
 
         self.assertEqual(exec_info.exception.args[0]["msg"], "ERROR MESSAGE")
-
-
-if __name__ == "__main__":
-    unittest.main()

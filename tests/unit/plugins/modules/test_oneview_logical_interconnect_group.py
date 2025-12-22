@@ -231,7 +231,3 @@ class LogicalInterconnectGroupGeneralSpec(unittest.TestCase, OneViewBaseTestCase
             ansible_facts=dict(logical_interconnect_group=resource_data),
             msg=LogicalInterconnectGroupModule.MSG_ALREADY_PRESENT,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

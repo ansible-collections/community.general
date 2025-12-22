@@ -325,7 +325,3 @@ class TestGithubRepo(unittest.TestCase):
             }
         )
         self.assertEqual(result["changed"], False)
-
-
-if __name__ == "__main__":
-    unittest.main()

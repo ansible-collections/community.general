@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import unittest
 from contextlib import contextmanager
 from io import StringIO
 from itertools import count
@@ -166,7 +165,3 @@ class TestKeycloakRealmRole(ModuleTestCase):
         self.assertEqual(result["keys_metadata"], return_value[0])
 
         self.assertEqual(len(mock_get_realm_keys_metadata_by_id.mock_calls), 1)
-
-
-if __name__ == "__main__":
-    unittest.main()
