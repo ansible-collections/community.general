@@ -134,7 +134,3 @@ class FcoeNetworkSpec(unittest.TestCase, OneViewBaseTestCase):
         self.mock_ansible_module.exit_json.assert_called_once_with(
             changed=False, ansible_facts=dict(fcoe_network=resource_data), msg=FcoeNetworkModule.MSG_ALREADY_PRESENT
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

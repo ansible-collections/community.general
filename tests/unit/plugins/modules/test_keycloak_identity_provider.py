@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 
-import unittest
 from unittest.mock import patch
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
@@ -909,7 +908,3 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]["changed"], changed)
-
-
-if __name__ == "__main__":
-    unittest.main()

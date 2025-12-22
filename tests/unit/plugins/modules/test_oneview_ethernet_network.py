@@ -356,7 +356,3 @@ class EthernetNetworkModuleSpec(unittest.TestCase, OneViewBaseTestCase):
             ansible_facts=dict(ethernet_network=resource_data),
             msg=EthernetNetworkModule.MSG_ALREADY_PRESENT,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

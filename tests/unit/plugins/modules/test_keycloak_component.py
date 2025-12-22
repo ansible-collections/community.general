@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import unittest
 from contextlib import contextmanager
 from io import StringIO
 from itertools import count
@@ -308,7 +307,3 @@ class TestKeycloakComponent(ModuleTestCase):
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]["changed"], changed)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -113,7 +113,3 @@ class EnclosureInfoSpec(unittest.TestCase, FactsParamsTestCase):
         self.enclosures.get_utilization.assert_called_once_with(
             PRESENT_ENCLOSURES[0]["uri"], fields="AveragePower", filter=date_filter, view="day", refresh=True
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

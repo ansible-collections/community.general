@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import unittest
 from contextlib import contextmanager
 from unittest.mock import patch
 
@@ -118,7 +117,3 @@ class TestKeycloakRealmRole(ModuleTestCase):
                         self.module.main()
 
         self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

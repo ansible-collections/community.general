@@ -38,7 +38,3 @@ class FcNetworkInfoSpec(unittest.TestCase, FactsParamsTestCase):
         FcNetworkInfoModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, fc_networks=PRESENT_NETWORKS)
-
-
-if __name__ == "__main__":
-    unittest.main()

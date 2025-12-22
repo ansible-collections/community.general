@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import unittest
 from unittest.mock import patch
 
 import pytest
@@ -217,7 +216,3 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
 
             self.assertEqual(delete_known_host_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)
-
-
-if __name__ == "__main__":
-    unittest.main()
