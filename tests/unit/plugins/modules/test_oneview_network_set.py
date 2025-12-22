@@ -158,7 +158,3 @@ class NetworkSetModuleSpec(unittest.TestCase, OneViewBaseTestCase):
         self.mock_ansible_module.exit_json.assert_called_once_with(
             changed=False, ansible_facts=dict(network_set=resource_data), msg=NetworkSetModule.MSG_ALREADY_PRESENT
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

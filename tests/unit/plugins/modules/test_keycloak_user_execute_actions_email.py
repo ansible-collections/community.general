@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import unittest
 from contextlib import contextmanager
 from unittest.mock import patch
 
@@ -115,7 +114,3 @@ class TestKeycloakUserExecuteActionsEmail(ModuleTestCase):
                         self.module.main()
         data = result.exception.args[0]
         self.assertIn("User 'missing' not found", data["msg"])
-
-
-if __name__ == "__main__":
-    unittest.main()
