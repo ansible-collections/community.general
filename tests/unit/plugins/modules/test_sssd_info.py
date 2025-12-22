@@ -201,7 +201,3 @@ class TestSssdInfo(unittest.TestCase):
                 mock_module.fail_json.assert_called_once()
                 error_msg = mock_module.fail_json.call_args[1].get("msg", "")
                 self.assertIn("Domain not found: nonexistent.com", error_msg)
-
-
-if __name__ == "__main__":
-    unittest.main()
