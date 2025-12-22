@@ -28,13 +28,13 @@ options:
   action:
     description:
       - The action to perform.
-      - V(domain_status) - Check if domain is online.
-      - V(domain_list) - List all configured domains.
-      - V(active_servers) - Get active servers for domain.
-      - V(list_servers) - List all servers for domain.
     type: str
     required: true
-    choices: ['domain_status', 'domain_list', 'active_servers', 'list_servers']
+    choices:
+      domain_status: Check if domain is online.
+      domain_list: List all configured domains.
+      active_servers: Get active servers for domain.
+      list_servers: List all servers for domain.
   domain:
     description:
       - Domain name to check.
@@ -88,6 +88,7 @@ online:
 domain_list:
   description: List of SSSD domains.
   type: list
+  elements: str
   returned: when O(action=domain_list)
   sample: ["ipa.domain", "winad.test"]
 servers:
@@ -98,6 +99,7 @@ servers:
 list_servers:
   description: List of servers for the specified domain.
   type: list
+  elements: str
   returned: when O(action=list_servers)
   sample: ["server1.winad.test", "server2.winad.test"]
 """
