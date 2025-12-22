@@ -318,6 +318,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 scw_config = yaml.safe_load(fh)
                 ansible_profile = self.get_option("scw_profile")
 
+                if "SCW_PROFILE" in os.environ:
+                    scw_profile = os.getenv("SCW_PROFILE")
+
+                if scw_profile:
+                    ansible_profile = scw_profile
+
                 if ansible_profile:
                     active_profile = ansible_profile
                 else:
