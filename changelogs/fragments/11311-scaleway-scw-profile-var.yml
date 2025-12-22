@@ -1,0 +1,2 @@
+minor_changes:
+  - inventory_scaleway - added support for SCW_PROFILE environment variable (https://github.com/ansible-collections/community.general/pull/11311).
