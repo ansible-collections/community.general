@@ -43,9 +43,11 @@ options:
       - The config profile to use in config file.
       - By default uses the one specified as C(active_profile) in the config file, or falls back to V(default) if that is
         not defined.
-      - If defined the C(SCW_PROFILE) environment variable takes precedence over all.
     type: string
     version_added: 4.4.0
+    env:
+      - name: SCW_PROFILE
+        version_added: 12.2.0
   oauth_token:
     description:
       - Scaleway OAuth token.
@@ -318,12 +320,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             with open(scw_config_path) as fh:
                 scw_config = yaml.safe_load(fh)
                 ansible_profile = self.get_option("scw_profile")
-
-                if "SCW_PROFILE" in os.environ:
-                    scw_profile = os.getenv("SCW_PROFILE")
-
-                if scw_profile:
-                    ansible_profile = scw_profile
 
                 if ansible_profile:
                     active_profile = ansible_profile
