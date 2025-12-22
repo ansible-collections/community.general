@@ -148,6 +148,31 @@ class TestKeycloakUserprofile(ModuleTestCase):
                                 "required": {"roles": ["user"]},
                                 "validations": {"length": {"max": 255}, "person_name_prohibited_characters": {}},
                             },
+                            {
+                                "annotations": {},
+                                "displayName": "${testAttr}",
+                                "multivalued": False,
+                                "name": "testAttr",
+                                "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                "required": {"roles": ["user"]},
+                                "validations": {
+                                    "integer": {"min": 0, "max": 255},
+                                    "double": {},
+                                    "iso_date": {},
+                                    "local_date": {},
+                                },
+                            },
+                            {
+                                "annotations": {},
+                                "displayName": "${testAttr2}",
+                                "multivalued": True,
+                                "name": "testAttr2",
+                                "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                "required": {"roles": ["user"]},
+                                "validations": {
+                                    "multivalued": {"min": 0, "max": 5},
+                                },
+                            },
                         ],
                         "groups": [
                             {
@@ -209,6 +234,31 @@ class TestKeycloakUserprofile(ModuleTestCase):
                                     "permissions": {"view": ["admin", "user"], "edit": ["admin", "user"]},
                                     "multivalued": False,
                                     "annotations": {},
+                                },
+                                {
+                                    "annotations": {},
+                                    "displayName": "${testAttr}",
+                                    "multivalued": False,
+                                    "name": "testAttr",
+                                    "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                    "required": {"roles": ["user"]},
+                                    "validations": {
+                                        "integer": {"min": 0, "max": 255},
+                                        "double": {},
+                                        "iso_date": {},
+                                        "local_date": {},
+                                    },
+                                },
+                                {
+                                    "annotations": {},
+                                    "displayName": "${testAttr2}",
+                                    "multivalued": True,
+                                    "name": "testAttr2",
+                                    "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                    "required": {"roles": ["user"]},
+                                    "validations": {
+                                        "multivalued": {"min": 0, "max": 5},
+                                    },
                                 },
                             ],
                             "groups": [
@@ -306,6 +356,31 @@ class TestKeycloakUserprofile(ModuleTestCase):
                                 "required": {"roles": ["user"]},
                                 "validations": {"length": {"max": 255}, "person_name_prohibited_characters": {}},
                             },
+                            {
+                                "annotations": {},
+                                "displayName": "${testAttr}",
+                                "multivalued": False,
+                                "name": "testAttr",
+                                "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                "required": {"roles": ["user"]},
+                                "validations": {
+                                    "integer": {"min": 0, "max": 255},
+                                    "double": {},
+                                    "iso_date": {},
+                                    "local_date": {},
+                                },
+                            },
+                            {
+                                "annotations": {},
+                                "displayName": "${testAttr2}",
+                                "multivalued": True,
+                                "name": "testAttr2",
+                                "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                "required": {"roles": ["user"]},
+                                "validations": {
+                                    "multivalued": {"min": 0, "max": 5},
+                                },
+                            },
                         ],
                         "groups": [
                             {
@@ -375,6 +450,31 @@ class TestKeycloakUserprofile(ModuleTestCase):
                                             "permissions": {"view": ["admin", "user"], "edit": ["admin", "user"]},
                                             "multivalued": False,
                                             "annotations": {},
+                                        },
+                                        {
+                                            "annotations": {},
+                                            "displayName": "${testAttr}",
+                                            "multivalued": False,
+                                            "name": "testAttr",
+                                            "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                            "required": {"roles": ["user"]},
+                                            "validations": {
+                                                "integer": {"min": 0, "max": 255},
+                                                "double": {},
+                                                "iso_date": {},
+                                                "local_date": {},
+                                            },
+                                        },
+                                        {
+                                            "annotations": {},
+                                            "displayName": "${testAttr2}",
+                                            "multivalued": True,
+                                            "name": "testAttr2",
+                                            "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                            "required": {"roles": ["user"]},
+                                            "validations": {
+                                                "multivalued": {"min": 0, "max": 5},
+                                            },
                                         },
                                     ],
                                     "groups": [
@@ -527,6 +627,31 @@ class TestKeycloakUserprofile(ModuleTestCase):
                                             "permissions": {"view": ["admin", "user"], "edit": ["admin", "user"]},
                                             "multivalued": False,
                                             "annotations": {},
+                                        },
+                                        {
+                                            "annotations": {},
+                                            "displayName": "${testAttr}",
+                                            "multivalued": False,
+                                            "name": "testAttr",
+                                            "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                            "required": {"roles": ["user"]},
+                                            "validations": {
+                                                "integer": {"min": 0, "max": 255},
+                                                "double": {},
+                                                "iso_date": {},
+                                                "local_date": {},
+                                            },
+                                        },
+                                        {
+                                            "annotations": {},
+                                            "displayName": "${testAttr2}",
+                                            "multivalued": True,
+                                            "name": "testAttr2",
+                                            "permissions": {"edit": ["admin", "user"], "view": ["admin", "user"]},
+                                            "required": {"roles": ["user"]},
+                                            "validations": {
+                                                "multivalued": {"min": 0, "max": 5},
+                                            },
                                         },
                                     ],
                                     "groups": [
