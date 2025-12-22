@@ -1495,7 +1495,7 @@ files:
   $tests/fqdn_valid.py:
     maintainers: vbotka
   $modules/sssd_info.py:
-    maintainers: agabidullin63
+    maintainers: a-gabidullin
 #########################
   docs/docsite/rst/filter_guide.rst: {}
   docs/docsite/rst/filter_guide_abstract_informations.rst: {}
