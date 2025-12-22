@@ -209,6 +209,10 @@ def test_build_wsl_command(connection):
     cmd = connection._build_wsl_command('/bin/sh -c "ls -la"')
     assert cmd == 'wsl.exe --distribution test --user test-become-user -- /bin/sh -c "ls -la"'
 
+    connection.set_option("wsl_shell_type", "powershell")
+    cmd = connection._build_wsl_command('/bin/sh -c "ls -la"')
+    assert cmd == 'wsl.exe --% --distribution test --user test-become-user -- /bin/sh -c "ls -la"'
+
 
 @patch("paramiko.SSHClient")
 def test_exec_command_success(mock_ssh, connection):
