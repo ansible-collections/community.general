@@ -43,6 +43,7 @@ options:
       - The config profile to use in config file.
       - By default uses the one specified as C(active_profile) in the config file, or falls back to V(default) if that is
         not defined.
+      - If defined the C(SCW_PROFILE) environment variable takes precedence over all.
     type: string
     version_added: 4.4.0
   oauth_token:
