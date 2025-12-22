@@ -83,7 +83,3 @@ class EthernetNetworkInfoSpec(unittest.TestCase, FactsParamsTestCase):
             enet_associated_profiles=ENET_ASSOCIATED_PROFILES,
             enet_associated_uplink_groups=ENET_ASSOCIATED_UPLINK_GROUPS,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

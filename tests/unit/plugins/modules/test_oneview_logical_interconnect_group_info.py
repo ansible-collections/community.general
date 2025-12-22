@@ -50,7 +50,3 @@ class LogicalInterconnectGroupInfoSpec(unittest.TestCase, FactsParamsTestCase):
         self.mock_ansible_module.exit_json.assert_called_once_with(
             changed=False, logical_interconnect_groups=(PRESENT_LIGS)
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

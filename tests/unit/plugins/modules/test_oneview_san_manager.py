@@ -212,7 +212,3 @@ class SanManagerModuleSpec(unittest.TestCase, OneViewBaseTestCase):
         msg = "A connectionInfo field is required for this operation."
 
         self.mock_ansible_module.fail_json.assert_called_once_with(exception=mock.ANY, msg=msg)
-
-
-if __name__ == "__main__":
-    unittest.main()

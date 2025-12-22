@@ -39,7 +39,3 @@ class FcoeNetworkInfoSpec(unittest.TestCase, FactsParamsTestCase):
         FcoeNetworkInfoModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, fcoe_networks=PRESENT_NETWORKS)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -79,7 +79,3 @@ class NetworkSetInfoSpec(unittest.TestCase, FactsParamsTestCase):
         self.network_sets.get_all_without_ethernet.assert_called_once_with(filter=expected_filter)
 
         self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, network_sets=network_sets)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -56,7 +56,3 @@ class SanManagerInfoSpec(unittest.TestCase, FactsParamsTestCase):
         SanManagerInfoModule().run()
 
         self.mock_ansible_module.exit_json.assert_called_once_with(changed=False, san_managers=[])
-
-
-if __name__ == "__main__":
-    unittest.main()

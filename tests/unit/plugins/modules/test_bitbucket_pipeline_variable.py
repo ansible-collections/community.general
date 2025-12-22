@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import unittest
 from unittest.mock import patch
 
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
@@ -372,7 +371,3 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
 
             self.assertEqual(delete_pipeline_variable_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)
-
-
-if __name__ == "__main__":
-    unittest.main()
