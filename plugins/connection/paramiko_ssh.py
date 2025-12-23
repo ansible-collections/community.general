@@ -8,18 +8,16 @@ author: Ansible Core Team
 name: paramiko_ssh
 short_description: Run tasks via Python SSH (paramiko)
 description:
-  - Use the Python SSH implementation (Paramiko) to connect to targets
-  - The paramiko transport is provided because many distributions, in particular EL6 and before do not support ControlPersist
-    in their SSH implementations.
-  - This is needed on the Ansible control machine to be reasonably efficient with connections.
-    Thus paramiko is faster for most users on these platforms.
-    Users with ControlPersist capability can consider using -c ssh or configuring the transport in the configuration file.
-  - This plugin also borrows a lot of settings from the ssh plugin as they both cover the same protocol.
+  - Use the Python SSH implementation (Paramiko) to connect to targets.
+  - This is more efficient than using P(ansible.builtin.ssh#connection) for versions of OpenSSH earlier than 5.6 without C(ControlPersist).
+  - This plugin also borrows a lot of settings from the P(ansible.builtin.ssh#connection) plugin as they both cover the same protocol.
+requirements:
+  - paramiko>=2.4.3
 version_added: "12.2.0"
 options:
   remote_addr:
     description:
-      - Address of the remote target
+      - Address of the remote target.
     default: inventory_hostname
     type: string
     vars:
@@ -47,7 +45,7 @@ options:
       - name: port
   remote_user:
     description:
-      - User to login/authenticate as
+      - User to login/authenticate as.
       - Can be set from the CLI via the C(--user) or C(-u) options.
     type: string
     vars:
@@ -66,7 +64,7 @@ options:
       - name: remote_user
   password:
     description:
-      - Secret used to either login the ssh server or as a passphrase for ssh keys that require it
+      - Secret used to either login the ssh server or as a passphrase for ssh keys that require it.
       - Can be set from the CLI via the C(--ask-pass) option.
     type: string
     vars:
@@ -77,43 +75,50 @@ options:
       - name: ansible_paramiko_password
   use_rsa_sha2_algorithms:
     description:
-      - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys
-      - On paramiko versions older than 2.9, this only affects hostkeys
-      - For behavior matching paramiko<2.9 set this to V(False)
+      - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys.
+      - On paramiko versions older than 2.9, this only affects hostkeys.
+      - For behavior matching paramiko<2.9 set this to V(False).
     vars:
       - name: ansible_paramiko_use_rsa_sha2_algorithms
     ini:
-      - {key: use_rsa_sha2_algorithms, section: paramiko_connection}
+      - key: use_rsa_sha2_algorithms
+        section: paramiko_connection
     env:
-      - {name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS}
+      - name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS
     default: true
     type: boolean
   host_key_auto_add:
-    description: 'Automatically add host keys'
-    env: [{name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD}]
+    description: Automatically add host keys.
+    env:
+      - name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD
     ini:
-      - {key: host_key_auto_add, section: paramiko_connection}
+      - key: host_key_auto_add
+        section: paramiko_connection
     type: boolean
   look_for_keys:
     default: true
-    description: 'False to disable searching for private key files in ~/.ssh/'
-    env: [{name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS}]
+    description: Set to V(false) to disable searching for private key files in ~/.ssh/.
+    env:
+      - name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS
     ini:
-      - {key: look_for_keys, section: paramiko_connection}
+      - key: look_for_keys
+        section: paramiko_connection
     type: boolean
   proxy_command:
     default: ''
     description:
       - Proxy information for running the connection via a jumphost.
     type: string
-    env: [{name: ANSIBLE_PARAMIKO_PROXY_COMMAND}]
+    env:
+      - name: ANSIBLE_PARAMIKO_PROXY_COMMAND
     ini:
-      - {key: proxy_command, section: paramiko_connection}
+      - key: proxy_command
+        section: paramiko_connection
     vars:
       - name: ansible_paramiko_proxy_command
   pty:
     default: true
-    description: 'SUDO usually requires a PTY, True to give a PTY and False to not give a PTY.'
+    description: SUDO usually requires a PTY. Set to V(false) to not give a PTY.
     env:
       - name: ANSIBLE_PARAMIKO_PTY
     ini:
@@ -122,14 +127,15 @@ options:
     type: boolean
   record_host_keys:
     default: true
-    description: 'Save the host keys to a file'
-    env: [{name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS}]
+    description: Save the host keys to a file.
+    env:
+      - name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS
     ini:
       - section: paramiko_connection
         key: record_host_keys
     type: boolean
   host_key_checking:
-    description: 'Set this to "False" if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host'
+    description: Set to V(false) to avoid host key checking by the underlying tools Ansible uses to connect to the host.
     type: boolean
     default: true
     env:
@@ -146,7 +152,7 @@ options:
       - name: ansible_ssh_host_key_checking
       - name: ansible_paramiko_host_key_checking
   use_persistent_connections:
-    description: 'Toggles the use of persistence for connections'
+    description: Toggle the use of persistence for connections.
     type: boolean
     default: false
     env:
@@ -158,9 +164,8 @@ options:
     type: float
     default: 30
     description:
-      - Configures, in seconds, the amount of time to wait for the SSH
-        banner to be presented. This option is supported by paramiko
-        version 1.15.0 or newer.
+      - Configure, in seconds, the amount of time to wait for the SSH
+        banner to be presented.
     ini:
       - section: paramiko_connection
         key: banner_timeout
@@ -402,13 +407,12 @@ class Connection(ConnectionBase):
             if self.get_option('private_key_file'):
                 key_filename = os.path.expanduser(self.get_option('private_key_file'))
 
-            # paramiko 2.2 introduced auth_timeout parameter
-            if LooseVersion(paramiko.__version__) >= LooseVersion('2.2.0'):
-                ssh_connect_kwargs['auth_timeout'] = self.get_option('timeout')
+            ssh_connect_kwargs['auth_timeout'] = self.get_option('timeout')
 
-            # paramiko 1.15 introduced banner timeout parameter
-            if LooseVersion(paramiko.__version__) >= LooseVersion('1.15.0'):
-                ssh_connect_kwargs['banner_timeout'] = self.get_option('banner_timeout')
+            ssh_connect_kwargs['banner_timeout'] = self.get_option('banner_timeout')
+
+            if LooseVersion(paramiko.__version__) >= LooseVersion('2.6.0'):
+                ssh_connect_kwargs['disabled_algorithms'] = disabled_algorithms
 
             ssh.connect(
                 self.get_option('remote_addr').lower(),
@@ -419,7 +423,6 @@ class Connection(ConnectionBase):
                 password=conn_password,
                 timeout=self.get_option('timeout'),
                 port=port,
-                disabled_algorithms=disabled_algorithms,
                 **ssh_connect_kwargs,
             )
         except paramiko.ssh_exception.BadHostKeyException as e:
