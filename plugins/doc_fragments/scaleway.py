@@ -13,7 +13,6 @@ options:
     description:
       - Scaleway OAuth token.
     type: str
-    required: true
     aliases: [oauth_token]
   api_url:
     description:
@@ -27,10 +26,11 @@ options:
     type: int
     default: 30
     aliases: [timeout]
-  scw_profile:
+  profile:
     description:
       - The config profile to use in config file.
     type: string
+    aliases: [scw_profile]
     version_added: 12.2.0
   query_parameters:
     description:

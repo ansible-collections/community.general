@@ -44,8 +44,8 @@ def scaleway_argument_spec() -> dict[str, t.Any]:
         api_url=dict(
             fallback=(env_fallback, ["SCW_API_URL"]), default="https://api.scaleway.com", aliases=["base_url"]
         ),
-        scw_profile=dict(
-            fallback=(env_fallback, ["SCW_PROFILE"]),
+        profile=dict(
+            fallback=(env_fallback, ["SCW_PROFILE"]), aliases=["scw_profile"],
         ),
         api_timeout=dict(type="int", default=30, aliases=["timeout"]),
         query_parameters=dict(type="dict", default={}),
@@ -179,7 +179,7 @@ class Scaleway:
     def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         oauth_token = self.module.params.get("api_token")
-        scw_profile = self.module.params.get("scw_profile")
+        scw_profile = self.module.params.get("profile")
 
         if scw_profile:
             if "SCW_CONFIG_PATH" in os.environ:
