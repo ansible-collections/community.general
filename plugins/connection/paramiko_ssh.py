@@ -243,8 +243,8 @@ display = Display()
 
 
 AUTHENTICITY_MSG = """
-paramiko: The authenticity of host '%s' can't be established.
-The %s key fingerprint is %s.
+paramiko: The authenticity of host '{host!s}' can't be established.
+The {key!s} key fingerprint is {fingerprint!s}.
 Are you sure you want to continue connecting (yes/no)?
 """
 
@@ -280,10 +280,10 @@ class MyAddPolicy(MissingHostKeyPolicy):
             if self.connection.get_option('use_persistent_connections') or self.connection.force_persistence:
                 # don't print the prompt string since the user cannot respond
                 # to the question anyway
-                raise AnsibleError(AUTHENTICITY_MSG[1:92] % (hostname, ktype, fingerprint))
+                raise AnsibleError(AUTHENTICITY_MSG[1:92].format(host=hostname, key=ktype, fingerprint=fingerprint))
 
             inp = to_text(
-                display.prompt_until(AUTHENTICITY_MSG % (hostname, ktype, fingerprint), private=False),
+                display.prompt_until(AUTHENTICITY_MSG.format(host=hostname, key=ktype, fingerprint=fingerprint), private=False),
                 errors='surrogate_or_strict'
             )
 
