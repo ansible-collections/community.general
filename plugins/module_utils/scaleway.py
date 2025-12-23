@@ -14,14 +14,6 @@ import traceback
 import typing as t
 from urllib.parse import urlencode
 
-YAML_IMPORT_ERROR: ImportError | None
-try:
-    import yaml
-except ImportError as exc:
-    YAML_IMPORT_ERROR = exc
-else:
-    YAML_IMPORT_ERROR = None
-
 from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.urls import fetch_url
 
@@ -42,6 +34,13 @@ except Exception:
     SCALEWAY_SECRET_IMP_ERR = traceback.format_exc()
     HAS_SCALEWAY_SECRET_PACKAGE = False
 
+YAML_IMPORT_ERROR: ImportError | None
+try:
+    import yaml
+except ImportError as exc:
+    YAML_IMPORT_ERROR = exc
+else:
+    YAML_IMPORT_ERROR = None
 
 def scaleway_argument_spec() -> dict[str, t.Any]:
     return dict(
@@ -191,7 +190,7 @@ class Scaleway:
         oauth_token = self.module.params.get("api_token")
         scw_profile = self.module.params.get("profile")
 
-        if scw_profile:
+        if scw_profile and YAML_IMPORT_ERROR is None:
             if "SCW_CONFIG_PATH" in os.environ:
                 scw_config_path = os.getenv("SCW_CONFIG_PATH", "")
             elif "XDG_CONFIG_HOME" in os.environ:
@@ -206,7 +205,7 @@ class Scaleway:
 
         if oauth_token is None:
             self.module.fail_json(
-                msg="Either your config profile could not be loaded or you have not provided an api_token. Aborting!"
+                msg="Either your config profile could not be loaded or you have not provided an api_token."
             )
 
         self.headers = {
