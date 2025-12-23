@@ -44,6 +44,8 @@ options:
       - Validate SSL certs of the Scaleway API.
     type: bool
     default: true
+requirements:
+  - PyYAML (when O(profile) is used)
 notes:
   - Also see the API documentation on U(https://developer.scaleway.com/).
   - If O(api_token) is not set within the module, the following environment variables can be used in decreasing order of precedence
