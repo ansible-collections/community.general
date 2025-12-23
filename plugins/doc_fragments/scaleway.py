@@ -29,7 +29,7 @@ options:
   profile:
     description:
       - The config profile to use in config file.
-    type: string
+    type: str
     aliases: [scw_profile]
     version_added: 12.2.0
   query_parameters:
