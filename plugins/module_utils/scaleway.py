@@ -42,6 +42,7 @@ except ImportError as exc:
 else:
     YAML_IMPORT_ERROR = None
 
+
 def scaleway_argument_spec() -> dict[str, t.Any]:
     return dict(
         api_token=dict(
