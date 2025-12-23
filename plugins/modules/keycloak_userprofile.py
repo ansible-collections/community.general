@@ -586,9 +586,7 @@ def main():
                                 "required": dict(
                                     type="dict", options={"roles": dict(type="list", elements="str", default=["user"])}
                                 ),
-                                "selector": dict(
-                                    type="dict", options={"scopes": dict(type="list", elements="str")}
-                                ),
+                                "selector": dict(type="dict", options={"scopes": dict(type="list", elements="str")}),
                             },
                         ),
                         "groups": dict(
