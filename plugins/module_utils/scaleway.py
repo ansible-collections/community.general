@@ -14,6 +14,14 @@ import traceback
 import typing as t
 from urllib.parse import urlencode
 
+YAML_IMPORT_ERROR: ImportError | None
+try:
+    import yaml
+except ImportError as exc:
+    YAML_IMPORT_ERROR = exc
+else:
+    YAML_IMPORT_ERROR = None
+
 from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.urls import fetch_url
 
