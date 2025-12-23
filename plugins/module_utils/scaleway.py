@@ -54,7 +54,8 @@ def scaleway_argument_spec() -> dict[str, t.Any]:
             fallback=(env_fallback, ["SCW_API_URL"]), default="https://api.scaleway.com", aliases=["base_url"]
         ),
         profile=dict(
-            fallback=(env_fallback, ["SCW_PROFILE"]), aliases=["scw_profile"],
+            fallback=(env_fallback, ["SCW_PROFILE"]),
+            aliases=["scw_profile"],
         ),
         api_timeout=dict(type="int", default=30, aliases=["timeout"]),
         query_parameters=dict(type="dict", default={}),
