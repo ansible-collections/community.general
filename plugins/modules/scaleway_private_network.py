@@ -79,7 +79,7 @@ options:
 
 EXAMPLES = r"""
 - name: Create an private network
-  community.general.scaleway_vpc:
+  community.general.scaleway_private_network:
     project: '{{ scw_project }}'
     name: 'vpc_one'
     state: present
@@ -87,7 +87,7 @@ EXAMPLES = r"""
   register: vpc_creation_task
 
 - name: Make sure private network with name 'foo' is deleted in region par1
-  community.general.scaleway_vpc:
+  community.general.scaleway_private_network:
     name: 'foo'
     state: absent
     region: par1
