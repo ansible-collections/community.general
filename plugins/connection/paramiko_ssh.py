@@ -220,7 +220,6 @@ import fcntl
 import re
 import typing as t
 
-from ansible.module_utils.compat.version import LooseVersion
 from binascii import hexlify
 
 from ansible.errors import (
@@ -234,10 +233,11 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native, to_
 from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
-from ansible_collections.community.general.plugins.module_utils.paramiko import (
+from ansible_collections.community.general.plugins.module_utils._paramiko import (
     _PARAMIKO_IMPORT_ERR as PARAMIKO_IMPORT_ERR,
     _paramiko as paramiko,
 )
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 display = Display()
 
