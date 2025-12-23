@@ -54,7 +54,7 @@ def scaleway_argument_spec() -> dict[str, t.Any]:
             fallback=(env_fallback, ["SCW_API_URL"]), default="https://api.scaleway.com", aliases=["base_url"]
         ),
         profile=dict(
-            fallback=(env_fallback, ["SCW_PROFILE"]), aliases=["scw_profile"],
+            fallback=(env_fallback, ["SCW_PROFILE"]), default="", aliases=["scw_profile"],
         ),
         api_timeout=dict(type="int", default=30, aliases=["timeout"]),
         query_parameters=dict(type="dict", default={}),
@@ -190,7 +190,7 @@ class Scaleway:
         oauth_token = self.module.params.get("api_token")
         scw_profile = self.module.params.get("profile")
 
-        if scw_profile:
+        if len(scw_profile) > 0:
             if "SCW_CONFIG_PATH" in os.environ:
                 scw_config_path = os.getenv("SCW_CONFIG_PATH")
             elif "XDG_CONFIG_HOME" in os.environ:
