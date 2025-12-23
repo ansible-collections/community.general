@@ -234,12 +234,15 @@ options:
   wsl_shell_type:
     description:
       - The shell type expected in the SSH session (not inside the WSL session).
-      - Can be cmd or powershell.
-      - See also ansible_shell_type.
+      - See also C(ansible_shell_type).
     type: string
+    choices:
+      - cmd
+      - powershell
     default: cmd
     vars:
       - name: wsl_shell_type
+    version_added: 12.2.0
   wsl_user:
     description:
       - WSL distribution user.
