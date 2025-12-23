@@ -204,6 +204,9 @@ class Scaleway:
                     scw_config = yaml.safe_load(fh)
                     oauth_token = scw_config["profiles"][scw_profile].get("secret_key")
 
+        if oauth_token is None:
+            self.module.fail_json(msg="Either your config profile could not be loaded or you have not provided an api_token. Aborting!")
+
         self.headers = {
             "X-Auth-Token": oauth_token,
             "User-Agent": self.get_user_agent_string(module),

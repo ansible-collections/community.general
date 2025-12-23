@@ -12,6 +12,7 @@ options:
   api_token:
     description:
       - Scaleway OAuth token.
+      - This is required if O(profile) is not specified.
     type: str
     aliases: [oauth_token]
   api_url:
@@ -28,7 +29,8 @@ options:
     aliases: [timeout]
   profile:
     description:
-      - The config profile to use in config file.
+      - The config profile in config file to load the Scaleway OAuth token from, use instead of O(api_token).
+      - It is also possible to set E(SCW_PROFILE) to use a SCW CLI config profile.
     type: str
     aliases: [scw_profile]
     version_added: 12.2.0
@@ -47,7 +49,6 @@ notes:
   - If O(api_token) is not set within the module, the following environment variables can be used in decreasing order of precedence
     E(SCW_TOKEN), E(SCW_API_KEY), E(SCW_OAUTH_TOKEN) or E(SCW_API_TOKEN).
   - If one wants to use a different O(api_url) one can also set the E(SCW_API_URL) environment variable.
-  - It is also possible to set E(SCW_PROFILE) to use a SCW CLI config profile instead of an O(api_token).
 """
 
     ACTIONGROUP_SCALEWAY = r"""
