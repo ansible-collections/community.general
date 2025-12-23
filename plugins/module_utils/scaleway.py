@@ -37,13 +37,15 @@ except Exception:
 def scaleway_argument_spec() -> dict[str, t.Any]:
     return dict(
         api_token=dict(
-            required=True,
             fallback=(env_fallback, ["SCW_TOKEN", "SCW_API_KEY", "SCW_OAUTH_TOKEN", "SCW_API_TOKEN"]),
             no_log=True,
             aliases=["oauth_token"],
         ),
         api_url=dict(
             fallback=(env_fallback, ["SCW_API_URL"]), default="https://api.scaleway.com", aliases=["base_url"]
+        ),
+        scw_profile=dict(
+            fallback=(env_fallback, ["SCW_PROFILE"]),
         ),
         api_timeout=dict(type="int", default=30, aliases=["timeout"]),
         query_parameters=dict(type="dict", default={}),
@@ -176,8 +178,24 @@ class Response:
 class Scaleway:
     def __init__(self, module: AnsibleModule) -> None:
         self.module = module
+        oauth_token = self.module.params.get("api_token")
+        scw_profile = self.module.params.get("scw_profile")
+
+        if scw_profile:
+            if "SCW_CONFIG_PATH" in os.environ:
+                scw_config_path = os.getenv("SCW_CONFIG_PATH")
+            elif "XDG_CONFIG_HOME" in os.environ:
+                scw_config_path = os.path.join(os.getenv("XDG_CONFIG_HOME"), "scw", "config.yaml")
+            else:
+                scw_config_path = os.path.join(os.path.expanduser("~"), ".config", "scw", "config.yaml")
+
+            if os.path.exists(scw_config_path):
+                with open(scw_config_path) as fh:
+                    scw_config = yaml.safe_load(fh)
+                    oauth_token = scw_config["profiles"][scw_profile].get("secret_key")
+
         self.headers = {
-            "X-Auth-Token": self.module.params.get("api_token"),
+            "X-Auth-Token": oauth_token,
             "User-Agent": self.get_user_agent_string(module),
             "Content-Type": "application/json",
         }

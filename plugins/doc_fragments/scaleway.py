@@ -27,6 +27,11 @@ options:
     type: int
     default: 30
     aliases: [timeout]
+  scw_profile:
+    description:
+      - The config profile to use in config file.
+    type: string
+    version_added: 12.2.0
   query_parameters:
     description:
       - List of parameters passed to the query string.
@@ -42,6 +47,7 @@ notes:
   - If O(api_token) is not set within the module, the following environment variables can be used in decreasing order of precedence
     E(SCW_TOKEN), E(SCW_API_KEY), E(SCW_OAUTH_TOKEN) or E(SCW_API_TOKEN).
   - If one wants to use a different O(api_url) one can also set the E(SCW_API_URL) environment variable.
+  - It is also possible to set E(SCW_PROFILE) to use a SCW CLI config profile instead of an O(api_token).
 """
 
     ACTIONGROUP_SCALEWAY = r"""
