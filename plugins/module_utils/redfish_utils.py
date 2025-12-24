@@ -2269,8 +2269,8 @@ class RedfishUtils:
         response = self.get_request(self.root_uri + self.systems_uri)
         if response["ret"] is False:
             return response
-        data = response['data']
-        boot = data.get('Boot')
+        data = response["data"]
+        boot = data.get("Boot")
         boot_settings = boot
         settings_uri = self.systems_uri
 
