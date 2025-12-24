@@ -37,7 +37,7 @@ except Exception:
 YAML_IMPORT_ERROR: str | None
 try:
     import yaml
-except ImportError as exc:
+except ImportError:
     YAML_IMPORT_ERROR = traceback.format_exc()
 else:
     YAML_IMPORT_ERROR = None
