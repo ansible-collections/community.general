@@ -77,9 +77,9 @@ def payload_from_object(scw_object):
 
 def get_scw_config_path(scw_profile: str) -> str | None:
     if "SCW_CONFIG_PATH" in os.environ:
-        scw_config_path = os.getenv["SCW_CONFIG_PATH"]
+        scw_config_path = os.getenv("SCW_CONFIG_PATH")
     elif "XDG_CONFIG_HOME" in os.environ:
-        scw_config_path = os.path.join(os.getenv["XDG_CONFIG_HOME"], "scw", "config.yaml")
+        scw_config_path = os.path.join(os.getenv("XDG_CONFIG_HOME", ""), "scw", "config.yaml")
     else:
         scw_config_path = os.path.join(os.path.expanduser("~"), ".config", "scw", "config.yaml")
 
