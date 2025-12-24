@@ -209,7 +209,7 @@ class Scaleway:
         scw_profile = self.module.params.get("profile")
 
         if scw_profile:
-            if YAML_IMPORT_ERROR is None:
+            if YAML_IMPORT_ERROR is not None:
                 self.module.fail_json(
                     msg=missing_required_lib("PyYAML", reason="for scw_profile"), exception=YAML_IMPORT_ERROR
                 )
