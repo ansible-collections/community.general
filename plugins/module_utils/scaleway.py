@@ -75,6 +75,22 @@ def payload_from_object(scw_object):
     return {k: v for k, v in scw_object.items() if k != "id" and v is not None}
 
 
+def get_scw_config_path(scw_profile: str) -> str | None:
+    if "SCW_CONFIG_PATH" in os.environ:
+        scw_config_path = os.getenv["SCW_CONFIG_PATH"]
+    elif "XDG_CONFIG_HOME" in os.environ:
+        scw_config_path = os.path.join(os.getenv["XDG_CONFIG_HOME"], "scw", "config.yaml")
+    else:
+        scw_config_path = os.path.join(os.path.expanduser("~"), ".config", "scw", "config.yaml")
+
+    if os.path.exists(scw_config_path):
+        with open(scw_config_path) as fh:
+            scw_config = yaml.safe_load(fh)
+            return scw_config["profiles"][scw_profile].get("secret_key")
+
+    return None
+
+
 class ScalewayException(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
@@ -196,17 +212,7 @@ class Scaleway:
                 self.module.fail_json(
                     msg=missing_required_lib("PyYAML", reason="for scw_profile"), exception=YAML_IMPORT_ERROR
                 )
-            if "SCW_CONFIG_PATH" in os.environ:
-                scw_config_path = os.getenv("SCW_CONFIG_PATH", "")
-            elif "XDG_CONFIG_HOME" in os.environ:
-                scw_config_path = os.path.join(os.getenv("XDG_CONFIG_HOME", ""), "scw", "config.yaml")
-            else:
-                scw_config_path = os.path.join(os.path.expanduser("~"), ".config", "scw", "config.yaml")
-
-            if os.path.exists(scw_config_path):
-                with open(scw_config_path) as fh:
-                    scw_config = yaml.safe_load(fh)
-                    oauth_token = scw_config["profiles"][scw_profile].get("secret_key")
+            oauth_token = get_scw_config_path(scw_profile)
 
         if oauth_token is None:
             self.module.fail_json(
