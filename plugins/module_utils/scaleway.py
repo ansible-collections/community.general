@@ -83,11 +83,10 @@ def get_scw_config_path(scw_profile: str) -> str | None:
     else:
         scw_config_path = os.path.join(os.path.expanduser("~"), ".config", "scw", "config.yaml")
 
-    if scw_config_path is not None:
-        if os.path.exists(scw_config_path):
-            with open(scw_config_path) as fh:
-                scw_config = yaml.safe_load(fh)
-                return scw_config["profiles"][scw_profile].get("secret_key")
+    if os.path.exists(scw_config_path):
+        with open(scw_config_path) as fh:
+            scw_config = yaml.safe_load(fh)
+            return scw_config["profiles"][scw_profile].get("secret_key")
 
     return None
 
