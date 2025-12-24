@@ -34,11 +34,11 @@ except Exception:
     SCALEWAY_SECRET_IMP_ERR = traceback.format_exc()
     HAS_SCALEWAY_SECRET_PACKAGE = False
 
-YAML_IMPORT_ERROR: ImportError | None
+YAML_IMPORT_ERROR: str | None
 try:
     import yaml
 except ImportError as exc:
-    YAML_IMPORT_ERROR = exc
+    YAML_IMPORT_ERROR = traceback.format_exc()
 else:
     YAML_IMPORT_ERROR = None
 
@@ -191,7 +191,11 @@ class Scaleway:
         oauth_token = self.module.params.get("api_token")
         scw_profile = self.module.params.get("profile")
 
-        if scw_profile and YAML_IMPORT_ERROR is None:
+        if scw_profile:
+            if YAML_IMPORT_ERROR is None:
+                self.module.fail_json(
+                    msg=missing_required_lib("PyYAML", reason="for scw_profile"), exception=YAML_IMPORT_ERROR
+                )
             if "SCW_CONFIG_PATH" in os.environ:
                 scw_config_path = os.getenv("SCW_CONFIG_PATH", "")
             elif "XDG_CONFIG_HOME" in os.environ:
