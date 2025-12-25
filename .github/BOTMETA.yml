@@ -114,6 +114,8 @@ files:
   $connections/lxd.py:
     labels: lxd
     maintainers: mattclay
+  $connections/paramiko_ssh.py:
+    maintainers: $team_ansible_core
   $connections/qubes.py:
     maintainers: kushaldas
   $connections/saltstack.py:
