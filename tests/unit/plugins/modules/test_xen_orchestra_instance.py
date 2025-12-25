@@ -25,7 +25,7 @@ def _make_xo(module_params=None):
 
 
 def test_pointer_increments_sequentially():
-    xo, _ = _make_xo()
+    xo, mod = _make_xo()
 
     assert xo.pointer == 0
     assert xo.pointer == 1
@@ -33,7 +33,7 @@ def test_pointer_increments_sequentially():
 
 
 def test_login_success(mocker):
-    xo, _ = _make_xo()
+    xo, mod = _make_xo()
     mocker.patch.object(xo, "call", return_value={"result": {"token": "abc"}})
 
     result = xo.login("user", "password")
@@ -99,7 +99,7 @@ def test_create_vm_error_raises_fail_json(mocker):
     ],
 )
 def test_vm_actions_success(mocker, method_name, rpc_method):
-    xo, _ = _make_xo()
+    xo, mod = _make_xo()
     mock_call = mocker.patch.object(xo, "call", return_value={"result": True})
 
     method = getattr(xo, method_name)
@@ -118,7 +118,7 @@ def test_vm_actions_success(mocker, method_name, rpc_method):
     ],
 )
 def test_vm_actions_special_error_codes_return_false(mocker, method_name, code_constant, expected):
-    xo, _ = _make_xo()
+    xo, mod = _make_xo()
     mocker.patch.object(xo, "call", return_value={"error": {"code": code_constant}})
 
     method = getattr(xo, method_name)
@@ -137,7 +137,7 @@ def test_vm_actions_special_error_codes_return_false(mocker, method_name, code_c
     ],
 )
 def test_vm_actions_other_errors_raise_fail_json(mocker, method_name, code_constant, error_snippet):
-    xo, _ = _make_xo()
+    xo, mod = _make_xo()
     mocker.patch.object(xo, "call", return_value={"error": {"code": code_constant}})
 
     method = getattr(xo, method_name)
