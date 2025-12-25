@@ -86,6 +86,12 @@ options:
   container_command:
     description:
       - Run a command within a container.
+      - The O(container_command) can be used with any state except V(absent). If used with state V(stopped) the container is V(started),
+        the command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the container does not
+        exist it is first created, V(started), the command executed, and then V(stopped). If you use a C(|) in the variable you
+        can use common script formatting within the variable itself. The O(container_command) option always execute as C(bash).
+        When using O(container_command), a log file is created in the C(/tmp/) directory which contains both RV(ignore:stdout) and RV(ignore:stderr)
+        of any command executed.
     type: str
   lxc_path:
     description:
@@ -125,8 +131,8 @@ options:
     default: false
   archive:
     description:
-      - Create an archive of a container.
-      - This creates a tarball of the running container.
+      - When set to V(true) the system attempts to create a compressed tarball of the running container. The O(archive) option
+        supports LVM backed containers and creates a snapshot of the running container when creating the archive.
     type: bool
     default: false
   archive_path:
@@ -170,14 +176,6 @@ requirements:
 notes:
   - Containers must have a unique name. If you attempt to create a container with a name that already exists in the users
     namespace the module simply returns as "unchanged".
-  - The O(container_command) can be used with any state except V(absent). If used with state V(stopped) the container is V(started),
-    the command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the container does not
-    exist it is first created, V(started), the command executed, and then V(stopped). If you use a C(|) in the variable you
-    can use common script formatting within the variable itself. The O(container_command) option always execute as C(bash).
-    When using O(container_command), a log file is created in the C(/tmp/) directory which contains both RV(ignore:stdout) and RV(ignore:stderr)
-    of any command executed.
-  - If O(archive=true) the system attempts to create a compressed tarball of the running container. The O(archive) option
-    supports LVM backed containers and creates a snapshot of the running container when creating the archive.
   - If your distro does not have a package for C(python3-lxc), which is a requirement for this module, it can be installed
     from source at U(https://github.com/lxc/python3-lxc) or installed using C(pip install lxc).
 """
@@ -563,7 +561,7 @@ def create_script(command):
         stdout_file.close()
 
         # Remove the script file upon completion of execution.
-        os.remove(script_file)
+            os.remove(script_file)
 
 
 class LxcContainerManagement:
