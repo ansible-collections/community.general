@@ -1349,7 +1349,7 @@ class LxcContainerManagement:
             * Clean up
         """
 
-        with tempfile.TemporaryDirectory as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir:
             # Set the name of the working dir, temp + container_name
             work_dir = os.path.join(temp_dir, self.container_name)
 
