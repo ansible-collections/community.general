@@ -561,7 +561,7 @@ def create_script(command):
         stdout_file.close()
 
         # Remove the script file upon completion of execution.
-            os.remove(script_file)
+        os.remove(script_file)
 
 
 class LxcContainerManagement:
