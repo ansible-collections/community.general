@@ -1,0 +1,2 @@
+minor_changes:
+  - idrac_redfish_info - add multiple manager support to ``GetManagerAttributes`` command (https://github.com/ansible-collections/community.general/pull/11294).
