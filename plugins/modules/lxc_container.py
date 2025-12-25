@@ -86,12 +86,12 @@ options:
   container_command:
     description:
       - Run a command within a container.
-      - The O(container_command) can be used with any state except V(absent). If used with state V(stopped) the container is V(started),
-        the command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the container does not
-        exist it is first created, V(started), the command executed, and then V(stopped). If you use a C(|) in the variable you
-        can use common script formatting within the variable itself. The O(container_command) option always execute as C(bash).
-        When using O(container_command), a log file is created in the C(/tmp/) directory which contains both RV(ignore:stdout) and RV(ignore:stderr)
-        of any command executed.
+      - The O(container_command) can be used with any state except V(absent). If used with state V(stopped) the container
+        is V(started), the command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the
+        container does not exist it is first created, V(started), the command executed, and then V(stopped). If you use a
+        C(|) in the variable you can use common script formatting within the variable itself. The O(container_command) option
+        always execute as C(bash). When using O(container_command), a log file is created in the C(/tmp/) directory which
+        contains both RV(ignore:stdout) and RV(ignore:stderr) of any command executed.
     type: str
   lxc_path:
     description:
