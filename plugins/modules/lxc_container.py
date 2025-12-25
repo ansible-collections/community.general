@@ -409,9 +409,7 @@ lxc_container:
 """
 
 import os
-import os.path
 import re
-import shutil
 import subprocess
 import tempfile
 import time
@@ -1351,82 +1349,77 @@ class LxcContainerManagement:
             * Clean up
         """
 
-        # Create a temp dir
-        temp_dir = tempfile.mkdtemp()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Set the name of the working dir, temp + container_name
+            work_dir = os.path.join(temp_dir, self.container_name)
 
-        # Set the name of the working dir, temp + container_name
-        work_dir = os.path.join(temp_dir, self.container_name)
+            # LXC container rootfs
+            lxc_rootfs = self.container.get_config_item("lxc.rootfs")
 
-        # LXC container rootfs
-        lxc_rootfs = self.container.get_config_item("lxc.rootfs")
+            # Test if the containers rootfs is a block device
+            block_backed = lxc_rootfs.startswith(os.path.join(os.sep, "dev"))
 
-        # Test if the containers rootfs is a block device
-        block_backed = lxc_rootfs.startswith(os.path.join(os.sep, "dev"))
+            # Test if the container is using overlayfs
+            overlayfs_backed = lxc_rootfs.startswith("overlayfs")
 
-        # Test if the container is using overlayfs
-        overlayfs_backed = lxc_rootfs.startswith("overlayfs")
+            mount_point = os.path.join(work_dir, "rootfs")
 
-        mount_point = os.path.join(work_dir, "rootfs")
+            # Set the snapshot name if needed
+            snapshot_name = f"{self.container_name}_lxc_snapshot"
 
-        # Set the snapshot name if needed
-        snapshot_name = f"{self.container_name}_lxc_snapshot"
+            container_state = self._get_state()
+            try:
+                # Ensure the original container is stopped or frozen
+                if container_state not in ["stopped", "frozen"]:
+                    if container_state == "running":
+                        self.container.freeze()
+                    else:
+                        self.container.stop()
 
-        container_state = self._get_state()
-        try:
-            # Ensure the original container is stopped or frozen
-            if container_state not in ["stopped", "frozen"]:
+                # Sync the container data from the container_path to work_dir
+                self._rsync_data(lxc_rootfs, temp_dir)
+
+                if block_backed:
+                    if snapshot_name not in self._lvm_lv_list():
+                        if not os.path.exists(mount_point):
+                            os.makedirs(mount_point)
+
+                        # Take snapshot
+                        size, measurement = self._get_lv_size(lv_name=self.container_name)
+                        self._lvm_snapshot_create(
+                            source_lv=self.container_name, snapshot_name=snapshot_name, snapshot_size_gb=size
+                        )
+
+                        # Mount snapshot
+                        self._lvm_lv_mount(lv_name=snapshot_name, mount_point=mount_point)
+                    else:
+                        self.failure(
+                            err=f"snapshot [ {snapshot_name} ] already exists",
+                            rc=1,
+                            msg=f"The snapshot [ {snapshot_name} ] already exists. Please clean up old snapshot of containers before continuing.",
+                        )
+                elif overlayfs_backed:
+                    lowerdir, upperdir = lxc_rootfs.split(":")[1:]
+                    self._overlayfs_mount(lowerdir=lowerdir, upperdir=upperdir, mount_point=mount_point)
+
+                # Set the state as changed and set a new fact
+                self.state_change = True
+                return self._create_tar(source_dir=work_dir)
+            finally:
+                if block_backed or overlayfs_backed:
+                    # unmount snapshot
+                    self._unmount(mount_point)
+
+                if block_backed:
+                    # Remove snapshot
+                    self._lvm_lv_remove(snapshot_name)
+
+                # Restore original state of container
                 if container_state == "running":
-                    self.container.freeze()
-                else:
-                    self.container.stop()
-
-            # Sync the container data from the container_path to work_dir
-            self._rsync_data(lxc_rootfs, temp_dir)
-
-            if block_backed:
-                if snapshot_name not in self._lvm_lv_list():
-                    if not os.path.exists(mount_point):
-                        os.makedirs(mount_point)
-
-                    # Take snapshot
-                    size, measurement = self._get_lv_size(lv_name=self.container_name)
-                    self._lvm_snapshot_create(
-                        source_lv=self.container_name, snapshot_name=snapshot_name, snapshot_size_gb=size
-                    )
-
-                    # Mount snapshot
-                    self._lvm_lv_mount(lv_name=snapshot_name, mount_point=mount_point)
-                else:
-                    self.failure(
-                        err=f"snapshot [ {snapshot_name} ] already exists",
-                        rc=1,
-                        msg=f"The snapshot [ {snapshot_name} ] already exists. Please clean up old snapshot of containers before continuing.",
-                    )
-            elif overlayfs_backed:
-                lowerdir, upperdir = lxc_rootfs.split(":")[1:]
-                self._overlayfs_mount(lowerdir=lowerdir, upperdir=upperdir, mount_point=mount_point)
-
-            # Set the state as changed and set a new fact
-            self.state_change = True
-            return self._create_tar(source_dir=work_dir)
-        finally:
-            if block_backed or overlayfs_backed:
-                # unmount snapshot
-                self._unmount(mount_point)
-
-            if block_backed:
-                # Remove snapshot
-                self._lvm_lv_remove(snapshot_name)
-
-            # Restore original state of container
-            if container_state == "running":
-                if self._get_state() == "frozen":
-                    self.container.unfreeze()
-                else:
-                    self.container.start()
-
-            # Remove tmpdir
-            shutil.rmtree(temp_dir)
+                    if self._get_state() == "frozen":
+                        self.container.unfreeze()
+                    else:
+                        self.container.start()
 
     def check_count(self, count, method):
         if count > 1:
