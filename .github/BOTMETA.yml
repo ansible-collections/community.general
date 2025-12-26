@@ -1525,6 +1525,10 @@ files:
     maintainers: vbotka
   docs/docsite/rst/filter_guide_abstract_informations_merging_lists_of_dictionaries.rst:
     maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-types.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-types-reveal_ansible_type.rst:
+    maintainers: vbotka
   docs/docsite/rst/filter_guide_conversions.rst:
     maintainers: Ajpantuso kellyjonbrazil
   docs/docsite/rst/filter_guide_creating_identifiers.rst:
@@ -1572,7 +1576,7 @@ files:
   docs/docsite/rst/guide_vardict.rst:
     maintainers: russoz
   docs/docsite/rst/test_guide.rst:
-    maintainers: felixfontein
+    maintainers: felixfontein vbotka
 #########################
   tests/:
     labels: tests
