@@ -14,17 +14,19 @@ import sys
 # Handle TLS and non-TLS support
 try:
     import smtpd_tls
+
     HAS_TLS = True
 except ImportError:
     import smtpd
+
     HAS_TLS = False
-    print('Library smtpd-tls is missing or not supported, hence starttls is NOT supported.')
+    print("Library smtpd-tls is missing or not supported, hence starttls is NOT supported.")
 
 # Handle custom ports
-port = '25:465'
+port = "25:465"
 if len(sys.argv) > 1:
     port = sys.argv[1]
-ports = port.split(':')
+ports = port.split(":")
 if len(ports) > 1:
     port1, port2 = int(ports[0]), int(ports[1])
 else:
@@ -32,30 +34,30 @@ else:
 
 # Handle custom certificate
 basename = os.path.splitext(sys.argv[0])[0]
-certfile = basename + '.crt'
+certfile = basename + ".crt"
 if len(sys.argv) > 2:
     certfile = sys.argv[2]
 
 # Handle custom key
-keyfile = basename + '.key'
+keyfile = basename + ".key"
 if len(sys.argv) > 3:
     keyfile = sys.argv[3]
 
 ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 
 if HAS_TLS and ssl_ctx is not None:
-    print('Using %s and %s' % (certfile, keyfile))
+    print("Using %s and %s" % (certfile, keyfile))
     ssl_ctx.load_cert_chain(certfile=certfile, keyfile=keyfile)
 
-    print('Start SMTP server on port', port1)
-    smtp_server1 = smtpd_tls.DebuggingServer(('127.0.0.1', port1), None, ssl_ctx=ssl_ctx, starttls=True)
+    print("Start SMTP server on port", port1)
+    smtp_server1 = smtpd_tls.DebuggingServer(("127.0.0.1", port1), None, ssl_ctx=ssl_ctx, starttls=True)
     if port2:
-        print('Start TLS SMTP server on port', port2)
-        smtp_server2 = smtpd_tls.DebuggingServer(('127.0.0.1', port2), None, ssl_ctx=ssl_ctx, starttls=False)
+        print("Start TLS SMTP server on port", port2)
+        smtp_server2 = smtpd_tls.DebuggingServer(("127.0.0.1", port2), None, ssl_ctx=ssl_ctx, starttls=False)
 else:
-    print('Start SMTP server on port', port1)
-    smtp_server1 = smtpd.DebuggingServer(('127.0.0.1', port1), None)  # pylint: disable=used-before-assignment
+    print("Start SMTP server on port", port1)
+    smtp_server1 = smtpd.DebuggingServer(("127.0.0.1", port1), None)  # pylint: disable=used-before-assignment
     if port2:
-        print('WARNING: TLS is NOT supported on this system, not listening on port %s.' % port2)
+        print("WARNING: TLS is NOT supported on this system, not listening on port %s." % port2)
 
 asyncore.loop()

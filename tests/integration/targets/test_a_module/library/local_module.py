@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: local_module
 short_description: Test local module
@@ -14,11 +14,11 @@ description:
   - This is a test module locally next to a playbook.
 author: "Felix Fontein (@felixfontein)"
 options: {}
-'''
+"""
 
-EXAMPLES = ''' # '''
+EXAMPLES = """ # """
 
-RETURN = ''' # '''
+RETURN = """ # """
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -27,5 +27,5 @@ def main():
     AnsibleModule(argument_spec={}).exit_json()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
