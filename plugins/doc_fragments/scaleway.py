@@ -12,8 +12,8 @@ options:
   api_token:
     description:
       - Scaleway OAuth token.
+      - This is required if O(profile) is not specified.
     type: str
-    required: true
     aliases: [oauth_token]
   api_url:
     description:
@@ -27,6 +27,13 @@ options:
     type: int
     default: 30
     aliases: [timeout]
+  profile:
+    description:
+      - The config profile in config file to load the Scaleway OAuth token from, use instead of O(api_token).
+      - It is also possible to set E(SCW_PROFILE) to use a SCW CLI config profile.
+    type: str
+    aliases: [scw_profile]
+    version_added: 12.2.0
   query_parameters:
     description:
       - List of parameters passed to the query string.
@@ -37,6 +44,8 @@ options:
       - Validate SSL certs of the Scaleway API.
     type: bool
     default: true
+requirements:
+  - PyYAML (when O(profile) is used)
 notes:
   - Also see the API documentation on U(https://developer.scaleway.com/).
   - If O(api_token) is not set within the module, the following environment variables can be used in decreasing order of precedence
