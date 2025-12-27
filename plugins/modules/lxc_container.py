@@ -408,7 +408,6 @@ lxc_container:
 
 import os
 import re
-import subprocess
 import tempfile
 import time
 import shlex
@@ -518,11 +517,11 @@ pushd "$(getent passwd $(whoami)|cut -f6 -d':')"
 popd
 
 # User defined command
-%(container_command)s
+{}
 """
 
 
-def create_script(command):
+def create_script(command: str, module: AnsibleModule) -> None:
     """Write out a script onto a target.
 
     This method should be backward compatible with Python when executing
@@ -530,36 +529,27 @@ def create_script(command):
 
     :param command: command to run, this can be a script and can use spacing
                     with newlines as separation.
-    :type command: ``str``
+    :param module: AnsibleModule to run commands with.
     """
 
-    (fd, script_file) = tempfile.mkstemp(prefix="lxc-attach-script")
-    f = os.fdopen(fd, "wb")
+    script_file = ""
     try:
-        f.write(to_bytes(ATTACH_TEMPLATE % {"container_command": command}, errors="surrogate_or_strict"))
+        f = tempfile.NamedTemporaryFile(prefix="lxc-attach-script", delete=False, mode="wb")
+        f.write(to_bytes(ATTACH_TEMPLATE.format(command), errors="surrogate_or_strict"))
+        script_file = f.name
         f.flush()
-    finally:
         f.close()
 
-    # Ensure the script is executable.
-    os.chmod(script_file, int("0700", 8))
+        os.chmod(script_file, 0o0700)
 
-    # Output log file.
-    stdout_file = os.fdopen(tempfile.mkstemp(prefix="lxc-attach-script-log")[0], "ab")
-
-    # Error log file.
-    stderr_file = os.fdopen(tempfile.mkstemp(prefix="lxc-attach-script-err")[0], "ab")
-
-    # Execute the script command.
-    try:
-        subprocess.Popen([script_file], stdout=stdout_file, stderr=stderr_file).communicate()
+        with tempfile.NamedTemporaryFile(prefix="lxc-attach-script-log", delete=False, mode="ab") as stdout_file:
+            with tempfile.NamedTemporaryFile(prefix="lxc-attach-script-err", delete=False, mode="ab") as stderr_file:
+                rc, out, err = module.run_command([script_file], encoding=None)
+                stdout_file.write(out)
+                stderr_file.write(err)
     finally:
-        # Close the log files.
-        stderr_file.close()
-        stdout_file.close()
-
-        # Remove the script file upon completion of execution.
-        os.remove(script_file)
+        if script_file:
+            os.remove(script_file)
 
 
 class LxcContainerManagement:
@@ -865,7 +855,7 @@ class LxcContainerManagement:
             elif container_state == "stopped":
                 self._container_startup()
 
-            self.container.attach_wait(create_script, container_command)
+            self.container.attach_wait(create_script, (container_command, self.module))
             self.state_change = True
 
     def _container_startup(self, timeout=60):
