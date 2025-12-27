@@ -2391,10 +2391,10 @@ class Nmcli:
         if rc != 0:
             raise NmcliModuleError(err)
 
-        lines = out.strip().split("\n")
+        lines = [ll.strip() for ll in out.splitlines() if "GENERAL.STATE" in ll]
         for line in lines:
             if "GENERAL.STATE" in line:
-                state = line.split(":")[-1].strip()
+                state = line.split(":")
                 return state
         return None
 
@@ -2958,8 +2958,7 @@ def main():
                 if is_active and not nmcli.conn_reload:
                     result["changed"] = False
                     result["msg"] = f"Connection {nmcli.conn_name} is already active"
-                    if module.check_mode:
-                        module.exit_json(changed=False, **result)
+                    module.exit_json(**result)
                 else:
                     if module.check_mode:
                         module.exit_json(changed=True, **result)
@@ -2991,8 +2990,7 @@ def main():
                 if not is_active and not nmcli.conn_reload:
                     result["changed"] = False
                     result["msg"] = f"Connection {nmcli.conn_name} is already inactive"
-                    if module.check_mode:
-                        module.exit_json(changed=False, **result)
+                    module.exit_json(**result)
                 else:
                     if module.check_mode:
                         module.exit_json(changed=True, **result)
