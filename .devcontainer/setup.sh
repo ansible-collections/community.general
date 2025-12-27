@@ -9,3 +9,5 @@ pip install -r tests/unit/requirements.txt
 export ANSIBLE_COLLECTIONS_PATH=/workspace:${ANSIBLE_COLLECTIONS_PATH}
 ansible-galaxy collection install -v -r tests/unit/requirements.yml
 ansible-galaxy collection install -v -r tests/integration/requirements.yml
+
+pre-commit install
