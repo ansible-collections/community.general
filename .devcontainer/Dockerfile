@@ -7,4 +7,5 @@ FROM mcr.microsoft.com/devcontainers/python:3.14-bookworm
 
 WORKDIR /workspace/ansible_collections/community/general
 
-RUN pip install -U pip
+RUN chown -R vscode:vscode /workspace/. \
+    && pip install -U pip
