@@ -259,6 +259,18 @@ options:
                     default:
                       - user
 
+              selector:
+                description:
+                  - Selector when the attribute should be added.
+                type: dict
+                version_added: 12.2.0
+                suboptions:
+                  scopes:
+                    description:
+                      - Scopes to which the attribute should be added.
+                    type: list
+                    elements: str
+
           groups:
             description:
               - A list of attribute groups to be included in the User Profile.
@@ -574,6 +586,7 @@ def main():
                                 "required": dict(
                                     type="dict", options={"roles": dict(type="list", elements="str", default=["user"])}
                                 ),
+                                "selector": dict(type="dict", options={"scopes": dict(type="list", elements="str")}),
                             },
                         ),
                         "groups": dict(
