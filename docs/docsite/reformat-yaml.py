@@ -10,7 +10,7 @@ from ruamel.yaml import YAML
 
 
 def main() -> None:
-    yaml = YAML(typ='rt')
+    yaml = YAML(typ="rt")
     yaml.indent(mapping=2, sequence=4, offset=2)
 
     # Load
@@ -19,7 +19,7 @@ def main() -> None:
     # Dump
     sio = StringIO()
     yaml.dump(data, sio)
-    print(sio.getvalue().rstrip('\n'))
+    print(sio.getvalue().rstrip("\n"))
 
 
 if __name__ == "__main__":
