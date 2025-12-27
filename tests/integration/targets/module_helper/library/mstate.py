@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: mstate
 author: "Alexei Znamensky (@russoz)"
 short_description: State-based module for testing
@@ -28,7 +28,7 @@ options:
     type: str
     choices: [join, b_x_a, c_x_a, both_x_a]
     default: join
-'''
+"""
 
 EXAMPLES = ""
 
@@ -38,30 +38,30 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 
 class MState(StateModuleHelper):
-    output_params = ('a', 'b', 'c', 'state')
+    output_params = ("a", "b", "c", "state")
     module = dict(
         argument_spec=dict(
-            a=dict(type='int', required=True),
-            b=dict(type='str'),
-            c=dict(type='str'),
-            state=dict(type='str', choices=['join', 'b_x_a', 'c_x_a', 'both_x_a', 'nop'], default='join'),
+            a=dict(type="int", required=True),
+            b=dict(type="str"),
+            c=dict(type="str"),
+            state=dict(type="str", choices=["join", "b_x_a", "c_x_a", "both_x_a", "nop"], default="join"),
         ),
     )
 
     def __init_module__(self):
-        self.vars.set('result', "abc", diff=True)
+        self.vars.set("result", "abc", diff=True)
 
     def state_join(self):
-        self.vars['result'] = "".join([str(self.vars.a), str(self.vars.b), str(self.vars.c)])
+        self.vars["result"] = "".join([str(self.vars.a), str(self.vars.b), str(self.vars.c)])
 
     def state_b_x_a(self):
-        self.vars['result'] = str(self.vars.b) * self.vars.a
+        self.vars["result"] = str(self.vars.b) * self.vars.a
 
     def state_c_x_a(self):
-        self.vars['result'] = str(self.vars.c) * self.vars.a
+        self.vars["result"] = str(self.vars.c) * self.vars.a
 
     def state_both_x_a(self):
-        self.vars['result'] = (str(self.vars.b) + str(self.vars.c)) * self.vars.a
+        self.vars["result"] = (str(self.vars.b) + str(self.vars.c)) * self.vars.a
 
     def state_nop(self):
         pass
@@ -72,5 +72,5 @@ def main():
     mstate.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

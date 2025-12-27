@@ -20,7 +20,7 @@ except ImportError:
 
 # Argument parsing
 if len(sys.argv) != 4:
-    print('Syntax: {0} <bind> <port> <path>'.format(sys.argv[0]))
+    print("Syntax: {0} <bind> <port> <path>".format(sys.argv[0]))
     sys.exit(-1)
 
 HOST, PORT, PATH = sys.argv[1:4]
@@ -34,16 +34,16 @@ class Handler(SimpleHTTPRequestHandler):
         # to support using another base directory than CWD.
 
         # abandon query parameters
-        path = path.split('?', 1)[0]
-        path = path.split('#', 1)[0]
+        path = path.split("?", 1)[0]
+        path = path.split("#", 1)[0]
         # Don't forget explicit trailing slash when normalizing. Issue17324
-        trailing_slash = path.rstrip().endswith('/')
+        trailing_slash = path.rstrip().endswith("/")
         try:
-            path = unquote(path, errors='surrogatepass')
+            path = unquote(path, errors="surrogatepass")
         except (UnicodeDecodeError, TypeError) as exc:
             path = unquote(path)
         path = posixpath.normpath(path)
-        words = path.split('/')
+        words = path.split("/")
         words = filter(None, words)
         path = PATH
         for word in words:
@@ -52,7 +52,7 @@ class Handler(SimpleHTTPRequestHandler):
                 continue
             path = os.path.join(path, word)
         if trailing_slash:
-            path += '/'
+            path += "/"
         return path
 
 
