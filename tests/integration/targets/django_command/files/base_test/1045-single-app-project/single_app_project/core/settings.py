@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # single_app_project/core/settings.py
-SECRET_KEY = 'testtesttesttesttest'
+SECRET_KEY = "testtesttesttesttest"
