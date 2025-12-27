@@ -1,0 +1,6 @@
+nox
+ruff
+antsibull-nox
+pre-commit
+ansible-core
+andebox

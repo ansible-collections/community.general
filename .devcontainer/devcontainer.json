@@ -1,0 +1,43 @@
+{
+  "name": "community.general devcontainer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "python.pythonPath": "/usr/local/bin/python",
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "files.autoSave": "afterDelay",
+        "files.eol": "\n",
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true,
+        "files.trimTrailingWhitespace": true
+      },
+      "extensions": [
+        "charliermarsh.ruff",
+        "chrislajoie.vscode-modelines",
+        "eamodio.gitlens",
+        "esbenp.prettier-vscode",
+        "michelemelluso.gitignore",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "oderwat.indent-rainbow",
+        "redhat.ansible",
+        "redhat.vscode-yaml",
+        "trond-snekvik.simple-rst",
+        "wayou.vscode-todo-highlight"
+      ]
+    }
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": ".devcontainer/setup.sh",
+  "workspaceFolder": "/workspace/ansible_collections/community/general",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/ansible_collections/community/general,type=bind"
+}
