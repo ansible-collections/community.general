@@ -17,8 +17,8 @@ There you can find feature ideas to implement, reports about bugs to solve, or s
 Also somebody may already have started discussing or working on implementing the same or a similar idea,
 so you can cooperate to create a better solution together.
 
-* If you are interested in starting with an easy issue, look for [issues with an `easyfix` label](https://github.com/ansible-collections/community.general/labels/easyfix).
-* Often issues that are waiting for contributors to pick up have [the `waiting_on_contributor` label](https://github.com/ansible-collections/community.general/labels/waiting_on_contributor).
+- If you are interested in starting with an easy issue, look for [issues with an `easyfix` label](https://github.com/ansible-collections/community.general/labels/easyfix).
+- Often issues that are waiting for contributors to pick up have [the `waiting_on_contributor` label](https://github.com/ansible-collections/community.general/labels/waiting_on_contributor).
 
 ## Review pull requests
 
@@ -33,13 +33,13 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 
 Please read our ['Contributing to collections'](https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections_contributing.html#contributing-to-a-collection-community-general) guide.
 
-* Try committing your changes with an informative but short commit message.
-* Do not squash your commits and force-push to your branch if not needed. Reviews of your pull request are much easier with individual commits to comprehend the pull request history. All commits of your pull request branch will be squashed into one commit by GitHub upon merge.
-* Do not add merge commits to your PR. The bot will complain and you will have to rebase ([instructions for rebasing](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_rebasing.html)) to remove them before your PR can be merged. To avoid that git automatically does merges during pulls, you can configure it to do rebases instead by running `git config pull.rebase true` inside the repository checkout.
-* Make sure your PR includes a [changelog fragment](https://docs.ansible.com/projects/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment).
-  * You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. (If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
-  * Please always include a link to the pull request itself, and if the PR is about an issue, also a link to the issue. Also make sure the fragment ends with a period, and begins with a lower-case letter after `-`. (Again, if you don't do this, we'll add suggestions to fix it, so don't worry too much :) )
-* Note that we format the code with `ruff format`. If your change does not match the formatters expectations, CI will fail and your PR will not get merged. See below for how to format code with antsibull-nox.
+- Try committing your changes with an informative but short commit message.
+- Do not squash your commits and force-push to your branch if not needed. Reviews of your pull request are much easier with individual commits to comprehend the pull request history. All commits of your pull request branch will be squashed into one commit by GitHub upon merge.
+- Do not add merge commits to your PR. The bot will complain and you will have to rebase ([instructions for rebasing](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_rebasing.html)) to remove them before your PR can be merged. To avoid that git automatically does merges during pulls, you can configure it to do rebases instead by running `git config pull.rebase true` inside the repository checkout.
+- Make sure your PR includes a [changelog fragment](https://docs.ansible.com/projects/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment).
+  - You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. (If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
+  - Please always include a link to the pull request itself, and if the PR is about an issue, also a link to the issue. Also make sure the fragment ends with a period, and begins with a lower-case letter after `-`. (Again, if you don't do this, we'll add suggestions to fix it, so don't worry too much :) )
+- Note that we format the code with `ruff format`. If your change does not match the formatters expectations, CI will fail and your PR will not get merged. See below for how to format code with antsibull-nox.
 
 You can also read the Ansible community's [Quick-start development guide](https://docs.ansible.com/projects/ansible/devel/community/create_pr_quick_start.html).
 
@@ -133,6 +133,7 @@ ansible-test sanity --docker -v plugins/modules/system/pids.py tests/integration
 Note that for running unit tests, you need to install required collections in the same folder structure that `community.general` is checked out in.
 Right now, you need to install [`community.internal_test_tools`](https://github.com/ansible-collections/community.internal_test_tools).
 If you want to use the latest version from GitHub, you can run:
+
 ```
 git clone https://github.com/ansible-collections/community.internal_test_tools.git ~/dev/ansible_collections/community/internal_test_tools
 ```
@@ -155,6 +156,7 @@ ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools
 Note that for running integration tests, you need to install required collections in the same folder structure that `community.general` is checked out in.
 Right now, depending on the test, you need to install [`ansible.posix`](https://github.com/ansible-collections/ansible.posix), [`community.crypto`](https://github.com/ansible-collections/community.crypto), and [`community.docker`](https://github.com/ansible-collections/community.docker):
 If you want to use the latest versions from GitHub, you can run:
+
 ```
 mkdir -p ~/dev/ansible_collections/ansible
 git clone https://github.com/ansible-collections/ansible.posix.git ~/dev/ansible_collections/ansible/posix
@@ -167,11 +169,13 @@ The following commands show how to run integration tests:
 #### In Docker
 
 Integration tests on Docker have the following parameters:
+
 - `image_name` (required): The name of the Docker image. To get the list of supported Docker images, run
   `ansible-test integration --help` and look for _target docker images_.
 - `test_name` (optional): The name of the integration test.
   For modules, this equals the short name of the module; for example, `pacman` in case of `community.general.pacman`.
   For plugins, the plugin type is added before the plugin's short name, for example `callback_yaml` for the `community.general.yaml` callback.
+
 ```.bash
 # Test all plugins/modules on fedora40
 ansible-test integration -v --docker fedora40
@@ -206,7 +210,8 @@ Beware of:
   When testing your changes locally, keep in mind that the collection must support older versions of
   `ansible-core` and, depending on what is being tested, results may vary.
 - Integration tests executed directly inside the devcontainer without isolation (see above) may fail if
-  they expected to be run in full fledged VMs. On the other hand, the devcontainer setup allows running containers inside the container (the `docker-in-docker` feature).
+  they expected to be run in full fledged VMs. On the other hand, the devcontainer setup allows running
+  containers inside the container (the `docker-in-docker` feature).
 - The devcontainer is built with a directory structure such that
   `.../ansible_collections/community/general` contains the project repository, so `ansible-test` and
   other standard tools should work without any additional setup
@@ -225,7 +230,7 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
 
 2. Please do not add more than one plugin/module in one PR, especially if it is the first plugin/module you are contributing.
    That makes it easier for reviewers, and increases the chance that your PR will get merged. If you plan to contribute a group
-   of plugins/modules (say, more than a module and a corresponding ``_info`` module), please mention that in the first PR. In
+   of plugins/modules (say, more than a module and a corresponding `_info` module), please mention that in the first PR. In
    such cases, you also have to think whether it is better to publish the group of plugins/modules in a new collection.
 
 3. When creating a new module or plugin, please make sure that you follow various guidelines:
