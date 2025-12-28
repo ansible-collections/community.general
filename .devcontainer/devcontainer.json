@@ -19,17 +19,11 @@
       },
       "extensions": [
         "charliermarsh.ruff",
-        "chrislajoie.vscode-modelines",
-        "eamodio.gitlens",
-        "esbenp.prettier-vscode",
-        "michelemelluso.gitignore",
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "oderwat.indent-rainbow",
         "redhat.ansible",
         "redhat.vscode-yaml",
         "trond-snekvik.simple-rst",
-        "wayou.vscode-todo-highlight"
       ]
     }
   },
