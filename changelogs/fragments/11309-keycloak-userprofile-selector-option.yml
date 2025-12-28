@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_userprofile - add support for ``selector`` option (https://github.com/ansible-collections/community.general/pull/11309).
