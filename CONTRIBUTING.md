@@ -17,8 +17,8 @@ There you can find feature ideas to implement, reports about bugs to solve, or s
 Also somebody may already have started discussing or working on implementing the same or a similar idea,
 so you can cooperate to create a better solution together.
 
-- If you are interested in starting with an easy issue, look for [issues with an `easyfix` label](https://github.com/ansible-collections/community.general/labels/easyfix).
-- Often issues that are waiting for contributors to pick up have [the `waiting_on_contributor` label](https://github.com/ansible-collections/community.general/labels/waiting_on_contributor).
+* If you are interested in starting with an easy issue, look for [issues with an `easyfix` label](https://github.com/ansible-collections/community.general/labels/easyfix).
+* Often issues that are waiting for contributors to pick up have [the `waiting_on_contributor` label](https://github.com/ansible-collections/community.general/labels/waiting_on_contributor).
 
 ## Review pull requests
 
@@ -33,13 +33,13 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 
 Please read our ['Contributing to collections'](https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections_contributing.html#contributing-to-a-collection-community-general) guide.
 
-- Try committing your changes with an informative but short commit message.
-- Do not squash your commits and force-push to your branch if not needed. Reviews of your pull request are much easier with individual commits to comprehend the pull request history. All commits of your pull request branch will be squashed into one commit by GitHub upon merge.
-- Do not add merge commits to your PR. The bot will complain and you will have to rebase ([instructions for rebasing](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_rebasing.html)) to remove them before your PR can be merged. To avoid that git automatically does merges during pulls, you can configure it to do rebases instead by running `git config pull.rebase true` inside the repository checkout.
-- Make sure your PR includes a [changelog fragment](https://docs.ansible.com/projects/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment).
-  - You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. (If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
-  - Please always include a link to the pull request itself, and if the PR is about an issue, also a link to the issue. Also make sure the fragment ends with a period, and begins with a lower-case letter after `-`. (Again, if you don't do this, we'll add suggestions to fix it, so don't worry too much :) )
-- Note that we format the code with `ruff format`. If your change does not match the formatters expectations, CI will fail and your PR will not get merged. See below for how to format code with antsibull-nox.
+* Try committing your changes with an informative but short commit message.
+* Do not squash your commits and force-push to your branch if not needed. Reviews of your pull request are much easier with individual commits to comprehend the pull request history. All commits of your pull request branch will be squashed into one commit by GitHub upon merge.
+* Do not add merge commits to your PR. The bot will complain and you will have to rebase ([instructions for rebasing](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_rebasing.html)) to remove them before your PR can be merged. To avoid that git automatically does merges during pulls, you can configure it to do rebases instead by running `git config pull.rebase true` inside the repository checkout.
+* Make sure your PR includes a [changelog fragment](https://docs.ansible.com/projects/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment).
+  * You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. (If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
+  * Please always include a link to the pull request itself, and if the PR is about an issue, also a link to the issue. Also make sure the fragment ends with a period, and begins with a lower-case letter after `-`. (Again, if you don't do this, we'll add suggestions to fix it, so don't worry too much :) )
+* Note that we format the code with `ruff format`. If your change does not match the formatters expectations, CI will fail and your PR will not get merged. See below for how to format code with antsibull-nox.
 
 You can also read the Ansible community's [Quick-start development guide](https://docs.ansible.com/projects/ansible/devel/community/create_pr_quick_start.html).
 
