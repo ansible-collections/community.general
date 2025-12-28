@@ -192,6 +192,30 @@ ansible-test integration -v lookup_flattened
 
 If you are unsure about the integration test target name for a module or plugin, you can take a look in `tests/integration/targets/`. Tests for plugins have the plugin type prepended.
 
+## Devcontainer
+
+Since community.general 12.2.0, the project repository supports [devcontainers](https://containers.dev/). In short, it is a standard mechanism to
+create a container that is then used during the development cycle. Many tools are pre-installed in the container and will be already available
+to you as a developer. A number of different IDEs support that configuration, the most prominent ones being VSCode and PyCharm.
+
+See the files under [.devcontainer](.devcontainer) for details on what is deployed inside that container.
+
+Beware of:
+
+- By default, the devcontainer installs the latest version of `ansible-core`.
+  When testing your changes locally, keep in mind that the collection must support older versions of
+  `ansible-core` and, depending on what is being tested, results may vary.
+- Integration tests executed directly inside the devcontainer without isolation (see above) may fail if
+  they expected to be run in full fledged VMs. On the other hand, the devcontainer setup allows running containers inside the container (the `docker-in-docker` feature).
+- The devcontainer is built with a directory structure such that
+  `.../ansible_collections/community/general` contains the project repository, so `ansible-test` and
+  other standard tools should work without any additional setup
+- By default, the devcontainer installs `pre-commit` and configures it to perform `ruff check` and
+  `ruff format` on the Python files, prior to commiting. That configuration is going to be used by
+  `git` even outside the devcontainer. To prevent errors, you have to either install `pre-commit` in
+  your computer, outside the devcontainer, or run `pre-commit uninstall` from within the devcontainer
+  before quitting it.
+
 ## Creating new modules or plugins
 
 Creating new modules and plugins requires a bit more work than other Pull Requests.
