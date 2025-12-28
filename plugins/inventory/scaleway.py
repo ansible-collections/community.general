@@ -45,6 +45,9 @@ options:
         not defined.
     type: string
     version_added: 4.4.0
+    env:
+      - name: SCW_PROFILE
+        version_added: 12.2.0
   oauth_token:
     description:
       - Scaleway OAuth token.
