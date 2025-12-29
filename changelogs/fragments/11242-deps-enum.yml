@@ -1,2 +1,0 @@
-minor_changes:
-  - deps module utils - change the internal representaion of dependency state (https://github.com/ansible-collections/community.general/pull/11242).

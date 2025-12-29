@@ -1,2 +1,0 @@
-minor_changes:
-  - lxc_container - use ``tempfile.TemporaryDirectory()`` instead of ``mkdtemp()`` (https://github.com/ansible-collections/community.general/pull/11323).

@@ -1,3 +1,0 @@
----
-bugfixes:
-  - apk - fix ``packages`` return value for apk-tools >= 3 (Alpine 3.23) (https://github.com/ansible-collections/community.general/issues/11264).

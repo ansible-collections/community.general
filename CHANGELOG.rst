@@ -6,6 +6,51 @@ Community General Release Notes
 
 This changelog describes changes after version 11.0.0.
 
+v12.2.0
+=======
+
+Release Summary
+---------------
+
+Feature and bugfix release.
+
+Minor Changes
+-------------
+
+- btrfs module utils - make execution of external commands safer by passing arguments as list (https://github.com/ansible-collections/community.general/pull/11240).
+- deps module utils - change the internal representaion of dependency state (https://github.com/ansible-collections/community.general/pull/11242).
+- keycloak_userprofile - add support for ``selector`` option (https://github.com/ansible-collections/community.general/pull/11309).
+- keycloak_userprofile - add support for additional user profile attribute-validations available in Keycloak (https://github.com/ansible-collections/community.general/issues/9048, https://github.com/ansible-collections/community.general/pull/11285).
+- lxc_container - refactor function ``create_script``, using ``subprocess.Popen()``, to a new module_utils ``_lxc`` (https://github.com/ansible-collections/community.general/pull/11204).
+- lxc_container - use ``tempfile.TemporaryDirectory()`` instead of ``mkdtemp()`` (https://github.com/ansible-collections/community.general/pull/11323).
+- monit - add ``monit_version`` return value also when the module has succeeded (https://github.com/ansible-collections/community.general/pull/11255).
+- monit - use ``Enum`` to represent the possible states (https://github.com/ansible-collections/community.general/pull/11245).
+- nmcli module - add ``vxlan_parent`` option required for multicast ``vxlan_remote`` addresses; add ``vxlan`` to list of bridgeable devices (https://github.com/ansible-collections/community.general/pull/11182).
+- scaleway inventory plugin - added support for ``SCW_PROFILE`` environment variable for the ``scw_profile`` option (https://github.com/ansible-collections/community.general/issues/11310, https://github.com/ansible-collections/community.general/pull/11311).
+- scaleway module utils - added ``scw_profile`` parameter with ``SCW_PROFILE`` environment variable support (https://github.com/ansible-collections/community.general/issues/11313, https://github.com/ansible-collections/community.general/pull/11314).
+
+Deprecated Features
+-------------------
+
+- All module utils, plugin utils, and doc fragments will be made **private** in community.general 13.0.0. This means that they will no longer be part of the public API of the collection, and can have breaking changes even in bugfix releases. If you depend on importing code from the module or plugin utils, or use one of the doc fragments, please `comment in the issue to discuss this <https://github.com/ansible-collections/community.general/issues/11312>`__. Note that this does not affect any use of community.general in task files, roles, or playbooks (https://github.com/ansible-collections/community.general/issues/11312, https://github.com/ansible-collections/community.general/pull/11320).
+
+Bugfixes
+--------
+
+- apk - fix ``packages`` return value for apk-tools >= 3 (Alpine 3.23) (https://github.com/ansible-collections/community.general/issues/11264).
+- iptables_state - refactor code to avoid writing unnecessary temporary files (https://github.com/ansible-collections/community.general/pull/11258).
+- keycloak_realm - fixed crash in ``sanitize_cr()`` when ``realmrep`` was ``None`` (https://github.com/ansible-collections/community.general/pull/11260).
+- keycloak_user_rolemapping module - fixed crash when assigning roles to users without an existing role (https://github.com/ansible-collections/community.general/issues/10960, https://github.com/ansible-collections/community.general/pull/11256).
+- listen_ports_facts - fix handling of empty PID lists when ``command=ss`` (https://github.com/ansible-collections/community.general/pull/11332).
+- monit - add delay of 0.5 seconds after state change and check for status (https://github.com/ansible-collections/community.general/pull/11255).
+- monit - internal state was not reflecting when operation is "pending" in ``monit`` (https://github.com/ansible-collections/community.general/pull/11245).
+
+New Modules
+-----------
+
+- community.general.ip2location_info - Retrieve IP geolocation information of a host's IP address.
+- community.general.sssd_info - Check SSSD domain status using D-Bus.
+
 v12.1.0
 =======
 

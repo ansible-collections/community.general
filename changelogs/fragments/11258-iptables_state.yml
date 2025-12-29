@@ -1,2 +1,0 @@
-bugfixes:
-  - "iptables_state - refactor code to avoid writing unnecessary temporary files (https://github.com/ansible-collections/community.general/pull/11258)."

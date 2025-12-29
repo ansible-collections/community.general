@@ -1,2 +1,0 @@
-minor_changes:
-  - scaleway inventory plugin - added support for ``SCW_PROFILE`` environment variable for the ``scw_profile`` option (https://github.com/ansible-collections/community.general/issues/11310, https://github.com/ansible-collections/community.general/pull/11311).
