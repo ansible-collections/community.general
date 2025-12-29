@@ -2112,3 +2112,13 @@ releases:
       - 11005-keycloak_user.yml
       - replace-random-with-secrets.yml
     release_date: '2025-11-02'
+  10.7.7:
+    changes:
+      bugfixes:
+        - monit - add delay of 0.5 seconds after state change and check for status
+          (https://github.com/ansible-collections/community.general/pull/11255).
+      release_summary: Bugfix release.
+    fragments:
+      - 10.7.7.yml
+      - 11255-monit-integrationtests.yml
+    release_date: '2025-12-29'

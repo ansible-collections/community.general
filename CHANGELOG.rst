@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 9.0.0.
 
+v10.7.7
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- monit - add delay of 0.5 seconds after state change and check for status (https://github.com/ansible-collections/community.general/pull/11255).
+
 v10.7.6
 =======
 
