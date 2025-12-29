@@ -423,6 +423,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.parsing.convert_bool import BOOLEANS_FALSE
 from ansible.module_utils.common.text.converters import to_text, to_bytes
 
+from ansible_collections.community.general.plugins.module_utils._lxc import create_script
 
 # LXC_COMPRESSION_MAP is a map of available compression types when creating
 # an archive of a container.
@@ -501,55 +502,6 @@ LXC_ANSIBLE_STATES = {
     "frozen": "_frozen",
     "clone": "_clone",
 }
-
-
-# This is used to attach to a running container and execute commands from
-# within the container on the host.  This will provide local access to a
-# container without using SSH.  The template will attempt to work within the
-# home directory of the user that was attached to the container and source
-# that users environment variables by default.
-ATTACH_TEMPLATE = """#!/usr/bin/env bash
-pushd "$(getent passwd $(whoami)|cut -f6 -d':')"
-    if [[ -f ".bashrc" ]];then
-        source .bashrc
-        unset HOSTNAME
-    fi
-popd
-
-# User defined command
-{}
-"""
-
-
-def create_script(command: str, module: AnsibleModule) -> None:
-    """Write out a script onto a target.
-
-    This method should be backward compatible with Python when executing
-    from within the container.
-
-    :param command: command to run, this can be a script and can use spacing
-                    with newlines as separation.
-    :param module: AnsibleModule to run commands with.
-    """
-
-    script_file = ""
-    try:
-        f = tempfile.NamedTemporaryFile(prefix="lxc-attach-script", delete=False, mode="wb")
-        f.write(to_bytes(ATTACH_TEMPLATE.format(command), errors="surrogate_or_strict"))
-        script_file = f.name
-        f.flush()
-        f.close()
-
-        os.chmod(script_file, 0o0700)
-
-        with tempfile.NamedTemporaryFile(prefix="lxc-attach-script-log", delete=False, mode="ab") as stdout_file:
-            with tempfile.NamedTemporaryFile(prefix="lxc-attach-script-err", delete=False, mode="ab") as stderr_file:
-                rc, out, err = module.run_command([script_file], encoding=None)
-                stdout_file.write(out)
-                stderr_file.write(err)
-    finally:
-        if script_file:
-            os.remove(script_file)
 
 
 class LxcContainerManagement:
