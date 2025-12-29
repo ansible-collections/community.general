@@ -4,6 +4,9 @@
 
 line-length = 120
 
+# Include only the files:
+include = ["plugins/**/*.py", "tests/unit/**/*.py", "noxfile.py"]
+
 [lint]
 # https://docs.astral.sh/ruff/rules/
 
