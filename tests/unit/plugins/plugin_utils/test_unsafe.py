@@ -139,7 +139,7 @@ def test_make_unsafe_dict_key():
 
 
 def test_make_unsafe_set():
-    value = set([_make_trusted("test")])
+    value = {_make_trusted("test")}
     if not SUPPORTS_DATA_TAGGING:
         value.add(_make_trusted(b"test"))
     unsafe_value = make_unsafe(value)
@@ -147,7 +147,7 @@ def test_make_unsafe_set():
     for obj in unsafe_value:
         assert _is_trusted(obj)
 
-    value = set([_make_trusted("{{test}}")])
+    value = {_make_trusted("{{test}}")}
     if not SUPPORTS_DATA_TAGGING:
         value.add(_make_trusted(b"{{test}}"))
     unsafe_value = make_unsafe(value)
