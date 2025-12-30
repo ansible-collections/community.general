@@ -688,7 +688,7 @@ class JenkinsPlugin:
                 with open(cache_path, "w") as f:
                     json.dump(plugin_data, f)
 
-            with open(cache_path, "r") as f:
+            with open(cache_path) as f:
                 plugin_data = json.load(f)
 
         except Exception as e:
@@ -759,7 +759,7 @@ class JenkinsPlugin:
 
             try:
                 os.close(tmp_update_fd)
-            except IOError as e:
+            except OSError as e:
                 self.module.fail_json(msg=f"Cannot close the tmp updates file {tmp_updates_file}.", details=f"{e}")
         else:
             tmp_updates_file = updates_file
@@ -771,7 +771,7 @@ class JenkinsPlugin:
             # Read only the second line
             dummy = f.readline()
             data = json.loads(f.readline())
-        except IOError as e:
+        except OSError as e:
             self.module.fail_json(
                 msg=f"Cannot open{' temporary' if tmp_updates_file != updates_file else ''} updates file.",
                 details=f"{e}",
@@ -808,7 +808,7 @@ class JenkinsPlugin:
 
         try:
             os.close(tmp_f_fd)
-        except IOError as e:
+        except OSError as e:
             self.module.fail_json(msg=f"Cannot close the temporal plugin file {tmp_f}.", details=f"{e}")
 
         # Move the file onto the right place

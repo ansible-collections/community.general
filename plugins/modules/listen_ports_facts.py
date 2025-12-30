@@ -282,7 +282,7 @@ def ss_parse(raw):
 
     if len(lines) == 0 or not lines[0].startswith("Netid "):
         # unexpected stdout from ss
-        raise EnvironmentError(f"Unknown stdout format of `ss`: {raw}")
+        raise OSError(f"Unknown stdout format of `ss`: {raw}")
 
     # skip headers (-H arg is not present on e.g. Ubuntu 16)
     lines = lines[1:]
@@ -298,7 +298,7 @@ def ss_parse(raw):
                 protocol, state, recv_q, send_q, local_addr_port, peer_addr_port, process = cells
         except ValueError as e:
             # unexpected stdout from ss
-            raise EnvironmentError(
+            raise OSError(
                 'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and'
                 f'optionally "Process", but got something else: {line}'
             ) from e
@@ -394,9 +394,7 @@ def main():
                     break
 
         if bin_path is None:
-            raise EnvironmentError(
-                f"Unable to find any of the supported commands in PATH: {', '.join(sorted(commands_map))}"
-            )
+            raise OSError(f"Unable to find any of the supported commands in PATH: {', '.join(sorted(commands_map))}")
 
         # which ports are listening for connections?
         args = commands_map[command]["args"]
@@ -416,7 +414,7 @@ def main():
                     result["ansible_facts"]["tcp_listen"].append(connection)
                 elif connection["protocol"].startswith("udp"):
                     result["ansible_facts"]["udp_listen"].append(connection)
-    except (KeyError, EnvironmentError) as e:
+    except (KeyError, OSError) as e:
         module.fail_json(msg=f"{e}")
 
     module.exit_json(**result)

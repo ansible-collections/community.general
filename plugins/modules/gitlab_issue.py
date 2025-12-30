@@ -358,7 +358,7 @@ def main():
             try:
                 with open(description_path, "rb") as f:
                     description = to_text(f.read(), errors="surrogate_or_strict")
-            except IOError as e:
+            except OSError as e:
                 module.fail_json(msg=f"Cannot open {description_path}: {e}")
 
         # sorting necessary in order to properly detect changes, as we don't want to get false positive
