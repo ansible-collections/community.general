@@ -101,7 +101,6 @@ import platform
 import pwd
 import re
 import shlex
-import sys
 import tempfile
 from shlex import quote as shlex_quote
 
@@ -162,7 +161,7 @@ class CronVar:
                 # cron file does not exist
                 return
             except Exception as e:
-                raise CronVarError("Unexpected error:", sys.exc_info()[0]) from e
+                raise CronVarError(f"Unexpected error: {e}", type(e)) from e
         else:
             # using safely quoted shell for now, but this really should be two non-shell calls instead.  FIXME
             (rc, out, err) = self.module.run_command(self._read_user_execute(), use_unsafe_shell=True)
@@ -219,7 +218,7 @@ class CronVar:
             # cron file does not exist
             return False
         except Exception as e:
-            raise CronVarError("Unexpected error:", sys.exc_info()[0]) from e
+            raise CronVarError(f"Unexpected error: {e}", type(e)) from e
 
     def parse_for_var(self, line):
         lexer = shlex.shlex(line)
