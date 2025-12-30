@@ -179,7 +179,7 @@ def getValueFromLine(s):
 
 
 def read_interfaces_file(module, filename):
-    with open(filename, "r") as f:
+    with open(filename) as f:
         return read_interfaces_lines(module, f)
 
 

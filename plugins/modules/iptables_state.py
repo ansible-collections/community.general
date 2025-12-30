@@ -252,7 +252,7 @@ def read_state(b_path):
     """
     Read a file and store its content in a variable as a list.
     """
-    with open(b_path, "r") as f:
+    with open(b_path) as f:
         text = f.read()
     return [t for t in text.splitlines() if t != ""]
 
@@ -270,7 +270,7 @@ def write_state(module: AnsibleModule, b_path: bytes, lines: list[str], changed:
     Write given contents to the given path, and return changed status.
     """
     joined_lines = "\n".join(lines)
-    content = f"{joined_lines}\n".encode("utf-8")
+    content = f"{joined_lines}\n".encode()
 
     existing_contents = get_file_contents(b_path)
     if existing_contents == content:
@@ -540,7 +540,7 @@ def main() -> None:
 
     if module.check_mode:
         joined_initial_state = "\n".join(initial_state)
-        if get_file_contents(b_path) == f"{joined_initial_state}\n".encode("utf-8"):
+        if get_file_contents(b_path) == f"{joined_initial_state}\n".encode():
             restored_state = initial_state
         else:
             restored_state = state_to_restore

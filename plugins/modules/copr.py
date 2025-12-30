@@ -348,7 +348,7 @@ class CoprModule:
             repo = self._get_copr_repo()
         for repo_id in repo.cfg.sections():
             repo_content_api = self._download_repo_info()
-            with open(repo_filename_path, "r") as file:
+            with open(repo_filename_path) as file:
                 repo_content_file = file.read()
             if repo_content_file != repo_content_api:
                 if not self.resolve_differences(repo_content_file, repo_content_api, repo_filename_path):
@@ -449,7 +449,7 @@ class CoprModule:
         """
         if not os.path.isfile(repo_filename_path):
             return False
-        with open(repo_filename_path, "r") as file:
+        with open(repo_filename_path) as file:
             repo_content_file = file.read()
         return repo_content_file == repo_content_api
 

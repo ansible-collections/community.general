@@ -164,7 +164,7 @@ class LocaleGen(StateModuleHelper):
         available_locale_entry_re_matches = []
         for locale_path in self.mechanisms[self.vars.mechanism]["available"]:
             if os.path.exists(locale_path):
-                with open(locale_path, "r") as fd:
+                with open(locale_path) as fd:
                     self.vars.available_lines.extend(fd.readlines())
 
         re_locale_entry = re.compile(r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$")
@@ -210,7 +210,7 @@ class LocaleGen(StateModuleHelper):
 
     def set_locale_glibc(self, names, enabled=True):
         """Sets the state of the locale. Defaults to enabled."""
-        with open(ETC_LOCALE_GEN, "r") as fr:
+        with open(ETC_LOCALE_GEN) as fr:
             lines = fr.readlines()
 
         locale_regexes = []
@@ -265,7 +265,7 @@ class LocaleGen(StateModuleHelper):
                 ctx.run()
         else:
             # Delete locale involves discarding the locale from /var/lib/locales/supported.d/local and regenerating all locales.
-            with open(VAR_LIB_LOCALES_LOCAL, "r") as fr:
+            with open(VAR_LIB_LOCALES_LOCAL) as fr:
                 content = fr.readlines()
             with open(VAR_LIB_LOCALES_LOCAL, "w") as fw:
                 for line in content:
