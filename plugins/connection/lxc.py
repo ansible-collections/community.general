@@ -94,7 +94,7 @@ class Connection(ConnectionBase):
         while len(read_fds) > 0 or len(write_fds) > 0:
             try:
                 ready_reads, ready_writes, dummy = select.select(read_fds, write_fds, [])
-            except select.error as e:
+            except OSError as e:
                 if e.args[0] == errno.EINTR:
                     continue
                 raise
@@ -173,7 +173,7 @@ class Connection(ConnectionBase):
             raise errors.AnsibleFileNotFound(msg)
         try:
             src_file = open(in_path, "rb")
-        except IOError as e:
+        except OSError as e:
             traceback.print_exc()
             raise errors.AnsibleError(f"failed to open input file to {in_path}") from e
         try:
@@ -184,7 +184,7 @@ class Connection(ConnectionBase):
 
             try:
                 self.container.attach_wait(write_file, None)
-            except IOError as e:
+            except OSError as e:
                 traceback.print_exc()
                 msg = f"failed to transfer file to {out_path}"
                 raise errors.AnsibleError(msg) from e
@@ -200,7 +200,7 @@ class Connection(ConnectionBase):
 
         try:
             dst_file = open(out_path, "wb")
-        except IOError as e:
+        except OSError as e:
             traceback.print_exc()
             msg = f"failed to open output file {out_path}"
             raise errors.AnsibleError(msg) from e
@@ -217,7 +217,7 @@ class Connection(ConnectionBase):
 
             try:
                 self.container.attach_wait(write_file, None)
-            except IOError as e:
+            except OSError as e:
                 traceback.print_exc()
                 msg = f"failed to transfer file from {in_path} to {out_path}"
                 raise errors.AnsibleError(msg) from e
