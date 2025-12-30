@@ -205,7 +205,7 @@ class TestLookupModule(unittest.TestCase):
     def test_bitwarden_plugin_duplicates(self):
         # There are two records with name dupe_name; we need to be order-insensitive with
         # checking what was retrieved.
-        self.assertEqual(set(["b", "d"]), set(self.lookup.run(["dupe_name"], field="password")[0]))
+        self.assertEqual({"b", "d"}, set(self.lookup.run(["dupe_name"], field="password")[0]))
 
     @patch("ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden", new=MockBitwarden())
     def test_bitwarden_plugin_full_item(self):

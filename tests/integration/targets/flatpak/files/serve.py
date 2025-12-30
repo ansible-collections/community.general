@@ -20,7 +20,7 @@ except ImportError:
 
 # Argument parsing
 if len(sys.argv) != 4:
-    print("Syntax: {0} <bind> <port> <path>".format(sys.argv[0]))
+    print(f"Syntax: {sys.argv[0]} <bind> <port> <path>")
     sys.exit(-1)
 
 HOST, PORT, PATH = sys.argv[1:4]

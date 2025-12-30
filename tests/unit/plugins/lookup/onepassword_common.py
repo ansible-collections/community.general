@@ -14,7 +14,7 @@ from ansible_collections.community.general.plugins.lookup.onepassword import (
 
 
 def load_file(file):
-    with open((os.path.join(os.path.dirname(__file__), "onepassword_fixtures", file)), "r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "onepassword_fixtures", file)) as f:
         return json.loads(f.read())
 
 
