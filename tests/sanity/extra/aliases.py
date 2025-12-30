@@ -56,11 +56,11 @@ def main():
         if not targets:
             if "targets/setup_" in path:
                 continue
-            print("{}: {}".format(path, "found no targets"))
+            print(f"{path}: found no targets")
             has_errors = True
         for target in targets:
             if target not in allowed_targets:
-                print("{}: {}".format(path, f'found invalid target "{target}"'))
+                print(f'{path}: found invalid target "{target}"')
                 has_errors = True
 
     return 1 if has_errors else 0
