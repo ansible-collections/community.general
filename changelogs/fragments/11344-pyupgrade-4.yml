@@ -31,4 +31,3 @@ minor_changes:
   - xfs_quota - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
   - zypper - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
   - zypper_repository - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
-
