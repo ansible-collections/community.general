@@ -142,10 +142,19 @@ class Connection(ConnectionBase):
         ]
 
         if getattr(self._shell, "_IS_WINDOWS", False):
-            if (
-                (regex_match := self.powershell_regex_pattern.match(cmd))
-                and (regex_pattern := self.powershell_regex_pattern)
-            ) or ((regex_match := self.cmd_regex_pattern.match(cmd)) and (regex_pattern := self.cmd_regex_pattern)):
+            regex_match_ps1 = self.powershell_regex_pattern.match(cmd)
+            regex_match_cmd = self.cmd_regex_pattern.match(cmd)
+
+            if regex_match_ps1:
+                regex_match = regex_match_ps1
+                regex_pattern = self.powershell_regex_pattern
+            elif regex_match_cmd:
+                regex_match = regex_match_cmd
+                regex_pattern = self.cmd_regex_pattern
+            else:
+                regex_match = None
+
+            if regex_match:
                 self._display.vvvvvv(
                     f'Found keyword: "{regex_match.group("command")}" based on regex: {regex_pattern.pattern}',
                     host=self._instance(),
