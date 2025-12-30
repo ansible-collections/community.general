@@ -129,7 +129,6 @@ lease:
 """
 
 import binascii
-import socket
 import struct
 import traceback
 
