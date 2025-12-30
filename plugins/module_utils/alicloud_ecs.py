@@ -163,7 +163,7 @@ def get_profile(params):
             else f"{os.getenv('HOME')}/.aliyun/config.json"
         )
         auth = {}
-        with open(path, "r") as f:
+        with open(path) as f:
             for pro in json.load(f)["profiles"]:
                 if params["profile"] == pro["name"]:
                     auth = pro

@@ -89,7 +89,7 @@ def banner(self, msg, color=None, cows=True):
     msg = msg.strip()
     try:
         star_len = self.columns - get_text_width(msg) - timestamp_len
-    except EnvironmentError:
+    except OSError:
         star_len = self.columns - len(msg) - timestamp_len
     if star_len <= 3:
         star_len = 3

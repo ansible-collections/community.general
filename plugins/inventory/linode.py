@@ -203,7 +203,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 ips += [instance.ips.ipv6.slaac, instance.ips.ipv6.link_local]
                 ips += instance.ips.ipv6.pools
 
-                for ip_type in set(ip.type for ip in ips):
+                for ip_type in {ip.type for ip in ips}:
                     self.inventory.set_variable(
                         hostname, ip_type, make_unsafe(self._ip_data([ip for ip in ips if ip.type == ip_type]))
                     )

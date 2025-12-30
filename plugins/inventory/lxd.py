@@ -210,9 +210,9 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             dict(json_data): json data"""
         try:
-            with open(path, "r") as json_file:
+            with open(path) as json_file:
                 return json.load(json_file)
-        except (IOError, json.decoder.JSONDecodeError) as err:
+        except (OSError, json.decoder.JSONDecodeError) as err:
             raise AnsibleParserError(f"Could not load the test data from {to_native(path)}: {err}") from err
 
     def save_json_data(self, path, file_name=None):
@@ -242,7 +242,7 @@ class InventoryModule(BaseInventoryPlugin):
             cwd = os.path.abspath(os.path.dirname(__file__))
             with open(os.path.abspath(os.path.join(cwd, *path)), "w") as json_file:
                 json.dump(self.data, json_file)
-        except IOError as err:
+        except OSError as err:
             raise AnsibleParserError(f"Could not save data: {err}") from err
 
     def verify_file(self, path):

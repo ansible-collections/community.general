@@ -97,7 +97,7 @@ def not_in_host_file(self, host):
         try:
             with open(hf) as host_fh:
                 data = host_fh.read()
-        except IOError:
+        except OSError:
             hfiles_not_found += 1
             continue
 
