@@ -465,7 +465,7 @@ def delete_target(module, headers):
 # Function to read the private key for types texts and ssh_key
 def read_privateKey(module):
     try:
-        with open(module.params["private_key_path"], "r") as f:
+        with open(module.params["private_key_path"]) as f:
             private_key = f.read().strip()
             return private_key
     except Exception as e:
@@ -738,9 +738,9 @@ def run_module():
 
                 elif ext.lower() in [".pem", ".crt"]:  # PEM mode
                     try:
-                        with open(filePath, "r") as f:
+                        with open(filePath) as f:
                             cert_chain = f.read()
-                        with open(private_key_path, "r") as f:
+                        with open(private_key_path) as f:
                             private_key = f.read()
                     except Exception as e:
                         module.fail_json(msg=f"Failed to read PEM files: {e}")

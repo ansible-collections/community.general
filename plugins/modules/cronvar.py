@@ -155,9 +155,9 @@ class CronVar:
         if self.cron_file:
             # read the cronfile
             try:
-                with open(self.cron_file, "r") as f:
+                with open(self.cron_file) as f:
                     self.lines = f.read().splitlines()
-            except IOError:
+            except OSError:
                 # cron file does not exist
                 return
             except Exception as e:

@@ -248,7 +248,7 @@ def test_read_privateKey_returns_trimmed_contents():
     expected = "-----BEGIN PRIVATE KEY-----\nKEYDATA\n-----END PRIVATE KEY-----"
 
     assert result == expected
-    mocked_file.assert_called_once_with("/fake/path/key.pem", "r")
+    mocked_file.assert_called_once_with("/fake/path/key.pem")
 
 
 def test_read_privateKey_handles_file_read_error():

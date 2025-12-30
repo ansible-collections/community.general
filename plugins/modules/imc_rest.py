@@ -398,7 +398,7 @@ def main():
         if content:
             rawdata = content.replace("\n", "")
         elif file_exists:
-            with open(path, "r") as config_object:
+            with open(path) as config_object:
                 rawdata = config_object.read().replace("\n", "")
 
         # Wrap the XML documents in a <root> element

@@ -109,7 +109,7 @@ def rescan_device(module, device):
             with open(rescan_path, "w") as f:
                 f.write("1")
             return True
-        except IOError as e:
+        except OSError as e:
             module.warn(f"Failed to rescan device {device}: {e!s}")
     else:
         module.warn(f"Rescan path does not exist for device {device}")
