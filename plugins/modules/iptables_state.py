@@ -252,7 +252,7 @@ def read_state(b_path):
     """
     Read a file and store its content in a variable as a list.
     """
-    with open(b_path, "r") as f:
+    with open(b_path) as f:
         text = f.read()
     return [t for t in text.splitlines() if t != ""]
 

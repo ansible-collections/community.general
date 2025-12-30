@@ -181,7 +181,7 @@ def get_host_key(module, hostname):
     try:
         sock = socket.socket()
         sock.connect((hostname, 22))
-    except socket.error:
+    except OSError:
         module.fail_json(msg=f"Error opening socket to {hostname}")
 
     try:

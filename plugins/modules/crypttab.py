@@ -171,7 +171,7 @@ class Crypttab:
                 os.makedirs(os.path.dirname(path))
             open(path, "a").close()
 
-        with open(path, "r") as f:
+        with open(path) as f:
             for line in f.readlines():
                 self._lines.append(Line(line))
 

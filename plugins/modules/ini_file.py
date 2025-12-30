@@ -349,7 +349,7 @@ def do_ini(
             os.makedirs(destpath)
         ini_lines = []
     else:
-        with open(target_filename, "r", encoding="utf-8-sig") as ini_file:
+        with open(target_filename, encoding="utf-8-sig") as ini_file:
             ini_lines = [to_text(line) for line in ini_file.readlines()]
 
     if module._diff:
@@ -579,12 +579,12 @@ def do_ini(
             f = os.fdopen(tmpfd, "wb")
             f.writelines(encoded_ini_lines)
             f.close()
-        except IOError:
+        except OSError:
             module.fail_json(msg="Unable to create temporary file %s", traceback=traceback.format_exc())
 
         try:
             module.atomic_move(tmpfile, os.path.abspath(target_filename))
-        except IOError:
+        except OSError:
             module.ansible.fail_json(
                 msg=f"Unable to move temporary file {tmpfile} to {target_filename}, IOError",
                 traceback=traceback.format_exc(),

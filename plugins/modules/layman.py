@@ -135,7 +135,7 @@ def download_url(module, url, dest):
     try:
         with open(dest, "w") as f:
             shutil.copyfileobj(response, f)
-    except IOError as e:
+    except OSError as e:
         raise ModuleError(f"Failed to write: {e}") from e
 
 
