@@ -1,16 +1,16 @@
 minor_changes:
-  - yaml cache - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - logentries callback - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - timestamp callback - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - chroot connection - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - jail connection - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - lxc connection - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - wsl connection - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - zone connection - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - cobbler inventory - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - linode inventory - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - lxd inventory - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
-  - opennebula inventory - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - yaml cache plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - logentries callback plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - timestamp callback plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - chroot connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - jail connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - lxc connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - wsl connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - zone connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - cobbler inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - linode inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - lxd inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+  - opennebula inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
   - alicloud_ecs module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
   - known_hosts module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
   - lxd module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
