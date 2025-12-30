@@ -104,11 +104,17 @@ class Connection(ConnectionBase):
         if getattr(self._shell, "_IS_WINDOWS", False):
             # Initializing regular expression patterns to match on a PowerShell or cmd command line.
             self.powershell_regex_pattern = re.compile(
-                r"^(?P<executable>(\"?([a-z]:)?[a-z0-9 ()\\.]+)?powershell(\.exe)?\"?|(([a-z]:)?[a-z0-9()\\.]+)?powershell(\.exe)?)\s+.*(?P<command>-c(ommand)?)\s+",  # noqa: E501
+                (
+                    r"^(?P<executable>("
+                    r'"([a-z]:)?[a-z0-9 ()\\\.]+)?powershell(\.exe)?"'  # "c:\powershell.exe" or "\\host\powershell.exe"
+                    r"|"
+                    r"([a-z]:)?[a-z0-9()\\\.]+)?powershell(\.exe)?"  #    same thing, no quotes, and no whitespace
+                    r")\s+.*(?P<command>-c(ommand)?)\s+"
+                ),
                 re.IGNORECASE,
             )
             self.cmd_regex_pattern = re.compile(
-                r"^(?P<executable>(\"?([a-z]:)?[a-z0-9 ()\\.]+)?cmd(\.exe)?\"?|(([a-z]:)?[a-z0-9()\\.]+)?cmd(\.exe)?)\s+.*(?P<command>/c)\s+",
+                r'^(?P<executable>("?[a-z]:)?[a-z0-9 ()\\\.]+)?cmd(\.exe)?"|(([a-z]:)?[a-z0-9()\\\.]+)?cmd(\.exe)?)\s+.*(?P<command>/c)\s+',
                 re.IGNORECASE,
             )
 
