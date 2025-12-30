@@ -512,7 +512,7 @@ def _content_of_file_at_path(path):
     """
     content = None
     if path and os.path.exists(path):
-        with open(path, mode="rt") as opened_file:
+        with open(path) as opened_file:
             b_content = opened_file.read()
             try:
                 content = to_text(b_content, errors="surrogate_or_strict")

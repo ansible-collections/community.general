@@ -273,7 +273,7 @@ def main():
                     svc.enable()
                 else:
                     svc.disable()
-            except (OSError, IOError) as e:
+            except OSError as e:
                 module.fail_json(msg=f"Could not change service link: {e}")
 
     if state is not None and state != svc.state:
@@ -290,7 +290,7 @@ def main():
                     open(d_file, "a").close()
                 else:
                     os.unlink(d_file)
-            except (OSError, IOError) as e:
+            except OSError as e:
                 module.fail_json(msg=f"Could not change downed file: {e} ")
 
     module.exit_json(changed=changed, svc=svc.report())

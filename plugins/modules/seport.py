@@ -229,7 +229,7 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange="s0", ses
             else:
                 seport.modify(port, proto, serange, setype)
 
-    except (ValueError, IOError, KeyError, OSError, RuntimeError) as e:
+    except (ValueError, OSError, KeyError, RuntimeError) as e:
         module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
     return change
@@ -270,7 +270,7 @@ def semanage_port_del(module, ports, proto, setype, do_reload, sestore="", local
                 if not module.check_mode:
                     seport.delete(port, proto)
 
-    except (ValueError, IOError, KeyError, OSError, RuntimeError) as e:
+    except (ValueError, OSError, KeyError, RuntimeError) as e:
         module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
     return change

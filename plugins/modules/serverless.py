@@ -138,7 +138,7 @@ def read_serverless_config(module):
         with open(full_path) as sls_config:
             config = yaml.safe_load(sls_config.read())
             return config
-    except IOError as e:
+    except OSError as e:
         module.fail_json(msg=f"Could not open serverless.yml in {full_path}. err: {e}")
 
 

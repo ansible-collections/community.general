@@ -104,7 +104,7 @@ def wakeonlan(module, mac, broadcast, port):
     if not module.check_mode:
         try:
             sock.sendto(data, (broadcast, port))
-        except socket.error as e:
+        except OSError as e:
             sock.close()
             module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 

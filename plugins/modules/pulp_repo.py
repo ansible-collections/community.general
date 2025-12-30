@@ -541,19 +541,19 @@ def main():
     if importer_ssl_ca_cert is not None:
         importer_ssl_ca_cert_file_path = os.path.abspath(importer_ssl_ca_cert)
         if os.path.isfile(importer_ssl_ca_cert_file_path):
-            with open(importer_ssl_ca_cert_file_path, "r") as importer_ssl_ca_cert_file_object:
+            with open(importer_ssl_ca_cert_file_path) as importer_ssl_ca_cert_file_object:
                 importer_ssl_ca_cert = importer_ssl_ca_cert_file_object.read()
 
     if importer_ssl_client_cert is not None:
         importer_ssl_client_cert_file_path = os.path.abspath(importer_ssl_client_cert)
         if os.path.isfile(importer_ssl_client_cert_file_path):
-            with open(importer_ssl_client_cert_file_path, "r") as importer_ssl_client_cert_file_object:
+            with open(importer_ssl_client_cert_file_path) as importer_ssl_client_cert_file_object:
                 importer_ssl_client_cert = importer_ssl_client_cert_file_object.read()
 
     if importer_ssl_client_key is not None:
         importer_ssl_client_key_file_path = os.path.abspath(importer_ssl_client_key)
         if os.path.isfile(importer_ssl_client_key_file_path):
-            with open(importer_ssl_client_key_file_path, "r") as importer_ssl_client_key_file_object:
+            with open(importer_ssl_client_key_file_path) as importer_ssl_client_key_file_object:
                 importer_ssl_client_key = importer_ssl_client_key_file_object.read()
 
     server = pulp_server(module, pulp_host, repo_type, wait_for_completion=wait_for_completion)
