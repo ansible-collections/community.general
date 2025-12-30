@@ -1628,11 +1628,11 @@ def get_connection_info(module):
             if authfile is None:
                 authfile = os.path.join(os.environ.get("HOME"), ".one", "one_auth")
             try:
-                with open(authfile, "r") as fp:
+                with open(authfile) as fp:
                     authstring = fp.read().rstrip()
                 username = authstring.split(":")[0]
                 password = authstring.split(":")[1]
-            except (OSError, IOError):
+            except OSError:
                 module.fail_json(msg=f"Could not find or read ONE_AUTH file at '{authfile}'")
             except Exception:
                 module.fail_json(msg=f"Error occurs when read ONE_AUTH file at '{authfile}'")

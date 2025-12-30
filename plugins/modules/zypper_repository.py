@@ -403,7 +403,7 @@ def main():
             try:
                 with open(repo, encoding="utf-8") as file:
                     repofile_text = file.read()
-            except IOError:
+            except OSError:
                 module.fail_json(msg="Error opening .repo file from provided path")
 
         repofile = configparser.ConfigParser()

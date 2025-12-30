@@ -131,7 +131,7 @@ def db_delete(conn, cursor, db):
 
 def db_import(conn, cursor, module, db, target):
     if os.path.isfile(target):
-        with open(target, "r") as backup:
+        with open(target) as backup:
             sqlQuery = f"USE [{db}]\n"
             for line in backup:
                 if line is None:

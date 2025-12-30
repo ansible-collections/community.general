@@ -282,7 +282,7 @@ class Zone:
     def configure_password(self):
         shadow = f"{self.path}/root/etc/shadow"
         if self.root_password:
-            with open(shadow, "r") as f:
+            with open(shadow) as f:
                 lines = f.readlines()
 
             for i in range(0, len(lines)):

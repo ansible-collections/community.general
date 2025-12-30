@@ -577,7 +577,7 @@ def repo_refresh(m):
 
 
 def get_fs_type_and_readonly_state(mount_point):
-    with open("/proc/mounts", "r") as file:
+    with open("/proc/mounts") as file:
         for line in file.readlines():
             fields = line.split()
             path = fields[1]
