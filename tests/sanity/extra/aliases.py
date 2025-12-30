@@ -17,13 +17,13 @@ def main():
     with open(".azure-pipelines/azure-pipelines.yml", "rb") as f:
         azp = yaml.safe_load(f)
 
-    allowed_targets = set(["azp/generic/1"])
+    allowed_targets = {"azp/generic/1"}
     for stage in azp["stages"]:
         if stage["stage"].startswith(("Sanity", "Unit", "Generic", "Summary")):
             continue
         for job in stage["jobs"]:
             for group in job["parameters"]["groups"]:
-                allowed_targets.add("azp/posix/{0}".format(group))
+                allowed_targets.add(f"azp/posix/{group}")
 
     paths = glob.glob("tests/integration/targets/*/aliases")
 
@@ -31,7 +31,7 @@ def main():
     for path in paths:
         targets = []
         skip = False
-        with open(path, "r") as f:
+        with open(path) as f:
             for line in f:
                 if "#" in line:
                     line = line[: line.find("#")]
@@ -56,11 +56,11 @@ def main():
         if not targets:
             if "targets/setup_" in path:
                 continue
-            print("%s: %s" % (path, "found no targets"))
+            print(f"{path}: found no targets")
             has_errors = True
         for target in targets:
             if target not in allowed_targets:
-                print("%s: %s" % (path, 'found invalid target "{0}"'.format(target)))
+                print(f'{path}: found invalid target "{target}"')
                 has_errors = True
 
     return 1 if has_errors else 0

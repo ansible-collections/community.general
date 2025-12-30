@@ -80,7 +80,7 @@ def test_verify_file_bad_config(inventory):
 
 
 def get_vm_pool_json():
-    with open("tests/unit/plugins/inventory/fixtures/opennebula_inventory.json", "r") as json_file:
+    with open("tests/unit/plugins/inventory/fixtures/opennebula_inventory.json") as json_file:
         jsondata = json.load(json_file)
 
     data = type("pyone.bindings.VM_POOLSub", (object,), {"VM": []})()
@@ -349,15 +349,13 @@ keyed_groups:
     # note the vm_pool (and json data file) has four hosts,
     # but the options above asks ansible to filter one out
     assert len(get_vm_pool_json().VM) == 4
-    assert set(vm.NAME for vm in get_vm_pool_json().VM) == set(
-        [
-            "terraform_demo_00",
-            "terraform_demo_01",
-            "terraform_demo_srv_00",
-            "bs-windows",
-        ]
-    )
-    assert set(im._inventory.hosts) == set(["terraform_demo_00", "terraform_demo_01", "terraform_demo_srv_00"])
+    assert {vm.NAME for vm in get_vm_pool_json().VM} == {
+        "terraform_demo_00",
+        "terraform_demo_01",
+        "terraform_demo_srv_00",
+        "bs-windows",
+    }
+    assert set(im._inventory.hosts) == {"terraform_demo_00", "terraform_demo_01", "terraform_demo_srv_00"}
 
     host_demo00 = im._inventory.get_host("terraform_demo_00")
     host_demo01 = im._inventory.get_host("terraform_demo_01")
