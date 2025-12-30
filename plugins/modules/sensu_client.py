@@ -252,8 +252,8 @@ def main():
     # Load the current config, if there is one, so we can compare
     current_config = None
     try:
-        current_config = json.load(open(path, "r"))
-    except (IOError, ValueError):
+        current_config = json.load(open(path))
+    except (OSError, ValueError):
         # File either doesn't exist or it is invalid JSON
         pass
 
@@ -277,7 +277,7 @@ def main():
         with open(path, "w") as client:
             client.write(json.dumps(config, indent=4))
             module.exit_json(msg="Client configuration updated", changed=True, config=config["client"], file=path)
-    except (OSError, IOError) as e:
+    except OSError as e:
         module.fail_json(msg=f"Unable to write file {path}: {e}")
 
 

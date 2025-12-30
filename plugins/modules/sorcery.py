@@ -369,7 +369,7 @@ def match_depends(module):
 
         try:
             shutil.copy2(sorcery_depends_orig, sorcery_depends)
-        except IOError:
+        except OSError:
             module.fail_json(msg="failed to copy depends.check file")
     else:
         sorcery_depends = os.path.join(SORCERY_STATE_DIR, "depends")
@@ -441,7 +441,7 @@ def match_depends(module):
                         sys.stdout.write(line)
                 else:
                     sys.stdout.write(line)
-        except IOError:
+        except OSError:
             module.fail_json(msg="I/O error on the depends file")
     finally:
         fi.close()
@@ -453,7 +453,7 @@ def match_depends(module):
             with open(sorcery_depends, "a") as fl:
                 for k in depends_new:
                     fl.write(f"{spell}:{k}:{depends[k]}:optional::\n")
-        except IOError:
+        except OSError:
             module.fail_json(msg="I/O error on the depends file")
 
         depends_ok = False
@@ -461,7 +461,7 @@ def match_depends(module):
     if module.check_mode:
         try:
             os.remove(sorcery_depends)
-        except IOError:
+        except OSError:
             module.fail_json(msg="failed to clean up depends.backup file")
 
     return depends_ok
@@ -545,7 +545,7 @@ def manage_spells(module):
             # back up original queue
             try:
                 os.rename(sorcery_queue, f"{sorcery_queue}.backup")
-            except IOError:
+            except OSError:
                 module.fail_json(msg="failed to backup the update queue")
 
             # see update_codex()
@@ -567,7 +567,7 @@ def manage_spells(module):
                 if module.check_mode:
                     try:
                         os.rename(f"{sorcery_queue}.backup", sorcery_queue)
-                    except IOError:
+                    except OSError:
                         module.fail_json(msg="failed to restore the update queue")
 
                     return (True, "would have updated the system")

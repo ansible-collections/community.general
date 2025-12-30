@@ -168,7 +168,7 @@ class OmapiHostManager:
             self.module.fail_json(
                 msg=f"Unable to open OMAPI connection. Ensure 'host', 'port', 'key' and 'key_name' are valid. Exception was: {e}"
             )
-        except socket.error as e:
+        except OSError as e:
             self.module.fail_json(msg=f"Unable to connect to OMAPI server: {e}")
 
     def get_host(self, macaddr):

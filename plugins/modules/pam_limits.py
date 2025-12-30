@@ -348,7 +348,7 @@ def main():
 
     nf.flush()
 
-    with open(nf.name, "r") as content:
+    with open(nf.name) as content:
         content_new = content.read()
 
     if not module.check_mode:

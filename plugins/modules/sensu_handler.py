@@ -252,8 +252,8 @@ def main():
     # Load the current config, if there is one, so we can compare
     current_config = None
     try:
-        current_config = json.load(open(path, "r"))
-    except (IOError, ValueError):
+        current_config = json.load(open(path))
+    except (OSError, ValueError):
         # File either doesn't exist or it is invalid JSON
         pass
 
@@ -285,7 +285,7 @@ def main():
             module.exit_json(
                 msg="Handler configuration updated", changed=True, config=config["handlers"][name], file=path, name=name
             )
-    except (OSError, IOError) as e:
+    except OSError as e:
         module.fail_json(msg=f"Unable to write file {path}: {e}")
 
 

@@ -376,9 +376,9 @@ class NosystemdTimezone(Timezone):
             self.conf_files["name"] = "/etc/sysconfig/clock"
             self.conf_files["hwclock"] = "/etc/sysconfig/clock"
             try:
-                with open(self.conf_files["name"], "r") as f:
+                with open(self.conf_files["name"]) as f:
                     sysconfig_clock = f.read()
-            except IOError as err:
+            except OSError as err:
                 if self._allow_ioerror(err, "name"):
                     # If the config file doesn't exist detect the distribution and set regexps.
                     if distribution == "SuSE":
@@ -427,9 +427,9 @@ class NosystemdTimezone(Timezone):
         """
         # Read the file
         try:
-            with open(filename, "r") as file:
+            with open(filename) as file:
                 lines = file.readlines()
-        except IOError as err:
+        except OSError as err:
             if self._allow_ioerror(err, key):
                 lines = []
             else:
@@ -452,16 +452,16 @@ class NosystemdTimezone(Timezone):
         try:
             with open(filename, "w") as file:
                 file.writelines(lines)
-        except IOError:
+        except OSError:
             self.abort(f'tried to configure {key} using a file "{filename}", but could not write to it')
         self.msg.append(f"Added 1 line and deleted {len(matched_indices)} line(s) on {filename}")
 
     def _get_value_from_config(self, key, phase):
         filename = self.conf_files[key]
         try:
-            with open(filename, mode="r") as file:
+            with open(filename) as file:
                 status = file.read()
-        except IOError as err:
+        except OSError as err:
             if self._allow_ioerror(err, key):
                 if key == "hwclock":
                     return "n/a"
@@ -602,7 +602,7 @@ class SmartOSTimezone(Timezone):
         """
         if key == "name":
             try:
-                with open("/etc/default/init", "r") as f:
+                with open("/etc/default/init") as f:
                     for line in f:
                         m = re.match("^TZ=(.*)$", line.strip())
                         if m:
@@ -783,7 +783,7 @@ class AIXTimezone(Timezone):
     def __get_timezone(self):
         """Return the current value of TZ= in /etc/environment"""
         try:
-            with open("/etc/environment", "r") as f:
+            with open("/etc/environment") as f:
                 etcenvironment = f.read()
         except Exception:
             self.module.fail_json(msg="Issue reading contents of /etc/environment")

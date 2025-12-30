@@ -1434,13 +1434,13 @@ def main():
     credentials_path = module.params.get("credentials_path")
 
     try:
-        with open(credentials_path, "r") as creds:
+        with open(credentials_path) as creds:
             for line in creds:
                 eq_index = line.find("=")
                 var_name = line[:eq_index].strip()
                 string_value = line[eq_index + 1 :].strip()
                 creds_file_loaded_vars[var_name] = string_value
-    except IOError:
+    except OSError:
         pass
     # End of creds file retrieval
 

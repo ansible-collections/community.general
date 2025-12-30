@@ -1034,9 +1034,9 @@ class SysPurpose:
         """
         current_syspurpose = {}
         try:
-            with open(self.path, "r") as fp:
+            with open(self.path) as fp:
                 content = fp.read()
-        except IOError:
+        except OSError:
             pass
         else:
             current_syspurpose = json.loads(content)

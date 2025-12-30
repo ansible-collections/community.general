@@ -189,7 +189,7 @@ def main():
     try:
         with open(path, "rb") as f:
             data = f.read()
-    except (IOError, OSError) as e:
+    except OSError as e:
         module.fail_json(msg=f"Unable to open file: {e}")
 
     reader = read_csv(data, dialect, fieldnames)
