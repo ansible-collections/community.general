@@ -475,7 +475,7 @@ class Connection(ConnectionBase):
                 try:
                     ssh.load_system_host_keys(ssh_known_hosts)
                     break
-                except IOError:
+                except OSError:
                     pass  # file was not found, but not required to function
                 except paramiko.hostkeys.InvalidHostKey as e:
                     raise AnsibleConnectionFailure(f"Invalid host key: {to_text(e.line)}") from e

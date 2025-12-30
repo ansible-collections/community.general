@@ -119,10 +119,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             if authfile is None:
                 authfile = os.path.join(os.environ.get("HOME"), ".one", "one_auth")
             try:
-                with open(authfile, "r") as fp:
+                with open(authfile) as fp:
                     authstring = fp.read().rstrip()
                 username, password = authstring.split(":")
-            except (OSError, IOError) as e:
+            except OSError as e:
                 raise AnsibleError(f"Could not find or read ONE_AUTH file at '{authfile}'") from e
             except Exception as e:
                 raise AnsibleError(f"Error occurs when reading ONE_AUTH file at '{authfile}'") from e
