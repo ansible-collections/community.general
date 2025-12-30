@@ -569,9 +569,9 @@ def read_record(file_path, default=None):
     Reads the first line of a file and returns it.
     """
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             return f.readline().strip()
-    except IOError:
+    except OSError:
         return default
 
 

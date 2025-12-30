@@ -199,7 +199,7 @@ def repository_modify(module, rhsm, state, name, purge=False):
     # Disable all enabled repos on the system that are not in the task and not
     # marked as disabled by the task
     if purge:
-        enabled_repo_ids = set(repo["id"] for repo in updated_repo_list if repo["enabled"])
+        enabled_repo_ids = {repo["id"] for repo in updated_repo_list if repo["enabled"]}
         matched_repoids_set = set(matched_existing_repo.keys())
         difference = enabled_repo_ids.difference(matched_repoids_set)
         if len(difference) > 0:

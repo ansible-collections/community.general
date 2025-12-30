@@ -201,7 +201,7 @@ class Sudoers:
         return os.path.exists(self.file)
 
     def matches(self):
-        with open(self.file, "r") as f:
+        with open(self.file) as f:
             content_matches = f.read() == self.content()
 
         current_mode = os.stat(self.file).st_mode & 0o777

@@ -241,7 +241,7 @@ def main():
                     sv.enable()
                 else:
                     sv.disable()
-            except (OSError, IOError) as e:
+            except OSError as e:
                 module.fail_json(msg=f"Could not change service link: {e}")
 
     if state is not None and state != sv.state:
