@@ -142,13 +142,10 @@ class Connection(ConnectionBase):
         ]
 
         if getattr(self._shell, "_IS_WINDOWS", False):
-            regex_match_ps1 = self.powershell_regex_pattern.match(cmd)
-            regex_match_cmd = self.cmd_regex_pattern.match(cmd)
-
-            if regex_match_ps1:
+            if regex_match_ps1 := self.powershell_regex_pattern.match(cmd):
                 regex_match = regex_match_ps1
                 regex_pattern = self.powershell_regex_pattern
-            elif regex_match_cmd:
+            elif regex_match_cmd := self.cmd_regex_pattern.match(cmd):
                 regex_match = regex_match_cmd
                 regex_pattern = self.cmd_regex_pattern
             else:
