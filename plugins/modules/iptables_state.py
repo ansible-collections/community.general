@@ -270,7 +270,7 @@ def write_state(module: AnsibleModule, b_path: bytes, lines: list[str], changed:
     Write given contents to the given path, and return changed status.
     """
     joined_lines = "\n".join(lines)
-    content = f"{joined_lines}\n".encode()
+    content = f"{joined_lines}\n".encode("utf-8")
 
     existing_contents = get_file_contents(b_path)
     if existing_contents == content:
@@ -540,7 +540,7 @@ def main() -> None:
 
     if module.check_mode:
         joined_initial_state = "\n".join(initial_state)
-        if get_file_contents(b_path) == f"{joined_initial_state}\n".encode():
+        if get_file_contents(b_path) == f"{joined_initial_state}\n".encode("utf-8"):
             restored_state = initial_state
         else:
             restored_state = state_to_restore
