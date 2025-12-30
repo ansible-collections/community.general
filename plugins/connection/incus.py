@@ -106,15 +106,15 @@ class Connection(ConnectionBase):
             self.powershell_regex_pattern = re.compile(
                 (
                     r"^(?P<executable>("
-                    r'"([a-z]:)?[a-z0-9 ()\\\.]+)?powershell(\.exe)?"'  # "c:\powershell.exe" or "\\host\powershell.exe"
+                    r'"([a-z]:)?[a-z0-9 ()\\.]+)?powershell(\.exe)?"'  # "c:\powershell.exe" or "\\host\powershell.exe"
                     r"|"
-                    r"([a-z]:)?[a-z0-9()\\\.]+)?powershell(\.exe)?"  #    same thing, no quotes, and no whitespace
+                    r"([a-z]:)?[a-z0-9()\\.]+)?powershell(\.exe)?"  # same thing, no quotes, and no whitespace
                     r")\s+.*(?P<command>-c(ommand)?)\s+"
                 ),
                 re.IGNORECASE,
             )
             self.cmd_regex_pattern = re.compile(
-                r'^(?P<executable>("?[a-z]:)?[a-z0-9 ()\\\.]+)?cmd(\.exe)?"|(([a-z]:)?[a-z0-9()\\\.]+)?cmd(\.exe)?)\s+.*(?P<command>/c)\s+',
+                r'^(?P<executable>("?[a-z]:)?[a-z0-9 ()\\.]+)?cmd(\.exe)?"|(([a-z]:)?[a-z0-9()\\.]+)?cmd(\.exe)?)\s+.*(?P<command>/c)\s+',
                 re.IGNORECASE,
             )
 
