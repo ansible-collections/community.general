@@ -46,7 +46,7 @@ if len(sys.argv) > 3:
 ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 
 if HAS_TLS and ssl_ctx is not None:
-    print("Using %s and %s" % (certfile, keyfile))
+    print(f"Using {certfile} and {keyfile}")
     ssl_ctx.load_cert_chain(certfile=certfile, keyfile=keyfile)
 
     print("Start SMTP server on port", port1)

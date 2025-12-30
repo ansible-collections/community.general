@@ -128,4 +128,4 @@ STATIC_URL = "/static/"
 STATIC_ROOT = "/tmp/django-static"
 
 if "DJANGO_ANSIBLE_RAISE" in os.environ:
-    raise ValueError("DJANGO_ANSIBLE_RAISE={0}".format(os.environ["DJANGO_ANSIBLE_RAISE"]))
+    raise ValueError("DJANGO_ANSIBLE_RAISE={}".format(os.environ["DJANGO_ANSIBLE_RAISE"]))

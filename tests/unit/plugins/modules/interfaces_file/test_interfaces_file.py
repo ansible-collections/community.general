@@ -82,7 +82,7 @@ class TestInterfacesFileModule(unittest.TestCase):
             with open(testfilepath, "wb") as f:
                 f.write(string.encode())
         else:
-            with open(testfilepath, "r") as goldenfile:
+            with open(testfilepath) as goldenfile:
                 goldenData = json.load(goldenfile)
         self.assertEqual(goldenData, ifaces)
 
@@ -96,7 +96,7 @@ class TestInterfacesFileModule(unittest.TestCase):
             f.write(string.encode())
             f.close()
         else:
-            with open(testfilepath, "r") as goldenfile:
+            with open(testfilepath) as goldenfile:
                 goldenstring = goldenfile.read()
                 goldenfile.close()
         self.assertEqual(goldenstring, string)
