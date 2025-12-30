@@ -23,4 +23,3 @@ minor_changes:
   - listen_ports_facts - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
   - locale_gen - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
   - lvm_pv - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
-
