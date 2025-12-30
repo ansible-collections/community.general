@@ -146,8 +146,6 @@ class Connection(ConnectionBase):
                 regex_pattern = self.powershell_regex_pattern
             elif regex_match := self.cmd_regex_pattern.match(cmd):
                 regex_pattern = self.cmd_regex_pattern
-            else:
-                regex_match = None
 
             if regex_match:
                 self._display.vvvvvv(
