@@ -172,7 +172,7 @@ class Connection(ConnectionBase):
                     raise AnsibleError(
                         f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}"
                     )
-        except IOError as e:
+        except OSError as e:
             raise AnsibleError(f"file or module does not exist at: {in_path}") from e
 
     def fetch_file(self, in_path, out_path):

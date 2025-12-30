@@ -197,7 +197,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     data = self.cobbler.get_profiles(self.token)
                 else:
                     data = self.cobbler.get_profiles()
-            except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
+            except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
                 self._init_cache()
@@ -221,7 +221,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                             data[i] = self.cobbler.get_system_as_rendered(host["name"], self.token)
                         else:
                             data[i] = self.cobbler.get_system_as_rendered(host["name"])
-            except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
+            except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
                 self._init_cache()
