@@ -104,11 +104,11 @@ class Connection(ConnectionBase):
         if getattr(self._shell, "_IS_WINDOWS", False):
             # Initializing regular expression patterns to match on a PowerShell or cmd command line.
             self.powershell_regex_pattern = re.compile(
-                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*powershell(?:\.exe)?)"?\s+.*(?P<command>-c(?:ommand)?)\s+',
+                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*powershell(?:\.exe)?)"?\s+(?P<args>.*)(?P<command>-c(?:ommand)?\s+.*)',
                 re.IGNORECASE,
             )
             self.cmd_regex_pattern = re.compile(
-                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*cmd(?:\.exe)?)"?\s+.*(?P<command>/c)\s+',
+                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*cmd(?:\.exe)?)"?\s+(?P<args>.*)(?P<command>/c\s+.*)',
                 re.IGNORECASE,
             )
 
@@ -153,19 +153,14 @@ class Connection(ConnectionBase):
                     host=self._instance(),
                 )
 
-                # Split the command on the argument -c(ommand) for PowerShell or /c for cmd.
-                before_command_argument, after_command_argument = cmd.split(regex_match.group("command"), 1)
-
                 exec_cmd.extend(
                     [
                         # To avoid splitting on a space contained in the path, set the executable as the first argument.
                         regex_match.group("executable").strip('"'),
                         # Remove the executable path and split the rest by space.
-                        *(before_command_argument[len(regex_match.group("executable")) :].lstrip().split(" ")),
-                        # Set the command argument depending on cmd or powershell.
+                        *(regex_match.group("args").lstrip().split(" ")),
+                        # Set the command argument depending on cmd or powershell and the rest of it
                         regex_match.group("command"),
-                        # Add the rest of the command at the end.
-                        after_command_argument,
                     ]
                 )
             else:
