@@ -42,7 +42,14 @@ options:
     type: str
     description:
       - Scaleway organization identifier.
-    required: true
+      - Exactly one of O(project) and O(organization) must be specified.
+
+  project:
+    type: str
+    description:
+      - Project identifier.
+      - Exactly one of O(project) and O(organization) must be specified.
+    version_added: 12.2.0
 
   region:
     type: str
@@ -82,7 +89,7 @@ options:
 EXAMPLES = r"""
 - name: Create an IP
   community.general.scaleway_ip:
-    organization: '{{ scw_org }}'
+    project: '{{ project_id }}'
     state: present
     region: par1
   register: ip_creation_task
@@ -227,6 +234,7 @@ def absent_strategy(api, wished_ip):
 def core(module):
     wished_ip = {
         "organization": module.params["organization"],
+        "project": module.params["project"],
         "reverse": module.params["reverse"],
         "id": module.params["id"],
         "server": module.params["server"],
@@ -248,7 +256,8 @@ def main():
     argument_spec.update(
         dict(
             state=dict(default="present", choices=["absent", "present"]),
-            organization=dict(required=True),
+            organization=dict(),
+            project=dict(),
             server=dict(),
             reverse=dict(),
             region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
@@ -258,6 +267,12 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        mutually_exclusive=[
+            ("organization", "project"),
+        ],
+        required_one_of=[
+            ("organization", "project"),
+        ],
     )
 
     core(module)
