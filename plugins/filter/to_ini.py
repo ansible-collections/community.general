@@ -16,6 +16,13 @@ options:
     description: The dictionary that should be converted to the INI format.
     type: dictionary
     required: true
+seealso:
+  - ref: community_general_ini_file_module_tweak_settings_in_ini_files
+    description: Tweak settings in INI files
+  - ref: community_general_from_ini_filter_converts_ini_text_input_into_a_dictionary
+    description: Converts INI text input into a dictionary
+  - ref: ansible_builtin_ini_lookup_read_data_from_an_ini_file
+    description: Read data from an INI file
 """
 
 EXAMPLES = r"""
