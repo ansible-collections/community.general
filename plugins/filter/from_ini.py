@@ -17,12 +17,13 @@ options:
     type: string
     required: true
 seealso:
-  - ref: community_general_ini_file_module_tweak_settings_in_ini_files
-    description: Tweak settings in INI files
-  - ref: community_general_to_ini_filter_converts_a_dictionary_to_the_ini_file_format
+  - plugin: community.general.to_ini
+    plugin_type: filter
     description: Converts a dictionary to the INI file format
-  - ref: ansible_builtin_ini_lookup_read_data_from_an_ini_file
+  - plugin: ansible.builtin.ini
+    plugin_type: lookup
     description: Read data from an INI file
+  - module: community.general.ini_file
 """
 
 EXAMPLES = r"""

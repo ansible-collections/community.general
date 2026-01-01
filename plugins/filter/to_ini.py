@@ -17,12 +17,13 @@ options:
     type: dictionary
     required: true
 seealso:
-  - ref: community_general_ini_file_module_tweak_settings_in_ini_files
-    description: Tweak settings in INI files
-  - ref: community_general_from_ini_filter_converts_ini_text_input_into_a_dictionary
-    description: Converts INI text input into a dictionary
-  - ref: ansible_builtin_ini_lookup_read_data_from_an_ini_file
+  - plugin: ansible.builtin.ini
+    plugin_type: lookup
     description: Read data from an INI file
+  - module: community.general.ini_file
+  - plugin: community.general.from_ini
+    plugin_type: filter
+    description: Converts INI text input into a dictionary
 """
 
 EXAMPLES = r"""
