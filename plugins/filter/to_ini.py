@@ -19,11 +19,9 @@ options:
 seealso:
   - plugin: ansible.builtin.ini
     plugin_type: lookup
-    description: Read data from an INI file
   - module: community.general.ini_file
   - plugin: community.general.from_ini
     plugin_type: filter
-    description: Converts INI text input into a dictionary
 """
 
 EXAMPLES = r"""
