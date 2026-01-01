@@ -153,13 +153,10 @@ notes:
 seealso:
   - plugin: ansible.builtin.ini
     plugin_type: lookup
-    description: Read data from an INI file
   - plugin: community.general.from_ini
     plugin_type: filter
-    description: Converts INI text input into a dictionary
   - plugin: community.general.to_ini
     plugin_type: filter
-    description: Converts a dictionary to the INI file format
 author:
   - Jan-Piet Mens (@jpmens)
   - Ales Nosek (@noseka1)
