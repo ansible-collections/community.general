@@ -19,10 +19,8 @@ options:
 seealso:
   - plugin: community.general.to_ini
     plugin_type: filter
-    description: Converts a dictionary to the INI file format
   - plugin: ansible.builtin.ini
     plugin_type: lookup
-    description: Read data from an INI file
   - module: community.general.ini_file
 """
 
