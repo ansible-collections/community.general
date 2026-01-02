@@ -2962,15 +2962,11 @@ def main():
                     if nmcli.conn_reload:
                         (rc, out, err) = nmcli.reload_connection()
                         if rc != 0:
-                            module.fail_json(
-                                msg = f"Error bringing up connection named {nmcli.conn_name}: {err}", rc=rc
-                            )
+                            module.fail_json(msg=f"Error bringing up connection named {nmcli.conn_name}: {err}", rc=rc)
 
                     (rc, out, err) = nmcli.up_connection()
                     if rc != 0:
-                        module.fail_json(
-                            msg=f"Error bringing up connection named {nmcli.conn_name}: {err}", rc=rc
-                        )
+                        module.fail_json(msg=f"Error bringing up connection named {nmcli.conn_name}: {err}", rc=rc)
                     result["changed"] = True
             else:
                 module.fail_json(
@@ -2997,9 +2993,7 @@ def main():
 
                     (rc, out, err) = nmcli.down_connection()
                     if rc != 0:
-                        module.fail_json(
-                            name=f"Error bringing down connection named {nmcli.conn_name}", msg=err, rc=rc
-                        )
+                        module.fail_json(name=f"Error bringing down connection named {nmcli.conn_name}", msg=err, rc=rc)
                     result["changed"] = True
             else:
                 module.fail_json(msg=f"Connection {nmcli.conn_name} does not exist")
