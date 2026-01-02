@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
+import yaml
 
 
 DOCUMENTATION = r"""
@@ -19,7 +20,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
 options:
   api_key:
     description:
@@ -255,6 +256,7 @@ def main():
         module.fail_json(msg="record type MX required the 'priority' argument")
 
     has_changed = False
+    diff = dict(before="", after="")
     all_records = []
     try:
         with nc_dnsapi.Client(customer_id, api_key, api_password, timeout) as api:
@@ -284,23 +286,29 @@ def main():
                         if not module.check_mode:
                             all_records = api.delete_dns_records(domain, obsolete_records)
 
+                        if module._diff:
+                            diff["before"] = yaml.safe_dump(obsolete_records)
                         has_changed = True
 
                 if not record_exists:
                     if not module.check_mode:
                         all_records = api.add_dns_record(domain, record)
 
+                    if module._diff:
+                        diff["after"] = yaml.safe_dump([record])
                     has_changed = True
             elif state == "absent" and record_exists:
                 if not module.check_mode:
                     all_records = api.delete_dns_record(domain, record)
 
+                if module._diff:
+                    diff["before"] = yaml.safe_dump([record])
                 has_changed = True
 
     except Exception as ex:
         module.fail_json(msg=str(ex))
 
-    module.exit_json(changed=has_changed, result={"records": [record_data(r) for r in all_records]})
+    module.exit_json(changed=has_changed, diff=diff, result={"records": [record_data(r) for r in all_records]})
 
 
 def record_data(r):
