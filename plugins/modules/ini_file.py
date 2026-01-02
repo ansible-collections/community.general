@@ -153,6 +153,13 @@ options:
 notes:
   - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
   - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
+seealso:
+  - plugin: ansible.builtin.ini
+    plugin_type: lookup
+  - plugin: community.general.from_ini
+    plugin_type: filter
+  - plugin: community.general.to_ini
+    plugin_type: filter
 author:
   - Jan-Piet Mens (@jpmens)
   - Ales Nosek (@noseka1)
