@@ -126,12 +126,18 @@
           input |
             community.general.json_diff(target) |
             sort(attribute='path')
-          ==
-          [
-            {"op": "add", "path": "/baq", "value": {"baz": 2}},
-            {"op": "remove", "path": "/baw/1"},
-            {"op": "replace", "path": "/hello", "value": "night"},
-          ]
+          in [expected_1, expected_2]
   vars:
     input: {"foo": 1, "bar":{"baz": 2}, "baw": [1, 2, 3], "hello": "day"}
     target: {"foo": 1, "bar": {"baz": 2}, "baw": [1, 3], "baq": {"baz": 2}, "hello": "night"}
+    expected_1:
+      # Older jsonpatch version
+      - {"op": "add", "path": "/baq", "value": {"baz": 2}}
+      - {"op": "remove", "path": "/baw/1"}
+      - {"op": "replace", "path": "/hello", "value": "night"}
+    expected_2:
+      # Newer jsonpatch version
+      - {"op": "add", "path": "/baq", "value": {"baz": 2}}
+      - {"op": "remove", "path": "/baw/1"}
+      - {"op": "move", "path": "/baw/1", "from": "/baw/2"}
+      - {"op": "replace", "path": "/hello", "value": "night"}
