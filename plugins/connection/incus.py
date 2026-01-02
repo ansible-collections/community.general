@@ -104,11 +104,11 @@ class Connection(ConnectionBase):
         if getattr(self._shell, "_IS_WINDOWS", False):
             # Initializing regular expression patterns to match on a PowerShell or cmd command line.
             self.powershell_regex_pattern = re.compile(
-                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*powershell(?:\.exe)?)"?\s+(?P<args>.*)(?P<command>-c(?:ommand)?\s+.*)',
+                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*powershell(?:\.exe)?)"?\s+(?P<args>.*)(?P<command>-c(?:ommand)?\s+(?P<post_args>.*))',
                 re.IGNORECASE,
             )
             self.cmd_regex_pattern = re.compile(
-                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*cmd(?:\.exe)?)"?\s+(?P<args>.*)(?P<command>/c\s+.*)',
+                r'^"?(?P<executable>(?:[a-z]:\\)?[a-z0-9 ()\\.]*cmd(?:\.exe)?)"?\s+(?P<args>.*)(?P<command>/c\s+(?P<post_args>.*))',
                 re.IGNORECASE,
             )
 
@@ -157,9 +157,10 @@ class Connection(ConnectionBase):
                     [
                         # To avoid splitting on a space contained in the path, set the executable as the first argument.
                         regex_match.group("executable").strip('"'),
-                        *(regex_match.group("args").lstrip().split(" ")),
+                        *(regex_match.group("args").split(" ")),
                         # Set the command argument depending on cmd or powershell and the rest of it
                         regex_match.group("command"),
+                        *(regex_match.group("post_args").split(" ")),
                     ]
                 )
             else:
