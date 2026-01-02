@@ -2392,11 +2392,7 @@ class Nmcli:
             raise NmcliModuleError(err)
 
         lines = [ll.strip() for ll in out.splitlines() if "GENERAL.STATE" in ll]
-        for line in lines:
-            if "GENERAL.STATE" in line:
-                state = line.split(":")
-                return state
-        return None
+        return lines[0].split(":")[1] if lines else None
 
     def is_connection_active(self):
         """Check if the connection is currently active"""
@@ -2967,16 +2963,15 @@ def main():
                         (rc, out, err) = nmcli.reload_connection()
                         if rc != 0:
                             module.fail_json(
-                                name=f"Error bringing up connection named {nmcli.conn_name}", msg=err, rc=rc
+                                msg = f"Error bringing up connection named {nmcli.conn_name}: {err}", rc=rc
                             )
 
-                    if not is_active or nmcli.conn_reload:
-                        (rc, out, err) = nmcli.up_connection()
-                        if rc != 0:
-                            module.fail_json(
-                                name=f"Error bringing up connection named {nmcli.conn_name}", msg=err, rc=rc
-                            )
-                        result["changed"] = True
+                    (rc, out, err) = nmcli.up_connection()
+                    if rc != 0:
+                        module.fail_json(
+                            msg=f"Error bringing up connection named {nmcli.conn_name}: {err}", rc=rc
+                        )
+                    result["changed"] = True
             else:
                 module.fail_json(
                     name=nmcli.conn_name,
@@ -3000,13 +2995,12 @@ def main():
                         if rc != 0:
                             module.fail_json(name=f"Error reloading connection {nmcli.conn_name}", msg=err, rc=rc)
 
-                    if is_active or nmcli.conn_reload:
-                        (rc, out, err) = nmcli.down_connection()
-                        if rc != 0:
-                            module.fail_json(
-                                name=f"Error bringing down connection named {nmcli.conn_name}", msg=err, rc=rc
-                            )
-                        result["changed"] = True
+                    (rc, out, err) = nmcli.down_connection()
+                    if rc != 0:
+                        module.fail_json(
+                            name=f"Error bringing down connection named {nmcli.conn_name}", msg=err, rc=rc
+                        )
+                    result["changed"] = True
             else:
                 module.fail_json(msg=f"Connection {nmcli.conn_name} does not exist")
 
@@ -3014,10 +3008,7 @@ def main():
         module.fail_json(name=nmcli.conn_name, msg=str(e))
 
     if "changed" not in result:
-        if rc is None:
-            result["changed"] = False
-        else:
-            result["changed"] = True
+        result["changed"] = rc is not None
     if out:
         result["stdout"] = out
     if err:
