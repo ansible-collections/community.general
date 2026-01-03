@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-import yaml
 
 
 DOCUMENTATION = r"""
@@ -201,6 +200,15 @@ except ImportError:
     NCDNSAPI_IMP_ERR = traceback.format_exc()
     HAS_NCDNSAPI = False
 
+YAML_IMP_ERR = None
+try:
+    import yaml
+
+    HAS_YAML = True
+except ImportError:
+    YAML_IMP_ERR = traceback.format_exc()
+    HAS_YAML = False
+
 
 def main():
     module = AnsibleModule(
@@ -258,6 +266,9 @@ def main():
     has_changed = False
 
     diff_mode = module._diff
+    if diff_mode and not HAS_YAML:
+        module.error_as_warning(missing_required_lib("PyYAML", reason="For diff mode"), YAML_IMP_ERR)
+        diff_mode = False
     if diff_mode:
         yaml.SafeDumper.add_representer(DNSRecord, lambda dumper, data: dumper.represent_dict(record_data(data)))
     diff = dict(before="", after="")
