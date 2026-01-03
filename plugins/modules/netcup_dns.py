@@ -20,6 +20,7 @@ attributes:
     support: full
   diff_mode:
     support: full
+    version_added: 12.3.0
 options:
   api_key:
     description:
