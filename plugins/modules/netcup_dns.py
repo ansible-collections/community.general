@@ -257,9 +257,7 @@ def main():
     has_changed = False
 
     diff_mode = module._diff
-    if diff_mode:
-        empty_list = into_diffable([], domain)
-        diff = dict(before=empty_list, after=empty_list)
+    diff = None
 
     all_records = []
     try:
@@ -267,6 +265,8 @@ def main():
             all_records = api.dns_records(domain)
             record = DNSRecord(record, record_type, value, priority=priority)
 
+            if diff_mode:
+                diff_after = all_records.copy()
             # try to get existing record
             record_exists = False
             for r in all_records:
@@ -291,7 +291,7 @@ def main():
                             all_records = api.delete_dns_records(domain, obsolete_records)
 
                         if diff_mode:
-                            diff["before"] = into_diffable(obsolete_records, domain)
+                            diff_after = [r for r in diff_after if r not in obsolete_records]
                         has_changed = True
 
                 if not record_exists:
@@ -299,15 +299,17 @@ def main():
                         all_records = api.add_dns_record(domain, record)
 
                     if diff_mode:
-                        diff["after"] = into_diffable([record], domain)
+                        diff_after.append(record)
                     has_changed = True
             elif state == "absent" and record_exists:
                 if not module.check_mode:
                     all_records = api.delete_dns_record(domain, record)
 
                 if diff_mode:
-                    diff["before"] = into_diffable([record], domain)
+                    diff_after.remove(record)
                 has_changed = True
+        if diff_mode:
+            diff = dict(before=into_diffable(all_records, domain), after=into_diffable(diff_after, domain))
 
     except Exception as ex:
         module.fail_json(msg=str(ex))
@@ -317,6 +319,7 @@ def main():
 
 def record_data(r):
     return {"name": r.hostname, "type": r.type, "value": r.destination, "priority": r.priority, "id": r.id}
+
 
 def into_diffable(records, domain):
     return {domain: [record_data(r) for r in records]}
