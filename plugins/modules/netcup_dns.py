@@ -200,15 +200,6 @@ except ImportError:
     NCDNSAPI_IMP_ERR = traceback.format_exc()
     HAS_NCDNSAPI = False
 
-YAML_IMP_ERR = None
-try:
-    import yaml
-
-    HAS_YAML = True
-except ImportError:
-    YAML_IMP_ERR = traceback.format_exc()
-    HAS_YAML = False
-
 
 def main():
     module = AnsibleModule(
@@ -266,12 +257,9 @@ def main():
     has_changed = False
 
     diff_mode = module._diff
-    if diff_mode and not HAS_YAML:
-        module.error_as_warning(missing_required_lib("PyYAML", reason="For diff mode"), YAML_IMP_ERR)
-        diff_mode = False
     if diff_mode:
-        yaml.SafeDumper.add_representer(DNSRecord, lambda dumper, data: dumper.represent_dict(record_data(data)))
-    diff = dict(before="", after="")
+        empty_list = into_diffable([], domain)
+        diff = dict(before=empty_list, after=empty_list)
 
     all_records = []
     try:
@@ -303,7 +291,7 @@ def main():
                             all_records = api.delete_dns_records(domain, obsolete_records)
 
                         if diff_mode:
-                            diff["before"] = yaml.safe_dump(obsolete_records)
+                            diff["before"] = into_diffable(obsolete_records, domain)
                         has_changed = True
 
                 if not record_exists:
@@ -311,14 +299,14 @@ def main():
                         all_records = api.add_dns_record(domain, record)
 
                     if diff_mode:
-                        diff["after"] = yaml.safe_dump([record])
+                        diff["after"] = into_diffable([record], domain)
                     has_changed = True
             elif state == "absent" and record_exists:
                 if not module.check_mode:
                     all_records = api.delete_dns_record(domain, record)
 
                 if diff_mode:
-                    diff["before"] = yaml.safe_dump([record])
+                    diff["before"] = into_diffable([record], domain)
                 has_changed = True
 
     except Exception as ex:
@@ -329,6 +317,9 @@ def main():
 
 def record_data(r):
     return {"name": r.hostname, "type": r.type, "value": r.destination, "priority": r.priority, "id": r.id}
+
+def into_diffable(records, domain):
+    return {domain: [record_data(r) for r in records]}
 
 
 if __name__ == "__main__":
