@@ -40,7 +40,7 @@ class Handler(SimpleHTTPRequestHandler):
         trailing_slash = path.rstrip().endswith("/")
         try:
             path = unquote(path, errors="surrogatepass")
-        except (UnicodeDecodeError, TypeError) as exc:
+        except (UnicodeDecodeError, TypeError):
             path = unquote(path)
         path = posixpath.normpath(path)
         words = path.split("/")

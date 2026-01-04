@@ -58,6 +58,6 @@ else:
     print("Start SMTP server on port", port1)
     smtp_server1 = smtpd.DebuggingServer(("127.0.0.1", port1), None)  # pylint: disable=used-before-assignment
     if port2:
-        print("WARNING: TLS is NOT supported on this system, not listening on port %s." % port2)
+        print(f"WARNING: TLS is NOT supported on this system, not listening on port {port2}.")
 
 asyncore.loop()
