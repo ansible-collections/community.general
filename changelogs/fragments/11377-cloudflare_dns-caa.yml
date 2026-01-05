@@ -1,0 +1,2 @@
+bugfixes:
+  - "cloudflare_dns - also allow ``flag=128`` for CAA records (https://github.com/ansible-collections/community.general/issues/11355, https://github.com/ansible-collections/community.general/pull/11377)."
