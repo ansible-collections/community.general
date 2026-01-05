@@ -15,7 +15,6 @@ import pathlib
 import shutil
 import subprocess
 import tempfile
-import typing as t
 import urllib.request
 
 
@@ -23,7 +22,7 @@ import urllib.request
 class CoverageFile:
     name: str
     path: pathlib.Path
-    flags: t.List[str]
+    flags: list[str]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -46,7 +45,7 @@ def parse_args() -> Args:
     return Args(**kwargs)
 
 
-def process_files(directory: pathlib.Path) -> t.Tuple[CoverageFile, ...]:
+def process_files(directory: pathlib.Path) -> tuple[CoverageFile, ...]:
     processed = []
     for file in directory.joinpath("reports").glob("coverage*.xml"):
         name = file.stem.replace("coverage=", "")
@@ -62,7 +61,7 @@ def process_files(directory: pathlib.Path) -> t.Tuple[CoverageFile, ...]:
     return tuple(processed)
 
 
-def upload_files(codecov_bin: pathlib.Path, files: t.Tuple[CoverageFile, ...], dry_run: bool = False) -> None:
+def upload_files(codecov_bin: pathlib.Path, files: tuple[CoverageFile, ...], dry_run: bool = False) -> None:
     for file in files:
         cmd = [
             str(codecov_bin),
