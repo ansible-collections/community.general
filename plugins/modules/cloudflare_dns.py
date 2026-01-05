@@ -60,7 +60,7 @@ options:
     description:
       - Issuer Critical Flag.
       - Should be set either to V(0) for not critical, or to V(128) for critical.
-      - Before community.general 13.3.0, only V(0) and V(1) were valid options.
+      - Before community.general 12.3.0, only V(0) and V(1) were valid options.
         The value V(1) is still available for backwards-compatibility reasons.
       - Required for O(type=CAA) when O(state=present).
     type: int
