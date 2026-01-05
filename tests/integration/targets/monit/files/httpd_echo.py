@@ -6,16 +6,11 @@ from __future__ import annotations
 
 import daemon
 
-try:
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-    def write_to_output(stream, content):
-        stream.write(content)
-except ImportError:
-    from http.server import BaseHTTPRequestHandler, HTTPServer
 
-    def write_to_output(stream, content):
-        stream.write(bytes(content, "utf-8"))
+def write_to_output(stream, content):
+    stream.write(bytes(content, "utf-8"))
 
 
 hostname = "localhost"

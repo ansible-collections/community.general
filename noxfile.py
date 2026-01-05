@@ -9,14 +9,14 @@
 import os
 import sys
 
-import nox
+import nox  # type: ignore[import-not-found]
 
 # Whether the noxfile is running in CI:
 IN_CI = os.environ.get("CI") == "true"
 
 
 try:
-    import antsibull_nox
+    import antsibull_nox  # type: ignore[import-not-found]
 except ImportError:
     print("You need to install antsibull-nox in the same Python environment as nox.")
     sys.exit(1)

@@ -12,7 +12,6 @@ def callback_results_extractor(outputs_results):
         expected_output = result["test"]["expected_output"]
         stdout_lines = result["stdout_lines"]
         for i in range(max(len(expected_output), len(stdout_lines))):
-            line = "line_%s" % (i + 1)
             test_line = stdout_lines[i] if i < len(stdout_lines) else None
             expected_lines = expected_output[i] if i < len(expected_output) else None
             if not isinstance(expected_lines, str) and expected_lines is not None:

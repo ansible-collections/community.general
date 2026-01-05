@@ -43,20 +43,20 @@ def main():
         jobs[label] = max(attempt, jobs.get(label, 0))
 
     for label, attempt in jobs.items():
-        name = "Coverage {attempt} {label}".format(label=label, attempt=attempt)
+        name = f"Coverage {attempt} {label}"
         source = os.path.join(source_directory, name)
         source_files = os.listdir(source)
 
         for source_file in source_files:
             source_path = os.path.join(source, source_file)
             destination_path = os.path.join(destination_directory, source_file + "." + label)
-            print('"%s" -> "%s"' % (source_path, destination_path))
+            print(f'"{source_path}" -> "{destination_path}"')
             shutil.copyfile(source_path, destination_path)
             count += 1
 
-    print("Coverage file count: %d" % count)
-    print("##vso[task.setVariable variable=coverageFileCount]%d" % count)
-    print("##vso[task.setVariable variable=outputPath]%s" % output_path)
+    print(f"Coverage file count: {count}")
+    print(f"##vso[task.setVariable variable=coverageFileCount]{count}")
+    print(f"##vso[task.setVariable variable=outputPath]{output_path}")
 
 
 if __name__ == "__main__":
