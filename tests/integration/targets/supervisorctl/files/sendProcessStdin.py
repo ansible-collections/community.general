@@ -22,4 +22,4 @@ else:
     url = "http://127.0.0.1:9001/RPC2"
 
 server = ServerProxy(url, verbose=True)
-server.supervisor.sendProcessStdin(proc, "import sys; print(%s); sys.stdout.flush();\n" % value)
+server.supervisor.sendProcessStdin(proc, f"import sys; print({value}); sys.stdout.flush();\n")

@@ -6,7 +6,7 @@
 import sys
 from io import StringIO
 
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML  # type: ignore[import-not-found]
 
 
 def main() -> None:

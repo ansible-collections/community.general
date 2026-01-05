@@ -10,15 +10,11 @@ import sys
 root_dir = sys.argv[1]
 port = int(sys.argv[2])
 
-try:
-    from BaseHTTPServer import HTTPServer
-    from SimpleHTTPServer import SimpleHTTPRequestHandler
-except ModuleNotFoundError:
-    from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 httpd = HTTPServer(("localhost", port), SimpleHTTPRequestHandler)
 try:
-    httpd.socket = ssl.wrap_socket(
+    httpd.socket = ssl.wrap_socket(  # type: ignore[attr-defined]
         httpd.socket,
         server_side=True,
         certfile=os.path.join(root_dir, "cert.pem"),

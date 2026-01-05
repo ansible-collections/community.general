@@ -51,11 +51,10 @@ def main():
         with runner.context(p["arg_order"], check_mode_skip=p["check_mode_skip"]) as ctx:
             result = ctx.run(**p["arg_values"])
             info = ctx.run_info
-        check = "check"
         rc, out, err = result if result is not None else (None, None, None)
 
         module.exit_json(rc=rc, out=out, err=err, info=info)
-    except Exception as exc:
+    except Exception:
         module.fail_json(rc=1, module_stderr=traceback.format_exc(), msg="Module crashed with exception")
 
 
