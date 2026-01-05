@@ -1,0 +1,2 @@
+minor_changes:
+  - netcup_dns - support diff mode (https://github.com/ansible-collections/community.general/pull/11376).
