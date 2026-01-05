@@ -61,9 +61,12 @@ options:
   flag:
     description:
       - Issuer Critical Flag.
+      - Should be set either to V(0) for not critical, or to V(128) for critical.
+      - Before community.general 11.4.4, only V(0) and V(1) were valid options.
+        The value V(1) is still available for backwards-compatibility reasons.
       - Required for O(type=CAA) when O(state=present).
     type: int
-    choices: [0, 1]
+    choices: [0, 1, 128]
     version_added: 8.0.0
   tag:
     description:
@@ -907,7 +910,7 @@ def main():
             hash_type=dict(type='int', choices=[1, 2]),
             key_tag=dict(type='int', no_log=False),
             port=dict(type='int'),
-            flag=dict(type='int', choices=[0, 1]),
+            flag=dict(type='int', choices=[0, 1, 128]),
             tag=dict(type='str', choices=['issue', 'issuewild', 'iodef']),
             tags=dict(type='list', elements='str'),
             priority=dict(type='int', default=1),
