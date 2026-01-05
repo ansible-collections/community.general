@@ -27,6 +27,7 @@ port = "25:465"
 if len(sys.argv) > 1:
     port = sys.argv[1]
 ports = port.split(":")
+port1: int
 port2: int | None
 if len(ports) > 1:
     port1, port2 = int(ports[0]), int(ports[1])
