@@ -182,7 +182,6 @@ dns_rc_str:
 import traceback
 
 from binascii import Error as binascii_error
-from socket import error as socket_error
 
 DNSPYTHON_IMP_ERR = None
 try:
@@ -263,7 +262,7 @@ class RecordManager:
                     )
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
-            except (socket_error, dns.exception.Timeout) as e:
+            except (OSError, dns.exception.Timeout) as e:
                 self.module.fail_json(msg=f"DNS server error: ({e.__class__.__name__}): {e}")
             if lookup.rcode() in [dns.rcode.SERVFAIL, dns.rcode.REFUSED]:
                 self.module.fail_json(
@@ -298,7 +297,7 @@ class RecordManager:
                 )
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
-        except (socket_error, dns.exception.Timeout) as e:
+        except (OSError, dns.exception.Timeout) as e:
             self.module.fail_json(msg=f"DNS server error: ({e.__class__.__name__}): {e}")
         return response
 
@@ -367,7 +366,7 @@ class RecordManager:
                     )
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
-            except (socket_error, dns.exception.Timeout) as e:
+            except (OSError, dns.exception.Timeout) as e:
                 self.module.fail_json(msg=f"DNS server error: ({e.__class__.__name__}): {e}")
 
             lookup_result = lookup.answer[0] if lookup.answer else lookup.authority[0]
@@ -458,7 +457,7 @@ class RecordManager:
                 lookup = dns.query.udp(query, self.module.params["server"], timeout=10, port=self.module.params["port"])
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
-        except (socket_error, dns.exception.Timeout) as e:
+        except (OSError, dns.exception.Timeout) as e:
             self.module.fail_json(msg=f"DNS server error: ({e.__class__.__name__}): {e}")
 
         if lookup.rcode() != dns.rcode.NOERROR:
