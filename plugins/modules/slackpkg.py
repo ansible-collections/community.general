@@ -68,14 +68,14 @@ EXAMPLES = r"""
     state: latest
 """
 
+import platform
+import os
+import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 
-def query_package(module, slackpkg_path, name):
-    import platform
-    import os
-    import re
-
+def query_package(name):
     machine = platform.machine()
     # Exception for kernel-headers package on x86_64
     if name == "kernel-headers" and machine == "x86_64":
@@ -91,13 +91,13 @@ def remove_packages(module, slackpkg_path, packages):
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        if not query_package(module, slackpkg_path, package):
+        if not query_package(package):
             continue
 
         if not module.check_mode:
             rc, out, err = module.run_command([slackpkg_path, "-default_answer=y", "-batch=on", "remove", package])
 
-        if not module.check_mode and query_package(module, slackpkg_path, package):
+        if not module.check_mode and query_package(package):
             module.fail_json(msg=f"failed to remove {package}: {out}")
 
         remove_c += 1
@@ -112,13 +112,13 @@ def install_packages(module, slackpkg_path, packages):
     install_c = 0
 
     for package in packages:
-        if query_package(module, slackpkg_path, package):
+        if query_package(package):
             continue
 
         if not module.check_mode:
             rc, out, err = module.run_command([slackpkg_path, "-default_answer=y", "-batch=on", "install", package])
 
-        if not module.check_mode and not query_package(module, slackpkg_path, package):
+        if not module.check_mode and not query_package(package):
             module.fail_json(msg=f"failed to install {package}: {out}", stderr=err)
 
         install_c += 1
@@ -136,7 +136,7 @@ def upgrade_packages(module, slackpkg_path, packages):
         if not module.check_mode:
             rc, out, err = module.run_command([slackpkg_path, "-default_answer=y", "-batch=on", "upgrade", package])
 
-        if not module.check_mode and not query_package(module, slackpkg_path, package):
+        if not module.check_mode and not query_package(package):
             module.fail_json(msg=f"failed to install {package}: {out}", stderr=err)
 
         install_c += 1
