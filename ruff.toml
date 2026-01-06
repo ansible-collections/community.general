@@ -21,8 +21,6 @@ ignore = [
     "B905",  # zip-without-explicit-strict - needs Python 3.10+
     "UP045",  # Use `X | None` for type annotations - needs Python 3.10+
     # To fix:
-    "UP024",  # Replace aliased errors with `OSError`
-    "UP041",  # Replace aliased errors with `TimeoutError`
     "B026",  # star-arg-unpacking-after-keyword-arg
     "SIM102",  # collapsible-if
     "SIM114",  # if-with-same-arms
