@@ -312,7 +312,6 @@ import io
 import os
 import pathlib
 import shlex
-import socket
 import tempfile
 import traceback
 import typing as t
@@ -667,7 +666,7 @@ class Connection(ConnectionBase):
             elif in_data == b"":
                 chan.shutdown_write()
 
-        except socket.timeout as e:
+        except TimeoutError as e:
             raise AnsibleError(f"ssh timed out waiting for privilege escalation.\n{to_text(become_output)}") from e
 
         stdout = b"".join(chan.makefile("rb", bufsize))
