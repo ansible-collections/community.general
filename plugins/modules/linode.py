@@ -272,6 +272,9 @@ EXAMPLES = r"""
   delegate_to: localhost
 """
 
+import random
+import string
+
 import time
 import traceback
 
@@ -295,8 +298,6 @@ def randompass():
     # It must contain at least two of these four character classes:
     # lower case letters - upper case letters - numbers - punctuation
     # we play it safe :)
-    import random
-    import string
 
     # as of python 2.4, this reseeds the PRNG from urandom
     random.seed()

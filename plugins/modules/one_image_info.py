@@ -269,6 +269,7 @@ images:
           name: SampleName
 """
 
+import re
 
 from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
 
@@ -345,8 +346,6 @@ class ImageInfoModule(OpenNebulaModule):
         pool = self.get_all_images()
 
         if name_pattern.startswith("~"):
-            import re
-
             if name_pattern[1] == "*":
                 pattern = re.compile(name_pattern[2:], re.IGNORECASE)
             else:

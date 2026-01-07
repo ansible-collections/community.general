@@ -682,8 +682,13 @@ try:
 except ImportError:
     HAS_PYONE = False
 
-
+import copy
 import os
+import re
+import time
+
+from collections import namedtuple
+
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
@@ -875,7 +880,6 @@ def get_vm_info(client, vm):
                     "security_groups": vm.TEMPLATE["NIC"].get("SECURITY_GROUPS", ""),
                 }
             )
-    import time
 
     current_time = time.localtime()
     vm_start_time = time.localtime(vm.STIME)
@@ -1146,8 +1150,6 @@ def get_all_vms_by_attributes(client, attributes_dict, labels_list):
                     vm_list.append(vm)
         pool = vm_list
 
-    import copy
-
     vm_list = copy.copy(pool)
 
     for vm in pool:
@@ -1367,8 +1369,6 @@ LCM_STATES = [
 
 
 def wait_for_state(module, client, vm, wait_timeout, state_predicate):
-    import time
-
     start_time = time.time()
 
     while (time.time() - start_time) < wait_timeout:
@@ -1551,8 +1551,6 @@ def release_vm(module, client, vm):
 
 def check_name_attribute(module, attributes):
     if attributes.get("NAME"):
-        import re
-
         if re.match(r"^[^#]+#*$", attributes.get("NAME")) is None:
             module.fail_json(
                 msg=f"Illegal 'NAME' attribute: '{attributes.get('NAME')}"
@@ -1638,7 +1636,6 @@ def get_connection_info(module):
                 module.fail_json(msg=f"Error occurs when read ONE_AUTH file at '{authfile}'")
     if not url:
         module.fail_json(msg="Opennebula API url (api_url) is not specified")
-    from collections import namedtuple
 
     auth_params = namedtuple("auth", ("url", "username", "password"))
 
@@ -1752,8 +1749,6 @@ def main():
     if count_attributes:
         count_attributes = {key.upper(): value for key, value in count_attributes.items()}
         if not attributes:
-            import copy
-
             module.warn(
                 "When you pass `count_attributes` without `attributes` option when deploying, `attributes` option will have same values implicitly."
             )
@@ -1820,8 +1815,6 @@ def main():
         module.fail_json(msg="`count` has to be greater than 0")
 
     if permissions is not None:
-        import re
-
         if re.match("^[0-7]{3}$", permissions) is None:
             module.fail_json(msg="Option `mode` has to have exactly 3 digits and be in the octet format e.g. 600")
 
