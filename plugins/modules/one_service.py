@@ -231,6 +231,9 @@ roles:
 """
 
 import os
+import time
+from collections import namedtuple
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 
@@ -396,8 +399,6 @@ def create_service(module, auth, template_id, service_name, custom_attrs, unique
 
 
 def wait_for_service_to_become_ready(module, auth, service_id, wait_timeout):
-    import time
-
     start_time = time.time()
 
     while (time.time() - start_time) < wait_timeout:
@@ -729,8 +730,6 @@ def get_connection_info(module):
         module.fail_json(
             msg="One or more connection parameters (api_url, api_username, api_password) were not specified"
         )
-    from collections import namedtuple
-
     auth_params = namedtuple("auth", ("url", "user", "password"))
 
     return auth_params(url=url, user=username, password=password)
