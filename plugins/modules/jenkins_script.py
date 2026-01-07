@@ -103,6 +103,7 @@ output:
 
 import json
 from http import cookiejar
+from string import Template
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
@@ -153,8 +154,6 @@ def main():
         module.params["force_basic_auth"] = True
 
     if module.params["args"] is not None:
-        from string import Template
-
         try:
             script_contents = Template(module.params["script"]).substitute(module.params["args"])
         except KeyError as err:

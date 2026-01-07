@@ -1,0 +1,7 @@
+minor_changes:
+  - jenkins_script - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+  - linode - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+  - one_image - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+  - one_image_info - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+  - one_service - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+  - one_vm - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
