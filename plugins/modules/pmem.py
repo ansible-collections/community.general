@@ -497,7 +497,7 @@ class PersistentMemory:
             errmsg = ""
             rc = True
             for line in ipmctl_out.splitlines():
-                if line == "WARNING":
+                if line.startswith("WARNING"):
                     errmsg = f"{line} (command: {command})"
                     rc = False
                     break
