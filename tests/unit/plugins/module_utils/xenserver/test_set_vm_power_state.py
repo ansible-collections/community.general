@@ -5,12 +5,10 @@
 
 from __future__ import annotations
 
-
 import pytest
 
-from .FakeAnsibleModule import FailJsonException
 from .common import fake_xenapi_ref, testcase_bad_xenapi_refs
-
+from .FakeAnsibleModule import FailJsonException
 
 testcase_set_vm_power_state_bad_transitions = {
     "params": [

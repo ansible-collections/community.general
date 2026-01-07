@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: interfaces_file
 short_description: Tweak settings in C(/etc/network/interfaces) files

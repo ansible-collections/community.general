@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: redis_info
 short_description: Gather information about Redis servers
@@ -224,6 +223,7 @@ except ImportError:
     HAS_REDIS_PACKAGE = False
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.redis import (
     fail_imports,
     redis_auth_argument_spec,

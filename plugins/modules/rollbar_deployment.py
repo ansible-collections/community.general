@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: rollbar_deployment
 author: "Max Riveiro (@kavu)"

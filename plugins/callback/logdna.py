@@ -55,12 +55,13 @@ options:
     default: ansible
 """
 
-import logging
 import json
+import logging
 import socket
 from uuid import getnode
-from ansible.plugins.callback import CallbackBase
+
 from ansible.parsing.ajson import AnsibleJSONEncoder
+from ansible.plugins.callback import CallbackBase
 
 try:
     from logdna import LogDNAHandler

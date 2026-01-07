@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ovh_ip_loadbalancing_backend
 short_description: Manage OVH IP LoadBalancing backends

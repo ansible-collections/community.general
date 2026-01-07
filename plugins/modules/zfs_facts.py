@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: zfs_facts
 short_description: Gather facts about ZFS datasets
@@ -153,7 +152,6 @@ zfs_datasets:
 from collections import defaultdict
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 SUPPORTED_TYPES = ["all", "filesystem", "volume", "snapshot", "bookmark"]
 

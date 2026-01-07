@@ -213,6 +213,7 @@ import os
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint

@@ -5,15 +5,17 @@
 from __future__ import annotations
 
 import json
-import pytest
 from unittest.mock import Mock, patch
-from ansible_collections.community.general.plugins.modules import slack
+
+import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import slack
 
 
 class TestSlackModule(ModuleTestCase):

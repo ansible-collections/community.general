@@ -59,6 +59,7 @@ notes:
 """
 
 from shlex import quote as shlex_quote
+
 from ansible.plugins.become import BecomeBase
 
 

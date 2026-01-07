@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: cisco_webex
 short_description: Send a message to a Cisco Webex Teams Room or Individual

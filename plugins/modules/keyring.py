@@ -9,7 +9,6 @@ Ansible Module - community.general.keyring
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: keyring
 version_added: 5.2.0
@@ -74,8 +73,8 @@ EXAMPLES = r"""
     state: absent
 """
 
-from shlex import quote
 import traceback
+from shlex import quote
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 

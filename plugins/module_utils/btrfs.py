@@ -4,10 +4,11 @@
 
 from __future__ import annotations
 
-from ansible.module_utils.common.text.converters import to_bytes
-import re
 import os
+import re
 import typing as t
+
+from ansible.module_utils.common.text.converters import to_bytes
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule

@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: swupd
 short_description: Manages updates and bundles in ClearLinux systems
@@ -102,6 +101,7 @@ EXAMPLES = r"""
 
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
 
 

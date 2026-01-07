@@ -10,8 +10,8 @@ from unittest.mock import patch
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.bitwarden_secrets_manager import BitwardenSecretsManager
 
+from ansible_collections.community.general.plugins.lookup.bitwarden_secrets_manager import BitwardenSecretsManager
 
 MOCK_SECRETS = [
     {

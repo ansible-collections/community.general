@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pagerduty
 short_description: Create PagerDuty maintenance windows

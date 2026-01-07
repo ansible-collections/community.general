@@ -6,14 +6,16 @@ from __future__ import annotations
 
 import unittest
 from unittest import mock
+
 from ansible.module_utils import basic
-from ansible_collections.community.general.plugins.modules import usb_facts
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
-    set_module_args,
     exit_json,
     fail_json,
+    set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import usb_facts
 
 
 def get_bin_path(self, arg, required=False):

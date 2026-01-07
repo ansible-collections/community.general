@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: dconf
 author:
@@ -134,12 +133,13 @@ from ansible.module_utils.common.respawn import (
     probe_interpreters_for_module,
     respawn_module,
 )
+
 from ansible_collections.community.general.plugins.module_utils import deps
 
 glib_module_name = "gi.repository.GLib"
 
 try:
-    from gi.repository.GLib import Variant, GError
+    from gi.repository.GLib import GError, Variant
 except ImportError:
     Variant = None
     GError = AttributeError

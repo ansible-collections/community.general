@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pkgng
 short_description: Package manager for FreeBSD >= 9.0
@@ -135,8 +134,9 @@ EXAMPLES = r"""
 """
 
 
-from collections import defaultdict
 import re
+from collections import defaultdict
+
 from ansible.module_utils.basic import AnsibleModule
 
 

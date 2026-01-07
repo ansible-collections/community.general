@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: svr4pkg
 short_description: Manage Solaris SVR4 packages

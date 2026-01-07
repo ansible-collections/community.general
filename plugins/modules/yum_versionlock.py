@@ -87,8 +87,9 @@ state:
 """
 
 import re
-from ansible.module_utils.basic import AnsibleModule
 from fnmatch import fnmatch
+
+from ansible.module_utils.basic import AnsibleModule
 
 # on DNF-based distros, yum is a symlink to dnf, so we try to handle their different entry formats.
 NEVRA_RE_YUM = re.compile(

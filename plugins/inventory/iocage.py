@@ -170,13 +170,13 @@ groups:
   test: inventory_hostname.startswith('test')
 """
 
-import re
 import os
-from subprocess import Popen, PIPE
+import re
+from subprocess import PIPE, Popen
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.common.text.converters import to_native, to_text
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 from ansible.utils.display import Display
 
 display = Display()

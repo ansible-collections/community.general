@@ -5,18 +5,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-import pytest
+from io import StringIO
+from pathlib import Path
+from unittest.mock import MagicMock, mock_open, patch
 
-from ansible_collections.community.general.plugins.connection.wsl import authenticity_msg, MyAddPolicy
-from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
-from ansible.errors import AnsibleError, AnsibleAuthenticationFailure, AnsibleConnectionFailure
+import pytest
+from ansible.errors import AnsibleAuthenticationFailure, AnsibleConnectionFailure, AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
-from io import StringIO
-from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
 
+from ansible_collections.community.general.plugins.connection.wsl import MyAddPolicy, authenticity_msg
+from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
 
 paramiko = pytest.importorskip("paramiko")
 

@@ -7,10 +7,10 @@ from __future__ import annotations
 import time
 import typing as t
 
-from ansible.plugins.action import ActionBase
 from ansible.errors import AnsibleActionFail, AnsibleConnectionFailure
-from ansible.utils.vars import merge_hash
+from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
+from ansible.utils.vars import merge_hash
 
 display = Display()
 

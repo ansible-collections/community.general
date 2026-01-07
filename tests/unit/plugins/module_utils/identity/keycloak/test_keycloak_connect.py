@@ -4,14 +4,15 @@
 
 from __future__ import annotations
 
-import pytest
 from io import StringIO
 from itertools import count
 from urllib.error import HTTPError
 
+import pytest
+
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    get_token,
     KeycloakError,
+    get_token,
 )
 
 module_params_creds = {

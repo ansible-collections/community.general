@@ -5,11 +5,11 @@
 from __future__ import annotations
 
 import json
+
 import pytest
+from ansible.plugins.loader import lookup_loader
 
 from .onepassword_common import SSH_KEY_MOCK_ENTRIES
-
-from ansible.plugins.loader import lookup_loader
 
 
 @pytest.mark.parametrize(

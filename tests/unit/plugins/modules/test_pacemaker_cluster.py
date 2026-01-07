@@ -10,8 +10,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import pacemaker_cluster
-from .uthelper import UTHelper, RunCommandMock
+
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(pacemaker_cluster, __name__, mocks=[RunCommandMock])

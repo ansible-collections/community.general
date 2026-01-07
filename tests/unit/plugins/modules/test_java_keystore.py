@@ -7,13 +7,14 @@
 from __future__ import annotations
 
 import os
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
+from ansible.module_utils.basic import AnsibleModule  # noqa: F401 # pylint: disable=unused-import
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     ModuleTestCase,
     set_module_args,
 )
-from ansible.module_utils.basic import AnsibleModule  # noqa: F401 # pylint: disable=unused-import
+
 from ansible_collections.community.general.plugins.modules.java_keystore import JavaKeystore, create_module
 
 

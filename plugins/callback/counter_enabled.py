@@ -23,9 +23,9 @@ requirements:
 """
 
 from ansible import constants as C
+from ansible.playbook.task_include import TaskInclude
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.color import colorize, hostcolor
-from ansible.playbook.task_include import TaskInclude
 
 
 class CallbackModule(CallbackBase):

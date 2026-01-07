@@ -66,9 +66,9 @@ import re
 from os.path import basename
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.common.text.converters import to_native
 
+from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 with deps.declare("psutil"):

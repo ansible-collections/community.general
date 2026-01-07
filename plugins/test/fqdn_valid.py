@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = """
 name: fqdn_valid
 short_description: Validates fully-qualified domain names against RFC 1123

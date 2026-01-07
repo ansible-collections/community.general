@@ -193,7 +193,6 @@ from zlib import crc32
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
-
 STATE_ABSENT = "absent"
 STATE_ARCHIVED = "archive"
 STATE_COMPRESSED = "compress"

@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_ip
 short_description: Scaleway IP management module
@@ -116,12 +115,13 @@ data:
     }
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_LOCATION,
-    scaleway_argument_spec,
     Scaleway,
+    scaleway_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
 
 
 def ip_attributes_should_be_changed(api, target_ip, wished_ip):

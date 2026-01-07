@@ -83,6 +83,7 @@ memset_api:
 from time import sleep
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.memset import memset_api_call
 
 

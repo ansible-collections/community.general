@@ -35,8 +35,8 @@ except ImportError:
     pass
 
 import os
-import tempfile
 import shutil
+import tempfile
 
 from ansible.errors import AnsibleError
 from ansible.plugins.connection import ConnectionBase

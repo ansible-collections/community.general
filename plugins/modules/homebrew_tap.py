@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: homebrew_tap
 author:

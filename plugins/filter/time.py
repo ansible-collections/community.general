@@ -5,8 +5,8 @@
 from __future__ import annotations
 
 import re
-from ansible.errors import AnsibleFilterError
 
+from ansible.errors import AnsibleFilterError
 
 UNIT_FACTORS = {
     "ms": [],

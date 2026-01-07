@@ -83,7 +83,9 @@ EXAMPLES = r"""
 RETURN = r""" # """
 
 from os import path
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("pdpyras", url="https://github.com/PagerDuty/pdpyras"):

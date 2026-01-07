@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: influxdb_write
 short_description: Write data points into InfluxDB
@@ -63,6 +62,7 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
 
 

@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ovh_monthly_billing
 author: Francois Lallart (@fraff)

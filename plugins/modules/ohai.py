@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ohai
 short_description: Returns inventory data from I(Ohai)

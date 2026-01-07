@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: sensu_subscription
 short_description: Manage Sensu subscriptions

@@ -184,6 +184,7 @@ host_diff:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
 
 

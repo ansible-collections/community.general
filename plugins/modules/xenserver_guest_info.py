@@ -149,12 +149,13 @@ instance:
 
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.xenserver import (
-    xenserver_common_argument_spec,
     XenServerObject,
-    get_object_ref,
-    gather_vm_params,
     gather_vm_facts,
+    gather_vm_params,
+    get_object_ref,
+    xenserver_common_argument_spec,
 )
 
 

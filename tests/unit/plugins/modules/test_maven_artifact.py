@@ -4,10 +4,9 @@
 from __future__ import annotations
 
 import pytest
-
-from ansible_collections.community.general.plugins.modules import maven_artifact
 from ansible.module_utils import basic
 
+from ansible_collections.community.general.plugins.modules import maven_artifact
 
 pytestmark = pytest.mark.usefixtures("patch_ansible_module")
 

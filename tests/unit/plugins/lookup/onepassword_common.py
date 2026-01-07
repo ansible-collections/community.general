@@ -4,8 +4,8 @@
 
 from __future__ import annotations
 
-import os
 import json
+import os
 
 from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv1,

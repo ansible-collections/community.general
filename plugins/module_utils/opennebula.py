@@ -6,12 +6,11 @@
 
 from __future__ import annotations
 
-
-import time
 import ssl
+import time
 from os import environ
-from ansible.module_utils.basic import AnsibleModule
 
+from ansible.module_utils.basic import AnsibleModule
 
 IMAGE_STATES = [
     "INIT",

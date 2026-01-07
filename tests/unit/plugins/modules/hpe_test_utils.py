@@ -5,12 +5,15 @@
 
 from __future__ import annotations
 
-import pytest
 import re
-
 from unittest.mock import Mock, patch
+
+import pytest
+
 from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
-from hpOneView.oneview_client import OneViewClient
+
+# This import must come *after* the oneview_module_loader import!
+from hpOneView.oneview_client import OneViewClient  # isort: skip
 
 
 class OneViewBaseTest:

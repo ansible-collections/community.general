@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: java_keystore
 short_description: Create a Java keystore in JKS format
@@ -183,20 +182,20 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
 
 try:
-    from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
+    from cryptography.exceptions import UnsupportedAlgorithm
+    from cryptography.hazmat.backends.openssl import backend
+    from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.serialization import (
         BestAvailableEncryption,
         NoEncryption,
-        load_pem_private_key,
         load_der_private_key,
+        load_pem_private_key,
     )
+    from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
     from cryptography.x509 import (
-        load_pem_x509_certificate,
         load_der_x509_certificate,
+        load_pem_x509_certificate,
     )
-    from cryptography.hazmat.primitives import hashes
-    from cryptography.exceptions import UnsupportedAlgorithm
-    from cryptography.hazmat.backends.openssl import backend
 
     HAS_CRYPTOGRAPHY_PKCS12 = True
 except ImportError:

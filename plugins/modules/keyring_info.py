@@ -9,7 +9,6 @@ Ansible Module - community.general.keyring_info
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: keyring_info
 version_added: 5.2.0
@@ -62,8 +61,8 @@ passphrase:
   sample: Password123
 """
 
-from shlex import quote
 import traceback
+from shlex import quote
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 

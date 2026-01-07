@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ipmi_boot
 short_description: Management of order of boot devices
@@ -126,8 +125,8 @@ EXAMPLES = r"""
     state: absent
 """
 
-import traceback
 import binascii
+import traceback
 
 PYGHMI_IMP_ERR = None
 try:

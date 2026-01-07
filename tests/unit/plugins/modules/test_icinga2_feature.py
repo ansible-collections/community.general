@@ -7,14 +7,16 @@
 from __future__ import annotations
 
 from unittest.mock import patch
-from ansible_collections.community.general.plugins.modules import icinga2_feature
+
+from ansible.module_utils import basic
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
-from ansible.module_utils import basic
+
+from ansible_collections.community.general.plugins.modules import icinga2_feature
 
 
 def get_bin_path(*args, **kwargs):

@@ -9,9 +9,10 @@ import unittest
 from unittest.mock import patch
 
 from ansible.errors import AnsibleError
-from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden, BitwardenException
 from ansible.parsing.ajson import AnsibleJSONEncoder
+from ansible.plugins.loader import lookup_loader
+
+from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden, BitwardenException
 
 MOCK_COLLECTION_ID = "3b12a9da-7c49-40b8-ad33-aede017a7ead"
 MOCK_ORGANIZATION_ID = "292ba0c6-f289-11ee-9301-ef7b639ccd2a"

@@ -7,9 +7,9 @@ from __future__ import annotations
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.database import (
+    SQLParseError,
     is_input_dangerous,
     pg_quote_identifier,
-    SQLParseError,
 )
 
 # These are all valid strings

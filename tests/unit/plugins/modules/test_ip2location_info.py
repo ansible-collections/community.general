@@ -10,7 +10,6 @@ from unittest.mock import Mock, patch
 
 from ansible_collections.community.general.plugins.modules.ip2location_info import Ip2LocationInfo
 
-
 IP2LOCATION_DATA = {
     "ip": "8.8.8.8",
     "country_code": "US",

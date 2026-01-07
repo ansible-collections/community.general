@@ -8,7 +8,6 @@ import pytest
 
 from ansible_collections.community.general.plugins.modules.one_vm import parse_updateconf
 
-
 PARSE_UPDATECONF_VALID = [
     (
         {

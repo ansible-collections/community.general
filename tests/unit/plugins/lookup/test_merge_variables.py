@@ -7,12 +7,12 @@ from __future__ import annotations
 import unittest
 from unittest.mock import patch
 
-from ansible_collections.community.internal_test_tools.tests.unit.mock.loader import DictDataLoader
-
+from ansible.errors import AnsibleError
 from ansible.plugins import AnsiblePlugin
 from ansible.template import Templar
-from ansible.errors import AnsibleError
 from ansible.utils.display import Display
+from ansible_collections.community.internal_test_tools.tests.unit.mock.loader import DictDataLoader
+
 from ansible_collections.community.general.plugins.lookup import merge_variables
 
 

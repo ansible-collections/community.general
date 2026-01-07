@@ -41,8 +41,8 @@ _value:
 import typing as t
 from collections.abc import Callable
 
-from ansible.plugins.loader import action_loader, module_loader
 from ansible.errors import AnsibleFilterError
+from ansible.plugins.loader import action_loader, module_loader
 
 try:
     from ansible.errors import AnsiblePluginRemovedError

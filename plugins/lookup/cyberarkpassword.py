@@ -79,12 +79,11 @@ _result:
 
 import os
 import subprocess
-from subprocess import PIPE
-from subprocess import Popen
+from subprocess import PIPE, Popen
 
 from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 display = Display()

@@ -111,11 +111,13 @@ public_ip:
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
+    OneAndOneResources,
     get_datacenter,
     get_public_ip,
-    OneAndOneResources,
     wait_for_resource_creation_completion,
 )
 

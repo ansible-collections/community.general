@@ -6,7 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: aerospike_migrations
 short_description: Check or wait for migrations between nodes
@@ -154,9 +153,10 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 LIB_FOUND_ERR = None
 try:
-    import aerospike
-    from time import sleep
     import re
+    from time import sleep
+
+    import aerospike
 except ImportError:
     LIB_FOUND = False
     LIB_FOUND_ERR = traceback.format_exc()

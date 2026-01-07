@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: packet_ip_subnet
 
@@ -146,8 +145,8 @@ subnet:
 """
 
 
-import uuid
 import re
+import uuid
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 

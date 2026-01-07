@@ -100,17 +100,18 @@ update_time:
 # Imports
 ###############################################################################
 
+import re
+
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config,
     HwcClientException,
     HwcModule,
-    navigate_value,
     are_different_dicts,
-    is_empty_value,
     build_path,
     get_region,
+    is_empty_value,
+    navigate_value,
 )
-import re
 
 ###############################################################################
 # Main

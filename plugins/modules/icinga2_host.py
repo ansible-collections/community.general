@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: icinga2_host
 short_description: Manage a host in Icinga2

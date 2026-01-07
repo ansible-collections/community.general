@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import typing as t
-
 from functools import wraps
 
 from ansible.module_utils.common.collections import is_sequence

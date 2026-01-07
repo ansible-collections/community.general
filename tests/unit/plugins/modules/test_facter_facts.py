@@ -4,9 +4,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import facter_facts
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(facter_facts, __name__, mocks=[RunCommandMock])

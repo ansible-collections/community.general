@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: yarn
 short_description: Manage Node.js packages with Yarn
@@ -124,8 +123,8 @@ out:
     fresh packages...success Saved lockfile.success Saved 1 new dependency..left-pad@1.1.3 Done in 0.59s."
 """
 
-import os
 import json
+import os
 
 from ansible.module_utils.basic import AnsibleModule
 

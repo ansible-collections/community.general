@@ -63,12 +63,12 @@ EXAMPLES = r"""
 """
 
 import errno
+import filecmp
 import os
 import platform
 import random
 import re
 import string
-import filecmp
 
 from ansible.module_utils.basic import AnsibleModule, get_distribution
 

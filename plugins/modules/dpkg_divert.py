@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: dpkg_divert
 short_description: Override a debian package's version of a file
@@ -140,8 +139,8 @@ diversion:
 """
 
 
-import re
 import os
+import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes

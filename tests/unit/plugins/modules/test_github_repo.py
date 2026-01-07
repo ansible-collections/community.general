@@ -4,13 +4,14 @@
 
 from __future__ import annotations
 
-import re
 import json
+import re
 import unittest
-import pytest
-from httmock import with_httmock, urlmatch, response
-from ansible_collections.community.general.plugins.modules import github_repo
 
+import pytest
+from httmock import response, urlmatch, with_httmock
+
+from ansible_collections.community.general.plugins.modules import github_repo
 
 pytest.importorskip("github")
 

@@ -43,8 +43,9 @@ _raw:
   elements: string
 """
 
-from ansible_collections.community.general.plugins.lookup.onepassword import OnePass, OnePassCLIv2
 from ansible.plugins.lookup import LookupBase
+
+from ansible_collections.community.general.plugins.lookup.onepassword import OnePass, OnePassCLIv2
 
 
 class OnePassCLIv2Doc(OnePassCLIv2):

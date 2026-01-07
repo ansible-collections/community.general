@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ali_instance_info
 short_description: Gather information on instances of Alibaba Cloud ECS
@@ -343,11 +342,12 @@ ids:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
-    ecs_argument_spec,
-    ecs_connect,
     FOOTMARK_IMP_ERR,
     HAS_FOOTMARK,
+    ecs_argument_spec,
+    ecs_connect,
 )
 
 

@@ -4,10 +4,12 @@
 
 from __future__ import annotations
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules import pacman_key
-import pytest
 import json
+
+import pytest
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.modules import pacman_key
 
 # path used for mocking get_bin_path()
 MOCK_BIN_PATH = "/mocked/path"

@@ -86,10 +86,11 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.redis import (
+    RedisAnsible,
     fail_imports,
     redis_auth_argument_spec,
-    RedisAnsible,
 )
 
 

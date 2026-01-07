@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pear
 short_description: Manage pear/pecl packages
@@ -116,8 +115,8 @@ EXAMPLES = r"""
 
 import os
 
-from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_text
 
 
 def get_local_version(pear_output):

@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: nsupdate
 
@@ -180,16 +179,15 @@ dns_rc_str:
 """
 
 import traceback
-
 from binascii import Error as binascii_error
 
 DNSPYTHON_IMP_ERR = None
 try:
-    import dns.update
-    import dns.query
-    import dns.tsigkeyring
     import dns.message
+    import dns.query
     import dns.resolver
+    import dns.tsigkeyring
+    import dns.update
 
     HAVE_DNSPYTHON = True
 except ImportError:

@@ -193,11 +193,13 @@ firewall_policy:
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
+    OneAndOneResources,
     get_firewall_policy,
     get_server,
-    OneAndOneResources,
     wait_for_resource_creation_completion,
 )
 

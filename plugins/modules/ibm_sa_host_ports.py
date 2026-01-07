@@ -76,11 +76,12 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (
-    execute_pyxcli_command,
     connect_ssl,
-    spectrum_accelerate_spec,
+    execute_pyxcli_command,
     is_pyxcli_installed,
+    spectrum_accelerate_spec,
 )
 
 

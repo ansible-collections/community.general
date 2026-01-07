@@ -6,12 +6,14 @@
 from __future__ import annotations
 
 from unittest.mock import call, patch
-from ansible_collections.community.general.plugins.modules import ipa_getkeytab
+
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import ipa_getkeytab
 
 
 class IPAKeytabModuleTestCase(ModuleTestCase):

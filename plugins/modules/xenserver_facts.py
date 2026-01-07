@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: xenserver_facts
 short_description: Get facts reported on xenserver

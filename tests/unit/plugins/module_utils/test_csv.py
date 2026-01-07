@@ -10,7 +10,6 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils import csv
 
-
 VALID_CSV = [
     (
         "excel",

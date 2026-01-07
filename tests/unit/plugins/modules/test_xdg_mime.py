@@ -5,9 +5,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import xdg_mime
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(xdg_mime, __name__, mocks=[RunCommandMock])

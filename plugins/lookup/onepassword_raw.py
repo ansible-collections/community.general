@@ -54,8 +54,9 @@ _raw:
 
 import json
 
-from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
 from ansible.plugins.lookup import LookupBase
+
+from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
 
 
 class LookupModule(LookupBase):

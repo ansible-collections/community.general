@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: run0
 short_description: Systemd's run0
@@ -78,8 +77,8 @@ EXAMPLES = r"""
 
 from re import compile as re_compile
 
-from ansible.plugins.become import BecomeBase
 from ansible.module_utils.common.text.converters import to_bytes
+from ansible.plugins.become import BecomeBase
 
 ansi_color_codes = re_compile(to_bytes(r"\x1B\[[0-9;]+m"))
 

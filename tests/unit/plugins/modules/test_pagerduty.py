@@ -4,10 +4,10 @@
 
 from __future__ import annotations
 
-import unittest
-from ansible_collections.community.general.plugins.modules import pagerduty
-
 import json
+import unittest
+
+from ansible_collections.community.general.plugins.modules import pagerduty
 
 
 class PagerDutyTest(unittest.TestCase):

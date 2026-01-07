@@ -5,13 +5,15 @@
 from __future__ import annotations
 
 from unittest.mock import call, patch
-from ansible_collections.community.general.plugins.modules import rhsm_release
+
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import rhsm_release
 
 
 class RhsmRepositoryReleaseModuleTestCase(ModuleTestCase):

@@ -4,10 +4,11 @@
 
 from __future__ import annotations
 
-
 import unittest
-from ansible_collections.community.general.plugins.filter.json_patch import FilterModule
+
 from ansible.errors import AnsibleFilterError
+
+from ansible_collections.community.general.plugins.filter.json_patch import FilterModule
 
 
 class TestJsonPatch(unittest.TestCase):

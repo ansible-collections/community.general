@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: keycloak_clientscope_type
 
@@ -142,9 +141,8 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
     KeycloakAPI,
     KeycloakError,
     get_token,
+    keycloak_argument_spec,
 )
-
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import keycloak_argument_spec
 
 
 def keycloak_clientscope_type_module():

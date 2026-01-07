@@ -4,9 +4,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import krb_ticket
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(krb_ticket, __name__, mocks=[RunCommandMock])

@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import typing as t
 from json import loads
+
 from ansible.errors import AnsibleFilterError
 
-
 if t.TYPE_CHECKING:
-    from typing import Any
     from collections.abc import Callable
+    from typing import Any
 
 JSONPATCH_IMPORT_ERROR: ImportError | None
 try:

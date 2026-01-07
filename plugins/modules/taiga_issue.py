@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: taiga_issue
 short_description: Creates/deletes an issue in a Taiga Project Management Platform
@@ -119,9 +118,9 @@ EXAMPLES = r"""
 
 RETURN = """#"""
 import traceback
-
 from os import getenv
 from os.path import isfile
+
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 TAIGA_IMP_ERR = None

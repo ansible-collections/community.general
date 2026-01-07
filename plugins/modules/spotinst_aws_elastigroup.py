@@ -719,6 +719,7 @@ HAS_SPOTINST_SDK = False
 
 import os
 import time
+
 from ansible.module_utils.basic import AnsibleModule
 
 try:

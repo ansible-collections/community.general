@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: macports
 author: "Jimmy Tang (@jcftang)"

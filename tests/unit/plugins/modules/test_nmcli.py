@@ -7,10 +7,10 @@ from __future__ import annotations
 import json
 
 import pytest
-
-from ansible.module_utils.common.text.converters import to_text
-from ansible_collections.community.general.plugins.modules import nmcli
 from ansible.module_utils.basic import AnsibleModule  # noqa: F401 # pylint: disable=unused-import
+from ansible.module_utils.common.text.converters import to_text
+
+from ansible_collections.community.general.plugins.modules import nmcli
 
 pytestmark = pytest.mark.usefixtures("patch_ansible_module")
 

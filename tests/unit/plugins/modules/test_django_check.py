@@ -4,9 +4,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import django_check
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(django_check, __name__, mocks=[RunCommandMock])

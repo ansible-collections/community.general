@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_compute
 short_description: Scaleway compute management module
@@ -182,11 +181,12 @@ import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.datetime import now
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_LOCATION,
-    scaleway_argument_spec,
     Scaleway,
+    scaleway_argument_spec,
 )
 
 SCALEWAY_SERVER_STATES = ("stopped", "stopping", "starting", "running", "locked")

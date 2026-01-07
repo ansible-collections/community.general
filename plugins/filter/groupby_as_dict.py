@@ -52,8 +52,9 @@ _value:
   type: dictionary
 """
 
-from ansible.errors import AnsibleFilterError
 from collections.abc import Mapping, Sequence
+
+from ansible.errors import AnsibleFilterError
 
 
 def groupby_as_dict(sequence, attribute):

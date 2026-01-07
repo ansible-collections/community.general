@@ -6,11 +6,13 @@ from __future__ import annotations
 
 import unittest
 
-from ansible_collections.community.general.plugins.modules.pamd import PamdRule
-from ansible_collections.community.general.plugins.modules.pamd import PamdLine
-from ansible_collections.community.general.plugins.modules.pamd import PamdComment
-from ansible_collections.community.general.plugins.modules.pamd import PamdInclude
-from ansible_collections.community.general.plugins.modules.pamd import PamdService
+from ansible_collections.community.general.plugins.modules.pamd import (
+    PamdComment,
+    PamdInclude,
+    PamdLine,
+    PamdRule,
+    PamdService,
+)
 
 
 class PamdLineTestCase(unittest.TestCase):

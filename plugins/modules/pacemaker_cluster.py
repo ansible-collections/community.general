@@ -67,8 +67,8 @@ out:
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pacemaker import (
-    pacemaker_runner,
     get_pacemaker_maintenance_mode,
+    pacemaker_runner,
 )
 
 

@@ -7,9 +7,10 @@ from __future__ import annotations
 import json
 import unittest
 from datetime import datetime
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from ansible.executor.task_result import TaskResult
+
 from ansible_collections.community.general.plugins.callback.loganalytics import AzureLogAnalyticsSource
 
 

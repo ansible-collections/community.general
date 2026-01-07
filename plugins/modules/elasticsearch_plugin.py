@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: elasticsearch_plugin
 short_description: Manage Elasticsearch plugins
@@ -114,7 +113,6 @@ EXAMPLES = r"""
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 PACKAGE_STATE_MAP = dict(present="install", absent="remove")
 

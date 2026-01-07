@@ -4,20 +4,20 @@
 
 from __future__ import annotations
 
-import operator
 import itertools
 import json
+import operator
+
 import pytest
-
-from .onepassword_common import MOCK_ENTRIES
-
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 from ansible.plugins.loader import lookup_loader
+
 from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv1,
     OnePassCLIv2,
 )
 
+from .onepassword_common import MOCK_ENTRIES
 
 OP_VERSION_FIXTURES = ["opv1", "opv2"]
 

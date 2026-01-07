@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: twilio
 short_description: Sends a text message to a mobile phone through Twilio
@@ -107,6 +106,7 @@ EXAMPLES = r"""
 # twilio module support methods
 #
 from urllib.parse import urlencode
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 

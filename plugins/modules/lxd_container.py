@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: lxd_container
 short_description: Manage LXD instances
@@ -403,6 +402,7 @@ import time
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used

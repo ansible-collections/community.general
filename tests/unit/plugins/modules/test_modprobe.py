@@ -4,11 +4,13 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch, Mock, mock_open
+from unittest.mock import Mock, mock_open, patch
+
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     ModuleTestCase,
     set_module_args,
 )
+
 from ansible_collections.community.general.plugins.modules.modprobe import Modprobe, build_module
 
 

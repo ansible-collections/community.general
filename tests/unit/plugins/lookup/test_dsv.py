@@ -7,12 +7,13 @@ from __future__ import annotations
 
 from unittest import TestCase
 from unittest.mock import (
-    patch,
     MagicMock,
+    patch,
 )
 
-from ansible_collections.community.general.plugins.lookup import dsv
 from ansible.plugins.loader import lookup_loader
+
+from ansible_collections.community.general.plugins.lookup import dsv
 
 
 class MockSecretsVault(MagicMock):

@@ -67,9 +67,9 @@ _raw:
   elements: str
 """
 
+from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.cmd_functions import run_cmd
-from ansible.module_utils.common.text.converters import to_text
 
 
 class Hiera:

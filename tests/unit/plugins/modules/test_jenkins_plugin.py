@@ -4,17 +4,18 @@
 
 from __future__ import annotations
 
-from io import BytesIO
 import json
 from collections import OrderedDict
 from collections.abc import Mapping
+from io import BytesIO
 from unittest.mock import (
     MagicMock,
     patch,
 )
 
-from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
 from ansible.module_utils.urls import basic_auth_header
+
+from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
 
 
 def pass_function(*args, **kwargs):

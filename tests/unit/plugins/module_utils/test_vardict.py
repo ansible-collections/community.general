@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.module_utils.vardict import VarDict
 
 

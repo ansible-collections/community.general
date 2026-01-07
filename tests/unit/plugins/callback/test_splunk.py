@@ -4,13 +4,14 @@
 
 from __future__ import annotations
 
-import unittest
-from unittest.mock import patch, Mock
-from ansible.executor.task_result import TaskResult
-from ansible_collections.community.general.plugins.callback.splunk import SplunkHTTPCollectorSource
-from datetime import datetime
-
 import json
+import unittest
+from datetime import datetime
+from unittest.mock import Mock, patch
+
+from ansible.executor.task_result import TaskResult
+
+from ansible_collections.community.general.plugins.callback.splunk import SplunkHTTPCollectorSource
 
 
 class TestSplunkClient(unittest.TestCase):

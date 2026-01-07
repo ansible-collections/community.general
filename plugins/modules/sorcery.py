@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: sorcery
 short_description: Package manager for Source Mage GNU/Linux
@@ -191,7 +190,6 @@ import shutil
 import sys
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 # auto-filled at module init
 SORCERY = {"sorcery": None, "scribe": None, "cast": None, "dispel": None, "gaze": None}

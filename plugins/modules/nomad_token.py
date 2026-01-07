@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: nomad_token
 author: Pedro Nascimento (@apecnascimento)

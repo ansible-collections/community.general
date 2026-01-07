@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-import ssl
+
 import os
+import ssl
 import sys
 
 root_dir = sys.argv[1]

@@ -56,7 +56,6 @@ options:
 
 import logging
 import logging.handlers
-
 import socket
 
 from ansible.plugins.callback import CallbackBase

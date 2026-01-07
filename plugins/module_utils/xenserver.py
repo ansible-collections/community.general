@@ -6,8 +6,8 @@
 from __future__ import annotations
 
 import atexit
-import time
 import re
+import time
 import traceback
 import typing as t
 
@@ -20,8 +20,8 @@ except ImportError:
     HAS_XENAPI = False
     XENAPI_IMP_ERR = traceback.format_exc()
 
-from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
+from ansible.module_utils.basic import env_fallback, missing_required_lib
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule

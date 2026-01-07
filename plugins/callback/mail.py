@@ -79,10 +79,10 @@ options:
     version_added: 8.2.0
 """
 
+import email.utils
 import json
 import os
 import re
-import email.utils
 import smtplib
 
 from ansible.module_utils.common.text.converters import to_bytes

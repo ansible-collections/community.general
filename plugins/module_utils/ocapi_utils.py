@@ -7,13 +7,13 @@ from __future__ import annotations
 
 import json
 import os
-import uuid
 import typing as t
-from urllib.error import URLError, HTTPError
+import uuid
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 
-from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.urls import open_url
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule

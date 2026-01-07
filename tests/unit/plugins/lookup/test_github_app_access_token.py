@@ -9,9 +9,9 @@ import sys
 import types
 import unittest
 from unittest.mock import (
-    patch,
     MagicMock,
     mock_open,
+    patch,
 )
 
 from ansible.plugins.loader import lookup_loader

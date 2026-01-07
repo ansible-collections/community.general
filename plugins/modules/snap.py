@@ -168,14 +168,14 @@ version:
   version_added: 10.3.0
 """
 
-import re
 import json
 import numbers
+import re
 
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.snap import snap_runner, get_version
+from ansible_collections.community.general.plugins.module_utils.snap import get_version, snap_runner
 
 
 class Snap(StateModuleHelper):

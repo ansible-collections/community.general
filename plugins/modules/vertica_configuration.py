@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: vertica_configuration
 short_description: Updates Vertica configuration parameters

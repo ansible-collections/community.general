@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: udm_user
 author:
@@ -317,15 +316,16 @@ EXAMPLES = r"""
 
 RETURN = """#"""
 
-from datetime import date, timedelta
 import traceback
+from datetime import date, timedelta
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
+    base_dn,
+    ldap_search,
     umc_module_for_add,
     umc_module_for_edit,
-    ldap_search,
-    base_dn,
 )
 
 CRYPT_IMPORT_ERROR: str | None

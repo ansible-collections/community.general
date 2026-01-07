@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: composer
 author:
@@ -142,6 +141,7 @@ EXAMPLES = r"""
 
 import re
 import shlex
+
 from ansible.module_utils.basic import AnsibleModule
 
 

@@ -15,21 +15,38 @@ if "hpOneView" not in sys.modules:
 
 ONEVIEW_MODULE_UTILS_PATH = "ansible_collections.community.general.plugins.module_utils.oneview"
 from ansible_collections.community.general.plugins.module_utils.oneview import (  # noqa: F401, pylint: disable=unused-import
-    OneViewModuleException,
-    OneViewModuleTaskError,
-    OneViewModuleResourceNotFound,
     OneViewModuleBase,
+    OneViewModuleException,
+    OneViewModuleResourceNotFound,
+    OneViewModuleTaskError,
 )
-
-from ansible_collections.community.general.plugins.modules.oneview_ethernet_network import EthernetNetworkModule  # noqa: F401, pylint: disable=unused-import
+from ansible_collections.community.general.plugins.modules.oneview_ethernet_network import (  # pylint: disable=unused-import
+    EthernetNetworkModule,  # noqa: F401
+)
 from ansible_collections.community.general.plugins.modules.oneview_ethernet_network_info import (  # noqa: F401, pylint: disable=unused-import
     EthernetNetworkInfoModule,
 )
-from ansible_collections.community.general.plugins.modules.oneview_fc_network import FcNetworkModule  # noqa: F401, pylint: disable=unused-import
-from ansible_collections.community.general.plugins.modules.oneview_fc_network_info import FcNetworkInfoModule  # noqa: F401, pylint: disable=unused-import
-from ansible_collections.community.general.plugins.modules.oneview_fcoe_network import FcoeNetworkModule  # noqa: F401, pylint: disable=unused-import
-from ansible_collections.community.general.plugins.modules.oneview_fcoe_network_info import FcoeNetworkInfoModule  # noqa: F401, pylint: disable=unused-import
-from ansible_collections.community.general.plugins.modules.oneview_network_set import NetworkSetModule  # noqa: F401, pylint: disable=unused-import
-from ansible_collections.community.general.plugins.modules.oneview_network_set_info import NetworkSetInfoModule  # noqa: F401, pylint: disable=unused-import
-from ansible_collections.community.general.plugins.modules.oneview_san_manager import SanManagerModule  # noqa: F401, pylint: disable=unused-import
-from ansible_collections.community.general.plugins.modules.oneview_san_manager_info import SanManagerInfoModule  # noqa: F401, pylint: disable=unused-import
+from ansible_collections.community.general.plugins.modules.oneview_fc_network import (  # pylint: disable=unused-import
+    FcNetworkModule,  # noqa: F401
+)
+from ansible_collections.community.general.plugins.modules.oneview_fc_network_info import (  # pylint: disable=unused-import
+    FcNetworkInfoModule,  # noqa: F401
+)
+from ansible_collections.community.general.plugins.modules.oneview_fcoe_network import (  # pylint: disable=unused-import
+    FcoeNetworkModule,  # noqa: F401
+)
+from ansible_collections.community.general.plugins.modules.oneview_fcoe_network_info import (  # pylint: disable=unused-import
+    FcoeNetworkInfoModule,  # noqa: F401
+)
+from ansible_collections.community.general.plugins.modules.oneview_network_set import (  # pylint: disable=unused-import
+    NetworkSetModule,  # noqa: F401
+)
+from ansible_collections.community.general.plugins.modules.oneview_network_set_info import (  # pylint: disable=unused-import
+    NetworkSetInfoModule,  # noqa: F401
+)
+from ansible_collections.community.general.plugins.modules.oneview_san_manager import (  # pylint: disable=unused-import
+    SanManagerModule,  # noqa: F401
+)
+from ansible_collections.community.general.plugins.modules.oneview_san_manager_info import (  # pylint: disable=unused-import
+    SanManagerInfoModule,  # noqa: F401
+)

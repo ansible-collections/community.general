@@ -102,8 +102,8 @@ version:
   version_added: 10.0.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.gconftool2 import gconftool2_runner
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
 
 class GConftool(StateModuleHelper):

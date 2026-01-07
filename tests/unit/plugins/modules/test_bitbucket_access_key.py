@@ -6,14 +6,15 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
-from ansible_collections.community.general.plugins.modules import bitbucket_access_key
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-    AnsibleFailJson,
     AnsibleExitJson,
+    AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
+from ansible_collections.community.general.plugins.modules import bitbucket_access_key
 
 
 class TestBucketAccessKeyModule(ModuleTestCase):

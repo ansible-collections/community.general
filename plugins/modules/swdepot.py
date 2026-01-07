@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: swdepot
 short_description: Manage packages with swdepot package manager (HP-UX)

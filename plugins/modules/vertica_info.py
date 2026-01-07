@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: vertica_info
 short_description: Gathers Vertica database facts

@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: consul_kv
@@ -112,9 +111,9 @@ _raw:
 
 from urllib.parse import urlparse
 
-from ansible.errors import AnsibleError, AnsibleAssertionError
-from ansible.plugins.lookup import LookupBase
+from ansible.errors import AnsibleAssertionError, AnsibleError
 from ansible.module_utils.common.text.converters import to_text
+from ansible.plugins.lookup import LookupBase
 
 try:
     import consul
