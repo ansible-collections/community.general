@@ -160,7 +160,7 @@ class Connection(ConnectionBase):
                         *(regex_match.group("args").split(" ")),
                         # Set the command argument depending on cmd or powershell and the rest of it
                         regex_match.group("command"),
-                        *(regex_match.group("post_args")),
+                        regex_match.group("post_args"),
                     ]
                 )
             else:
