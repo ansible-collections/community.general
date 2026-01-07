@@ -1,0 +1,4 @@
+bugfixes:
+  - pmem - fix test for invalid data input (https://github.com/ansible-collections/community.general/pull/11388).
+minor_changes:
+  - pmem - simplify text tests without using regular expression (https://github.com/ansible-collections/community.general/pull/11388).

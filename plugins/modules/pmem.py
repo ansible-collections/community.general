@@ -199,7 +199,6 @@ EXAMPLES = r"""
 """
 
 import json
-import re
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, human_to_bytes
 
@@ -493,19 +492,17 @@ class PersistentMemory:
             return ipmctl_opts
 
         def is_allocation_good(self, ipmctl_out, command):
-            warning = re.compile("WARNING")
-            error = re.compile(".*Error.*")
-            ignore_error = re.compile("Do you want to continue? [y/n] Error: Invalid data input.")
+            ignore_error = "Do you want to continue? [y/n] Error: Invalid data input."
 
             errmsg = ""
             rc = True
             for line in ipmctl_out.splitlines():
-                if warning.match(line):
+                if line.startswith("WARNING"):
                     errmsg = f"{line} (command: {command})"
                     rc = False
                     break
-                elif error.match(line):
-                    if not ignore_error:
+                elif "Error" in line:
+                    if not line.startswith(ignore_error):
                         errmsg = f"{line} (command: {command})"
                         rc = False
                         break
