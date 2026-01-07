@@ -686,7 +686,6 @@ import copy
 import os
 import re
 import time
-
 from collections import namedtuple
 
 

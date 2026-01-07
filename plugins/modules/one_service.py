@@ -232,7 +232,6 @@ roles:
 
 import os
 import time
-
 from collections import namedtuple
 
 from ansible.module_utils.basic import AnsibleModule

@@ -369,6 +369,7 @@ snapshots:
 
 
 import time
+
 from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
 
 
