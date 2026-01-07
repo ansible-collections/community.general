@@ -502,7 +502,7 @@ class PersistentMemory:
                     rc = False
                     break
                 elif "Error" in line:
-                    if line != ignore_error:
+                    if not line.startswith(ignore_error):
                         errmsg = f"{line} (command: {command})"
                         rc = False
                         break
