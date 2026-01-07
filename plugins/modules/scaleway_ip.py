@@ -49,7 +49,7 @@ options:
     description:
       - Project identifier.
       - Exactly one of O(project) and O(organization) must be specified.
-    version_added: 12.2.0
+    version_added: 12.3.0
 
   region:
     type: str
