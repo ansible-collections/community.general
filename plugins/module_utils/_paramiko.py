@@ -15,10 +15,10 @@ try:
     with _warnings.catch_warnings():
         # Blowfish has been moved, but the deprecated import is used by paramiko versions older than 2.9.5.
         # See: https://github.com/paramiko/paramiko/pull/2039
-        _warnings.filterwarnings('ignore', message='Blowfish has been ', category=UserWarning)
+        _warnings.filterwarnings("ignore", message="Blowfish has been ", category=UserWarning)
         # TripleDES has been moved, but the deprecated import is used by paramiko versions older than 3.3.2 and 3.4.1.
         # See: https://github.com/paramiko/paramiko/pull/2421
-        _warnings.filterwarnings('ignore', message='TripleDES has been ', category=UserWarning)
+        _warnings.filterwarnings("ignore", message="TripleDES has been ", category=UserWarning)
         import paramiko as _paramiko
 # paramiko and gssapi are incompatible and raise AttributeError not ImportError
 # When running in FIPS mode, cryptography raises InternalError
