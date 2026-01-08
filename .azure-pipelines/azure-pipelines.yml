@@ -195,9 +195,8 @@ stages:
               test: rhel/10.1
             - name: RHEL 9.7
               test: rhel/9.7
-            # TODO: enable this ASAP!
-            # - name: FreeBSD 15.0
-            #   test: freebsd/15.0
+            - name: FreeBSD 15.0
+              test: freebsd/15.0
             - name: FreeBSD 14.3
               test: freebsd/14.3
           groups:
