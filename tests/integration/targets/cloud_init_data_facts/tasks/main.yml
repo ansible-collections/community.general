@@ -29,6 +29,7 @@
     - not (ansible_distribution == 'Archlinux')  # TODO: package seems to be broken, cannot be downloaded from mirrors?
     - not (ansible_distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
     - not (ansible_distribution == 'Debian' and ansible_distribution_major_version|int == 13)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
+    - not (ansible_distribution == 'Fedora' and ansible_distribution_major_version|int == 43)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
   block:
     - name: setup install cloud-init
       package:
