@@ -1,6 +1,7 @@
-# (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
-# (c) 2017 Ansible Project
+# Copyright (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
+# Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 DOCUMENTATION = """
@@ -122,8 +123,8 @@ options:
     env:
       - name: ANSIBLE_PARAMIKO_PTY
     ini:
-    - section: paramiko_connection
-      key: pty
+      - section: paramiko_connection
+        key: pty
     type: boolean
   record_host_keys:
     default: true
