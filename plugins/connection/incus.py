@@ -154,7 +154,7 @@ class Connection(ConnectionBase):
                 )
 
                 # To avoid splitting on a space contained in the path, set the executable as the first argument.
-                exec_cmd.append(regex_match.group("executable").strip('"'))
+                exec_cmd.append(regex_match.group("executable"))
                 if args := regex_match.group("args"):
                     exec_cmd.extend(args.strip().split(" "))
                 # Set the command argument depending on cmd or powershell and the rest of it
