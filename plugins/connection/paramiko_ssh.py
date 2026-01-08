@@ -77,7 +77,7 @@ options:
     description:
       - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys.
       - On paramiko versions older than 2.9, this only affects hostkeys.
-      - For behavior matching paramiko<2.9 set this to V(False).
+      - For behavior matching paramiko<2.9 set this to V(false).
     vars:
       - name: ansible_paramiko_use_rsa_sha2_algorithms
     ini:
@@ -97,7 +97,7 @@ options:
     type: boolean
   look_for_keys:
     default: true
-    description: Set to V(false) to disable searching for private key files in ~/.ssh/.
+    description: Set to V(false) to disable searching for private key files in C(~/.ssh/).
     env:
       - name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS
     ini:
@@ -229,7 +229,7 @@ from ansible.errors import (
     AnsibleFileNotFound,
 )
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
@@ -258,9 +258,7 @@ if paramiko:
 
 class MyAddPolicy(MissingHostKeyPolicy):
     """
-    Based on AutoAddPolicy in paramiko so we can determine when keys are added
-
-    and also prompt for input.
+    Based on AutoAddPolicy in paramiko so we can determine when keys are added and also prompt for input.
 
     Policy for automatically adding the hostname and new host key to the
     local L{HostKeys} object, and saving it.  This is used by L{SSHClient}.
@@ -351,7 +349,7 @@ class Connection(ConnectionBase):
         return sock_kwarg
 
     def _connect_uncached(self) -> paramiko.SSHClient:
-        """ activates the connection object """
+        """Activates the connection object."""
 
         if paramiko is None:
             raise AnsibleError(f"paramiko is not installed: {PARAMIKO_IMPORT_ERR}")
@@ -384,7 +382,6 @@ class Connection(ConnectionBase):
         if self.get_option('host_key_checking'):
             for ssh_known_hosts in ("/etc/ssh/ssh_known_hosts", "/etc/openssh/ssh_known_hosts"):
                 try:
-                    # TODO: check if we need to look at several possible locations, possible for loop
                     ssh.load_system_host_keys(ssh_known_hosts)
                     break
                 except OSError:
@@ -445,7 +442,7 @@ class Connection(ConnectionBase):
         return ssh
 
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
-        """ run a command on the remote host """
+        """Run a command on the remote host."""
 
         super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
@@ -458,11 +455,10 @@ class Connection(ConnectionBase):
             self.ssh.get_transport().set_keepalive(5)
             chan = self.ssh.get_transport().open_session()
         except Exception as e:
-            text_e = to_text(e)
             msg = "Failed to open session"
-            if text_e:
+            if (text_e := f"{e!s}"):
                 msg += f": {text_e}"
-            raise AnsibleConnectionFailure(to_native(msg)) from e
+            raise AnsibleConnectionFailure(msg) from e
 
         # sudo usually requires a PTY (cf. requiretty option), therefore
         # we give it one by default (pty=True in ansible.cfg), and we try
@@ -490,11 +486,10 @@ class Connection(ConnectionBase):
                     display.debug(f"chunk is: {chunk!r}")
                     if not chunk:
                         if b'unknown user' in become_output:
-                            n_become_user = to_native(self.become.get_option('become_user'))
-                            raise AnsibleError(f'user {n_become_user} does not exist')
+                            become_user = self.become.get_option('become_user')
+                            raise AnsibleError(f'user {become_user} does not exist')
                         else:
                             break
-                            # raise AnsibleError('ssh connection closed waiting for password prompt')
                     become_output += chunk
 
                     # need to check every line because we might get lectured
@@ -525,7 +520,7 @@ class Connection(ConnectionBase):
         return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
 
     def put_file(self, in_path: str, out_path: str) -> None:
-        """ transfer a file from local to remote """
+        """Transfer a file from local to remote."""
 
         super().put_file(in_path, out_path)
 
@@ -553,7 +548,7 @@ class Connection(ConnectionBase):
             return result
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
-        """ save a remote file to the specified path """
+        """Save a remote file to the specified path."""
 
         super().fetch_file(in_path, out_path)
 
@@ -580,10 +575,10 @@ class Connection(ConnectionBase):
 
     def _save_ssh_host_keys(self, filename: str) -> None:
         """
-        not using the paramiko save_ssh_host_keys function as we want to add new SSH keys at the bottom so folks
-        don't complain about it :)
-        """
+        Append new SSH keys to the end of the file.
 
+        The paramiko save_host_keys function is not used since it injects new keys at the top.
+        """
         if not self._any_keys_added():
             return
 
@@ -596,7 +591,6 @@ class Connection(ConnectionBase):
 
                 for keytype, key in keys.items():
 
-                    # was f.write
                     added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                     if not added_this_time:
                         f.write(f"{hostname} {keytype} {key.get_base64()}\n")
@@ -615,7 +609,7 @@ class Connection(ConnectionBase):
         self._connect()
 
     def close(self) -> None:
-        """ terminate the connection """
+        """Terminate the connection."""
 
         cache_key = self._cache_key()
         SSH_CONNECTION_CACHE.pop(cache_key, None)
