@@ -87,13 +87,6 @@ options:
 """
 
 EXAMPLES = r"""
-- name: Create an IP in the default project with an organization ID (deprecated)
-  community.general.scaleway_ip:
-    organization: '{{ scw_org }}'
-    state: present
-    region: par1
-  register: ip_creation_task
-
 - name: Create an IP with a project ID
   community.general.scaleway_ip:
     project: '{{ project_id }}'
@@ -106,6 +99,13 @@ EXAMPLES = r"""
     id: '{{ ip_creation_task.scaleway_ip.id }}'
     state: absent
     region: par1
+
+- name: Create an IP in the default project with an organization ID (deprecated)
+  community.general.scaleway_ip:
+    organization: '{{ scw_org }}'
+    state: present
+    region: par1
+  register: ip_creation_task
 """
 
 RETURN = r"""
