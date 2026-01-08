@@ -357,6 +357,18 @@ stages:
           targets:
             - name: Alpine 3.23 + extra VMs
               test: ansible-test-integration-devel-alpine-3.23-azp-posix-vm
+            - name: FreeBSD 14.4 + group 1
+              test: ansible-test-integration-devel-freebsd-14.4-azp-posix-1
+            - name: FreeBSD 14.4 + group 2
+              test: ansible-test-integration-devel-freebsd-14.4-azp-posix-2
+            - name: FreeBSD 14.4 + group 3
+              test: ansible-test-integration-devel-freebsd-14.4-azp-posix-3
+            - name: FreeBSD 15.0 + group 1
+              test: ansible-test-integration-devel-freebsd-15.0-azp-posix-1
+            - name: FreeBSD 15.0 + group 2
+              test: ansible-test-integration-devel-freebsd-15.0-azp-posix-2
+            - name: FreeBSD 15.0 + group 3
+              test: ansible-test-integration-devel-freebsd-15.0-azp-posix-3
             - name: macOS 26.3 + group 1
               test: ansible-test-integration-devel-macos-26.3-azp-posix-1
             - name: macOS 26.3 + group 2
