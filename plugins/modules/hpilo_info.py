@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: hpilo_info
 author: Dag Wieers (@dagwieers)
@@ -140,7 +139,6 @@ except ImportError:
     HAS_HPILO = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-
 
 # Suppress warnings from hpilo
 warnings.simplefilter("ignore")

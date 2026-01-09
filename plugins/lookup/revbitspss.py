@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: revbitspss
 author: RevBits (@RevBits) <info@revbits.com>
@@ -61,9 +60,9 @@ EXAMPLES = r"""
           UUIDPAM is {{ (secret['UUIDPAM']) }} and DB_PASS is {{ (secret['DB_PASS']) }}
 """
 
+from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
-from ansible.errors import AnsibleError
 
 ANOTHER_LIBRARY_IMPORT_ERROR: ImportError | None
 try:

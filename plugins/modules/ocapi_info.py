@@ -140,8 +140,9 @@ status:
 from urllib.parse import urljoin
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {"Jobs": ["JobStatus"]}

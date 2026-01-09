@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: redhat_subscription
 short_description: Manage registration and subscriptions to RHSM using C(subscription-manager)
@@ -268,18 +267,17 @@ subscribed_pool_ids:
   sample: {"8a85f9815ab905d3015ab928c7005de4": "1"}
 """
 
-from os.path import isfile
-from os import getuid, unlink
 import configparser
+import json
 import re
 import shutil
 import tempfile
-import json
+from os import getuid, unlink
+from os.path import isfile
 
+from ansible.module_utils import distro
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils import distro
-
 
 SUBMAN_CMD = None
 

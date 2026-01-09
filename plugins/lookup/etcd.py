@@ -69,8 +69,8 @@ _raw:
 
 import json
 
-from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.urls import open_url
+from ansible.plugins.lookup import LookupBase
 
 # this can be made configurable, not should not use ansible.cfg
 #

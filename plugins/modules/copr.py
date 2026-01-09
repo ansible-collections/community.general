@@ -96,8 +96,8 @@ repo:
   sample: copr.fedorainfracloud.org/group_copr/integration_tests
 """
 
-import stat
 import os
+import stat
 import traceback
 from urllib.error import HTTPError
 
@@ -113,10 +113,9 @@ except ImportError:
     DNF_IMP_ERR = traceback.format_exc()
     HAS_DNF_PACKAGES = False
 
-from ansible.module_utils.common import respawn
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils import distro
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common import respawn
 from ansible.module_utils.urls import open_url
 
 

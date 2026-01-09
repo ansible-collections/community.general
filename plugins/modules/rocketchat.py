@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: rocketchat
 short_description: Send notifications to Rocket Chat
@@ -159,7 +158,6 @@ EXAMPLES = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-
 
 ROCKETCHAT_INCOMING_WEBHOOK = "%s://%s/hooks/%s"
 

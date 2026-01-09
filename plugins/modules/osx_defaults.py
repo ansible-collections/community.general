@@ -134,8 +134,8 @@ EXAMPLES = r"""
     state: absent
 """
 
-from datetime import datetime
 import re
+from datetime import datetime
 
 from ansible.module_utils.basic import AnsibleModule
 

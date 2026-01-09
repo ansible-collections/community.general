@@ -160,8 +160,8 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec,
     find_project,
-    gitlab_authentication,
     gitlab,
+    gitlab_authentication,
 )
 
 ACCESS_LEVELS = dict(guest=10, planner=15, reporter=20, developer=30, maintainer=40, owner=50)

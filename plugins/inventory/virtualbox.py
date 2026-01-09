@@ -72,14 +72,13 @@ groups:
 """
 
 import os
-
-from subprocess import Popen, PIPE
+from collections.abc import MutableMapping
+from subprocess import PIPE, Popen
 
 from ansible.errors import AnsibleParserError
-from ansible.module_utils.common.text.converters import to_bytes, to_text
-from collections.abc import MutableMapping
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.process import get_bin_path
+from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 

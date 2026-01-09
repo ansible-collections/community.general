@@ -7,10 +7,10 @@ from __future__ import annotations
 
 import json
 
-from ansible.module_utils import basic
-from ansible_collections.community.general.plugins.modules import redhat_subscription
-
 import pytest
+from ansible.module_utils import basic
+
+from ansible_collections.community.general.plugins.modules import redhat_subscription
 
 TESTED_MODULE = redhat_subscription.__name__
 

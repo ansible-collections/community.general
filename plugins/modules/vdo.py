@@ -220,9 +220,10 @@ EXAMPLES = r"""
 
 RETURN = r"""#"""
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import re
 import traceback
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 YAML_IMP_ERR = None
 try:

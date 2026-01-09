@@ -203,8 +203,8 @@ cmd:
 """
 
 import os
-import tempfile
 import re
+import tempfile
 from urllib.parse import urlparse
 from urllib.request import getproxies
 

@@ -8,10 +8,8 @@ from __future__ import annotations
 import os
 import posixpath
 import sys
-
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import unquote
-
 
 # Argument parsing
 if len(sys.argv) != 4:

@@ -9,11 +9,11 @@ import json
 from collections.abc import MutableMapping
 
 import pytest
-
-from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     set_module_args as _set_module_args,
 )
+
+from ansible_collections.community.general.plugins.module_utils import deps
 
 
 def _fix_ansible_args(args):

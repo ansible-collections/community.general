@@ -6,11 +6,15 @@
 from __future__ import annotations
 
 import json
+
 import pytest
 
 from .xenserver_common import fake_xenapi_ref
-from .xenserver_conftest import fake_ansible_module, XenAPI, xenserver_guest_powerstate  # noqa: F401, pylint: disable=unused-import
-
+from .xenserver_conftest import (  # noqa: F401, pylint: disable=unused-import
+    XenAPI,
+    fake_ansible_module,
+    xenserver_guest_powerstate,
+)
 
 testcase_set_powerstate = {
     "params": [

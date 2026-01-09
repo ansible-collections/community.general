@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: terraform
 short_description: Manages a Terraform deployment (and plans)
@@ -278,8 +277,8 @@ command:
   sample: terraform apply ...
 """
 
-import os
 import json
+import os
 import tempfile
 from shlex import quote as shlex_quote
 

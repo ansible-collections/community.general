@@ -6,9 +6,9 @@ from __future__ import annotations
 import json
 
 import pytest
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 from ansible_collections.community.general.plugins.modules import terraform
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 
 def test_terraform_without_argument(capfd):

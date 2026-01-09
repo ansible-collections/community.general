@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 author:
   - Fabrizio Colonna (@ColOfAbRiX)
@@ -223,11 +222,11 @@ EXAMPLES = r"""
 """
 
 
-from ansible.module_utils.basic import AnsibleModule
 import math
-import re
 import os
+import re
 
+from ansible.module_utils.basic import AnsibleModule
 
 # Reference prefixes (International System of Units and IEC)
 units_si = ["B", "KB", "MB", "GB", "TB"]

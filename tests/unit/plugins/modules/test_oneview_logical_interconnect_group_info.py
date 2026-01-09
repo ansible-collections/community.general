@@ -5,11 +5,13 @@
 from __future__ import annotations
 
 import unittest
+
 from .hpe_test_utils import FactsParamsTestCase
-from ansible_collections.community.general.plugins.modules.oneview_logical_interconnect_group_info import (
+
+# This import must come *after* the oneview_module_loader / hpe_test_utils import!
+from ansible_collections.community.general.plugins.modules.oneview_logical_interconnect_group_info import (  # isort: skip
     LogicalInterconnectGroupInfoModule,
 )
-
 
 ERROR_MSG = "Fake message error"
 

@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ipify_facts
 short_description: Retrieve the public IP of your internet gateway
@@ -62,8 +61,8 @@ ipify_public_ip:
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.urls import fetch_url
 
 
 class IpifyFacts:

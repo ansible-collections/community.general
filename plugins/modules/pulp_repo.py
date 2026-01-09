@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pulp_repo
 author: "Joe Adams (@sysadmind)"
@@ -193,8 +192,7 @@ from time import sleep
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.urls import url_argument_spec
+from ansible.module_utils.urls import fetch_url, url_argument_spec
 
 
 class pulp_server:

@@ -74,6 +74,7 @@ scaleway_organization_info:
 """
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     Scaleway,
     ScalewayException,

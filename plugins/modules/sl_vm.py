@@ -287,7 +287,6 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 
-
 # TODO: get this info from API
 STATES = ["present", "absent"]
 DATACENTERS = [

@@ -143,6 +143,7 @@ targets:
 """
 
 from shlex import quote as shlex_quote
+
 from ansible.module_utils.basic import AnsibleModule
 
 

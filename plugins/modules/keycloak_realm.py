@@ -809,14 +809,15 @@ end_state:
     }
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI,
-    camel,
-    keycloak_argument_spec,
-    get_token,
     KeycloakError,
+    camel,
+    get_token,
+    keycloak_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
 
 
 def normalise_cr(realmrep):

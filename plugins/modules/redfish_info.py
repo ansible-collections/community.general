@@ -395,9 +395,10 @@ result:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
-    RedfishUtils,
     REDFISH_COMMON_ARGUMENT_SPEC,
+    RedfishUtils,
 )
 
 CATEGORY_COMMANDS_ALL = {

@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: statusio_maintenance
 short_description: Create maintenance windows for your status.io dashboard

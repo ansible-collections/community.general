@@ -40,9 +40,9 @@ _list:
 """
 import shelve
 
-from ansible.errors import AnsibleError, AnsibleAssertionError
-from ansible.plugins.lookup import LookupBase
+from ansible.errors import AnsibleAssertionError, AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.plugins.lookup import LookupBase
 
 
 class LookupModule(LookupBase):

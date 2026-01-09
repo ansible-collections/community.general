@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: mqtt
 short_description: Publish a message on an MQTT topic for the IoT
@@ -125,13 +124,13 @@ HAS_PAHOMQTT = True
 PAHOMQTT_IMP_ERR = None
 try:
     import socket
+
     import paho.mqtt.publish as mqtt
 except ImportError:
     PAHOMQTT_IMP_ERR = traceback.format_exc()
     HAS_PAHOMQTT = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-
 
 # ===========================================
 # Main

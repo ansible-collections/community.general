@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: xfs_quota
 short_description: Manage quotas on XFS filesystems

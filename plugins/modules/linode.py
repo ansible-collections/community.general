@@ -286,7 +286,7 @@ except ImportError:
     LINODE_IMP_ERR = traceback.format_exc()
     HAS_LINODE = False
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
+from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
 
 
 def randompass():

@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: bundler
 short_description: Manage Ruby Gem dependencies with Bundler

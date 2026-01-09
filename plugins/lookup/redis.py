@@ -81,8 +81,8 @@ try:
 except ImportError:
     pass
 
-from ansible.module_utils.common.text.converters import to_text
 from ansible.errors import AnsibleError
+from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.lookup import LookupBase
 
 

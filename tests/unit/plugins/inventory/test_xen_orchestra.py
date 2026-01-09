@@ -7,8 +7,8 @@
 from __future__ import annotations
 
 import pytest
-
 from ansible.inventory.data import InventoryData
+
 from ansible_collections.community.general.plugins.inventory.xen_orchestra import InventoryModule
 
 objects = {

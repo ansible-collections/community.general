@@ -16,8 +16,8 @@ description:
   - This allows you to use existing Saltstack infrastructure to connect to targets.
 """
 
-import os
 import base64
+import os
 
 from ansible import errors
 from ansible.plugins.connection import ConnectionBase

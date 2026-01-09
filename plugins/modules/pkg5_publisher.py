@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pkg5_publisher
 author: "Peter Oliver (@mavit)"

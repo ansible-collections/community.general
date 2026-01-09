@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 import http.client as http_client
 import json
 import os

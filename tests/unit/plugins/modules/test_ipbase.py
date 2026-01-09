@@ -5,11 +5,10 @@
 from __future__ import annotations
 
 import json
-
-from ansible_collections.community.general.plugins.modules.ipbase_info import IpbaseInfo
 import unittest
 from unittest.mock import Mock
 
+from ansible_collections.community.general.plugins.modules.ipbase_info import IpbaseInfo
 
 IPBASE_DATA = {
     "response": b"""

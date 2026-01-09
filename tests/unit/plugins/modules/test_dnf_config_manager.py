@@ -3,14 +3,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-from unittest.mock import patch, call
-from ansible_collections.community.general.plugins.modules import dnf_config_manager as dnf_config_manager_module
+from unittest.mock import call, patch
+
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import dnf_config_manager as dnf_config_manager_module
 
 # Return value on all-default arguments
 mock_repolist_crb_enabled = """Loaded plugins: builddep, changelog, config-manager, copr, debug, debuginfo-install

@@ -41,8 +41,8 @@ EXAMPLES = r"""
     # Produces ['a', 'ab', 'abc']
 """
 
-from itertools import accumulate
 from collections.abc import Sequence
+from itertools import accumulate
 
 from ansible.errors import AnsibleFilterError
 

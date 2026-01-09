@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: zpool_facts
 short_description: Gather facts about ZFS pools

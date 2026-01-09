@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: sendgrid
 short_description: Sends an email with the SendGrid API

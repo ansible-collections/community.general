@@ -11,6 +11,7 @@ linode_apiv4 = pytest.importorskip("linode_api4")
 from ansible.errors import AnsibleError
 from ansible.parsing.dataloader import DataLoader
 from ansible.template import Templar
+
 from ansible_collections.community.general.plugins.inventory.linode import InventoryModule
 
 

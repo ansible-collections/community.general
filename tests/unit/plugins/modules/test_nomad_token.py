@@ -7,13 +7,14 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import nomad
-from ansible_collections.community.general.plugins.modules import nomad_token
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import nomad_token
 
 
 def mock_acl_get_tokens(empty_list=False):

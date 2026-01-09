@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import pytest
-
 from ansible.cli.arguments import option_helpers as opt_help
 from ansible.utils import context_objects as co
 

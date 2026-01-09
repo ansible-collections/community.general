@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_lb
 short_description: Scaleway load-balancer management module
@@ -160,13 +159,15 @@ scaleway_lb:
 
 import datetime
 import time
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.datetime import now
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_REGIONS,
     SCALEWAY_ENDPOINT,
-    scaleway_argument_spec,
+    SCALEWAY_REGIONS,
     Scaleway,
+    scaleway_argument_spec,
 )
 
 STABLE_STATES = ("ready", "absent")

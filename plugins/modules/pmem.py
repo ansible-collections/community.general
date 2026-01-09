@@ -200,7 +200,8 @@ EXAMPLES = r"""
 
 import json
 import traceback
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib, human_to_bytes
+
+from ansible.module_utils.basic import AnsibleModule, human_to_bytes, missing_required_lib
 
 XMLTODICT_LIBRARY_IMPORT_ERROR: str | None
 try:

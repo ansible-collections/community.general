@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: imc_rest
 short_description: Manage Cisco IMC hardware through its REST API

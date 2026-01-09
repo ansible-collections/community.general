@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_user_data
 short_description: Scaleway user_data management module
@@ -79,10 +78,11 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_LOCATION,
-    scaleway_argument_spec,
     Scaleway,
+    scaleway_argument_spec,
 )
 
 

@@ -9,7 +9,6 @@ from __future__ import annotations
 #
 # This module utils is deprecated and will be removed in community.general 13.0.0
 #
-
 import logging
 import logging.config
 import os
@@ -22,24 +21,21 @@ from datetime import datetime  # noqa: F401, pylint: disable=unused-import
 from operator import eq
 
 try:
-    import yaml  # noqa: F401, pylint: disable=unused-import
-
     import oci
+    import yaml  # noqa: F401, pylint: disable=unused-import
     from oci.constants import HEADER_NEXT_PAGE
-
     from oci.exceptions import (
+        ConfigFileNotFound,
         InvalidConfig,
         InvalidPrivateKey,
-        MissingPrivateKeyPassphrase,
-        ConfigFileNotFound,
-        ServiceError,
         MaximumWaitTimeExceeded,
+        MissingPrivateKeyPassphrase,
+        ServiceError,
     )
     from oci.identity.identity_client import IdentityClient
-    from oci.object_storage.models import CreateBucketDetails
-    from oci.object_storage.models import UpdateBucketDetails
+    from oci.object_storage.models import CreateBucketDetails, UpdateBucketDetails
     from oci.retry import RetryStrategyBuilder
-    from oci.util import to_dict, Sentinel
+    from oci.util import Sentinel, to_dict
 
     HAS_OCI_PY_SDK = True
 except ImportError:

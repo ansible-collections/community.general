@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: vertica_schema
 short_description: Adds or removes Vertica database schema and roles

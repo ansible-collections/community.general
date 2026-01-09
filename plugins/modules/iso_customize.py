@@ -100,8 +100,9 @@ dest_iso:
 
 import os
 
-from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("pycdlib"):
     import pycdlib

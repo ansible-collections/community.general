@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: supervisorctl
 short_description: Manage the state of a program or group of programs managed by C(supervisord)
@@ -114,6 +113,7 @@ EXAMPLES = r"""
 
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule, is_executable
 
 

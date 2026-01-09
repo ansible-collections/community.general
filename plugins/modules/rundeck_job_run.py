@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: rundeck_job_run
 short_description: Run a Rundeck job
@@ -183,6 +182,7 @@ from time import sleep
 from urllib.parse import quote
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.rundeck import api_argument_spec, api_request
 
 

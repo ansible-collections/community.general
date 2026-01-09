@@ -17,18 +17,18 @@ def _dummy(x):
 
 pytestmark = []
 try:
+    # GitLab module requirements
+    from gitlab.v4.objects import Group
+
     from .gitlab import (
         GitlabModuleTestCase,
-        resp_get_group,
-        resp_get_missing_group,
         resp_create_group,
         resp_create_subgroup,
         resp_delete_group,
         resp_find_group_project,
+        resp_get_group,
+        resp_get_missing_group,
     )
-
-    # GitLab module requirements
-    from gitlab.v4.objects import Group
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing

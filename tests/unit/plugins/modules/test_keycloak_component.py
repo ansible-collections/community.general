@@ -9,14 +9,13 @@ from io import StringIO
 from itertools import count
 from unittest.mock import patch
 
-from ansible_collections.community.general.plugins.modules import keycloak_realm_key
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     ModuleTestCase,
     set_module_args,
 )
 
-from ansible_collections.community.general.plugins.modules import keycloak_component
+from ansible_collections.community.general.plugins.modules import keycloak_component, keycloak_realm_key
 
 
 @contextmanager

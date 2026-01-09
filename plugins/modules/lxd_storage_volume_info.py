@@ -192,6 +192,7 @@ import typing as t
 from urllib.parse import quote, urlencode
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.lxd import (
     LXDClient,
     LXDClientException,

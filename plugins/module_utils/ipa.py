@@ -15,13 +15,13 @@ import json
 import os
 import re
 import socket
-import uuid
 import typing as t
+import uuid
 from urllib.parse import quote
 
-from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
+from ansible.module_utils.basic import AnsibleFallbackNotFound, env_fallback
 from ansible.module_utils.common.text.converters import to_bytes, to_text
-from ansible.module_utils.urls import fetch_url, HAS_GSSAPI
+from ansible.module_utils.urls import HAS_GSSAPI, fetch_url
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule

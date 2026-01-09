@@ -81,9 +81,9 @@ EXAMPLES = r"""
 
 import os.path
 import platform
+import re
 import shlex
 import traceback
-import re
 
 from ansible.module_utils.basic import AnsibleModule
 

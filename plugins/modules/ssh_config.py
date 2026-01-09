@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ssh_config
 short_description: Manage SSH config for user
@@ -220,14 +219,14 @@ hosts_change_diff:
 """
 
 import os
-
 from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 from ansible_collections.community.general.plugins.module_utils._stormssh import (
-    ConfigParser,
     HAS_PARAMIKO,
     PARAMIKO_IMPORT_ERROR,
+    ConfigParser,
 )
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 

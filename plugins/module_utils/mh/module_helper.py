@@ -9,13 +9,14 @@ import typing as t
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils.vardict import VarDict
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
+from ansible_collections.community.general.plugins.module_utils.vardict import VarDict
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
+
     from ansible.module_utils.basic import AnsibleModule
 
 

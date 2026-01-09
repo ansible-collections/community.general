@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: zypper_repository
 author: "Matthias Vogelgesang (@matze)"
@@ -138,11 +137,11 @@ except ImportError:
     XML_IMP_ERR = traceback.format_exc()
     HAS_XML = False
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.common.text.converters import to_text
 from io import StringIO
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 

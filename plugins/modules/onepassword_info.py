@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: onepassword_info
 author:
@@ -159,8 +158,8 @@ import json
 import os
 import re
 
-from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
 

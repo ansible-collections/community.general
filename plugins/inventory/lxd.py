@@ -167,15 +167,16 @@ groupby:
 """
 
 import json
+import os
 import re
 import time
-import os
 from urllib.parse import urlencode
 
-from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible.module_utils.common.text.converters import to_native, to_text
-from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils.common.dict_transformations import dict_merge
+from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.plugins.inventory import BaseInventoryPlugin
+
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 

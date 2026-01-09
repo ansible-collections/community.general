@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: irc
 short_description: Send a message to an IRC channel or a nick
@@ -179,8 +178,8 @@ import ssl
 import time
 import traceback
 
-from ansible.module_utils.common.text.converters import to_native, to_bytes
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 
 def send_msg(

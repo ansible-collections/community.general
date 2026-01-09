@@ -17,18 +17,18 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from .gitlab import (
-        GitlabModuleTestCase,
-        resp_get_group,
-        resp_get_project_by_name,
-        resp_create_project,
-        resp_get_project,
-        resp_delete_project,
-        resp_get_user,
-    )
-
     # GitLab module requirements
     from gitlab.v4.objects import Project
+
+    from .gitlab import (
+        GitlabModuleTestCase,
+        resp_create_project,
+        resp_delete_project,
+        resp_get_group,
+        resp_get_project,
+        resp_get_project_by_name,
+        resp_get_user,
+    )
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing

@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from io import StringIO
+from itertools import count
 from unittest.mock import patch
 
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
@@ -14,9 +16,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 )
 
 from ansible_collections.community.general.plugins.modules import keycloak_role
-
-from io import StringIO
-from itertools import count
 
 
 @contextmanager

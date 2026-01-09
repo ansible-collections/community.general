@@ -5,14 +5,15 @@
 from __future__ import annotations
 
 from unittest.mock import patch
-from ansible_collections.community.general.plugins.modules import lvg_rename
+
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-    AnsibleFailJson,
     AnsibleExitJson,
+    AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
 
+from ansible_collections.community.general.plugins.modules import lvg_rename
 
 VGS_OUTPUT = """\
 vg_data_testhost1;XKZ5gn-YhWY-NlrT-QCFN-qmMG-VGT9-7uOmex

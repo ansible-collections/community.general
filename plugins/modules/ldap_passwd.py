@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ldap_passwd
 short_description: Set passwords in LDAP
@@ -60,6 +59,7 @@ modlist:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 from ansible_collections.community.general.plugins.module_utils.ldap import (
     LdapGeneric,
     gen_specs,

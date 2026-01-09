@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: passwordstore
 author:
@@ -240,20 +239,20 @@ _raw:
   elements: str
 """
 
-from contextlib import contextmanager
 import os
 import re
 import subprocess
 import time
-import yaml
+from contextlib import contextmanager
 
-from ansible.errors import AnsibleError, AnsibleAssertionError
+import yaml
+from ansible import constants as C
+from ansible.errors import AnsibleAssertionError, AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.parsing.convert_bool import boolean
+from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 from ansible.utils.encrypt import random_password
-from ansible.plugins.lookup import LookupBase
-from ansible import constants as C
 
 from ansible_collections.community.general.plugins.module_utils._filelock import FileLock
 

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: influxdb_query
 short_description: Query data points from InfluxDB
@@ -66,6 +65,7 @@ query_results:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
 
 

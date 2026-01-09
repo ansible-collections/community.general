@@ -9,7 +9,6 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils import known_hosts
 
-
 URLS = {
     "ssh://one.example.org/example.git": {
         "is_ssh_url": True,

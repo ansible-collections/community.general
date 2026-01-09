@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pritunl_org
 author: Florian Dambrine (@Lowess)
@@ -78,12 +77,13 @@ response:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
+
 from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api import (
     PritunlException,
     delete_pritunl_organization,
-    post_pritunl_organization,
-    list_pritunl_organizations,
     get_pritunl_settings,
+    list_pritunl_organizations,
+    post_pritunl_organization,
     pritunl_argument_spec,
 )
 

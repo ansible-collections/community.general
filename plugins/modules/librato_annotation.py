@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: librato_annotation
 short_description: Create an annotation in Librato

@@ -66,17 +66,17 @@ options:
         section: defaults
 """
 
+import json
 import re
 import time
-import json
 
 from ansible.errors import AnsibleError
-from ansible.parsing.ajson import AnsibleJSONEncoder, AnsibleJSONDecoder
+from ansible.parsing.ajson import AnsibleJSONDecoder, AnsibleJSONEncoder
 from ansible.plugins.cache import BaseCacheModule
 from ansible.utils.display import Display
 
 try:
-    from redis import StrictRedis, VERSION
+    from redis import VERSION, StrictRedis
 
     HAS_REDIS = True
 except ImportError:

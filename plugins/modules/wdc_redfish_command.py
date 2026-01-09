@@ -194,10 +194,11 @@ msg:
   sample: "Action was successful"
 """
 
-from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
 
 CATEGORY_COMMANDS_ALL = {
     "Update": ["FWActivate", "UpdateAndActivate"],

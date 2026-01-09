@@ -5,8 +5,9 @@
 from __future__ import annotations
 
 import unittest
-from .oneview_module_loader import SanManagerInfoModule
+
 from .hpe_test_utils import FactsParamsTestCase
+from .oneview_module_loader import SanManagerInfoModule
 
 
 class SanManagerInfoSpec(unittest.TestCase, FactsParamsTestCase):

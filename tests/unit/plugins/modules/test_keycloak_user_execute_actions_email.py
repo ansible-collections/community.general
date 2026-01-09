@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from io import StringIO
+from itertools import count
 from unittest.mock import patch
 
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
@@ -17,9 +19,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 from ansible_collections.community.general.plugins.modules import (
     keycloak_user_execute_actions_email as module_under_test,
 )
-
-from io import StringIO
-from itertools import count
 
 
 def _create_wrapper(text_as_string):

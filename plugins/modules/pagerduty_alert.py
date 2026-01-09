@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pagerduty_alert
 short_description: Trigger, acknowledge or resolve PagerDuty incidents
@@ -215,11 +214,11 @@ EXAMPLES = r"""
     state: resolved
 """
 import json
+from datetime import datetime
+from urllib.parse import urlencode, urlparse, urlunparse
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from datetime import datetime
-from urllib.parse import urlparse, urlencode, urlunparse
 
 
 def check(module, name, state, service_id, integration_key, api_key, incident_key=None, http_call=fetch_url):

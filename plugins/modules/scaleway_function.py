@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_function
 short_description: Scaleway Function management
@@ -192,15 +191,16 @@ function:
 
 from copy import deepcopy
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS,
-    scaleway_argument_spec,
     Scaleway,
-    scaleway_waitable_resource_argument_spec,
-    resource_attributes_should_be_changed,
     SecretVariables,
+    resource_attributes_should_be_changed,
+    scaleway_argument_spec,
+    scaleway_waitable_resource_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
 
 STABLE_STATES = ("ready", "created", "absent")
 

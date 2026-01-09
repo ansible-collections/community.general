@@ -7,7 +7,6 @@ from __future__ import annotations
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
 from ansible_collections.community.general.plugins.modules.gitlab_protected_branch import GitlabProtectedBranch
 
 
@@ -19,19 +18,19 @@ def _dummy(x):
 
 pytestmark = []
 try:
+    # GitLab module requirements
+    from gitlab.v4.objects import Project  # noqa: F401, pylint: disable=unused-import
+
     from .gitlab import (
         GitlabModuleTestCase,
         python_gitlab_module_version,
         python_gitlab_version_match_requirement,
-        resp_get_protected_branch,
-        resp_get_project_by_name,
-        resp_get_protected_branch_not_exist,
         resp_delete_protected_branch,
+        resp_get_project_by_name,
+        resp_get_protected_branch,
+        resp_get_protected_branch_not_exist,
         resp_get_user,
     )
-
-    # GitLab module requirements
-    from gitlab.v4.objects import Project  # noqa: F401, pylint: disable=unused-import
 
     gitlab_req_version = python_gitlab_version_match_requirement()
     gitlab_module_version = python_gitlab_module_version()

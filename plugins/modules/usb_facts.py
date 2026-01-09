@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: usb_facts
 short_description: Allows listing information about USB devices
@@ -69,6 +68,7 @@ ansible_facts:
 """
 
 import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 

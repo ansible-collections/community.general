@@ -13,10 +13,9 @@
 
 from __future__ import annotations
 
-import os
 import hmac
+import os
 import re
-
 from urllib.parse import urlparse
 
 try:

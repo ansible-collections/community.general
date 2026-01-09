@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: influxdb_user
 short_description: Manage InfluxDB users
@@ -102,8 +101,9 @@ RETURN = r"""#"""
 
 import json
 
-from ansible.module_utils.urls import ConnectionError
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import ConnectionError
+
 import ansible_collections.community.general.plugins.module_utils.influxdb as influx
 
 

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: bigpanda
 author: "Hagai Kariti (@hkariti)"

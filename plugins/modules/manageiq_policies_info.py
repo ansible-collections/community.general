@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: manageiq_policies_info
 version_added: 5.8.0
@@ -89,6 +88,7 @@ profiles:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.manageiq import (
     ManageIQ,
     manageiq_argument_spec,

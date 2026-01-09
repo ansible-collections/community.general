@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: lxc_container
 short_description: Manage LXC Containers
@@ -408,9 +407,9 @@ lxc_container:
 
 import os
 import re
+import shlex
 import tempfile
 import time
-import shlex
 
 try:
     import lxc
@@ -420,8 +419,8 @@ else:
     HAS_LXC = True
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.parsing.convert_bool import BOOLEANS_FALSE
-from ansible.module_utils.common.text.converters import to_text, to_bytes
 
 from ansible_collections.community.general.plugins.module_utils._lxc import create_script
 

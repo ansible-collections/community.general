@@ -115,6 +115,7 @@ EXAMPLES = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.consul import AUTH_ARGUMENTS_SPEC, _ConsulModule
 
 

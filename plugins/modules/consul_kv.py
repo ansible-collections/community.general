@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: consul_kv
 short_description: Manipulate entries in the key/value store of a Consul cluster

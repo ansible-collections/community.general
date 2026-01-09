@@ -4,14 +4,15 @@
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import Mock, patch
 
+import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     ModuleTestCase,
     set_module_args,
 )
-from ansible_collections.community.general.plugins.modules.archive import get_archive, common_path, create_module
+
+from ansible_collections.community.general.plugins.modules.archive import common_path, create_module, get_archive
 
 
 class TestArchive(ModuleTestCase):

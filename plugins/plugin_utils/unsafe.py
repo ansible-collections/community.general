@@ -6,11 +6,13 @@ from __future__ import annotations
 
 import re
 import typing as t
-
 from collections.abc import Mapping, Sequence, Set
+
 from ansible.module_utils.common.collections import is_sequence
 from ansible.utils.unsafe_proxy import (
     AnsibleUnsafe,
+)
+from ansible.utils.unsafe_proxy import (
     wrap_var as _make_unsafe,
 )
 

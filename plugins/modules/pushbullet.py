@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 author: "Willy Barro (@willybarro)"
 requirements: [pushbullet.py]
@@ -106,7 +105,6 @@ else:
     pushbullet_found = True
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-
 
 # ===========================================
 # Main

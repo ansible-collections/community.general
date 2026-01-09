@@ -11,8 +11,8 @@ from unittest.mock import patch
 
 from ansible.errors import AnsibleError
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.lastpass import LPass, LPassException
 
+from ansible_collections.community.general.plugins.lookup.lastpass import LPass, LPassException
 
 MOCK_ENTRIES = [
     {

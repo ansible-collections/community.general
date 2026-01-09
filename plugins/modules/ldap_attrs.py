@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ldap_attrs
 short_description: Add or remove multiple LDAP attribute values
@@ -157,17 +156,17 @@ modlist:
     - [2, "olcRootDN", ["cn=root,dc=example,dc=com"]]
 """
 
+import re
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+
 from ansible_collections.community.general.plugins.module_utils.ldap import (
     LdapGeneric,
     gen_specs,
     ldap_required_together,
 )
-
-import re
 
 LDAP_IMP_ERR = None
 try:

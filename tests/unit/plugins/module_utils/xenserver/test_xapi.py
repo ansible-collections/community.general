@@ -5,13 +5,12 @@
 
 from __future__ import annotations
 
-
-import pytest
 import atexit
 
-from .FakeAnsibleModule import FailJsonException
+import pytest
 from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 
+from .FakeAnsibleModule import FailJsonException
 
 testcase_module_local_conn = {
     "params": [

@@ -4,9 +4,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import xfconf_info
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(xfconf_info, __name__, mocks=[RunCommandMock])

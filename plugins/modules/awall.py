@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: awall
 short_description: Manage awall policies
@@ -67,6 +66,7 @@ EXAMPLES = r"""
 RETURN = """ # """
 
 import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 

@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pacman
 short_description: Manage packages with I(pacman)
@@ -244,8 +243,9 @@ EXAMPLES = r"""
 
 import re
 import shlex
-from ansible.module_utils.basic import AnsibleModule
 from collections import defaultdict, namedtuple
+
+from ansible.module_utils.basic import AnsibleModule
 
 
 class Package:

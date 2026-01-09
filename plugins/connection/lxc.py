@@ -31,12 +31,12 @@ options:
       - name: ansible_lxc_executable
 """
 
+import errno
+import fcntl
 import os
+import select
 import shutil
 import traceback
-import select
-import fcntl
-import errno
 
 HAS_LIBLXC = False
 try:

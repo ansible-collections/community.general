@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: icinga2_feature
 
@@ -59,6 +58,7 @@ RETURN = r"""
 """
 
 import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 

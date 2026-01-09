@@ -118,8 +118,9 @@ _list:
       key2: bar
 """
 
-from ansible.errors import AnsibleLookupError
 from collections.abc import Mapping, Sequence
+
+from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 from ansible.template import Templar
 

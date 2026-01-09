@@ -8,7 +8,6 @@ from ansible.errors import (
     AnsibleError,
     AnsibleFilterError,
 )
-
 from ansible.module_utils.common.collections import is_sequence
 
 try:

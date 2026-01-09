@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: gunicorn
 short_description: Run gunicorn with various settings

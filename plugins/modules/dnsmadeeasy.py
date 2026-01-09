@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: dnsmadeeasy
 short_description: Interface with dnsmadeeasy.com (a DNS hosting service)
@@ -356,11 +355,11 @@ EXAMPLES = r"""
 # DNSMadeEasy module specific support methods.
 #
 
-import json
 import hashlib
 import hmac
+import json
 import locale
-from time import strftime, gmtime
+from time import gmtime, strftime
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule

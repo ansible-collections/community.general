@@ -5,12 +5,12 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
-import json
 
-import yaml
 import pytest
+import yaml
 
 
 class UTHelper:

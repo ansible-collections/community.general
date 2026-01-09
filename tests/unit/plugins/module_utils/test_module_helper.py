@@ -9,7 +9,6 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import cause_changes
 
-
 #
 # DEPRECATION NOTICE
 # Parameters on_success and on_failure are deprecated and will be removed in community.general 12.0.0

@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_security_group
 short_description: Scaleway Security Group management module
@@ -135,13 +134,15 @@ data:
     }
 """
 
+from uuid import uuid4
+
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_LOCATION,
-    scaleway_argument_spec,
     Scaleway,
+    scaleway_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
-from uuid import uuid4
 
 
 def payload_from_security_group(security_group):

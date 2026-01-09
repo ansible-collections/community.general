@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ldap_entry
 short_description: Add or remove LDAP entries
@@ -133,6 +132,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
+
 from ansible_collections.community.general.plugins.module_utils.ldap import (
     LdapGeneric,
     gen_specs,
@@ -141,8 +141,8 @@ from ansible_collections.community.general.plugins.module_utils.ldap import (
 
 LDAP_IMP_ERR = None
 try:
-    import ldap.modlist
     import ldap.controls
+    import ldap.modlist
 
     HAS_LDAP = True
 except ImportError:

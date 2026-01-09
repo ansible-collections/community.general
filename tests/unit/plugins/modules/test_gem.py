@@ -6,14 +6,14 @@ from __future__ import annotations
 import copy
 
 import pytest
-
-from ansible_collections.community.general.plugins.modules import gem
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import gem
 
 
 def get_command(run_command):

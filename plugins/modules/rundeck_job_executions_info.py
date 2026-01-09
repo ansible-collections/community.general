@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: rundeck_job_executions_info
 short_description: Query executions for a Rundeck job
@@ -129,7 +128,9 @@ executions:
 """
 
 from urllib.parse import quote
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.rundeck import api_argument_spec, api_request
 
 

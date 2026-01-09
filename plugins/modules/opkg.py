@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: opkg
 author: "Patrick Pelletier (@skinp)"
@@ -114,6 +113,7 @@ version:
 """
 
 import os
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 

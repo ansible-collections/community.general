@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: jenkins_credential
 short_description: Manage Jenkins credentials and domains through API
@@ -317,14 +316,15 @@ token_uuid:
   returned: success
 """
 
-from urllib.parse import urlencode
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, basic_auth_header
-from ansible_collections.community.general.plugins.module_utils import deps
-
+import base64
 import json
 import os
-import base64
+from urllib.parse import urlencode
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import basic_auth_header, fetch_url
+
+from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("urllib3", reason="urllib3 is required to embed files into requests"):
     import urllib3

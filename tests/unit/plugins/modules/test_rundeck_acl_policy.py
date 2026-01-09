@@ -4,16 +4,17 @@
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import patch
 
-from ansible_collections.community.general.plugins.modules import rundeck_acl_policy
+import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-    set_module_args,
     AnsibleExitJson,
     exit_json,
     fail_json,
+    set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import rundeck_acl_policy
 
 
 @pytest.fixture(autouse=True)

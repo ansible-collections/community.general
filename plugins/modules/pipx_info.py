@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pipx_info
 short_description: Rretrieves information about applications installed with pipx
@@ -131,15 +130,15 @@ version:
   version_added: 10.1.0
 """
 
+from ansible.module_utils.facts.compat import ansible_facts
+
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import (
-    pipx_runner,
-    pipx_common_argspec,
     make_process_dict,
+    pipx_common_argspec,
+    pipx_runner,
 )
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
-from ansible.module_utils.facts.compat import ansible_facts
 
 
 class PipXInfo(ModuleHelper):
