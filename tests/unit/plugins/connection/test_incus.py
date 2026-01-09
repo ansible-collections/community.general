@@ -29,6 +29,22 @@ BUILD_CMD_TEST_CASES: list[dict[str, t.Any]] = [
         output=["powershell", "-c", "My-Command1 -Param 'param'"],
     ),
     dict(
+        id=r"D:\my path\powershell.exe simple",
+        input=dict(
+            cmd=r"""D:\my path\powershell.exe -c My-Command1 -Param 'param' """,
+            shell="powershell",
+        ),
+        output=[r"D:\my path\powershell.exe", "-c", "My-Command1 -Param 'param'"],
+    ),
+    dict(
+        id=r"\\127.0.0.1\share\powershell simple",
+        input=dict(
+            cmd=r"""\\127.0.0.1\share\powershell -c My-Command1 -Param 'param' """,
+            shell="powershell",
+        ),
+        output=[r"\\127.0.0.1\share\powershell", "-c", "My-Command1 -Param 'param'"],
+    ),
+    dict(
         id=r"C:\powershell simple",
         input=dict(
             cmd=r"""C:\powershell -c My-Command1 -Param 'param' """,
@@ -102,7 +118,7 @@ def test_build_command(mocker, testcase):
     play_context.shell = testcase["input"].get("shell", "sh")
     in_stream = StringIO()
     conn = connection_loader.get("community.general.incus", play_context, in_stream)
-    conn.set_option("remote_addr", "192.168.1.100")
+    conn.set_option("remote_addr", "server1")
     conn.set_option("remote_user", "root")
 
     cli_preamble = [
@@ -111,7 +127,7 @@ def test_build_command(mocker, testcase):
         "default",
         "exec",
         *(["-T"] if play_context.shell in ["cmd", "powershell"] else []),
-        "local:192",
+        "local:server1",
         "--",
     ]
 
