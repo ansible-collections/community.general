@@ -220,12 +220,18 @@ options:
       - Set metric level of ipv4 routes configured on interface.
     type: int
     version_added: 2.0.0
-  routing_rules4:
+  routing_rules:
     description:
       - Is the same as in an C(ip rule add) command, except always requires specifying a priority.
     type: list
     elements: str
     version_added: 3.3.0
+  routing_rules6:
+    description:
+      - Is the same as in an C(ip rule add) command, except always requires specifying a priority.
+    type: list
+    elements: str
+    version_added: 12.4.0
   never_default4:
     description:
       - Set as default route.
@@ -1765,6 +1771,7 @@ class Nmcli:
         self.routes6 = module.params["routes6"]
         self.routes6_extended = module.params["routes6_extended"]
         self.route_metric6 = module.params["route_metric6"]
+        self.routing_rules6 = module.params["routing_rules6"]
         self.dns6 = module.params["dns6"]
         self.dns6_search = module.params["dns6_search"]
         self.dns6_options = module.params["dns6_options"]
@@ -1902,6 +1909,7 @@ class Nmcli:
                     "ipv6.ignore-auto-routes": self.gw6_ignore_auto,
                     "ipv6.routes": self.enforce_routes_format(self.routes6, self.routes6_extended),
                     "ipv6.route-metric": self.route_metric6,
+                    "ipv6.routing-rules": self.routing_rules6,
                     "ipv6.method": self.ipv6_method,
                     "ipv6.ip6-privacy": self.ip_privacy6,
                     "ipv6.addr-gen-mode": self.addr_gen_mode6,
@@ -2788,6 +2796,7 @@ def create_module() -> AnsibleModule:
                 ),
             ),
             route_metric6=dict(type="int"),
+            routing_rules6=dict(type="list", elements="str"),
             method6=dict(type="str", choices=["ignore", "auto", "dhcp", "link-local", "manual", "shared", "disabled"]),
             ip_privacy6=dict(type="str", choices=["disabled", "prefer-public-addr", "prefer-temp-addr", "unknown"]),
             addr_gen_mode6=dict(type="str", choices=["default", "default-or-eui64", "eui64", "stable-privacy"]),
