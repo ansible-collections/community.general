@@ -4,10 +4,10 @@
 
 from __future__ import annotations
 
-import pytest
 import typing as t
 from io import StringIO
 
+import pytest
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
 
