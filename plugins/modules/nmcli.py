@@ -220,7 +220,7 @@ options:
       - Set metric level of ipv4 routes configured on interface.
     type: int
     version_added: 2.0.0
-  routing_rules:
+  routing_rules4:
     description:
       - Is the same as in an C(ip rule add) command, except always requires specifying a priority.
     type: list
