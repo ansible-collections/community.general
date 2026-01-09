@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: znode
 short_description: Create, delete, retrieve, and update znodes using ZooKeeper

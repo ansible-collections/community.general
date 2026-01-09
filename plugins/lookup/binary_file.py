@@ -77,7 +77,6 @@ import base64
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
-
 from ansible.utils.display import Display
 
 display = Display()

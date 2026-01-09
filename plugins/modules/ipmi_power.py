@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ipmi_power
 short_description: Power management for machine
@@ -150,8 +149,8 @@ EXAMPLES = r"""
         state: 'off'
 """
 
-import traceback
 import binascii
+import traceback
 
 PYGHMI_IMP_ERR = None
 INVALID_TARGET_ADDRESS = 0x100

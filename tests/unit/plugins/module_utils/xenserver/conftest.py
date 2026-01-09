@@ -5,11 +5,10 @@
 
 from __future__ import annotations
 
-
-import sys
 import importlib
-import os
 import json
+import os
+import sys
 from unittest.mock import MagicMock
 
 import pytest

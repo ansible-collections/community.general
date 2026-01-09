@@ -10,8 +10,8 @@ from unittest import mock
 
 import yaml
 
-from .oneview_module_loader import EthernetNetworkModule
 from .hpe_test_utils import OneViewBaseTestCase
+from .oneview_module_loader import EthernetNetworkModule
 
 FAKE_MSG_ERROR = "Fake message error"
 DEFAULT_ETHERNET_NAME = "Test Ethernet Network"

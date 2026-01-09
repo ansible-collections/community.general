@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: packet_device
 
@@ -275,8 +274,8 @@ devices:
 import os
 import re
 import time
-import uuid
 import traceback
+import uuid
 
 from ansible.module_utils.basic import AnsibleModule
 

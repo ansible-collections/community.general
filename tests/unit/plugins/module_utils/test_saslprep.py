@@ -9,7 +9,6 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils.saslprep import saslprep
 
-
 VALID = [
     ("", ""),
     ("\u00a0", " "),

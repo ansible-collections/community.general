@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: atomic_container
 short_description: Manage the containers on the atomic host platform

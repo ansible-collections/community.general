@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_container_registry
 short_description: Scaleway Container registry management module
@@ -118,14 +117,15 @@ container_registry:
     updated_at: "2022-10-14T09:51:07.949716Z"
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS,
-    scaleway_argument_spec,
     Scaleway,
-    scaleway_waitable_resource_argument_spec,
     resource_attributes_should_be_changed,
+    scaleway_argument_spec,
+    scaleway_waitable_resource_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
 
 STABLE_STATES = ("ready", "absent")
 

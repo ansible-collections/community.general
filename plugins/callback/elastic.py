@@ -81,7 +81,6 @@ import getpass
 import socket
 import time
 import uuid
-
 from collections import OrderedDict
 from contextlib import closing
 from os.path import basename
@@ -92,7 +91,7 @@ from ansible.plugins.callback import CallbackBase
 
 ELASTIC_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
-    from elasticapm import Client, capture_span, trace_parent_from_string, instrument, label
+    from elasticapm import Client, capture_span, instrument, label, trace_parent_from_string
 except ImportError as imp_exc:
     ELASTIC_LIBRARY_IMPORT_ERROR = imp_exc
 else:

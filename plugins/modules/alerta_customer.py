@@ -94,8 +94,8 @@ response:
   type: dict
 """
 
-from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import basic_auth_header, fetch_url
 
 
 class AlertaInterface:

@@ -7,14 +7,14 @@ from __future__ import annotations
 
 from unittest import TestCase
 from unittest.mock import (
-    patch,
     DEFAULT,
     MagicMock,
+    patch,
 )
 
-from ansible_collections.community.general.plugins.lookup import tss
 from ansible.plugins.loader import lookup_loader
 
+from ansible_collections.community.general.plugins.lookup import tss
 
 TSS_IMPORT_PATH = "ansible_collections.community.general.plugins.lookup.tss"
 

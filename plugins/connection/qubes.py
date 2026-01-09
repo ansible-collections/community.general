@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: qubes
 short_description: Interact with an existing QubesOS AppVM
@@ -40,9 +39,9 @@ options:
 
 import subprocess
 
+from ansible.errors import AnsibleConnectionFailure
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.connection import ConnectionBase, ensure_connect
-from ansible.errors import AnsibleConnectionFailure
 from ansible.utils.display import Display
 
 display = Display()

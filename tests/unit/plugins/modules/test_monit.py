@@ -8,13 +8,12 @@ import unittest
 from unittest import mock
 
 import pytest
-
-from ansible_collections.community.general.plugins.modules import monit
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
 )
 
+from ansible_collections.community.general.plugins.modules import monit
 
 TEST_OUTPUT = """
 %s '%s'

@@ -11,13 +11,11 @@ import random
 import string
 import time
 import typing as t
-
-from ansible.module_utils.urls import open_url
-from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.common.text.converters import to_bytes
-from urllib.error import URLError, HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
+
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.urls import open_url
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule

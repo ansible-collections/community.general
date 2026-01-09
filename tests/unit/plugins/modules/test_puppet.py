@@ -10,9 +10,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import puppet
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(puppet, __name__, mocks=[RunCommandMock])

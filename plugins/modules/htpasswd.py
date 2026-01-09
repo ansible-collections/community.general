@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: htpasswd
 short_description: Manage user files for basic authentication
@@ -103,8 +102,8 @@ import os
 import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils import deps
 
+from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("passlib"):
     # Apparently the type infos don't know htpasswd_context, which *does* exist

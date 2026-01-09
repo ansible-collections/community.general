@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import gitlab
-
 import pytest
 
 from ansible_collections.community.general.plugins.modules.gitlab_runner import GitLabRunner
@@ -19,22 +18,22 @@ def _dummy(x):
 
 pytestmark = []
 try:
+    # GitLab module requirements
+    from gitlab.v4.objects import Runner
+
     from .gitlab import (
         FakeAnsibleModule,
         GitlabModuleTestCase,
-        resp_find_runners_all,
-        resp_find_runners_list,
-        resp_find_project_runners,
-        resp_find_group_runners,
-        resp_get_runner,
         resp_create_runner,
         resp_delete_runner,
-        resp_get_project_by_name,
+        resp_find_group_runners,
+        resp_find_project_runners,
+        resp_find_runners_all,
+        resp_find_runners_list,
         resp_get_group_by_name,
+        resp_get_project_by_name,
+        resp_get_runner,
     )
-
-    # GitLab module requirements
-    from gitlab.v4.objects import Runner
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing

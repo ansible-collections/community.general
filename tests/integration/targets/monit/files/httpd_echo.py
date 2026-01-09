@@ -4,9 +4,9 @@
 
 from __future__ import annotations
 
-import daemon
-
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+import daemon
 
 
 def write_to_output(stream, content):

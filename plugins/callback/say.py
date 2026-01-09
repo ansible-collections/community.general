@@ -18,9 +18,9 @@ description:
   - This plugin uses C(say) or C(espeak) to "speak" about play events.
 """
 
+import os
 import platform
 import subprocess
-import os
 
 from ansible.module_utils.common.process import get_bin_path
 from ansible.plugins.callback import CallbackBase

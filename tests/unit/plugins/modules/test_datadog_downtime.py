@@ -4,17 +4,17 @@
 
 from __future__ import annotations
 
-
-from ansible_collections.community.general.plugins.modules import datadog_downtime
 from unittest.mock import MagicMock, patch
+
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
-
 from pytest import importorskip
+
+from ansible_collections.community.general.plugins.modules import datadog_downtime
 
 # Skip this test if datadog_api_client cannot be installed
 datadog_api_client = importorskip("datadog_api_client")

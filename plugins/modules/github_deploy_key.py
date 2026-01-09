@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: github_deploy_key
 author: "Ali (@bincyber)"
@@ -178,9 +177,10 @@ id:
   sample: 24381901
 """
 
+from re import findall
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from re import findall
 
 
 class GithubDeployKey:

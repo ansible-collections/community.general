@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_sshkey
 short_description: Scaleway SSH keys management module
@@ -86,7 +85,8 @@ data:
 """
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.general.plugins.module_utils.scaleway import scaleway_argument_spec, Scaleway
+
+from ansible_collections.community.general.plugins.module_utils.scaleway import Scaleway, scaleway_argument_spec
 
 
 def extract_present_sshkeys(raw_organization_dict):

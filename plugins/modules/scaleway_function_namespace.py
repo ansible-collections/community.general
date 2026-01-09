@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_function_namespace
 short_description: Scaleway Function namespace management
@@ -132,16 +131,16 @@ function_namespace:
 
 from copy import deepcopy
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_REGIONS,
-    scaleway_argument_spec,
-    Scaleway,
-    scaleway_waitable_resource_argument_spec,
-    resource_attributes_should_be_changed,
-    SecretVariables,
-)
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.community.general.plugins.module_utils.scaleway import (
+    SCALEWAY_REGIONS,
+    Scaleway,
+    SecretVariables,
+    resource_attributes_should_be_changed,
+    scaleway_argument_spec,
+    scaleway_waitable_resource_argument_spec,
+)
 
 STABLE_STATES = ("ready", "absent")
 

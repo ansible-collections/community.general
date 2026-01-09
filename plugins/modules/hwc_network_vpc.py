@@ -129,19 +129,20 @@ enable_shared_snat:
 # Imports
 ###############################################################################
 
+import re
+
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config,
     HwcClientException,
     HwcClientException404,
     HwcModule,
     are_different_dicts,
-    is_empty_value,
-    wait_to_finish,
-    get_region,
     build_path,
+    get_region,
+    is_empty_value,
     navigate_value,
+    wait_to_finish,
 )
-import re
 
 ###############################################################################
 # Main

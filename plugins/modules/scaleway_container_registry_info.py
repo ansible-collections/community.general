@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_container_registry_info
 short_description: Scaleway Container registry info module
@@ -81,12 +80,13 @@ container_registry:
     updated_at: "2022-10-14T09:51:07.949716Z"
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS,
-    scaleway_argument_spec,
     Scaleway,
+    scaleway_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
 
 
 def info_strategy(api, wished_cn):

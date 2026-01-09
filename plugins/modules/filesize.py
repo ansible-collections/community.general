@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: filesize
 
@@ -214,12 +213,11 @@ path:
 """
 
 
-import re
-import os
 import math
+import os
+import re
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 # These are the multiplicative suffixes understood (or returned) by dd and
 # others (ls, df, lvresize, lsblk...).

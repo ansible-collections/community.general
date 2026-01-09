@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: easy_install
 short_description: Installs Python libraries
@@ -83,6 +82,7 @@ EXAMPLES = r"""
 import os
 import os.path
 import tempfile
+
 from ansible.module_utils.basic import AnsibleModule
 
 

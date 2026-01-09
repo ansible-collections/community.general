@@ -40,11 +40,10 @@ examples: |-
     url = https://endpoint1.collection.us2.sumologic.com/receiver/v1/http/R8moSv1d8EW9LAUFZJ6dbxCFxwLH6kfCdcBfddlfxCbLuL-BN5twcTpMk__pYy_cDmp==
 """
 
-import json
-import uuid
-import socket
 import getpass
-
+import json
+import socket
+import uuid
 from os.path import basename
 
 from ansible.module_utils.ansible_release import __version__ as ansible_version

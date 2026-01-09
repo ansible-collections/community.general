@@ -11,8 +11,8 @@ sys.modules["hpe3par_sdk"] = mock.Mock()
 sys.modules["hpe3par_sdk.client"] = mock.Mock()
 sys.modules["hpe3parclient"] = mock.Mock()
 sys.modules["hpe3parclient.exceptions"] = mock.Mock()
-from ansible_collections.community.general.plugins.modules import ss_3par_cpg
 from ansible_collections.community.general.plugins.module_utils.storage.hpe3par import hpe3par
+from ansible_collections.community.general.plugins.modules import ss_3par_cpg
 
 
 @mock.patch("ansible_collections.community.general.plugins.modules.ss_3par_cpg.client")

@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pkgutil
 short_description: OpenCSW package management on Solaris

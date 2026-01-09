@@ -191,9 +191,11 @@ ansible_facts:
 
 import binascii
 from collections import defaultdict
-from ansible_collections.community.general.plugins.module_utils import deps
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
+
+from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("pysnmp"):
     from pysnmp.entity.rfc3413.oneliner import cmdgen

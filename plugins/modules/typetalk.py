@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: typetalk
 short_description: Send a message to typetalk
@@ -61,7 +60,7 @@ import json
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, ConnectionError
+from ansible.module_utils.urls import ConnectionError, fetch_url
 
 
 def do_request(module, url, params, headers=None):

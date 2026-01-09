@@ -11,7 +11,6 @@ from io import StringIO
 
 from ansible.module_utils.common.text.converters import to_native
 
-
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
 

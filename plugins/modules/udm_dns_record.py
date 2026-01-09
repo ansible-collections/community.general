@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: udm_dns_record
 author:
@@ -94,16 +93,16 @@ RETURN = """#"""
 
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
-    umc_module_for_add,
-    umc_module_for_edit,
-    ldap_search,
     base_dn,
     config,
+    ldap_search,
     uldap,
+    umc_module_for_add,
+    umc_module_for_edit,
 )
-
 
 with deps.declare("univention", msg="This module requires univention python bindings"):
     from univention.admin.handlers.dns import (

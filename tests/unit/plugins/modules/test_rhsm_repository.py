@@ -15,10 +15,10 @@ import fnmatch
 import itertools
 import json
 
-from ansible.module_utils import basic
-from ansible_collections.community.general.plugins.modules import rhsm_repository
-
 import pytest
+from ansible.module_utils import basic
+
+from ansible_collections.community.general.plugins.modules import rhsm_repository
 
 TESTED_MODULE = rhsm_repository.__name__
 

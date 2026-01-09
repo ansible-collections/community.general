@@ -82,6 +82,7 @@ EXAMPLES = r"""
 RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule, _load_params
+
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 
 error_messages = {

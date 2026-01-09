@@ -126,10 +126,11 @@ specs_todelete:
   sample: ["bind"]
 """
 
-from ansible.module_utils.basic import AnsibleModule
 import fnmatch
 import os
 import re
+
+from ansible.module_utils.basic import AnsibleModule
 
 DNF_BIN = "/usr/bin/dnf"
 VERSIONLOCK_CONF = "/etc/dnf/plugins/versionlock.conf"

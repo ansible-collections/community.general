@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: opennebula
 author:
@@ -90,13 +89,13 @@ try:
 except ImportError:
     HAS_PYONE = False
 
+import os
+from collections import namedtuple
+
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
-
-from collections import namedtuple
-import os
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable):

@@ -5,12 +5,11 @@
 # Make coding more python3-ish
 from __future__ import annotations
 
-import pytest
 import sys
-
 from io import StringIO
 from unittest import mock
 
+import pytest
 from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader

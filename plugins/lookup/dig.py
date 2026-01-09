@@ -240,20 +240,20 @@ _list:
         - C(strings).
 """
 
-from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
-from ansible.module_utils.parsing.convert_bool import boolean
-from ansible.utils.display import Display
 import socket
+
+from ansible.errors import AnsibleError
+from ansible.module_utils.parsing.convert_bool import boolean
+from ansible.plugins.lookup import LookupBase
+from ansible.utils.display import Display
 
 try:
     import dns.exception
     import dns.name
+    import dns.rdataclass
     import dns.resolver
     import dns.reversename
-    import dns.rdataclass
     from dns.rdatatype import (
-        A,
         AAAA,
         CAA,
         CNAME,
@@ -274,6 +274,7 @@ try:
         SSHFP,
         TLSA,
         TXT,
+        A,
     )
 
     HAVE_DNS = True

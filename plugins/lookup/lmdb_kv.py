@@ -59,8 +59,8 @@ _raw:
 
 
 from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.plugins.lookup import LookupBase
 
 HAVE_LMDB = True
 try:

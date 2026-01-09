@@ -49,11 +49,11 @@ options:
 import collections
 import os
 import time
-from multiprocessing import Lock
+from collections.abc import MutableSet
 from itertools import chain
+from multiprocessing import Lock
 
 from ansible.errors import AnsibleError
-from collections.abc import MutableSet
 from ansible.plugins.cache import BaseCacheModule
 from ansible.utils.display import Display
 

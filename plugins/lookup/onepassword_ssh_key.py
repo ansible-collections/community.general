@@ -49,12 +49,13 @@ _raw:
 """
 import json
 
+from ansible.errors import AnsibleLookupError
+from ansible.plugins.lookup import LookupBase
+
 from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePass,
     OnePassCLIv2,
 )
-from ansible.errors import AnsibleLookupError
-from ansible.plugins.lookup import LookupBase
 
 
 class LookupModule(LookupBase):

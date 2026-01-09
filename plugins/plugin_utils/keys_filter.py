@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import re
 import typing as t
-
 from collections.abc import Mapping, Sequence
 
 from ansible.errors import AnsibleFilterError

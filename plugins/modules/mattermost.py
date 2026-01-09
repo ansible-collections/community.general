@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: mattermost
 short_description: Send Mattermost notifications

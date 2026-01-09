@@ -7,20 +7,21 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from ansible.module_utils.common.dict_transformations import dict_merge
-from ansible_collections.community.general.plugins.modules import (
-    pritunl_org,
-)
-from ansible_collections.community.general.tests.unit.plugins.module_utils.net_tools.pritunl.test_api import (
-    PritunlDeleteOrganizationMock,
-    PritunlListOrganizationMock,
-    PritunlListOrganizationAfterPostMock,
-    PritunlPostOrganizationMock,
-)
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
+)
+
+from ansible_collections.community.general.plugins.modules import (
+    pritunl_org,
+)
+from ansible_collections.community.general.tests.unit.plugins.module_utils.net_tools.pritunl.test_api import (
+    PritunlDeleteOrganizationMock,
+    PritunlListOrganizationAfterPostMock,
+    PritunlListOrganizationMock,
+    PritunlPostOrganizationMock,
 )
 
 

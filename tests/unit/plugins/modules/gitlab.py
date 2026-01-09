@@ -6,10 +6,11 @@ from __future__ import annotations
 
 import unittest
 
-from httmock import response  # noqa
-from httmock import urlmatch  # noqa
-
 import gitlab
+from httmock import (
+    response,  # noqa
+    urlmatch,  # noqa
+)
 
 
 class FakeAnsibleModule:

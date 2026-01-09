@@ -83,10 +83,11 @@ remotes:
   - remote-2:default
 """
 
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
-from ansible.utils.display import Display
 from json import loads
 from subprocess import check_output
+
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+from ansible.utils.display import Display
 
 display = Display()
 

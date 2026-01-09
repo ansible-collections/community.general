@@ -6,13 +6,11 @@
 
 from __future__ import annotations
 
-
-from collections import OrderedDict
 import json
 import os
+from collections import OrderedDict
 
 import pytest
-
 from ansible import constants as C
 from ansible.inventory.data import InventoryData
 from ansible.inventory.manager import InventoryManager
@@ -21,7 +19,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.mock.loader im
 from ansible_collections.community.internal_test_tools.tests.unit.mock.path import mock_unfrackpath_noop
 
 from ansible_collections.community.general.plugins.inventory.opennebula import InventoryModule
-
 
 original_exists = os.path.exists
 original_access = os.access

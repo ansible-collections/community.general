@@ -5,8 +5,8 @@
 
 from __future__ import annotations
 
-
 import json
+
 import pytest
 
 from .xenserver_common import fake_xenapi_ref

@@ -11,10 +11,11 @@
 
 from __future__ import annotations
 
-from urllib.parse import urlencode
-from ansible.module_utils.urls import open_url
-from ansible.module_utils.basic import json
 import urllib.error as urllib_error
+from urllib.parse import urlencode
+
+from ansible.module_utils.basic import json
+from ansible.module_utils.urls import open_url
 
 
 class Response:

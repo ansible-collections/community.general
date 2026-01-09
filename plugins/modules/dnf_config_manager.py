@@ -119,9 +119,10 @@ changed_repos:
   sample: ["crb"]
 """
 
-from ansible.module_utils.basic import AnsibleModule
 import os
 import re
+
+from ansible.module_utils.basic import AnsibleModule
 
 DNF_BIN = "/usr/bin/dnf"
 REPO_ID_RE = re.compile(r"^Repo-id\s*:\s*(\S+)$")

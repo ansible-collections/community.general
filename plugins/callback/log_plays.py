@@ -27,16 +27,15 @@ options:
         key: log_folder
 """
 
+import json
 import os
 import time
-import json
-
-from ansible.utils.path import makedirs_safe
-from ansible.module_utils.common.text.converters import to_bytes
 from collections.abc import MutableMapping
+
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
-
+from ansible.utils.path import makedirs_safe
 
 # NOTE: in Ansible 1.2 or later general logging is available without
 # this plugin, just set ANSIBLE_LOG_PATH as an environment variable

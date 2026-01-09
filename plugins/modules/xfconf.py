@@ -175,7 +175,7 @@ version:
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner, get_xfconf_version
+from ansible_collections.community.general.plugins.module_utils.xfconf import get_xfconf_version, xfconf_runner
 
 
 class XFConfProperty(StateModuleHelper):

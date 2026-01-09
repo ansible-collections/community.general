@@ -6,12 +6,11 @@
 
 from __future__ import annotations
 
-
 import typing as t
 
-from ansible.errors import AnsibleError, AnsibleConnectionFailure
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.errors import AnsibleConnectionFailure, AnsibleError
 from ansible.module_utils.common.collections import is_string
+from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 

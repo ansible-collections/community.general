@@ -7,8 +7,8 @@ from __future__ import annotations
 import sys
 
 from ansible_collections.community.general.plugins.modules import snap
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 issue_6803_status_out = """Name    Version      Rev    Tracking         Publisher    Notes
 core20  20220826     1623   latest/stable    canonical**  base

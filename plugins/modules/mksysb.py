@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 author: Kairo Araujo (@kairoaraujo)
 module: mksysb

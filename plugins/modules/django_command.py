@@ -63,8 +63,8 @@ version:
 
 import shlex
 
-from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
 
 
 class DjangoCommand(DjangoModuleHelper):

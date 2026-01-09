@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ipinfoio_facts
 short_description: Retrieve IP geolocation facts of a host's IP address
@@ -78,9 +77,7 @@ ansible_facts:
       sample: "94035"
 """
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible.module_utils.urls import fetch_url
-
 
 USER_AGENT = "ansible-ipinfoio-module/0.0.1"
 

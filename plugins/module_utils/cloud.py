@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 """
 This module adds shared support for generic cloud modules
 
@@ -32,9 +31,9 @@ The 'cloud' module provides the following common classes:
 
 """
 import random
-from functools import wraps
 import syslog
 import time
+from functools import wraps
 
 
 def _exponential_backoff(retries=10, delay=2, backoff=2, max_delay=60):

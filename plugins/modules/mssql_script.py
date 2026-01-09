@@ -262,9 +262,10 @@ query_results_dict:
               returned: success, if output is dict
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import traceback
 import json
+import traceback
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 PYMSSQL_IMP_ERR = None
 try:

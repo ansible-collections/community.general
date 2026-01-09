@@ -157,13 +157,14 @@ vlan:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.dimensiondata import (
     DimensionDataModule,
     UnknownNetworkError,
 )
 
 try:
-    from libcloud.common.dimensiondata import DimensionDataVlan, DimensionDataAPIException
+    from libcloud.common.dimensiondata import DimensionDataAPIException, DimensionDataVlan
 
     HAS_LIBCLOUD = True
 

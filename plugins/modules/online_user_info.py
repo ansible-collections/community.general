@@ -46,6 +46,7 @@ online_user_info:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.online import (
     Online,
     OnlineException,

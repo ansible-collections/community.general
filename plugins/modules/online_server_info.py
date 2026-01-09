@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: online_server_info
 short_description: Gather information about Online servers
@@ -129,6 +128,7 @@ online_server_info:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.online import (
     Online,
     OnlineException,

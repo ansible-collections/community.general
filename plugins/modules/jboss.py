@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: jboss
 short_description: Deploy applications to JBoss
@@ -79,8 +78,8 @@ RETURN = r""" # """
 
 import os
 import time
-from ansible.module_utils.basic import AnsibleModule
 
+from ansible.module_utils.basic import AnsibleModule
 
 DEFAULT_DEPLOY_PATH = "/var/lib/jbossas/standalone/deployments"
 

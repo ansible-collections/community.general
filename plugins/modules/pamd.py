@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pamd
 author:
@@ -228,12 +227,12 @@ backupdest:
 """
 
 
-from ansible.module_utils.basic import AnsibleModule
 import os
 import re
-from tempfile import NamedTemporaryFile
 from datetime import datetime
+from tempfile import NamedTemporaryFile
 
+from ansible.module_utils.basic import AnsibleModule
 
 RULE_REGEX = re.compile(
     r"""(?P<rule_type>-?(?:auth|account|session|password))\s+

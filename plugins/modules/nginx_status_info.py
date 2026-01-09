@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: nginx_status_info
 short_description: Retrieve information on nginx status
@@ -92,9 +91,10 @@ data:
 """
 
 import re
+
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.urls import fetch_url
 
 
 class NginxStatusInfo:

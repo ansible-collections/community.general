@@ -7,8 +7,6 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.general.plugins.modules import interfaces_file
-from shutil import copyfile, move
 import difflib
 import inspect
 import json
@@ -17,6 +15,9 @@ import re
 import shutil
 import tempfile
 import unittest
+from shutil import copyfile, move
+
+from ansible_collections.community.general.plugins.modules import interfaces_file
 
 
 class AnsibleFailJson(Exception):

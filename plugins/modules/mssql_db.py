@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: mssql_db
 short_description: Add or remove MSSQL databases from a remote host

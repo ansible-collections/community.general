@@ -5,13 +5,15 @@
 from __future__ import annotations
 
 from unittest.mock import patch
+
 from ansible.module_utils import basic
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-    set_module_args,
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
+    set_module_args,
 )
+
 from ansible_collections.community.general.plugins.modules import sysupgrade
 
 

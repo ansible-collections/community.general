@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: sssd_info
 version_added: 12.2.0
@@ -105,8 +104,10 @@ list_servers:
 """
 
 
-from ansible.module_utils.basic import AnsibleModule
 from typing import Any
+
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("dbus"):

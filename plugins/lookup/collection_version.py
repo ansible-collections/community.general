@@ -61,10 +61,8 @@ import re
 from importlib import import_module
 
 import yaml
-
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
-
 
 FQCN_RE = re.compile(r"^[A-Za-z0-9_]+\.[A-Za-z0-9_]+$")
 

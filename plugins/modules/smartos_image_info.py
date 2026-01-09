@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: smartos_image_info
 short_description: Get SmartOS image details
@@ -70,6 +69,7 @@ RETURN = r"""
 """
 
 import json
+
 from ansible.module_utils.basic import AnsibleModule
 
 

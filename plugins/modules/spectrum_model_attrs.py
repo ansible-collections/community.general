@@ -140,12 +140,13 @@ changed_attrs:
 """
 
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
-from urllib.parse import quote
 import json
 import re
 import xml.etree.ElementTree as ET
+from urllib.parse import quote
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
 
 
 class spectrum_model_attrs:

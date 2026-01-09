@@ -124,11 +124,11 @@ _raw:
       description: Time of last metadata update or creation (depends on OS).
       type: float
 """
+import grp
 import os
 import pwd
-import grp
-import stat
 import re
+import stat
 
 HAVE_SELINUX = False
 try:
@@ -138,8 +138,8 @@ try:
 except ImportError:
     pass
 
-from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 display = Display()

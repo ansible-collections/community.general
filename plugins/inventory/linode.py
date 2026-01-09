@@ -125,15 +125,14 @@ compose:
 """
 
 from ansible.errors import AnsibleError
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
-
 try:
     from linode_api4 import LinodeClient
-    from linode_api4.objects.linode import Instance
     from linode_api4.errors import ApiError as LinodeApiError
+    from linode_api4.objects.linode import Instance
 
     HAS_LINODE = True
 except ImportError:

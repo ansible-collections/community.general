@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: spectrum_device
 short_description: Creates/deletes devices in CA Spectrum
@@ -124,8 +123,8 @@ device:
     }
 """
 
-from socket import gethostbyname, gaierror
 import xml.etree.ElementTree as ET
+from socket import gaierror, gethostbyname
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url

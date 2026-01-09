@@ -241,12 +241,14 @@ load_balancer:
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
+    OneAndOneResources,
+    get_datacenter,
     get_load_balancer,
     get_server,
-    get_datacenter,
-    OneAndOneResources,
     wait_for_resource_creation_completion,
 )
 

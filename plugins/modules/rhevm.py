@@ -340,7 +340,6 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 
-
 RHEV_FAILED = 1
 RHEV_SUCCESS = 0
 RHEV_UNAVAILABLE = 2

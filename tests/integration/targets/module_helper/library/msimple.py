@@ -28,8 +28,8 @@ EXAMPLES = ""
 
 RETURN = ""
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.mh.deco import check_mode_skip
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
 
 class MSimple(ModuleHelper):

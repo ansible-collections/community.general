@@ -114,9 +114,10 @@ msg:
 
 CATEGORY_COMMANDS_ALL = {"Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]}
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
-from ansible.module_utils.basic import AnsibleModule
 
 
 def main():

@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: dimensiondata_network
 short_description: Create, update, and delete MCP 1.0 & 2.0 networks
@@ -119,11 +118,12 @@ network:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.dimensiondata import HAS_LIBCLOUD, DimensionDataModule
 
 if HAS_LIBCLOUD:
-    from libcloud.compute.base import NodeLocation
     from libcloud.common.dimensiondata import DimensionDataAPIException
+    from libcloud.compute.base import NodeLocation
 
 
 class DimensionDataNetworkModule(DimensionDataModule):

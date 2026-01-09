@@ -4,16 +4,15 @@
 
 from __future__ import annotations
 
-
-from ansible_collections.community.general.plugins.modules import jenkins_credential
-from unittest.mock import (
-    MagicMock,
-    patch,
-    mock_open,
-)
-
 import builtins
 import json
+from unittest.mock import (
+    MagicMock,
+    mock_open,
+    patch,
+)
+
+from ansible_collections.community.general.plugins.modules import jenkins_credential
 
 
 def test_validate_file_exist_passes_when_file_exists():

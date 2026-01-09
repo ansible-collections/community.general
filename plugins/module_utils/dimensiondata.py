@@ -18,24 +18,26 @@ from __future__ import annotations
 #
 # This module utils is deprecated and will be removed in community.general 13.0.0
 #
-
 import configparser
 import os
 import re
 import traceback
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib  # noqa: F401, pylint: disable=unused-import
 from os.path import expanduser
 from uuid import UUID
 
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib  # noqa: F401, pylint: disable=unused-import
+
 LIBCLOUD_IMP_ERR = None
 try:
-    from libcloud.common.dimensiondata import API_ENDPOINTS, DimensionDataAPIException, DimensionDataStatus  # noqa: F401, pylint: disable=unused-import
+    import libcloud.security
+    from libcloud.common.dimensiondata import (  # noqa: F401, pylint: disable=unused-import
+        API_ENDPOINTS,
+        DimensionDataAPIException,
+        DimensionDataStatus,
+    )
     from libcloud.compute.base import Node, NodeLocation  # noqa: F401, pylint: disable=unused-import
     from libcloud.compute.providers import get_driver
     from libcloud.compute.types import Provider
-
-    import libcloud.security
 
     HAS_LIBCLOUD = True
 except ImportError:

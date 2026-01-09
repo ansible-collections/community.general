@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 author:
   - Dag Wieers (@dagwieers)
@@ -220,11 +219,11 @@ import smtplib
 import ssl
 import traceback
 from email import encoders
-from email.utils import parseaddr, formataddr, formatdate, make_msgid
+from email.header import Header
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.header import Header
+from email.utils import formataddr, formatdate, make_msgid, parseaddr
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native

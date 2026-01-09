@@ -39,9 +39,8 @@ EXAMPLES = r"""
 import difflib
 
 from ansible import constants as C
-from ansible.plugins.callback import CallbackBase
 from ansible.module_utils.common.text.converters import to_text
-
+from ansible.plugins.callback import CallbackBase
 
 DONT_COLORIZE = False
 COLORS = {

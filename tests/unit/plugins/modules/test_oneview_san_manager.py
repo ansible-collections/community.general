@@ -8,8 +8,8 @@ import unittest
 from copy import deepcopy
 from unittest import mock
 
-from .oneview_module_loader import SanManagerModule
 from .hpe_test_utils import OneViewBaseTestCase
+from .oneview_module_loader import SanManagerModule
 
 FAKE_MSG_ERROR = "Fake message error"
 

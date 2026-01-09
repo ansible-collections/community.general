@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: consul
 short_description: Add, modify & delete services within a Consul cluster
@@ -240,6 +239,7 @@ except ImportError:
     python_consul_installed = False
 
 import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 

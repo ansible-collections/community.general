@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: jenkins_plugin
 author: Jiri Tyr (@jtyr)
@@ -341,7 +340,7 @@ from http import cookiejar
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
-from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
+from ansible.module_utils.urls import basic_auth_header, fetch_url, url_argument_spec
 
 from ansible_collections.community.general.plugins.module_utils.jenkins import download_updates_file
 

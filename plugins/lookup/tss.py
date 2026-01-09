@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: tss
 author: Adam Migus (@amigus) <adam@migus.org>
@@ -301,17 +300,18 @@ EXAMPLES = r"""
 
 import abc
 import os
+
 from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
     from delinea.secrets.server import (
+        AccessTokenAuthorizer,
+        DomainPasswordGrantAuthorizer,
+        PasswordGrantAuthorizer,
         SecretServer,
         SecretServerError,
-        PasswordGrantAuthorizer,
-        DomainPasswordGrantAuthorizer,
-        AccessTokenAuthorizer,
     )
 
     HAS_TSS_SDK = True
@@ -320,11 +320,11 @@ try:
 except ImportError:
     try:
         from thycotic.secrets.server import (
+            AccessTokenAuthorizer,
+            DomainPasswordGrantAuthorizer,
+            PasswordGrantAuthorizer,
             SecretServer,
             SecretServerError,
-            PasswordGrantAuthorizer,
-            DomainPasswordGrantAuthorizer,
-            AccessTokenAuthorizer,
         )
 
         HAS_TSS_SDK = True

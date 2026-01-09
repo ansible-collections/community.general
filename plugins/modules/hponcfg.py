@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: hponcfg
 author: Dag Wieers (@dagwieers)

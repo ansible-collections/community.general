@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: jira
 short_description: Create and modify issues in a JIRA instance
@@ -467,9 +466,10 @@ import string
 import traceback
 from urllib.request import pathname2url
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
-from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
 
 
 class JIRA(StateModuleHelper):

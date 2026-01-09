@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 author:
   - Kairo Araujo (@kairoaraujo)
@@ -164,9 +163,10 @@ EXAMPLES = r"""
 """
 
 
-from ansible.module_utils.basic import AnsibleModule
-from os.path import ismount
 import re
+from os.path import ismount
+
+from ansible.module_utils.basic import AnsibleModule
 
 
 def _fs_exists(module, filesystem):

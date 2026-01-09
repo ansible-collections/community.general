@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: datadog_monitor
 short_description: Manages Datadog monitors
@@ -242,7 +241,7 @@ import traceback
 # Import Datadog
 DATADOG_IMP_ERR = None
 try:
-    from datadog import initialize, api
+    from datadog import api, initialize
 
     HAS_DATADOG = True
 except Exception:

@@ -5,10 +5,9 @@
 
 from __future__ import annotations
 
-import sys
 import http.server
 import socketserver
-
+import sys
 
 if __name__ == "__main__":
     PORT = int(sys.argv[1])

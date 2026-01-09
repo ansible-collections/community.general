@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: vexata_volume
 short_description: Manage volumes on Vexata VX100 storage arrays
@@ -72,6 +71,7 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.vexata import (
     argument_spec,
     get_array,

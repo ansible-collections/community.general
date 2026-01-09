@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: consul_agent_service
 short_description: Add, modify and delete services within a Consul cluster
@@ -184,11 +183,12 @@ operation:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.consul import (
     AUTH_ARGUMENTS_SPEC,
     OPERATION_CREATE,
-    OPERATION_UPDATE,
     OPERATION_DELETE,
+    OPERATION_UPDATE,
     _ConsulModule,
 )
 

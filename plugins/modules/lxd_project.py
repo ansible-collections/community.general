@@ -168,14 +168,16 @@ actions:
   sample: ["create"]
 """
 
+import os
+
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.lxd import (
     LXDClient,
     LXDClientException,
-    default_key_file,
     default_cert_file,
+    default_key_file,
 )
-from ansible.module_utils.basic import AnsibleModule
-import os
 
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = "unix:/var/lib/lxd/unix.socket"

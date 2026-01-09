@@ -8,16 +8,15 @@ import unittest
 from unittest.mock import patch
 
 from ansible.module_utils import basic
-import ansible_collections.community.general.plugins.modules.wdc_redfish_info as module
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
-)
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-    set_module_args,
     exit_json,
     fail_json,
+    set_module_args,
 )
+
+import ansible_collections.community.general.plugins.modules.wdc_redfish_info as module
 
 MOCK_SUCCESSFUL_RESPONSE_WITH_ACTIONS = {"ret": True, "data": {"Actions": {}}}
 

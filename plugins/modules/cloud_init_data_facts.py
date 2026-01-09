@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: cloud_init_data_facts
 short_description: Retrieve facts of cloud-init
@@ -89,7 +88,6 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
-
 
 CLOUD_INIT_PATH = "/var/lib/cloud/data"
 

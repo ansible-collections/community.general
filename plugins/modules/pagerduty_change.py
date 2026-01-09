@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pagerduty_change
 short_description: Track a code or infrastructure change as a PagerDuty change event
@@ -99,8 +98,8 @@ EXAMPLES = r"""
     link_text: View changes on GitHub
 """
 
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,

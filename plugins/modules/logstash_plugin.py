@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: logstash_plugin
 short_description: Manage Logstash plugins
@@ -76,7 +75,6 @@ EXAMPLES = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 PACKAGE_STATE_MAP = dict(present="install", absent="remove")
 

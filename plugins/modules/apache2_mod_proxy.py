@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: apache2_mod_proxy
 author: Olivier Boukili (@oboukili)
@@ -208,11 +207,11 @@ members:
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils import deps
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper, ModuleHelperException
-
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper, ModuleHelperException
 
 with deps.declare("beautifulsoup4"):
     from bs4 import BeautifulSoup

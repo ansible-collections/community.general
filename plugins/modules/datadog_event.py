@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: datadog_event
 short_description: Posts events to Datadog service
@@ -129,7 +128,7 @@ import traceback
 # Import Datadog
 DATADOG_IMP_ERR = None
 try:
-    from datadog import initialize, api
+    from datadog import api, initialize
 
     HAS_DATADOG = True
 except Exception:

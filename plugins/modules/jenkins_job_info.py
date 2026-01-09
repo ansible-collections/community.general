@@ -137,8 +137,8 @@ jobs:
     ]
 """
 
-import ssl
 import fnmatch
+import ssl
 import traceback
 
 JENKINS_IMP_ERR = None

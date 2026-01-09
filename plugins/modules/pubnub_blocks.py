@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pubnub_blocks
 short_description: PubNub blocks management module
@@ -208,9 +207,7 @@ import os
 
 try:
     # Import PubNub BLOCKS client.
-    from pubnub_blocks_client import User
-    from pubnub_blocks_client import Block, EventHandler
-    from pubnub_blocks_client import exceptions
+    from pubnub_blocks_client import Block, EventHandler, User, exceptions
 
     HAS_PUBNUB_BLOCKS_CLIENT = True
 except ImportError:

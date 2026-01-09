@@ -5,8 +5,9 @@
 from __future__ import annotations
 
 import unittest
-from .oneview_module_loader import NetworkSetInfoModule
+
 from .hpe_test_utils import FactsParamsTestCase
+from .oneview_module_loader import NetworkSetInfoModule
 
 ERROR_MSG = "Fake message error"
 

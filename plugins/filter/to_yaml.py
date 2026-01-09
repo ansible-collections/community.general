@@ -18,8 +18,8 @@ from ansible.module_utils.common.collections import is_sequence
 
 try:
     # This is ansible-core 2.19+
-    from ansible.utils.vars import transform_to_native_types
     from ansible.parsing.vault import VaultHelper, VaultLib
+    from ansible.utils.vars import transform_to_native_types
 
     HAS_TRANSFORM_TO_NATIVE_TYPES = True
 except ImportError:

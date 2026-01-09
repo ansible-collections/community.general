@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ali_instance
 short_description: Create, Start, Stop, Restart or Terminate an Instance in ECS; Add or Remove Instance to/from a Security
@@ -614,12 +613,14 @@ ids:
 
 import re
 import time
+
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
-    ecs_argument_spec,
-    ecs_connect,
     FOOTMARK_IMP_ERR,
     HAS_FOOTMARK,
+    ecs_argument_spec,
+    ecs_connect,
 )
 
 

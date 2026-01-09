@@ -148,14 +148,16 @@ except ImportError:
 else:
     redis_found = True
 
+import re
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.formatters import human_to_bytes
+
 from ansible_collections.community.general.plugins.module_utils.redis import (
     fail_imports,
     redis_auth_argument_spec,
     redis_auth_params,
 )
-import re
 
 
 # Redis module specific support methods.

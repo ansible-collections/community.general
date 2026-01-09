@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: alternatives
 short_description: Manages alternative programs for common commands

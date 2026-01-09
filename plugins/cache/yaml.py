@@ -46,9 +46,8 @@ options:
 import os
 
 import yaml
-
-from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.parsing.yaml.dumper import AnsibleDumper
+from ansible.parsing.yaml.loader import AnsibleLoader
 from ansible.plugins.cache import BaseFileCacheModule
 
 

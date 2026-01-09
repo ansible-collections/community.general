@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 author:
   - David Lundgren (@dlundgren)
@@ -94,10 +93,10 @@ EXAMPLES = r"""
 """
 
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-
 import os
 import re
+
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
 
 class Sysrc(StateModuleHelper):

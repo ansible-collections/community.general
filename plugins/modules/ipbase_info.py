@@ -209,10 +209,10 @@ data:
     }
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
 from urllib.parse import urlencode
 
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
 
 USER_AGENT = "ansible-community.general.ipbase_info/0.1.0"
 BASE_URL = "https://api.ipbase.com/v2/info"

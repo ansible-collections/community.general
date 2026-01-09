@@ -81,17 +81,18 @@ hluid:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 from ansible_collections.community.general.plugins.module_utils.storage.emc.emc_vnx import emc_vnx_argument_spec
 
 LIB_IMP_ERR = None
 try:
     from storops import VNXSystem
     from storops.exception import (
-        VNXCredentialError,
-        VNXStorageGroupError,
         VNXAluAlreadyAttachedError,
         VNXAttachAluError,
+        VNXCredentialError,
         VNXDetachAluNotFoundError,
+        VNXStorageGroupError,
     )
 
     HAS_LIB = True

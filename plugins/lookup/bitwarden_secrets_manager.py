@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: bitwarden_secrets_manager
 author:
@@ -67,7 +66,7 @@ _raw:
   elements: dict
 """
 
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 from time import sleep
 
 from ansible.errors import AnsibleLookupError

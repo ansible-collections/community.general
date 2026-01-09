@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ldap_inc
 short_description: Use the Modify-Increment LDAP V3 feature to increment an attribute value
@@ -116,6 +115,7 @@ rfc4525:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
+
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.general.plugins.module_utils.ldap import (
     LdapGeneric,
