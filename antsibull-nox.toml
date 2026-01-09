@@ -23,6 +23,12 @@ stable_branches = [ "stable-*" ]
 code_files = ["."]  # consider all Python files in the collection
 run_isort = false
 run_black = false
+run_ruff_autofix = true
+ruff_autofix_config = "ruff.toml"
+ruff_autofix_select = [
+    "I",
+    "RUF022",
+]
 run_ruff_check = true
 ruff_check_config = "ruff.toml"
 run_ruff_format = true
