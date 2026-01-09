@@ -51,14 +51,13 @@ examples: |-
     shared_key = dZD0kCbKl3ehZG6LHFMuhtE0yHiFCmetzFMc2u+roXIUQuatqU924SsAAAAPemhjbGlAemhjbGktTUJQAQIDBA==
 """
 
+import base64
+import getpass
 import hashlib
 import hmac
-import base64
 import json
-import uuid
 import socket
-import getpass
-
+import uuid
 from os.path import basename
 
 from ansible.module_utils.ansible_release import __version__ as ansible_version

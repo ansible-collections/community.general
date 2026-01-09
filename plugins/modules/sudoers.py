@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: sudoers
 short_description: Manage sudoers files
@@ -158,6 +157,7 @@ EXAMPLES = r"""
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
 
 

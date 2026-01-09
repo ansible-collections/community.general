@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: influxdb_database
 short_description: Manage InfluxDB databases
@@ -72,6 +71,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
 
 

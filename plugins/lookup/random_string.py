@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: random_string
 author:
@@ -171,8 +170,8 @@ import secrets
 import string
 
 from ansible.errors import AnsibleLookupError
-from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.plugins.lookup import LookupBase
 
 
 class LookupModule(LookupBase):

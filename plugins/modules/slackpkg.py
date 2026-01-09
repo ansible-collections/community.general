@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: slackpkg
 short_description: Package manager for Slackware >= 12.2
@@ -68,8 +67,8 @@ EXAMPLES = r"""
     state: latest
 """
 
-import platform
 import os
+import platform
 import re
 
 from ansible.module_utils.basic import AnsibleModule

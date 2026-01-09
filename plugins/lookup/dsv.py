@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: dsv
 author: Adam Migus (@amigus) <adam@migus.org>
@@ -96,9 +95,8 @@ try:
 except ImportError:
     sdk_is_missing = True
 
-from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
-
+from ansible.utils.display import Display
 
 display = Display()
 

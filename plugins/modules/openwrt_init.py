@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: openwrt_init
 author:
@@ -75,6 +74,7 @@ RETURN = r"""
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
 
 module = None

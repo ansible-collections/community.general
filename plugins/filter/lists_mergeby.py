@@ -194,12 +194,12 @@ _value:
   elements: dictionary
 """
 
-from ansible.errors import AnsibleFilterError
-from collections.abc import Mapping, Sequence
-from ansible.utils.vars import merge_hash
-
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from operator import itemgetter
+
+from ansible.errors import AnsibleFilterError
+from ansible.utils.vars import merge_hash
 
 
 def list_mergeby(x, y, index, recursive=False, list_merge="replace"):

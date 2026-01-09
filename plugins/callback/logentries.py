@@ -96,8 +96,8 @@ examples: >-
 """
 
 import os
-import socket
 import random
+import socket
 import time
 import uuid
 

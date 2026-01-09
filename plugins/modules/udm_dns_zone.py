@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: udm_dns_zone
 author:
@@ -103,11 +102,12 @@ EXAMPLES = r"""
 RETURN = """#"""
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
+    base_dn,
+    ldap_search,
     umc_module_for_add,
     umc_module_for_edit,
-    ldap_search,
-    base_dn,
 )
 
 

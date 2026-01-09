@@ -14,7 +14,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 from ansible_collections.community.general.plugins.modules.simpleinit_msb import SimpleinitMSB, build_module
 
-
 _TELINIT_LIST = """
 RUNLEVEL SCRIPT
 2        smgl-suspend-single

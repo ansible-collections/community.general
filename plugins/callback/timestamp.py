@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: timestamp
 type: stdout
@@ -49,12 +48,13 @@ extends_documentation_fragment:
 """
 
 
+import sys
+import types
+from datetime import datetime
+
+from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.callback.default import CallbackModule as Default
 from ansible.utils.display import get_text_width
-from ansible.module_utils.common.text.converters import to_text
-from datetime import datetime
-import types
-import sys
 
 # Store whether the zoneinfo module is available
 _ZONEINFO_AVAILABLE = sys.version_info >= (3, 9)

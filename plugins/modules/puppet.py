@@ -188,9 +188,9 @@ import json
 import os
 import stat
 
-import ansible_collections.community.general.plugins.module_utils.puppet as puppet_utils
-
 from ansible.module_utils.basic import AnsibleModule
+
+import ansible_collections.community.general.plugins.module_utils.puppet as puppet_utils
 
 
 def _write_structured_data(basedir, basename, data):

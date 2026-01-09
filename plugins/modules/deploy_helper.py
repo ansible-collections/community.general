@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: deploy_helper
 author: "Ramon de la Fuente (@ramondelafuente)"

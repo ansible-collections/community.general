@@ -8,14 +8,15 @@ import copy
 import json
 import traceback
 import typing as t
-from urllib.parse import urlencode, quote
 from urllib.error import HTTPError
+from urllib.parse import quote, urlencode
 
-from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.urls import open_url
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
+
     from ansible.module_utils.basic import AnsibleModule
 
 

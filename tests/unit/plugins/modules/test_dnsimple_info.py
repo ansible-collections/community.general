@@ -4,17 +4,15 @@
 
 from __future__ import annotations
 
-
-from ansible_collections.community.general.plugins.modules import dnsimple_info
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
-    AnsibleExitJson,
 )
-from httmock import response
-from httmock import with_httmock
-from httmock import urlmatch
+from httmock import response, urlmatch, with_httmock
+
+from ansible_collections.community.general.plugins.modules import dnsimple_info
 
 
 @urlmatch(netloc="(.)*dnsimple.com(.)*", path="/v2/[0-9]*/zones/")

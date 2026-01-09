@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: dnsimple
 short_description: Interface with dnsimple.com (a DNS hosting service)
@@ -166,8 +165,8 @@ EXAMPLES = r"""
 
 RETURN = r"""#"""
 
-import traceback
 import re
+import traceback
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -284,14 +283,14 @@ try:
     # try to import dnsimple >= 2.0.0
     from dnsimple import Client, DNSimpleException
     from dnsimple.service import Accounts
+    from dnsimple.struct.zone_record import ZoneRecordInput, ZoneRecordUpdateInput
     from dnsimple.version import version as dnsimple_version
-    from dnsimple.struct.zone_record import ZoneRecordUpdateInput, ZoneRecordInput
 
     HAS_DNSIMPLE = True
 except ImportError:
     DNSIMPLE_IMP_ERR.append(traceback.format_exc())
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
+from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
 
 
 def main():

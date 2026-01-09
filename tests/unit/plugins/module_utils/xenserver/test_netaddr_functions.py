@@ -5,9 +5,7 @@
 
 from __future__ import annotations
 
-
 import pytest
-
 from ansible.module_utils.common.network import is_mac
 
 testcase_is_valid_mac_addr = [

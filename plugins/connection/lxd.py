@@ -74,9 +74,9 @@ options:
 """
 
 import os
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
-from ansible.errors import AnsibleError, AnsibleConnectionFailure, AnsibleFileNotFound
+from ansible.errors import AnsibleConnectionFailure, AnsibleError, AnsibleFileNotFound
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.connection import ConnectionBase

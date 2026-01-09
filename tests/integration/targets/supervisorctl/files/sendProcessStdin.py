@@ -7,9 +7,8 @@
 from __future__ import annotations
 
 import sys
-from xmlrpc.client import ServerProxy
 from urllib.parse import quote
-
+from xmlrpc.client import ServerProxy
 
 proc = sys.argv[1]
 value = sys.argv[2]

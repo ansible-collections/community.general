@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: homebrew_cask
 author:
@@ -152,11 +151,11 @@ import os
 import re
 import tempfile
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
-
-from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_bytes
+
+from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 # exceptions -------------------------------------------------------------- {{{

@@ -25,9 +25,11 @@ except ImportError:
 
 INFLUXDB_IMP_ERR = None
 try:
-    from influxdb import InfluxDBClient
+    from influxdb import (  # pylint: disable=unused-import
+        InfluxDBClient,
+        exceptions,  # noqa: F401
+    )
     from influxdb import __version__ as influxdb_version
-    from influxdb import exceptions  # noqa: F401, pylint: disable=unused-import
 
     HAS_INFLUXDB = True
 except ImportError:

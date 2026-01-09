@@ -82,8 +82,9 @@ repositories:
 """
 
 import os
-from fnmatch import fnmatch
 from copy import deepcopy
+from fnmatch import fnmatch
+
 from ansible.module_utils.basic import AnsibleModule
 
 

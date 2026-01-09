@@ -6,11 +6,11 @@ from __future__ import annotations
 
 import pytest
 import yaml
-
 from ansible.inventory.data import InventoryData
 from ansible.template import Templar
-from ansible_collections.community.general.plugins.inventory.iocage import InventoryModule
 from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import make_trusted
+
+from ansible_collections.community.general.plugins.inventory.iocage import InventoryModule
 
 
 @pytest.fixture

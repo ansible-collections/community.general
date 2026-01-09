@@ -75,14 +75,14 @@ _raw:
 """
 
 import abc
-import os
 import json
+import os
 import subprocess
 
-from ansible.plugins.lookup import LookupBase
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.plugins.lookup import LookupBase
 
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
 

@@ -146,11 +146,11 @@ list:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.csv import (
+    CSVError,
+    CustomDialectFailureError,
+    DialectNotAvailableError,
     initialize_dialect,
     read_csv,
-    CSVError,
-    DialectNotAvailableError,
-    CustomDialectFailureError,
 )
 
 

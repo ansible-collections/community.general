@@ -134,9 +134,18 @@ import traceback
 
 PUREOMAPI_IMP_ERR = None
 try:
-    from pypureomapi import Omapi, OmapiMessage, OmapiError, OmapiErrorNotFound
-    from pypureomapi import pack_ip, unpack_ip, pack_mac, unpack_mac
-    from pypureomapi import OMAPI_OP_STATUS, OMAPI_OP_UPDATE
+    from pypureomapi import (
+        OMAPI_OP_STATUS,
+        OMAPI_OP_UPDATE,
+        Omapi,
+        OmapiError,
+        OmapiErrorNotFound,
+        OmapiMessage,
+        pack_ip,
+        pack_mac,
+        unpack_ip,
+        unpack_mac,
+    )
 
     pureomapi_found = True
 except ImportError:

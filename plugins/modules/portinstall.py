@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: portinstall
 short_description: Installing packages from FreeBSD's ports system
@@ -61,8 +60,8 @@ EXAMPLES = r"""
 """
 
 import re
-
 from shlex import quote as shlex_quote
+
 from ansible.module_utils.basic import AnsibleModule
 
 

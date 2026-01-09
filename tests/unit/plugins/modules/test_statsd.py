@@ -4,15 +4,16 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from ansible_collections.community.general.plugins.modules import statsd
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import statsd
 
 
 class FakeStatsD(MagicMock):

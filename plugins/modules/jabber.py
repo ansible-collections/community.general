@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: jabber
 short_description: Send a message to jabber user or chat room

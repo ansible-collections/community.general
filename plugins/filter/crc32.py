@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.common.collections import is_string
+from ansible.module_utils.common.text.converters import to_bytes
 
 try:
     from zlib import crc32

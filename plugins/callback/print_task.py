@@ -22,7 +22,7 @@ ansible.cfg: |-
   callbacks_enabled=community.general.print_task
 """
 
-from yaml import load, dump
+from yaml import dump, load
 
 try:
     from yaml import CSafeDumper as SafeDumper

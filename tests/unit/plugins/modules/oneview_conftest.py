@@ -4,11 +4,14 @@
 
 from __future__ import annotations
 
+from unittest.mock import Mock, patch
+
 import pytest
 
-from unittest.mock import Mock, patch
 from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
-from hpOneView.oneview_client import OneViewClient
+
+# This import must come *after* the oneview_module_loader import!
+from hpOneView.oneview_client import OneViewClient  # isort: skip
 
 
 @pytest.fixture

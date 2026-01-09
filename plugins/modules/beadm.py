@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: beadm
 short_description: Manage ZFS boot environments on FreeBSD/Solaris/illumos systems
@@ -139,6 +138,7 @@ force:
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
 
 

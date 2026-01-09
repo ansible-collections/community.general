@@ -4,11 +4,12 @@
 
 from __future__ import annotations
 
+import unittest
+
 from .hpe_test_utils import FactsParamsTestCase
 
-import unittest
-from ansible_collections.community.general.plugins.modules.oneview_enclosure_info import EnclosureInfoModule
-
+# This import must come *after* the oneview_module_loader / hpe_test_utils import!
+from ansible_collections.community.general.plugins.modules.oneview_enclosure_info import EnclosureInfoModule  # isort: skip
 
 ERROR_MSG = "Fake message error"
 

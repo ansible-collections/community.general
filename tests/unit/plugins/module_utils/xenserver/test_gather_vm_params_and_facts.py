@@ -5,11 +5,9 @@
 
 from __future__ import annotations
 
-
 import pytest
 
 from .common import testcase_bad_xenapi_refs
-
 
 testcase_gather_vm_params_and_facts = {
     "params": [

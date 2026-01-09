@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: newrelic_deployment
 author: "Matt Coddington (@mcodd)"
@@ -78,10 +77,11 @@ EXAMPLES = r"""
     revision: '1.0'
 """
 
+import json
+from urllib.parse import quote
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from urllib.parse import quote
-import json
 
 # ===========================================
 # Module execution.

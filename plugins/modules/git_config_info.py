@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: git_config_info
 author:

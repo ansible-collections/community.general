@@ -72,9 +72,9 @@ msg:
   returned: on failure
 """
 
-from ansible.module_utils.basic import AnsibleModule
-
 import os.path
+
+from ansible.module_utils.basic import AnsibleModule
 
 
 def run_module():

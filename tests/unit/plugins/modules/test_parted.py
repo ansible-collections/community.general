@@ -4,17 +4,17 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch, call
+from unittest.mock import call, patch
 
-from ansible_collections.community.general.plugins.modules import parted as parted_module
-from ansible_collections.community.general.plugins.modules.parted import parse_parted_version
-from ansible_collections.community.general.plugins.modules.parted import parse_partition_info
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import parted as parted_module
+from ansible_collections.community.general.plugins.modules.parted import parse_parted_version, parse_partition_info
 
 # Example of output : parted -s -m /dev/sdb -- unit 'MB' print
 parted_output1 = """

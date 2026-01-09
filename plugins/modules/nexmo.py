@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: nexmo
 short_description: Send a SMS using nexmo
@@ -73,7 +72,6 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, url_argument_spec
-
 
 NEXMO_API = "https://rest.nexmo.com/sms/json"
 

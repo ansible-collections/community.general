@@ -6,10 +6,11 @@
 from __future__ import annotations
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+from ansible.plugins.loader import lookup_loader
 
 from ansible_collections.community.general.plugins.lookup import etcd3
-from ansible.plugins.loader import lookup_loader
 
 
 class FakeKVMetadata:

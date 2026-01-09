@@ -12,14 +12,19 @@ import pytest
 
 linode_apiv4 = pytest.importorskip("linode_api4")
 
-from linode_api4.errors import ApiError as LinodeApiError
-from linode_api4 import LinodeClient
-
-from ansible_collections.community.general.plugins.modules import linode_v4
-from ansible_collections.community.general.plugins.module_utils.linode import get_user_agent
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
+from linode_api4 import LinodeClient
+from linode_api4.errors import ApiError as LinodeApiError
 
-from .linode_conftest import access_token, no_access_token_in_env, default_args, mock_linode  # noqa: F401, pylint: disable=unused-import
+from ansible_collections.community.general.plugins.module_utils.linode import get_user_agent
+from ansible_collections.community.general.plugins.modules import linode_v4
+
+from .linode_conftest import (  # noqa: F401, pylint: disable=unused-import
+    access_token,
+    default_args,
+    mock_linode,
+    no_access_token_in_env,
+)
 
 
 def test_mandatory_state_is_validated(capfd):

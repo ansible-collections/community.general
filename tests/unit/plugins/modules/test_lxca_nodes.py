@@ -8,6 +8,7 @@ import json
 from unittest import mock
 
 import pytest
+
 from ansible_collections.community.general.plugins.modules import lxca_nodes
 
 

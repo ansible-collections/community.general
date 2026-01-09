@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: ovh_ip_failover
 short_description: Manage OVH IP failover address

@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: homebrew
 author:
@@ -178,9 +177,9 @@ changed_pkgs:
 import json
 import re
 
-from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
-
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
 
 
 # exceptions -------------------------------------------------------------- {{{

@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: android_sdk
 short_description: Manages Android SDK packages
@@ -133,8 +132,8 @@ removed:
   sample: ["build-tools;34.0.0", "platform-tools"]
 """
 
+from ansible_collections.community.general.plugins.module_utils.android_sdkmanager import AndroidSdkManager, Package
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.android_sdkmanager import Package, AndroidSdkManager
 
 
 class AndroidSdk(StateModuleHelper):

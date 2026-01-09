@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: icinga2
 short_description: Icinga2 inventory source
@@ -97,8 +96,8 @@ import json
 from urllib.error import HTTPError
 
 from ansible.errors import AnsibleParserError
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible.module_utils.urls import open_url
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 

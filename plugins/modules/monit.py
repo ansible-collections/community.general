@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: monit
 short_description: Manage the state of a program monitored using Monit
@@ -49,13 +48,11 @@ EXAMPLES = r"""
     state: started
 """
 
-import time
 import re
-
+import time
 from enum import Enum
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 STATE_COMMAND_MAP = {
     "stopped": "stop",

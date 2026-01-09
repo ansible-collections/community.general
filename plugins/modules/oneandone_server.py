@@ -204,17 +204,19 @@ servers:
 
 import os
 import time
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
-    get_datacenter,
-    get_fixed_instance_size,
-    get_appliance,
-    get_private_network,
-    get_monitoring_policy,
-    get_firewall_policy,
-    get_load_balancer,
-    get_server,
     OneAndOneResources,
+    get_appliance,
+    get_datacenter,
+    get_firewall_policy,
+    get_fixed_instance_size,
+    get_load_balancer,
+    get_monitoring_policy,
+    get_private_network,
+    get_server,
     wait_for_resource_creation_completion,
     wait_for_resource_deletion_completion,
 )

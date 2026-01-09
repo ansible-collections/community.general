@@ -13,7 +13,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: pkgin
 short_description: Package manager for SmartOS, NetBSD, et al

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: packet_sshkey
 short_description: Create/delete an SSH key in Packet host

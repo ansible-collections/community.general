@@ -315,21 +315,22 @@ import shlex
 import tempfile
 import traceback
 import typing as t
+from binascii import hexlify
+from subprocess import list2cmdline
 
 from ansible.errors import (
     AnsibleAuthenticationFailure,
     AnsibleConnectionFailure,
     AnsibleError,
 )
-from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
-from binascii import hexlify
-from subprocess import list2cmdline
+
+from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 PARAMIKO_IMPORT_ERR: str | None
 try:

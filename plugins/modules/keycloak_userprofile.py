@@ -474,17 +474,19 @@ data:
   type: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    KeycloakAPI,
-    camel,
-    keycloak_argument_spec,
-    get_token,
-    KeycloakError,
-)
-from ansible.module_utils.basic import AnsibleModule
+import json
 from copy import deepcopy
 from urllib.parse import urlencode
-import json
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    KeycloakError,
+    camel,
+    get_token,
+    keycloak_argument_spec,
+)
 
 
 def remove_null_values(data):

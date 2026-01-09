@@ -95,8 +95,9 @@ realm_info:
       sample: 0
 """
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI
 
 
 def main():

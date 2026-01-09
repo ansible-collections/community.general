@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: catapult
 short_description: Send a sms / mms using the catapult bandwidth API

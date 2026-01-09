@@ -49,8 +49,8 @@ _value:
 """
 
 
-from io import StringIO
 from configparser import ConfigParser
+from io import StringIO
 
 from ansible.errors import AnsibleFilterError
 

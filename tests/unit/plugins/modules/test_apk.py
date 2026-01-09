@@ -4,8 +4,8 @@
 
 from __future__ import annotations
 
-from unittest import mock
 import unittest
+from unittest import mock
 
 from ansible_collections.community.general.plugins.modules import apk
 

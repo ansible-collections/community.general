@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: vertica_user
 short_description: Adds or removes Vertica database users and assigns roles

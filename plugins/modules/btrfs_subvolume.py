@@ -204,15 +204,17 @@ target_subvolume_id:
   returned: Success and subvolume exists after module execution
 """
 
-from ansible_collections.community.general.plugins.module_utils.btrfs import (
-    BtrfsFilesystemsProvider,
-    BtrfsCommands,
-    BtrfsModuleException,
-)
-from ansible_collections.community.general.plugins.module_utils.btrfs import normalize_subvolume_path
-from ansible.module_utils.basic import AnsibleModule
 import os
 import tempfile
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.btrfs import (
+    BtrfsCommands,
+    BtrfsFilesystemsProvider,
+    BtrfsModuleException,
+    normalize_subvolume_path,
+)
 
 
 class BtrfsSubvolumeModule:

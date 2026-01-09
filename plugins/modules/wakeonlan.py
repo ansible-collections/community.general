@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: wakeonlan
 short_description: Send a magic Wake-on-LAN (WoL) broadcast packet

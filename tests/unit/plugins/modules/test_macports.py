@@ -4,9 +4,9 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.general.plugins.modules import macports
-
 import pytest
+
+from ansible_collections.community.general.plugins.modules import macports
 
 TESTED_MODULE = macports.__name__
 

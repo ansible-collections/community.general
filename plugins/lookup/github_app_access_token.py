@@ -83,7 +83,7 @@ except ImportError:
 HAS_PYTHON_JWT = False  # vs pyjwt
 if HAS_JWT and hasattr(jwt, "JWT"):
     HAS_PYTHON_JWT = True
-    from jwt import jwk_from_pem, JWT  # type: ignore[attr-defined]
+    from jwt import JWT, jwk_from_pem  # type: ignore[attr-defined]
 
     jwt_instance = JWT()
 
@@ -95,12 +95,12 @@ except ImportError:
     HAS_CRYPTOGRAPHY = False
 
 
-import time
 import json
+import time
 from urllib.error import HTTPError
 
-from ansible.module_utils.urls import open_url
 from ansible.errors import AnsibleError, AnsibleOptionsError
+from ansible.module_utils.urls import open_url
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 

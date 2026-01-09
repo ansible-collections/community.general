@@ -543,21 +543,22 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.network import is_mac
+
 from ansible_collections.community.general.plugins.module_utils.xenserver import (
-    xenserver_common_argument_spec,
     XenServerObject,
-    get_object_ref,
-    gather_vm_params,
     gather_vm_facts,
-    set_vm_power_state,
-    wait_for_vm_ip_address,
+    gather_vm_params,
+    get_object_ref,
+    ip_netmask_to_prefix,
+    ip_prefix_to_netmask,
+    is_valid_ip6_addr,
+    is_valid_ip6_prefix,
     is_valid_ip_addr,
     is_valid_ip_netmask,
     is_valid_ip_prefix,
-    ip_prefix_to_netmask,
-    ip_netmask_to_prefix,
-    is_valid_ip6_addr,
-    is_valid_ip6_prefix,
+    set_vm_power_state,
+    wait_for_vm_ip_address,
+    xenserver_common_argument_spec,
 )
 
 

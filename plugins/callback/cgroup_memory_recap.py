@@ -41,8 +41,8 @@ options:
         key: cur_mem_file
 """
 
-import time
 import threading
+import time
 
 from ansible.plugins.callback import CallbackBase
 

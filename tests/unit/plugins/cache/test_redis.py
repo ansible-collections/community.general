@@ -10,6 +10,7 @@ import pytest
 pytest.importorskip("redis")
 
 from ansible.plugins.loader import cache_loader
+
 from ansible_collections.community.general.plugins.cache.redis import CacheModule as RedisCache
 
 

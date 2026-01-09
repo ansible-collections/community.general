@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: airbrake_deployment
 author:
@@ -93,7 +92,6 @@ EXAMPLES = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-
 
 # ===========================================
 # Module execution.

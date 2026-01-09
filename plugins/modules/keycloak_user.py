@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: keycloak_user
 short_description: Create and configure a user in Keycloak
@@ -340,16 +339,18 @@ user_created:
   version_added: 12.0.0
 """
 
+import copy
+
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI,
-    camel,
-    keycloak_argument_spec,
-    get_token,
     KeycloakError,
+    camel,
+    get_token,
     is_struct_included,
+    keycloak_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
-import copy
 
 
 def main():

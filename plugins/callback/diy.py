@@ -778,10 +778,11 @@ playbook.yml: >-
 
 import sys
 from contextlib import contextmanager
+
+from ansible.module_utils.common.text.converters import to_text
+from ansible.plugins.callback.default import CallbackModule as Default
 from ansible.template import Templar
 from ansible.vars.manager import VariableManager
-from ansible.plugins.callback.default import CallbackModule as Default
-from ansible.module_utils.common.text.converters import to_text
 
 try:
     from ansible.template import trust_as_template  # noqa: F401, pylint: disable=unused-import

@@ -8,8 +8,9 @@ from __future__ import annotations
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException as _MHE
+
 from ansible_collections.community.general.plugins.module_utils.mh.deco import module_fails_on_exception
+from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException as _MHE
 
 
 class ModuleHelperBase:

@@ -4,17 +4,18 @@
 
 from __future__ import annotations
 
-import pytest
 import json
 from unittest.mock import patch
+
+import pytest
 
 pytest.importorskip("xmltodict")
 
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
-    AnsibleFailJson,
-    AnsibleExitJson,
 )
 
 from ansible_collections.community.general.plugins.modules import pmem as pmem_module

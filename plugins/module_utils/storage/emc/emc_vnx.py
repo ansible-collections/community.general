@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 emc_vnx_argument_spec = {
     "sp_address": dict(type="str", required=True),
     "sp_user": dict(type="str", required=False, default="sysadmin"),

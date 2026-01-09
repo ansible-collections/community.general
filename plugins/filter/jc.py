@@ -74,8 +74,9 @@ _value:
   type: any
 """
 
-from ansible.errors import AnsibleError, AnsibleFilterError
 import importlib
+
+from ansible.errors import AnsibleError, AnsibleFilterError
 
 try:
     import jc

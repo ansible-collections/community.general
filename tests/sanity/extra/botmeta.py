@@ -11,10 +11,8 @@ import re
 import sys
 
 import yaml
-
-from voluptuous import Any, MultipleInvalid, PREVENT_EXTRA, Schema
+from voluptuous import PREVENT_EXTRA, Any, MultipleInvalid, Schema
 from voluptuous.humanize import humanize_error
-
 
 IGNORE_NO_MAINTAINERS = [
     "docs/docsite/rst/filter_guide.rst",

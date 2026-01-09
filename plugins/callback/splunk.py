@@ -83,11 +83,10 @@ examples: >-
     authtoken = f23blad6-5965-4537-bf69-5b5a545blabla88
 """
 
-import json
-import uuid
-import socket
 import getpass
-
+import json
+import socket
+import uuid
 from os.path import basename
 
 from ansible.module_utils.ansible_release import __version__ as ansible_version

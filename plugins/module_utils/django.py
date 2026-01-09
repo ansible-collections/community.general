@@ -7,12 +7,14 @@ from __future__ import annotations
 import typing as t
 
 from ansible.module_utils.common.dict_transformations import dict_merge
+
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
+
     from ansible_collections.community.general.plugins.module_utils.cmd_runner import ArgFormatter
 
 

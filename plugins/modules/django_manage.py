@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: django_manage
 short_description: Manages a Django application
@@ -170,8 +169,8 @@ EXAMPLES = r"""
 """
 
 import os
-import sys
 import shlex
+import sys
 
 from ansible.module_utils.basic import AnsibleModule
 

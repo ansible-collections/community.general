@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: consul_auth_method
 short_description: Manipulate Consul auth methods
@@ -132,6 +131,7 @@ operation:
 import re
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.consul import (
     AUTH_ARGUMENTS_SPEC,
     _ConsulModule,

@@ -3,15 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-import os
 import json
+import os
 from unittest.mock import patch
 
 import pytest
-
-from ansible_collections.community.general.plugins.modules import scaleway_private_network
-from ansible_collections.community.general.plugins.module_utils.scaleway import Scaleway, Response
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
+
+from ansible_collections.community.general.plugins.module_utils.scaleway import Response, Scaleway
+from ansible_collections.community.general.plugins.modules import scaleway_private_network
 
 
 def response_with_zero_network():

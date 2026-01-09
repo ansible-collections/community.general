@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: mas
 short_description: Manage Mac App Store applications with mas-cli
@@ -101,12 +100,12 @@ EXAMPLES = r"""
 
 RETURN = r""" # """
 
-from ansible.module_utils.basic import AnsibleModule
 import os
+import platform
+
+from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
-import platform
 
 NOT_WORKING_MAC_VERSION_MAS_ACCOUNT = "12.0"
 

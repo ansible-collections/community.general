@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 short_description: Manage HPE StoreServ 3PAR CPG
 author:
@@ -123,6 +122,7 @@ RETURN = r"""
 """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.storage.hpe3par import hpe3par
 
 try:

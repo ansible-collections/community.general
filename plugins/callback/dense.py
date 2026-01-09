@@ -27,12 +27,12 @@ try:
 except ImportError:
     pass
 
+import sys
 from collections.abc import MutableMapping, MutableSequence
+
 from ansible.plugins.callback.default import CallbackModule as CallbackModule_default
 from ansible.utils.color import colorize, hostcolor
 from ansible.utils.display import Display
-
-import sys
 
 display = Display()
 

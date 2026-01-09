@@ -6,10 +6,11 @@ from __future__ import annotations
 
 import unittest
 from collections import OrderedDict
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import MagicMock, Mock, patch
 
-from ansible.playbook.task import Task
 from ansible.executor.task_result import TaskResult
+from ansible.playbook.task import Task
+
 from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData
 
 

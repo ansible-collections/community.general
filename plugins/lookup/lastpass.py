@@ -39,7 +39,7 @@ _raw:
   elements: str
 """
 
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes, to_text

@@ -4,14 +4,16 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.general.plugins.modules import dnsimple as dnsimple_module
+from unittest.mock import patch
+
+import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
-from unittest.mock import patch
-import pytest
+
+from ansible_collections.community.general.plugins.modules import dnsimple as dnsimple_module
 
 dnsimple = pytest.importorskip("dnsimple")
 

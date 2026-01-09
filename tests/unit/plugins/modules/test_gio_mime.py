@@ -4,9 +4,8 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import gio_mime
-from .uthelper import UTHelper, RunCommandMock
 
+from .uthelper import RunCommandMock, UTHelper
 
 UTHelper.from_module(gio_mime, __name__, mocks=[RunCommandMock])

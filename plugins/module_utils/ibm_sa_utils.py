@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import traceback
 import typing as t
-
 from functools import wraps
+
 from ansible.module_utils.basic import missing_required_lib
 
 if t.TYPE_CHECKING:

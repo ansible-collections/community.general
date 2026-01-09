@@ -14,7 +14,8 @@ if t.TYPE_CHECKING:
 
 with deps.declare("packaging"):
     from packaging.requirements import Requirement
-    from packaging.version import parse as parse_version, InvalidVersion
+    from packaging.version import InvalidVersion
+    from packaging.version import parse as parse_version
 
 
 class PackageRequirement:

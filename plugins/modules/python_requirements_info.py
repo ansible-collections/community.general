@@ -117,13 +117,14 @@ not_found:
     - requests
 """
 
+import operator
 import re
 import sys
-import operator
 
 HAS_DISTUTILS = False
 try:
     import pkg_resources
+
     from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
     HAS_DISTUTILS = True

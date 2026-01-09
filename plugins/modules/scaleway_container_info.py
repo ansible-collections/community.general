@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_container_info
 short_description: Retrieve information on Scaleway Container
@@ -91,12 +90,13 @@ container:
     timeout: 300s
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS,
-    scaleway_argument_spec,
     Scaleway,
+    scaleway_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
 
 
 def info_strategy(api, wished_cn):

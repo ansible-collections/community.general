@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: systemd_creds_decrypt
 short_description: C(systemd)'s C(systemd-creds decrypt) plugin

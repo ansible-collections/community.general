@@ -187,8 +187,9 @@ ansible_facts:
           sample: "root"
 """
 
-import re
 import platform
+import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 

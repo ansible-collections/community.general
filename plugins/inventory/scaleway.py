@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 name: scaleway
 author:
@@ -118,8 +117,8 @@ variables:
   ansible_user: "'admin'"
 """
 
-import os
 import json
+import os
 
 YAML_IMPORT_ERROR: ImportError | None
 try:
@@ -129,14 +128,15 @@ except ImportError as exc:
 else:
     YAML_IMPORT_ERROR = None
 
+import urllib.parse as urllib_parse
+
 from ansible.errors import AnsibleError
+from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.urls import open_url
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, parse_pagination_link
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
-from ansible.module_utils.urls import open_url
-from ansible.module_utils.common.text.converters import to_text
-
-import urllib.parse as urllib_parse
 
 
 def _fetch_information(token, url):

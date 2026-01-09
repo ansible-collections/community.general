@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: sensu_silence
 author: Steven Bambling (@smbambling)

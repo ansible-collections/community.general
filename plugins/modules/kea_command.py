@@ -117,7 +117,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 
-
 # default buffer size for socket I/O
 BUFSIZ = 8192
 

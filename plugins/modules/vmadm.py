@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: vmadm
 short_description: Manage SmartOS virtual machines and zones
@@ -343,7 +342,6 @@ import os
 import re
 import tempfile
 import traceback
-
 
 from ansible.module_utils.basic import AnsibleModule
 

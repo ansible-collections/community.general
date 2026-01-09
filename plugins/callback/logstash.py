@@ -94,12 +94,13 @@ ansible.cfg: |
       }
 """
 
-import os
 import json
-from ansible import context
+import logging
+import os
 import socket
 import uuid
-import logging
+
+from ansible import context
 
 try:
     import logstash

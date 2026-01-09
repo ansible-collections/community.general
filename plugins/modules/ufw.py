@@ -287,7 +287,6 @@ EXAMPLES = r"""
 """
 
 import re
-
 from operator import itemgetter
 
 from ansible.module_utils.basic import AnsibleModule

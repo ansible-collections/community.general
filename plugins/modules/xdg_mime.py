@@ -87,7 +87,7 @@ version:
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xdg_mime import xdg_mime_runner, xdg_mime_get
+from ansible_collections.community.general.plugins.module_utils.xdg_mime import xdg_mime_get, xdg_mime_runner
 
 
 class XdgMime(ModuleHelper):

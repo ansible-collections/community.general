@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: oci_vcn
 short_description: Manage Virtual Cloud Networks(VCN) in OCI
@@ -99,12 +98,12 @@ vcn:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 from ansible_collections.community.general.plugins.module_utils.oracle import oci_utils
 
 try:
+    from oci.core.models import CreateVcnDetails, UpdateVcnDetails
     from oci.core.virtual_network_client import VirtualNetworkClient
-    from oci.core.models import CreateVcnDetails
-    from oci.core.models import UpdateVcnDetails
 
     HAS_OCI_PY_SDK = True
 except ImportError:

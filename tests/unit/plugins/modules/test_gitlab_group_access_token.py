@@ -4,8 +4,8 @@
 
 from __future__ import annotations
 
-import pytest
 import gitlab
+import pytest
 
 from ansible_collections.community.general.plugins.modules.gitlab_group_access_token import GitLabGroupAccessToken
 
@@ -27,10 +27,10 @@ pytestmark = []
 try:
     from .gitlab import (
         GitlabModuleTestCase,
-        resp_get_user,
-        resp_get_group,
-        resp_list_group_access_tokens,
         resp_create_group_access_tokens,
+        resp_get_group,
+        resp_get_user,
+        resp_list_group_access_tokens,
         resp_revoke_group_access_tokens,
     )
 

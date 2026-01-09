@@ -34,9 +34,10 @@ _value:
   type: dictionary
 """
 
-from ansible.errors import AnsibleFilterError
-from collections.abc import Sequence
 from collections import Counter
+from collections.abc import Sequence
+
+from ansible.errors import AnsibleFilterError
 
 
 def counter(sequence):

@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: kibana_plugin
 short_description: Manage Kibana plugins
@@ -114,10 +113,10 @@ state:
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
 
 PACKAGE_STATE_MAP = dict(present="--install", absent="--remove")
 

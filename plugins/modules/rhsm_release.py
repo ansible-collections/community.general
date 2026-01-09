@@ -59,10 +59,10 @@ current_release:
   type: str
 """
 
-from ansible.module_utils.basic import AnsibleModule
-
 import os
 import re
+
+from ansible.module_utils.basic import AnsibleModule
 
 # Matches release-like values such as 7.2, 5.10, 6Server, 8
 # but rejects unlikely values, like 100Server, 1.100, 7server etc.

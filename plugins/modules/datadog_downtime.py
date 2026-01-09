@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: datadog_downtime
 short_description: Manages Datadog downtimes
@@ -153,12 +152,13 @@ downtime:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 # Import Datadog
 
 DATADOG_IMP_ERR = None
 HAS_DATADOG = True
 try:
-    from datadog_api_client.v1 import Configuration, ApiClient, ApiException
+    from datadog_api_client.v1 import ApiClient, ApiException, Configuration
     from datadog_api_client.v1.api.downtimes_api import DowntimesApi
     from datadog_api_client.v1.model.downtime import Downtime
     from datadog_api_client.v1.model.downtime_recurrence import DowntimeRecurrence

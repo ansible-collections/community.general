@@ -94,9 +94,10 @@ ilo_redfish_command:
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {"Systems": ["WaitforiLORebootCompletion"]}
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
-from ansible.module_utils.basic import AnsibleModule
 
 
 def main():

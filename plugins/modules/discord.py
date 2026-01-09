@@ -125,8 +125,8 @@ http_code:
   sample: 204
 """
 
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
 
 
 def discord_check_mode(module):

@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: grove
 short_description: Sends a notification to a grove.io channel
@@ -65,7 +64,6 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-
 
 BASE_URL = "https://grove.io/api/notice/%s/"
 

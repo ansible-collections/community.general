@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: scaleway_volume
 short_description: Scaleway volumes management module
@@ -118,12 +117,13 @@ data:
     }
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_LOCATION,
-    scaleway_argument_spec,
     Scaleway,
+    scaleway_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
 
 
 def core(module):

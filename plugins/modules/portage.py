@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: portage
 short_description: Package manager for Gentoo
@@ -260,7 +259,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.respawn import has_respawned, respawn_module
-
 
 try:
     from portage.dbapi import vartree

@@ -10,6 +10,7 @@ import pytest
 pytest.importorskip("memcache")
 
 from ansible.plugins.loader import cache_loader
+
 from ansible_collections.community.general.plugins.cache.memcached import CacheModule as MemcachedCache
 
 

@@ -125,14 +125,13 @@ groups:
 
 import os
 import re
-
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 from ansible import constants as C
 from ansible.errors import AnsibleParserError
-from ansible.module_utils.common.text.converters import to_native, to_text
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.process import get_bin_path
+from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 

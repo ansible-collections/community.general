@@ -4,11 +4,11 @@
 
 from __future__ import annotations
 
-import os
+import datetime
 import json
+import os
 import re
 import sys
-import datetime
 import time
 import traceback
 import typing as t
@@ -23,6 +23,7 @@ from ansible_collections.community.general.plugins.module_utils.datetime import 
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
+
     from ansible.module_utils.basic import AnsibleModule
 
 SCALEWAY_SECRET_IMP_ERR: str | None = None

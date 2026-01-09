@@ -12,7 +12,6 @@ import tempfile
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 
-
 # This is used to attach to a running container and execute commands from
 # within the container on the host.  This will provide local access to a
 # container without using SSH.  The template will attempt to work within the

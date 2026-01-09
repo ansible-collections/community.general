@@ -15,7 +15,6 @@
 
 from __future__ import annotations
 
-
 DOCUMENTATION = r"""
 module: zypper
 author:
@@ -253,8 +252,8 @@ EXAMPLES = r"""
 """
 
 import os.path
-import xml
 import re
+import xml
 from xml.dom.minidom import parseString as parseXML
 
 # import module snippets

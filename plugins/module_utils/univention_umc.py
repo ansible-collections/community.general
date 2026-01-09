@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-
 """Univention Corporate Server (UCS) access module.
 
 Provides the following functions for working with an UCS server.
@@ -41,11 +40,10 @@ Any other module is not part of the "official" API and may change at any time.
 
 import re
 
-
 __all__ = [
-    "ldap_search",
-    "config_registry",
     "base_dn",
+    "config_registry",
+    "ldap_search",
     "uldap",
     "umc_module_for_add",
     "umc_module_for_edit",

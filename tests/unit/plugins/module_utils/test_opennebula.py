@@ -10,7 +10,6 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
 
-
 FLATTEN_VALID = [
     ([[[1]], [2], 3], False, [1, 2, 3]),
     ([[[1]], [2], 3], True, [1, 2, 3]),

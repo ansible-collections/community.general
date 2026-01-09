@@ -7,12 +7,13 @@ from __future__ import annotations
 import datetime
 import os
 import re
-import time
 import tarfile
+import time
 import typing as t
 from urllib.parse import urlparse, urlunparse
 
 from ansible.module_utils.urls import fetch_file
+
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 
 if t.TYPE_CHECKING:

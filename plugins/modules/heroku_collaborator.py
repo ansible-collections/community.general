@@ -81,6 +81,7 @@ EXAMPLES = r"""
 RETURN = """ # """
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.heroku import HerokuHelper
 
 

@@ -13,8 +13,8 @@ import hashlib
 import hmac
 import json
 import time
-import uuid
 import typing as t
+import uuid
 
 from ansible.module_utils.urls import open_url
 

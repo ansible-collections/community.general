@@ -6,8 +6,9 @@
 from __future__ import annotations
 
 import unittest
-from .oneview_module_loader import FcoeNetworkModule
+
 from .hpe_test_utils import OneViewBaseTestCase
+from .oneview_module_loader import FcoeNetworkModule
 
 FAKE_MSG_ERROR = "Fake message error"
 

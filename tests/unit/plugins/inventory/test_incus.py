@@ -5,10 +5,10 @@
 from __future__ import annotations
 
 import pytest
-
 from ansible.inventory.data import InventoryData
 from ansible.parsing.dataloader import DataLoader
 from ansible.template import Templar
+
 from ansible_collections.community.general.plugins.inventory.incus import (
     InventoryModule,
 )
