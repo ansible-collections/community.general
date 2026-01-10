@@ -340,7 +340,7 @@ stages:
             - name: Debian 13 Trixie
               test: debian-13-trixie/3.13
             - name: ArchLinux
-              test: archlinux/3.13
+              test: archlinux/3.14
           groups:
             - 1
             - 2
