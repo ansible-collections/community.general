@@ -19,7 +19,7 @@ def main():
     sys.stdout.reconfigure(errors="surrogateescape")
 
     for line in sys.stdin:
-        seconds = time.time() - start
+        seconds = int(time.time() - start)
         sys.stdout.write(f"{seconds // 60:02}:{seconds % 60:02} {line}")
         sys.stdout.flush()
 
