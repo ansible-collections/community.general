@@ -196,8 +196,8 @@ Filter
 New Modules
 -----------
 
-- community.general.django_dumpdata - Wrapper for C(django-admin dumpdata).
-- community.general.django_loaddata - Wrapper for C(django-admin loaddata).
+- community.general.django_dumpdata - Wrapper for ``django-admin dumpdata``.
+- community.general.django_loaddata - Wrapper for ``django-admin loaddata``.
 - community.general.pacemaker_stonith - Manage Pacemaker STONITH.
 
 v11.2.1
@@ -694,7 +694,7 @@ Minor Changes
 - iocage inventory plugin - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
 - iocage inventory plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379).
 - iocage inventory plugin - the new parameter ``hooks_results`` of the plugin is a list of files inside a jail that provide configuration parameters for the inventory. The inventory plugin reads the files from the jails and put the contents into the items of created variable ``iocage_hooks`` (https://github.com/ansible-collections/community.general/issues/9650, https://github.com/ansible-collections/community.general/pull/9651).
-- iocage inventory plugin - the new parameter ``inventory_hostname_tag`` of the plugin provides the name of the tag in the C(iocage properties notes) that contains the jails alias. The new parameter ``inventory_hostname_required``, if enabled, makes the tag mandatory (https://github.com/ansible-collections/community.general/issues/10206, https://github.com/ansible-collections/community.general/pull/10207).
+- iocage inventory plugin - the new parameter ``inventory_hostname_tag`` of the plugin provides the name of the tag in the ``iocage properties notes`` that contains the jails alias. The new parameter ``inventory_hostname_required``, if enabled, makes the tag mandatory (https://github.com/ansible-collections/community.general/issues/10206, https://github.com/ansible-collections/community.general/pull/10207).
 - iocage inventory plugin - the new parameter ``sudo`` of the plugin lets the command ``iocage list -l`` to run as root on the iocage host. This is needed to get the IPv4 of a running DHCP jail (https://github.com/ansible-collections/community.general/issues/9572, https://github.com/ansible-collections/community.general/pull/9573).
 - iptables_state action plugin - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9583).
 - iptables_state action plugin - use f-strings instead of interpolations or ``format`` (https://github.com/ansible-collections/community.general/pull/9318).
@@ -1102,8 +1102,8 @@ New Modules
 - community.general.ldap_inc - Use the Modify-Increment LDAP V3 feature to increment an attribute value.
 - community.general.lvm_pv - Manage LVM Physical Volumes.
 - community.general.pacemaker_resource - Manage pacemaker resources.
-- community.general.systemd_creds_decrypt - C(systemd)'s C(systemd-creds decrypt) plugin.
-- community.general.systemd_creds_encrypt - C(systemd)'s C(systemd-creds encrypt) plugin.
-- community.general.systemd_info - Gather C(systemd) unit info.
+- community.general.systemd_creds_decrypt - ``systemd``'s ``systemd-creds decrypt`` plugin.
+- community.general.systemd_creds_encrypt - ``systemd``'s ``systemd-creds encrypt`` plugin.
+- community.general.systemd_info - Gather ``systemd`` unit info.
 - community.general.xdg_mime - Set default handler for MIME types, for applications using XDG tools.
 - community.general.zpool - Manage ZFS zpools.

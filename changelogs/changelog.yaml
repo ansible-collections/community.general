@@ -422,7 +422,7 @@ releases:
           the contents into the items of created variable ``iocage_hooks`` (https://github.com/ansible-collections/community.general/issues/9650,
           https://github.com/ansible-collections/community.general/pull/9651).
         - iocage inventory plugin - the new parameter ``inventory_hostname_tag`` of
-          the plugin provides the name of the tag in the C(iocage properties notes)
+          the plugin provides the name of the tag in the ``iocage properties notes``
           that contains the jails alias. The new parameter ``inventory_hostname_required``,
           if enabled, makes the tag mandatory (https://github.com/ansible-collections/community.general/issues/10206,
           https://github.com/ansible-collections/community.general/pull/10207).
@@ -1048,13 +1048,13 @@ releases:
       - description: Manage pacemaker resources.
         name: pacemaker_resource
         namespace: ''
-      - description: C(systemd)'s C(systemd-creds decrypt) plugin.
+      - description: '``systemd``''s ``systemd-creds decrypt`` plugin.'
         name: systemd_creds_decrypt
         namespace: ''
-      - description: C(systemd)'s C(systemd-creds encrypt) plugin.
+      - description: '``systemd``''s ``systemd-creds encrypt`` plugin.'
         name: systemd_creds_encrypt
         namespace: ''
-      - description: Gather C(systemd) unit info.
+      - description: Gather ``systemd`` unit info.
         name: systemd_info
         namespace: ''
       - description: Set default handler for MIME types, for applications using XDG
@@ -1721,10 +1721,10 @@ releases:
       - keycloak-realm-webauthn-policies.yml
       - random_string_seed.yml
     modules:
-      - description: Wrapper for C(django-admin dumpdata).
+      - description: Wrapper for ``django-admin dumpdata``.
         name: django_dumpdata
         namespace: ''
-      - description: Wrapper for C(django-admin loaddata).
+      - description: Wrapper for ``django-admin loaddata``.
         name: django_loaddata
         namespace: ''
       - description: Manage Pacemaker STONITH.

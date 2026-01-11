@@ -260,8 +260,8 @@ Regular bugfix and feature release\.
 <a id="new-modules"></a>
 ### New Modules
 
-* community\.general\.django\_dumpdata \- Wrapper for C\(django\-admin dumpdata\)\.
-* community\.general\.django\_loaddata \- Wrapper for C\(django\-admin loaddata\)\.
+* community\.general\.django\_dumpdata \- Wrapper for <code>django\-admin dumpdata</code>\.
+* community\.general\.django\_loaddata \- Wrapper for <code>django\-admin loaddata</code>\.
 * community\.general\.pacemaker\_stonith \- Manage Pacemaker STONITH\.
 
 <a id="v11-2-1"></a>
@@ -758,7 +758,7 @@ This is release 11\.0\.0 of <code>community\.general</code>\, released on 2025\-
 * iocage inventory plugin \- adjust standard preamble for Python 3 \([https\://github\.com/ansible\-collections/community\.general/pull/9584](https\://github\.com/ansible\-collections/community\.general/pull/9584)\)\.
 * iocage inventory plugin \- clean up string conversions \([https\://github\.com/ansible\-collections/community\.general/pull/9379](https\://github\.com/ansible\-collections/community\.general/pull/9379)\)\.
 * iocage inventory plugin \- the new parameter <code>hooks\_results</code> of the plugin is a list of files inside a jail that provide configuration parameters for the inventory\. The inventory plugin reads the files from the jails and put the contents into the items of created variable <code>iocage\_hooks</code> \([https\://github\.com/ansible\-collections/community\.general/issues/9650](https\://github\.com/ansible\-collections/community\.general/issues/9650)\, [https\://github\.com/ansible\-collections/community\.general/pull/9651](https\://github\.com/ansible\-collections/community\.general/pull/9651)\)\.
-* iocage inventory plugin \- the new parameter <code>inventory\_hostname\_tag</code> of the plugin provides the name of the tag in the C\(iocage properties notes\) that contains the jails alias\. The new parameter <code>inventory\_hostname\_required</code>\, if enabled\, makes the tag mandatory \([https\://github\.com/ansible\-collections/community\.general/issues/10206](https\://github\.com/ansible\-collections/community\.general/issues/10206)\, [https\://github\.com/ansible\-collections/community\.general/pull/10207](https\://github\.com/ansible\-collections/community\.general/pull/10207)\)\.
+* iocage inventory plugin \- the new parameter <code>inventory\_hostname\_tag</code> of the plugin provides the name of the tag in the <code>iocage properties notes</code> that contains the jails alias\. The new parameter <code>inventory\_hostname\_required</code>\, if enabled\, makes the tag mandatory \([https\://github\.com/ansible\-collections/community\.general/issues/10206](https\://github\.com/ansible\-collections/community\.general/issues/10206)\, [https\://github\.com/ansible\-collections/community\.general/pull/10207](https\://github\.com/ansible\-collections/community\.general/pull/10207)\)\.
 * iocage inventory plugin \- the new parameter <code>sudo</code> of the plugin lets the command <code>iocage list \-l</code> to run as root on the iocage host\. This is needed to get the IPv4 of a running DHCP jail \([https\://github\.com/ansible\-collections/community\.general/issues/9572](https\://github\.com/ansible\-collections/community\.general/issues/9572)\, [https\://github\.com/ansible\-collections/community\.general/pull/9573](https\://github\.com/ansible\-collections/community\.general/pull/9573)\)\.
 * iptables\_state action plugin \- adjust standard preamble for Python 3 \([https\://github\.com/ansible\-collections/community\.general/pull/9583](https\://github\.com/ansible\-collections/community\.general/pull/9583)\)\.
 * iptables\_state action plugin \- use f\-strings instead of interpolations or <code>format</code> \([https\://github\.com/ansible\-collections/community\.general/pull/9318](https\://github\.com/ansible\-collections/community\.general/pull/9318)\)\.
@@ -1166,8 +1166,8 @@ This is release 11\.0\.0 of <code>community\.general</code>\, released on 2025\-
 * community\.general\.ldap\_inc \- Use the Modify\-Increment LDAP V3 feature to increment an attribute value\.
 * community\.general\.lvm\_pv \- Manage LVM Physical Volumes\.
 * community\.general\.pacemaker\_resource \- Manage pacemaker resources\.
-* community\.general\.systemd\_creds\_decrypt \- C\(systemd\)\'s C\(systemd\-creds decrypt\) plugin\.
-* community\.general\.systemd\_creds\_encrypt \- C\(systemd\)\'s C\(systemd\-creds encrypt\) plugin\.
-* community\.general\.systemd\_info \- Gather C\(systemd\) unit info\.
+* community\.general\.systemd\_creds\_decrypt \- <code>systemd</code>\'s <code>systemd\-creds decrypt</code> plugin\.
+* community\.general\.systemd\_creds\_encrypt \- <code>systemd</code>\'s <code>systemd\-creds encrypt</code> plugin\.
+* community\.general\.systemd\_info \- Gather <code>systemd</code> unit info\.
 * community\.general\.xdg\_mime \- Set default handler for MIME types\, for applications using XDG tools\.
 * community\.general\.zpool \- Manage ZFS zpools\.
