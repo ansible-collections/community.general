@@ -231,7 +231,7 @@ options:
       - Is the same as in an C(ip rule add) command, except always requires specifying a priority.
     type: list
     elements: str
-    version_added: 12.4.0
+    version_added: 12.3.0
   never_default4:
     description:
       - Set as default route.
