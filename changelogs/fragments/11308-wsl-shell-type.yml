@@ -1,3 +1,3 @@
 minor_changes:
-  - wsl connection plugin - add option ``wsl_shell_type``. Support PowerShell in addition to cmd as the Windows
+  - wsl connection plugin - add option ``wsl_remote_ssh_shell_type``. Support PowerShell in addition to cmd as the Windows
     shell (https://github.com/ansible-collections/community.general/issues/11307, https://github.com/ansible-collections/community.general/pull/11308).

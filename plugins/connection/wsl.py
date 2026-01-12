@@ -231,7 +231,7 @@ options:
     required: true
     vars:
       - name: wsl_distribution
-  wsl_shell_type:
+  wsl_remote_ssh_shell_type:
     description:
       - The shell type expected in the SSH session (not inside the WSL session).
       - See also C(ansible_shell_type).
@@ -241,7 +241,7 @@ options:
       - powershell
     default: cmd
     vars:
-      - name: wsl_shell_type
+      - name: wsl_remote_ssh_shell_type
     version_added: 12.2.0
   wsl_user:
     description:
@@ -590,14 +590,14 @@ class Connection(ConnectionBase):
         wsl_distribution = self.get_option("wsl_distribution")
         become = self.get_option("become")
         become_user = self.get_option("become_user")
-        wsl_shell_type = self.get_option("wsl_shell_type")
+        wsl_remote_ssh_shell_type = self.get_option("wsl_remote_ssh_shell_type")
         is_integration_test = os.getenv("_ANSIBLE_TEST_WSL_CONNECTION_PLUGIN_WAERI5TEPHEESHA2FAE8")
         if become and become_user:
             wsl_user = become_user
         else:
             wsl_user = self.get_option("wsl_user")
         args = ["wsl.exe"]
-        if wsl_shell_type == "powershell" and not is_integration_test:
+        if wsl_remote_ssh_shell_type == "powershell" and not is_integration_test:
             # Powershell stop-parsing token, treat the rest as arguments to the native command wsl.exe
             args.append("--%")
         args.extend(["--distribution", wsl_distribution])
