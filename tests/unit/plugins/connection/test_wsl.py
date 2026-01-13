@@ -219,7 +219,7 @@ def test_build_wsl_command_powershell(connection):
     cmd = connection._build_wsl_command('/bin/sh -c "ls -la"')
     assert cmd == 'wsl.exe --distribution test --% -- /bin/sh -c "ls -la"'
 
-    with pytest.raises(AnsibleError, match="Command contains '%', cannot safely escape it for Powershell"):
+    with pytest.raises(AnsibleError, match="The command contains '%', cannot safely escape it for Powershell"):
         connection._build_wsl_command('/bin/sh -c "ls -la %PATH%"')
 
 
