@@ -14,7 +14,7 @@ except ImportError as imp_exc:
 else:
     TOMLKIT_IMPORT_ERROR = None
 
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleRuntimeError, AnsibleTypeError
 from ansible.module_utils.common.collections import is_sequence
 
 try:
