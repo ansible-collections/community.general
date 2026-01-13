@@ -1502,6 +1502,8 @@ files:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
     maintainers: felixfontein
+  $plugin_utils/_tags.py:
+    maintainers: felixfontein
   $tests/a_module.py:
     maintainers: felixfontein
   $tests/ansible_type.py:
