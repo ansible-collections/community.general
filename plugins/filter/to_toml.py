@@ -14,7 +14,7 @@ except ImportError as imp_exc:
 else:
     TOMLKIT_IMPORT_ERROR = None
 
-from ansible.errors import AnsibleRuntimeError, AnsibleTypeError
+from ansible.errors import AnsibleRuntimeError, AnsibleError
 from ansible.module_utils.common.collections import is_sequence
 
 try:
@@ -97,7 +97,7 @@ def to_toml(value: t.Mapping, *, redact_sensitive_values: bool = False) -> str:
     if TOMLKIT_IMPORT_ERROR:
         raise AnsibleRuntimeError('tomlkit must be installed to use this plugin') from TOMLKIT_IMPORT_ERROR
     if not isinstance(value, Mapping):
-        raise AnsibleTypeError("to_toml only accepts dictionaries.")
+        raise AnsibleError("to_toml only accepts dictionaries.")
     return dumps(
         remove_all_tags(value, redact_sensitive_values=redact_sensitive_values),
     )
