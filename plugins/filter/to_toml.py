@@ -98,7 +98,7 @@ def to_toml(value: t.Mapping, *, redact_sensitive_values: bool = False) -> str:
     if TOMLKIT_IMPORT_ERROR:
         raise AnsibleError("tomlkit must be installed to use this plugin") from TOMLKIT_IMPORT_ERROR
     if not isinstance(value, Mapping):
-        raise AnsibleError("to_toml only accepts dictionaries.")
+        raise AnsibleFilterError("to_toml only accepts dictionaries.")
     return dumps(
         remove_all_tags(value, redact_sensitive_values=redact_sensitive_values),
     )
