@@ -8,7 +8,12 @@ import datetime
 import typing as t
 from collections.abc import Mapping, Set
 
-from tomlkit import dumps
+try:
+    from tomlkit import dumps
+except ImportError as imp_exc:
+    TOMLKIT_IMPORT_ERROR = imp_exc
+else:
+    TOMLKIT_IMPORT_ERROR = None
 
 from ansible.module_utils.common.collections import is_sequence
 
@@ -89,8 +94,10 @@ def remove_all_tags(value: t.Any, *, redact_sensitive_values: bool = False) -> t
 
 def to_toml(value: t.Mapping, *, redact_sensitive_values: bool = False) -> str:
     """Serialize input as terse flow-style TOML."""
+    if TOMLKIT_IMPORT_ERROR:
+        raise AnsibleError('tomlkit must be installed to use this plugin') from TOMLKIT_IMPORT_ERROR
     if not isinstance(value, Mapping):
-        raise ValueError("foo")
+        raise ValueError("to_toml only accepts dictionaries.")
     return dumps(
         remove_all_tags(value, redact_sensitive_values=redact_sensitive_values),
     )
