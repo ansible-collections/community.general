@@ -96,7 +96,7 @@ def remove_all_tags(value: t.Any, *, redact_sensitive_values: bool = False) -> t
 def to_toml(value: t.Mapping, *, redact_sensitive_values: bool = False) -> str:
     """Serialize input as terse flow-style TOML."""
     if TOMLKIT_IMPORT_ERROR:
-        raise AnsibleRuntimeError("tomlkit must be installed to use this plugin") from TOMLKIT_IMPORT_ERROR
+        raise AnsibleError("tomlkit must be installed to use this plugin") from TOMLKIT_IMPORT_ERROR
     if not isinstance(value, Mapping):
         raise AnsibleError("to_toml only accepts dictionaries.")
     return dumps(
