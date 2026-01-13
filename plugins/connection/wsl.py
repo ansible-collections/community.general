@@ -592,6 +592,13 @@ class Connection(ConnectionBase):
         become_user = self.get_option("become_user")
         wsl_remote_ssh_shell_type = self.get_option("wsl_remote_ssh_shell_type")
         is_integration_test = os.getenv("_ANSIBLE_TEST_WSL_CONNECTION_PLUGIN_WAERI5TEPHEESHA2FAE8")
+        if "%" in cmd:
+            if wsl_remote_ssh_shell_type == "powershell":
+                # there is no universal way to escape '%' here
+                # if this is raised, add a workaround to allow the specific situation (if possible)
+                raise AnsibleError("The command contains '%', cannot safely escape it for Powershell")
+            else:
+                cmd = cmd.replace("%", "^%")
         if become and become_user:
             wsl_user = become_user
         else:
