@@ -46,6 +46,7 @@ mypy_extra_deps = [
     "cryptography",
     "dnspython",
     "lxml-stubs",
+    "tomlkit",
     "types-mock",
     "types-paramiko",
     "types-passlib",
