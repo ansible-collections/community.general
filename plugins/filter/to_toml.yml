@@ -5,9 +5,7 @@
 DOCUMENTATION:
   name: to_toml
   author:
-    - Ansible Core Team
     - Matt Williaks (@milliams)
-    - Felix Fontein (@felixfontein)
   version_added: 13.0.0
   short_description: Convert variable to TOML string
   description:
