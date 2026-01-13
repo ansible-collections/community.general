@@ -5,4 +5,11 @@
 
 set -eux
 
+source virtualenv.sh
+
+# Requirements have to be installed prior to running ansible-playbook
+# because plugins and requirements are loaded before the task runs
+
+pip install tomlkit
+
 ansible-playbook --vault-password-file password main.yml "$@"
