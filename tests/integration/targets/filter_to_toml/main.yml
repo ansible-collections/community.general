@@ -8,7 +8,7 @@
   vars_files:
     - vaulted_vars.yml
   vars:
-    timestamp: "2025-01-02T03:04:05Z"
+    timestamp: 2025-01-02T03:04:05Z
     bar: "foobarbaz"
   tasks:
     - name: Convert more complex data structure (from vars file)
