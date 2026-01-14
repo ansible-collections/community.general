@@ -217,9 +217,9 @@ files:
   $filters/to_time_unit.yml:
     maintainers: resmo
   $filters/to_toml.py:
-    maintainers: felixfontein milliams
+    maintainers: milliams
   $filters/to_toml.yml:
-    maintainers: felixfontein milliams
+    maintainers: milliams
   $filters/to_weeks.yml:
     maintainers: resmo
   $filters/to_yaml.py:
