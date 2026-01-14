@@ -36,7 +36,7 @@ options:
     type: str
   server:
     description:
-      - Apply DNS modification on this server, specified by IPv4 or IPv6 address.
+      - Apply DNS modification on this server, specified by IPv4/IPv6 address or FQDN.
     required: true
     type: str
   port:
@@ -138,6 +138,15 @@ EXAMPLES = r"""
     record: "1.1.168.192.in-addr.arpa."
     type: "PTR"
     state: absent
+
+- name: Use FQDN for server instead of IP address
+  community.general.nsupdate:
+    key_name: "nsupdate"
+    key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
+    server: "ns1.example.org"
+    zone: "example.org"
+    record: "ansible"
+    value: "192.168.1.1"
 """
 
 RETURN = r"""
@@ -178,6 +187,7 @@ dns_rc_str:
   sample: 'REFUSED'
 """
 
+import ipaddress
 import traceback
 from binascii import Error as binascii_error
 
@@ -200,6 +210,8 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 class RecordManager:
     def __init__(self, module):
         self.module = module
+
+        self.server_ip = self.resolve_server()
 
         if module.params["key_name"]:
             try:
@@ -238,6 +250,42 @@ class RecordManager:
 
         self.dns_rc = 0
 
+    def resolve_server(self):
+        """Resolve server parameter to an IP address if it's a FQDN."""
+        server = self.module.params["server"]
+
+        # Check if it's already an IPv4/IPv6 address
+        try:
+            ipaddress.ip_address(server)
+            return server
+        except ValueError:
+            pass
+
+        # Try to resolve the FQDN
+        try:
+            resolver = dns.resolver.Resolver()
+            name = dns.name.from_text(server)
+
+            # Try AAAA record first, then A
+            try:
+                answers = resolver.resolve(name, dns.rdatatype.AAAA)
+                self.server_fqdn = server
+                return str(answers[0])
+            except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+                pass
+
+            try:
+                answers = resolver.resolve(name, dns.rdatatype.A)
+                self.server_fqdn = server
+                return str(answers[0])
+            except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+                self.module.fail_json(msg=f"Failed to resolve server '{server}' to an IP address")
+
+        except dns.exception.DNSException as e:
+            self.module.fail_json(msg=f"DNS resolution error for server '{server}': {e}")
+
+        return server
+
     def txt_helper(self, entry):
         if entry[0] == '"' and entry[-1] == '"':
             return entry
@@ -251,13 +299,9 @@ class RecordManager:
                 query.use_tsig(keyring=self.keyring, algorithm=self.algorithm)
             try:
                 if self.module.params["protocol"] == "tcp":
-                    lookup = dns.query.tcp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
+                    lookup = dns.query.tcp(query, self.server_ip, timeout=10, port=self.module.params["port"])
                 else:
-                    lookup = dns.query.udp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
+                    lookup = dns.query.udp(query, self.server_ip, timeout=10, port=self.module.params["port"])
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
             except (OSError, dns.exception.Timeout) as e:
@@ -286,13 +330,9 @@ class RecordManager:
         response = None
         try:
             if self.module.params["protocol"] == "tcp":
-                response = dns.query.tcp(
-                    update, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                )
+                response = dns.query.tcp(update, self.server_ip, timeout=10, port=self.module.params["port"])
             else:
-                response = dns.query.udp(
-                    update, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                )
+                response = dns.query.udp(update, self.server_ip, timeout=10, port=self.module.params["port"])
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
         except (OSError, dns.exception.Timeout) as e:
@@ -355,13 +395,9 @@ class RecordManager:
 
             try:
                 if self.module.params["protocol"] == "tcp":
-                    lookup = dns.query.tcp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
+                    lookup = dns.query.tcp(query, self.server_ip, timeout=10, port=self.module.params["port"])
                 else:
-                    lookup = dns.query.udp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
+                    lookup = dns.query.udp(query, self.server_ip, timeout=10, port=self.module.params["port"])
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
             except (OSError, dns.exception.Timeout) as e:
@@ -450,9 +486,9 @@ class RecordManager:
 
         try:
             if self.module.params["protocol"] == "tcp":
-                lookup = dns.query.tcp(query, self.module.params["server"], timeout=10, port=self.module.params["port"])
+                lookup = dns.query.tcp(query, self.server_ip, timeout=10, port=self.module.params["port"])
             else:
-                lookup = dns.query.udp(query, self.module.params["server"], timeout=10, port=self.module.params["port"])
+                lookup = dns.query.udp(query, self.server_ip, timeout=10, port=self.module.params["port"])
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
         except (OSError, dns.exception.Timeout) as e:
