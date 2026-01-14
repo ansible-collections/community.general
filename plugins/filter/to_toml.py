@@ -23,7 +23,7 @@ from ansible_collections.community.general.plugins.plugin_utils._tags import rem
 
 
 def _stringify_keys(value: t.Any) -> t.Any:
-    """Recursively convert all keps to strings."""
+    """Recursively convert all keys to strings."""
     if isinstance(value, Mapping):
         return {str(k): _stringify_keys(v) for k, v in value.items()}
     if is_sequence(value):
