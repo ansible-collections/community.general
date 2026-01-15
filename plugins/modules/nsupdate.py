@@ -236,7 +236,7 @@ class RecordManager:
     def __init__(self, module):
         self.module = module
 
-        self.server_ip = self.resolve_server()
+        self.server_ips = self.resolve_server()
 
         if module.params["key_algorithm"] == "hmac-md5":
             self.algorithm = "HMAC-MD5.SIG-ALG.REG.INT"
@@ -280,13 +280,13 @@ class RecordManager:
         self.dns_rc = 0
 
     def resolve_server(self):
-        """Resolve server parameter to an IP address if it's a FQDN."""
+        """Resolve server parameter to a list of IP addresses if it's a FQDN."""
         server = self.module.params["server"]
 
         # Check if it's already an IPv4/IPv6 address
         try:
             ipaddress.ip_address(server)
-            return server
+            return [server]
         except ValueError:
             pass
 
@@ -294,32 +294,47 @@ class RecordManager:
         try:
             resolver = dns.resolver.Resolver()
             name = dns.name.from_text(server)
+            ip_list = []
 
-            # Try AAAA record first, then A
             try:
                 answers = resolver.resolve(name, dns.rdatatype.AAAA)
                 self.server_fqdn = server
-                return str(answers[0])
+                ip_list.extend([str(answer) for answer in answers])
             except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
                 pass
 
             try:
                 answers = resolver.resolve(name, dns.rdatatype.A)
                 self.server_fqdn = server
-                return str(answers[0])
+                ip_list.extend([str(answer) for answer in answers])
             except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+                pass
+
+            if not ip_list:
                 self.module.fail_json(msg=f"Failed to resolve server '{server}' to an IP address")
+
+            return ip_list
 
         except dns.exception.DNSException as e:
             self.module.fail_json(msg=f"DNS resolution error for server '{server}': {e}")
 
-        return server
+        return [server]
 
     def query(self, query, timeout=10):
-        if self.module.params["protocol"] == "tcp":
-            return dns.query.tcp(query, self.server_ip, timeout=timeout, port=self.module.params["port"])
-        else:
-            return dns.query.udp(query, self.server_ip, timeout=timeout, port=self.module.params["port"])
+        last_exception = None
+        for server_ip in self.server_ips:
+            try:
+                if self.module.params["protocol"] == "tcp":
+                    return dns.query.tcp(query, server_ip, timeout=timeout, port=self.module.params["port"])
+                else:
+                    return dns.query.udp(query, server_ip, timeout=timeout, port=self.module.params["port"])
+            except (OSError, dns.exception.Timeout) as e:
+                last_exception = e
+                continue
+
+        # If all servers failed, raise the last exception
+        if last_exception:
+            raise last_exception
 
     def build_tkey_query(self, token, key_ring, key_name):
         inception_time = int(time.time())
