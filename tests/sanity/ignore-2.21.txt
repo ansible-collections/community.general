@@ -1,3 +1,4 @@
+plugins/module_utils/_lxc.py pylint:ansible-bad-function  # needs to use Popen() to stream logs
 plugins/modules/ansible_galaxy_install.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
 plugins/modules/gandi_livedns.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
