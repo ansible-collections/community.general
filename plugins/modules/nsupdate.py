@@ -315,6 +315,12 @@ class RecordManager:
 
         return server
 
+    def query(self, query, timeout=10):
+        if self.module.params["protocol"] == "tcp":
+            return dns.query.tcp(query, self.server_ip, timeout=timeout, port=self.module.params["port"])
+        else:
+            return dns.query.udp(query, self.server_ip, timeout=timeout, port=self.module.params["port"])
+
     def build_tkey_query(self, token, key_ring, key_name):
         inception_time = int(time.time())
         tkey = dns.rdtypes.ANY.TKEY.TKEY(
@@ -359,7 +365,7 @@ class RecordManager:
         while not gss_ctx.complete:
             tkey_query = self.build_tkey_query(token, keyring, keyname)
             try:
-                response = dns.query.tcp(tkey_query, self.server_ip, timeout=10, port=self.module.params["port"])
+                response = self.query(tkey_query)
             except (OSError, dns.exception.Timeout) as e:
                 self.module.fail_json(msg=f"GSS-TSIG negotiation error: ({e.__class__.__name__}): {e}")
             if not gss_ctx.complete:
@@ -379,10 +385,7 @@ class RecordManager:
             if self.keyring:
                 query.use_tsig(keyring=self.keyring, keyname=self.keyname, algorithm=self.algorithm)
             try:
-                if self.module.params["protocol"] == "tcp":
-                    lookup = dns.query.tcp(query, self.server_ip, timeout=10, port=self.module.params["port"])
-                else:
-                    lookup = dns.query.udp(query, self.server_ip, timeout=10, port=self.module.params["port"])
+                lookup = self.query(query)
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
             except (OSError, dns.exception.Timeout) as e:
@@ -410,10 +413,7 @@ class RecordManager:
     def __do_update(self, update):
         response = None
         try:
-            if self.module.params["protocol"] == "tcp":
-                response = dns.query.tcp(update, self.server_ip, timeout=10, port=self.module.params["port"])
-            else:
-                response = dns.query.udp(update, self.server_ip, timeout=10, port=self.module.params["port"])
+            response = self.query(update)
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
         except (OSError, dns.exception.Timeout) as e:
@@ -475,10 +475,7 @@ class RecordManager:
                 query.use_tsig(keyring=self.keyring, keyname=self.keyname, algorithm=self.algorithm)
 
             try:
-                if self.module.params["protocol"] == "tcp":
-                    lookup = dns.query.tcp(query, self.server_ip, timeout=10, port=self.module.params["port"])
-                else:
-                    lookup = dns.query.udp(query, self.server_ip, timeout=10, port=self.module.params["port"])
+                lookup = self.query(query)
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
             except (OSError, dns.exception.Timeout) as e:
@@ -566,10 +563,7 @@ class RecordManager:
             query.use_tsig(keyring=self.keyring, keyname=self.keyname, algorithm=self.algorithm)
 
         try:
-            if self.module.params["protocol"] == "tcp":
-                lookup = dns.query.tcp(query, self.server_ip, timeout=10, port=self.module.params["port"])
-            else:
-                lookup = dns.query.udp(query, self.server_ip, timeout=10, port=self.module.params["port"])
+            lookup = self.query(query)
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
         except (OSError, dns.exception.Timeout) as e:
