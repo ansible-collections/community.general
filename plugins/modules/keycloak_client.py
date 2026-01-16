@@ -916,6 +916,7 @@ def normalize_kc_resp(clientrep):
     if "direct_grant" not in authentication_flow_overrides:
         authentication_flow_overrides["direct_grant"] = None
 
+
 def sanitize_cr(clientrep):
     """Removes probably sensitive details from a client representation.
 
