@@ -210,6 +210,19 @@ def test_build_wsl_command(connection):
     assert cmd == 'wsl.exe --distribution test --user test-become-user -- /bin/sh -c "ls -la"'
 
 
+def test_build_wsl_command_powershell(connection):
+    """Test wsl command building for powershell and cmd remote ssh shell"""
+    cmd = connection._build_wsl_command('/bin/sh -c "ls -la %PATH%"')
+    assert cmd == 'wsl.exe --distribution test -- /bin/sh -c "ls -la ^%PATH^%"'
+
+    connection.set_option("wsl_remote_ssh_shell_type", "powershell")
+    cmd = connection._build_wsl_command('/bin/sh -c "ls -la"')
+    assert cmd == 'wsl.exe --% --distribution test -- /bin/sh -c "ls -la"'
+
+    with pytest.raises(AnsibleError, match="The command contains '%', cannot safely escape it for Powershell"):
+        connection._build_wsl_command('/bin/sh -c "ls -la %PATH%"')
+
+
 @patch("paramiko.SSHClient")
 def test_exec_command_success(mock_ssh, connection):
     """Test successful command execution"""
