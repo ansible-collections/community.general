@@ -167,7 +167,7 @@ TESTCASE_GENERIC_DIFF_CHECK = [
     },
 ]
 
-TESTCASE_GENERIC_MODIFY_ROUTING_RULES = [
+TESTCASE_GENERIC_MODIFY_ROUTING_RULES4 = [
     {
         "type": "generic",
         "conn_name": "non_existent_nw_device",
@@ -175,6 +175,19 @@ TESTCASE_GENERIC_MODIFY_ROUTING_RULES = [
         "ip4": "10.10.10.10/24",
         "gw4": "10.10.10.1",
         "routing_rules4": ["priority 5 from 10.0.0.0/24 table 5000", "priority 10 from 10.0.1.0/24 table 5001"],
+        "state": "present",
+        "_ansible_check_mode": False,
+    },
+]
+
+TESTCASE_GENERIC_MODIFY_ROUTING_RULES6 = [
+    {
+        "type": "generic",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "generic_non_existant",
+        "ip6": "fd00::10/24",
+        "gw6": "fd00::1",
+        "routing_rules6": ["priority 5 from fd00::/24 table 5000", "priority 10 from fd01::/24 table 5001"],
         "state": "present",
         "_ansible_check_mode": False,
     },
@@ -2211,7 +2224,7 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
 
 
 @pytest.mark.parametrize(
-    "patch_ansible_module", TESTCASE_GENERIC_MODIFY_ROUTING_RULES, indirect=["patch_ansible_module"]
+    "patch_ansible_module", TESTCASE_GENERIC_MODIFY_ROUTING_RULES4, indirect=["patch_ansible_module"]
 )
 def test_generic_connection_modify_routing_rules4(mocked_generic_connection_create, capfd):
     """
@@ -2225,6 +2238,28 @@ def test_generic_connection_modify_routing_rules4(mocked_generic_connection_crea
     args, kwargs = arg_list[0]
 
     assert "ipv4.routing-rules" in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
+
+
+@pytest.mark.parametrize(
+    "patch_ansible_module", TESTCASE_GENERIC_MODIFY_ROUTING_RULES6, indirect=["patch_ansible_module"]
+)
+def test_generic_connection_modify_routing_rules6(mocked_generic_connection_create, capfd):
+    """
+    Test : Generic connection modified with routing-rules6
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert "ipv6.routing-rules" in args[0]
 
     out, err = capfd.readouterr()
     results = json.loads(out)
