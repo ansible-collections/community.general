@@ -6,7 +6,7 @@ DOCUMENTATION:
   name: to_toml
   author:
     - Matt Williaks (@milliams)
-  version_added: 13.3.0
+  version_added: 12.3.0
   short_description: Convert variable to TOML string
   description:
     - Converts an Ansible variable into a TOML string representation.
