@@ -11,6 +11,8 @@ DOCUMENTATION:
   description:
     - Converts an Ansible variable into a TOML string representation.
     - This filter functions as a wrapper to the L(Python TOML Kit library, https://pypi.org/project/tomlkit/)'s C(tomlkit.dumps) function.
+  requirements:
+    - tomlkit
   positional: _input
   options:
     _input:
