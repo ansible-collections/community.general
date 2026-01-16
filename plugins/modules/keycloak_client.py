@@ -911,7 +911,10 @@ def normalize_kc_resp(clientrep):
     # to minimize diff/changes we set it to false if not set by kc
     if clientrep and "authorizationServicesEnabled" not in clientrep:
         clientrep["authorizationServicesEnabled"] = False
-
+    # to minimize diff/changes we set the direct_grant override to false if it doesn't exist
+    authentication_flow_overrides = clientrep["authenticationFlowBindingOverrides"]
+    if "direct_grant" not in authentication_flow_overrides:
+        authentication_flow_overrides["direct_grant"] = None
 
 def sanitize_cr(clientrep):
     """Removes probably sensitive details from a client representation.
