@@ -185,6 +185,7 @@ class TaskData:
                 # concatenate task include output from multiple items
                 host.result = f"{self.host_data[host.uuid].result}\n{host.result}"
             else:
+                self.host_data[host.uuid].update(host)
                 return
 
         self.host_data[host.uuid] = host
@@ -195,12 +196,20 @@ class HostData:
     Data about an individual host.
     """
 
-    def __init__(self, uuid, name, status, result):
+    def __init__(self, uuid, name, status, result, start=None):
         self.uuid = uuid
         self.name = name
         self.status = status
         self.result = result
         self.finish = time_ns()
+        self.start = start
+
+    def update(self, host):
+        self.status = host.status
+        self.result = host.result
+        self.finish = host.finish
+        if host.start is not None:
+            self.start = host.start
 
 
 class OpenTelemetrySource:
@@ -221,13 +230,17 @@ class OpenTelemetrySource:
         carrier["traceparent"] = traceparent
         return TraceContextTextMapPropagator().extract(carrier=carrier)
 
-    def start_task(self, tasks_data, hide_task_arguments, play_name, task):
+    def start_task(self, tasks_data, hide_task_arguments, play_name, task, host=None):
         """record the start of a task for one or more hosts"""
 
         uuid = task._uuid
 
         if uuid in tasks_data:
-            return
+            if host:
+                tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started", None, time_ns()))
+                return
+            else:
+                return
 
         name = task.get_name().strip()
         path = task.get_path()
@@ -238,6 +251,8 @@ class OpenTelemetrySource:
             args = task.args
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
+        if host:
+            tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started", None, time_ns()))
 
     def finish_task(self, tasks_data, status, result, dump):
         """record the results of a task for a single host"""
@@ -310,7 +325,8 @@ class OpenTelemetrySource:
             parent.set_attribute("ansible.host.user", self.user)
             for task in tasks:
                 for host_data in task.host_data.values():
-                    with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
+                    start = host_data.start or task.start
+                    with tracer.start_as_current_span(task.name, start_time=start, end_on_exit=False) as span:
                         self.update_span_data(task, host_data, span, disable_logs, disable_attributes_in_logs)
 
         return otel_exporter
@@ -564,6 +580,9 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
+
+    def v2_runner_on_start(self, host, task):
+        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task, host)
 
     def v2_playbook_on_cleanup_task_start(self, task):
         self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)

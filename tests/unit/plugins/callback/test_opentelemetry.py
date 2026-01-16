@@ -50,6 +50,27 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(task_data.action, "myaction")
         self.assertEqual(task_data.args, {})
 
+    def test_run_task_with_host(self):
+        tasks_data = OrderedDict()
+
+        self.opentelemetry.start_task(tasks_data, False, "myplay", self.mock_task, self.mock_host)
+
+        task_data = tasks_data["myuuid"]
+        self.assertEqual(task_data.uuid, "myuuid")
+        self.assertEqual(task_data.name, "mytask")
+        self.assertEqual(task_data.path, "/mypath")
+        self.assertEqual(task_data.play, "myplay")
+        self.assertEqual(task_data.action, "myaction")
+        self.assertEqual(task_data.args, {})
+
+        host_data = task_data.host_data["myhost_uuid"]
+        self.assertEqual(host_data.uuid, "myhost_uuid")
+        self.assertEqual(host_data.name, "myhost")
+        self.assertIsNotNone(host_data.start)
+
+        self.opentelemetry.finish_task(tasks_data, "ok", self.my_task_result, "")
+        self.assertEqual(host_data.status, "ok")
+
     def test_finish_task_with_a_host_match(self):
         tasks_data = OrderedDict()
         tasks_data["myuuid"] = self.my_task
