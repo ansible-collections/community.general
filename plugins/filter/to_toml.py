@@ -8,6 +8,7 @@ import typing as t
 from collections.abc import Mapping
 
 from ansible.module_utils.common.collections import is_sequence
+from ansible.module_utils.common.text.converters import to_text
 
 TOMLKIT_IMPORT_ERROR: ImportError | None
 try:
