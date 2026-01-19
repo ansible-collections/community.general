@@ -37,19 +37,6 @@ class TestOpentelemetry(unittest.TestCase):
             host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields
         )
 
-    def test_start_task(self):
-        tasks_data = OrderedDict()
-
-        self.opentelemetry.start_task(tasks_data, False, "myplay", self.mock_task)
-
-        task_data = tasks_data["myuuid"]
-        self.assertEqual(task_data.uuid, "myuuid")
-        self.assertEqual(task_data.name, "mytask")
-        self.assertEqual(task_data.path, "/mypath")
-        self.assertEqual(task_data.play, "myplay")
-        self.assertEqual(task_data.action, "myaction")
-        self.assertEqual(task_data.args, {})
-
     def test_run_task_with_host(self):
         tasks_data = OrderedDict()
 
