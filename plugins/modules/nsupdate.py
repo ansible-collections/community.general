@@ -202,12 +202,15 @@ dns_rc_str:
 
 import ipaddress
 import time
-import traceback
 import uuid
 from binascii import Error as binascii_error
+from contextlib import suppress
 
-DNSPYTHON_IMP_ERR = None
-try:
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils import deps
+
+with deps.declare("dnspython", url="https://github.com/rthalley/dnspython"):
     import dns.message
     import dns.query
     import dns.rdtypes.ANY.TKEY
@@ -215,21 +218,8 @@ try:
     import dns.tsigkeyring
     import dns.update
 
-    HAVE_DNSPYTHON = True
-except ImportError:
-    DNSPYTHON_IMP_ERR = traceback.format_exc()
-    HAVE_DNSPYTHON = False
-
-GSSAPI_IMP_ERR = None
-try:
+with deps.declare("gssapi", reason="for gss-tsig keys", url="https://github.com/pythongssapi/python-gssapi"):
     import gssapi
-
-    HAVE_GSSAPI = True
-except ImportError:
-    GSSAPI_IMP_ERR = traceback.format_exc()
-    HAVE_GSSAPI = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 class RecordManager:
@@ -296,19 +286,15 @@ class RecordManager:
             name = dns.name.from_text(server)
             ip_list = []
 
-            try:
+            with suppress(dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
                 answers = resolver.resolve(name, dns.rdatatype.AAAA)
                 self.server_fqdn = server
                 ip_list.extend([str(answer) for answer in answers])
-            except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-                pass
 
-            try:
+            with suppress(dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
                 answers = resolver.resolve(name, dns.rdatatype.A)
                 self.server_fqdn = server
                 ip_list.extend([str(answer) for answer in answers])
-            except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-                pass
 
             if not ip_list:
                 self.module.fail_json(msg=f"Failed to resolve server '{server}' to an IP address")
@@ -358,8 +344,7 @@ class RecordManager:
         return query
 
     def init_gssapi(self):
-        if not HAVE_GSSAPI:
-            self.module.fail_json(msg=missing_required_lib("gssapi"), exception=GSSAPI_IMP_ERR)
+        deps.validate(self.module, "gssapi")
         if not self.server_fqdn:
             self.module.fail_json(msg="server must be a FQDN")
 
@@ -622,8 +607,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not HAVE_DNSPYTHON:
-        module.fail_json(msg=missing_required_lib("dnspython"), exception=DNSPYTHON_IMP_ERR)
+    deps.validate(module, "dnspython")
 
     if len(module.params["record"]) == 0:
         module.fail_json(msg="record cannot be empty.")
