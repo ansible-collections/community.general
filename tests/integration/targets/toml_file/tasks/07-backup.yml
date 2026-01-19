@@ -1,0 +1,108 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Backup tests
+
+- name: test-backup 1 - create initial file
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: host
+    value: localhost
+  register: result_backup_1
+
+- name: test-backup 1 - verify no backup file returned
+  assert:
+    that:
+      - result_backup_1 is changed
+      - "'backup_file' not in result_backup_1"
+
+- name: test-backup 1 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_backup_1
+
+- name: test-backup 1 - verify initial content
+  vars:
+    expected: |
+      [server]
+      host = "localhost"
+  assert:
+    that:
+      - (content_backup_1.content | b64decode) == expected
+
+- name: test-backup 2 - modify with backup enabled
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: host
+    value: "192.168.1.1"
+    backup: true
+  register: result_backup_2
+
+- name: test-backup 2 - verify backup file created
+  assert:
+    that:
+      - result_backup_2 is changed
+      - "'backup_file' in result_backup_2"
+      - result_backup_2.backup_file is match(".*test.toml.*~$")
+
+- name: test-backup 2 - verify backup file exists
+  stat:
+    path: "{{ result_backup_2.backup_file }}"
+  register: stat_backup_2
+
+- name: test-backup 2 - assert backup file exists
+  assert:
+    that:
+      - stat_backup_2.stat.exists
+
+- name: test-backup 2 - read backup file content
+  slurp:
+    src: "{{ result_backup_2.backup_file }}"
+  register: content_backup_2
+
+- name: test-backup 2 - verify backup has original content
+  vars:
+    expected: |
+      [server]
+      host = "localhost"
+  assert:
+    that:
+      - (content_backup_2.content | b64decode) == expected
+
+- name: test-backup 2 - read current file content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_backup_2_current
+
+- name: test-backup 2 - verify current file has new content
+  vars:
+    expected: |
+      [server]
+      host = "192.168.1.1"
+  assert:
+    that:
+      - (content_backup_2_current.content | b64decode) == expected
+
+- name: test-backup 3 - no change should not create backup
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: host
+    value: "192.168.1.1"
+    backup: true
+  register: result_backup_3
+
+- name: test-backup 3 - verify no backup when no change
+  assert:
+    that:
+      - result_backup_3 is not changed
+      - "'backup_file' not in result_backup_3 or result_backup_3.backup_file is none"
+
+- name: test-backup 4 - cleanup backup file
+  file:
+    path: "{{ result_backup_2.backup_file }}"
+    state: absent

@@ -1,0 +1,133 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Table tests - create and remove tables
+
+- name: test-table 1 - create a table with a key
+  toml_file:
+    path: "{{ output_file }}"
+    table: database
+    key: host
+    value: localhost
+  register: result_table_1
+
+- name: test-table 1 - verify change
+  assert:
+    that:
+      - result_table_1 is changed
+
+- name: test-table 1 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_table_1
+
+- name: test-table 1 - verify table created
+  vars:
+    expected: |
+      [database]
+      host = "localhost"
+  assert:
+    that:
+      - (content_table_1.content | b64decode) == expected
+
+- name: test-table 2 - add another key to the same table
+  toml_file:
+    path: "{{ output_file }}"
+    table: database
+    key: port
+    value: 5432
+  register: result_table_2
+
+- name: test-table 2 - verify change
+  assert:
+    that:
+      - result_table_2 is changed
+
+- name: test-table 2 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_table_2
+
+- name: test-table 2 - verify key added
+  vars:
+    expected: |
+      [database]
+      host = "localhost"
+      port = 5432
+  assert:
+    that:
+      - (content_table_2.content | b64decode) == expected
+
+- name: test-table 3 - create a second table
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: name
+    value: myserver
+  register: result_table_3
+
+- name: test-table 3 - verify change
+  assert:
+    that:
+      - result_table_3 is changed
+
+- name: test-table 3 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_table_3
+
+- name: test-table 3 - verify both tables exist
+  vars:
+    expected: |
+      [database]
+      host = "localhost"
+      port = 5432
+
+      [server]
+      name = "myserver"
+  assert:
+    that:
+      - (content_table_3.content | b64decode) == expected
+
+- name: test-table 4 - remove entire table
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    state: absent
+  register: result_table_4
+
+- name: test-table 4 - verify change
+  assert:
+    that:
+      - result_table_4 is changed
+      - result_table_4.msg == "table removed"
+
+- name: test-table 4 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_table_4
+
+- name: test-table 4 - verify table removed
+  vars:
+    expected: |
+      [database]
+      host = "localhost"
+      port = 5432
+  assert:
+    that:
+      - (content_table_4.content | b64decode) == expected
+
+- name: test-table 5 - remove non-existing table (idempotent)
+  toml_file:
+    path: "{{ output_file }}"
+    table: nonexistent
+    state: absent
+  register: result_table_5
+
+- name: test-table 5 - verify no change
+  assert:
+    that:
+      - result_table_5 is not changed
+      - result_table_5.msg == "table not found"

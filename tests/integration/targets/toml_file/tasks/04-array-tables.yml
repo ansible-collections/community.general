@@ -1,0 +1,187 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Array of tables tests - [[table]] handling
+
+- name: test-aot 1 - create first array of tables entry
+  toml_file:
+    path: "{{ output_file }}"
+    table: products
+    key: name
+    value: Hammer
+    array_table_index: -1
+  register: result_aot_1
+
+- name: test-aot 1 - verify change
+  assert:
+    that:
+      - result_aot_1 is changed
+
+- name: test-aot 1 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_aot_1
+
+- name: test-aot 1 - verify array of tables created
+  vars:
+    expected: |
+      [[products]]
+      name = "Hammer"
+  assert:
+    that:
+      - (content_aot_1.content | b64decode) == expected
+
+- name: test-aot 2 - add key to existing entry
+  toml_file:
+    path: "{{ output_file }}"
+    table: products
+    key: price
+    value: 9.99
+    array_table_index: 0
+  register: result_aot_2
+
+- name: test-aot 2 - verify change
+  assert:
+    that:
+      - result_aot_2 is changed
+
+- name: test-aot 2 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_aot_2
+
+- name: test-aot 2 - verify price added
+  vars:
+    expected: |
+      [[products]]
+      name = "Hammer"
+      price = 9.99
+  assert:
+    that:
+      - (content_aot_2.content | b64decode) == expected
+
+- name: test-aot 3 - append new entry to array of tables
+  toml_file:
+    path: "{{ output_file }}"
+    table: products
+    key: name
+    value: Nail
+    array_table_index: -1
+  register: result_aot_3
+
+- name: test-aot 3 - verify change
+  assert:
+    that:
+      - result_aot_3 is changed
+
+- name: test-aot 3 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_aot_3
+
+- name: test-aot 3 - verify second entry added
+  vars:
+    expected: |
+      [[products]]
+      name = "Hammer"
+      price = 9.99
+
+      [[products]]
+      name = "Nail"
+  assert:
+    that:
+      - (content_aot_3.content | b64decode) == expected
+
+- name: test-aot 4 - modify second entry
+  toml_file:
+    path: "{{ output_file }}"
+    table: products
+    key: price
+    value: 0.05
+    array_table_index: 1
+  register: result_aot_4
+
+- name: test-aot 4 - verify change
+  assert:
+    that:
+      - result_aot_4 is changed
+
+- name: test-aot 4 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_aot_4
+
+- name: test-aot 4 - verify second entry modified
+  vars:
+    expected: |
+      [[products]]
+      name = "Hammer"
+      price = 9.99
+
+      [[products]]
+      name = "Nail"
+      price = 0.05
+  assert:
+    that:
+      - (content_aot_4.content | b64decode) == expected
+
+- name: test-aot 5 - remove key from first entry
+  toml_file:
+    path: "{{ output_file }}"
+    table: products
+    key: price
+    state: absent
+    array_table_index: 0
+  register: result_aot_5
+
+- name: test-aot 5 - verify change
+  assert:
+    that:
+      - result_aot_5 is changed
+
+- name: test-aot 5 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_aot_5
+
+- name: test-aot 5 - verify key removed from first entry
+  vars:
+    expected: |
+      [[products]]
+      name = "Hammer"
+
+      [[products]]
+      name = "Nail"
+      price = 0.05
+  assert:
+    that:
+      - (content_aot_5.content | b64decode) == expected
+
+- name: test-aot 6 - remove last entry from array of tables
+  toml_file:
+    path: "{{ output_file }}"
+    table: products
+    state: absent
+    array_table_index: -1
+  register: result_aot_6
+
+- name: test-aot 6 - verify change
+  assert:
+    that:
+      - result_aot_6 is changed
+
+- name: test-aot 6 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_aot_6
+
+- name: test-aot 6 - verify last entry removed
+  vars:
+    expected: |
+      [[products]]
+      name = "Hammer"
+  assert:
+    that:
+      - (content_aot_6.content | b64decode) == expected

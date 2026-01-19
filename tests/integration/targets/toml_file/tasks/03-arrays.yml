@@ -1,0 +1,141 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Array tests - array values
+
+- name: test-array 1 - set an array value
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: ports
+    value:
+      - 80
+      - 443
+      - 8080
+  register: result_array_1
+
+- name: test-array 1 - verify change
+  assert:
+    that:
+      - result_array_1 is changed
+
+- name: test-array 1 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_array_1
+
+- name: test-array 1 - verify array in TOML
+  vars:
+    expected: |
+      [server]
+      ports = [80, 443, 8080]
+  assert:
+    that:
+      - (content_array_1.content | b64decode) == expected
+
+- name: test-array 2 - set the same array again (idempotent)
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: ports
+    value:
+      - 80
+      - 443
+      - 8080
+  register: result_array_2
+
+- name: test-array 2 - verify no change
+  assert:
+    that:
+      - result_array_2 is not changed
+
+- name: test-array 3 - update array value
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: ports
+    value:
+      - 80
+      - 443
+  register: result_array_3
+
+- name: test-array 3 - verify change
+  assert:
+    that:
+      - result_array_3 is changed
+
+- name: test-array 3 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_array_3
+
+- name: test-array 3 - verify updated array
+  vars:
+    expected: |
+      [server]
+      ports = [80, 443]
+  assert:
+    that:
+      - (content_array_3.content | b64decode) == expected
+
+- name: test-array 4 - set array of strings
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: allowed_hosts
+    value:
+      - localhost
+      - "127.0.0.1"
+      - "::1"
+  register: result_array_4
+
+- name: test-array 4 - verify change
+  assert:
+    that:
+      - result_array_4 is changed
+
+- name: test-array 4 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_array_4
+
+- name: test-array 4 - verify string array
+  vars:
+    expected: |
+      [server]
+      ports = [80, 443]
+      allowed_hosts = ["localhost", "127.0.0.1", "::1"]
+  assert:
+    that:
+      - (content_array_4.content | b64decode) == expected
+
+- name: test-array 5 - set empty array
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: empty_list
+    value: []
+  register: result_array_5
+
+- name: test-array 5 - verify change
+  assert:
+    that:
+      - result_array_5 is changed
+
+- name: test-array 5 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_array_5
+
+- name: test-array 5 - verify empty array
+  vars:
+    expected: |
+      [server]
+      ports = [80, 443]
+      allowed_hosts = ["localhost", "127.0.0.1", "::1"]
+      empty_list = []
+  assert:
+    that:
+      - (content_array_5.content | b64decode) == expected

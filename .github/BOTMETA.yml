@@ -738,6 +738,8 @@ files:
     maintainers: resmo
   $modules/ini_file.py:
     maintainers: jpmens noseka1
+  $modules/toml_file.py:
+    maintainers: jdrowne
   $modules/installp.py:
     keywords: aix efix lpar wpar
     labels: aix installp
