@@ -2962,7 +2962,7 @@ def main():
                     if nmcli.conn_reload:
                         (rc, out, err) = nmcli.reload_connection()
                         if rc != 0:
-                            module.fail_json(msg=f"Error bringing up connection named {nmcli.conn_name}: {err}", rc=rc)
+                            module.fail_json(msg=f"Error reloading connection named {nmcli.conn_name}: {err}", rc=rc)
 
                     (rc, out, err) = nmcli.up_connection()
                     if rc != 0:
