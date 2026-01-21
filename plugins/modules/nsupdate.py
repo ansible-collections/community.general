@@ -38,6 +38,7 @@ options:
   server:
     description:
       - Apply DNS modification on this server, specified by IPv4/IPv6 address or FQDN.
+      - FQDNs are supported since community.general 12.3.0.
     required: true
     type: str
   port:
@@ -226,6 +227,7 @@ class RecordManager:
     def __init__(self, module):
         self.module = module
 
+        self.server_fqdn = None
         self.server_ips = self.resolve_server()
 
         if module.params["key_algorithm"] == "hmac-md5":
@@ -303,8 +305,6 @@ class RecordManager:
 
         except dns.exception.DNSException as e:
             self.module.fail_json(msg=f"DNS resolution error for server '{server}': {e}")
-
-        return [server]
 
     def query(self, query, timeout=10):
         last_exception = None
