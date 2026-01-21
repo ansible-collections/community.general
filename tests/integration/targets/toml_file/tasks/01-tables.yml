@@ -111,10 +111,12 @@
 
 - name: test-table 4 - verify table removed
   vars:
+    # Note: tomlkit preserves the blank line that preceded the removed table
     expected: |
       [database]
       host = "localhost"
       port = 5432
+
   assert:
     that:
       - (content_table_4.content | b64decode) == expected

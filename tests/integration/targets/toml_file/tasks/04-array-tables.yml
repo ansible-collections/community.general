@@ -179,9 +179,11 @@
 
 - name: test-aot 6 - verify last entry removed
   vars:
+    # Note: tomlkit preserves the blank line that preceded the removed entry
     expected: |
       [[products]]
       name = "Hammer"
+
   assert:
     that:
       - (content_aot_6.content | b64decode) == expected
