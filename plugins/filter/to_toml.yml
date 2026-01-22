@@ -1,0 +1,42 @@
+# Copyright (c) Contributors to the Ansible project
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: to_toml
+  author:
+    - Matt Williaks (@milliams)
+  version_added: 12.3.0
+  short_description: Convert variable to TOML string
+  description:
+    - Converts an Ansible variable into a TOML string representation.
+    - This filter functions as a wrapper to the L(Python TOML Kit library, https://pypi.org/project/tomlkit/)'s C(tomlkit.dumps) function.
+  requirements:
+    - tomlkit
+  positional: _input
+  options:
+    _input:
+      description:
+        - A variable or expression that returns a data structure.
+      type: dict
+      required: true
+    redact_sensitive_values:
+      description:
+        - If set to V(true), vaulted strings are replaced by V(<redacted>) instead of being decrypted.
+        - With future ansible-core versions, this can extend to other strings tagged as sensitive.
+        - B(Note) that with ansible-core 2.18 and before this might not yield the expected result
+          since these versions of ansible-core strip the vault information away from strings that are
+          part of more complex data structures specified in C(vars).
+      type: bool
+      default: false
+
+EXAMPLES: |
+  ---
+  # Dump variable in a template to create a TOML document
+  value: "{{ my_config | community.general.to_toml }}"
+
+RETURN:
+  _value:
+    description:
+      - The TOML serialized string representing the variable structure inputted.
+    type: string
