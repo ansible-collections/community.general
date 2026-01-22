@@ -216,6 +216,10 @@ files:
     maintainers: resmo
   $filters/to_time_unit.yml:
     maintainers: resmo
+  $filters/to_toml.py:
+    maintainers: milliams
+  $filters/to_toml.yml:
+    maintainers: milliams
   $filters/to_weeks.yml:
     maintainers: resmo
   $filters/to_yaml.py:
@@ -1497,6 +1501,8 @@ files:
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
+    maintainers: felixfontein
+  $plugin_utils/_tags.py:
     maintainers: felixfontein
   $tests/a_module.py:
     maintainers: felixfontein
