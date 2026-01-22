@@ -19,6 +19,7 @@ description:
   - Create, update and remove DNS records using DDNS updates.
 requirements:
   - dnspython
+  - gssapi (when using GSS-TSIG authentication)
 author: "Loic Blot (@nerzhul)"
 extends_documentation_fragment:
   - community.general.attributes
@@ -36,7 +37,8 @@ options:
     type: str
   server:
     description:
-      - Apply DNS modification on this server, specified by IPv4 or IPv6 address.
+      - Apply DNS modification on this server, specified by IPv4/IPv6 address or FQDN.
+      - FQDNs are supported since community.general 12.3.0.
     required: true
     type: str
   port:
@@ -47,15 +49,19 @@ options:
   key_name:
     description:
       - Use TSIG key name to authenticate against DNS O(server).
+      - Not required when using O(key_algorithm=gss-tsig).
     type: str
   key_secret:
     description:
       - Use TSIG key secret, associated with O(key_name), to authenticate against O(server).
+      - Not required when using O(key_algorithm=gss-tsig).
     type: str
   key_algorithm:
     description:
       - Specify key algorithm used by O(key_secret).
-    choices: ['HMAC-MD5.SIG-ALG.REG.INT', 'hmac-md5', 'hmac-sha1', 'hmac-sha224', 'hmac-sha256', 'hmac-sha384', 'hmac-sha512']
+      - Use V(gss-tsig) for GSS-TSIG authentication (requires the gssapi library and Kerberos credentials).
+      - V(gss-tsig) was added in community.general 12.3.0.
+    choices: ['HMAC-MD5.SIG-ALG.REG.INT', 'hmac-md5', 'hmac-sha1', 'hmac-sha224', 'hmac-sha256', 'hmac-sha384', 'hmac-sha512', 'gss-tsig']
     default: 'hmac-md5'
     type: str
   zone:
@@ -138,6 +144,23 @@ EXAMPLES = r"""
     record: "1.1.168.192.in-addr.arpa."
     type: "PTR"
     state: absent
+
+- name: Use FQDN for server instead of IP address
+  community.general.nsupdate:
+    key_name: "nsupdate"
+    key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
+    server: "ns1.example.org"
+    zone: "example.org"
+    record: "ansible"
+    value: "192.168.1.1"
+
+- name: Use GSS-TSIG authentication (requires Kerberos credentials)
+  community.general.nsupdate:
+    key_algorithm: "gss-tsig"
+    server: "ns1.example.org"
+    zone: "example.org"
+    record: "ansible"
+    value: "192.168.1.1"
 """
 
 RETURN = r"""
@@ -178,43 +201,53 @@ dns_rc_str:
   sample: 'REFUSED'
 """
 
-import traceback
+import ipaddress
+import time
+import uuid
 from binascii import Error as binascii_error
+from contextlib import suppress
 
-DNSPYTHON_IMP_ERR = None
-try:
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils import deps
+
+with deps.declare("dnspython", url="https://github.com/rthalley/dnspython"):
     import dns.message
     import dns.query
+    import dns.rdtypes.ANY.TKEY
     import dns.resolver
     import dns.tsigkeyring
     import dns.update
 
-    HAVE_DNSPYTHON = True
-except ImportError:
-    DNSPYTHON_IMP_ERR = traceback.format_exc()
-    HAVE_DNSPYTHON = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+with deps.declare("gssapi", reason="for gss-tsig keys", url="https://github.com/pythongssapi/python-gssapi"):
+    import gssapi
 
 
 class RecordManager:
     def __init__(self, module):
         self.module = module
 
+        self.server_fqdn = None
+        self.server_ips = self.resolve_server()
+
+        if module.params["key_algorithm"] == "hmac-md5":
+            self.algorithm = "HMAC-MD5.SIG-ALG.REG.INT"
+        elif module.params["key_algorithm"] == "gss-tsig":
+            if module.params["key_name"]:
+                self.module.fail_json(msg="key_name cannot be used with GSS-TSIG")
+            self.algorithm = dns.tsig.GSS_TSIG
+            self.keyring, self.keyname = self.init_gssapi()
+        else:
+            self.algorithm = module.params["key_algorithm"]
+
         if module.params["key_name"]:
             try:
                 self.keyring = dns.tsigkeyring.from_text({module.params["key_name"]: module.params["key_secret"]})
+                self.keyname = module.params["key_name"]
             except TypeError:
                 module.fail_json(msg="Missing key_secret")
             except binascii_error as e:
                 module.fail_json(msg=f"TSIG key error: {e}")
-        else:
-            self.keyring = None
-
-        if module.params["key_algorithm"] == "hmac-md5":
-            self.algorithm = "HMAC-MD5.SIG-ALG.REG.INT"
-        else:
-            self.algorithm = module.params["key_algorithm"]
 
         if module.params["zone"] is None:
             if module.params["record"][-1] != ".":
@@ -238,6 +271,108 @@ class RecordManager:
 
         self.dns_rc = 0
 
+    def resolve_server(self):
+        """Resolve server parameter to a list of IP addresses if it's a FQDN."""
+        server = self.module.params["server"]
+
+        # Check if it's already an IPv4/IPv6 address
+        try:
+            ipaddress.ip_address(server)
+            return [server]
+        except ValueError:
+            pass
+
+        # Try to resolve the FQDN
+        try:
+            resolver = dns.resolver.Resolver()
+            name = dns.name.from_text(server)
+            ip_list = []
+
+            with suppress(dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+                answers = resolver.resolve(name, dns.rdatatype.AAAA)
+                self.server_fqdn = server
+                ip_list.extend([str(answer) for answer in answers])
+
+            with suppress(dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+                answers = resolver.resolve(name, dns.rdatatype.A)
+                self.server_fqdn = server
+                ip_list.extend([str(answer) for answer in answers])
+
+            if not ip_list:
+                self.module.fail_json(msg=f"Failed to resolve server '{server}' to an IP address")
+
+            return ip_list
+
+        except dns.exception.DNSException as e:
+            self.module.fail_json(msg=f"DNS resolution error for server '{server}': {e}")
+
+    def query(self, query, timeout=10):
+        last_exception = None
+        for server_ip in self.server_ips:
+            try:
+                if self.module.params["protocol"] == "tcp":
+                    return dns.query.tcp(query, server_ip, timeout=timeout, port=self.module.params["port"])
+                else:
+                    return dns.query.udp(query, server_ip, timeout=timeout, port=self.module.params["port"])
+            except (OSError, dns.exception.Timeout) as e:
+                last_exception = e
+                continue
+
+        # If all servers failed, raise the last exception
+        if last_exception:
+            raise last_exception
+
+    def build_tkey_query(self, token, key_ring, key_name):
+        inception_time = int(time.time())
+        tkey = dns.rdtypes.ANY.TKEY.TKEY(
+            dns.rdataclass.ANY,
+            dns.rdatatype.TKEY,
+            dns.tsig.GSS_TSIG,
+            inception_time,
+            inception_time,
+            3,
+            dns.rcode.NOERROR,
+            token,
+            b"",
+        )
+
+        query = dns.message.make_query(key_name, dns.rdatatype.TKEY, dns.rdataclass.ANY)
+        query.keyring = key_ring
+        query.find_rrset(dns.message.ADDITIONAL, key_name, dns.rdataclass.ANY, dns.rdatatype.TKEY, create=True).add(
+            tkey
+        )
+        return query
+
+    def init_gssapi(self):
+        deps.validate(self.module, "gssapi")
+        if not self.server_fqdn:
+            self.module.fail_json(msg="server must be a FQDN")
+
+        # Acquire GSSAPI credentials
+        gss_name = gssapi.Name(f"DNS@{self.server_fqdn}", gssapi.NameType.hostbased_service)
+        try:
+            gss_ctx = gssapi.SecurityContext(name=gss_name, usage="initiate")
+        except gssapi.exceptions.GSSError as e:
+            self.module.fail_json(msg=f"GSSAPI context initialization error: {e}")
+
+        # Generate unique key name
+        keyname = dns.name.from_text(f"{uuid.uuid4()}.{self.server_fqdn}")
+        tsig_key = dns.tsig.Key(keyname, gss_ctx, dns.tsig.GSS_TSIG)
+        keyring = dns.tsig.GSSTSigAdapter({keyname: tsig_key})
+
+        # Perform GSS-TSIG negotiation
+        token = gss_ctx.step()
+        while not gss_ctx.complete:
+            tkey_query = self.build_tkey_query(token, keyring, keyname)
+            try:
+                response = self.query(tkey_query)
+            except (OSError, dns.exception.Timeout) as e:
+                self.module.fail_json(msg=f"GSS-TSIG negotiation error: ({e.__class__.__name__}): {e}")
+            if not gss_ctx.complete:
+                token = gss_ctx.step(response.answer[0][0].key)
+
+        return (keyring, keyname)
+
     def txt_helper(self, entry):
         if entry[0] == '"' and entry[-1] == '"':
             return entry
@@ -248,16 +383,9 @@ class RecordManager:
         while True:
             query = dns.message.make_query(name, dns.rdatatype.SOA)
             if self.keyring:
-                query.use_tsig(keyring=self.keyring, algorithm=self.algorithm)
+                query.use_tsig(keyring=self.keyring, keyname=self.keyname, algorithm=self.algorithm)
             try:
-                if self.module.params["protocol"] == "tcp":
-                    lookup = dns.query.tcp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
-                else:
-                    lookup = dns.query.udp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
+                lookup = self.query(query)
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
             except (OSError, dns.exception.Timeout) as e:
@@ -285,14 +413,7 @@ class RecordManager:
     def __do_update(self, update):
         response = None
         try:
-            if self.module.params["protocol"] == "tcp":
-                response = dns.query.tcp(
-                    update, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                )
-            else:
-                response = dns.query.udp(
-                    update, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                )
+            response = self.query(update)
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
         except (OSError, dns.exception.Timeout) as e:
@@ -328,7 +449,7 @@ class RecordManager:
         return result
 
     def create_record(self):
-        update = dns.update.Update(self.zone, keyring=self.keyring, keyalgorithm=self.algorithm)
+        update = dns.update.Update(self.zone, keyring=self.keyring, keyname=self.keyname, keyalgorithm=self.algorithm)
         for entry in self.value:
             try:
                 update.add(self.module.params["record"], self.module.params["ttl"], self.module.params["type"], entry)
@@ -341,7 +462,7 @@ class RecordManager:
         return dns.message.Message.rcode(response)
 
     def modify_record(self):
-        update = dns.update.Update(self.zone, keyring=self.keyring, keyalgorithm=self.algorithm)
+        update = dns.update.Update(self.zone, keyring=self.keyring, keyname=self.keyname, keyalgorithm=self.algorithm)
 
         if self.module.params["type"].upper() == "NS":
             # When modifying a NS record, Bind9 silently refuses to delete all the NS entries for a zone:
@@ -351,17 +472,10 @@ class RecordManager:
             # Let's perform dns inserts and updates first, deletes after.
             query = dns.message.make_query(self.module.params["record"], self.module.params["type"])
             if self.keyring:
-                query.use_tsig(keyring=self.keyring, algorithm=self.algorithm)
+                query.use_tsig(keyring=self.keyring, keyname=self.keyname, algorithm=self.algorithm)
 
             try:
-                if self.module.params["protocol"] == "tcp":
-                    lookup = dns.query.tcp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
-                else:
-                    lookup = dns.query.udp(
-                        query, self.module.params["server"], timeout=10, port=self.module.params["port"]
-                    )
+                lookup = self.query(query)
             except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
                 self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
             except (OSError, dns.exception.Timeout) as e:
@@ -398,7 +512,7 @@ class RecordManager:
         if self.module.check_mode:
             self.module.exit_json(changed=True)
 
-        update = dns.update.Update(self.zone, keyring=self.keyring, keyalgorithm=self.algorithm)
+        update = dns.update.Update(self.zone, keyring=self.keyring, keyname=self.keyname, keyalgorithm=self.algorithm)
         update.delete(self.module.params["record"], self.module.params["type"])
 
         response = self.__do_update(update)
@@ -413,7 +527,7 @@ class RecordManager:
         return result
 
     def record_exists(self):
-        update = dns.update.Update(self.zone, keyring=self.keyring, keyalgorithm=self.algorithm)
+        update = dns.update.Update(self.zone, keyring=self.keyring, keyname=self.keyname, keyalgorithm=self.algorithm)
         try:
             update.present(self.module.params["record"], self.module.params["type"])
         except dns.rdatatype.UnknownRdatatype as e:
@@ -446,13 +560,10 @@ class RecordManager:
     def ttl_changed(self):
         query = dns.message.make_query(self.fqdn, self.module.params["type"])
         if self.keyring:
-            query.use_tsig(keyring=self.keyring, algorithm=self.algorithm)
+            query.use_tsig(keyring=self.keyring, keyname=self.keyname, algorithm=self.algorithm)
 
         try:
-            if self.module.params["protocol"] == "tcp":
-                lookup = dns.query.tcp(query, self.module.params["server"], timeout=10, port=self.module.params["port"])
-            else:
-                lookup = dns.query.udp(query, self.module.params["server"], timeout=10, port=self.module.params["port"])
+            lookup = self.query(query)
         except (dns.tsig.PeerBadKey, dns.tsig.PeerBadSignature) as e:
             self.module.fail_json(msg=f"TSIG update error ({e.__class__.__name__}): {e}")
         except (OSError, dns.exception.Timeout) as e:
@@ -475,6 +586,7 @@ def main():
         "hmac-sha256",
         "hmac-sha384",
         "hmac-sha512",
+        "gss-tsig",
     ]
 
     module = AnsibleModule(
@@ -495,8 +607,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not HAVE_DNSPYTHON:
-        module.fail_json(msg=missing_required_lib("dnspython"), exception=DNSPYTHON_IMP_ERR)
+    deps.validate(module, "dnspython")
 
     if len(module.params["record"]) == 0:
         module.fail_json(msg="record cannot be empty.")
