@@ -2253,6 +2253,94 @@ class RedfishUtils:
             return response
         return {"ret": True, "changed": True, "msg": "BIOS set to default settings"}
 
+    def set_boot_override_with_settings_uri(self, boot_opts):
+        # Extract the requested boot override options
+        bootdevice = boot_opts.get("bootdevice")
+        uefi_target = boot_opts.get("uefi_target")
+        boot_next = boot_opts.get("boot_next")
+        override_enabled = boot_opts.get("override_enabled")
+        boot_override_mode = boot_opts.get("boot_override_mode")
+        if not bootdevice and override_enabled != "Disabled":
+            return {"ret": False, "msg": "bootdevice option required for temporary boot override"}
+
+        # Get the current boot override options from the Boot property
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response["ret"] is False:
+            return response
+        data = response["data"]
+        current_boot = data.get("Boot")
+        if current_boot is None:
+            return {"ret": False, "msg": "Boot property not found"}
+        cur_override_mode = current_boot.get("BootSourceOverrideMode")
+        rfsettings = data.get("@Redfish.Settings")
+
+        settings_uri = rfsettings["SettingsObject"]["@odata.id"]
+        response = self.get_request(self.root_uri + settings_uri)
+        if response["ret"] is False:
+            return response
+        data = response["data"]
+        future_boot = data.get("Boot")
+
+        # Check if the requested target is supported by the system
+        if override_enabled != "Disabled":
+            annotation = "BootSourceOverrideTarget@Redfish.AllowableValues"
+            if annotation in future_boot:
+                allowable_values = future_boot[annotation]
+                if isinstance(allowable_values, list) and bootdevice not in allowable_values:
+                    return {
+                        "ret": False,
+                        "msg": f"Boot device {bootdevice} not in list of allowable values ({allowable_values})",
+                    }
+
+        # Build the request payload based on the desired boot override options
+        if override_enabled == "Disabled":
+            payload = {"Boot": {"BootSourceOverrideEnabled": override_enabled, "BootSourceOverrideTarget": "None"}}
+        elif bootdevice == "UefiTarget":
+            if not uefi_target:
+                return {"ret": False, "msg": "uefi_target option required to SetOneTimeBoot for UefiTarget"}
+            payload = {
+                "Boot": {
+                    "BootSourceOverrideEnabled": override_enabled,
+                    "BootSourceOverrideTarget": bootdevice,
+                    "UefiTargetBootSourceOverride": uefi_target,
+                }
+            }
+            # If needed, also specify UEFI mode
+            if cur_override_mode == "Legacy":
+                payload["Boot"]["BootSourceOverrideMode"] = "UEFI"
+        elif bootdevice == "UefiBootNext":
+            if not boot_next:
+                return {"ret": False, "msg": "boot_next option required to SetOneTimeBoot for UefiBootNext"}
+            payload = {
+                "Boot": {
+                    "BootSourceOverrideEnabled": override_enabled,
+                    "BootSourceOverrideTarget": bootdevice,
+                    "BootNext": boot_next,
+                }
+            }
+            # If needed, also specify UEFI mode
+            if cur_override_mode == "Legacy":
+                payload["Boot"]["BootSourceOverrideMode"] = "UEFI"
+        else:
+            payload = {"Boot": {"BootSourceOverrideEnabled": override_enabled, "BootSourceOverrideTarget": bootdevice}}
+            if boot_override_mode:
+                payload["Boot"]["BootSourceOverrideMode"] = boot_override_mode
+
+        # Apply the requested boot override request
+        resp = self.patch_request(self.root_uri + settings_uri, payload, check_pyld=True)
+        if resp["ret"] is False:
+            # WORKAROUND
+            # Older Dell systems do not allow BootSourceOverrideEnabled to be
+            # specified with UefiTarget as the target device
+            vendor = self._get_vendor()["Vendor"]
+            if vendor == "Dell":
+                if bootdevice == "UefiTarget" and override_enabled != "Disabled":
+                    payload["Boot"].pop("BootSourceOverrideEnabled", None)
+                    resp = self.patch_request(self.root_uri + settings_uri, payload, check_pyld=True)
+        if resp["ret"] and resp["changed"]:
+            resp["msg"] = "Updated the boot override settings"
+        return resp
+
     def set_boot_override(self, boot_opts):
         # Extract the requested boot override options
         bootdevice = boot_opts.get("bootdevice")
@@ -2268,6 +2356,7 @@ class RedfishUtils:
         if response["ret"] is False:
             return response
         data = response["data"]
+        rfsettings = data.get("@Redfish.Settings")
         boot = data.get("Boot")
         if boot is None:
             return {"ret": False, "msg": "Boot property not found"}
@@ -2321,14 +2410,21 @@ class RedfishUtils:
         # Apply the requested boot override request
         resp = self.patch_request(self.root_uri + self.systems_uri, payload, check_pyld=True)
         if resp["ret"] is False:
-            # WORKAROUND
-            # Older Dell systems do not allow BootSourceOverrideEnabled to be
-            # specified with UefiTarget as the target device
             vendor = self._get_vendor()["Vendor"]
             if vendor == "Dell":
+                # WORKAROUND
+                # Newer Dell systems (iDRAC10) do not allow to PATCH ComputerSystem resource
+                # directly. Need to PATCH Settings URI
+                if rfsettings:
+                    return self.set_boot_override_with_settings_uri(boot_opts)
+
+                # WORKAROUND
+                # Older Dell systems do not allow BootSourceOverrideEnabled to be
+                # specified with UefiTarget as the target device
                 if bootdevice == "UefiTarget" and override_enabled != "Disabled":
                     payload["Boot"].pop("BootSourceOverrideEnabled", None)
                     resp = self.patch_request(self.root_uri + self.systems_uri, payload, check_pyld=True)
+
         if resp["ret"] and resp["changed"]:
             resp["msg"] = "Updated the boot override settings"
         return resp
