@@ -406,6 +406,7 @@ def navigate_to_table(doc, table_path, create=False):
                     if index == -1:
                         if is_last and create:
                             new_table = tomlkit.table()
+                            new_table.trivia.indent = '\n'
                             item.append(new_table)
                             current = new_table
                         else:
