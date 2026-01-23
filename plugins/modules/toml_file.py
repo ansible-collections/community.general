@@ -598,7 +598,7 @@ def _handle_aot_append(aot, is_last, ctx, i):
     """Handle AoT[-1] - append new or get last entry."""
     if is_last and ctx.create:
         new_table = tomlkit.table()
-        new_table.trivia.indent = '\n'
+        new_table.trivia.indent = "\n"
         aot.append(new_table)
         return new_table
     if len(aot) == 0:
@@ -680,10 +680,7 @@ def _values_equal(a, b):
     if isinstance(a, (InlineTable, Table)) and isinstance(b, (InlineTable, Table, dict)):
         if len(a) != len(b):
             return False
-        for k in a:
-            if k not in b or not _values_equal(a[k], b[k]):
-                return False
-        return True
+        return all(k in b and _values_equal(a[k], b[k]) for k in a)
     return a == b
 
 
@@ -844,7 +841,9 @@ def _write_if_changed(module, target_path, doc, changed, backup):
     try:
         module.atomic_move(tmpfile, os.path.abspath(target_path))
     except OSError:
-        module.fail_json(msg=f"Unable to move temporary file {tmpfile} to {target_path}", traceback=traceback.format_exc())
+        module.fail_json(
+            msg=f"Unable to move temporary file {tmpfile} to {target_path}", traceback=traceback.format_exc()
+        )
 
     return backup_file
 
