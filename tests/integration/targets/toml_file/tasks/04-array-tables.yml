@@ -8,10 +8,9 @@
 - name: test-aot 1 - create first array of tables entry
   toml_file:
     path: "{{ output_file }}"
-    table: products
+    table: products[-1]
     key: name
     value: Hammer
-    array_table_index: -1
   register: result_aot_1
 
 - name: test-aot 1 - verify change
@@ -36,10 +35,9 @@
 - name: test-aot 2 - add key to existing entry
   toml_file:
     path: "{{ output_file }}"
-    table: products
+    table: products[0]
     key: price
     value: 9.99
-    array_table_index: 0
   register: result_aot_2
 
 - name: test-aot 2 - verify change
@@ -65,10 +63,9 @@
 - name: test-aot 3 - append new entry to array of tables
   toml_file:
     path: "{{ output_file }}"
-    table: products
+    table: products[-1]
     key: name
     value: Nail
-    array_table_index: -1
   register: result_aot_3
 
 - name: test-aot 3 - verify change
@@ -97,10 +94,9 @@
 - name: test-aot 4 - modify second entry
   toml_file:
     path: "{{ output_file }}"
-    table: products
+    table: products[1]
     key: price
     value: 0.05
-    array_table_index: 1
   register: result_aot_4
 
 - name: test-aot 4 - verify change
@@ -130,10 +126,9 @@
 - name: test-aot 5 - remove key from first entry
   toml_file:
     path: "{{ output_file }}"
-    table: products
+    table: products[0]
     key: price
     state: absent
-    array_table_index: 0
   register: result_aot_5
 
 - name: test-aot 5 - verify change
@@ -162,9 +157,8 @@
 - name: test-aot 6 - remove last entry from array of tables
   toml_file:
     path: "{{ output_file }}"
-    table: products
+    table: products[-1]
     state: absent
-    array_table_index: -1
   register: result_aot_6
 
 - name: test-aot 6 - verify change
