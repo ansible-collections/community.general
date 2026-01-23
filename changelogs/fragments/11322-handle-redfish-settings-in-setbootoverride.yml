@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - redfish_utils module utils - adds support of ``@Redfish.Settings`` in ``ComputerSystem`` attributes for ``set_boot_override`` function (https://github.com/ansible-collections/community.general/issues/11297, https://github.com/ansible-collections/community.general/pull/11322).
