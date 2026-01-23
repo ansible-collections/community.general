@@ -1637,9 +1637,8 @@ class KeycloakAPI:
     def get_group_by_name(self, name, realm: str = "master", parents=None):
         """Fetch a keycloak group within a realm based on its name.
 
-        The Keycloak API does not allow filtering of the Groups resource by name.
-        As a result, this method first retrieves the entire list of groups - name and ID -
-        then performs a second query to fetch the group.
+        Uses the Keycloak search API with exact matching for efficient lookup
+        instead of fetching all groups.
 
         If the group does not exist, None is returned.
         :param name: Name of the group to fetch.
@@ -1653,11 +1652,22 @@ class KeycloakAPI:
                 if not parent:
                     return None
 
-                all_groups = self.get_subgroups(parent, realm)
+                # For subgroups: use children endpoint with search parameter
+                search_url = "{url}?search={name}&exact=true".format(
+                    url=URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent["id"]),
+                    name=quote(name, safe='')
+                )
             else:
-                all_groups = self.get_groups(realm=realm)
+                # For top-level groups: use groups endpoint with search parameter
+                search_url = "{url}?search={name}&exact=true".format(
+                    url=URL_GROUPS.format(url=self.baseurl, realm=realm),
+                    name=quote(name, safe='')
+                )
 
-            for group in all_groups:
+            groups = self._request_and_deserialize(search_url, method="GET")
+
+            # exact=true should return only exact matches, but verify the name
+            for group in groups:
                 if group["name"] == name:
                     return self.get_group_by_groupid(group["id"], realm=realm)
 
