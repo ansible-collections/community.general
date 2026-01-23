@@ -302,7 +302,9 @@ import os
 import re
 import tempfile
 import traceback
+from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
@@ -318,16 +320,36 @@ class TomlFileError(Exception):
     pass
 
 
-def parse_table_path(table_path: str | None) -> list[tuple[str, int | None]]:
-    """Parse a table path with optional array indices.
+@dataclass
+class TomlParams:
+    """Parameters for TOML file operations."""
 
-    Examples:
-        "products" -> [("products", None)]
-        "products[0]" -> [("products", 0)]
-        "products[-1]" -> [("products", -1)]
-        "servers[1].databases[0]" -> [("servers", 1), ("databases", 0)]
-        "server.database" -> [("server", None), ("database", None)]
-    """
+    path: str
+    table: str | None
+    key: str | None
+    value: Any
+    value_type: str
+    state: str
+    backup: bool
+    create: bool
+    follow: bool
+
+
+@dataclass
+class NavContext:
+    """Context for table navigation operations."""
+
+    parsed: list[tuple[str, int | None]]
+    create: bool
+
+
+# =============================================================================
+# Path Parsing Functions
+# =============================================================================
+
+
+def parse_table_path(table_path: str | None) -> list[tuple[str, int | None]]:
+    """Parse a table path with optional array indices."""
     if not table_path:
         return []
 
@@ -353,7 +375,172 @@ def _format_path(parsed: list[tuple[str, int | None]], up_to: int | None = None)
     return ".".join(name + (f"[{idx}]" if idx is not None else "") for name, idx in parsed[:up_to])
 
 
+# =============================================================================
+# Value Conversion Functions (dispatch pattern for O(1) lookup)
+# =============================================================================
+
+
+def _convert_auto(value):
+    """Auto-detect and convert value type."""
+    if isinstance(value, (bool, int, float)):
+        return value
+    if isinstance(value, str):
+        return _try_parse_datetime_string(value)
+    if isinstance(value, list):
+        return _convert_list_to_array(value)
+    if isinstance(value, dict):
+        return _convert_dict_to_inline_table(value)
+    return str(value)
+
+
+def _try_parse_datetime_string(value):
+    """Try parsing string as datetime, return as-is if not."""
+    if "T" in value or " " in value:
+        try:
+            return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except (ValueError, AttributeError):
+            pass
+    return value
+
+
+def _convert_list_to_array(value):
+    """Convert Python list to TOML array."""
+    arr = tomlkit.array()
+    for item in value:
+        arr.append(convert_value(item, "auto"))
+    return arr
+
+
+def _convert_dict_to_inline_table(value):
+    """Convert Python dict to TOML inline table."""
+    tbl = tomlkit.inline_table()
+    for k, v in value.items():
+        tbl[k] = convert_value(v, "auto")
+    return tbl
+
+
+def _convert_string(value):
+    return str(value)
+
+
+def _convert_literal_string(value):
+    return tomlkit.string(str(value), literal=True)
+
+
+def _convert_multiline_string(value):
+    return tomlkit.string(str(value), multiline=True)
+
+
+def _convert_multiline_literal_string(value):
+    return tomlkit.string(str(value), literal=True, multiline=True)
+
+
+def _convert_integer(value):
+    return int(value)
+
+
+def _convert_hex_integer(value):
+    int_val = int(value) if isinstance(value, int) else int(str(value), 16)
+    return Integer(int_val, Trivia(), hex(int_val))
+
+
+def _convert_octal_integer(value):
+    int_val = int(value) if isinstance(value, int) else int(str(value), 8)
+    return Integer(int_val, Trivia(), oct(int_val))
+
+
+def _convert_binary_integer(value):
+    int_val = int(value) if isinstance(value, int) else int(str(value), 2)
+    return Integer(int_val, Trivia(), bin(int_val))
+
+
+def _convert_float(value):
+    if isinstance(value, str):
+        return float(value.lower())
+    return float(value)
+
+
+def _convert_boolean(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.lower() in ("true", "yes", "1", "on")
+    return bool(value)
+
+
+def _convert_datetime(value):
+    if isinstance(value, datetime):
+        return value
+    return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+
+def _convert_date(value):
+    from datetime import date as date_type
+
+    if isinstance(value, date_type) and not isinstance(value, datetime):
+        return tomlkit.date(value.isoformat())
+    return tomlkit.date(str(value))
+
+
+def _convert_time(value):
+    from datetime import time as time_type
+
+    if isinstance(value, time_type):
+        return tomlkit.time(value.isoformat())
+    return tomlkit.time(str(value))
+
+
+def _convert_array(value):
+    if isinstance(value, list):
+        return _convert_list_to_array(value)
+    arr = tomlkit.array()
+    arr.append(convert_value(value, "auto"))
+    return arr
+
+
+def _convert_inline_table(value):
+    if not isinstance(value, dict):
+        raise ValueError(f"Cannot convert {type(value).__name__} to inline_table")
+    return _convert_dict_to_inline_table(value)
+
+
+# Dispatch dict for O(1) type lookup
+_CONVERTERS = {
+    "string": _convert_string,
+    "literal_string": _convert_literal_string,
+    "multiline_string": _convert_multiline_string,
+    "multiline_literal_string": _convert_multiline_literal_string,
+    "integer": _convert_integer,
+    "hex_integer": _convert_hex_integer,
+    "octal_integer": _convert_octal_integer,
+    "binary_integer": _convert_binary_integer,
+    "float": _convert_float,
+    "boolean": _convert_boolean,
+    "datetime": _convert_datetime,
+    "date": _convert_date,
+    "time": _convert_time,
+    "array": _convert_array,
+    "inline_table": _convert_inline_table,
+}
+
+
+def convert_value(value, value_type="auto"):
+    """Convert a value to the appropriate TOML type."""
+    if value_type == "auto":
+        return _convert_auto(value)
+    converter = _CONVERTERS.get(value_type)
+    if converter:
+        return converter(value)
+    return value
+
+
+# =============================================================================
+# Table Navigation Functions (extracted for reduced nesting)
+# =============================================================================
+
+
 def load_toml_document(path, create=True):
+    """Load a TOML document from file."""
     if not os.path.exists(path):
         if not create:
             raise TomlFileError(f"Destination {path} does not exist!")
@@ -366,160 +553,104 @@ def load_toml_document(path, create=True):
         raise TomlFileError(f"Failed to parse TOML file: {e}") from e
 
 
-def navigate_to_table(doc, table_path, create=False):
-    """Navigate to a table in the document.
+def _create_new_aot_entry(current, name):
+    """Create a new array of tables with first entry."""
+    new_table = tomlkit.table()
+    aot = tomlkit.aot()
+    aot.append(new_table)
+    current[name] = aot
+    return new_table
 
-    The table_path can include array indices using bracket notation:
-    - "products[0]" - first entry in products array of tables
-    - "products[-1]" - last entry (or append new if create=True)
-    - "servers[1].databases[0]" - nested arrays
-    """
+
+def _create_regular_table(current, name):
+    """Create a regular table."""
+    new_table = tomlkit.table()
+    current[name] = new_table
+    return new_table
+
+
+def _create_table_segment(current, name, index, ctx, i):
+    """Create a new table segment when name not in current."""
+    if not ctx.create:
+        raise TomlFileError(f"Table '{_format_path(ctx.parsed, i + 1)}' does not exist")
+    if index == -1:
+        return _create_new_aot_entry(current, name)
+    if index is not None:
+        raise TomlFileError(f"Cannot create table at index {index} - array of tables '{name}' does not exist")
+    return _create_regular_table(current, name)
+
+
+def _get_aot_default(aot, ctx, i):
+    """Get first entry from AoT when no index specified."""
+    if len(aot) == 0:
+        raise TomlFileError(f"Array of tables '{_format_path(ctx.parsed, i + 1)}' is empty")
+    return aot[0]
+
+
+def _get_aot_at_index(aot, index, ctx, i):
+    """Get AoT entry at specific index."""
+    if 0 <= index < len(aot):
+        return aot[index]
+    raise TomlFileError(f"Array of tables index {index} is out of range for '{_format_path(ctx.parsed, i + 1)}'")
+
+
+def _handle_aot_append(aot, is_last, ctx, i):
+    """Handle AoT[-1] - append new or get last entry."""
+    if is_last and ctx.create:
+        new_table = tomlkit.table()
+        new_table.trivia.indent = '\n'
+        aot.append(new_table)
+        return new_table
+    if len(aot) == 0:
+        raise TomlFileError(f"Array of tables '{_format_path(ctx.parsed, i + 1)}' is empty")
+    return aot[-1]
+
+
+def _navigate_aot(aot, index, is_last, ctx, i):
+    """Navigate within an array of tables."""
+    if index is None:
+        return _get_aot_default(aot, ctx, i)
+    if index == -1:
+        return _handle_aot_append(aot, is_last, ctx, i)
+    return _get_aot_at_index(aot, index, ctx, i)
+
+
+def _navigate_existing_segment(current, name, index, ctx, i):
+    """Navigate into an existing table segment."""
+    item = current[name]
+    is_last = i == len(ctx.parsed) - 1
+    if isinstance(item, AoT):
+        return _navigate_aot(item, index, is_last, ctx, i)
+    if isinstance(item, (Table, dict)):
+        if index is not None:
+            raise TomlFileError(f"'{_format_path(ctx.parsed, i + 1)}' is not an array of tables, cannot use index")
+        return item
+    raise TomlFileError(f"'{_format_path(ctx.parsed, i + 1)}' is not a table")
+
+
+def navigate_to_table(doc, table_path, create=False):
+    """Navigate to a table in the document."""
     parsed = parse_table_path(table_path)
     if not parsed:
         return doc
 
+    ctx = NavContext(parsed=parsed, create=create)
     current = doc
-
     for i, (name, index) in enumerate(parsed):
-        is_last = i == len(parsed) - 1
-
         if name not in current:
-            if not create:
-                raise TomlFileError(f"Table '{_format_path(parsed, i + 1)}' does not exist")
-
-            if index == -1:
-                new_table = tomlkit.table()
-                aot = tomlkit.aot()
-                aot.append(new_table)
-                current[name] = aot
-                current = new_table
-            elif index is not None:
-                raise TomlFileError(f"Cannot create table at index {index} - array of tables '{name}' does not exist")
-            else:
-                new_table = tomlkit.table()
-                current[name] = new_table
-                current = new_table
+            current = _create_table_segment(current, name, index, ctx, i)
         else:
-            item = current[name]
-            if isinstance(item, AoT):
-                if index is not None:
-                    if index == -1:
-                        if is_last and create:
-                            new_table = tomlkit.table()
-                            new_table.trivia.indent = '\n'
-                            item.append(new_table)
-                            current = new_table
-                        else:
-                            if len(item) == 0:
-                                raise TomlFileError(f"Array of tables '{_format_path(parsed, i + 1)}' is empty")
-                            current = item[-1]
-                    elif 0 <= index < len(item):
-                        current = item[index]
-                    else:
-                        raise TomlFileError(
-                            f"Array of tables index {index} is out of range for '{_format_path(parsed, i + 1)}'"
-                        )
-                else:
-                    if len(item) == 0:
-                        raise TomlFileError(f"Array of tables '{_format_path(parsed, i + 1)}' is empty")
-                    current = item[0]
-            elif isinstance(item, (Table, dict)):
-                if index is not None:
-                    raise TomlFileError(f"'{_format_path(parsed, i + 1)}' is not an array of tables, cannot use index")
-                current = item
-            else:
-                raise TomlFileError(f"'{_format_path(parsed, i + 1)}' is not a table")
-
+            current = _navigate_existing_segment(current, name, index, ctx, i)
     return current
 
 
-def convert_value(value, value_type="auto"):
-    if value_type == "auto":
-        if isinstance(value, (bool, int, float)):
-            return value
-        if isinstance(value, str):
-            if "T" in value or " " in value:
-                try:
-                    return datetime.fromisoformat(value.replace("Z", "+00:00"))
-                except (ValueError, AttributeError):
-                    pass
-            return value
-        if isinstance(value, list):
-            arr = tomlkit.array()
-            for item in value:
-                arr.append(convert_value(item, "auto"))
-            return arr
-        if isinstance(value, dict):
-            tbl = tomlkit.inline_table()
-            for k, v in value.items():
-                tbl[k] = convert_value(v, "auto")
-            return tbl
-        return str(value)
-    if value_type == "string":
-        return str(value)
-    if value_type == "literal_string":
-        return tomlkit.string(str(value), literal=True)
-    if value_type == "multiline_string":
-        return tomlkit.string(str(value), multiline=True)
-    if value_type == "multiline_literal_string":
-        return tomlkit.string(str(value), literal=True, multiline=True)
-    if value_type == "integer":
-        return int(value)
-    if value_type == "hex_integer":
-        int_val = int(value) if isinstance(value, int) else int(str(value), 16)
-        return Integer(int_val, Trivia(), hex(int_val))
-    if value_type == "octal_integer":
-        int_val = int(value) if isinstance(value, int) else int(str(value), 8)
-        return Integer(int_val, Trivia(), oct(int_val))
-    if value_type == "binary_integer":
-        int_val = int(value) if isinstance(value, int) else int(str(value), 2)
-        return Integer(int_val, Trivia(), bin(int_val))
-    if value_type == "float":
-        if isinstance(value, str):
-            return float(value.lower())
-        return float(value)
-    if value_type == "boolean":
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, str):
-            return value.lower() in ("true", "yes", "1", "on")
-        return bool(value)
-    if value_type == "datetime":
-        if isinstance(value, datetime):
-            return value
-        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    if value_type == "date":
-        from datetime import date as date_type
-
-        if isinstance(value, date_type) and not isinstance(value, datetime):
-            return tomlkit.date(value.isoformat())
-        return tomlkit.date(str(value))
-    if value_type == "time":
-        from datetime import time as time_type
-
-        if isinstance(value, time_type):
-            return tomlkit.time(value.isoformat())
-        return tomlkit.time(str(value))
-    if value_type == "array":
-        if isinstance(value, list):
-            arr = tomlkit.array()
-            for item in value:
-                arr.append(convert_value(item, "auto"))
-            return arr
-        arr = tomlkit.array()
-        arr.append(convert_value(value, "auto"))
-        return arr
-    if value_type == "inline_table":
-        if not isinstance(value, dict):
-            raise ValueError(f"Cannot convert {type(value).__name__} to inline_table")
-        tbl = tomlkit.inline_table()
-        for k, v in value.items():
-            tbl[k] = convert_value(v, "auto")
-        return tbl
-    return value
+# =============================================================================
+# Key Operations
+# =============================================================================
 
 
 def navigate_to_key_parent(target, key):
+    """Navigate to the parent container of a key."""
     parts = key.split(".")
     if len(parts) == 1:
         return target, key
@@ -540,7 +671,24 @@ def navigate_to_key_parent(target, key):
     return parent, parts[-1]
 
 
+def _values_equal(a, b):
+    """Check if two values are equal."""
+    if isinstance(a, Array) and isinstance(b, (Array, list)):
+        if len(a) != len(b):
+            return False
+        return all(_values_equal(x, y) for x, y in zip(a, b))
+    if isinstance(a, (InlineTable, Table)) and isinstance(b, (InlineTable, Table, dict)):
+        if len(a) != len(b):
+            return False
+        for k in a:
+            if k not in b or not _values_equal(a[k], b[k]):
+                return False
+        return True
+    return a == b
+
+
 def set_key_value(target, key, value, value_type="auto"):
+    """Set a key to a value in the target table."""
     parent, final_key = navigate_to_key_parent(target, key)
     converted_value = convert_value(value, value_type)
 
@@ -553,19 +701,8 @@ def set_key_value(target, key, value, value_type="auto"):
     return True
 
 
-def _values_equal(a, b):
-    if isinstance(a, Array) and isinstance(b, (Array, list)):
-        if len(a) != len(b):
-            return False
-        return all(_values_equal(x, y) for x, y in zip(a, b))
-    if isinstance(a, (InlineTable, Table)) and isinstance(b, (InlineTable, Table, dict)):
-        if a.keys() != b.keys():
-            return False
-        return all(_values_equal(a[k], b[k]) for k in a)
-    return a == b
-
-
 def remove_key(target, key):
+    """Remove a key from the target table."""
     parts = key.split(".")
     parent = target
     for part in parts[:-1]:
@@ -584,148 +721,157 @@ def remove_key(target, key):
     return False
 
 
-def remove_table(doc, table_path):
-    """Remove a table from the document.
+# =============================================================================
+# Table Removal
+# =============================================================================
 
-    The table_path can include array indices using bracket notation:
-    - "products[0]" - remove first entry from products array of tables
-    - "products[-1]" - remove last entry
-    - "products" - remove entire array of tables
-    """
+
+def remove_table(doc, table_path):
+    """Remove a table from the document."""
     parsed = parse_table_path(table_path)
     if not parsed:
         raise TomlFileError("Cannot remove document root")
 
-    # Navigate to parent of the target
     if len(parsed) == 1:
         parent = doc
     else:
         try:
-            parent_path = _format_path(parsed[:-1])
+            parent_path = _format_path(parsed, len(parsed) - 1)
             parent = navigate_to_table(doc, parent_path, create=False)
         except TomlFileError:
             return False
 
     name, index = parsed[-1]
-
     if name not in parent:
         return False
 
     item = parent[name]
     if isinstance(item, AoT) and index is not None:
-        if index == -1:
-            if len(item) > 0:
-                del item[-1]
-                return True
-            return False
-        elif 0 <= index < len(item):
-            del item[index]
-            return True
-        raise TomlFileError(f"Array of tables index {index} out of range")
+        return _remove_aot_entry(item, index)
 
-    # If it's an AoT but no index specified, or a regular table, remove entirely
     del parent[name]
     return True
 
 
-def do_toml(
-    module,
-    path,
-    table,
-    key,
-    value,
-    value_type,
-    state,
-    backup,
-    create,
-    follow,
-):
+def _remove_aot_entry(aot, index):
+    """Remove an entry from an array of tables."""
+    if index == -1:
+        if len(aot) > 0:
+            del aot[-1]
+            return True
+        return False
+    if 0 <= index < len(aot):
+        del aot[index]
+        return True
+    raise TomlFileError(f"Array of tables index {index} out of range")
+
+
+# =============================================================================
+# Main TOML Operations (extracted for reduced nesting and statements)
+# =============================================================================
+
+
+def _init_diff(path, diff_enabled, doc):
+    """Initialize the diff dictionary."""
     diff = {
         "before": "",
         "after": "",
         "before_header": f"{path} (content)",
         "after_header": f"{path} (content)",
     }
-
-    if follow and os.path.islink(path):
-        target_path = os.path.realpath(path)
-    else:
-        target_path = path
-
-    doc = load_toml_document(target_path, create)
-
-    if module._diff:
+    if diff_enabled:
         diff["before"] = tomlkit.dumps(doc)
+    return diff
 
+
+def _handle_present(doc, params, original_content):
+    """Handle state=present operations."""
+    if params.key:
+        if params.value is None:
+            raise TomlFileError("Parameter 'value' is required when state=present and key is specified")
+        target = navigate_to_table(doc, params.table, create=True)
+        changed = set_key_value(target, params.key, params.value, params.value_type)
+        msg = "key added" if changed else "OK"
+        return changed, msg
+
+    if params.table:
+        navigate_to_table(doc, params.table, create=True)
+        new_content = tomlkit.dumps(doc)
+        if new_content != original_content:
+            return True, "table added"
+    return False, "nothing to do"
+
+
+def _handle_absent(doc, params):
+    """Handle state=absent operations."""
+    if params.key:
+        try:
+            target = navigate_to_table(doc, params.table, create=False)
+            changed = remove_key(target, params.key)
+            return changed, "key removed" if changed else "key not found"
+        except TomlFileError:
+            return False, "key not found"
+
+    if params.table:
+        changed = remove_table(doc, params.table)
+        return changed, "table removed" if changed else "table not found"
+    return False, "nothing to do"
+
+
+def _write_if_changed(module, target_path, doc, changed, backup):
+    """Write the document to file if changed."""
+    if not changed or module.check_mode:
+        return None
+
+    backup_file = None
+    if backup and os.path.exists(target_path):
+        backup_file = module.backup_local(target_path)
+
+    destpath = os.path.dirname(target_path)
+    if destpath and not os.path.exists(destpath):
+        os.makedirs(destpath)
+
+    content = tomlkit.dumps(doc)
+    encoded_content = to_bytes(content)
+
+    try:
+        tmpfd, tmpfile = tempfile.mkstemp(dir=module.tmpdir)
+        with os.fdopen(tmpfd, "wb") as f:
+            f.write(encoded_content)
+    except OSError:
+        module.fail_json(msg="Unable to create temporary file", traceback=traceback.format_exc())
+
+    try:
+        module.atomic_move(tmpfile, os.path.abspath(target_path))
+    except OSError:
+        module.fail_json(msg=f"Unable to move temporary file {tmpfile} to {target_path}", traceback=traceback.format_exc())
+
+    return backup_file
+
+
+def do_toml(module, params: TomlParams):
+    """Execute the main TOML file operation."""
+    target_path = os.path.realpath(params.path) if params.follow and os.path.islink(params.path) else params.path
+    doc = load_toml_document(target_path, params.create)
+
+    diff = _init_diff(params.path, module._diff, doc)
     original_content = tomlkit.dumps(doc)
-    changed = False
-    msg = "OK"
 
-    if state == "present":
-        if key:
-            if value is None:
-                raise TomlFileError("Parameter 'value' is required when state=present and key is specified")
-
-            target = navigate_to_table(doc, table, create=True)
-            changed = set_key_value(target, key, value, value_type)
-
-            if changed:
-                msg = "key added" if key not in target or changed else "key changed"
-        else:
-            if table:
-                navigate_to_table(doc, table, create=True)
-                new_content = tomlkit.dumps(doc)
-                if new_content != original_content:
-                    changed = True
-                    msg = "table added"
-            else:
-                msg = "nothing to do"
-    elif state == "absent":
-        if key:
-            try:
-                target = navigate_to_table(doc, table, create=False)
-                changed = remove_key(target, key)
-                msg = "key removed" if changed else "key not found"
-            except TomlFileError:
-                msg = "key not found"
-        else:
-            if table:
-                changed = remove_table(doc, table)
-                msg = "table removed" if changed else "table not found"
-            else:
-                msg = "nothing to do"
+    if params.state == "present":
+        changed, msg = _handle_present(doc, params, original_content)
+    else:
+        changed, msg = _handle_absent(doc, params)
 
     if module._diff:
         diff["after"] = tomlkit.dumps(doc)
 
-    backup_file = None
-    if changed and not module.check_mode:
-        if backup and os.path.exists(target_path):
-            backup_file = module.backup_local(target_path)
-
-        destpath = os.path.dirname(target_path)
-        if destpath and not os.path.exists(destpath):
-            os.makedirs(destpath)
-
-        content = tomlkit.dumps(doc)
-        encoded_content = to_bytes(content)
-
-        try:
-            tmpfd, tmpfile = tempfile.mkstemp(dir=module.tmpdir)
-            with os.fdopen(tmpfd, "wb") as f:
-                f.write(encoded_content)
-        except OSError:
-            module.fail_json(msg="Unable to create temporary file", traceback=traceback.format_exc())
-
-        try:
-            module.atomic_move(tmpfile, os.path.abspath(target_path))
-        except OSError:
-            module.fail_json(
-                msg=f"Unable to move temporary file {tmpfile} to {target_path}",
-                traceback=traceback.format_exc(),
-            )
-
+    backup_file = _write_if_changed(module, target_path, doc, changed, params.backup)
     return changed, backup_file, diff, msg
+
+
+# =============================================================================
+# Module Entry Point
+# =============================================================================
 
 
 def main() -> None:
@@ -768,24 +914,24 @@ def main() -> None:
 
     deps.validate(module)
 
-    path = module.params["path"]
-    table = module.params["table"]
-    key = module.params["key"]
-    value = module.params["value"]
-    value_type = module.params["value_type"]
-    state = module.params["state"]
-    backup = module.params["backup"]
-    create = module.params["create"]
-    follow = module.params["follow"]
+    params = TomlParams(
+        path=module.params["path"],
+        table=module.params["table"],
+        key=module.params["key"],
+        value=module.params["value"],
+        value_type=module.params["value_type"],
+        state=module.params["state"],
+        backup=module.params["backup"],
+        create=module.params["create"],
+        follow=module.params["follow"],
+    )
 
     try:
-        changed, backup_file, diff, msg = do_toml(
-            module, path, table, key, value, value_type, state, backup, create, follow
-        )
+        changed, backup_file, diff, msg = do_toml(module, params)
     except TomlFileError as e:
         module.fail_json(msg=str(e))
 
-    if not module.check_mode and os.path.exists(path):
+    if not module.check_mode and os.path.exists(params.path):
         file_args = module.load_file_common_arguments(module.params)
         changed = module.set_fs_attributes_if_different(file_args, changed)
 
@@ -793,7 +939,7 @@ def main() -> None:
         changed=changed,
         diff=diff,
         msg=msg,
-        path=path,
+        path=params.path,
     )
     if backup_file is not None:
         results["backup_file"] = backup_file
