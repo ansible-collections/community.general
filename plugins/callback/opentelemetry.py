@@ -196,7 +196,7 @@ class HostData:
     Data about an individual host.
     """
 
-    def __init__(self, uuid, name, status, result):
+    def __init__(self, uuid, name, status, result=None):
         self.uuid = uuid
         self.name = name
         self.status = status
@@ -234,7 +234,7 @@ class OpenTelemetrySource:
         uuid = task._uuid
 
         if uuid in tasks_data:
-            tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started", None))
+            tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started"))
             return
 
         name = task.get_name().strip()
@@ -246,7 +246,7 @@ class OpenTelemetrySource:
             args = task.args
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
-        tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started", None))
+        tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started"))
 
     def finish_task(self, tasks_data, status, result, dump):
         """record the results of a task for a single host"""
@@ -337,13 +337,13 @@ class OpenTelemetrySource:
         if host_data.status != "included":
             # Support loops
             enriched_error_message = None
-            if "results" in host_data.result._result:
+            if host_data.result and "results" in host_data.result._result:
                 if host_data.status == "failed":
                     message = self.get_error_message_from_results(host_data.result._result["results"], task_data.action)
                     enriched_error_message = self.enrich_error_message_from_results(
                         host_data.result._result["results"], task_data.action
                     )
-            else:
+            elif host_data.result:
                 res = host_data.result._result
                 rc = res.get("rc", 0)
                 if host_data.status == "failed":
@@ -591,6 +591,12 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_skipped(self, result):
         self.opentelemetry.finish_task(
             self.tasks_data, "skipped", result, self.dump_results(self.tasks_data[result._task._uuid], result)
+        )
+
+    def v2_runner_on_unreachable(self, result):
+        self.errors += 1
+        self.opentelemetry.finish_task(
+            self.tasks_data, "failed", result, self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_playbook_on_include(self, included_file):

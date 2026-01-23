@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, Mock, patch
 from ansible.executor.task_result import TaskResult
 from ansible.playbook.task import Task
 
-from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData
+from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData, HostData
 
 
 class TestOpentelemetry(unittest.TestCase):
@@ -36,6 +36,10 @@ class TestOpentelemetry(unittest.TestCase):
         self.my_task_result = TaskResult(
             host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields
         )
+        self.mock_span = Mock("MockSpan")
+        self.mock_span.set_status = MagicMock()
+        self.mock_span.set_attributes = MagicMock()
+        self.mock_span.end = MagicMock()
 
     def test_run_task_with_host(self):
         tasks_data = OrderedDict()
@@ -82,6 +86,13 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, "include")
         self.assertEqual(host_data.name, "include")
         self.assertEqual(host_data.status, "ok")
+
+    @patch("ansible_collections.community.general.plugins.callback.opentelemetry.Status", create=True)
+    @patch("ansible_collections.community.general.plugins.callback.opentelemetry.StatusCode", create=True)
+    def test_update_span_data(self, mock_status_code, mock_status):
+        unfinished_host = HostData("myhost_uuid", "myhost", "unreachable")
+        self.opentelemetry.update_span_data(self.mock_task, unfinished_host, self.mock_span, True, True)
+        self.mock_span.end.assert_called()
 
     def test_get_error_message(self):
         test_cases = (
