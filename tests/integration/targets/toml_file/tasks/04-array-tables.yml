@@ -174,7 +174,7 @@
 - name: test-aot 6 - verify last entry removed
   vars:
     # Note: tomlkit preserves the blank line that preceded the removed entry
-    expected: |
+    expected: |+
       [[products]]
       name = "Hammer"
 
