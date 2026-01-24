@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, Mock, patch
 from ansible.executor.task_result import TaskResult
 from ansible.playbook.task import Task
 
-from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData, HostData
+from ansible_collections.community.general.plugins.callback.opentelemetry import HostData, OpenTelemetrySource, TaskData
 
 
 class TestOpentelemetry(unittest.TestCase):
