@@ -112,7 +112,7 @@
 - name: test-table 4 - verify table removed
   vars:
     # Note: tomlkit preserves the blank line that preceded the removed table
-    expected: |
+    expected: |+
       [database]
       host = "localhost"
       port = 5432
