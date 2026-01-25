@@ -1,0 +1,2 @@
+minor_changes:
+  - scaleway_security_group - added ``project`` parameter (https://github.com/ansible-collections/community.general/issues/11364, https://github.com/ansible-collections/community.general/pull/11366).
