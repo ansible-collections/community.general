@@ -8,7 +8,7 @@
 - name: test-aot 1 - create first array of tables entry
   toml_file:
     path: "{{ output_file }}"
-    table: products[-1]
+    table: products[append]
     key: name
     value: Hammer
   register: result_aot_1
@@ -63,7 +63,7 @@
 - name: test-aot 3 - append new entry to array of tables
   toml_file:
     path: "{{ output_file }}"
-    table: products[-1]
+    table: products[append]
     key: name
     value: Nail
   register: result_aot_3
