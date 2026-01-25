@@ -24,6 +24,7 @@
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet"
     state: present
   register: options_add
   check_mode: true
@@ -61,6 +62,7 @@
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet"
     state: present
   register: options_add
 
@@ -87,6 +89,7 @@
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet"
     state: present
   register: options_add_again
 
@@ -116,6 +119,7 @@
       - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -132,6 +136,7 @@
     dynamicforward: '11080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet6"
     state: present
   register: options_update
 
@@ -160,6 +165,7 @@
     dynamicforward: '11080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet6"
     state: present
   register: options_update
 
@@ -190,6 +196,7 @@
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -225,6 +232,7 @@
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -278,6 +286,7 @@
       - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' not in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' not in slurp_ssh_config['content'] | b64decode"
 
 # Proxycommand and ProxyJump are mutually exclusive.
 # Reset ssh_config before testing options with proxyjump
@@ -302,6 +311,7 @@
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet"
     state: present
   register: options_add
   check_mode: true
@@ -339,6 +349,7 @@
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet"
     state: present
   register: options_add
 
@@ -365,6 +376,7 @@
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet"
     state: present
   register: options_add_again
 
@@ -394,6 +406,7 @@
       - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -410,6 +423,7 @@
     dynamicforward: '11080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet6"
     state: present
   register: options_update
 
@@ -438,6 +452,7 @@
     dynamicforward: '11080'
     other_options:
       serveraliveinterval: '30'
+    address_family: "inet6"
     state: present
   register: options_update
 
@@ -468,6 +483,7 @@
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -503,6 +519,7 @@
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -556,3 +573,4 @@
       - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
       - "'serveraliveinterval 30' not in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' not in slurp_ssh_config['content'] | b64decode"
