@@ -11,7 +11,6 @@ from ansible.errors import AnsibleFilterError
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
-    from typing import Any
 
 JSONPATCH_IMPORT_ERROR: ImportError | None
 try:
@@ -31,7 +30,7 @@ OPERATIONS_NEEDING_VALUE = ["add", "replace", "test"]
 class FilterModule:
     """Filter plugin."""
 
-    def check_json_object(self, filter_name: str, object_name: str, inp: Any):
+    def check_json_object(self, filter_name: str, object_name: str, inp: t.Any):
         if isinstance(inp, (str, bytes, bytearray)):
             try:
                 return loads(inp)
@@ -64,9 +63,9 @@ class FilterModule:
         inp: str | list | dict | bytes | bytearray,
         op: str,
         path: str,
-        value: Any = None,
+        value: t.Any = None,
         **kwargs: dict,
-    ) -> Any:
+    ) -> t.Any:
         if not HAS_LIB:
             raise AnsibleFilterError(
                 "You need to install 'jsonpatch' package prior to running 'json_patch' filter"
@@ -110,7 +109,7 @@ class FilterModule:
         operations: list,
         /,
         fail_test: bool = False,
-    ) -> Any:
+    ) -> t.Any:
         if not HAS_LIB:
             raise AnsibleFilterError(
                 "You need to install 'jsonpatch' package prior to running 'json_patch_recipe' filter"
@@ -160,7 +159,7 @@ class FilterModule:
 
         return result
 
-    def filters(self) -> dict[str, Callable[..., Any]]:
+    def filters(self) -> dict[str, Callable[..., t.Any]]:
         """Map filter plugin names to their functions.
 
         Returns:
