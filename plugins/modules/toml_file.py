@@ -302,9 +302,9 @@ import os
 import re
 import tempfile
 import traceback
+import typing as t
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
@@ -327,7 +327,7 @@ class TomlParams:
     path: str
     table: str | None
     key: str | None
-    value: Any
+    value: t.Any
     value_type: str
     state: str
     backup: bool
