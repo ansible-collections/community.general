@@ -37,10 +37,10 @@ options:
     default: present
 
   organization:
+    type: str
     description:
       - Organization identifier.
-    type: str
-    required: true
+      - Exactly one of O(project) and O(organization) must be specified.
 
   region:
     description:
@@ -95,16 +95,36 @@ options:
     description:
       - Create security group to be the default one.
     type: bool
+
+  project:
+    type: str
+    description:
+      - Project identifier.
+      - Exactly one of O(project) and O(organization) must be specified.
+    version_added: 12.3.0
 """
 
 EXAMPLES = r"""
-- name: Create a Security Group
+- name: Create a Security Group using a project ID
   community.general.scaleway_security_group:
     state: present
     region: par1
     name: security_group
     description: "my security group description"
-    organization: "43a3b6c8-916f-477b-b7ec-ff1898f5fdd9"
+    stateful: false
+    inbound_default_policy: accept
+    outbound_default_policy: accept
+    organization_default: false
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
+  register: security_group_creation_task
+
+- name: Create a Security Group in the default project using an organization ID (deprecated)
+  community.general.scaleway_security_group:
+    state: present
+    region: par1
+    name: security_group
+    description: "my security group description"
+    organization: 43a3b6c8-916f-477b-b7ec-ff1898f5fdd9
     stateful: false
     inbound_default_policy: accept
     outbound_default_policy: accept
@@ -216,6 +236,7 @@ def core(module):
         "inbound_default_policy": module.params["inbound_default_policy"],
         "outbound_default_policy": module.params["outbound_default_policy"],
         "organization_default": module.params["organization_default"],
+        "project": module.params["project"],
     }
 
     region = module.params["region"]
@@ -234,7 +255,7 @@ def main():
     argument_spec.update(
         dict(
             state=dict(type="str", default="present", choices=["absent", "present"]),
-            organization=dict(type="str", required=True),
+            organization=dict(type="str"),
             name=dict(type="str", required=True),
             description=dict(type="str"),
             region=dict(type="str", required=True, choices=list(SCALEWAY_LOCATION.keys())),
@@ -242,12 +263,19 @@ def main():
             inbound_default_policy=dict(type="str", choices=["accept", "drop"]),
             outbound_default_policy=dict(type="str", choices=["accept", "drop"]),
             organization_default=dict(type="bool"),
+            project=dict(type="str"),
         )
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
         required_if=[["stateful", True, ["inbound_default_policy", "outbound_default_policy"]]],
+        mutually_exclusive=[
+            ("organization", "project"),
+        ],
+        required_one_of=[
+            ("organization", "project"),
+        ],
     )
 
     core(module)
