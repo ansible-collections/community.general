@@ -14,15 +14,12 @@ description:
 author: "Aleksandr Gabidullin (@a-gabidullin)"
 requirements:
   - dbus
+  - SSSD needs to be running
 attributes:
   check_mode:
     support: full
   diff_mode:
     support: none
-  platform:
-    platforms: posix
-    description: This action requires a system with D-Bus and SSSD running.
-    support: full
 options:
   action:
     description:
