@@ -104,7 +104,7 @@ list_servers:
 """
 
 
-from typing import Any
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -218,7 +218,7 @@ def main() -> None:
     server_type = module.params.get("server_type")
 
     sssd = SSSDHandler()
-    result: dict[str, Any] = {}
+    result: dict[str, t.Any] = {}
 
     try:
         if action == "domain_status":
