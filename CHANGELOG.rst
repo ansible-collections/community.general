@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.4
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- cloudflare_dns - also allow ``flag=128`` for CAA records (https://github.com/ansible-collections/community.general/issues/11355, https://github.com/ansible-collections/community.general/pull/11377).
+- logstash_plugin - fix argument order when using ``version`` parameter. The plugin name must come after options like ``--version`` for the ``logstash-plugin`` CLI to work correctly (https://github.com/ansible-collections/community.general/issues/10745, https://github.com/ansible-collections/community.general/pull/11440).
+
 v11.4.3
 =======
 
