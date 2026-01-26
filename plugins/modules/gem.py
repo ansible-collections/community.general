@@ -160,13 +160,12 @@ def get_rubygems_environ(module):
 
 def get_installed_versions(module, remote=False):
     cmd = get_rubygems_path(module)
-    cmd.append("query")
+    cmd.append("list")
     cmd.extend(common_opts(module))
     if remote:
         cmd.append("--remote")
         if module.params["repository"]:
             cmd.extend(["--source", module.params["repository"]])
-    cmd.append("-n")
     cmd.append(f"^{module.params['name']}$")
 
     environ = get_rubygems_environ(module)

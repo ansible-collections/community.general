@@ -1,0 +1,2 @@
+bugfixes:
+  - "gem - add compatibility with Ruby 4 rubygems (https://github.com/ansible-collections/community.general/issues/11397, https://github.com/ansible-collections/community.general/pull/11442)."
