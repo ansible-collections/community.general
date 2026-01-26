@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_client - fix idempotency bug caused by ``null`` client attribute value differences for non-existing client attributes (https://github.com/ansible-collections/community.general/issues/11443, https://github.com/ansible-collections/community.general/pull/11444).
