@@ -101,13 +101,15 @@ def parse_error(string):
 
 
 def install_plugin(module, plugin_bin, plugin_name, version, proxy_host, proxy_port):
-    cmd_args = [plugin_bin, PACKAGE_STATE_MAP["present"], plugin_name]
+    cmd_args = [plugin_bin, PACKAGE_STATE_MAP["present"]]
 
     if version:
         cmd_args.extend(["--version", version])
 
     if proxy_host and proxy_port:
         cmd_args.extend(["-DproxyHost=%s" % proxy_host, "-DproxyPort=%s" % proxy_port])
+
+    cmd_args.append(plugin_name)
 
     cmd = " ".join(cmd_args)
 
