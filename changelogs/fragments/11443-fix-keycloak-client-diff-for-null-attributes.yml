@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_client module - fix null client attribute value diff for non existing client attributes (https://github.com/ansible-collections/community.general/pull/11444).
