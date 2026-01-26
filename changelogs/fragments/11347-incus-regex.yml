@@ -1,6 +1,0 @@
-bugfixes:
-  - >
-    incus connection plugin - fix parsing of commands for Windows, enforcing a ``\`` after the drive letter and colon symbol
-    (https://github.com/ansible-collections/community.general/pull/11347).
-minor_changes:
-  - incus connection plugin - simplify regular expression matching commands (https://github.com/ansible-collections/community.general/pull/11347).

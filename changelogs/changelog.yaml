@@ -1627,3 +1627,163 @@ releases:
         name: sssd_info
         namespace: ''
     release_date: '2025-12-29'
+  12.3.0:
+    changes:
+      bugfixes:
+        - cloudflare_dns - also allow ``flag=128`` for CAA records (https://github.com/ansible-collections/community.general/issues/11355,
+          https://github.com/ansible-collections/community.general/pull/11377).
+        - gem - add compatibility with Ruby 4 rubygems (https://github.com/ansible-collections/community.general/issues/11397,
+          https://github.com/ansible-collections/community.general/pull/11442).
+        - 'incus connection plugin - fix parsing of commands for Windows, enforcing
+          a ``\`` after the drive letter and colon symbol (https://github.com/ansible-collections/community.general/pull/11347).
+
+          '
+        - keycloak_client - fix idempotency bug caused by ``null`` client attribute
+          value differences for non-existing client attributes (https://github.com/ansible-collections/community.general/issues/11443,
+          https://github.com/ansible-collections/community.general/pull/11444).
+        - logstash_plugin - fix argument order when using ``version`` parameter. The
+          plugin name must come after options like ``--version`` for the ``logstash-plugin``
+          CLI to work correctly (https://github.com/ansible-collections/community.general/issues/10745,
+          https://github.com/ansible-collections/community.general/pull/11440).
+        - pmem - fix test for invalid data input (https://github.com/ansible-collections/community.general/pull/11388).
+      minor_changes:
+        - alicloud_ecs module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - android_sdk - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - archive - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - bitbucket_pipeline_known_host - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - chroot connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - cobbler inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - copr - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - cronvar - simplify handling unknown exceptions (https://github.com/ansible-collections/community.general/pull/11340).
+        - cronvar - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - crypttab - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - elasticsearch_plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - gitlab_group - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - gitlab_issue - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - gitlab_merge_request - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - gitlab_project - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - gunicorn - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - htpasswd - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - idrac_redfish_info - add multiple manager support to ``GetManagerAttributes``
+          command (https://github.com/ansible-collections/community.general/pull/11294).
+        - imc_rest - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - incus connection plugin - improve code readability (https://github.com/ansible-collections/community.general/pull/11346).
+        - incus connection plugin - simplify regular expression matching commands
+          (https://github.com/ansible-collections/community.general/pull/11347).
+        - ini_file - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - interfaces_file - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - iptables_state - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - jail connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - jenkins_credential - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - jenkins_plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - jenkins_script - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+        - kdeconfig - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - known_hosts module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - layman - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - linode - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+        - linode inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - listen_ports_facts - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - locale_gen - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - logentries callback plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - lvm_pv - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+        - lxc connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - lxd inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - lxd module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - manageiq module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - manageiq_alert_profiles - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - modprobe - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - mssql_db - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - nagios - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - netcup_dns - support diff mode (https://github.com/ansible-collections/community.general/pull/11376).
+        - nmcli - add idempotency check (https://github.com/ansible-collections/community.general/pull/11114).
+        - nmcli - add support for IPv6 routing rules (https://github.com/ansible-collections/community.general/issues/7094,
+          https://github.com/ansible-collections/community.general/pull/11413).
+        - nosh - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - nsupdate - add support for server FQDN and the GSS-TSIG key algorithm (https://github.com/ansible-collections/community.general/issues/5730,
+          https://github.com/ansible-collections/community.general/pull/11425).
+        - nsupdate modules plugin - replace aliased errors with proper Python error
+          (https://github.com/ansible-collections/community.general/pull/11391).
+        - oci_utils module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - omapi_host - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - one_image - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+        - one_image_info - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+        - one_service - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+        - one_vm - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+        - one_vm - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - opennebula inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - pam_limits - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - pamd - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - parted - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - pmem - simplify text tests without using regular expression (https://github.com/ansible-collections/community.general/pull/11388).
+        - pubnub_blocks - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - pulp_repo - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - read_csv - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - redfish_utils module utils - adds support of ``@Redfish.Settings`` in ``ComputerSystem``
+          attributes for ``set_boot_override`` function (https://github.com/ansible-collections/community.general/issues/11297,
+          https://github.com/ansible-collections/community.general/pull/11322).
+        - redhat_subscription - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - rhsm_repository - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - runit - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - scaleway_ip - added ``project`` parameter (https://github.com/ansible-collections/community.general/issues/11367,
+          https://github.com/ansible-collections/community.general/pull/11368).
+        - scaleway_security_group - added ``project`` parameter (https://github.com/ansible-collections/community.general/issues/11364,
+          https://github.com/ansible-collections/community.general/pull/11366).
+        - sensu_check - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - sensu_client - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - sensu_handler - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - sensu_subscription - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - seport - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - serverless - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - slackpkg - refactor function ``query_packages()`` (https://github.com/ansible-collections/community.general/pull/11390).
+        - solaris_zone - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - sorcery - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - spotinst_aws_elastigroup - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - sudoers - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - svc - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - timestamp callback plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - timezone - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - univention_umc module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - wakeonlan - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - wsl connection plugin - add option ``wsl_remote_ssh_shell_type``. Support
+          PowerShell in addition to cmd as the Windows shell (https://github.com/ansible-collections/community.general/issues/11307,
+          https://github.com/ansible-collections/community.general/pull/11308).
+        - wsl connection plugin - replace aliased errors with proper Python error
+          (https://github.com/ansible-collections/community.general/pull/11391).
+        - wsl connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - xfs_quota - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - yaml cache plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - zone connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+        - zypper - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+        - zypper_repository - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+      release_summary: Regular feature and bugfix release.
+    fragments:
+      - 11114-nmcli-idempotency.yml
+      - 11301-idrac-info-multi-manager.yml
+      - 11308-wsl-shell-type.yml
+      - 11322-handle-redfish-settings-in-setbootoverride.yml
+      - 11340-cronvar-simplify-exc.yml
+      - 11341-pyupgrade-1.yml
+      - 11343-pyupgrade-3.yml
+      - 11344-pyupgrade-4.yml
+      - 11346-incus-readability.yml
+      - 11347-incus-regex.yml
+      - 11366-scaleway-sg-project-param.yml
+      - 11368-scaleway-ip-project-param.yml
+      - 11376-netcup-dns-diff-mode.yml
+      - 11377-cloudflare_dns-caa.yml
+      - 11388-pmem-redundant-regexps.yml
+      - 11390-slackpkg-query.yml
+      - 11391-ruff-cases-11.yml
+      - 11396-in-def-imports.yml
+      - 11413-nmcli-routing-rules6.yml
+      - 11425-nsupdate-gss-tsig.yml
+      - 11440-logstash-plugin-fix-version-argument-order.yml
+      - 11442-gem-module-ruby-4.yml
+      - 11443-fix-keycloak-client-diff-for-null-attributes.yml
+      - 12.3.0.yml
+    plugins:
+      filter:
+        - description: Convert variable to TOML string.
+          name: to_toml
+          namespace: null
+    release_date: '2026-01-26'

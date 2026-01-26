@@ -1,2 +1,0 @@
-minor_changes:
-  - slackpkg - refactor function ``query_packages()`` (https://github.com/ansible-collections/community.general/pull/11390).
