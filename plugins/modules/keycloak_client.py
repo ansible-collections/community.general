@@ -1319,19 +1319,12 @@ def main():
             new_param_value = flow_binding_from_dict_to_model(new_param_value, realm, kc)
         elif client_param == "attributes" and "attributes" in before_client:
             attributes_copy = copy.deepcopy(before_client["attributes"])
-            before_client_attributes_copy = copy.deepcopy(before_client["attributes"])
-            # Merge client attributes while excluding null-valued attributes that are not present
-            # in Keycloak's response. This ensures idempotency by treating absent attributes
-            # and null attributes as equivalent.
-            new_client_attributes = new_param_value
-            new_param_value = {
-                **before_client_attributes_copy,
-                **{
-                    key: value
-                    for key, value in new_client_attributes.items()
-                    if value is not None or key in before_client_attributes_copy
-                }
-            }
+            # Merge client attributes while excluding null-valued attributes that are not present in Keycloak's response.
+            # This ensures idempotency by treating absent attributes and null attributes as equivalent.
+            attributes_copy.update(
+                {key: value for key, value in new_param_value.items() if value is not None or key in attributes_copy}
+            )
+            new_param_value = attributes_copy
         elif client_param in ["clientScopesBehavior", "client_scopes_behavior"]:
             continue
 
