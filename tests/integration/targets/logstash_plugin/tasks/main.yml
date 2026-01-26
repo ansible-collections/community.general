@@ -1,0 +1,72 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Check if logstash-plugin is available
+  ansible.builtin.stat:
+    path: /usr/share/logstash/bin/logstash-plugin
+  register: logstash_plugin_bin
+
+- name: Run logstash_plugin tests
+  when: logstash_plugin_bin.stat.exists
+  block:
+    - name: Install plugin without version (should succeed)
+      community.general.logstash_plugin:
+        name: logstash-filter-dissect
+        state: present
+      register: install_no_version
+
+    - name: Assert plugin installed
+      ansible.builtin.assert:
+        that:
+          - install_no_version is changed
+
+    - name: Install same plugin again (idempotency)
+      community.general.logstash_plugin:
+        name: logstash-filter-dissect
+        state: present
+      register: install_no_version_again
+
+    - name: Assert idempotency without version
+      ansible.builtin.assert:
+        that:
+          - install_no_version_again is not changed
+
+    - name: Remove plugin for version test
+      community.general.logstash_plugin:
+        name: logstash-filter-dissect
+        state: absent
+
+    - name: Install plugin with specific version
+      community.general.logstash_plugin:
+        name: logstash-filter-dissect
+        state: present
+        version: "3.2.0"
+      register: install_with_version
+
+    - name: Assert plugin with version installed
+      ansible.builtin.assert:
+        that:
+          - install_with_version is changed
+
+    - name: Verify command has correct argument order
+      ansible.builtin.assert:
+        that:
+          # The cmd output should show --version before plugin name
+          - "'--version' in install_with_version.cmd"
+          - "'3.2.0' in install_with_version.cmd"
+          - "install_with_version.cmd.index('--version') < install_with_version.cmd.index('logstash-filter-dissect')"
+
+  always:
+    - name: Cleanup - remove test plugin
+      community.general.logstash_plugin:
+        name: logstash-filter-dissect
+        state: absent
+      when: logstash_plugin_bin.stat.exists
+      ignore_errors: true
