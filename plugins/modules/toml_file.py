@@ -9,7 +9,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: toml_file
 short_description: Manage individual settings in TOML files
-version_added: 12.3.0
+version_added: 12.4.0
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.general.attributes
