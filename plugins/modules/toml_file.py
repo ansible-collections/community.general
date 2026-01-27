@@ -346,6 +346,7 @@ def parse_table_path(table_path: str | None) -> list[tuple[str, int | str | None
             raise TomlFileError(f"Invalid table path segment: '{segment}'")
         name = match.group(1)
         index_str = match.group(2)
+        index: int | str | None
         if index_str is None:
             index = None
         elif index_str == "append":
@@ -602,6 +603,7 @@ def _navigate_aot(aot: AoT, index: int | str | None, is_last: bool, ctx: NavCont
         return _get_aot_default(aot, ctx, i)
     if index == "append":
         return _handle_aot_append(aot, is_last, ctx, i)
+    assert isinstance(index, int)
     return _get_aot_at_index(aot, index, ctx, i)
 
 
@@ -750,6 +752,7 @@ def _remove_aot_entry(aot: AoT, index: int | str) -> bool:
     """Remove an entry from an array of tables."""
     if index == "append":
         raise TomlFileError("Cannot use [append] with state=absent; use [-1] to remove the last entry")
+    assert isinstance(index, int)
     if index == -1:
         if len(aot) > 0:
             del aot[-1]
