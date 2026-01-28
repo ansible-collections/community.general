@@ -312,7 +312,11 @@ class TomlParams:
     table: str | None
     key: str | None
     value: t.Any
-    value_type: str
+    value_type: t.Literal[
+        "auto", "string", "literal_string", "multiline_string", "multiline_literal_string",
+        "integer", "hex_integer", "octal_integer", "binary_integer",
+        "float", "boolean", "datetime", "date", "time", "array", "inline_table",
+    ]
     state: str
     backup: bool
     create: bool
@@ -603,8 +607,7 @@ def _navigate_aot(aot: AoT, index: int | str | None, is_last: bool, ctx: NavCont
         return _get_aot_default(aot, ctx, i)
     if index == "append":
         return _handle_aot_append(aot, is_last, ctx, i)
-    assert isinstance(index, int)
-    return _get_aot_at_index(aot, index, ctx, i)
+    return _get_aot_at_index(aot, t.cast(int, index), ctx, i)
 
 
 def _navigate_existing_segment(
@@ -752,16 +755,16 @@ def _remove_aot_entry(aot: AoT, index: int | str) -> bool:
     """Remove an entry from an array of tables."""
     if index == "append":
         raise TomlFileError("Cannot use [append] with state=absent; use [-1] to remove the last entry")
-    assert isinstance(index, int)
-    if index == -1:
+    int_index = t.cast(int, index)
+    if int_index == -1:
         if len(aot) > 0:
             del aot[-1]
             return True
         return False
-    if 0 <= index < len(aot):
-        del aot[index]
+    if 0 <= int_index < len(aot):
+        del aot[int_index]
         return True
-    raise TomlFileError(f"Array of tables index {index} out of range")
+    raise TomlFileError(f"Array of tables index {int_index} out of range")
 
 
 # =============================================================================
@@ -839,13 +842,13 @@ def _write_if_changed(
         with os.fdopen(tmpfd, "wb") as f:
             f.write(encoded_content)
     except OSError:
-        module.fail_json(msg="Unable to create temporary file", traceback=traceback.format_exc())
+        module.fail_json(msg="Unable to create temporary file", exception=traceback.format_exc())
 
     try:
         module.atomic_move(tmpfile, os.path.abspath(target_path))
     except OSError:
         module.fail_json(
-            msg=f"Unable to move temporary file {tmpfile} to {target_path}", traceback=traceback.format_exc()
+            msg=f"Unable to move temporary file {tmpfile} to {target_path}", exception=traceback.format_exc()
         )
 
     return backup_file
