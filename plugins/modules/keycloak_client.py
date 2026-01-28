@@ -1174,6 +1174,26 @@ def remove_optional_client_scopes(desired_client, before_client, realm, kc):
             kc.delete_optional_clientscope(scope["id"], realm, desired_client["clientId"])
 
 
+def merge_settings_without_absent_nulls(existing_settings, desired_settings):
+    """
+    Merges existing and desired settings into a new dictionary while excluding null values in desired settings that are absent in the existing settings.
+    This ensures idempotency by treating absent keys in existing settings and null values in desired settings as equivalent, preventing unnecessary updates.
+
+    Args:
+      existing_settings (dict): Dictionary representing the current settings in Keycloak
+      desired_settings (dict): Dictionary representing the desired settings
+
+    Returns:
+      dict: A new dictionary containing all entries from existing_settings and desired_settings,
+      excluding null values in desired_settings whose corresponding keys are not present in existing_settings
+    """
+
+    existing = existing_settings or {}
+    desired = desired_settings or {}
+
+    return {**existing, **{k: v for k, v in desired.items() if v is not None or k in existing}}
+
+
 def main():
     """
     Module execution
@@ -1316,15 +1336,17 @@ def main():
         if client_param == "protocol_mappers":
             new_param_value = [{k: v for k, v in x.items() if v is not None} for x in new_param_value]
         elif client_param == "authentication_flow_binding_overrides":
-            new_param_value = flow_binding_from_dict_to_model(new_param_value, realm, kc)
-        elif client_param == "attributes" and "attributes" in before_client:
-            attributes_copy = copy.deepcopy(before_client["attributes"])
-            # Merge client attributes while excluding null-valued attributes that are not present in Keycloak's response.
-            # This ensures idempotency by treating absent attributes and null attributes as equivalent.
-            attributes_copy.update(
-                {key: value for key, value in new_param_value.items() if value is not None or key in attributes_copy}
+            desired_flow_binding_overrides = flow_binding_from_dict_to_model(new_param_value, realm, kc)
+            existing_flow_binding_overrides = before_client.get("authenticationFlowBindingOverrides")
+            # ensures idempotency
+            new_param_value = merge_settings_without_absent_nulls(
+                existing_flow_binding_overrides, desired_flow_binding_overrides
             )
-            new_param_value = attributes_copy
+        elif client_param == "attributes" and "attributes" in before_client:
+            desired_attributes = new_param_value
+            existing_attributes = copy.deepcopy(before_client["attributes"])
+            # ensures idempotency
+            new_param_value = merge_settings_without_absent_nulls(existing_attributes, desired_attributes)
         elif client_param in ["clientScopesBehavior", "client_scopes_behavior"]:
             continue
 
