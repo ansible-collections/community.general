@@ -317,7 +317,7 @@ class TomlParams:
         "integer", "hex_integer", "octal_integer", "binary_integer",
         "float", "boolean", "datetime", "date", "time", "array", "inline_table",
     ]
-    state: str
+    state: t.Literal["absent", "present"]
     backup: bool
     create: bool
     follow: bool
