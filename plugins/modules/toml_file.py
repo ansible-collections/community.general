@@ -305,7 +305,7 @@ class TomlFileError(Exception):
 
 
 # Type alias for array-of-tables index (int for position, "append" for new entry, None for default)
-IndexType = int | t.Literal["append"] | None
+IndexType = t.Union[int, t.Literal["append"], None]  # noqa: UP007 (Python 3.8/3.9 compat)
 
 
 @dataclass
