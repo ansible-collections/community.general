@@ -304,6 +304,10 @@ class TomlFileError(Exception):
     pass
 
 
+# Type alias for array-of-tables index (int for position, "append" for new entry, None for default)
+IndexType = int | t.Literal["append"] | None
+
+
 @dataclass
 class TomlParams:
     """Parameters for TOML file operations."""
@@ -313,9 +317,22 @@ class TomlParams:
     key: str | None
     value: t.Any
     value_type: t.Literal[
-        "auto", "string", "literal_string", "multiline_string", "multiline_literal_string",
-        "integer", "hex_integer", "octal_integer", "binary_integer",
-        "float", "boolean", "datetime", "date", "time", "array", "inline_table",
+        "auto",
+        "string",
+        "literal_string",
+        "multiline_string",
+        "multiline_literal_string",
+        "integer",
+        "hex_integer",
+        "octal_integer",
+        "binary_integer",
+        "float",
+        "boolean",
+        "datetime",
+        "date",
+        "time",
+        "array",
+        "inline_table",
     ]
     state: t.Literal["absent", "present"]
     backup: bool
@@ -327,7 +344,7 @@ class TomlParams:
 class NavContext:
     """Context for table navigation operations."""
 
-    parsed: list[tuple[str, int | str | None]]
+    parsed: list[tuple[str, IndexType]]
     create: bool
 
 
@@ -336,7 +353,7 @@ class NavContext:
 # =============================================================================
 
 
-def parse_table_path(table_path: str | None) -> list[tuple[str, int | str | None]]:
+def parse_table_path(table_path: str | None) -> list[tuple[str, IndexType]]:
     """Parse a table path with optional array indices."""
     if table_path is None or table_path == "":
         return []  # Empty list means document root
@@ -350,7 +367,7 @@ def parse_table_path(table_path: str | None) -> list[tuple[str, int | str | None
             raise TomlFileError(f"Invalid table path segment: '{segment}'")
         name = match.group(1)
         index_str = match.group(2)
-        index: int | str | None
+        index: IndexType
         if index_str is None:
             index = None
         elif index_str == "append":
@@ -362,7 +379,7 @@ def parse_table_path(table_path: str | None) -> list[tuple[str, int | str | None
     return result
 
 
-def _format_path(parsed: list[tuple[str, int | str | None]], up_to: int | None = None) -> str:
+def _format_path(parsed: list[tuple[str, IndexType]], up_to: int | None = None) -> str:
     """Format a parsed path back to string for error messages."""
     if up_to is None:
         up_to = len(parsed)
@@ -563,7 +580,7 @@ def _create_regular_table(current: Table | tomlkit.TOMLDocument, name: str) -> T
 
 
 def _create_table_segment(
-    current: Table | tomlkit.TOMLDocument, name: str, index: int | str | None, ctx: NavContext, i: int
+    current: Table | tomlkit.TOMLDocument, name: str, index: IndexType, ctx: NavContext, i: int
 ) -> Table:
     """Create a new table segment when name not in current."""
     if not ctx.create:
@@ -601,17 +618,17 @@ def _handle_aot_append(aot: AoT, is_last: bool, ctx: NavContext, i: int) -> Tabl
     return new_table
 
 
-def _navigate_aot(aot: AoT, index: int | str | None, is_last: bool, ctx: NavContext, i: int) -> Table:
+def _navigate_aot(aot: AoT, index: IndexType, is_last: bool, ctx: NavContext, i: int) -> Table:
     """Navigate within an array of tables."""
     if index is None:
         return _get_aot_default(aot, ctx, i)
     if index == "append":
         return _handle_aot_append(aot, is_last, ctx, i)
-    return _get_aot_at_index(aot, t.cast(int, index), ctx, i)
+    return _get_aot_at_index(aot, index, ctx, i)
 
 
 def _navigate_existing_segment(
-    current: Table | tomlkit.TOMLDocument, name: str, index: int | str | None, ctx: NavContext, i: int
+    current: Table | tomlkit.TOMLDocument, name: str, index: IndexType, ctx: NavContext, i: int
 ) -> Table | tomlkit.TOMLDocument:
     """Navigate into an existing table segment."""
     item = current[name]
@@ -751,20 +768,19 @@ def remove_table(doc: tomlkit.TOMLDocument, table_path: str) -> bool:
     return True
 
 
-def _remove_aot_entry(aot: AoT, index: int | str) -> bool:
+def _remove_aot_entry(aot: AoT, index: int | t.Literal["append"]) -> bool:
     """Remove an entry from an array of tables."""
     if index == "append":
         raise TomlFileError("Cannot use [append] with state=absent; use [-1] to remove the last entry")
-    int_index = t.cast(int, index)
-    if int_index == -1:
+    if index == -1:
         if len(aot) > 0:
             del aot[-1]
             return True
         return False
-    if 0 <= int_index < len(aot):
-        del aot[int_index]
+    if 0 <= index < len(aot):
+        del aot[index]
         return True
-    raise TomlFileError(f"Array of tables index {int_index} out of range")
+    raise TomlFileError(f"Array of tables index {index} out of range")
 
 
 # =============================================================================
