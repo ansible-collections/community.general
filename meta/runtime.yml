@@ -378,6 +378,10 @@ plugin_routing:
         warning_text: Use community.general.idrac_redfish_info instead.
     idrac_server_config_profile:
       redirect: dellemc.openmanage.idrac_server_config_profile
+    jboss:
+      deprecation:
+        removal_version: 14.0.0
+        warning_text: Use role middleware_automation.wildfly.wildfly_app_deploy instead.
     jenkins_job_facts:
       tombstone:
         removal_version: 3.0.0

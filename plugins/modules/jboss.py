@@ -11,6 +11,12 @@ module: jboss
 short_description: Deploy applications to JBoss
 description:
   - Deploy applications to JBoss standalone using the filesystem.
+deprecated:
+  removed_in: 14.0.0
+  why: The module has not been very actively maintained and there is a better alternative.
+  alternative: >-
+    Use the C(middleware_automation.wildfly.wildfly_app_deploy) role to deploy applications in JBoss or WildFly.
+    See U(https://galaxy.ansible.com/ui/repo/published/middleware_automation/wildfly/content/role/wildfly_app_deploy/) for details.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
