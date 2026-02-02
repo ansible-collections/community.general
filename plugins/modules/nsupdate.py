@@ -248,6 +248,9 @@ class RecordManager:
                 module.fail_json(msg="Missing key_secret")
             except binascii_error as e:
                 module.fail_json(msg=f"TSIG key error: {e}")
+        else:
+            self.keyring = None
+            self.keyname = None
 
         if module.params["zone"] is None:
             if module.params["record"][-1] != ".":
