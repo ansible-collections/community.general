@@ -33,7 +33,7 @@ options:
     description:
       - If V(true), only the keys listed in the O(overrides) will be modified by this module. Any other pre-existing
         keys will be ignored.
-      - If V(false), all locale overrides will be made to match configuration of this module. I.e. any keys 
+      - If V(false), all locale overrides will be made to match configuration of this module. I.e. any keys
         missing from the O(overrides) will be removed regardless of O(state) value.
     type: bool
     default: true
