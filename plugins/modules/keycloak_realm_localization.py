@@ -76,7 +76,7 @@ options:
         required: true
       value:
         description:
-          - The override value for the message key. If ommitted, value will be set to an empty string.
+          - The override value for the message key. If omitted, value will be set to an empty string.
         type: str
         default: ""
         required: false
