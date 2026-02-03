@@ -103,6 +103,7 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: en
     state: present
+    append: false
     overrides:
       - key: greeting
         value: "Hello"
@@ -118,6 +119,7 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: fi
     state: present
+    append: false
     overrides:
       - key: app.title
         value: "Sovellukseni"
@@ -130,9 +132,10 @@ EXAMPLES = r"""
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    parent_id: my-realm
+    parent_id: my-realm    
     locale: de
     state: absent
+    append: false
   delegate_to: localhost
 
 - name: Dry run - see what would change for locale "en"
