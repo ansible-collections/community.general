@@ -76,9 +76,10 @@ options:
         required: true
       value:
         description:
-          - The override value for the message key.
+          - The override value for the message key. If ommitted, value will be set to an empty string.
         type: str
-        required: true
+        default: ""
+        required: false
 
 seealso:
   - module: community.general.keycloak_realm
