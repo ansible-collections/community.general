@@ -217,7 +217,7 @@ def main():
     # Describe a single override record
     overrides_spec = dict(
         key=dict(type="str", no_log=False, required=True),
-        value=dict(type="str", required=True),
+        value=dict(type="str", required=True, default=""),
     )
 
     # Module-specific arguments
