@@ -124,44 +124,6 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
         self.assertEqual(mock_del_value.call_count, 0)
         self.assertIs(exec_info.exception.args[0]["changed"], False)
 
-    def test_present_creates_updates_and_deletes(self):
-        """Create missing, update differing, and delete extra overrides."""
-        module_args = {
-            "auth_keycloak_url": "http://keycloak.url/auth",
-            "token": "{{ access_token }}",
-            "parent_id": "my-realm",
-            "locale": "en",
-            "state": "present",
-            "overrides": [
-                {"key": "a", "value": "1-new"},  # update
-                {"key": "c", "value": "3"},  # create
-            ],
-        }
-        # Before: a=1, b=2; After: a=1-new, c=3
-        return_value_get_localization_values = [
-            {"a": "1", "b": "2"},
-            {"a": "1-new", "c": "3"},
-        ]
-        return_value_set = [None, None]
-        return_value_delete = [None]
-
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_localization_values=return_value_get_localization_values,
-                    set_localization_value=return_value_set,
-                    delete_localization_value=return_value_delete,
-                ) as (mock_get_values, mock_set_value, mock_del_value):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
-
-        self.assertEqual(mock_get_values.call_count, 2)
-        # One delete for 'b'
-        self.assertEqual(mock_del_value.call_count, 1)
-        # Two set calls: update 'a', create 'c'
-        self.assertEqual(mock_set_value.call_count, 2)
-        self.assertIs(exec_info.exception.args[0]["changed"], True)
-
     def test_present_check_mode_only_reports(self):
         """Check mode: report changes, do not call API mutators."""
         module_args = {
@@ -196,34 +158,6 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
         self.assertEqual(mock_del_value.call_count, 0)
         self.assertIs(exec_info.exception.args[0]["changed"], True)
         self.assertIn("would be updated", exec_info.exception.args[0]["msg"])
-
-    def test_absent_deletes_all(self):
-        """Remove all overrides when present."""
-        module_args = {
-            "auth_keycloak_url": "http://keycloak.url/auth",
-            "token": "{{ access_token }}",
-            "parent_id": "my-realm",
-            "locale": "en",
-            "state": "absent",
-        }
-        return_value_get_localization_values = [
-            {"k1": "v1", "k2": "v2"},
-        ]
-        return_value_delete = [None, None]
-
-        with set_module_args(module_args):
-            with mock_good_connection():
-                with patch_keycloak_api(
-                    get_localization_values=return_value_get_localization_values,
-                    delete_localization_value=return_value_delete,
-                ) as (mock_get_values, mock_set_value, mock_del_value):
-                    with self.assertRaises(AnsibleExitJson) as exec_info:
-                        self.module.main()
-
-        self.assertEqual(mock_get_values.call_count, 1)
-        self.assertEqual(mock_del_value.call_count, 2)
-        self.assertEqual(mock_set_value.call_count, 0)
-        self.assertIs(exec_info.exception.args[0]["changed"], True)
 
     def test_absent_idempotent_when_nothing_to_delete(self):
         """No change when locale has no overrides."""
@@ -273,6 +207,147 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
                         self.module.main()
 
         self.assertIn("missing required arguments: value", exec_info.exception.args[0]["msg"])
+
+    def test_present_append_true_preserves_unspecified_keys(self):
+        """With append=True, only modify specified keys, preserve others."""
+        module_args = {
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "token": "{{ access_token }}",
+            "parent_id": "my-realm",
+            "locale": "en",
+            "state": "present",
+            "append": True,
+            "overrides": [
+                {"key": "a", "value": "1-updated"},  # update existing
+                {"key": "c", "value": "3"},  # create new
+            ],
+        }
+        # Before: a=1, b=2; After: a=1-updated, b=2, c=3 (b is preserved)
+        return_value_get_localization_values = [
+            {"a": "1", "b": "2"},
+            {"a": "1-updated", "b": "2", "c": "3"},
+        ]
+        return_value_set = [None, None]
+
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_localization_values=return_value_get_localization_values,
+                    set_localization_value=return_value_set,
+                ) as (mock_get_values, mock_set_value, mock_del_value):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
+
+        self.assertEqual(mock_get_values.call_count, 2)
+        # No deletes - key 'b' should be preserved
+        self.assertEqual(mock_del_value.call_count, 0)
+        # Two set calls: update 'a', create 'c'
+        self.assertEqual(mock_set_value.call_count, 2)
+        self.assertIs(exec_info.exception.args[0]["changed"], True)
+
+    def test_present_append_false_removes_unspecified_keys(self):
+        """With append=False, create new, update existing, and delete unspecified keys."""
+        module_args = {
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "token": "{{ access_token }}",
+            "parent_id": "my-realm",
+            "locale": "en",
+            "state": "present",
+            "append": False,
+            "overrides": [
+                {"key": "a", "value": "1-updated"},  # update
+                {"key": "c", "value": "3"},  # create
+            ],
+        }
+        # Before: a=1, b=2; After: a=1-updated, c=3 (b is removed)
+        return_value_get_localization_values = [
+            {"a": "1", "b": "2"},
+            {"a": "1-updated", "c": "3"},
+        ]
+        return_value_set = [None, None]
+        return_value_delete = [None]
+
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_localization_values=return_value_get_localization_values,
+                    set_localization_value=return_value_set,
+                    delete_localization_value=return_value_delete,
+                ) as (mock_get_values, mock_set_value, mock_del_value):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
+
+        self.assertEqual(mock_get_values.call_count, 2)
+        # One delete for 'b'
+        self.assertEqual(mock_del_value.call_count, 1)
+        # Two set calls: update 'a', create 'c'
+        self.assertEqual(mock_set_value.call_count, 2)
+        self.assertIs(exec_info.exception.args[0]["changed"], True)
+
+    def test_absent_append_true_removes_only_specified_keys(self):
+        """With state=absent and append=True, remove only specified keys."""
+        module_args = {
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "token": "{{ access_token }}",
+            "parent_id": "my-realm",
+            "locale": "en",
+            "state": "absent",
+            "append": True,
+            "overrides": [
+                {"key": "a"},
+            ],
+        }
+        # Before: a=1, b=2; Remove only 'a', keep 'b'
+        return_value_get_localization_values = [
+            {"a": "1", "b": "2"},
+        ]
+        return_value_delete = [None]
+
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_localization_values=return_value_get_localization_values,
+                    delete_localization_value=return_value_delete,
+                ) as (mock_get_values, mock_set_value, mock_del_value):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
+
+        self.assertEqual(mock_get_values.call_count, 1)
+        # One delete for 'a' only
+        self.assertEqual(mock_del_value.call_count, 1)
+        self.assertEqual(mock_set_value.call_count, 0)
+        self.assertIs(exec_info.exception.args[0]["changed"], True)
+
+    def test_absent_append_false_removes_all_keys(self):
+        """With state=absent and append=False, remove all keys."""
+        module_args = {
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "token": "{{ access_token }}",
+            "parent_id": "my-realm",
+            "locale": "en",
+            "state": "absent",
+            "append": False,
+        }
+        # Before: a=1, b=2; Remove all
+        return_value_get_localization_values = [
+            {"a": "1", "b": "2"},
+        ]
+        return_value_delete = [None, None]
+
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_localization_values=return_value_get_localization_values,
+                    delete_localization_value=return_value_delete,
+                ) as (mock_get_values, mock_set_value, mock_del_value):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
+
+        self.assertEqual(mock_get_values.call_count, 1)
+        # Two deletes for 'a' and 'b'
+        self.assertEqual(mock_del_value.call_count, 2)
+        self.assertEqual(mock_set_value.call_count, 0)
+        self.assertIs(exec_info.exception.args[0]["changed"], True)
 
 
 if __name__ == "__main__":

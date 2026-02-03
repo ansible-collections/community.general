@@ -29,6 +29,14 @@ attributes:
     support: full
 
 options:
+  append:
+    description:
+      - If V(true), only the keys listed in the O(overrides) will be modified by this module. Any other pre-existing
+        keys will be ignored.
+      - If V(false), all locale overrides will be made to match configuration of this module. I.e. any keys 
+        missing from the O(overrides) will be removed regardless of O(state) value.
+    type: bool
+    default: true
   locale:
     description:
       - Locale code for which the overrides apply (for example, V(en), V(fi), V(de)).
@@ -42,9 +50,13 @@ options:
   state:
     description:
       - Desired state of localization overrides for the given locale.
-      - On V(present), the set of overrides for the locale will be made to match O(overrides) exactly.
-      - Keys not listed in O(overrides) will be removed, and the listed keys will be created or updated.
-      - On V(absent), all overrides for the locale will be removed.
+      - On V(present), the set of overrides for the locale will be made to match O(overrides).
+        If O(append) is V(false) keys not listed in O(overrides) will be removed,
+        and the listed keys will be created or updated.
+        If O(append) is V(true)  keys not listed in O(overrides) will be ignored,
+        and the listed keys will be created or updated.
+      - On V(absent), overrides for the locale will be removed. If O(append) is V(false), all keys will be removed.
+        If O(append) is V(true), only the keys listed in O(overrides) will be removed.
     type: str
     choices: ['present', 'absent']
     default: present
@@ -163,14 +175,16 @@ end_state:
           value: Bye
 """
 
+from copy import deepcopy
+
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI,
-    keycloak_argument_spec,
-    get_token,
     KeycloakError,
+    get_token,
+    keycloak_argument_spec,
 )
-from ansible.module_utils.basic import AnsibleModule
-from copy import deepcopy
 
 
 def _normalize_overrides_from_api(current):
@@ -212,6 +226,7 @@ def main():
         parent_id=dict(type="str", required=True),
         state=dict(type="str", default="present", choices=["present", "absent"]),
         overrides=dict(type="list", elements="dict", options=overrides_spec, default=[]),
+        append=dict(type="bool", default=True),
     )
 
     argument_spec.update(meta_args)
@@ -239,6 +254,7 @@ def main():
     locale = module.params.get("locale")
     state = module.params.get("state")
     parent_id = module.params.get("parent_id")
+    append = module.params.get("append")
 
     desired_raw = module.params.get("overrides") or []
     desired_map = {r["key"]: r.get("value") for r in desired_raw}
@@ -291,6 +307,11 @@ def main():
                 to_update.append(record)
                 result["changed"] = True
 
+        # ignore any left-overs in to_remove, append is true
+        if append:
+            changeset["overrides"].extend(to_remove)
+            to_remove = []
+
         # Any leftovers in to_remove must be deleted
         if to_remove:
             result["changed"] = True
@@ -325,22 +346,43 @@ def main():
         result["end_state"] = {"locale": locale, "overrides": final_overrides}
 
     elif state == "absent":
-        # Full removal of locale overrides
+        # touch only overrides listed in parameters, leave the rest be
+        if append:
+            to_remove = deepcopy(desired_overrides)
+            to_keep = deepcopy(old_overrides)
+
+            for override in to_remove:
+                found = False
+                for keep in to_keep:
+                    if override["key"] == keep["key"]:
+                        to_keep.remove(keep)
+                        found = True
+                        break
+
+                # not present
+                if not found:
+                    to_remove.remove(override)
+
+            changeset["overrides"] = to_keep
+
+        else:
+            to_remove = old_overrides
+
+        if to_remove:
+            result["changed"] = True
 
         if module._diff:
             result["diff"] = dict(before=before, after=changeset)
 
         if module.check_mode:
-            if old_overrides:
-                result["changed"] = True
-                result["msg"] = "All overrides for locale %s would be deleted." % (locale)
+            if result["changed"]:
+                result["msg"] = "Overrides for locale %s would be deleted." % (locale)
             else:
                 result["msg"] = "No overrides for locale %s to be deleted." % (locale)
 
         else:
-            for override in old_overrides:
+            for override in to_remove:
                 kc.delete_localization_value(locale, override["key"], parent_id)
-                result["changed"] = True
 
             result["msg"] = "Locale %s has no overrides." % (locale)
 
