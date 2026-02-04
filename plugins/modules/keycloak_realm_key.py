@@ -120,6 +120,7 @@ options:
           - ES384
           - ES512
           - AES
+        default: RS256
         type: str
       private_key:
         description:
@@ -447,7 +448,7 @@ def main():
                 ),
                 private_key=dict(type="str", no_log=True),
                 certificate=dict(type="str"),
-                secret_size=dict(type="int"),
+                secret_size=dict(type="int", no_log=True),
                 key_size=dict(type="int"),
                 elliptic_curve=dict(type="str", choices=["P-256", "P-384", "P-521"]),
             ),
