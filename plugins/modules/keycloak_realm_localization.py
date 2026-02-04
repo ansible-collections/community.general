@@ -1,6 +1,5 @@
 # Python
 # !/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright Jakub Danek <danek.ja@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
@@ -11,7 +10,7 @@ module: keycloak_realm_localization
 
 short_description: Manage Keycloak realm localization overrides via the Keycloak API
 
-version_added: 11.4.0
+version_added: 12.4.0
 
 description:
   - Manage per-locale message overrides for a Keycloak realm using the Keycloak Admin REST API.
