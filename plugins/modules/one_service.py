@@ -330,11 +330,11 @@ def get_service(module, auth, pred):
 
 
 def get_service_by_id(module, auth, service_id):
-    return get_service(module, auth, lambda service: (int(service["ID"]) == int(service_id))) if service_id else None
+    return get_service(module, auth, lambda service: int(service["ID"]) == int(service_id)) if service_id else None
 
 
 def get_service_by_name(module, auth, service_name):
-    return get_service(module, auth, lambda service: (service["NAME"] == service_name))
+    return get_service(module, auth, lambda service: service["NAME"] == service_name)
 
 
 def get_service_info(module, auth, service):
@@ -681,13 +681,11 @@ def delete_service(module, auth, service_id):
 
 
 def get_template_by_name(module, auth, template_name):
-    return get_template(module, auth, lambda template: (template["NAME"] == template_name))
+    return get_template(module, auth, lambda template: template["NAME"] == template_name)
 
 
 def get_template_by_id(module, auth, template_id):
-    return (
-        get_template(module, auth, lambda template: (int(template["ID"]) == int(template_id))) if template_id else None
-    )
+    return get_template(module, auth, lambda template: int(template["ID"]) == int(template_id)) if template_id else None
 
 
 def get_template_id(module, auth, requested_id, requested_name):
