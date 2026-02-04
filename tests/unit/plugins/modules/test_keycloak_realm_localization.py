@@ -187,8 +187,8 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
         self.assertEqual(mock_set_value.call_count, 0)
         self.assertIs(exec_info.exception.args[0]["changed"], False)
 
-    def test_present_missing_value_validation(self):
-        """Validation error when state=present and value is missing."""
+    def test_present_value_defaults_to_empty_string(self):
+        """When value is omitted, it defaults to empty string."""
         module_args = {
             "auth_keycloak_url": "http://keycloak.url/auth",
             "token": "{{ access_token }}",
@@ -196,17 +196,30 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
             "locale": "en",
             "state": "present",
             "overrides": [
-                {"key": "greeting"},
+                {"key": "greeting"},  # value omitted, should default to ""
             ],
         }
+        # Before: greeting="Hello"; After: greeting="" (empty string)
+        return_value_get_localization_values = [
+            {"greeting": "Hello"},
+            {"greeting": ""},
+        ]
+        return_value_set = [None]
 
         with set_module_args(module_args):
             with mock_good_connection():
-                with patch_keycloak_api() as (_mock_get_values, _mock_set_value, _mock_del_value):
-                    with self.assertRaises(AnsibleFailJson) as exec_info:
+                with patch_keycloak_api(
+                    get_localization_values=return_value_get_localization_values,
+                    set_localization_value=return_value_set,
+                ) as (mock_get_values, mock_set_value, mock_del_value):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
                         self.module.main()
 
-        self.assertIn("missing required arguments: value", exec_info.exception.args[0]["msg"])
+        self.assertEqual(mock_get_values.call_count, 2)
+        self.assertEqual(mock_del_value.call_count, 0)
+        # One set call to update 'greeting' to empty string
+        self.assertEqual(mock_set_value.call_count, 1)
+        self.assertIs(exec_info.exception.args[0]["changed"], True)
 
     def test_present_append_true_preserves_unspecified_keys(self):
         """With append=True, only modify specified keys, preserve others."""
