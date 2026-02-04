@@ -433,7 +433,7 @@ class KeycloakAPI:
                     token = _request_token_using_refresh_token(self.module.params)
                     self.restheaders["Authorization"] = f"Bearer {token}"
 
-                    r = make_request_catching_401()
+                    r = make_request_catching_401(headers)
                 except KeycloakError as e:
                     # Token refresh returns 400 if token is expired/invalid, so continue on if we get a 400
                     if e.authError is not None and e.authError.code != 400:  # type: ignore # TODO!
@@ -447,7 +447,7 @@ class KeycloakAPI:
                 token = _request_token_using_credentials(self.module.params)
                 self.restheaders["Authorization"] = f"Bearer {token}"
 
-                r = make_request_catching_401()
+                r = make_request_catching_401(headers)
 
         if isinstance(r, Exception):
             # Try to re-auth with client_id and client_secret, if available
@@ -458,7 +458,7 @@ class KeycloakAPI:
                     token = _request_token_using_client_credentials(self.module.params)
                     self.restheaders["Authorization"] = f"Bearer {token}"
 
-                    r = make_request_catching_401()
+                    r = make_request_catching_401(headers)
                 except KeycloakError as e:
                     # Token refresh returns 400 if token is expired/invalid, so continue on if we get a 400
                     if e.authError is not None and e.authError.code != 400:  # type: ignore # TODO!
