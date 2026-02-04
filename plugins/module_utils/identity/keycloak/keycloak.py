@@ -615,7 +615,7 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(
                 e,
-                msg="Could not read localization overrides for realm %s, locale %s: %s" % (realm, locale, str(e)),
+                msg=f"Could not read localization overrides for realm {realm}, locale {locale}: {e}",
                 exception=traceback.format_exc(),
             )
 
@@ -642,8 +642,7 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(
                 e,
-                msg="Could not set localization value in realm %s, locale %s: %s=%s: %s"
-                % (realm, locale, key, value, str(e)),
+                msg=f"Could not set localization value in realm {realm}, locale {locale}: {key}={value}: {e}",
                 exception=traceback.format_exc(),
             )
 
@@ -666,8 +665,7 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(
                 e,
-                msg="Could not delete localization value in realm %s, locale %s, key %s: %s"
-                % (realm, locale, key, str(e)),
+                msg=f"Could not delete localization value in realm {realm}, locale {locale}, key {key}: {e}",
                 exception=traceback.format_exc(),
             )
 

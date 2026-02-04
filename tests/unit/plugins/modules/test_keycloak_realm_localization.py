@@ -1,14 +1,9 @@
 # Python
-# -*- coding: utf-8 -*-
 
 # Copyright Jakub Danek <danek.ja@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
 
 from contextlib import contextmanager
 from io import StringIO
@@ -86,7 +81,7 @@ def mock_good_connection():
 
 class TestKeycloakRealmLocalization(ModuleTestCase):
     def setUp(self):
-        super(TestKeycloakRealmLocalization, self).setUp()
+        super().setUp()
         self.module = keycloak_realm_localization
 
     def test_present_no_change_in_sync(self):

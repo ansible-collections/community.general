@@ -6,10 +6,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
 DOCUMENTATION = r"""
 module: keycloak_realm_localization
 
@@ -326,7 +322,7 @@ def main():
 
             if module.check_mode:
                 # Dry-run: report intent without side effects
-                result["msg"] = "Locale %s overrides would be updated." % (locale)
+                result["msg"] = f"Locale {locale} overrides would be updated."
 
             else:
                 for override in to_remove:
@@ -335,10 +331,10 @@ def main():
                 for override in to_update:
                     kc.set_localization_value(locale, override["key"], override["value"], parent_id)
 
-                result["msg"] = "Locale %s overrides have been updated." % (locale)
+                result["msg"] = f"Locale {locale} overrides have been updated."
 
         else:
-            result["msg"] = "Locale %s overrides are in sync." % (locale)
+            result["msg"] = f"Locale {locale} overrides are in sync."
 
         # For accurate end_state, read back from API unless we are in check_mode
         if not module.check_mode:
@@ -380,15 +376,15 @@ def main():
 
         if module.check_mode:
             if result["changed"]:
-                result["msg"] = "Overrides for locale %s would be deleted." % (locale)
+                result["msg"] = f"Overrides for locale {locale} would be deleted."
             else:
-                result["msg"] = "No overrides for locale %s to be deleted." % (locale)
+                result["msg"] = f"No overrides for locale {locale} to be deleted."
 
         else:
             for override in to_remove:
                 kc.delete_localization_value(locale, override["key"], parent_id)
 
-            result["msg"] = "Locale %s has no overrides." % (locale)
+            result["msg"] = f"Locale {locale} has no overrides."
 
         result["end_state"] = changeset
 
