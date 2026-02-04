@@ -320,10 +320,10 @@ class NetworksModule(OpenNebulaModule):
         return None
 
     def get_template_by_id(self, template_id):
-        return self.get_template(lambda template: (template_id == template.ID))
+        return self.get_template(lambda template: template_id == template.ID)
 
     def get_template_by_name(self, name):
-        return self.get_template(lambda template: (name == template.NAME))
+        return self.get_template(lambda template: name == template.NAME)
 
     def get_template_instance(self, requested_id, requested_name):
         if requested_id:
