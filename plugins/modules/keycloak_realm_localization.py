@@ -133,7 +133,7 @@ EXAMPLES = r"""
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    parent_id: my-realm    
+    parent_id: my-realm
     locale: de
     state: absent
     append: false
