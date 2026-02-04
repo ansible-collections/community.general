@@ -766,11 +766,11 @@ def get_template(module, client, predicate):
 
 
 def get_template_by_name(module, client, template_name):
-    return get_template(module, client, lambda template: (template_name == template.NAME))
+    return get_template(module, client, lambda template: template_name == template.NAME)
 
 
 def get_template_by_id(module, client, template_id):
-    return get_template(module, client, lambda template: (template_id == template.ID))
+    return get_template(module, client, lambda template: template_id == template.ID)
 
 
 def get_template_id(module, client, requested_id, requested_name):
@@ -805,11 +805,11 @@ def get_datastore(module, client, predicate):
 
 
 def get_datastore_by_name(module, client, datastore_name):
-    return get_datastore(module, client, lambda datastore: (datastore_name == datastore.NAME))
+    return get_datastore(module, client, lambda datastore: datastore_name == datastore.NAME)
 
 
 def get_datastore_by_id(module, client, datastore_id):
-    return get_datastore(module, client, lambda datastore: (datastore_id == datastore.ID))
+    return get_datastore(module, client, lambda datastore: datastore_id == datastore.ID)
 
 
 def get_datastore_id(module, client, requested_id, requested_name):
@@ -1396,25 +1396,21 @@ def wait_for_running(module, client, vm, wait_timeout):
         client,
         vm,
         wait_timeout,
-        lambda state, lcm_state: (state in [VM_STATES.index("ACTIVE")] and lcm_state in [LCM_STATES.index("RUNNING")]),
+        lambda state, lcm_state: state in [VM_STATES.index("ACTIVE")] and lcm_state in [LCM_STATES.index("RUNNING")],
     )
 
 
 def wait_for_done(module, client, vm, wait_timeout):
-    return wait_for_state(
-        module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index("DONE")])
-    )
+    return wait_for_state(module, client, vm, wait_timeout, lambda state, lcm_state: state in [VM_STATES.index("DONE")])
 
 
 def wait_for_hold(module, client, vm, wait_timeout):
-    return wait_for_state(
-        module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index("HOLD")])
-    )
+    return wait_for_state(module, client, vm, wait_timeout, lambda state, lcm_state: state in [VM_STATES.index("HOLD")])
 
 
 def wait_for_poweroff(module, client, vm, wait_timeout):
     return wait_for_state(
-        module, client, vm, wait_timeout, lambda state, lcm_state: (state in [VM_STATES.index("POWEROFF")])
+        module, client, vm, wait_timeout, lambda state, lcm_state: state in [VM_STATES.index("POWEROFF")]
     )
 
 
