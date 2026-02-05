@@ -25,7 +25,7 @@ options:
     type: str
     required: true
     env:
-      - name: LOGANALYTICS_DCE_URL
+      - name: ANSIBLE_LOGANALYTICS_DCE_URL
     ini:
       - section: callback_loganalytics
         key: dce_url
@@ -34,7 +34,7 @@ options:
     type: str
     required: true
     env:
-      - name: LOGANALYTICS_DCR_ID
+      - name: ANSIBLE_LOGANALYTICS_DCR_ID
     ini:
       - section: callback_loganalytics
         key: dcr_id
@@ -46,7 +46,7 @@ options:
     required: false
     default: 3
     env:
-      - name: LOGANALYTICS_DISABLE_ATTEMPTS
+      - name: ANSIBLE_LOGANALYTICS_DISABLE_ATTEMPTS
     ini:
       - section: callback_loganalytics
         key: disable_attempts
@@ -56,7 +56,7 @@ options:
     required: false
     default: true
     env:
-      - name: LOGANALYTICS_DISABLE_ON_FAILURE
+      - name: ANSIBLE_LOGANALYTICS_DISABLE_ON_FAILURE
     ini:
       - section: callback_loganalytics
         key: disable_on_failure
@@ -65,7 +65,7 @@ options:
     type: str
     required: true
     env:
-      - name: LOGANALYTICS_CLIENT_ID
+      - name: ANSIBLE_LOGANALYTICS_CLIENT_ID
     ini:
       - section: callback_loganalytics
         key: client_id
@@ -74,7 +74,7 @@ options:
     type: str
     required: true
     env:
-      - name: LOGANALYTICS_CLIENT_SECRET
+      - name: ANSIBLE_LOGANALYTICS_CLIENT_SECRET
     ini:
       - section: callback_loganalytics
         key: client_secret
@@ -84,7 +84,7 @@ options:
     required: false
     default: false
     env:
-      - name: LOGANALYTICS_INCLUDE_CONTENT
+      - name: ANSIBLE_LOGANALYTICS_INCLUDE_CONTENT
     ini:
       - section: callback_loganalytics
         key: include_content
@@ -94,7 +94,7 @@ options:
     required: false
     default: false
     env:
-      - name: LOGANALYTICS_INCLUDE_TASK_ARGS
+      - name: ANSIBLE_LOGANALYTICS_INCLUDE_TASK_ARGS
     ini:
       - section: callback_loganalytics
         key: include_task_args
@@ -103,7 +103,7 @@ options:
     type: str
     required: true
     env:
-      - name: LOGANALYTICS_STREAM_NAME
+      - name: ANSIBLE_LOGANALYTICS_STREAM_NAME
     ini:
       - section: callback_loganalytics
         key: stream_name
@@ -112,7 +112,7 @@ options:
     type: str
     required: true
     env:
-      - name: LOGANALYTICS_TENANT_ID
+      - name: ANSIBLE_LOGANALYTICS_TENANT_ID
     ini:
       - section: callback_loganalytics
         key: tenant_id
@@ -122,7 +122,7 @@ options:
     required: false
     default: 2
     env:
-      - name: LOGANALYTICS_TIMEOUT
+      - name: ANSIBLE_LOGANALYTICS_TIMEOUT
     ini:
       - section: callback_loganalytics
         key: timeout
@@ -138,12 +138,12 @@ examples: |
     [defaults]
     callback_enabled = community.general.loganalytics_ingestion
   Set the environment variables:
-    export LOGANALYTICS_DCE_URL=https://my-dce.ingest.monitor.azure.com
-    export LOGANALYTICS_DCR_ID=dcr-xxxxxx
-    export LOGANALYTICS_CLIENT_ID=xxxxxxxx
-    export LOGANALYTICS_CLIENT_SECRET=xxxxxxxx
-    export LOGANALYTICS_TENANT_ID=xxxxxxxx
-    export LOGANALYTICS_STREAM_NAME=Custom-MyTable
+    export ANSIBLE_LOGANALYTICS_DCE_URL=https://my-dce.ingest.monitor.azure.com
+    export ANSIBLE_LOGANALYTICS_DCR_ID=dcr-xxxxxx
+    export ANSIBLE_LOGANALYTICS_CLIENT_ID=xxxxxxxx
+    export ANSIBLE_LOGANALYTICS_CLIENT_SECRET=xxxxxxxx
+    export ANSIBLE_LOGANALYTICS_TENANT_ID=xxxxxxxx
+    export ANSIBLE_LOGANALYTICS_STREAM_NAME=Custom-MyTable
 '''
 
 import getpass
