@@ -66,7 +66,9 @@ options:
       - The value V(rsa-enc) has been added in community.general 8.2.0.
       - The values V(rsa-generated), V(hmac-generated), V(aes-generated), and V(ecdsa-generated) have been added in
         community.general 12.4.0. These are auto-generated key providers where Keycloak manages the key material.
-    choices: ['rsa', 'rsa-enc', 'rsa-generated', 'hmac-generated', 'aes-generated', 'ecdsa-generated']
+      - The values V(rsa-enc-generated), V(ecdh-generated), and V(eddsa-generated) have been added in
+        community.general 12.4.0. These complete the set of auto-generated key providers available in Keycloak.
+    choices: ['rsa', 'rsa-enc', 'rsa-generated', 'rsa-enc-generated', 'hmac-generated', 'aes-generated', 'ecdsa-generated', 'ecdh-generated', 'eddsa-generated']
     default: 'rsa'
     type: str
   config:
@@ -98,10 +100,14 @@ options:
             added in community.general 8.2.0.
           - The values V(HS256), V(HS384), V(HS512) (for HMAC), V(ES256), V(ES384), V(ES512) (for ECDSA), and V(AES)
             have been added in community.general 12.4.0.
+          - The values V(ECDH_ES), V(ECDH_ES_A128KW), V(ECDH_ES_A192KW), V(ECDH_ES_A256KW) (for ECDH key exchange),
+            and V(Ed25519), V(Ed448) (for EdDSA signing) have been added in community.general 12.4.0.
           - For O(provider_id=rsa) and O(provider_id=rsa-generated), defaults to V(RS256).
-          - For O(provider_id=rsa-enc), must be one of V(RSA1_5), V(RSA-OAEP), V(RSA-OAEP-256) (required, no default).
+          - For O(provider_id=rsa-enc) and O(provider_id=rsa-enc-generated), must be one of V(RSA1_5), V(RSA-OAEP), V(RSA-OAEP-256) (required, no default).
           - For O(provider_id=hmac-generated), must be one of V(HS256), V(HS384), V(HS512) (required, no default).
           - For O(provider_id=ecdsa-generated), must be one of V(ES256), V(ES384), V(ES512) (required, no default).
+          - For O(provider_id=ecdh-generated), must be one of V(ECDH_ES), V(ECDH_ES_A128KW), V(ECDH_ES_A192KW), V(ECDH_ES_A256KW) (required, no default).
+          - For O(provider_id=eddsa-generated), this option is not used (the algorithm is determined by O(config.elliptic_curve)).
           - For O(provider_id=aes-generated), this option is not used (AES is always used).
         choices:
           - RS256
@@ -120,6 +126,12 @@ options:
           - ES384
           - ES512
           - AES
+          - ECDH_ES
+          - ECDH_ES_A128KW
+          - ECDH_ES_A192KW
+          - ECDH_ES_A256KW
+          - Ed25519
+          - Ed448
         default: RS256
         type: str
       private_key:
@@ -147,16 +159,16 @@ options:
       key_size:
         description:
           - The size of the generated key in bits.
-          - Only applicable to O(provider_id=rsa-generated).
+          - Only applicable to O(provider_id=rsa-generated) and O(provider_id=rsa-enc-generated).
           - Valid values are V(1024), V(2048), V(4096). Default is V(2048).
         type: int
       elliptic_curve:
         description:
-          - The elliptic curve to use for ECDSA keys.
-          - Only applicable to O(provider_id=ecdsa-generated).
-          - Default is V(P-256).
+          - The elliptic curve to use for ECDSA, ECDH, or EdDSA keys.
+          - For O(provider_id=ecdsa-generated) and O(provider_id=ecdh-generated), valid values are V(P-256), V(P-384), V(P-521). Default is V(P-256).
+          - For O(provider_id=eddsa-generated), valid values are V(Ed25519), V(Ed448). Default is V(Ed25519).
         type: str
-        choices: ['P-256', 'P-384', 'P-521']
+        choices: ['P-256', 'P-384', 'P-521', 'Ed25519', 'Ed448']
 notes:
   - Current value of the private key cannot be fetched from Keycloak. Therefore comparing its desired state to the current
     state is not possible.
@@ -164,8 +176,9 @@ notes:
     state of the certificate to the desired state (which may be empty) is not possible.
   - Due to the private key and certificate options the module is B(not fully idempotent). You can use O(force=true) to force
     the module to ensure updating if you know that the private key might have changed.
-  - For auto-generated providers (V(rsa-generated), V(hmac-generated), V(aes-generated), V(ecdsa-generated)), Keycloak manages
-    the key material automatically. The O(config.private_key) and O(config.certificate) options are not used.
+  - For auto-generated providers (V(rsa-generated), V(rsa-enc-generated), V(hmac-generated), V(aes-generated), V(ecdsa-generated),
+    V(ecdh-generated), V(eddsa-generated)), Keycloak manages the key material automatically. The O(config.private_key) and
+    O(config.certificate) options are not used.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
@@ -291,6 +304,56 @@ EXAMPLES = r"""
     auth_realm: master
     config:
       priority: 100
+
+- name: Create RSA encryption key (auto-generated)
+  community.general.keycloak_realm_key:
+    name: rsa-enc-auto
+    state: present
+    parent_id: master
+    provider_id: rsa-enc-generated
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: keycloak
+    auth_password: keycloak
+    auth_realm: master
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RSA-OAEP
+      key_size: 2048
+
+- name: Create ECDH key exchange key (auto-generated)
+  community.general.keycloak_realm_key:
+    name: ecdh-custom
+    state: present
+    parent_id: master
+    provider_id: ecdh-generated
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: keycloak
+    auth_password: keycloak
+    auth_realm: master
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: ECDH_ES
+      elliptic_curve: P-256
+
+- name: Create EdDSA signing key (auto-generated)
+  community.general.keycloak_realm_key:
+    name: eddsa-custom
+    state: present
+    parent_id: master
+    provider_id: eddsa-generated
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: keycloak
+    auth_password: keycloak
+    auth_realm: master
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      elliptic_curve: Ed25519
 """
 
 RETURN = r"""
@@ -365,36 +428,54 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 # Provider IDs that require private_key and certificate
 IMPORTED_KEY_PROVIDERS = ["rsa", "rsa-enc"]
 # Provider IDs that auto-generate keys
-GENERATED_KEY_PROVIDERS = ["rsa-generated", "hmac-generated", "aes-generated", "ecdsa-generated"]
+GENERATED_KEY_PROVIDERS = ["rsa-generated", "rsa-enc-generated", "hmac-generated", "aes-generated", "ecdsa-generated", "ecdh-generated", "eddsa-generated"]
 
 # Mapping of Ansible parameter names to Keycloak config property names
-# for cases where camel() conversion doesn't produce the correct result
+# for cases where camel() conversion doesn't produce the correct result.
+# Each provider type may use a different config key for elliptic curve.
 CONFIG_PARAM_MAPPING = {
     "elliptic_curve": "ecdsaEllipticCurveKey",
 }
 
+# Provider-specific config key names for elliptic_curve parameter
+# ECDSA and ECDH both use the same curves (P-256, P-384, P-521) but different config keys
+# EdDSA uses different curves (Ed25519, Ed448) with its own config key
+ELLIPTIC_CURVE_CONFIG_KEYS = {
+    "ecdsa-generated": "ecdsaEllipticCurveKey",
+    "ecdh-generated": "ecdhEllipticCurveKey",
+    "eddsa-generated": "eddsaEllipticCurveKey",
+}
+
 # Valid algorithm choices per provider type
-# Note: aes-generated doesn't use algorithm config - it's always AES
+# Note: aes-generated and eddsa-generated don't use algorithm config
 PROVIDER_ALGORITHMS = {
     "rsa": ["RS256", "RS384", "RS512", "PS256", "PS384", "PS512"],
     "rsa-enc": ["RSA1_5", "RSA-OAEP", "RSA-OAEP-256"],
     "rsa-generated": ["RS256", "RS384", "RS512", "PS256", "PS384", "PS512"],
+    "rsa-enc-generated": ["RSA1_5", "RSA-OAEP", "RSA-OAEP-256"],
     "hmac-generated": ["HS256", "HS384", "HS512"],
     "ecdsa-generated": ["ES256", "ES384", "ES512"],
+    "ecdh-generated": ["ECDH_ES", "ECDH_ES_A128KW", "ECDH_ES_A192KW", "ECDH_ES_A256KW"],
 }
 
 # Providers that don't use the algorithm config parameter
-PROVIDERS_WITHOUT_ALGORITHM = ["aes-generated"]
+# eddsa-generated: algorithm is determined by the elliptic curve (Ed25519 or Ed448)
+# aes-generated: always uses AES algorithm
+PROVIDERS_WITHOUT_ALGORITHM = ["aes-generated", "eddsa-generated"]
 
 # Providers where the RS256 default is valid (for backward compatibility)
 PROVIDERS_WITH_RS256_DEFAULT = ["rsa", "rsa-generated"]
 
 
-def get_keycloak_config_key(param_name):
+def get_keycloak_config_key(param_name, provider_id=None):
     """Convert Ansible parameter name to Keycloak config key.
 
     Uses explicit mapping if available, otherwise applies camelCase conversion.
+    For elliptic_curve, the config key depends on the provider type.
     """
+    # Handle elliptic_curve specially - each provider uses a different config key
+    if param_name == "elliptic_curve" and provider_id in ELLIPTIC_CURVE_CONFIG_KEYS:
+        return ELLIPTIC_CURVE_CONFIG_KEYS[provider_id]
     if param_name in CONFIG_PARAM_MAPPING:
         return CONFIG_PARAM_MAPPING[param_name]
     return camel(param_name)
@@ -416,7 +497,17 @@ def main():
         provider_id=dict(
             type="str",
             default="rsa",
-            choices=["rsa", "rsa-enc", "rsa-generated", "hmac-generated", "aes-generated", "ecdsa-generated"],
+            choices=[
+                "rsa",
+                "rsa-enc",
+                "rsa-generated",
+                "rsa-enc-generated",
+                "hmac-generated",
+                "aes-generated",
+                "ecdsa-generated",
+                "ecdh-generated",
+                "eddsa-generated",
+            ],
         ),
         config=dict(
             type="dict",
@@ -444,13 +535,19 @@ def main():
                         "ES384",
                         "ES512",
                         "AES",
+                        "ECDH_ES",
+                        "ECDH_ES_A128KW",
+                        "ECDH_ES_A192KW",
+                        "ECDH_ES_A256KW",
+                        "Ed25519",
+                        "Ed448",
                     ],
                 ),
                 private_key=dict(type="str", no_log=True),
                 certificate=dict(type="str"),
                 secret_size=dict(type="int", no_log=True),
                 key_size=dict(type="int"),
-                elliptic_curve=dict(type="str", choices=["P-256", "P-384", "P-521"]),
+                elliptic_curve=dict(type="str", choices=["P-256", "P-384", "P-521", "Ed25519", "Ed448"]),
             ),
         ),
     )
@@ -500,8 +597,26 @@ def main():
                         f"Valid choices are: {', '.join(valid_algorithms)}"
                     )
         elif provider_id in PROVIDERS_WITHOUT_ALGORITHM and algorithm is not None and algorithm != "RS256":
-            # aes-generated doesn't use algorithm - only warn if user explicitly set a non-default value
+            # aes-generated and eddsa-generated don't use algorithm - only warn if user explicitly set a non-default value
             module.warn(f"algorithm is ignored for provider_id '{provider_id}'")
+
+    # Validate elliptic curve for providers that use it
+    if state == "present":
+        elliptic_curve = config.get("elliptic_curve")
+        if provider_id in ["ecdsa-generated", "ecdh-generated"] and elliptic_curve is not None:
+            valid_curves = ["P-256", "P-384", "P-521"]
+            if elliptic_curve not in valid_curves:
+                module.fail_json(
+                    msg=f"elliptic_curve '{elliptic_curve}' is not valid for provider_id '{provider_id}'. "
+                    f"Valid choices are: {', '.join(valid_curves)}"
+                )
+        elif provider_id == "eddsa-generated" and elliptic_curve is not None:
+            valid_curves = ["Ed25519", "Ed448"]
+            if elliptic_curve not in valid_curves:
+                module.fail_json(
+                    msg=f"elliptic_curve '{elliptic_curve}' is not valid for provider_id '{provider_id}'. "
+                    f"Valid choices are: {', '.join(valid_curves)}"
+                )
 
     # Initialize the result object. Only "changed" seems to have special
     # meaning for Ansible.
@@ -553,7 +668,8 @@ def main():
                 if raw_value is None:
                     continue
                 # Use custom mapping if available, otherwise camelCase
-                keycloak_key = get_keycloak_config_key(config_param)
+                # Pass provider_id for elliptic_curve which uses different config keys per provider
+                keycloak_key = get_keycloak_config_key(config_param, provider_id)
                 changeset["config"][keycloak_key] = []
                 if isinstance(raw_value, bool):
                     value = str(raw_value).lower()

@@ -773,6 +773,234 @@
       - result.end_state == {}
       - result.msg == "Realm key hmac-generated deleted"
 
+# ============================================================
+# RSA encryption generated key tests (rsa-enc-generated)
+# ============================================================
+
+- name: Create RSA encryption key (rsa-enc-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-enc-gen-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: rsa-enc-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RSA-OAEP
+      key_size: 2048
+  register: result
+
+- name: Assert RSA encryption key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "rsa-enc-gen-test-key"
+      - result.end_state.providerId == "rsa-enc-generated"
+      - result.end_state.config.algorithm == ["RSA-OAEP"]
+      - result.end_state.config.keySize == ["2048"]
+      - result.msg == "Realm key rsa-enc-gen-test-key created"
+
+- name: Create RSA encryption key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-enc-gen-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: rsa-enc-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RSA-OAEP
+      key_size: 2048
+  register: result
+
+- name: Assert RSA encryption key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key rsa-enc-gen-test-key was in sync"
+
+- name: Remove RSA encryption key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-enc-gen-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: rsa-enc-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert RSA encryption key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key rsa-enc-gen-test-key deleted"
+
+# ============================================================
+# ECDH generated key tests (ecdh-generated)
+# ============================================================
+
+- name: Create ECDH key (ecdh-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdh-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: ecdh-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: ECDH_ES
+      elliptic_curve: P-256
+  register: result
+
+- name: Assert ECDH key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "ecdh-test-key"
+      - result.end_state.providerId == "ecdh-generated"
+      - result.end_state.config.algorithm == ["ECDH_ES"]
+      - result.end_state.config.ecdhEllipticCurveKey == ["P-256"]
+      - result.msg == "Realm key ecdh-test-key created"
+
+- name: Create ECDH key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdh-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: ecdh-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: ECDH_ES
+      elliptic_curve: P-256
+  register: result
+
+- name: Assert ECDH key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key ecdh-test-key was in sync"
+
+- name: Remove ECDH key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdh-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: ecdh-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert ECDH key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key ecdh-test-key deleted"
+
+# ============================================================
+# EdDSA generated key tests (eddsa-generated)
+# ============================================================
+
+- name: Create EdDSA key (eddsa-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: eddsa-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: eddsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      elliptic_curve: Ed25519
+  register: result
+
+- name: Assert EdDSA key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "eddsa-test-key"
+      - result.end_state.providerId == "eddsa-generated"
+      - result.end_state.config.eddsaEllipticCurveKey == ["Ed25519"]
+      - result.msg == "Realm key eddsa-test-key created"
+
+- name: Create EdDSA key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: eddsa-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: eddsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      elliptic_curve: Ed25519
+  register: result
+
+- name: Assert EdDSA key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key eddsa-test-key was in sync"
+
+- name: Remove EdDSA key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: eddsa-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: eddsa-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert EdDSA key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key eddsa-test-key deleted"
+
 - name: Remove Keycloak test realm
   community.general.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
