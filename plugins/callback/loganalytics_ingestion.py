@@ -1,136 +1,135 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 DOCUMENTATION = '''
-    name: loganalytics_ingestion
-    type: notification
-    short_description: Posts task results to an Azure Log Analytics workspace using the new Logs Ingestion API
-    author:
-      - Wade Cline (@wtcline-intc) <wade.cline@intel.com>
-      - Sriramoju Vishal Bharath (@sriramoj) <sriramoju.vishal.bharath@intel.com>
-      - Cyrus Li (@zhcli) <cyrus1006@gmail.com>
+name: loganalytics_ingestion
+type: notification
+short_description: Posts task results to an Azure Log Analytics workspace using the new Logs Ingestion API
+author:
+  - Wade Cline (@wtcline-intc) <wade.cline@intel.com>
+  - Sriramoju Vishal Bharath (@vsh47) <sriramoju.vishal.bharath@intel.com>
+  - Cyrus Li (@zhcli) <cyrus1006@gmail.com>
+description:
+  - This callback plugin will post task results in JSON format to an Azure Log Analytics workspace using the new Logs Ingestion API.
+version_added: "10.7.0"
+requirements:
+  - The callback plugin has been enabled
+  - an Azure Log Analytics workspace has been established
+  - a Data Collection Rule (DCR) and custom table are created
+options:
+  dce_url:
+    description: URL of the Data Collection Endpoint (DCE) for Azure Logs Ingestion API.
+    type: str
+    required: true
+    env:
+      - name: LOGANALYTICS_DCE_URL
+    ini:
+      - section: callback_loganalytics
+        key: dce_url
+  dcr_id:
+    description: Data Collection Rule (DCR) ID for the Azure Log Ingestion API.
+    type: str
+    required: true
+    env:
+      - name: LOGANALYTICS_DCR_ID
+    ini:
+      - section: callback_loganalytics
+        key: dcr_id
+  disable_attempts:
     description:
-      - This callback plugin will post task results in JSON format to an Azure Log Analytics workspace using the new Logs Ingestion API.
-    version_added: "10.7.0"
-    requirements:
-      - The callback plugin has been enabled
-      - an Azure Log Analytics workspace has been established
-      - a Data Collection Rule (DCR) and custom table are created
-    options:
-      dce_url:
-        description: URL of the Data Collection Endpoint (DCE) for Azure Logs Ingestion API.
-        type: str
-        required: true
-        env:
-          - name: LOGANALYTICS_DCE_URL
-        ini:
-          - section: callback_loganalytics
-            key: dce_url
-      dcr_id:
-        description: Data Collection Rule (DCR) ID for the Azure Log Ingestion API.
-        type: str
-        required: true
-        env:
-          - name: LOGANALYTICS_DCR_ID
-        ini:
-          - section: callback_loganalytics
-            key: dcr_id
-      disable_attempts:
-        description:
-          - When O(disable_on_failure=true), number of module failures that must occur before the module is disabled.
-          - This helps prevent outright module failure from a single, transient network issue.
-        type: int
-        required: false
-        default: 3
-        env:
-          - name: LOGANALYTICS_DISABLE_ATTEMPTS
-        ini:
-          - section: callback_loganalytics
-            key: disable_attempts
-      disable_on_failure:
-        description: Stop trying to send data on module failure.
-        type: bool
-        required: false
-        default: true
-        env:
-          - name: LOGANALYTICS_DISABLE_ON_FAILURE
-        ini:
-          - section: callback_loganalytics
-            key: disable_on_failure
-      client_id:
-        description: Client ID of the Azure App registration for OAuth2 authentication ("Modern Authentication").
-        type: str
-        required: true
-        env:
-          - name: LOGANALYTICS_CLIENT_ID
-        ini:
-          - section: callback_loganalytics
-            key: client_id
-      client_secret:
-        description: Client Secret of the Azure App registration.
-        type: str
-        required: true
-        env:
-          - name: LOGANALYTICS_CLIENT_SECRET
-        ini:
-          - section: callback_loganalytics
-            key: client_secret
-      include_content:
-        description: Send the content to the Azure Log Analytics workspace.
-        type: bool
-        required: false
-        default: false
-        env:
-          - name: LOGANALYTICS_INCLUDE_CONTENT
-        ini:
-          - section: callback_loganalytics
-            key: include_content
-      include_task_args:
-        description: Send the task args to the Azure Log Analytics workspace.
-        type: bool
-        required: false
-        default: false
-        env:
-          - name: LOGANALYTICS_INCLUDE_TASK_ARGS
-        ini:
-          - section: callback_loganalytics
-            key: include_task_args
-      stream_name:
-        description: The name of the stream used to send the logs to the Azure Log Analytics workspace.
-        type: str
-        required: true
-        env:
-          - name: LOGANALYTICS_STREAM_NAME
-        ini:
-          - section: callback_loganalytics
-            key: stream_name
-      tenant_id:
-        description: Tenant ID for the Azure Active Directory.
-        type: str
-        required: true
-        env:
-          - name: LOGANALYTICS_TENANT_ID
-        ini:
-          - section: callback_loganalytics
-            key: tenant_id
-      timeout:
-        description: Timeout for the HTTP requests to the Azure Log Analytics API.
-        type: int
-        required: false
-        default: 2
-        env:
-          - name: LOGANALYTICS_TIMEOUT
-        ini:
-          - section: callback_loganalytics
-            key: timeout
-    seealso:
-      - name: Logs Ingestion API
-        description: Overview of Logs Ingestion API in Azure Monitor
-        link: https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview
+      - When O(disable_on_failure=true), number of module failures that must occur before the module is disabled.
+      - This helps prevent outright module failure from a single, transient network issue.
+    type: int
+    required: false
+    default: 3
+    env:
+      - name: LOGANALYTICS_DISABLE_ATTEMPTS
+    ini:
+      - section: callback_loganalytics
+        key: disable_attempts
+  disable_on_failure:
+    description: Stop trying to send data on module failure.
+    type: bool
+    required: false
+    default: true
+    env:
+      - name: LOGANALYTICS_DISABLE_ON_FAILURE
+    ini:
+      - section: callback_loganalytics
+        key: disable_on_failure
+  client_id:
+    description: Client ID of the Azure App registration for OAuth2 authentication ("Modern Authentication").
+    type: str
+    required: true
+    env:
+      - name: LOGANALYTICS_CLIENT_ID
+    ini:
+      - section: callback_loganalytics
+        key: client_id
+  client_secret:
+    description: Client Secret of the Azure App registration.
+    type: str
+    required: true
+    env:
+      - name: LOGANALYTICS_CLIENT_SECRET
+    ini:
+      - section: callback_loganalytics
+        key: client_secret
+  include_content:
+    description: Send the content to the Azure Log Analytics workspace.
+    type: bool
+    required: false
+    default: false
+    env:
+      - name: LOGANALYTICS_INCLUDE_CONTENT
+    ini:
+      - section: callback_loganalytics
+        key: include_content
+  include_task_args:
+    description: Send the task args to the Azure Log Analytics workspace.
+    type: bool
+    required: false
+    default: false
+    env:
+      - name: LOGANALYTICS_INCLUDE_TASK_ARGS
+    ini:
+      - section: callback_loganalytics
+        key: include_task_args
+  stream_name:
+    description: The name of the stream used to send the logs to the Azure Log Analytics workspace.
+    type: str
+    required: true
+    env:
+      - name: LOGANALYTICS_STREAM_NAME
+    ini:
+      - section: callback_loganalytics
+        key: stream_name
+  tenant_id:
+    description: Tenant ID for the Azure Active Directory.
+    type: str
+    required: true
+    env:
+      - name: LOGANALYTICS_TENANT_ID
+    ini:
+      - section: callback_loganalytics
+        key: tenant_id
+  timeout:
+    description: Timeout for the HTTP requests to the Azure Log Analytics API.
+    type: int
+    required: false
+    default: 2
+    env:
+      - name: LOGANALYTICS_TIMEOUT
+    ini:
+      - section: callback_loganalytics
+        key: timeout
+seealso:
+  - name: Logs Ingestion API
+    description: Overview of Logs Ingestion API in Azure Monitor
+    link: https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview
 '''
 
 EXAMPLES = '''
