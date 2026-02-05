@@ -64,11 +64,23 @@ options:
     description:
       - The name of the "provider ID" for the key.
       - The value V(rsa-enc) has been added in community.general 8.2.0.
+      - The value V(java-keystore) has been added in community.general 12.4.0. This provider imports keys from
+        a Java Keystore (JKS or PKCS12) file located on the Keycloak server filesystem.
       - The values V(rsa-generated), V(hmac-generated), V(aes-generated), and V(ecdsa-generated) have been added in
         community.general 12.4.0. These are auto-generated key providers where Keycloak manages the key material.
       - The values V(rsa-enc-generated), V(ecdh-generated), and V(eddsa-generated) have been added in
         community.general 12.4.0. These complete the set of auto-generated key providers available in Keycloak.
-    choices: ['rsa', 'rsa-enc', 'rsa-generated', 'rsa-enc-generated', 'hmac-generated', 'aes-generated', 'ecdsa-generated', 'ecdh-generated', 'eddsa-generated']
+    choices:
+      - rsa
+      - rsa-enc
+      - java-keystore
+      - rsa-generated
+      - rsa-enc-generated
+      - hmac-generated
+      - aes-generated
+      - ecdsa-generated
+      - ecdh-generated
+      - eddsa-generated
     default: 'rsa'
     type: str
   config:
@@ -102,7 +114,7 @@ options:
             have been added in community.general 12.4.0.
           - The values V(ECDH_ES), V(ECDH_ES_A128KW), V(ECDH_ES_A192KW), V(ECDH_ES_A256KW) (for ECDH key exchange),
             and V(Ed25519), V(Ed448) (for EdDSA signing) have been added in community.general 12.4.0.
-          - For O(provider_id=rsa) and O(provider_id=rsa-generated), defaults to V(RS256).
+          - For O(provider_id=rsa), O(provider_id=rsa-generated), and O(provider_id=java-keystore), defaults to V(RS256).
           - For O(provider_id=rsa-enc) and O(provider_id=rsa-enc-generated), must be one of V(RSA1_5), V(RSA-OAEP), V(RSA-OAEP-256) (required, no default).
           - For O(provider_id=hmac-generated), must be one of V(HS256), V(HS384), V(HS512) (required, no default).
           - For O(provider_id=ecdsa-generated), must be one of V(ES256), V(ES384), V(ES512) (required, no default).
@@ -169,6 +181,46 @@ options:
           - For O(provider_id=eddsa-generated), valid values are V(Ed25519), V(Ed448). Default is V(Ed25519).
         type: str
         choices: ['P-256', 'P-384', 'P-521', 'Ed25519', 'Ed448']
+      keystore:
+        description:
+          - Path to the Java Keystore file on the Keycloak server filesystem.
+          - Required when O(provider_id=java-keystore).
+          - Added in community.general 12.4.0.
+        type: str
+      keystore_password:
+        description:
+          - Password for the Java Keystore.
+          - Required when O(provider_id=java-keystore).
+          - Added in community.general 12.4.0.
+        type: str
+      key_alias:
+        description:
+          - Alias of the key within the keystore.
+          - Required when O(provider_id=java-keystore).
+          - Added in community.general 12.4.0.
+        type: str
+      key_password:
+        description:
+          - Password for the key within the keystore.
+          - If not specified, the O(config.keystore_password) is used.
+          - Only applicable to O(provider_id=java-keystore).
+          - Added in community.general 12.4.0.
+        type: str
+  update_password:
+    description:
+      - Controls when passwords are sent to Keycloak for V(java-keystore) provider.
+      - V(always) - Always send passwords. Keycloak will update the component even if passwords
+        have not changed. Use when you need to ensure passwords are updated.
+      - V(on_create) - Only send passwords when creating a new component. When updating an
+        existing component, send the masked value to preserve existing passwords. This makes
+        the module idempotent for password fields.
+      - This is necessary because Keycloak masks passwords in API responses (returns C(**********)),
+        making comparison impossible.
+      - Has no effect for providers other than V(java-keystore).
+      - Added in community.general 12.4.0.
+    type: str
+    choices: ['always', 'on_create']
+    default: always
 notes:
   - Current value of the private key cannot be fetched from Keycloak. Therefore comparing its desired state to the current
     state is not possible.
@@ -179,6 +231,9 @@ notes:
   - For auto-generated providers (V(rsa-generated), V(rsa-enc-generated), V(hmac-generated), V(aes-generated), V(ecdsa-generated),
     V(ecdh-generated), V(eddsa-generated)), Keycloak manages the key material automatically. The O(config.private_key) and
     O(config.certificate) options are not used.
+  - For V(java-keystore) provider, the O(config.keystore_password) and O(config.key_password) values are returned masked by
+    Keycloak. Therefore comparing their current state to the desired state is not possible. Use O(update_password=on_create)
+    for idempotent playbooks, or use O(update_password=always) (default) if you need to ensure passwords are updated.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
@@ -354,6 +409,48 @@ EXAMPLES = r"""
       active: true
       priority: 100
       elliptic_curve: Ed25519
+
+- name: Import key from Java Keystore (always update passwords)
+  community.general.keycloak_realm_key:
+    name: jks-imported
+    state: present
+    parent_id: master
+    provider_id: java-keystore
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: keycloak
+    auth_password: keycloak
+    auth_realm: master
+    # update_password: always is the default - passwords are always sent to Keycloak
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: /opt/keycloak/conf/keystore.jks
+      keystore_password: "{{ keystore_password }}"
+      key_alias: mykey
+      key_password: "{{ key_password }}"
+
+- name: Import key from Java Keystore (idempotent - only set password on create)
+  community.general.keycloak_realm_key:
+    name: jks-idempotent
+    state: present
+    parent_id: master
+    provider_id: java-keystore
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: keycloak
+    auth_password: keycloak
+    auth_realm: master
+    update_password: on_create  # Only send passwords when creating, preserve existing on update
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: /opt/keycloak/conf/keystore.jks
+      keystore_password: "{{ keystore_password }}"
+      key_alias: mykey
+      key_password: "{{ key_password }}"
 """
 
 RETURN = r"""
@@ -410,8 +507,36 @@ end_state:
             "140"
           ]
         }
+    key_info:
+      description:
+        - Cryptographic key metadata fetched from the realm keys endpoint.
+        - Only returned for V(java-keystore) provider when O(state=present) and not in check mode.
+        - This includes the key ID (kid) and certificate fingerprint, which can be used to detect
+          if the actual cryptographic key changed.
+        - Added in community.general 12.4.0.
+      type: dict
+      returned: when O(provider_id=java-keystore) and O(state=present)
+      contains:
+        kid:
+          description: The key ID (kid) - unique identifier for the cryptographic key.
+          type: str
+          sample: bN7p5Nc_V2M7N_-mb5vVSRVPKq5qD_OuARInB9ofsJ0
+        certificate_fingerprint:
+          description: SHA256 fingerprint of the certificate in colon-separated hex format.
+          type: str
+          sample: "A1:B2:C3:D4:E5:F6:..."
+        status:
+          description: The key status (ACTIVE, PASSIVE, DISABLED).
+          type: str
+          sample: ACTIVE
+        valid_to:
+          description: Certificate expiration timestamp in milliseconds since epoch.
+          type: int
+          sample: 1801789047000
 """
 
+import base64
+import hashlib
 from copy import deepcopy
 from urllib.parse import urlencode
 
@@ -427,6 +552,8 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 
 # Provider IDs that require private_key and certificate
 IMPORTED_KEY_PROVIDERS = ["rsa", "rsa-enc"]
+# Provider IDs that import keys from Java Keystore
+KEYSTORE_PROVIDERS = ["java-keystore"]
 # Provider IDs that auto-generate keys
 GENERATED_KEY_PROVIDERS = [
     "rsa-generated",
@@ -459,6 +586,7 @@ ELLIPTIC_CURVE_CONFIG_KEYS = {
 PROVIDER_ALGORITHMS = {
     "rsa": ["RS256", "RS384", "RS512", "PS256", "PS384", "PS512"],
     "rsa-enc": ["RSA1_5", "RSA-OAEP", "RSA-OAEP-256"],
+    "java-keystore": ["RS256", "RS384", "RS512", "PS256", "PS384", "PS512"],
     "rsa-generated": ["RS256", "RS384", "RS512", "PS256", "PS384", "PS512"],
     "rsa-enc-generated": ["RSA1_5", "RSA-OAEP", "RSA-OAEP-256"],
     "hmac-generated": ["HS256", "HS384", "HS512"],
@@ -472,7 +600,7 @@ PROVIDER_ALGORITHMS = {
 PROVIDERS_WITHOUT_ALGORITHM = ["aes-generated", "eddsa-generated"]
 
 # Providers where the RS256 default is valid (for backward compatibility)
-PROVIDERS_WITH_RS256_DEFAULT = ["rsa", "rsa-generated"]
+PROVIDERS_WITH_RS256_DEFAULT = ["rsa", "rsa-generated", "java-keystore"]
 
 
 def get_keycloak_config_key(param_name, provider_id=None):
@@ -483,10 +611,68 @@ def get_keycloak_config_key(param_name, provider_id=None):
     """
     # Handle elliptic_curve specially - each provider uses a different config key
     if param_name == "elliptic_curve" and provider_id in ELLIPTIC_CURVE_CONFIG_KEYS:
-        return ELLIPTIC_CURVE_CONFIG_KEYS[provider_id]
+        return ELLIPTIC_CURVE_CONFIG_KEYS[param_name]
     if param_name in CONFIG_PARAM_MAPPING:
         return CONFIG_PARAM_MAPPING[param_name]
     return camel(param_name)
+
+
+def compute_certificate_fingerprint(certificate_pem):
+    """Compute SHA256 fingerprint of a PEM certificate.
+
+    Args:
+        certificate_pem: Base64-encoded certificate (without PEM headers)
+
+    Returns:
+        SHA256 fingerprint in colon-separated hex format, or None if invalid
+    """
+    if not certificate_pem:
+        return None
+    try:
+        # Decode the base64 certificate
+        cert_der = base64.b64decode(certificate_pem)
+        # Compute SHA256 hash
+        fingerprint = hashlib.sha256(cert_der).hexdigest().upper()
+        # Format as colon-separated pairs
+        return ":".join(fingerprint[i : i + 2] for i in range(0, len(fingerprint), 2))
+    except Exception:
+        return None
+
+
+def get_key_info_for_component(kc, realm, component_id):
+    """Fetch key metadata from the realm keys endpoint for a specific component.
+
+    Args:
+        kc: KeycloakAPI instance
+        realm: Realm name
+        component_id: The component ID to find key info for
+
+    Returns:
+        Dict with key info (kid, certificate_fingerprint, public_key, valid_to, status)
+        or None if no key found for this component
+    """
+    try:
+        # Fetch all realm keys using the existing API method
+        keys_response = kc.get_realm_keys_metadata_by_id(realm)
+        if not keys_response or "keys" not in keys_response:
+            return None
+
+        # Find the key matching our component
+        for key in keys_response.get("keys", []):
+            if key.get("providerId") == component_id:
+                return {
+                    "kid": key.get("kid"),
+                    "certificate_fingerprint": compute_certificate_fingerprint(key.get("certificate")),
+                    "public_key": key.get("publicKey"),
+                    "valid_to": key.get("validTo"),
+                    "status": key.get("status"),
+                    "algorithm": key.get("algorithm"),
+                    "type": key.get("type"),
+                }
+        return None
+    except Exception:
+        # If we can't fetch key info, don't fail - just return None
+        return None
 
 
 def main():
@@ -508,6 +694,7 @@ def main():
             choices=[
                 "rsa",
                 "rsa-enc",
+                "java-keystore",
                 "rsa-generated",
                 "rsa-enc-generated",
                 "hmac-generated",
@@ -556,7 +743,17 @@ def main():
                 secret_size=dict(type="int", no_log=True),
                 key_size=dict(type="int"),
                 elliptic_curve=dict(type="str", choices=["P-256", "P-384", "P-521", "Ed25519", "Ed448"]),
+                keystore=dict(type="str", no_log=False),
+                keystore_password=dict(type="str", no_log=True),
+                key_alias=dict(type="str", no_log=False),
+                key_password=dict(type="str", no_log=True),
             ),
+        ),
+        update_password=dict(
+            type="str",
+            default="always",
+            choices=["always", "on_create"],
+            no_log=False,
         ),
     )
 
@@ -584,6 +781,15 @@ def main():
         if config.get("certificate") is None:
             module.fail_json(
                 msg=f"config.certificate is required for provider_id '{provider_id}' (use empty string for auto-generation)"
+            )
+
+    # Validate that java-keystore providers have the required parameters
+    if state == "present" and provider_id in KEYSTORE_PROVIDERS:
+        required_params = ["keystore", "keystore_password", "key_alias"]
+        missing = [p for p in required_params if not config.get(p)]
+        if missing:
+            module.fail_json(
+                msg=f"For provider_id=java-keystore, the following config options are required: {', '.join(missing)}"
             )
 
     # Validate algorithm for providers that use it
@@ -643,7 +849,7 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    params_to_ignore = list(keycloak_argument_spec().keys()) + ["state", "force", "parent_id"]
+    params_to_ignore = list(keycloak_argument_spec().keys()) + ["state", "force", "parent_id", "update_password"]
 
     # Filter and map the parameters names that apply to the role
     component_params = [x for x in module.params if x not in params_to_ignore and module.params.get(x) is not None]
@@ -714,6 +920,13 @@ def main():
     if "certificate" in changeset_copy["config"]:
         del changeset_copy["config"]["certificate"]
 
+    # Similarly, for java-keystore provider, passwords cannot be compared as
+    # Keycloak returns masked values ("**********"). Remove them from the comparison changeset.
+    if "keystorePassword" in changeset_copy["config"]:
+        del changeset_copy["config"]["keystorePassword"]
+    if "keyPassword" in changeset_copy["config"]:
+        del changeset_copy["config"]["keyPassword"]
+
     # Make it easier to refer to current module parameters
     name = module.params.get("name")
     force = module.params.get("force")
@@ -763,12 +976,37 @@ def main():
                     changes += f"config.{p}: {current_value} -> {v}, "
                     result["changed"] = True
 
+            # For java-keystore provider, also fetch and compare key info (kid)
+            # This detects if the actual cryptographic key changed even when
+            # other config parameters remain the same
+            if provider_id in KEYSTORE_PROVIDERS:
+                current_key_info = get_key_info_for_component(kc, parent_id, key_id)
+                if current_key_info:
+                    before_realm_key["key_info"] = {
+                        "kid": current_key_info.get("kid"),
+                        "certificate_fingerprint": current_key_info.get("certificate_fingerprint"),
+                    }
+
     # Sanitize linefeeds for the privateKey and certificate (only for imported providers).
     # Without this the JSON payload will be invalid.
     if "privateKey" in changeset["config"]:
         changeset["config"]["privateKey"][0] = changeset["config"]["privateKey"][0].replace("\\n", "\n")
     if "certificate" in changeset["config"]:
         changeset["config"]["certificate"][0] = changeset["config"]["certificate"][0].replace("\\n", "\n")
+
+    # For java-keystore provider: handle update_password parameter
+    # When update_password=on_create and we're updating an existing component,
+    # replace actual passwords with the masked value ("**********") that Keycloak
+    # returns in API responses. When Keycloak receives this masked value, it
+    # preserves the existing password instead of updating it.
+    # This makes the module idempotent for password fields.
+    update_password = module.params.get("update_password")
+    if provider_id in KEYSTORE_PROVIDERS and key_id and update_password == "on_create":
+        SECRET_VALUE = "**********"
+        if "keystorePassword" in changeset["config"]:
+            changeset["config"]["keystorePassword"] = [SECRET_VALUE]
+        if "keyPassword" in changeset["config"]:
+            changeset["config"]["keyPassword"] = [SECRET_VALUE]
 
     # Check all the possible states of the resource and do what is needed to
     # converge current state with desired state (create, update or delete
@@ -781,6 +1019,11 @@ def main():
                     del before_realm_key["config"]["privateKey"]
                 if "certificate" in before_realm_key["config"]:
                     del before_realm_key["config"]["certificate"]
+                # Similarly for java-keystore passwords
+                if "keystorePassword" in before_realm_key["config"]:
+                    del before_realm_key["config"]["keystorePassword"]
+                if "keyPassword" in before_realm_key["config"]:
+                    del before_realm_key["config"]["keyPassword"]
                 result["diff"] = dict(before=before_realm_key, after=changeset_copy)
 
             if module.check_mode:
@@ -796,6 +1039,24 @@ def main():
             result["msg"] = f"Realm key {name} was in sync"
 
         result["end_state"] = changeset_copy
+
+        # For java-keystore provider, include key info in end_state
+        if provider_id in KEYSTORE_PROVIDERS:
+            if not module.check_mode:
+                key_info = get_key_info_for_component(kc, parent_id, key_id)
+                if key_info:
+                    result["end_state"]["key_info"] = {
+                        "kid": key_info.get("kid"),
+                        "certificate_fingerprint": key_info.get("certificate_fingerprint"),
+                        "status": key_info.get("status"),
+                        "valid_to": key_info.get("valid_to"),
+                    }
+                else:
+                    # Key component exists but no key loaded - likely wrong password/path/alias
+                    module.warn(
+                        f"Key component '{name}' exists but no active key was found. "
+                        "This may indicate an incorrect keystore password, path, or alias."
+                    )
     elif key_id and state == "absent":
         if module._diff:
             # Only try to delete privateKey/certificate from diff if they exist
@@ -803,6 +1064,11 @@ def main():
                 del before_realm_key["config"]["privateKey"]
             if "certificate" in before_realm_key["config"]:
                 del before_realm_key["config"]["certificate"]
+            # Similarly for java-keystore passwords
+            if "keystorePassword" in before_realm_key["config"]:
+                del before_realm_key["config"]["keystorePassword"]
+            if "keyPassword" in before_realm_key["config"]:
+                del before_realm_key["config"]["keyPassword"]
             result["diff"] = dict(before=before_realm_key, after={})
 
         if module.check_mode:
@@ -825,6 +1091,28 @@ def main():
             kc.create_component(changeset, parent_id)
             result["changed"] = True
             result["msg"] = f"Realm key {name} created"
+
+            # For java-keystore provider, fetch and include key info after creation
+            if provider_id in KEYSTORE_PROVIDERS:
+                # We need to get the component ID first (it was just created)
+                realm_keys_after = kc.get_components(urlencode(dict(type=provider_type)), parent_id)
+                for k in realm_keys_after:
+                    if k["name"] == name:
+                        new_key_id = k["id"]
+                        key_info = get_key_info_for_component(kc, parent_id, new_key_id)
+                        if key_info:
+                            changeset_copy["key_info"] = {
+                                "kid": key_info.get("kid"),
+                                "certificate_fingerprint": key_info.get("certificate_fingerprint"),
+                                "status": key_info.get("status"),
+                                "valid_to": key_info.get("valid_to"),
+                            }
+                        else:
+                            module.warn(
+                                f"Key component '{name}' was created but no active key was found. "
+                                "This may indicate an incorrect keystore password, path, or alias."
+                            )
+                        break
 
         result["end_state"] = changeset_copy
     elif not key_id and state == "absent":
