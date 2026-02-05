@@ -428,7 +428,15 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 # Provider IDs that require private_key and certificate
 IMPORTED_KEY_PROVIDERS = ["rsa", "rsa-enc"]
 # Provider IDs that auto-generate keys
-GENERATED_KEY_PROVIDERS = ["rsa-generated", "rsa-enc-generated", "hmac-generated", "aes-generated", "ecdsa-generated", "ecdh-generated", "eddsa-generated"]
+GENERATED_KEY_PROVIDERS = [
+    "rsa-generated",
+    "rsa-enc-generated",
+    "hmac-generated",
+    "aes-generated",
+    "ecdsa-generated",
+    "ecdh-generated",
+    "eddsa-generated",
+]
 
 # Mapping of Ansible parameter names to Keycloak config property names
 # for cases where camel() conversion doesn't produce the correct result.
