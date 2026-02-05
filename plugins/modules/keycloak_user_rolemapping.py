@@ -356,9 +356,9 @@ def main():
                     if role_rep is not None:
                         role["name"] = role_rep["name"]
                 else:
-                    role["name"] = kc.get_client_user_rolemapping_by_id(
-                        uid=uid, cid=cid, rid=role.get("id"), realm=realm
-                    )["name"]
+                    role_rep = kc.get_client_user_rolemapping_by_id(uid=uid, cid=cid, rid=role.get("id"), realm=realm)
+                    if role_rep is not None:
+                        role["name"] = role_rep["name"]
                 if role.get("name") is None:
                     module.fail_json(
                         msg=f"Could not fetch role {role.get('id')} for client_id {client_id} or realm {realm}"
