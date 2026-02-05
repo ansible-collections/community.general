@@ -9,6 +9,7 @@ admin_user: admin
 admin_password: password
 realm: myrealm
 client_id: myclient
+client_id_2: myotherclient
 role: myrole
 description_1: desc 1
 description_2: desc 2
