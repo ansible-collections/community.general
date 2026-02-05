@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_client - remove IDs as change from diff result for protocol mappers (https://github.com/ansible-collections/community.general/issues/11453, https://github.com/ansible-collections/community.general/pull/11454).

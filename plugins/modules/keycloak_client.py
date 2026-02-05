@@ -1393,7 +1393,7 @@ def main():
             if module.check_mode:
                 result["end_state"] = sanitize_cr(desired_client_with_scopes)
                 if module._diff:
-                    result["diff"] = dict(before=sanitize_cr(before_client), after=sanitize_cr(desired_client))
+                    result["diff"] = dict(before=sanitize_cr(before_norm), after=sanitize_cr(desired_norm))
                 module.exit_json(**result)
 
             # do the update
