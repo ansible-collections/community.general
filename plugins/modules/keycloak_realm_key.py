@@ -168,12 +168,14 @@ options:
           - Valid values are V(16), V(24), V(32), V(64), V(128), V(256), V(512).
           - Default is V(64) for HMAC, V(16) for AES.
         type: int
+        version_added: 12.4.0
       key_size:
         description:
           - The size of the generated key in bits.
           - Only applicable to O(provider_id=rsa-generated) and O(provider_id=rsa-enc-generated).
           - Valid values are V(1024), V(2048), V(4096). Default is V(2048).
         type: int
+        version_added: 12.4.0
       elliptic_curve:
         description:
           - The elliptic curve to use for ECDSA, ECDH, or EdDSA keys.
@@ -181,31 +183,32 @@ options:
           - For O(provider_id=eddsa-generated), valid values are V(Ed25519), V(Ed448). Default is V(Ed25519).
         type: str
         choices: ['P-256', 'P-384', 'P-521', 'Ed25519', 'Ed448']
+        version_added: 12.4.0
       keystore:
         description:
           - Path to the Java Keystore file on the Keycloak server filesystem.
           - Required when O(provider_id=java-keystore).
-          - Added in community.general 12.4.0.
         type: str
+        version_added: 12.4.0
       keystore_password:
         description:
           - Password for the Java Keystore.
           - Required when O(provider_id=java-keystore).
-          - Added in community.general 12.4.0.
         type: str
+        version_added: 12.4.0
       key_alias:
         description:
           - Alias of the key within the keystore.
           - Required when O(provider_id=java-keystore).
-          - Added in community.general 12.4.0.
         type: str
+        version_added: 12.4.0
       key_password:
         description:
           - Password for the key within the keystore.
           - If not specified, the O(config.keystore_password) is used.
           - Only applicable to O(provider_id=java-keystore).
-          - Added in community.general 12.4.0.
         type: str
+        version_added: 12.4.0
   update_password:
     description:
       - Controls when passwords are sent to Keycloak for V(java-keystore) provider.
@@ -217,10 +220,10 @@ options:
       - This is necessary because Keycloak masks passwords in API responses (returns C(**********)),
         making comparison impossible.
       - Has no effect for providers other than V(java-keystore).
-      - Added in community.general 12.4.0.
     type: str
     choices: ['always', 'on_create']
     default: always
+    version_added: 12.4.0
 notes:
   - Current value of the private key cannot be fetched from Keycloak. Therefore comparing its desired state to the current
     state is not possible.
@@ -513,9 +516,9 @@ end_state:
         - Only returned for V(java-keystore) provider when O(state=present) and not in check mode.
         - This includes the key ID (kid) and certificate fingerprint, which can be used to detect
           if the actual cryptographic key changed.
-        - Added in community.general 12.4.0.
       type: dict
       returned: when O(provider_id=java-keystore) and O(state=present)
+      version_added: 12.4.0
       contains:
         kid:
           description: The key ID (kid) - unique identifier for the cryptographic key.
@@ -740,7 +743,7 @@ def main():
                 ),
                 private_key=dict(type="str", no_log=True),
                 certificate=dict(type="str"),
-                secret_size=dict(type="int", no_log=True),
+                secret_size=dict(type="int", no_log=False),
                 key_size=dict(type="int"),
                 elliptic_curve=dict(type="str", choices=["P-256", "P-384", "P-521", "Ed25519", "Ed448"]),
                 keystore=dict(type="str", no_log=False),
