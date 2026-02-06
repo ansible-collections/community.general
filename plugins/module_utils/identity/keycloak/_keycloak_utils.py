@@ -2,8 +2,17 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# Note that this module util is **PRIVATE** to the collection. It can have breaking changes at any time.
+# Do not use this from other collections or standalone plugins/modules!
 
-def merge_settings_without_absent_nulls(existing_settings, desired_settings):
+from __future__ import annotations
+
+import typing as t
+
+
+def merge_settings_without_absent_nulls(
+    existing_settings: dict[str, t.Any], desired_settings: dict[str, t.Any]
+) -> dict[str, t.Any]:
     """
     Merges existing and desired settings into a new dictionary while excluding null values in desired settings that are absent in the existing settings.
     This ensures idempotency by treating absent keys in existing settings and null values in desired settings as equivalent, preventing unnecessary updates.
