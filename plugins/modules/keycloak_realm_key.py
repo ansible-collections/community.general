@@ -69,7 +69,7 @@ options:
       - The values V(rsa-generated), V(hmac-generated), V(aes-generated), and V(ecdsa-generated) have been added in
         community.general 12.4.0. These are auto-generated key providers where Keycloak manages the key material.
       - The values V(rsa-enc-generated), V(ecdh-generated), and V(eddsa-generated) have been added in
-        community.general 12.4.0. These complete the set of auto-generated key providers available in Keycloak.
+        community.general 12.4.0. These correspond to the auto-generated key providers available in Keycloak 26.
     choices:
       - rsa
       - rsa-enc
@@ -539,6 +539,7 @@ end_state:
 """
 
 import base64
+import binascii
 import hashlib
 from copy import deepcopy
 from urllib.parse import urlencode
@@ -621,46 +622,20 @@ def get_keycloak_config_key(param_name, provider_id=None):
 
 
 def compute_certificate_fingerprint(certificate_pem):
-    """Compute SHA256 fingerprint of a PEM certificate.
-
-    Args:
-        certificate_pem: Base64-encoded certificate (without PEM headers)
-
-    Returns:
-        SHA256 fingerprint in colon-separated hex format, or None if invalid
-    """
-    if not certificate_pem:
-        return None
     try:
-        # Decode the base64 certificate
         cert_der = base64.b64decode(certificate_pem)
-        # Compute SHA256 hash
         fingerprint = hashlib.sha256(cert_der).hexdigest().upper()
-        # Format as colon-separated pairs
         return ":".join(fingerprint[i : i + 2] for i in range(0, len(fingerprint), 2))
-    except Exception:
+    except (ValueError, binascii.Error):
         return None
 
 
 def get_key_info_for_component(kc, realm, component_id):
-    """Fetch key metadata from the realm keys endpoint for a specific component.
-
-    Args:
-        kc: KeycloakAPI instance
-        realm: Realm name
-        component_id: The component ID to find key info for
-
-    Returns:
-        Dict with key info (kid, certificate_fingerprint, public_key, valid_to, status)
-        or None if no key found for this component
-    """
     try:
-        # Fetch all realm keys using the existing API method
         keys_response = kc.get_realm_keys_metadata_by_id(realm)
         if not keys_response or "keys" not in keys_response:
             return None
 
-        # Find the key matching our component
         for key in keys_response.get("keys", []):
             if key.get("providerId") == component_id:
                 return {
@@ -673,8 +648,7 @@ def get_key_info_for_component(kc, realm, component_id):
                     "type": key.get("type"),
                 }
         return None
-    except Exception:
-        # If we can't fetch key info, don't fail - just return None
+    except (KeyError, TypeError):
         return None
 
 
@@ -772,10 +746,9 @@ def main():
         required_by={"refresh_token": "auth_realm"},
     )
 
-    # Extract frequently used parameters
-    provider_id = module.params.get("provider_id")
-    config = module.params.get("config") or {}
-    state = module.params.get("state")
+    provider_id = module.params["provider_id"]
+    config = module.params["config"] or {}
+    state = module.params["state"]
 
     # Validate that imported key providers have the required parameters
     if state == "present" and provider_id in IMPORTED_KEY_PROVIDERS:
