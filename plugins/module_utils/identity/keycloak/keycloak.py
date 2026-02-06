@@ -598,16 +598,6 @@ class KeycloakAPI:
             self.fail_request(e, msg=f"Could not delete realm {realm}: {e}", exception=traceback.format_exc())
 
     def get_localization_values(self, locale: str, realm: str = "master") -> dict[str, str]:
-        """
-        Get all localization overrides for a given realm and locale.
-
-        :param locale: Locale code (for example, 'en', 'fi', 'de').
-        :param realm: Realm name. Defaults to 'master'.
-
-        :return: Mapping of localization keys to override values.
-
-        :raise KeycloakError: Wrapped HTTP/JSON error with context
-        """
         realm_url = URL_LOCALIZATIONS.format(url=self.baseurl, realm=realm, locale=locale)
 
         try:
@@ -620,18 +610,6 @@ class KeycloakAPI:
             )
 
     def set_localization_value(self, locale: str, key: str, value: str, realm: str = "master"):
-        """
-        Create or update a single localization override for the given key.
-
-        :param locale: Locale code (for example, 'en').
-        :param key: Localization message key to set.
-        :param value: Override value to set.
-        :param realm: Realm name. Defaults to 'master'.
-
-        :return: HTTPResponse: Response object on success.
-
-        :raise KeycloakError: Wrapped HTTP error with context
-        """
         realm_url = URL_LOCALIZATION.format(url=self.baseurl, realm=realm, locale=locale, key=key)
 
         headers = self.restheaders.copy()
@@ -647,17 +625,6 @@ class KeycloakAPI:
             )
 
     def delete_localization_value(self, locale: str, key: str, realm: str = "master"):
-        """
-        Delete a single localization override key for the given locale.
-
-        :param locale: Locale code (for example, 'en').
-        :param key: Localization message key to delete.
-        :param realm: Realm name. Defaults to 'master'.
-
-        :return: HTTPResponse: Response object on success.
-
-        :raise KeycloakError: Wrapped HTTP error with context
-        """
         realm_url = URL_LOCALIZATION.format(url=self.baseurl, realm=realm, locale=locale, key=key)
 
         try:

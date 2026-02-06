@@ -187,39 +187,22 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 
 
 def _normalize_overrides_from_api(current):
-    """
-    Accepts:
-      - dict: {'k1': 'v1', ...}
-    Return a sorted list of {'key', 'value'}.
-
-    This helper provides a consistent shape for downstream comparison/diff logic.
-    """
     if not current:
         return []
 
-    # Convert mapping to list of key/value dicts
     items = [{"key": k, "value": v} for k, v in sorted(current.items())]
 
-    # Sort for stable comparisons and diff output
     return items
 
 
 def main():
-    """
-    Module execution
-
-    :return:
-    """
-    # Base Keycloak auth/spec fragment common across Keycloak modules
     argument_spec = keycloak_argument_spec()
 
-    # Describe a single override record
     overrides_spec = dict(
         key=dict(type="str", no_log=False, required=True),
         value=dict(type="str", default=""),
     )
 
-    # Module-specific arguments
     meta_args = dict(
         locale=dict(type="str", required=True),
         parent_id=dict(type="str", required=True),
@@ -233,15 +216,12 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        # Require token OR full credential set. This mirrors other Keycloak modules.
         required_one_of=([["token", "auth_realm", "auth_username", "auth_password"]]),
         required_together=([["auth_realm", "auth_username", "auth_password"]]),
     )
 
-    # Initialize the result object used by Ansible
     result = dict(changed=False, msg="", end_state={}, diff=dict(before={}, after={}))
 
-    # Obtain access token, initialize API
     try:
         connection_header = get_token(module.params)
     except KeycloakError as e:
@@ -249,7 +229,6 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    # Convenience locals for frequently used parameters
     locale = module.params.get("locale")
     state = module.params.get("state")
     parent_id = module.params.get("parent_id")
@@ -259,32 +238,25 @@ def main():
     desired_map = {r["key"]: r.get("value") for r in desired_raw}
     desired_overrides = [{"key": k, "value": v} for k, v in sorted(desired_map.items())]
 
-    # Fetch current overrides and normalize to comparable structure
     old_overrides = _normalize_overrides_from_api(kc.get_localization_values(locale, parent_id) or {})
     before = {
         "locale": locale,
         "overrides": deepcopy(old_overrides),
     }
 
-    # Proposed state used for diff reporting
     changeset = {
         "locale": locale,
         "overrides": [],
     }
 
-    # Default to no change; flip to True when updates/deletes are needed
     result["changed"] = False
 
     if state == "present":
         changeset["overrides"] = deepcopy(desired_overrides)
 
-        # Compute two sets:
-        # - to_update: keys missing or with different values
-        # - to_remove: keys existing in current state but not in desired
         to_update = []
         to_remove = deepcopy(old_overrides)
 
-        # Mark updates and remove matched ones from to_remove
         for record in desired_overrides:
             override_found = False
 
@@ -292,26 +264,21 @@ def main():
                 if override["key"] == record["key"]:
                     override_found = True
 
-                    # Value differs -> update needed
                     if override["value"] != record["value"]:
                         result["changed"] = True
                         to_update.append(record)
 
-                    # Remove processed item so what's left in to_remove are deletions
                     to_remove.remove(override)
                     break
 
             if not override_found:
-                # New key, must be created
                 to_update.append(record)
                 result["changed"] = True
 
-        # ignore any left-overs in to_remove, append is true
         if append:
             changeset["overrides"].extend(to_remove)
             to_remove = []
 
-        # Any leftovers in to_remove must be deleted
         if to_remove:
             result["changed"] = True
 
@@ -320,7 +287,6 @@ def main():
                 result["diff"] = dict(before=before, after=changeset)
 
             if module.check_mode:
-                # Dry-run: report intent without side effects
                 result["msg"] = f"Locale {locale} overrides would be updated."
 
             else:
@@ -335,7 +301,6 @@ def main():
         else:
             result["msg"] = f"Locale {locale} overrides are in sync."
 
-        # For accurate end_state, read back from API unless we are in check_mode
         if not module.check_mode:
             final_overrides = _normalize_overrides_from_api(kc.get_localization_values(locale, parent_id) or {})
 
@@ -345,7 +310,6 @@ def main():
         result["end_state"] = {"locale": locale, "overrides": final_overrides}
 
     elif state == "absent":
-        # touch only overrides listed in parameters, leave the rest be
         if append:
             to_remove = deepcopy(desired_overrides)
             to_keep = deepcopy(old_overrides)
@@ -358,7 +322,6 @@ def main():
                         found = True
                         break
 
-                # not present
                 if not found:
                     to_remove.remove(override)
 
