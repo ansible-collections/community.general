@@ -998,7 +998,7 @@ class KeycloakAPI:
         :param realm: Realm in which the user resides; default 'master'
         """
         users_url = URL_USERS.format(url=self.baseurl, realm=realm)
-        users_url += f"?username={username}&exact=true"
+        users_url += f"?username={quote(username, safe='')}&exact=true"
         try:
             userrep = None
             users = self._request_and_deserialize(users_url, method="GET")
@@ -3018,7 +3018,7 @@ class KeycloakAPI:
     def get_authz_permission_by_name(self, name, client_id, realm):
         """Get authorization permission by name"""
         url = URL_AUTHZ_POLICIES.format(url=self.baseurl, client_id=client_id, realm=realm)
-        search_url = f"{url}/search?name={name.replace(' ', '%20')}"
+        search_url = f"{url}/search?name={quote(name, safe='')}"
 
         try:
             return self._request_and_deserialize(search_url, method="GET")
@@ -3064,7 +3064,7 @@ class KeycloakAPI:
     def get_authz_resource_by_name(self, name, client_id, realm):
         """Get authorization resource by name"""
         url = URL_AUTHZ_RESOURCES.format(url=self.baseurl, client_id=client_id, realm=realm)
-        search_url = f"{url}/search?name={name.replace(' ', '%20')}"
+        search_url = f"{url}/search?name={quote(name, safe='')}"
 
         try:
             return self._request_and_deserialize(search_url, method="GET")
@@ -3074,7 +3074,7 @@ class KeycloakAPI:
     def get_authz_policy_by_name(self, name, client_id, realm):
         """Get authorization policy by name"""
         url = URL_AUTHZ_POLICIES.format(url=self.baseurl, client_id=client_id, realm=realm)
-        search_url = f"{url}/search?name={name.replace(' ', '%20')}"
+        search_url = f"{url}/search?name={quote(name, safe='')}"
 
         try:
             return self._request_and_deserialize(search_url, method="GET")
