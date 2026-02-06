@@ -112,3 +112,59 @@
     that:
       - delete_result.changed
       - delete_result.end_state | length == 0
+
+- name: Create user with plus-addressed email
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "testuser+tag"
+    realm: "{{ realm }}"
+    first_name: Plus
+    last_name: User
+    email: "testuser+tag@example.org"
+    state: present
+  register: plus_create_result
+
+- name: Assert plus-addressed user is created
+  assert:
+    that:
+      - plus_create_result.changed
+      - plus_create_result.end_state.username == 'testuser+tag'
+      - plus_create_result.end_state.email == 'testuser+tag@example.org'
+
+- name: Re-run plus-addressed user creation (idempotency)
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "testuser+tag"
+    realm: "{{ realm }}"
+    first_name: Plus
+    last_name: User
+    email: "testuser+tag@example.org"
+    state: present
+  register: plus_idempotent_result
+
+- name: Assert plus-addressed user is idempotent
+  assert:
+    that:
+      - plus_idempotent_result is not changed
+
+- name: Delete plus-addressed user
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "testuser+tag"
+    realm: "{{ realm }}"
+    state: absent
+  register: plus_delete_result
+
+- name: Assert plus-addressed user is deleted
+  assert:
+    that:
+      - plus_delete_result.changed

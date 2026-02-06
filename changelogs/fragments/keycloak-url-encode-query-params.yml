@@ -1,0 +1,7 @@
+bugfixes:
+  - keycloak module utils - fix ``TypeError`` crash when managing users whose username
+    or email contains special characters such as ``+``
+    (https://github.com/ansible-collections/community.general/issues/10305, https://github.com/ansible-collections/community.general/pull/11472).
+  - keycloak module utils - use proper URL encoding (``urllib.parse.quote``) for query
+    parameters in authorization permission name searches, replacing fragile
+    manual space replacement (https://github.com/ansible-collections/community.general/pull/11472).
