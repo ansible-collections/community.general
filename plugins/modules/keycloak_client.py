@@ -151,6 +151,17 @@ options:
     type: list
     elements: str
 
+  valid_post_logout_redirect_uris:
+    description:
+      - Valid post logout redirect URIs for this client.
+      - This is stored as C(post.logout.redirect.uris) in the client attributes.
+      - Use V(+) as a single list element to allow all redirect URIs.
+    aliases:
+      - postLogoutRedirectUris
+    type: list
+    elements: str
+    version_added: "12.4.0"
+
   not_before:
     description:
       - Revoke any tokens issued before this date for this client (this is a UNIX timestamp). This is C(notBefore) in the
@@ -226,6 +237,15 @@ options:
     aliases:
       - frontchannelLogout
     type: bool
+
+  backchannel_logout_url:
+    description:
+      - URL that will cause the client to log itself out when a logout request is sent to this realm.
+      - This is stored as C(backchannel.logout.url) in the client attributes.
+    aliases:
+      - backchannelLogoutUrl
+    type: str
+    version_added: "12.4.0"
 
   protocol:
     description:
@@ -764,6 +784,21 @@ PROTOCOL_SAML = "saml"
 PROTOCOL_DOCKER_V2 = "docker-v2"
 CLIENT_META_DATA = ["authorizationServicesEnabled"]
 
+# Parameters that map to client attributes rather than top-level API fields.
+# Each entry maps the module parameter name to (attribute_key, transform_fn).
+# transform_fn converts the module param value to the attribute string value.
+# Use None for transform_fn when no transformation is needed (identity).
+ATTRIBUTE_PARAMS = {
+    "valid_post_logout_redirect_uris": (
+        "post.logout.redirect.uris",
+        "##".join,
+    ),
+    "backchannel_logout_url": (
+        "backchannel.logout.url",
+        None,
+    ),
+}
+
 
 def normalise_scopes_for_behavior(desired_client, before_client, clientScopesBehavior):
     """
@@ -1222,6 +1257,7 @@ def main():
         default_roles=dict(type="list", elements="str", aliases=["defaultRoles"]),
         redirect_uris=dict(type="list", elements="str", aliases=["redirectUris"]),
         web_origins=dict(type="list", elements="str", aliases=["webOrigins"]),
+        valid_post_logout_redirect_uris=dict(type="list", elements="str", aliases=["postLogoutRedirectUris"]),
         not_before=dict(type="int", aliases=["notBefore"]),
         bearer_only=dict(type="bool", aliases=["bearerOnly"]),
         consent_required=dict(type="bool", aliases=["consentRequired"]),
@@ -1232,6 +1268,7 @@ def main():
         authorization_services_enabled=dict(type="bool", aliases=["authorizationServicesEnabled"]),
         public_client=dict(type="bool", aliases=["publicClient"]),
         frontchannel_logout=dict(type="bool", aliases=["frontchannelLogout"]),
+        backchannel_logout_url=dict(type="str", aliases=["backchannelLogoutUrl"]),
         protocol=dict(type="str", choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
         attributes=dict(type="dict"),
         full_scope_allowed=dict(type="bool", aliases=["fullScopeAllowed"]),
@@ -1311,8 +1348,19 @@ def main():
     # Build a proposed changeset from parameters given to this module
     changeset = {}
 
+    # Collect attribute-mapped parameters to inject into attributes later
+    attribute_overrides = {}
+    for param_name, (attr_key, transform_fn) in ATTRIBUTE_PARAMS.items():
+        param_value = module.params.get(param_name)
+        if param_value is not None:
+            attribute_overrides[attr_key] = transform_fn(param_value) if transform_fn else param_value
+
     for client_param in client_params:
         new_param_value = module.params.get(client_param)
+
+        # Skip attribute-mapped params; they are handled via attributes
+        if client_param in ATTRIBUTE_PARAMS:
+            continue
 
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
@@ -1334,6 +1382,13 @@ def main():
             continue
 
         changeset[camel(client_param)] = new_param_value
+
+    # Inject attribute-mapped parameters into the attributes dict
+    if attribute_overrides:
+        if "attributes" not in changeset:
+            changeset["attributes"] = copy.deepcopy(before_client.get("attributes", {}))
+        if isinstance(changeset["attributes"], dict):
+            changeset["attributes"].update(attribute_overrides)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_client = copy.deepcopy(before_client)
