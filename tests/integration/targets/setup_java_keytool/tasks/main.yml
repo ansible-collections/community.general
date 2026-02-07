@@ -11,8 +11,8 @@
 - set_fact:
     has_java_keytool: >-
       {{
-        ansible_os_family not in ['Darwin', 'FreeBSD']
-        and not (ansible_distribution == "CentOS" and ansible_distribution_version is version("7.0", "<"))
+        ansible_facts.os_family not in ['Darwin', 'FreeBSD']
+        and not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_version is version("7.0", "<"))
       }}
 
 - name: Include OS-specific variables
@@ -20,10 +20,10 @@
   vars:
     params:
       files:
-        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-        - '{{ ansible_distribution }}.yml'
-        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
       paths:
         - '{{ role_path }}/vars'
   when: has_java_keytool

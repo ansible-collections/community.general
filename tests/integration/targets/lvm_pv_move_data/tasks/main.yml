@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install required packages (Linux)
-  when: ansible_system == 'Linux'
+  when: ansible_facts.system == 'Linux'
   ansible.builtin.package:
     name:
       - lvm2

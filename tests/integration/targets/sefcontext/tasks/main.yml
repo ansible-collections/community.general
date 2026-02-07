@@ -8,14 +8,14 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# FIXME: Unfortunately ansible_selinux could be a boolean or a dictionary !
+# FIXME: Unfortunately ansible_facts.selinux could be a boolean or a dictionary !
 - debug:
     msg: SELinux is disabled
-  when: ansible_selinux is defined and ansible_selinux == False
+  when: ansible_facts.selinux is defined and ansible_facts.selinux == False
 
 - debug:
-    msg: SELinux is {{ ansible_selinux.status }}
-  when: ansible_selinux is defined and ansible_selinux != False
+    msg: SELinux is {{ ansible_facts.selinux.status }}
+  when: ansible_facts.selinux is defined and ansible_facts.selinux != False
 
 - include_tasks: sefcontext.yml
-  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
+  when: ansible_facts.selinux is defined and ansible_facts.selinux != False and ansible_facts.selinux.status == 'enabled'

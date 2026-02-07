@@ -10,7 +10,7 @@
 # Skip UUID set at creation tests for FreeBSD due to "xfs_admin: only 'rewrite' supported on V5 fs"
 - when:
     - new_uuid | default(False)
-    - not (ansible_system == "FreeBSD" and fstype == "xfs")
+    - not (ansible_facts.system == "FreeBSD" and fstype == "xfs")
   block:
     - name: "Create filesystem ({{ fstype }}) with UUID"
       community.general.filesystem:

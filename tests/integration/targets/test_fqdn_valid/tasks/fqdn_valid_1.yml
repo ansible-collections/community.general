@@ -3,12 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Debug ansible_version
-  ansible.builtin.debug:
-    var: ansible_version
-  when: debug_test|default(false)|bool
-  tags: t0
-
 - name: 1. Test valid hostnames. Default options.
   block:
     - name: "1. Default min_labels=1, allow_underscores=False"

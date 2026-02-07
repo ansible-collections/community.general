@@ -10,7 +10,7 @@
 
 - name: Skip some platforms which does not support ansible.posix.mount
   meta: end_play
-  when: ansible_distribution in ['Alpine']
+  when: ansible_facts.distribution in ['Alpine']
 
 - set_fact:
     test_dir: '{{ remote_tmp_dir }}/test_iso_customize'

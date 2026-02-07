@@ -267,7 +267,7 @@
   # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
   #       only running this on 12.1 or higher
   #
-  when: ansible_distribution_version is version('12.01', '>=')
+  when: ansible_facts.distribution_version is version('12.01', '>=')
   block:
     - name: Install GNU autotools
       pkgng:
@@ -539,9 +539,9 @@
   # See also
   # https://github.com/ansible-collections/community.general/issues/5795
   when: >-
-    (ansible_distribution_version is version('12.01', '>=') and ansible_distribution_version is version('12.3', '<'))
-    or (ansible_distribution_version is version('13.6', '>=') and ansible_distribution_version is version('14.0', '<'))
-    or ansible_distribution_version is version('14.4', '>=')
+    (ansible_facts.distribution_version is version('12.01', '>=') and ansible_facts.distribution_version is version('12.3', '<'))
+    or (ansible_facts.distribution_version is version('13.6', '>=') and ansible_facts.distribution_version is version('14.0', '<'))
+    or ansible_facts.distribution_version is version('14.4', '>=')
   block:
     - name: Setup testjail
       include_tasks: setup-testjail.yml

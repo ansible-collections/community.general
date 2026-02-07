@@ -14,10 +14,10 @@
 - include_tasks: run.yml
   vars:
     nodejs_version: '{{ item.node_version }}'
-    nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_system|lower }}-x{{ ansible_userspace_bits }}'
+    nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_facts.system|lower }}-x{{ ansible_facts.userspace_bits }}'
     yarn_version: '{{ item.yarn_version }}'
   with_items:
     - {node_version: 4.8.0, yarn_version: 1.6.0}  # Lowest compatible nodejs version
     - {node_version: 8.0.0, yarn_version: 1.6.0}
   when:
-    - not (ansible_os_family == 'Alpine')  # TODO
+    - not (ansible_facts.os_family == 'Alpine')  # TODO

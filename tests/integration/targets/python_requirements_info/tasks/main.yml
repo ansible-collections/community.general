@@ -12,7 +12,7 @@
   pip:
     name: setuptools
     state: present
-  when: ansible_facts.distribution == 'MacOSX' and ansible_distribution_version is version('15', '>=')
+  when: ansible_facts.distribution == 'MacOSX' and ansible_facts.distribution_version is version('15', '>=')
 
 - name: run python_requirements_info module
   python_requirements_info:
@@ -23,7 +23,7 @@
     that:
       - "'python' in basic_info"
       - "'python_version' in basic_info"
-      - basic_info.python_version_info == ansible_python.version
+      - basic_info.python_version_info == ansible_facts.python.version
 
 - name: run python_requirements_info module
   python_requirements_info:

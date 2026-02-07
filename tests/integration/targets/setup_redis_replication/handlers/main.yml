@@ -14,7 +14,7 @@
   args:
     name: "{{ item }}"
     state: absent
-  loop: "{{ redis_packages[ansible_distribution] }}"
+  loop: "{{ redis_packages[ansible_facts.distribution] }}"
   listen: cleanup redis
 
 - name: remove pip packages

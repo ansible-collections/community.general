@@ -10,7 +10,7 @@
 
 # Exit when Suse because it causes CI problems
 - meta: end_play
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts.os_family == 'Suse'
 
 # To avoid hangings on service start/stop postgres during CI runs:
 - meta: end_play
@@ -25,9 +25,9 @@
   vars:
     params:
       files:
-        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
         - default.yml
       paths:
         - '{{ role_path }}/vars'
@@ -36,7 +36,7 @@
   systemd:
     name: dbus
     state: started
-  when: ansible_service_mgr == 'systemd' and ansible_distribution == 'Fedora'
+  when: ansible_facts.service_mgr == 'systemd' and ansible_facts.distribution == 'Fedora'
 
 - name: Kill all postgres processes
   shell: 'pkill -u {{ pg_user }}'
@@ -53,21 +53,21 @@
     path: '{{ pg_dir }}'
     state: absent
   ignore_errors: true
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Suse"
+  when: ansible_facts.os_family == "RedHat" or ansible_facts.os_family == "Suse"
 
 - name: remove old db (FreeBSD)
   file:
     path: '{{ pg_dir }}'
     state: absent
   ignore_errors: true
-  when: ansible_os_family == "FreeBSD"
+  when: ansible_facts.os_family == "FreeBSD"
 
 - name: remove old db config and files (debian)
   file:
     path: '{{ loop_item }}'
     state: absent
   ignore_errors: true
-  when: ansible_os_family == "Debian"
+  when: ansible_facts.os_family == "Debian"
   loop:
     - /etc/postgresql
     - /var/lib/postgresql
@@ -84,38 +84,38 @@
 
 - name: initialize postgres (FreeBSD)
   command: /usr/local/etc/rc.d/postgresql oneinitdb
-  when: ansible_os_family == "FreeBSD"
+  when: ansible_facts.os_family == "FreeBSD"
 
 - name: Initialize postgres (RedHat systemd)
   command: postgresql-setup initdb
-  when: ansible_os_family == "RedHat" and ansible_service_mgr == "systemd"
+  when: ansible_facts.os_family == "RedHat" and ansible_facts.service_mgr == "systemd"
 
 - name: Initialize postgres (RedHat sysv)
   command: /sbin/service postgresql initdb
-  when: ansible_os_family == "RedHat" and ansible_service_mgr != "systemd"
+  when: ansible_facts.os_family == "RedHat" and ansible_facts.service_mgr != "systemd"
 
 - name: Initialize postgres (Archlinux)
   command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
-  when: ansible_os_family == "Archlinux"
+  when: ansible_facts.os_family == "Archlinux"
 
 - name: Initialize postgres (Alpine)
   command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgresql/data'"
-  when: ansible_os_family == "Alpine"
+  when: ansible_facts.os_family == "Alpine"
 
 - name: Initialize postgres (Debian)
   shell: . /usr/share/postgresql-common/maintscripts-functions && set_system_locale && /usr/bin/pg_createcluster -u postgres {{ pg_ver }} main
   args:
     creates: /etc/postgresql/{{ pg_ver }}/
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - name: Initialize postgres (Suse)
   service: name=postgresql state=stopped
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts.os_family == 'Suse'
 
 - name: Pause between stop and start postgresql
   pause:
     seconds: 5
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts.os_family == 'Suse'
 
 - name: Make installable on Arch
   community.general.ini_file:
@@ -136,16 +136,16 @@
     - RestrictNamespaces
     - RestrictRealtime
     - SystemCallArchitectures
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
 
 - name: Make installable on Arch
   systemd:
     daemon_reload: true
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
 
 - name: Initialize postgres (Suse)
   service: name=postgresql state=started
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts.os_family == 'Suse'
 
 - name: Copy pg_hba into place
   template:
@@ -162,7 +162,7 @@
   with_items:
     - pt_BR
     - es_ES
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - block:
     - name: Install langpacks (RHEL8)
@@ -172,7 +172,7 @@
           - glibc-langpack-pt
           - glibc-all-langpacks
         state: present
-      when: ansible_distribution_major_version is version('8', '>=')
+      when: ansible_facts.distribution_major_version is version('8', '>=')
 
     - name: Check if locales need to be generated (RedHat)
       shell: localedef --list-archive | grep -a -q '^{{ locale }}$'
@@ -192,7 +192,7 @@
       command: localedef -f ISO-8859-1 -i {{ item.locale }} {{ item.locale }}
       when: item is failed
       with_items: '{{ locale_present.results }}'
-  when: ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
+  when: ansible_facts.os_family == 'RedHat' and ansible_facts.distribution != 'Fedora'
 
 - name: Install glibc langpacks (Fedora >= 24)
   package:
@@ -201,13 +201,13 @@
   with_items:
     - glibc-langpack-es
     - glibc-langpack-pt
-  when: ansible_distribution == 'Fedora' and ansible_distribution_major_version is version('24', '>=')
+  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('24', '>=')
 
 - name: enable postgresql service (FreeBSD)
   lineinfile:
     path: /etc/rc.conf
     line: postgresql_enable="YES"
-  when: ansible_os_family == "FreeBSD"
+  when: ansible_facts.os_family == "FreeBSD"
 
 - name: start postgresql service
   service: name={{ postgresql_service }} state=started
@@ -239,7 +239,7 @@
     src: dummy.control
     dest: /usr/share/postgresql/{{ pg_ver }}/extension/dummy.control
     mode: '0444'
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - name: copy version files for dummy ext
   copy:
@@ -250,7 +250,7 @@
     - dummy--1.0.sql
     - dummy--2.0.sql
     - dummy--3.0.sql
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - name: add update paths
   file:
@@ -260,7 +260,7 @@
   with_items:
     - dummy--1.0--2.0.sql
     - dummy--2.0--3.0.sql
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - name: Get PostgreSQL version
   become_user: '{{ pg_user }}'

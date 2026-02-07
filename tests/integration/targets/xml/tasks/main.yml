@@ -10,9 +10,9 @@
 
 - name: Install lxml (FreeBSD)
   package:
-    name: 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-lxml'
+    name: 'py{{ ansible_facts.python.version.major }}{{ ansible_facts.python.version.minor }}-lxml'
     state: present
-  when: ansible_os_family == "FreeBSD"
+  when: ansible_facts.os_family == "FreeBSD"
 
 - name: Install requirements (RHEL 8)
   package:
@@ -21,14 +21,14 @@
       - libxslt-devel
       - python3-lxml
     state: present
-  when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "8"
+  when: ansible_facts.distribution == "RedHat" and ansible_facts.distribution_major_version == "8"
 
 # Needed for MacOSX !
 - name: Install lxml
   pip:
     name: lxml
     state: present
-#  when: ansible_os_family == "Darwin"
+#  when: ansible_facts.os_family == "Darwin"
 
 - name: Get lxml version
   command: "{{ ansible_python_interpreter }} -c 'from lxml import etree; print(\".\".join(str(v) for v in etree.LXML_VERSION))'"

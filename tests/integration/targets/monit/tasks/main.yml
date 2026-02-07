@@ -13,8 +13,8 @@
       include_role:
         name: setup_epel
       when:
-        - ansible_distribution in ['RedHat', 'CentOS']
-        - ansible_distribution_major_version is version('9', '<')
+        - ansible_facts.distribution in ['RedHat', 'CentOS']
+        - ansible_facts.distribution_major_version is version('9', '<')
 
     - name: create required directories
       become: true
@@ -36,7 +36,7 @@
       with_first_found:
         - files:
             - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
-            - '{{ ansible_os_family }}.yml'
+            - '{{ ansible_facts.os_family }}.yml'
             - 'defaults.yml'
 
     - name: monit config
@@ -55,13 +55,13 @@
       package:
         name: virtualenv
         state: present
-      when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+      when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
 
     - name: Install virtualenv on Arch Linux
       pip:
         name: virtualenv
         state: present
-      when: ansible_os_family == 'Archlinux'
+      when: ansible_facts.os_family == 'Archlinux'
 
     - name: install dependencies
       pip:

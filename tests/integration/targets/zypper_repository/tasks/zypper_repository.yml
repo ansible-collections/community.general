@@ -42,7 +42,7 @@
   community.general.zypper_repository:
     name: test
     state: present
-    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_distribution_version }}/
+    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_facts.distribution_version }}/
   register: zypper_result
 
 - name: Verify change on URL only change
@@ -55,7 +55,7 @@
     name: testrefresh
     refresh: false
     state: present
-    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_distribution_version }}/
+    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_facts.distribution_version }}/
 
 - name: check refreshoption
   command: zypper -x lr testrefresh
@@ -71,7 +71,7 @@
     name: testprio
     priority: 55
     state: present
-    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_distribution_version }}/
+    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_facts.distribution_version }}/
 
 - name: check refreshoption
   command: zypper -x lr testprio
@@ -114,8 +114,8 @@
     state: present
     repo: "{{ item }}"
   with_items:
-    - http://download.opensuse.org/repositories/science/openSUSE_Leap_{{ ansible_distribution_version }}/
-    - http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_distribution_version }}/
+    - http://download.opensuse.org/repositories/science/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
+    - http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
 
 - name: check repo is updated by name
   command: zypper lr samename
@@ -129,7 +129,7 @@
 
 - name: remove last added repos (by URL to test that)
   community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_distribution_version }}/
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
     state: absent
 
 # FIXME: this currently fails with `Repository 'Apache_PHP_Modules' is invalid.`
@@ -163,7 +163,7 @@
 
 - name: remove added repo
   community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_distribution_version }}/
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
     state: absent
   register: remove_repo
 
@@ -216,11 +216,11 @@
 # For now, the URL does not work for 15.4
 # FIXME: Try to get this working with newer versions
 #        (Maybe 'Uyuni' needs to be replaced with something else?)
-- when: ansible_distribution_version is version('15.4', '<')
+- when: ansible_facts.distribution_version is version('15.4', '<')
   block:
     - name: add new repository via url to .repo file
       community.general.zypper_repository:
-        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_facts.distribution_version }}/systemsmanagement:Uyuni:Stable.repo
         state: present
       register: added_by_repo_file
 
@@ -237,7 +237,7 @@
 
     - name: add same repository via url to .repo file again to verify idempotency
       community.general.zypper_repository:
-        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_facts.distribution_version }}/systemsmanagement:Uyuni:Stable.repo
         state: present
       register: added_again_by_repo_file
 
@@ -248,7 +248,7 @@
 
     - name: remove repository via url to .repo file
       community.general.zypper_repository:
-        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_facts.distribution_version }}/systemsmanagement:Uyuni:Stable.repo
         state: absent
       register: removed_by_repo_file
 

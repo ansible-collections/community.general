@@ -13,13 +13,13 @@
   include_role:
     name: setup_epel
   when:
-    - ansible_distribution in ['RedHat', 'CentOS']
-    - ansible_distribution_major_version is version('9', '<')
+    - ansible_facts.distribution in ['RedHat', 'CentOS']
+    - ansible_facts.distribution_major_version is version('9', '<')
 - name: Install iptables (SuSE only)
   package:
     name: iptables
   become: true
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts.os_family == 'Suse'
 - name: Install ufw
   become: true
   package:

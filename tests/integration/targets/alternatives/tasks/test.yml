@@ -46,11 +46,11 @@
 
 - name: 'check mode (manual: alternatives file existed, it has been updated)'
   shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
-  when: ansible_os_family != 'RedHat' or with_alternatives or item != 1
+  when: ansible_facts.os_family != 'RedHat' or with_alternatives or item != 1
 
 - name: 'check mode (auto: alternatives file didn''t exist, it has been created)'
   shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
-  when: ansible_os_family == 'RedHat' and not with_alternatives and item == 1
+  when: ansible_facts.os_family == 'RedHat' and not with_alternatives and item == 1
 
 - name: check that alternative has been updated
   command: "grep -Pzq '/bin/dummy{{ item }}\\n' '{{ alternatives_dir }}/dummy'"

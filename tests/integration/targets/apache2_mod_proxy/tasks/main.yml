@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - meta: end_play
-  when: ansible_os_family not in ['Debian', 'Suse']
+  when: ansible_facts.os_family not in ['Debian', 'Suse']
 
 - name: Enable mod_proxy
   community.general.apache2_module:
@@ -24,12 +24,12 @@
 
 - name: Add port 81
   lineinfile:
-    path: "/etc/apache2/{{ 'ports.conf' if ansible_os_family == 'Debian' else 'listen.conf' }}"
+    path: "/etc/apache2/{{ 'ports.conf' if ansible_facts.os_family == 'Debian' else 'listen.conf' }}"
     line: Listen 81
 
 - name: Set up virtual host
   copy:
-    dest: "/etc/apache2/{{ 'sites-available' if ansible_os_family == 'Debian' else 'vhosts.d' }}/000-apache2_mod_proxy-test.conf"
+    dest: "/etc/apache2/{{ 'sites-available' if ansible_facts.os_family == 'Debian' else 'vhosts.d' }}/000-apache2_mod_proxy-test.conf"
     content: |
       <VirtualHost *:81>
         <Proxy balancer://mycluster>
@@ -62,7 +62,7 @@
     owner: root
     group: root
     state: link
-  when: ansible_os_family not in ['Suse']
+  when: ansible_facts.os_family not in ['Suse']
 
 - name: Restart Apache
   service:

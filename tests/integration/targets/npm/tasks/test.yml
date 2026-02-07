@@ -13,7 +13,7 @@
     node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
     package: 'iconv-lite'
   environment:
-    PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+    PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
   block:
     - shell: npm --version
       register: npm_version

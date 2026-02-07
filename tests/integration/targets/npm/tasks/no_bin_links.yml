@@ -15,7 +15,7 @@
   block:
     - shell: npm --version
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
       register: npm_version
 
     - debug:
@@ -29,7 +29,7 @@
         name: '{{ package }}'
         no_bin_links: false
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
       register: npm_install_no_bin_links_disabled
 
     - name: 'Make sure .bin folder has been created'
@@ -50,7 +50,7 @@
         name: '{{ package }}'
         no_bin_links: true
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
       register: npm_install_no_bin_links_enabled
 
     - name: 'Make sure .bin folder has not been created'

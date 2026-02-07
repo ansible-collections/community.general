@@ -13,14 +13,14 @@
 - name: "get lvm facts"
   setup:
 
-- debug: var=ansible_lvm
+- debug: var=ansible_facts.lvm
 
 - name: "Assert the testvg span only on first disk"
   assert:
     that:
-      - ansible_lvm.pvs[loop_device1].vg == "testvg"
-      - 'loop_device2 not in ansible_lvm.pvs or
-        ansible_lvm.pvs[loop_device2].vg == ""'
+      - ansible_facts.lvm.pvs[loop_device1].vg == "testvg"
+      - 'loop_device2 not in ansible_facts.lvm.pvs or
+        ansible_facts.lvm.pvs[loop_device2].vg == ""'
 
 - name: "Extend to second disk AND keep first disk"
   lvg:
@@ -31,10 +31,10 @@
 - name: "get lvm facts"
   setup:
 
-- debug: var=ansible_lvm
+- debug: var=ansible_facts.lvm
 
 - name: "Assert the testvg spans on both disks"
   assert:
     that:
-      - ansible_lvm.pvs[loop_device1].vg == "testvg"
-      - ansible_lvm.pvs[loop_device2].vg == "testvg"
+      - ansible_facts.lvm.pvs[loop_device1].vg == "testvg"
+      - ansible_facts.lvm.pvs[loop_device2].vg == "testvg"
