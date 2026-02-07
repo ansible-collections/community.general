@@ -221,7 +221,7 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
             "parent_id": "my-realm",
             "locale": "en",
             "state": "present",
-            "append": True,
+            "force": False,
             "overrides": [
                 {"key": "a", "value": "1-updated"},  # update existing
                 {"key": "c", "value": "3"},  # create new
@@ -258,7 +258,7 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
             "parent_id": "my-realm",
             "locale": "en",
             "state": "present",
-            "append": False,
+            "force": True,
             "overrides": [
                 {"key": "a", "value": "1-updated"},  # update
                 {"key": "c", "value": "3"},  # create
@@ -297,7 +297,7 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
             "parent_id": "my-realm",
             "locale": "en",
             "state": "absent",
-            "append": True,
+            "force": False,
             "overrides": [
                 {"key": "a"},
             ],
@@ -331,7 +331,7 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
             "parent_id": "my-realm",
             "locale": "en",
             "state": "absent",
-            "append": False,
+            "force": True,
         }
         # Before: a=1, b=2; Remove all
         return_value_get_localization_values = [
