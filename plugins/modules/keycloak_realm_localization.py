@@ -356,7 +356,7 @@ def main():
 
         if module.check_mode:
             if result["changed"]:
-                result["msg"] = f"{to_remove.size()} overrides for locale {locale} would be deleted."
+                result["msg"] = f"{len(to_remove)} overrides for locale {locale} would be deleted."
             else:
                 result["msg"] = f"No overrides for locale {locale} to be deleted."
 
@@ -365,7 +365,7 @@ def main():
                 kc.delete_localization_value(locale, override["key"], parent_id)
 
             if result["changed"]:
-                result["msg"] = f"{to_remove.size()} overrides for locale {locale} deleted."
+                result["msg"] = f"{len(to_remove)} overrides for locale {locale} deleted."
             else:
                 result["msg"] = f"No overrides for locale {locale} to be deleted."
 
