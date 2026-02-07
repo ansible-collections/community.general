@@ -1,0 +1,5 @@
+bugfixes:
+  - keycloak_realm_key - fix ``KeyError`` crash when managing realm keys where Keycloak
+    does not return ``active``, ``enabled``, or ``algorithm`` fields in the config
+    response (https://github.com/ansible-collections/community.general/issues/11459,
+    https://github.com/ansible-collections/community.general/pull/11470).

@@ -402,10 +402,17 @@ def main():
                     result["changed"] = True
 
             # Compare parameters under the "config" key
+            # Note: Keycloak API may not return all config fields for default keys
+            # (e.g., 'active', 'enabled', 'algorithm' may be missing). Handle this
+            # gracefully by using .get() with defaults.
             for p, v in changeset_copy["config"].items():
-                before_realm_key["config"][p] = key["config"][p]
-                if v != key["config"][p]:
-                    changes += f"config.{p}: {key['config'][p]} -> {v}, "
+                # Get the current value, defaulting to our expected value if not present
+                # This handles the case where Keycloak does not return certain fields
+                # for default/generated keys
+                current_value = key["config"].get(p, v)
+                before_realm_key["config"][p] = current_value
+                if v != current_value:
+                    changes += f"config.{p}: {current_value} -> {v}, "
                     result["changed"] = True
 
     # Sanitize linefeeds for the privateKey. Without this the JSON payload
