@@ -457,3 +457,73 @@
       - end_state.attributes["oauth2.device.authorization.grant.enabled"] == 'false'
   vars:
     end_state: "{{ check_client_when_present_and_attributes_modified.end_state }}"
+
+# ---- Tests for valid_post_logout_redirect_uris and backchannel_logout_url ----
+
+- name: Create client with post logout redirect URIs and backchannel logout URL
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: logout-test-client
+    valid_post_logout_redirect_uris: "{{ post_logout_redirect_uris }}"
+    backchannel_logout_url: "{{ backchannel_logout_url }}"
+    state: present
+  register: result_create_logout_client
+
+- name: Assert logout client is created with correct attributes
+  assert:
+    that:
+      - result_create_logout_client is changed
+      - result_create_logout_client.end_state.attributes["post.logout.redirect.uris"] is defined
+      - result_create_logout_client.end_state.attributes["backchannel.logout.url"] == backchannel_logout_url
+
+- name: Re-create client with same logout fields (idempotency)
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: logout-test-client
+    valid_post_logout_redirect_uris: "{{ post_logout_redirect_uris }}"
+    backchannel_logout_url: "{{ backchannel_logout_url }}"
+    state: present
+  register: result_idempotent_logout_client
+
+- name: Assert logout client is idempotent
+  assert:
+    that:
+      - result_idempotent_logout_client is not changed
+
+- name: Update client logout fields
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: logout-test-client
+    valid_post_logout_redirect_uris:
+      - "https://example.com/new-logout"
+    backchannel_logout_url: "https://example.com/new-backchannel"
+    state: present
+  register: result_update_logout_client
+
+- name: Assert logout client fields are updated
+  assert:
+    that:
+      - result_update_logout_client is changed
+      - result_update_logout_client.end_state.attributes["backchannel.logout.url"] == "https://example.com/new-backchannel"
+
+- name: Delete logout test client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: logout-test-client
+    state: absent
