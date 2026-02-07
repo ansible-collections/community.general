@@ -23,11 +23,11 @@ attributes:
     support: full
 
 options:
-  append:
+  force:
     description:
-      - If V(true), only the keys listed in the O(overrides) will be modified by this module. Any other pre-existing
+      - If V(false), only the keys listed in the O(overrides) will be modified by this module. Any other pre-existing
         keys will be ignored.
-      - If V(false), all locale overrides will be made to match configuration of this module. I.e. any keys
+      - If V(true), all locale overrides will be made to match configuration of this module. I.e. any keys
         missing from the O(overrides) will be removed regardless of O(state) value.
     type: bool
     default: true
@@ -45,12 +45,12 @@ options:
     description:
       - Desired state of localization overrides for the given locale.
       - On V(present), the set of overrides for the locale will be made to match O(overrides).
-        If O(append) is V(false) keys not listed in O(overrides) will be removed,
+        If O(force) is V(true) keys not listed in O(overrides) will be removed,
         and the listed keys will be created or updated.
-        If O(append) is V(true)  keys not listed in O(overrides) will be ignored,
+        If O(force) is V(false)  keys not listed in O(overrides) will be ignored,
         and the listed keys will be created or updated.
-      - On V(absent), overrides for the locale will be removed. If O(append) is V(false), all keys will be removed.
-        If O(append) is V(true), only the keys listed in O(overrides) will be removed.
+      - On V(absent), overrides for the locale will be removed. If O(force) is V(true), all keys will be removed.
+        If O(force) is V(false), only the keys listed in O(overrides) will be removed.
     type: str
     choices: ['present', 'absent']
     default: present
@@ -98,7 +98,7 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: en
     state: present
-    append: false
+    force: false
     overrides:
       - key: greeting
         value: "Hello"
@@ -114,7 +114,7 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: fi
     state: present
-    append: false
+    force: false
     overrides:
       - key: app.title
         value: "Sovellukseni"
@@ -130,7 +130,7 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: de
     state: absent
-    append: false
+    force: false
   delegate_to: localhost
 
 - name: Dry run - see what would change for locale "en"
@@ -213,7 +213,7 @@ def main():
         parent_id=dict(type="str", required=True),
         state=dict(type="str", default="present", choices=["present", "absent"]),
         overrides=dict(type="list", elements="dict", options=overrides_spec, default=[]),
-        append=dict(type="bool", default=True),
+        force=dict(type="bool", default=False),
     )
 
     argument_spec.update(meta_args)
@@ -239,7 +239,7 @@ def main():
     locale = module.params["locale"]
     state = module.params["state"]
     parent_id = module.params["parent_id"]
-    append = module.params["append"]
+    force = module.params["force"]
 
     desired_overrides = _normalize_overrides(module.params["overrides"])
 
@@ -288,8 +288,8 @@ def main():
                 to_update.append(record)
                 result["changed"] = True
 
-        # ignore any left-overs in to_remove, append is true
-        if append:
+        # ignore any left-overs in to_remove, force is false
+        if not force:
             changeset["overrides"].extend(to_remove)
             to_remove = []
 
@@ -325,8 +325,12 @@ def main():
         result["end_state"] = {"locale": locale, "overrides": final_overrides}
 
     elif state == "absent":
-        # touch only overrides listed in parameters, leave the rest be
-        if append:
+        if force:
+
+            to_remove = old_overrides
+
+        else:
+            # touch only overrides listed in parameters, leave the rest be
             to_remove = deepcopy(desired_overrides)
             to_keep = deepcopy(old_overrides)
 
@@ -343,8 +347,6 @@ def main():
 
             changeset["overrides"] = to_keep
 
-        else:
-            to_remove = old_overrides
 
         if to_remove:
             result["changed"] = True
