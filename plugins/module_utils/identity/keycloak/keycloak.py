@@ -389,7 +389,7 @@ class KeycloakAPI:
         self.restheaders = connection_header
         self.http_agent = self.module.params.get("http_agent")
 
-    def _request(self, url: str, method: str, data: str | bytes | None = None, headers=None):
+    def _request(self, url: str, method: str, data: str | bytes | None = None, headers : dict[str,str] | None =None):
         """Makes a request to Keycloak and returns the raw response.
         If a 401 is returned, attempts to re-authenticate
         using first the module's refresh_token (if provided)
@@ -404,7 +404,7 @@ class KeycloakAPI:
         :return: raw API response
         """
 
-        def make_request_catching_401(headers) -> object | HTTPError:
+        def make_request_catching_401(headers : dict[str,str]) -> object | HTTPError:
             try:
                 return open_url(
                     url,

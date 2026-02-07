@@ -185,7 +185,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 )
 
 
-def _normalize_overrides_from_api(current : dict) -> list[dict]:
+def _normalize_overrides(current : dict | None) -> list[dict]:
     """
     Accepts:
       - dict: {'k1': 'v1', ...}
@@ -196,9 +196,7 @@ def _normalize_overrides_from_api(current : dict) -> list[dict]:
     if not current:
         return []
 
-    items = [{"key": k, "value": v} for k, v in sorted(current.items())]
-
-    return items
+    return [{"key": k, "value": v} for k, v in sorted(current.items())]
 
 
 def main():
@@ -238,17 +236,14 @@ def main():
     kc = KeycloakAPI(module, connection_header)
 
     # Convenience locals for frequently used parameters
-    locale = module.params.get("locale")
-    state = module.params.get("state")
-    parent_id = module.params.get("parent_id")
-    append = module.params.get("append")
+    locale = module.params["locale"]
+    state = module.params["state"]
+    parent_id = module.params["parent_id"]
+    append = module.params["append"]
 
-    desired_raw = module.params.get("overrides") or []
-    desired_map = {r["key"]: r.get("value") for r in desired_raw}
-    desired_overrides = [{"key": k, "value": v} for k, v in sorted(desired_map.items())]
+    desired_overrides = _normalize_overrides(module.params["overrides"])
 
-    # Fetch current overrides and normalize to comparable structure
-    old_overrides = _normalize_overrides_from_api(kc.get_localization_values(locale, parent_id) or {})
+    old_overrides = _normalize_overrides(kc.get_localization_values(locale, parent_id) or {})
     before = {
         "locale": locale,
         "overrides": deepcopy(old_overrides),
@@ -322,7 +317,7 @@ def main():
 
         # For accurate end_state, read back from API unless we are in check_mode
         if not module.check_mode:
-            final_overrides = _normalize_overrides_from_api(kc.get_localization_values(locale, parent_id) or {})
+            final_overrides = _normalize_overrides(kc.get_localization_values(locale, parent_id) or {})
 
         else:
             final_overrides = ["overrides"]
@@ -359,7 +354,7 @@ def main():
 
         if module.check_mode:
             if result["changed"]:
-                result["msg"] = f"Overrides for locale {locale} would be deleted."
+                result["msg"] = f"{to_remove.size()} overrides for locale {locale} would be deleted."
             else:
                 result["msg"] = f"No overrides for locale {locale} to be deleted."
 
@@ -367,7 +362,10 @@ def main():
             for override in to_remove:
                 kc.delete_localization_value(locale, override["key"], parent_id)
 
-            result["msg"] = f"Locale {locale} has no overrides."
+            if result["changed"]:
+                result["msg"] = f"{to_remove.size()} overrides for locale {locale} deleted."
+            else:
+                result["msg"] = f"No overrides for locale {locale} to be deleted."
 
         result["end_state"] = changeset
 
