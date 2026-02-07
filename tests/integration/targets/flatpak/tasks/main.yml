@@ -60,5 +60,5 @@
         pkill -f -- '{{ remote_tmp_dir }}/serve.py'
 
   when: |
-      ansible_distribution == 'Fedora' or
-      ansible_distribution == 'Ubuntu' and not ansible_distribution_major_version | int < 16
+      ansible_facts.distribution == 'Fedora' or
+      ansible_facts.distribution == 'Ubuntu' and not ansible_facts.distribution_major_version | int < 16

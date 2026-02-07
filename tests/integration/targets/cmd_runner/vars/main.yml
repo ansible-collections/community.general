@@ -171,8 +171,8 @@ cmd_echo_tests:
   - name: use cmd {{ remote_tmp_dir }}/echo
     condition: >
       {{
-        ansible_distribution != "MacOSX" and
-        not (ansible_distribution == "CentOS" and ansible_distribution_major_version is version('7.0', '<'))
+        ansible_facts.distribution != "MacOSX" and
+        not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_major_version is version('7.0', '<'))
       }}
     copy_to: "{{ remote_tmp_dir }}"
     cmd: "{{ remote_tmp_dir }}/echo"
@@ -196,8 +196,8 @@ cmd_echo_tests:
     cmd: echo
     condition: >
       {{
-        ansible_distribution != "MacOSX" and
-        not (ansible_distribution == "CentOS" and ansible_distribution_major_version is version('7.0', '<'))
+        ansible_facts.distribution != "MacOSX" and
+        not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_major_version is version('7.0', '<'))
       }}
     copy_to: "{{ remote_tmp_dir }}"
     path_prefix: "{{ remote_tmp_dir }}"

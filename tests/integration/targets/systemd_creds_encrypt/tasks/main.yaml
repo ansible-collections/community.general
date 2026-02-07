@@ -5,8 +5,8 @@
 
 - name: Test systemd_creds_encrypt
   when:
-    - ansible_systemd.version is defined
-    - ansible_systemd.version | int >= 250
+    - ansible_facts.systemd.version is defined
+    - ansible_facts.systemd.version | int >= 250
   block:
     - name: Encrypt secret
       become: true

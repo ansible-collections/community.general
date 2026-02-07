@@ -5,7 +5,7 @@
 
 postgresql_packages:
   - postgresql95-server
-  - "py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-psycopg2"
+  - "py{{ ansible_facts.python.version.major }}{{ ansible_facts.python.version.minor }}-psycopg2"
 
 pg_dir: /usr/local/pgsql/data
 pg_hba_location: "{{ pg_dir }}/pg_hba.conf"

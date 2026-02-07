@@ -16,8 +16,8 @@
   include_role:
     name: setup_epel
   when:
-    - ansible_distribution in ['RedHat', 'CentOS']
-    - ansible_distribution_major_version is version('9', '<')
+    - ansible_facts.distribution in ['RedHat', 'CentOS']
+    - ansible_facts.distribution_major_version is version('9', '<')
 
 - name: Distribution specific
   block:

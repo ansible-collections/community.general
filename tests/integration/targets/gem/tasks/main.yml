@@ -10,16 +10,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - when:
-    - not (ansible_os_family == 'Alpine')  # TODO
+    - not (ansible_facts.os_family == 'Alpine')  # TODO
   block:
 
     - include_vars: '{{ item }}'
       with_first_found:
         - files:
-            - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-            - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-            - '{{ ansible_distribution }}.yml'
-            - '{{ ansible_os_family }}.yml'
+            - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+            - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+            - '{{ ansible_facts.distribution }}.yml'
+            - '{{ ansible_facts.os_family }}.yml'
             - 'default.yml'
           paths: '../vars'
 
@@ -28,7 +28,7 @@
         name: "{{ item }}"
         state: present
       loop: "{{ test_packages }}"
-      when: ansible_distribution != "MacOSX"
+      when: ansible_facts.distribution != "MacOSX"
 
     - name: Install a gem
       gem:
@@ -44,7 +44,7 @@
         msg: "failed to install gem: {{ install_gem_result.msg }}"
       when:
         - install_gem_result is failed
-        - not (ansible_user_uid == 0 and "User --install-dir or --user-install but not both" not in install_gem_result.msg)
+        - not (ansible_facts.user_uid == 0 and "User --install-dir or --user-install but not both" not in install_gem_result.msg)
 
     - block:
         - name: List gems
@@ -108,7 +108,7 @@
             that:
               - remove_gem_results is changed
               - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
-      when: ansible_user_uid == 0
+      when: ansible_facts.user_uid == 0
 
     # Check custom gem directory
     - name: Install gem in a custom directory with incorrect options
@@ -217,12 +217,12 @@
       community.general.gem:
         name: json
         state: absent
-      when: ansible_distribution == "Ubuntu"
+      when: ansible_facts.distribution == "Ubuntu"
       register: gem_result
       ignore_errors: true
 
     - name: Assert gem uninstall failed as expected
-      when: ansible_distribution == "Ubuntu"
+      when: ansible_facts.distribution == "Ubuntu"
       assert:
         that:
           - gem_result is failed

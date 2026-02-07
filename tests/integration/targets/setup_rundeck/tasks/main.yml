@@ -10,11 +10,11 @@
 
 - name: Skip unsupported platforms
   meta: end_play
-  when: ansible_distribution not in ['CentOS', 'Fedora', 'Debian', 'Ubuntu']
+  when: ansible_facts.distribution not in ['CentOS', 'Fedora', 'Debian', 'Ubuntu']
 
 - name: Include OS-specific variables
-  include_vars: '{{ ansible_os_family }}.yml'
-  when: ansible_os_family in ['Debian', 'RedHat']
+  include_vars: '{{ ansible_facts.os_family }}.yml'
+  when: ansible_facts.os_family in ['Debian', 'RedHat']
 
 - name: Set Rundeck base dir
   set_fact:

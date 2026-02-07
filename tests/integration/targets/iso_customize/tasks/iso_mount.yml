@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- debug: var=ansible_distribution
+- debug: var=ansible_facts.distribution
 
 - block:
     - name: "Mount customized ISO on MAC"
@@ -20,7 +20,7 @@
     - set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount/CDROM"
       when: iso_name.find('udf') != -1
-  when: ansible_distribution == "MacOSX"
+  when: ansible_facts.distribution == "MacOSX"
 
 - block:
     - name: "Mount {{ iso_name }} to {{ test_dir }}/iso_mount on localhost"
@@ -36,4 +36,4 @@
     - set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount"
   when:
-    - ansible_distribution != "MacOSX"
+    - ansible_facts.distribution != "MacOSX"

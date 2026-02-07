@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: setup Alpine
-  when: ansible_distribution == 'Alpine'
+  when: ansible_facts.distribution == 'Alpine'
   package:
     name:
       - xfsprogs

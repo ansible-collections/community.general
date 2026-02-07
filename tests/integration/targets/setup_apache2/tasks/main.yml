@@ -12,7 +12,7 @@
   apt:
     name: "{{item}}"
     state: present
-  when: "ansible_os_family == 'Debian'"
+  when: "ansible_facts.os_family == 'Debian'"
   with_items:
     - apache2
     - libapache2-mod-evasive
@@ -21,10 +21,10 @@
   community.general.zypper:
     name: apache2
     state: present
-  when: "ansible_os_family == 'Suse'"
+  when: "ansible_facts.os_family == 'Suse'"
 
 - name: Enable mod_slotmem_shm on SuSE
   apache2_module:
     name: slotmem_shm
     state: present
-  when: "ansible_os_family == 'Suse'"
+  when: "ansible_facts.os_family == 'Suse'"

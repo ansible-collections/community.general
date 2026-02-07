@@ -12,7 +12,7 @@
     cargo_environment:
       # See https://github.com/rust-lang/cargo/issues/10230#issuecomment-1201662729:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-  when: has_cargo | default(false) and ansible_distribution == 'Alpine'
+  when: has_cargo | default(false) and ansible_facts.distribution == 'Alpine'
 - block:
     - import_tasks: test_general.yml
     - import_tasks: test_version.yml

@@ -38,14 +38,14 @@
     yarn_bin_path: "{{ remote_tmp_dir }}/yarn-v{{ yarn_version }}/bin"
     package: 'iconv-lite'
   environment:
-    PATH: "{{ node_bin_path }}:{{ansible_env.PATH}}"
+    PATH: "{{ node_bin_path }}:{{ansible_facts.env.PATH}}"
     YARN_IGNORE_ENGINES: true
   block:
 
     # Get the version of Yarn and register to a variable
     - shell: '{{ yarn_bin_path }}/yarn --version'
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_version
 
     - name: 'Create dummy package.json'
@@ -59,7 +59,7 @@
         executable: '{{ yarn_bin_path }}/yarn'
         state: present
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
 
     - name: 'Install the same package from package.json again.'
       yarn:
@@ -68,7 +68,7 @@
         name: '{{ package }}'
         state: present
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_install
 
     - assert:
@@ -81,7 +81,7 @@
         executable: '{{ yarn_bin_path }}/yarn'
         state: present
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       check_mode: true
       register: yarn_install_check
 
@@ -101,7 +101,7 @@
         version: 1.1.0
         state: present
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_install_old_package
 
     - assert:
@@ -115,7 +115,7 @@
         version: 1.1.0
         state: present
       environment:
-        PATH: '{{ yarn_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ yarn_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
 
     - name: 'Upgrade old package'
       yarn:
@@ -124,7 +124,7 @@
         name: left-pad
         state: latest
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_update_old_package
 
     - assert:
@@ -138,7 +138,7 @@
         name: '{{ package }}'
         state: absent
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_uninstall_package
 
     - name: 'Assert package removed'
@@ -154,7 +154,7 @@
         version: 2.0.0
         state: present
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_global_install_old_binary
 
     - assert:
@@ -168,7 +168,7 @@
         name: prettier
         state: latest
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_global_update_old_binary
 
     - assert:
@@ -182,7 +182,7 @@
         name: prettier
         state: absent
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_global_uninstall_binary
 
     - assert:
@@ -197,7 +197,7 @@
         version: 1.1.0
         state: present
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_global_install_old_package
 
     - assert:
@@ -211,7 +211,7 @@
         name: left-pad
         state: latest
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_global_update_old_package
 
     - assert:
@@ -225,7 +225,7 @@
         name: left-pad
         state: absent
       environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_global_uninstall_package
 
     - assert:

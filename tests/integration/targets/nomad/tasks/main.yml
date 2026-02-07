@@ -7,13 +7,13 @@
   meta: end_play
   # TODO: figure out why Alpine does not work!
   when: |
-    ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>=')
-    or ansible_distribution == 'Alpine'
+    ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version is not version('7', '>=')
+    or ansible_facts.distribution == 'Alpine'
 
 - name: Install Nomad and test
   vars:
     nomad_version: 0.12.4
-    nomad_uri: https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_{{ ansible_system | lower }}_{{ nomad_arch }}.zip
+    nomad_uri: https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_{{ ansible_facts.system | lower }}_{{ nomad_arch }}.zip
     nomad_cmd: '{{ remote_tmp_dir }}/nomad'
   block:
 
@@ -23,7 +23,7 @@
         extra_args: "-c {{ remote_constraints }}"
       register: result
       until: result is success
-      when: ansible_distribution_file_variety|default() == 'RedHat' and ansible_distribution_major_version is version('6', '<=')
+      when: ansible_facts.distribution_file_variety|default() == 'RedHat' and ansible_facts.distribution_major_version is version('6', '<=')
 
     - name: Install python-nomad
       pip:
@@ -64,18 +64,18 @@
         name: unzip
       register: result
       until: result is success
-      when: ansible_distribution != "MacOSX"
+      when: ansible_facts.distribution != "MacOSX"
 
     - assert:
-        that: ansible_architecture in ['i386', 'x86_64', 'amd64']
+        that: ansible_facts.architecture in ['i386', 'x86_64', 'amd64']
 
     - set_fact:
         nomad_arch: '386'
-      when: ansible_architecture == 'i386'
+      when: ansible_facts.architecture == 'i386'
 
     - set_fact:
         nomad_arch: amd64
-      when: ansible_architecture in ['x86_64', 'amd64']
+      when: ansible_facts.architecture in ['x86_64', 'amd64']
 
     - name: Download nomad binary
       unarchive:
