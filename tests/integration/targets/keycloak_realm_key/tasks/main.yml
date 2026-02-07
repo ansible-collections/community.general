@@ -364,6 +364,996 @@
       - result.end_state.config.priority == ["150"]
       - result.msg == "Realm key testkey_with_certificate was in sync"
 
+# ============================================================
+# Tests for auto-generated key providers
+# ============================================================
+
+- name: Create HMAC key (hmac-generated provider, check mode)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: hmac-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: hmac-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: HS256
+      secret_size: 64
+  check_mode: true
+  register: result
+
+- name: Assert HMAC key would be created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "hmac-test-key"
+      - result.end_state.providerId == "hmac-generated"
+      - result.end_state.config.algorithm == ["HS256"]
+      - result.end_state.config.secretSize == ["64"]
+      - result.msg == "Realm key hmac-test-key would be created"
+
+- name: Create HMAC key (hmac-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: hmac-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: hmac-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: HS256
+      secret_size: 64
+  register: result
+
+- name: Assert HMAC key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "hmac-test-key"
+      - result.end_state.providerId == "hmac-generated"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.algorithm == ["HS256"]
+      - result.end_state.config.secretSize == ["64"]
+      - result.msg == "Realm key hmac-test-key created"
+
+- name: Create HMAC key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: hmac-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: hmac-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: HS256
+      secret_size: 64
+  register: result
+
+- name: Assert HMAC key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key hmac-test-key was in sync"
+
+- name: Update HMAC key priority
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: hmac-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: hmac-generated
+    config:
+      enabled: true
+      active: true
+      priority: 110
+      algorithm: HS256
+      secret_size: 64
+  register: result
+
+- name: Assert HMAC key was updated
+  assert:
+    that:
+      - result is changed
+      - result.end_state.config.priority == ["110"]
+      - "'config.priority' in result.msg"
+
+- name: Remove HMAC key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: hmac-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: hmac-generated
+    config:
+      priority: 110
+  register: result
+
+- name: Assert HMAC key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == "Realm key hmac-test-key deleted"
+
+# ============================================================
+# AES generated key tests
+# ============================================================
+
+- name: Create AES key (aes-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: aes-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: aes-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      secret_size: 32
+  register: result
+
+- name: Assert AES key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "aes-test-key"
+      - result.end_state.providerId == "aes-generated"
+      - result.end_state.config.secretSize == ["32"]
+      - result.msg == "Realm key aes-test-key created"
+
+- name: Create AES key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: aes-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: aes-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      secret_size: 32
+  register: result
+
+- name: Assert AES key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key aes-test-key was in sync"
+
+- name: Remove AES key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: aes-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: aes-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert AES key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key aes-test-key deleted"
+
+# ============================================================
+# ECDSA generated key tests
+# ============================================================
+
+- name: Create ECDSA key (ecdsa-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdsa-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: ecdsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: ES256
+      elliptic_curve: P-256
+  register: result
+
+- name: Assert ECDSA key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "ecdsa-test-key"
+      - result.end_state.providerId == "ecdsa-generated"
+      - result.end_state.config.algorithm == ["ES256"]
+      - result.end_state.config.ecdsaEllipticCurveKey == ["P-256"]
+      - result.msg == "Realm key ecdsa-test-key created"
+
+- name: Create ECDSA key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdsa-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: ecdsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: ES256
+      elliptic_curve: P-256
+  register: result
+
+- name: Assert ECDSA key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key ecdsa-test-key was in sync"
+
+- name: Remove ECDSA key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdsa-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: ecdsa-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert ECDSA key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key ecdsa-test-key deleted"
+
+# ============================================================
+# RSA generated key tests
+# ============================================================
+
+- name: Create RSA generated key (rsa-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-gen-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: rsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      key_size: 2048
+  register: result
+
+- name: Assert RSA generated key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "rsa-gen-test-key"
+      - result.end_state.providerId == "rsa-generated"
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.keySize == ["2048"]
+      - result.msg == "Realm key rsa-gen-test-key created"
+
+- name: Create RSA generated key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-gen-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: rsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      key_size: 2048
+  register: result
+
+- name: Assert RSA generated key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key rsa-gen-test-key was in sync"
+
+- name: Remove RSA generated key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-gen-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: rsa-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert RSA generated key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key rsa-gen-test-key deleted"
+
+# ============================================================
+# Test managing default realm keys (issue #11459)
+# ============================================================
+
+- name: Update priority of default hmac-generated key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: hmac-generated
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: hmac-generated
+    config:
+      enabled: true
+      active: true
+      priority: 150
+  register: result
+
+- name: Assert default hmac-generated key was updated
+  assert:
+    that:
+      - result is changed
+      - result.end_state.config.priority == ["150"]
+
+- name: Remove default hmac-generated key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: hmac-generated
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: hmac-generated
+    config:
+      priority: 150
+  register: result
+
+- name: Assert default hmac-generated key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == "Realm key hmac-generated deleted"
+
+# ============================================================
+# RSA encryption generated key tests (rsa-enc-generated)
+# ============================================================
+
+- name: Create RSA encryption key (rsa-enc-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-enc-gen-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: rsa-enc-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RSA-OAEP
+      key_size: 2048
+  register: result
+
+- name: Assert RSA encryption key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "rsa-enc-gen-test-key"
+      - result.end_state.providerId == "rsa-enc-generated"
+      - result.end_state.config.algorithm == ["RSA-OAEP"]
+      - result.end_state.config.keySize == ["2048"]
+      - result.msg == "Realm key rsa-enc-gen-test-key created"
+
+- name: Create RSA encryption key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-enc-gen-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: rsa-enc-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RSA-OAEP
+      key_size: 2048
+  register: result
+
+- name: Assert RSA encryption key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key rsa-enc-gen-test-key was in sync"
+
+- name: Remove RSA encryption key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: rsa-enc-gen-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: rsa-enc-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert RSA encryption key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key rsa-enc-gen-test-key deleted"
+
+# ============================================================
+# ECDH generated key tests (ecdh-generated)
+# ============================================================
+
+- name: Create ECDH key (ecdh-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdh-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: ecdh-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: ECDH_ES
+      elliptic_curve: P-256
+  register: result
+
+- name: Assert ECDH key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "ecdh-test-key"
+      - result.end_state.providerId == "ecdh-generated"
+      - result.end_state.config.algorithm == ["ECDH_ES"]
+      - result.end_state.config.ecdhEllipticCurveKey == ["P-256"]
+      - result.msg == "Realm key ecdh-test-key created"
+
+- name: Create ECDH key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdh-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: ecdh-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: ECDH_ES
+      elliptic_curve: P-256
+  register: result
+
+- name: Assert ECDH key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key ecdh-test-key was in sync"
+
+- name: Remove ECDH key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: ecdh-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: ecdh-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert ECDH key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key ecdh-test-key deleted"
+
+# ============================================================
+# EdDSA generated key tests (eddsa-generated)
+# ============================================================
+
+- name: Create EdDSA key (eddsa-generated provider)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: eddsa-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: eddsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      elliptic_curve: Ed25519
+  register: result
+
+- name: Assert EdDSA key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "eddsa-test-key"
+      - result.end_state.providerId == "eddsa-generated"
+      - result.end_state.config.eddsaEllipticCurveKey == ["Ed25519"]
+      - result.msg == "Realm key eddsa-test-key created"
+
+- name: Create EdDSA key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: eddsa-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: eddsa-generated
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      elliptic_curve: Ed25519
+  register: result
+
+- name: Assert EdDSA key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key eddsa-test-key was in sync"
+
+- name: Remove EdDSA key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: eddsa-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: eddsa-generated
+    config:
+      priority: 100
+  register: result
+
+- name: Assert EdDSA key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.msg == "Realm key eddsa-test-key deleted"
+
+# ============================================================
+# Java Keystore provider tests (java-keystore)
+# Note: These tests require a keystore file on the Keycloak server
+# They are conditionally skipped if test_keystore_path is not defined
+# ============================================================
+
+- name: Create java-keystore key (check mode)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  check_mode: true
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key would be created (check mode)
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "jks-test-key"
+      - result.end_state.providerId == "java-keystore"
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.keystore == [test_keystore_path]
+      - result.end_state.config.keyAlias == [test_key_alias]
+      - result.msg == "Realm key jks-test-key would be created"
+  when: test_keystore_path is defined
+
+- name: Create java-keystore key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "jks-test-key"
+      - result.end_state.providerId == "java-keystore"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.key_info is defined
+      - result.end_state.key_info.kid is defined
+      - result.end_state.key_info.certificate_fingerprint is defined
+      - result.end_state.key_info.status == "ACTIVE"
+      - result.msg == "Realm key jks-test-key created"
+  when: test_keystore_path is defined
+
+- name: Create java-keystore key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key is in sync
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key jks-test-key was in sync"
+  when: test_keystore_path is defined
+
+- name: Update java-keystore key priority
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-test-key
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    config:
+      enabled: true
+      active: true
+      priority: 110
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key was updated
+  assert:
+    that:
+      - result is changed
+      - result.end_state.config.priority == ["110"]
+      - "'config.priority' in result.msg"
+  when: test_keystore_path is defined
+
+- name: Remove java-keystore key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-test-key
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    config:
+      priority: 110
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == "Realm key jks-test-key deleted"
+  when: test_keystore_path is defined
+
+# ============================================================
+# Java Keystore update_password tests
+# ============================================================
+
+- name: Create java-keystore key with update_password=always (default)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-update-pw-test
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    # update_password: always is the default
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "jks-update-pw-test"
+      - result.msg == "Realm key jks-update-pw-test created"
+  when: test_keystore_path is defined
+
+- name: Re-run with update_password=always (should NOT be idempotent - passwords always sent)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-update-pw-test
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    update_password: always
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+# Note: With update_password=always, the module always sends passwords to Keycloak.
+# Keycloak doesn't report back if passwords changed, so the module reports "in sync"
+# for the config comparison (passwords are excluded from comparison).
+# The key difference is: always sends real passwords, on_create sends masked values.
+- name: Assert java-keystore key is in sync (no config changes detected)
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key jks-update-pw-test was in sync"
+  when: test_keystore_path is defined
+
+- name: Remove java-keystore key to test update_password=on_create
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-update-pw-test
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    config:
+      priority: 100
+  register: result
+  when: test_keystore_path is defined
+
+- name: Create java-keystore key with update_password=on_create
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-update-pw-test
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    update_password: on_create
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key was created with on_create mode
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "jks-update-pw-test"
+      - result.msg == "Realm key jks-update-pw-test created"
+  when: test_keystore_path is defined
+
+- name: Re-run with update_password=on_create (should be idempotent)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-update-pw-test
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    update_password: on_create
+    config:
+      enabled: true
+      active: true
+      priority: 100
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore key is idempotent with on_create mode
+  assert:
+    that:
+      - result is not changed
+      - result.msg == "Realm key jks-update-pw-test was in sync"
+  when: test_keystore_path is defined
+
+- name: Update priority with update_password=on_create (passwords preserved)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-update-pw-test
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    update_password: on_create
+    config:
+      enabled: true
+      active: true
+      priority: 110
+      algorithm: RS256
+      keystore: "{{ test_keystore_path }}"
+      keystore_password: "{{ test_keystore_password }}"
+      key_alias: "{{ test_key_alias }}"
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert priority was updated but passwords preserved
+  assert:
+    that:
+      - result is changed
+      - result.end_state.config.priority == ["110"]
+      - "'config.priority' in result.msg"
+  when: test_keystore_path is defined
+
+- name: Remove java-keystore update_password test key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: jks-update-pw-test
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: java-keystore
+    config:
+      priority: 110
+  register: result
+  when: test_keystore_path is defined
+
+- name: Assert java-keystore update_password test key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+  when: test_keystore_path is defined
+
 - name: Remove Keycloak test realm
   community.general.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
