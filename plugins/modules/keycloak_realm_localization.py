@@ -185,7 +185,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 )
 
 
-def _normalize_overrides(current : dict | None) -> list[dict]:
+def _normalize_overrides(current: dict | None) -> list[dict]:
     """
     Accepts:
       - dict: {'k1': 'v1', ...}
@@ -326,7 +326,6 @@ def main():
 
     elif state == "absent":
         if force:
-
             to_remove = old_overrides
 
         else:
@@ -346,7 +345,6 @@ def main():
                     to_remove.remove(override)
 
             changeset["overrides"] = to_keep
-
 
         if to_remove:
             result["changed"] = True
