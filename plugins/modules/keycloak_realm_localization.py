@@ -1,4 +1,3 @@
-# Python
 # !/usr/bin/python
 
 # Copyright Jakub Danek <danek.ja@gmail.com>
@@ -186,7 +185,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 )
 
 
-def _normalize_overrides_from_api(current):
+def _normalize_overrides_from_api(current : dict) -> list[dict]:
     """
     Accepts:
       - dict: {'k1': 'v1', ...}
@@ -197,29 +196,20 @@ def _normalize_overrides_from_api(current):
     if not current:
         return []
 
-    # Convert mapping to list of key/value dicts
     items = [{"key": k, "value": v} for k, v in sorted(current.items())]
 
-    # Sort for stable comparisons and diff output
     return items
 
 
 def main():
-    """
-    Module execution
-
-    :return:
-    """
-    # Base Keycloak auth/spec fragment common across Keycloak modules
     argument_spec = keycloak_argument_spec()
 
-    # Describe a single override record
+    # Single override record structure
     overrides_spec = dict(
         key=dict(type="str", no_log=False, required=True),
         value=dict(type="str", default=""),
     )
 
-    # Module-specific arguments
     meta_args = dict(
         locale=dict(type="str", required=True),
         parent_id=dict(type="str", required=True),
@@ -233,12 +223,10 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        # Require token OR full credential set. This mirrors other Keycloak modules.
         required_one_of=([["token", "auth_realm", "auth_username", "auth_password"]]),
         required_together=([["auth_realm", "auth_username", "auth_password"]]),
     )
 
-    # Initialize the result object used by Ansible
     result = dict(changed=False, msg="", end_state={}, diff=dict(before={}, after={}))
 
     # Obtain access token, initialize API
@@ -272,7 +260,6 @@ def main():
         "overrides": [],
     }
 
-    # Default to no change; flip to True when updates/deletes are needed
     result["changed"] = False
 
     if state == "present":
@@ -311,7 +298,6 @@ def main():
             changeset["overrides"].extend(to_remove)
             to_remove = []
 
-        # Any leftovers in to_remove must be deleted
         if to_remove:
             result["changed"] = True
 
@@ -320,7 +306,6 @@ def main():
                 result["diff"] = dict(before=before, after=changeset)
 
             if module.check_mode:
-                # Dry-run: report intent without side effects
                 result["msg"] = f"Locale {locale} overrides would be updated."
 
             else:
@@ -358,7 +343,6 @@ def main():
                         found = True
                         break
 
-                # not present
                 if not found:
                     to_remove.remove(override)
 
