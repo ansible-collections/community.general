@@ -242,7 +242,8 @@ def main():
     parent_id = module.params["parent_id"]
     force = module.params["force"]
 
-    desired_overrides = _normalize_overrides(module.params["overrides"])
+    desired_raw = module.params["overrides"]
+    desired_overrides = _normalize_overrides({r["key"]: r.get("value") for r in desired_raw})
 
     old_overrides = _normalize_overrides(kc.get_localization_values(locale, parent_id) or {})
     before = {
