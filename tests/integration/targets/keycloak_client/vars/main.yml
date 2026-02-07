@@ -20,6 +20,11 @@ auth_args:
   auth_username: "{{ admin_user }}"
   auth_password: "{{ admin_password }}"
 
+post_logout_redirect_uris:
+  - "https://example.com/logout-callback"
+  - "https://example.com/signout"
+backchannel_logout_url: "https://example.com/backchannel-logout"
+
 redirect_uris1:
   - "http://example.c.com/"
   - "http://example.b.com/"

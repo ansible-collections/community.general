@@ -1,0 +1,7 @@
+minor_changes:
+  - keycloak_client - add ``valid_post_logout_redirect_uris`` option to configure
+    post logout redirect URIs for a client, and ``backchannel_logout_url`` option to configure the
+    backchannel logout URL for a client
+    (https://github.com/ansible-collections/community.general/issues/6812,
+    https://github.com/ansible-collections/community.general/issues/4892,
+    https://github.com/ansible-collections/community.general/pull/11473).
