@@ -50,12 +50,14 @@ options:
         is run.
     type: str
   includepkgs:
-    description: List of packages to include.
+    description:
+      - List of packages to include in all operations.  Inverse of O(excludepkgs), DNF will exclude any package in
+        the repository that does not match this list.  Matches a name or a glob.
     type: list
     elements: str
     version_added: 9.4.0
   excludepkgs:
-    description: List of packages to exclude.
+    description: List of packages in this repository to exclude from all operations.  Matches a name or a glob.
     type: list
     elements: str
     version_added: 9.4.0
@@ -74,12 +76,14 @@ EXAMPLES = r"""
     state: absent
     name: '@copr/integration_tests'
 
-- name: Install Caddy
+- name: Install a repo where only packages starting with "python" that do not have i386 are seen by DNF
   community.general.copr:
-    name: '@caddy/caddy'
+    name: '@sample/repo'
     chroot: fedora-rawhide-{{ ansible_facts.architecture }}
     includepkgs:
-      - caddy
+      - 'python*'
+    excludepkgs:
+      - '*.i386'
 """
 
 RETURN = r"""
