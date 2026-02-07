@@ -30,7 +30,7 @@ options:
       - If V(true), all locale overrides will be made to match configuration of this module. I.e. any keys
         missing from the O(overrides) will be removed regardless of O(state) value.
     type: bool
-    default: true
+    default: false
   locale:
     description:
       - Locale code for which the overrides apply (for example, V(en), V(fi), V(de)).
