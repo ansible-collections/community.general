@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Arch-less block
-  when: ansible_distribution not in ['Archlinux']
+  when: ansible_facts.distribution not in ['Archlinux']
   block:
     - name: Is the locale we're going to test against installed?
       command: locale -a

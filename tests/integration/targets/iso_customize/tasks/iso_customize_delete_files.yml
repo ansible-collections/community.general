@@ -10,7 +10,7 @@
     delete_files:
       - "test01.cfg"
 
-- debug: var=ansible_distribution
+- debug: var=ansible_facts.distribution
 
 - include_tasks: iso_mount.yml
   vars:

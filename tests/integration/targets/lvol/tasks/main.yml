@@ -12,7 +12,7 @@
   package:
     name: lvm2
     state: present
-  when: ansible_system == 'Linux'
+  when: ansible_facts.system == 'Linux'
 
 - name: Test lvol module
   block:

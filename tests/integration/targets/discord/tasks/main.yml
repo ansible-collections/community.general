@@ -42,7 +42,7 @@
             value: 1
           - name: "Field 2"
             value: "Text"
-        timestamp: "{{ ansible_date_time.iso8601 }}"
+        timestamp: "{{ ansible_facts.date_time.iso8601 }}"
     username: Ansible Test
     avatar_url: "https://avatars.githubusercontent.com/u/44586252?s=200&v=4"
   register: result

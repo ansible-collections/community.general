@@ -9,8 +9,8 @@
     owner: root
     group: root
     mode: '0644'
-  when: with_alternatives or ansible_os_family != 'RedHat'
+  when: with_alternatives or ansible_facts.os_family != 'RedHat'
 - file:
     path: '{{ alternatives_dir }}/dummy'
     state: absent
-  when: not with_alternatives and ansible_os_family == 'RedHat'
+  when: not with_alternatives and ansible_facts.os_family == 'RedHat'

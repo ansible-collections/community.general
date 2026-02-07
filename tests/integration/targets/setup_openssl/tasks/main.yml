@@ -13,10 +13,10 @@
   vars:
     search:
       files:
-        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-        - '{{ ansible_distribution }}.yml'
-        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
         - default.yml
       paths:
         - vars
@@ -25,7 +25,7 @@
   become: true
   package:
     name: '{{ openssl_package_name }}'
-  when: not ansible_os_family == 'Darwin'
+  when: not ansible_facts.os_family == 'Darwin'
 
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
   block:
@@ -53,5 +53,5 @@
   register: openssl_version
 
 - name: register cryptography version
-  command: "{{ ansible_python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+  command: "{{ ansible_facts.python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: cryptography_version

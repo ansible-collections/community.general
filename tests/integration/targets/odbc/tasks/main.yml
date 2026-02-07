@@ -9,12 +9,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - debug:
-    msg: "{{ ansible_os_family }} / {{ ansible_distribution }} / {{ ansible_distribution_major_version }}"
+    msg: "{{ ansible_facts.os_family }} / {{ ansible_facts.distribution }} / {{ ansible_facts.distribution_major_version }}"
 
 - when:
-    - ansible_os_family != 'Archlinux'  # TODO install driver from AUR: https://aur.archlinux.org/packages/psqlodbc
-    - ansible_os_family != 'RedHat' or ansible_distribution_major_version != '7'  # CentOS 7 stopped working
-    - ansible_distribution != 'Debian' or ansible_distribution_major_version != '13'  # TODO fix tests for Debian 13 (Trixie)!
+    - ansible_facts.os_family != 'Archlinux'  # TODO install driver from AUR: https://aur.archlinux.org/packages/psqlodbc
+    - ansible_facts.os_family != 'RedHat' or ansible_facts.distribution_major_version != '7'  # CentOS 7 stopped working
+    - ansible_facts.distribution != 'Debian' or ansible_facts.distribution_major_version != '13'  # TODO fix tests for Debian 13 (Trixie)!
   block:
 
     #
@@ -22,7 +22,7 @@
     #
     # Some of the docker images already have pyodbc installed on it
     - include_tasks: no_pyodbc.yml
-      when: ansible_os_family != 'FreeBSD' and ansible_os_family != 'Suse' and ansible_os_family != 'Debian'
+      when: ansible_facts.os_family != 'FreeBSD' and ansible_facts.os_family != 'Suse' and ansible_facts.os_family != 'Debian'
 
     #
     # Get pyodbc installed
@@ -40,17 +40,17 @@
     - name: Changing DSN for Suse
       set_fact:
         dsn: "DRIVER={PSQL};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
-      when: ansible_os_family == 'Suse' or ansible_os_family == 'Alpine'
+      when: ansible_facts.os_family == 'Suse' or ansible_facts.os_family == 'Alpine'
 
     - name: Changing DSN for Alpine
       set_fact:
         dsn: "DRIVER={/usr/lib/psqlodbcw.so};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
-      when: ansible_os_family == 'Alpine'
+      when: ansible_facts.os_family == 'Alpine'
 
     - name: Changing DSN for Debian
       set_fact:
         dsn: "DRIVER={PostgreSQL Unicode};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
 
     #
     # Name setup database

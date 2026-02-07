@@ -12,7 +12,7 @@
   yum:
     name: procps-ng
     state: latest
-  when: ansible_distribution == 'Fedora' and ansible_distribution_major_version == '34'
+  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '34'
 
 - block:
     - name: Install necessary packages to test yum_versionlock
@@ -83,5 +83,5 @@
         name: yum-plugin-versionlock
         state: absent
       when: yum_versionlock_install is changed
-  when: (ansible_distribution in ['CentOS', 'RedHat'] and ansible_distribution_major_version is version('7', '>=')) or
-        (ansible_distribution == 'Fedora')
+  when: (ansible_facts.distribution in ['CentOS', 'RedHat'] and ansible_facts.distribution_major_version is version('7', '>=')) or
+        (ansible_facts.distribution == 'Fedora')

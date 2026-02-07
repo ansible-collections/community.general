@@ -27,15 +27,15 @@
       - bzip2
     state: latest
   when:
-    - ansible_system != 'FreeBSD'
-    - ansible_os_family != 'Darwin'
-    - ansible_os_family != 'Debian'
+    - ansible_facts.system != 'FreeBSD'
+    - ansible_facts.os_family != 'Darwin'
+    - ansible_facts.os_family != 'Debian'
 
 - name: Ensure xz is present to create compressed files (Debian)
   package:
     name: xz-utils
     state: latest
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - name: Ensure xz is present to create compressed file (macOS)
   block:
@@ -58,7 +58,7 @@
       environment:
         HOMEBREW_NO_AUTO_UPDATE: "True"
   when:
-    - ansible_os_family == 'Darwin'
+    - ansible_facts.os_family == 'Darwin'
 
 - name: Generate compressed files
   shell: |

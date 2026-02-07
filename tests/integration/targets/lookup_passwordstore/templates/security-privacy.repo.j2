@@ -5,9 +5,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 #}
 
 [security_privacy]
-name=Crypto applications and utilities (openSUSE_Leap_{{ ansible_distribution_version }})
+name=Crypto applications and utilities (openSUSE_Leap_{{ ansible_facts.distribution_version }})
 type=rpm-md
-baseurl=http://download.opensuse.org/repositories/security:/privacy/openSUSE_Leap_{{ ansible_distribution_version }}/
+baseurl=http://download.opensuse.org/repositories/security:/privacy/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
 gpgcheck=1
-gpgkey=http://download.opensuse.org/repositories/security:/privacy/openSUSE_Leap_{{ ansible_distribution_version }}/repodata/repomd.xml.key
+gpgkey=http://download.opensuse.org/repositories/security:/privacy/openSUSE_Leap_{{ ansible_facts.distribution_version }}/repodata/repomd.xml.key
 enabled=1

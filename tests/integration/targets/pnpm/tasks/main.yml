@@ -16,12 +16,12 @@
 - name: Run tests on OSes
   ansible.builtin.include_tasks: run.yml
   vars:
-    ansible_system_os: "{{ ansible_system | lower }}"
+    ansible_system_os: "{{ ansible_facts.system | lower }}"
     nodejs_version: "{{ item.node_version }}"
-    nodejs_path: "node-v{{ nodejs_version }}-{{ ansible_system_os }}-x{{ ansible_userspace_bits }}"
+    nodejs_path: "node-v{{ nodejs_version }}-{{ ansible_system_os }}-x{{ ansible_facts.userspace_bits }}"
     pnpm_version: "{{ item.pnpm_version }}"
-    pnpm_path: "pnpm-{{ 'macos' if ansible_system_os == 'darwin' else 'linuxstatic' }}-x{{ ansible_userspace_bits }}"
+    pnpm_path: "pnpm-{{ 'macos' if ansible_system_os == 'darwin' else 'linuxstatic' }}-x{{ ansible_facts.userspace_bits }}"
   with_items:
     - { node_version: 16.20.0, pnpm_version: 8.7.0 }
   when:
-    - not(ansible_distribution == 'Alpine') and not(ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6')
+    - not(ansible_facts.distribution == 'Alpine') and not(ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '6')

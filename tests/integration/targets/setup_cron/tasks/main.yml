@@ -9,16 +9,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - when:
-    - not (ansible_os_family == 'Alpine' and ansible_distribution_version is version('3.15', '<'))  # TODO
+    - not (ansible_facts.os_family == 'Alpine' and ansible_facts.distribution_version is version('3.15', '<'))  # TODO
   block:
     - name: Include distribution specific variables
       include_vars: '{{ lookup(''first_found'', search) }}'
       vars:
         search:
           files:
-            - '{{ ansible_distribution | lower }}.yml'
-            - '{{ ansible_os_family | lower }}.yml'
-            - '{{ ansible_system | lower }}.yml'
+            - '{{ ansible_facts.distribution | lower }}.yml'
+            - '{{ ansible_facts.os_family | lower }}.yml'
+            - '{{ ansible_facts.system | lower }}.yml'
             - default.yml
           paths:
             - vars
@@ -38,7 +38,7 @@
         - name: Find libfaketime path
           shell: '{{ list_pkg_files }} {{ faketime_pkg }} | grep -F libfaketime.so.1'
           register: libfaketime_path
-        - when: ansible_service_mgr == 'systemd'
+        - when: ansible_facts.service_mgr == 'systemd'
           block:
             - name: create directory for cron drop-in file
               file:
@@ -60,7 +60,7 @@
                 owner: root
                 group: root
                 mode: '0644'
-        - when: ansible_system == 'FreeBSD'
+        - when: ansible_facts.system == 'FreeBSD'
           name: Use faketime with cron service
           copy:
             content: cron_env='LD_PRELOAD={{ libfaketime_path.stdout_lines[0].strip() }} FAKETIME="+0y x10"'
@@ -70,6 +70,6 @@
             mode: '0644'
     - name: enable cron service
       service:
-        daemon-reload: '{{ (ansible_service_mgr == ''systemd'') | ternary(true, omit) }}'
+        daemon-reload: '{{ (ansible_facts.service_mgr == ''systemd'') | ternary(true, omit) }}'
         name: '{{ cron_service }}'
         state: restarted

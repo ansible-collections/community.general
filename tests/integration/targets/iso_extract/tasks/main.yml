@@ -17,14 +17,14 @@
 - name: Doesn't work with Fedora 43 for some reason
   meta: end_play
   when:
-    - ansible_distribution == 'Fedora' and ansible_distribution_major_version is version('43', '==')
+    - ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('43', '==')
 
 - name: Install EPEL repository (RHEL only)
   include_role:
     name: setup_epel
   when:
-    - ansible_distribution in ['RedHat', 'CentOS']
-    - ansible_distribution_major_version is version('9', '<')
+    - ansible_facts.distribution in ['RedHat', 'CentOS']
+    - ansible_facts.distribution_major_version is version('9', '<')
 
 - name: Install 7zip
   import_tasks: 7zip.yml

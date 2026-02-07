@@ -10,8 +10,8 @@
 
 - name: Skip unsupported platforms
   meta: end_play
-  when: (ansible_distribution != 'CentOS') or
-        (ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>='))
+  when: (ansible_facts.distribution != 'CentOS') or
+        (ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version is not version('7', '>='))
 
 - name: Install java
   package:

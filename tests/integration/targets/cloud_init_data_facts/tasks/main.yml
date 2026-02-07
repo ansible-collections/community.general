@@ -11,10 +11,10 @@
 - name: Help debugging
   debug:
     msg: >-
-      distribution={{ ansible_distribution }},
-      distribution major version={{ ansible_distribution_major_version }},
-      os_family={{ ansible_os_family }},
-      Python version={{ ansible_python.version.major }}
+      distribution={{ ansible_facts.distribution }},
+      distribution major version={{ ansible_facts.distribution_major_version }},
+      os_family={{ ansible_facts.os_family }},
+      Python version={{ ansible_facts.python.version.major }}
 
 - name: test cloud-init
   # TODO: check for a workaround
@@ -23,13 +23,13 @@
   # /etc/init/ureadahead.conf to /etc/init/ureadahead.conf.distrib
   # https://bugs.launchpad.net/ubuntu/+source/ureadahead/+bug/997838
   when:
-    - not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int == 14)
-    - not (ansible_os_family == "Suse" and ansible_distribution_major_version|int == 15)
-    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version|int == 8)  # TODO: cannot start service
-    - not (ansible_distribution == 'Archlinux')  # TODO: package seems to be broken, cannot be downloaded from mirrors?
-    - not (ansible_distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
-    - not (ansible_distribution == 'Debian' and ansible_distribution_major_version|int == 13)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
-    - not (ansible_distribution == 'Fedora' and ansible_distribution_major_version|int == 43)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
+    - not (ansible_facts.distribution == "Ubuntu" and ansible_facts.distribution_major_version|int == 14)
+    - not (ansible_facts.os_family == "Suse" and ansible_facts.distribution_major_version|int == 15)
+    - not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_major_version|int == 8)  # TODO: cannot start service
+    - not (ansible_facts.distribution == 'Archlinux')  # TODO: package seems to be broken, cannot be downloaded from mirrors?
+    - not (ansible_facts.distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
+    - not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int == 13)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
+    - not (ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int == 43)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
   block:
     - name: setup install cloud-init
       package:
@@ -41,7 +41,7 @@
       user:
         name: systemd-network
         state: present
-      when: ansible_distribution == 'Fedora' and ansible_distribution_major_version|int >= 37
+      when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int >= 37
 
     - name: setup run cloud-init
       service:

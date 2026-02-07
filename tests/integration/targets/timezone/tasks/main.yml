@@ -23,12 +23,12 @@
 - name: set config file path on Debian
   set_fact:
     timezone_config_file: '/etc/timezone'
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - name: set config file path on RedHat
   set_fact:
     timezone_config_file: '/etc/sysconfig/clock'
-  when: ansible_os_family == 'RedHat'
+  when: ansible_facts.os_family == 'RedHat'
 
 ##
 ## set path to hwclock config files
@@ -37,12 +37,12 @@
 - name: set config file path on Debian
   set_fact:
     hwclock_config_file: '/etc/default/rcS'
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
 
 - name: set config file path on RedHat
   set_fact:
     hwclock_config_file: '/etc/sysconfig/clock'
-  when: ansible_os_family == 'RedHat'
+  when: ansible_facts.os_family == 'RedHat'
 
 ####
 #### timezone tests
@@ -52,33 +52,33 @@
   package:
     name: diffutils
     state: present
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
 
 - name: make sure util-linux-extra are installed on Debian 13+
   package:
     name: util-linux-extra
     state: present
-  when: ansible_distribution == 'Debian' and ansible_distribution_major_version|int >= 13
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int >= 13
 
 - name: make sure tzdata is installed on Alpine
   package:
     name: tzdata
     state: present
-  when: ansible_distribution == 'Alpine'
+  when: ansible_facts.distribution == 'Alpine'
 
 - name: make sure hwclock is installed in Ubuntu 24.04
   package:
     name: util-linux-extra
     state: present
   when:
-    - ansible_distribution == 'Ubuntu'
+    - ansible_facts.distribution == 'Ubuntu'
     - ansible_facts.distribution_major_version is version('24', '>=')
 
 
 - name: Run tests
   when:
-    - not (ansible_os_family == 'Alpine')  # TODO
-    - not (ansible_distribution == 'Archlinux')  # TODO
+    - not (ansible_facts.os_family == 'Alpine')  # TODO
+    - not (ansible_facts.distribution == 'Archlinux')  # TODO
   block:
     - name: set timezone to Etc/UTC
       timezone:

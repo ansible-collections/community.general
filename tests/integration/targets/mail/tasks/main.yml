@@ -12,7 +12,7 @@
 
 - when:
     # TODO: https://github.com/ansible-collections/community.general/issues/4656
-    - ansible_python.version.major != 3 or ansible_python.version.minor < 12
+    - ansible_facts.python.version.major != 3 or ansible_facts.python.version.minor < 12
   block:
 
     # NOTE: If the system does not support smtpd-tls (python 2.6 and older) we do basic tests
@@ -35,7 +35,7 @@
     # FIXME: Verify the mail after it was send would be nice
     #        This would require either dumping the content, or registering async task output
     - name: Start test smtpserver
-      shell: '{{ ansible_python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
+      shell: '{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
       async: 45
       poll: 0
       register: smtpserver

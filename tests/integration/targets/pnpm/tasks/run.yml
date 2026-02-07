@@ -25,9 +25,9 @@
 - name: Setting up pnpm via command
   ansible.builtin.command: "{{ tmp_dir.path }}/pnpm setup --force"
   environment:
-    PNPM_HOME: "{{ ansible_env.HOME }}/.local/share/pnpm"
+    PNPM_HOME: "{{ ansible_facts.env.HOME }}/.local/share/pnpm"
     SHELL: /bin/sh
-    ENV: "{{ ansible_env.HOME }}/.shrc"
+    ENV: "{{ ansible_facts.env.HOME }}/.shrc"
 
 - name: Remove the temporary directory
   ansible.builtin.file:
@@ -42,10 +42,10 @@
 - name: CI tests to run
   vars:
     node_bin_path: "{{ remote_tmp_dir }}/{{ nodejs_path }}/bin"
-    pnpm_bin_path: "{{ ansible_env.HOME }}/.local/share/pnpm"
+    pnpm_bin_path: "{{ ansible_facts.env.HOME }}/.local/share/pnpm"
     package: "tailwindcss"
   environment:
-    PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+    PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
 
   block:
     - name: Create dummy package.json
@@ -60,7 +60,7 @@
         executable: "{{ pnpm_bin_path }}/pnpm"
         state: present
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
 
     - name: Install the same package from package.json again
       pnpm:
@@ -69,7 +69,7 @@
         name: "reading-time"
         state: present
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_install
 
     - name: Assert that result is not changed
@@ -83,7 +83,7 @@
         executable: "{{ pnpm_bin_path }}/pnpm"
         state: present
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       check_mode: true
       register: pnpm_install_check
 
@@ -102,7 +102,7 @@
         state: present
         name: "{{ package }}"
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_install
 
     - name: Assert that result is changed and successful
@@ -118,7 +118,7 @@
         state: present
         name: "{{ package }}"
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_reinstall
 
     - name: Assert that there is no change
@@ -134,7 +134,7 @@
         state: latest
         name: "{{ package }}"
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_fix_install
 
     - name: Assert that result is changed and successful
@@ -150,7 +150,7 @@
         path: "{{ remote_tmp_dir }}"
         state: present
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_install
 
     - name: Assert that package with version is installed
@@ -166,7 +166,7 @@
         path: "{{ remote_tmp_dir }}"
         state: present
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_reinstall
 
     - name: Assert that there is no change
@@ -181,7 +181,7 @@
         path: "{{ remote_tmp_dir }}"
         state: latest
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_update
 
     - name: Assert that result is changed and successful
@@ -196,7 +196,7 @@
         path: "{{ remote_tmp_dir }}"
         state: absent
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_absent
 
     - name: Assert that result is changed and successful
@@ -213,7 +213,7 @@
         path: "{{ remote_tmp_dir }}"
         state: present
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_install
 
     - name: Assert that package with version and alias is installed
@@ -230,7 +230,7 @@
         path: "{{ remote_tmp_dir }}"
         state: present
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_reinstall
 
     - name: Assert that there is no change
@@ -246,7 +246,7 @@
         path: "{{ remote_tmp_dir }}"
         state: absent
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
       register: pnpm_absent
 
     - name: Assert that result is changed and successful
@@ -262,7 +262,7 @@
         state: present
         global: true
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
         PNPM_HOME: "{{ pnpm_bin_path }}"
       register: pnpm_install
 
@@ -278,7 +278,7 @@
         state: present
         global: true
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
         PNPM_HOME: "{{ pnpm_bin_path }}"
       register: pnpm_reinstall
 
@@ -294,7 +294,7 @@
         state: latest
         global: true
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
         PNPM_HOME: "{{ pnpm_bin_path }}"
       register: pnpm_reinstall
 
@@ -311,7 +311,7 @@
         global: true
         state: absent
       environment:
-        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
         PNPM_HOME: "{{ pnpm_bin_path }}"
       register: pnpm_absent
 

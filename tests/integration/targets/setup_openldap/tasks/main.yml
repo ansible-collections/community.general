@@ -11,7 +11,7 @@
 - name: Setup OpenLDAP on Debian or Ubuntu
   block:
     - name: Include OS-specific variables
-      include_vars: '{{ ansible_os_family }}.yml'
+      include_vars: '{{ ansible_facts.os_family }}.yml'
 
     - name: Install OpenLDAP server and tools
       become: true
@@ -89,4 +89,4 @@
         - initial_config.ldif
         - ldap_inc_config.ldif
 
-  when: ansible_os_family in ['Ubuntu', 'Debian']
+  when: ansible_facts.os_family in ['Ubuntu', 'Debian']

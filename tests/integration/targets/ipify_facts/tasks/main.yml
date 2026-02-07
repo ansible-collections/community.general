@@ -14,7 +14,7 @@
 
 - set_fact:
     validate_certs: false
-  when: (ansible_distribution == "MacOSX" and ansible_distribution_version == "10.11.1")
+  when: (ansible_facts.distribution == "MacOSX" and ansible_facts.distribution_version == "10.11.1")
 
 - name: get information about current IP using ipify facts
   ipify_facts:

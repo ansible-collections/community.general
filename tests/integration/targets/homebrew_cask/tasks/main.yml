@@ -12,13 +12,13 @@
 - name: Find brew binary
   command: which brew
   register: brew_which
-  when: ansible_distribution in ['MacOSX']
+  when: ansible_facts.distribution in ['MacOSX']
 
 - name: Get owner of brew binary
   stat:
     path: "{{ brew_which.stdout }}"
   register: brew_stat
-  when: ansible_distribution in ['MacOSX']
+  when: ansible_facts.distribution in ['MacOSX']
 
 - block:
     - name: Install cask

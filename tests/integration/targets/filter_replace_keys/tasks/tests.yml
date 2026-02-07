@@ -3,12 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Debug ansible_version
-  ansible.builtin.debug:
-    var: ansible_version
-  when: not (quiet_test | default(true) | bool)
-  tags: ansible_version
-
 - name: Tests
   ansible.builtin.assert:
     that:

@@ -10,9 +10,9 @@
 
 - when:
     # setuptools is too old on RHEL/CentOS 6 (https://github.com/Supervisor/meld3/issues/23)
-    - ansible_os_family != 'RedHat' or ansible_distribution_major_version|int > 6
+    - ansible_facts.os_family != 'RedHat' or ansible_facts.distribution_major_version|int > 6
     # For some reason CentOS 7 and OpenSuSE 15 do not work on ansible-core 2.16
-    - ansible_version.minor != 16 or ansible_distribution not in ['CentOS', 'openSUSE Leap']
+    - ansible_version.minor != 16 or ansible_facts.distribution not in ['CentOS', 'openSUSE Leap']
   block:
     - block:
         - tempfile:
@@ -28,16 +28,16 @@
         - include_vars: '{{ item }}'
           with_first_found:
             - files:
-                - '{{ ansible_distribution }}.yml'
-                - '{{ ansible_os_family }}.yml'
+                - '{{ ansible_facts.distribution }}.yml'
+                - '{{ ansible_facts.os_family }}.yml'
                 - 'defaults.yml'
 
         - include_tasks: '{{ item }}'
           with_first_found:
             - files:
-                - 'install_{{ ansible_distribution }}.yml' # CentOS
-                - 'install_{{ ansible_os_family }}.yml'    # RedHat
-                - 'install_{{ ansible_system }}.yml'       # Linux
+                - 'install_{{ ansible_facts.distribution }}.yml' # CentOS
+                - 'install_{{ ansible_facts.os_family }}.yml'    # RedHat
+                - 'install_{{ ansible_facts.system }}.yml'       # Linux
 
         - include_tasks: test.yml
           with_items:
@@ -50,9 +50,9 @@
         - include_tasks: '{{ item }}'
           with_first_found:
             - files:
-                - 'uninstall_{{ ansible_distribution }}.yml' # CentOS
-                - 'uninstall_{{ ansible_os_family }}.yml'    # RedHat
-                - 'uninstall_{{ ansible_system }}.yml'       # Linux
+                - 'uninstall_{{ ansible_facts.distribution }}.yml' # CentOS
+                - 'uninstall_{{ ansible_facts.os_family }}.yml'    # RedHat
+                - 'uninstall_{{ ansible_facts.system }}.yml'       # Linux
 
         - file:
             path: '{{ supervisord_sock_path.path }}'
