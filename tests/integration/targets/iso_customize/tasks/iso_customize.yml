@@ -52,12 +52,12 @@
 
     - set_fact:
         file_contents: "{{ get_file_content.stdout }}"
-  when: ansible_distribution == 'RedHat' and ansible_distribution_version is version('7.9', '==')
+  when: ansible_facts.distribution == 'RedHat' and ansible_facts.distribution_version is version('7.9', '==')
 
 - name: Get the content of file test02.cfg
   set_fact:
     file_contents: "{{ lookup('file', mount_root_dir + '/test02.cfg') }}"
-  when: not (ansible_distribution == 'RedHat' and ansible_distribution_version is version('7.9', '=='))
+  when: not (ansible_facts.distribution == 'RedHat' and ansible_facts.distribution_version is version('7.9', '=='))
 
 - fail: msg="Failed to replace the file test02.cfg"
   when: file_contents != "test"

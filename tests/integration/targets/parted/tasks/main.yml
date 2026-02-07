@@ -6,7 +6,7 @@
   package:
     name: parted
     state: present
-  when: ansible_os_family == 'Alpine'
+  when: ansible_facts.os_family == 'Alpine'
 
 - name: Create empty file
   community.general.filesize:

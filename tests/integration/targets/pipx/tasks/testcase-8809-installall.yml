@@ -5,7 +5,7 @@
 
 - name: Set up environment
   environment:
-    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+    PATH: /usr/local/bin:{{ ansible_facts.env.PATH }}
   block:
     - name: Uninstall pycowsay and black
       community.general.pipx:

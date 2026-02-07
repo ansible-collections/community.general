@@ -12,4 +12,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - include_tasks: 'zypper.yml'
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts.os_family == 'Suse'

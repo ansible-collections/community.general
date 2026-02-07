@@ -65,7 +65,7 @@
     state: present
 
 - name: Debian/Ubuntu specific tests
-  when: "ansible_os_family == 'Debian'"
+  when: "ansible_facts.os_family == 'Debian'"
   block:
     - name: force disable of autoindex  # bug #2499
       community.general.apache2_module:
@@ -89,7 +89,7 @@
         name: evasive
         state: present
       # TODO: fix for Debian 13 (Trixie)!
-      when: ansible_distribution != 'Debian' or ansible_distribution_major_version is version('13', '<')
+      when: ansible_facts.distribution != 'Debian' or ansible_facts.distribution_major_version is version('13', '<')
 
     - name: use identifier to enable module, fix for https://github.com/ansible/ansible/issues/33669
       community.general.apache2_module:

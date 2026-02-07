@@ -28,7 +28,7 @@ redis_user:
   Debian: redis
   Ubuntu: redis
   openSUSE Leap: redis
-  Fedora: "{{ '998' if ansible_distribution_major_version is version('41', '>=') else 'redis' }}"
+  Fedora: "{{ '998' if ansible_facts.distribution_major_version is version('41', '>=') else 'redis' }}"
   CentOS: redis
   FreeBSD: redis
 
@@ -38,7 +38,7 @@ redis_bin:
   Debian: /usr/bin/redis-server
   Ubuntu: /usr/bin/redis-server
   openSUSE Leap: /usr/sbin/redis-server
-  Fedora: "/usr/bin/{{ 'valkey-server' if ansible_distribution_major_version is version('41', '>=') else 'redis-server' }}"
+  Fedora: "/usr/bin/{{ 'valkey-server' if ansible_facts.distribution_major_version is version('41', '>=') else 'redis-server' }}"
   CentOS: /usr/bin/redis-server
   FreeBSD: /usr/local/bin/redis-server
 
@@ -48,9 +48,9 @@ redis_password: PASS
 
 old_redis: >-
   {{
-    (ansible_distribution == 'CentOS' and ansible_distribution_major_version|int <= 7) or
-    (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int <= 18) or
-    (ansible_os_family == 'FreeBSD' and ansible_distribution_major_version|int <= 12)
+    (ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version|int <= 7) or
+    (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version|int <= 18) or
+    (ansible_facts.os_family == 'FreeBSD' and ansible_facts.distribution_major_version|int <= 12)
   }}
 
 # Master

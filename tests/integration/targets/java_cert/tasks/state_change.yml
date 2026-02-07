@@ -49,7 +49,7 @@
     certificate_path: "{{ test_cert_path }}"
     privatekey_path: "{{ test_key_path }}"
   when:
-    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
+    - "not (ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_version is version('8.0', '<'))"
 
 - name: Create the pkcs12 archive from the test x509 cert (command)
   ansible.builtin.command:
@@ -62,8 +62,8 @@
       -passout stdin
     stdin: "{{ test_keystore2_password }}"
   when:
-    - "ansible_os_family == 'RedHat'"
-    - "ansible_distribution_version is version('8.0', '<')"
+    - "ansible_facts.os_family == 'RedHat'"
+    - "ansible_facts.distribution_version is version('8.0', '<')"
 
 - name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore
   community.crypto.openssl_pkcs12:
@@ -73,7 +73,7 @@
     certificate_path: "{{ test_cert2_path }}"
     privatekey_path: "{{ test_key2_path }}"
   when:
-    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
+    - "not (ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_version is version('8.0', '<'))"
 
 - name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore (command)
   ansible.builtin.command:
@@ -86,8 +86,8 @@
       -passout stdin
     stdin: "{{ test_keystore2_password }}"
   when:
-    - "ansible_os_family == 'RedHat'"
-    - "ansible_distribution_version is version('8.0', '<')"
+    - "ansible_facts.os_family == 'RedHat'"
+    - "ansible_facts.distribution_version is version('8.0', '<')"
 
 #
 # Run tests
@@ -246,7 +246,7 @@
     dest: "{{ remote_tmp_dir }}"
 
 - name: Create an SSL server that we will use for testing URL imports
-  command: "{{ ansible_python.executable }} {{ remote_tmp_dir }}/setupSSLServer.py {{ remote_tmp_dir }} {{ test_ssl_port }}"
+  command: "{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/setupSSLServer.py {{ remote_tmp_dir }} {{ test_ssl_port }}"
   async: 10
   poll: 0
 

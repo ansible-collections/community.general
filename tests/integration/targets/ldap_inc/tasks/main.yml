@@ -13,4 +13,4 @@
     - include_tasks: "{{ item }}"
       with_fileglob:
         - 'tests/*.yml'
-  when: ansible_os_family in ['Ubuntu', 'Debian']
+  when: ansible_facts.os_family in ['Ubuntu', 'Debian']

@@ -18,7 +18,7 @@
     - name: Install legacycrypt on Python 3.13+
       pip:
         name: legacycrypt
-      when: ansible_python_version is version("3.13", ">=")
+      when: ansible_facts.python_version is version("3.13", ">=")
 
     - name: Check and start systemd-homed service
       service:
@@ -183,5 +183,5 @@
   # homectl was first introduced in systemd 245 so check version  >= 245 and make sure system has systemd and homectl command
   when:
     - systemd_version.rc == 0 and (systemd_version.stdout | regex_search('[0-9][0-9][0-9]') | int >= 245) and homectl_version.rc == 0
-    - ansible_distribution != 'Archlinux'  # TODO!
-    - ansible_distribution != 'Fedora' or ansible_distribution_major_version|int < 36 # TODO!
+    - ansible_facts.distribution != 'Archlinux'  # TODO!
+    - ansible_facts.distribution != 'Fedora' or ansible_facts.distribution_major_version|int < 36 # TODO!

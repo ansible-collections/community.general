@@ -10,5 +10,5 @@
 
 - include_tasks: ubuntu.yml
   when:
-    - ansible_distribution == 'Ubuntu'
-    - ansible_distribution_release not in ['focal', 'jammy', 'noble']
+    - ansible_facts.distribution == 'Ubuntu'
+    - ansible_facts.distribution_release not in ['focal', 'jammy', 'noble']
