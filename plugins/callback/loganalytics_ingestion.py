@@ -148,19 +148,15 @@ examples: |
 
 import getpass
 import json
-try:
-    import requests
-except ImportError as exception:
-    IMPORT_ERROR_REQUESTS = exception
-else:
-    IMPORT_ERROR_REQUESTS = None
 import socket
 import uuid
 from datetime import datetime, timezone, timedelta
 from os.path import basename
 
-from ansible.plugins.callback import CallbackBase
 from ansible.errors import AnsibleError
+from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.urls import open_url
+from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
 
 display = Display()
@@ -182,7 +178,6 @@ class AzureLogAnalyticsIngestionSource(object):
         self.include_task_args = include_task_args
         self.include_content = include_content
         self.token_expiration_time = None
-        self.requests_session = requests.Session()
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         self.user = getpass.getuser()
@@ -194,18 +189,21 @@ class AzureLogAnalyticsIngestionSource(object):
     # This replaces the shared_key authentication mechanism
     def get_bearer_token(self):
         url = f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token"
-        payload = {
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        data = urlencode({
             'grant_type': 'client_credentials',
             'client_id': self.client_id,
             'client_secret': self.client_secret,
             # The scope value comes from https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview#headers
             # and https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#the-default-scope
             'scope': 'https://monitor.azure.com/.default'
-        }
-        response = self.requests_session.post(url, data=payload, timeout=self.timeout)
-        response.raise_for_status()
-        self.token_expiration_time = datetime.now() + timedelta(seconds=response.json().get("expires_in"))
-        return response.json().get('access_token')
+        })
+        response = open_url(url, data=data, force=True, headers=headers, method='POST', timeout=self.timeout)
+        j = json.loads(response.read().decode('utf-8'))
+        self.token_expiration_time = datetime.now() + timedelta(seconds=j.get('expires_in'))
+        return j.get('access_token')
 
     def is_token_valid(self):
         return True if (datetime.now() + timedelta(seconds=10)) < self.token_expiration_time else False
@@ -220,8 +218,7 @@ class AzureLogAnalyticsIngestionSource(object):
             'Authorization': f"Bearer {self.bearer_token}",
             'Content-Type': 'application/json'
         }
-        response = self.requests_session.post(ingestion_url, headers=headers, json=event_data, timeout=self.timeout)
-        response.raise_for_status()
+        open_url(ingestion_url, data=json.dumps(event_data), headers=headers, method='POST', timeout=self.timeout)
 
     def _rfc1123date(self):
         return datetime.now(timezone.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
@@ -293,8 +290,6 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self, display=None):
-        if IMPORT_ERROR_REQUESTS:
-            raise AnsibleError("'requests' must be installed in order to use this plugin") from IMPORT_ERROR_REQUESTS
         super(CallbackModule, self).__init__(display=display)
         self.start_datetimes = {}
         self.playbook_name = None
