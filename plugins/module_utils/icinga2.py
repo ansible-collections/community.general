@@ -1,7 +1,6 @@
-# Copyright (c) Contributors to the Ansible project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-# SPDX-FileCopyrightText: Ansible Project
+# SPDX-FileCopyrightText: 2026 Christoph Fiehe <christoph.fiehe@gmail.com>
 
 from __future__ import annotations
 

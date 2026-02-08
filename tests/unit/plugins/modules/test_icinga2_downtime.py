@@ -23,9 +23,6 @@ class TestIcinga2Downtime(ModuleTestCase):
         super().setUp()
         self.module = icinga2_downtime
 
-    def tearDown(self):
-        super().tearDown()
-
     @patch("ansible_collections.community.general.plugins.modules.icinga2_downtime.Icinga2Client")
     def test_schedule_downtime_successfully(self, client_mock):
         module_args = {
@@ -68,6 +65,7 @@ class TestIcinga2Downtime(ModuleTestCase):
             with self.assertRaises(AnsibleExitJson) as result:
                 self.module.main()
 
+        self.assertFalse(result.exception.args[0]["failed"])
         self.assertTrue(result.exception.args[0]["changed"])
         self.assertEqual(result.exception.args[0]["results"], response["results"])
         schedule_downtime_mock.assert_called_once_with(
@@ -103,7 +101,7 @@ class TestIcinga2Downtime(ModuleTestCase):
         }
         with set_module_args(module_args):
             info = {
-                "body": '{"error":404,"status":"No objects found."}',
+                "body": json.dumps({"error": 404, "status": "No objects found."}),
                 "content-length": "42",
                 "content-type": "application/json",
                 "msg": "HTTP Error 404: Not Found",
@@ -119,8 +117,8 @@ class TestIcinga2Downtime(ModuleTestCase):
             with self.assertRaises(AnsibleFailJson) as result:
                 self.module.main()
 
-        self.assertFalse(result.exception.args[0]["changed"])
         self.assertTrue(result.exception.args[0]["failed"])
+        self.assertFalse(result.exception.args[0]["changed"])
         self.assertEqual(
             result.exception.args[0]["error"],
             {"error": 404, "status": "No objects found."},
@@ -174,6 +172,7 @@ class TestIcinga2Downtime(ModuleTestCase):
             with self.assertRaises(AnsibleExitJson) as result:
                 self.module.main()
 
+        self.assertFalse(result.exception.args[0]["failed"])
         self.assertTrue(result.exception.args[0]["changed"])
         self.assertEqual(result.exception.args[0]["results"], response["results"])
         remove_downtime_mock.assert_called_once_with(
@@ -195,7 +194,7 @@ class TestIcinga2Downtime(ModuleTestCase):
         }
         with set_module_args(module_args):
             info = {
-                "body": '{"error":404,"status":"No objects found."}',
+                "body": json.dumps({"error": 404, "status": "No objects found."}),
                 "content-length": "42",
                 "content-type": "application/json",
                 "msg": "HTTP Error 404: Not Found",
@@ -211,8 +210,8 @@ class TestIcinga2Downtime(ModuleTestCase):
             with self.assertRaises(AnsibleExitJson) as result:
                 self.module.main()
 
-        self.assertFalse(result.exception.args[0]["changed"])
         self.assertFalse(result.exception.args[0]["failed"])
+        self.assertFalse(result.exception.args[0]["changed"])
         remove_downtime_mock.assert_called_once_with(
             filter=None,
             filter_vars=None,
