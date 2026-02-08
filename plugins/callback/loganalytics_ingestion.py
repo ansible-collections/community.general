@@ -206,7 +206,7 @@ class AzureLogAnalyticsIngestionSource(object):
         return j.get('access_token')
 
     def is_token_valid(self):
-        return True if (datetime.now() + timedelta(seconds=10)) < self.token_expiration_time else False
+        return datetime.now() + timedelta(seconds=10) < self.token_expiration_time
 
     # Method to send event data to the Azure Logs Ingestion API
     # This replaces the legacy API call and now uses the Logs Ingestion API endpoint
