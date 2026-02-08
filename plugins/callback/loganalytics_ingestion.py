@@ -15,9 +15,9 @@ description:
   - This callback plugin will post task results in JSON format to an Azure Log Analytics workspace using the new Logs Ingestion API.
 version_added: "12.3.0"
 requirements:
-  - The callback plugin has been enabled
-  - an Azure Log Analytics workspace has been established
-  - a Data Collection Rule (DCR) and custom table are created
+  - The callback plugin has been enabled.
+  - An Azure Log Analytics workspace has been established.
+  - A Data Collection Rule (DCR) and custom table are created.
 options:
   dce_url:
     description: URL of the Data Collection Endpoint (DCE) for Azure Logs Ingestion API.
