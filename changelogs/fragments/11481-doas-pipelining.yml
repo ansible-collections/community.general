@@ -1,4 +1,4 @@
 minor_changes:
   - "doas become plugin - add new option ``allow_pipelining`` to explicitly allow the use of pipelining with this plugin.
-     This should only be set to ``true`` with ansible-core 2.19+ when doas does not require a password
+     This should only be set to ``true`` with ansible-core 2.19+ when ``doas`` does not require a password
      (https://github.com/ansible-collections/community.general/issues/11411, https://github.com/ansible-collections/community.general/pull/11481)."
