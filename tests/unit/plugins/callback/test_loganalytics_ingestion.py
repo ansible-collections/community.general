@@ -26,7 +26,7 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
         response_mock.json.return_value = {"expires_in": time.time() + 3600, "access_token": "fake_access_token"}
         SessionMock.return_value.post.return_value = response_mock
 
-        # TODO: How to set module default arguments?
+        # TODO: How to set plugin default arguments?
         #       I tried instantiating the 'CallbackModule' but all it ever did was complain that 'client_id' wasn't defined.
         self.loganalytics = AzureLogAnalyticsIngestionSource(
             self.dce_url, self.dcr_id, 3, True,

@@ -39,8 +39,8 @@ options:
         key: dcr_id
   disable_attempts:
     description:
-      - When O(disable_on_failure=true), number of module failures that must occur before the module is disabled.
-      - This helps prevent outright module failure from a single, transient network issue.
+      - When O(disable_on_failure=true), number of plugin failures that must occur before the plugin is disabled.
+      - This helps prevent outright plugin failure from a single, transient network issue.
     type: int
     required: false
     default: 3
@@ -50,7 +50,7 @@ options:
       - section: callback_loganalytics
         key: disable_attempts
   disable_on_failure:
-    description: Stop trying to send data on module failure.
+    description: Stop trying to send data on plugin failure.
     type: bool
     required: false
     default: true
@@ -163,7 +163,7 @@ display = Display()
 
 class AzureLogAnalyticsIngestionSource(object):
     def __init__(self, dce_url, dcr_id, disable_attempts, disable_on_failure, client_id, client_secret, tenant_id, stream_name, include_task_args,
-                 include_content, timeout):
+                 include_content, timeout, fqcn):
         self.dce_url = dce_url
         self.dcr_id = dcr_id
         self.disabled = False
@@ -181,6 +181,7 @@ class AzureLogAnalyticsIngestionSource(object):
         self.host = socket.gethostname()
         self.user = getpass.getuser()
         self.timeout = timeout
+        self.fqcn = fqcn
 
         self.bearer_token = self.get_bearer_token()
 
@@ -229,14 +230,14 @@ class AzureLogAnalyticsIngestionSource(object):
         try:
             self._send_to_loganalytics(playbook_name, result, state)
         except Exception as e:
-            display.warning(f"LogAnalytics Ingestion callback module failure: {e}.")
+            display.warning(f"{self.fqcn} callback plugin failure: {e}.")
             if self.disable_on_failure:
                 self.failures += 1
                 if self.failures >= self.disable_attempts:
-                    display.warning(f"LogAnalytics module failures exceed maximum of '{self.disable_attempts}'!  Disabling module!")
+                    display.warning(f"{self.fqcn} callback plugin failures exceed maximum of '{self.disable_attempts}'!  Disabling plugin!")
                     self.disabled = True
                 else:
-                    display.v(f"LogAnalytics module failure {self.failures}/{self.disable_attempts}")
+                    display.v(f"{self.fqcn} callback plugin failure {self.failures}/{self.disable_attempts}")
 
     def _send_to_loganalytics(self, playbook_name, result, state):
         ansible_check_mode = None
@@ -293,6 +294,7 @@ class CallbackModule(CallbackBase):
         self.start_datetimes = {}
         self.playbook_name = None
         self.azure_loganalytics = None
+        self.fqcn = f"community.general.{self.CALLBACK_NAME}"
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
@@ -313,7 +315,7 @@ class CallbackModule(CallbackBase):
         # Initialize the AzureLogAnalyticsIngestionSource with the new settings
         self.azure_loganalytics = AzureLogAnalyticsIngestionSource(
             self.dce_url, self.dcr_id, self.disable_attempts, self.disable_on_failure, self.client_id, self.client_secret, self.tenant_id, self.stream_name,
-            self.include_task_args, self.include_content, self.timeout
+            self.include_task_args, self.include_content, self.timeout, self.fqcn
         )
 
     def v2_playbook_on_start(self, playbook):
