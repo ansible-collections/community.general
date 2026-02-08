@@ -310,24 +310,12 @@ class CallbackModule(CallbackBase):
         self.stream_name = self.get_option('stream_name')
         self.tenant_id = self.get_option('tenant_id')
         self.timeout = self.get_option('timeout')
-        self.validate_inputs()
 
         # Initialize the AzureLogAnalyticsIngestionSource with the new settings
         self.azure_loganalytics = AzureLogAnalyticsIngestionSource(
             self.dce_url, self.dcr_id, self.disable_attempts, self.disable_on_failure, self.client_id, self.client_secret, self.tenant_id, self.stream_name,
             self.include_task_args, self.include_content, self.timeout
         )
-
-    # Input checks
-    def validate_inputs(self):
-        # Type checks
-        boolean_checks = [
-            (self.include_task_args, "INCLUDE_TASK_ARGS must be true or false"),
-            (self.include_content, "INCLUDE_CONTENT must be true or false")
-        ]
-        for attribute, message in boolean_checks:
-            if not isinstance(attribute, bool):
-                Display().warning(message)
 
     def v2_playbook_on_start(self, playbook):
         self.playbook_name = basename(playbook._file_name)
