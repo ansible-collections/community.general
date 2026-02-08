@@ -1,9 +1,8 @@
 #!/usr/bin/python
-
-# Copyright (c) Contributors to the Ansible project
+#
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-# SPDX-FileCopyrightText: Ansible Project
+# SPDX-FileCopyrightText: 2026 Christoph Fiehe <christoph.fiehe@gmail.com>
 
 from __future__ import annotations
 
@@ -44,7 +43,7 @@ options:
     default: 10
   all_services:
     description:
-      - Whether downtimes should be set for all services of the matched host objects.
+      - Whether downtimes should be created for all services of the matched host objects.
       - If omitted, Icinga 2 does not create downtimes for all services of the matched host objects by default.
     type: bool
   author:
@@ -81,18 +80,18 @@ options:
     type: str
   fixed:
     description:
-      - Whether this downtime is fixed or flexible.
+      - Whether the downtime is fixed or flexible.
       - If omitted, Icinga 2 creates a fixed downtime by default.
     type: bool
   name:
     description:
-      - Name of the downtime.
+      - Name of the downtime object.
       - This option has no effect for states other than V(absent).
     type: str
   object_type:
     description:
       - Use V(Host) for a host downtime and V(Service) for a service downtime.
-      - Use V(Downtime) and give the name of the downtime you want to remove.
+      - Use V(Downtime) and give the name of the downtime object you want to remove.
     type: str
     choices: ["Service", "Host", "Downtime"]
     default: Host
@@ -167,12 +166,12 @@ results:
       type: int
       sample: 200
     legacy_id:
-      description: Legacy id of the scheduled downtime.
+      description: Legacy id of the downtime object.
       returned: if a downtime was scheduled successfully
       type: int
       sample: 28911
     name:
-      description: Name of the scheduled downtime.
+      description: Name of the downtime object.
       returned: if a downtime was scheduled successfully
       type: str
       sample: host.example.com!e19c705a-54c2-49c5-8014-70ff624f9e51
@@ -201,17 +200,17 @@ error:
     }
 """
 
-import typing as t
-
-from ansible.module_utils.basic import AnsibleModule
+import json
+from contextlib import suppress
 
 from ansible_collections.community.general.plugins.module_utils.icinga2 import (
     Icinga2Client,
     icinga2_argument_spec,
 )
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
 
-def main() -> None:
+class Icinga2Downtime(StateModuleHelper):
     argument_spec = icinga2_argument_spec()
     argument_spec.update(
         all_services=dict(type="bool"),
@@ -236,119 +235,92 @@ def main() -> None:
         state=dict(type="str", choices=["present", "absent"], default="present"),
         trigger_name=dict(type="str"),
     )
-
-    module = AnsibleModule(
+    module = dict(
         argument_spec=argument_spec,
         supports_check_mode=False,
         required_if=(
-            ("state", "present", ["comment", "start_time", "end_time", "filter"]),
+            (
+                "state",
+                "present",
+                ["comment", "start_time", "end_time", "filter"],
+            ),
             ("fixed", False, ["duration"]),
         ),
         required_one_of=[["filter", "name"]],
     )
 
-    client = Icinga2Client(
-        module=module, url=module.params["url"], ca_path=module.params["ca_path"], timeout=module.params.get("timeout")
-    )
+    def __init_module__(self) -> None:
+        self.client = Icinga2Client(
+            module=self.module,  # type:ignore[arg-type]
+            url=self.vars.url,
+            ca_path=self.vars.ca_path,
+            timeout=self.vars.timeout,
+        )
 
-    if module.params["state"] == "present":
-        schedule_downtime(module, client)
-    elif module.params["state"] == "absent":
-        remove_downtime(module, client)
+    def state_present(self) -> None:
+        duration = self.vars.duration
+        end_time = self.vars.end_time
+        start_time = self.vars.start_time
 
+        if end_time <= start_time:
+            self.do_raise(msg="The end time must be later than the start time.")
 
-def schedule_downtime(module: AnsibleModule, client: Icinga2Client) -> None:
-    duration = module.params.get("duration")
-    end_time = module.params.get("end_time")
-    start_time = module.params.get("start_time")
+        if duration is None:
+            duration = end_time - start_time
 
-    if end_time <= start_time:
-        module.fail_json(msg="The end time must be later than the start time.")
+        response, info = self.client.actions.schedule_downtime(
+            all_services=self.vars.all_services,
+            author=self.vars.author,
+            child_options=self.vars.child_options,
+            comment=self.vars.comment,
+            duration=duration,
+            end_time=end_time,
+            filter_vars=self.vars.filter_vars,
+            filter=self.vars.filter,
+            fixed=self.vars.fixed,
+            object_type=self.vars.object_type,
+            start_time=start_time,
+            trigger_name=self.vars.trigger_name,
+        )
 
-    if duration is None:
-        duration = end_time - start_time
+        status_code = info["status"]
 
-    response, info = client.actions.schedule_downtime(
-        all_services=module.params.get("all_services"),
-        author=module.params.get("author"),
-        child_options=module.params.get("child_options"),
-        comment=module.params.get("comment"),
-        duration=duration,
-        end_time=end_time,
-        filter_vars=module.params.get("filter_vars"),
-        filter=module.params.get("filter"),
-        fixed=module.params.get("fixed"),
-        object_type=module.params.get("object_type"),
-        start_time=start_time,
-        trigger_name=module.params.get("trigger_name"),
-    )
+        if 200 <= status_code <= 299:
+            self.vars.set("results", json.loads(response.read())["results"], output=True)
+            self.vars.msg = "Successfully scheduled downtime."
+            self.changed = True
+        elif status_code >= 400:
+            with suppress(KeyError, ValueError):
+                self.vars.set("error", json.loads(info["body"]))  # type:ignore[arg-type]
 
-    status_code = info["status"]
-    result: dict[str, t.Any] = {
-        "changed": False,
-        "failed": False,
-    }
+            self.do_raise(msg="Unable to schedule downtime.")
 
-    if 200 <= status_code <= 299:
-        result["changed"] = True
-        msg = "Successfully scheduled downtime."
-        try:
-            result["results"] = module.from_json(response.read())["results"]
-        except (ValueError, KeyError):
-            # As a precaution, catch key and value error in case of a malformed response message.
-            msg += "\nWarning: Malformed response received from server. Skipping content."
+    def state_absent(self) -> None:
+        response, info = self.client.actions.remove_downtime(
+            filter_vars=self.vars.filter_vars,
+            filter=self.vars.filter,
+            name=self.vars.name,
+            object_type=self.vars.object_type,
+        )
 
-        result["msg"] = msg
-        module.exit_json(**result)  # type:ignore[arg-type]
-    else:
-        result["failed"] = True
-        result["msg"] = "Unable to schedule downtime."
-        if status_code >= 400:
-            try:
-                result["error"] = module.from_json(info.get("body"))
-            except ValueError:
-                pass
-        module.fail_json(**result)  # type:ignore[arg-type]
+        status_code = info["status"]
 
-
-def remove_downtime(module: AnsibleModule, client: Icinga2Client) -> None:
-    response, info = client.actions.remove_downtime(
-        filter_vars=module.params.get("filter_vars"),
-        filter=module.params.get("filter"),
-        name=module.params.get("name"),
-        object_type=module.params.get("object_type"),
-    )
-
-    status_code = info["status"]
-    result: dict[str, t.Any] = {
-        "changed": False,
-        "failed": False,
-    }
-
-    if 200 <= status_code <= 299:
-        result["changed"] = True
-        msg = "Successfully removed downtime."
-        try:
-            result["results"] = module.from_json(response.read())["results"]
-        except (ValueError, KeyError):
-            # As a precaution, catch key and value error in case of a malformed response message.
-            msg += "\nWarning: Malformed response received from server. Skipping content."
-
-        result["msg"] = msg
-        module.exit_json(**result)  # type:ignore[arg-type]
-    else:
-        if status_code == 404:
-            result["msg"] = "No matching downtime found."
-            module.exit_json(**result)  # type:ignore[arg-type]
+        if 200 <= status_code <= 299:
+            self.vars.set("results", json.loads(response.read())["results"], output=True)
+            self.vars.msg = "Successfully removed downtime."
+            self.changed = True
         else:
-            if status_code >= 400:
-                try:
-                    result["error"] = module.from_json(info.get("body"))
-                except ValueError:
-                    pass
-            result["failed"] = True
-            result["msg"] = "Unable to remove downtime."
-            module.fail_json(**result)  # type:ignore[arg-type]
+            if status_code == 404:
+                self.vars.msg = "No matching downtime object found."
+            elif status_code >= 400:
+                with suppress(KeyError, ValueError):
+                    self.vars.set("error", json.loads(info["body"]))  # type:ignore[arg-type]
+
+                self.do_raise(msg="Unable to remove downtime.")
+
+
+def main():
+    Icinga2Downtime.execute()
 
 
 if __name__ == "__main__":
