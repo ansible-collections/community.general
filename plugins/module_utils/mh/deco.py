@@ -72,24 +72,14 @@ def module_fails_on_exception(func):
             # patchy solution to resolve conflict with output variables
             output = fix_var_conflicts(self.output)
             self.module.fail_json(
-                changed=self.has_changed(),
-                msg=e.msg,
-                exception=traceback.format_exc(),
-                output=self.output,
-                vars=self.vars.output(),
-                **output,
+                msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars.output(), **output
             )
         except Exception as e:
             # patchy solution to resolve conflict with output variables
             output = fix_var_conflicts(self.output)
             msg = f"Module failed with exception: {str(e).strip()}"
             self.module.fail_json(
-                changed=self.has_changed(),
-                msg=msg,
-                exception=traceback.format_exc(),
-                output=self.output,
-                vars=self.vars.output(),
-                **output,
+                msg=msg, exception=traceback.format_exc(), output=self.output, vars=self.vars.output(), **output
             )
 
     return wrapper
