@@ -152,7 +152,6 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from os.path import basename
 
-from ansible.errors import AnsibleError
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
@@ -161,7 +160,7 @@ from ansible.utils.display import Display
 display = Display()
 
 
-class AzureLogAnalyticsIngestionSource(object):
+class AzureLogAnalyticsIngestionSource():
     def __init__(self, dce_url, dcr_id, disable_attempts, disable_on_failure, client_id, client_secret, tenant_id, stream_name, include_task_args,
                  include_content, timeout, fqcn):
         self.dce_url = dce_url
@@ -282,14 +281,14 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self, display=None):
-        super(CallbackModule, self).__init__(display=display)
+        super().__init__(display=display)
         self.start_datetimes = {}
         self.playbook_name = None
         self.azure_loganalytics = None
         self.fqcn = f"community.general.{self.CALLBACK_NAME}"
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         # Set options for the new Azure Logs Ingestion API configuration
         self.client_id = self.get_option('client_id')
