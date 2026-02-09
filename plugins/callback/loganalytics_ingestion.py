@@ -240,14 +240,6 @@ class AzureLogAnalyticsIngestionSource(object):
                     display.v(f"{self.fqcn} callback plugin failure {self.failures}/{self.disable_attempts}")
 
     def _send_to_loganalytics(self, playbook_name, result, state):
-        ansible_check_mode = None
-        if result._task_fields['args'].get('_ansible_check_mode') is True:
-            ansible_check_mode = True
-
-        ansible_version = None
-        if result._task_fields['args'].get('_ansible_version'):
-            ansible_version = result._task_fields['args'].get('_ansible_version')
-
         ansible_role = None
         if result._task._role:
             ansible_role = str(result._task._role)
