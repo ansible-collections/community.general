@@ -9,12 +9,12 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: keycloak_realm_localization
 
-short_description: Manage Keycloak realm localization overrides via the Keycloak API
+short_description: Allows management of Keycloak realm localization overrides via the Keycloak API
 
 version_added: 12.4.0
 
 description:
-  - Manage per-locale message overrides for a Keycloak realm using the Keycloak Admin REST API.
+  - This module allows you to manage per-locale message overrides for a Keycloak realm using the Keycloak Admin REST API.
   - Requires access via OpenID Connect; the connecting user/client must have sufficient privileges.
   - The names of module options are snake_cased versions of the names found in the Keycloak API.
 
@@ -27,10 +27,10 @@ attributes:
 options:
   force:
     description:
-      - If V(false), only the keys listed in the O(overrides) will be modified by this module. Any other pre-existing
-        keys will be ignored.
-      - If V(true), all locale overrides will be made to match configuration of this module. I.e. any keys
-        missing from the O(overrides) will be removed regardless of O(state) value.
+      - If V(false), only the keys listed in the O(overrides) are modified by this module. Any other pre-existing
+        keys are ignored.
+      - If V(true), all locale overrides are made to match configuration of this module. For example any keys
+        missing from the O(overrides) are removed regardless of O(state) value.
     type: bool
     default: false
   locale:
@@ -46,13 +46,13 @@ options:
   state:
     description:
       - Desired state of localization overrides for the given locale.
-      - On V(present), the set of overrides for the locale will be made to match O(overrides).
-        If O(force) is V(true) keys not listed in O(overrides) will be removed,
-        and the listed keys will be created or updated.
-        If O(force) is V(false)  keys not listed in O(overrides) will be ignored,
-        and the listed keys will be created or updated.
-      - On V(absent), overrides for the locale will be removed. If O(force) is V(true), all keys will be removed.
-        If O(force) is V(false), only the keys listed in O(overrides) will be removed.
+      - On V(present), the set of overrides for the locale are made to match O(overrides).
+        If O(force) is V(true) keys not listed in O(overrides) are removed,
+        and the listed keys are created or updated.
+        If O(force) is V(false)  keys not listed in O(overrides) are ignored,
+        and the listed keys are created or updated.
+      - On V(absent), overrides for the locale is removed. If O(force) is V(true), all keys are removed.
+        If O(force) is V(false), only the keys listed in O(overrides) are removed.
     type: str
     choices: ['present', 'absent']
     default: present
@@ -72,7 +72,7 @@ options:
         required: true
       value:
         description:
-          - The override value for the message key. If omitted, value will be set to an empty string.
+          - The override value for the message key. If omitted, value defaults to an empty string.
         type: str
         default: ""
         required: false
