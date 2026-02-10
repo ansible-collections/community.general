@@ -100,6 +100,24 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: en
     state: present
+    force: true
+    overrides:
+      - key: greeting
+        value: "Hello"
+      - key: farewell
+        value: "Bye"
+  delegate_to: localhost
+
+- name: Replace listed overrides for locale "en" (credentials auth)
+  community.general.keycloak_realm_localization:
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    parent_id: my-realm
+    locale: en
+    state: present
     force: false
     overrides:
       - key: greeting
@@ -116,7 +134,7 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: fi
     state: present
-    force: false
+    force: true
     overrides:
       - key: app.title
         value: "Sovellukseni"
@@ -132,10 +150,10 @@ EXAMPLES = r"""
     parent_id: my-realm
     locale: de
     state: absent
-    force: false
+    force: true
   delegate_to: localhost
 
-- name: Dry run - see what would change for locale "en"
+- name: Remove only the listed overrides for locale "de"
   community.general.keycloak_realm_localization:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -143,12 +161,13 @@ EXAMPLES = r"""
     auth_username: USERNAME
     auth_password: PASSWORD
     parent_id: my-realm
-    locale: en
-    state: present
+    locale: de
+    state: absent
+    force: false
     overrides:
-      - key: greeting
-        value: "Hello again"
-  check_mode: true
+      - key: app.title
+      - key: foo
+      - key: bar
   delegate_to: localhost
 """
 
