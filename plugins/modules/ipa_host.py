@@ -203,7 +203,9 @@ class HostIPAClient(IPAClient):
         return self._post_json(method="host_show", name=name)
 
     def host_find(self, name):
-        return self._append_keytab_status(self._post_json(method="host_find", name=None, item={"all": True, "fqdn": name}), name)
+        return self._append_keytab_status(
+            self._post_json(method="host_find", name=None, item={"all": True, "fqdn": name}), name
+        )
 
     def host_add(self, name, host):
         return self._append_keytab_status(self._post_json(method="host_add", name=name, item=host), name)
