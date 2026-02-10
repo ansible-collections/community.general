@@ -1,10 +1,11 @@
 # !/usr/bin/python
-from __future__ import annotations
-
 # Copyright Jakub Danek <danek.ja@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
 DOCUMENTATION = r"""
 module: keycloak_realm_localization
 
