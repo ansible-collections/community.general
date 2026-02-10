@@ -79,7 +79,7 @@ class ModuleHelperBase:
     def output(self):
         raise NotImplementedError()
 
-    @module_fails_on_exception
+    @module_fails_on_exception(unhandled_exceptions_attribute="_unhandled_exceptions")
     def run(self):
         self.__init_module__()
         self.__run__()
