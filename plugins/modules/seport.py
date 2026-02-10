@@ -29,9 +29,10 @@ options:
   proto:
     description:
       - Protocol for the specified port.
+      - Support for V(dccp) and V(sctp) has been added in community.general 12.4.0.
     type: str
     required: true
-    choices: [tcp, udp]
+    choices: [tcp, udp, dccp, sctp]
   setype:
     description:
       - SELinux type for the specified port.
@@ -145,7 +146,7 @@ def semanage_port_get_ports(seport, setype, proto, local):
     :param setype: SELinux type.
 
     :type proto: str
-    :param proto: Protocol ('tcp' or 'udp')
+    :param proto: Protocol ('tcp', 'udp', 'dccp', 'sctp')
 
     :rtype: list
     :return: List of ports that have the specified SELinux type.
@@ -166,7 +167,7 @@ def semanage_port_get_type(seport, port, proto):
     :param port: Port or port range (example: "8080", "8080-9090")
 
     :type proto: str
-    :param proto: Protocol ('tcp' or 'udp')
+    :param proto: Protocol ('tcp', 'udp', 'dccp', 'sctp')
 
     :rtype: tuple
     :return: Tuple containing the SELinux type and MLS/MCS level, or None if not found.
@@ -194,7 +195,7 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange="s0", ses
     :param ports: List of ports and port ranges to add (e.g. ["8080", "8080-9090"])
 
     :type proto: str
-    :param proto: Protocol ('tcp' or 'udp')
+    :param proto: Protocol ('tcp', 'udp', 'dccp', 'sctp')
 
     :type setype: str
     :param setype: SELinux type
@@ -245,7 +246,7 @@ def semanage_port_del(module, ports, proto, setype, do_reload, sestore="", local
     :param ports: List of ports and port ranges to delete (e.g. ["8080", "8080-9090"])
 
     :type proto: str
-    :param proto: Protocol ('tcp' or 'udp')
+    :param proto: Protocol ('tcp', 'udp', 'dccp', 'sctp')
 
     :type setype: str
     :param setype: SELinux type.
@@ -281,7 +282,7 @@ def main():
         argument_spec=dict(
             ignore_selinux_state=dict(type="bool", default=False),
             ports=dict(type="list", elements="str", required=True),
-            proto=dict(type="str", required=True, choices=["tcp", "udp"]),
+            proto=dict(type="str", required=True, choices=["tcp", "udp", "dccp", "sctp"]),
             setype=dict(type="str", required=True),
             state=dict(type="str", default="present", choices=["absent", "present"]),
             reload=dict(type="bool", default=True),
