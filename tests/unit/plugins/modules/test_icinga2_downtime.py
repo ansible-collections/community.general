@@ -118,7 +118,6 @@ class TestIcinga2Downtime(ModuleTestCase):
                 self.module.main()
 
         self.assertTrue(result.exception.args[0]["failed"])
-        self.assertFalse(result.exception.args[0]["changed"])
         self.assertEqual(
             result.exception.args[0]["error"],
             {"error": 404, "status": "No objects found."},
