@@ -19,7 +19,7 @@ description:
 
 author:
   - Samaneh Yousefnezhad (@yousefenzhad)
-version_added: "12.2.0"
+version_added: "12.2cvh.0"
 
 extends_documentation_fragment:
   - community.general.attributes
