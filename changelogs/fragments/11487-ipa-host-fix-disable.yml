@@ -1,0 +1,4 @@
+bugfixes:
+  - ipa_host - fix logic to disable host that exists (https://github.com/ansible-collections/community.general/issues/11483)
+minor_changes:
+  - ipa_host - include has_keytab in returned dict
