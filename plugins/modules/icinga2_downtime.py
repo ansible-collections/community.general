@@ -256,7 +256,6 @@ class Icinga2Downtime(StateModuleHelper):
             ca_path=self.vars.ca_path,
             timeout=self.vars.timeout,
         )
-        self.changed = False
 
     def state_present(self) -> None:
         duration = self.vars.duration
@@ -294,7 +293,7 @@ class Icinga2Downtime(StateModuleHelper):
             with suppress(KeyError, ValueError):
                 self.vars.set("error", json.loads(info["body"]))  # type:ignore[arg-type]
 
-            self.do_raise(changed=self.changed, msg="Unable to schedule downtime.")
+            self.do_raise(msg="Unable to schedule downtime.")
 
     def state_absent(self) -> None:
         response, info = self.client.actions.remove_downtime(
@@ -316,7 +315,7 @@ class Icinga2Downtime(StateModuleHelper):
             with suppress(KeyError, ValueError):
                 self.vars.set("error", json.loads(info["body"]))  # type:ignore[arg-type]
 
-            self.do_raise(changed=self.changed, msg="Unable to remove downtime.")
+            self.do_raise(msg="Unable to remove downtime.")
 
 
 def main():
