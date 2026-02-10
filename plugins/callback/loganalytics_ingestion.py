@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 name: loganalytics_ingestion
 type: notification
 short_description: Posts task results to an Azure Log Analytics workspace using the new Logs Ingestion API
@@ -129,9 +129,9 @@ seealso:
   - name: Logs Ingestion API
     description: Overview of Logs Ingestion API in Azure Monitor
     link: https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 examples: |
   Enable the plugin in ansible.cfg:
     [defaults]
@@ -143,13 +143,13 @@ examples: |
     export ANSIBLE_LOGANALYTICS_CLIENT_SECRET=xxxxxxxx
     export ANSIBLE_LOGANALYTICS_TENANT_ID=xxxxxxxx
     export ANSIBLE_LOGANALYTICS_STREAM_NAME=Custom-MyTable
-'''
+"""
 
 import getpass
 import json
 import socket
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from os.path import basename
 
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -160,9 +160,22 @@ from ansible.utils.display import Display
 display = Display()
 
 
-class AzureLogAnalyticsIngestionSource():
-    def __init__(self, dce_url, dcr_id, disable_attempts, disable_on_failure, client_id, client_secret, tenant_id, stream_name, include_task_args,
-                 include_content, timeout, fqcn):
+class AzureLogAnalyticsIngestionSource:
+    def __init__(
+        self,
+        dce_url,
+        dcr_id,
+        disable_attempts,
+        disable_on_failure,
+        client_id,
+        client_secret,
+        tenant_id,
+        stream_name,
+        include_task_args,
+        include_content,
+        timeout,
+        fqcn,
+    ):
         self.dce_url = dce_url
         self.dcr_id = dcr_id
         self.disabled = False
@@ -188,21 +201,21 @@ class AzureLogAnalyticsIngestionSource():
     # This replaces the shared_key authentication mechanism
     def get_bearer_token(self):
         url = f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token"
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-        data = urlencode({
-            'grant_type': 'client_credentials',
-            'client_id': self.client_id,
-            'client_secret': self.client_secret,
-            # The scope value comes from https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview#headers
-            # and https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#the-default-scope
-            'scope': 'https://monitor.azure.com/.default'
-        })
-        response = open_url(url, data=data, force=True, headers=headers, method='POST', timeout=self.timeout)
-        j = json.loads(response.read().decode('utf-8'))
-        self.token_expiration_time = datetime.now() + timedelta(seconds=j.get('expires_in'))
-        return j.get('access_token')
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        data = urlencode(
+            {
+                "grant_type": "client_credentials",
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                # The scope value comes from https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview#headers
+                # and https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#the-default-scope
+                "scope": "https://monitor.azure.com/.default",
+            }
+        )
+        response = open_url(url, data=data, force=True, headers=headers, method="POST", timeout=self.timeout)
+        j = json.loads(response.read().decode("utf-8"))
+        self.token_expiration_time = datetime.now() + timedelta(seconds=j.get("expires_in"))
+        return j.get("access_token")
 
     def is_token_valid(self):
         return datetime.now() + timedelta(seconds=10) < self.token_expiration_time
@@ -212,15 +225,14 @@ class AzureLogAnalyticsIngestionSource():
     def send_event(self, event_data):
         if not self.is_token_valid():
             self.bearer_token = self.get_bearer_token()
-        ingestion_url = f"{self.dce_url}/dataCollectionRules/{self.dcr_id}/streams/{self.stream_name}?api-version=2023-01-01"
-        headers = {
-            'Authorization': f"Bearer {self.bearer_token}",
-            'Content-Type': 'application/json'
-        }
-        open_url(ingestion_url, data=json.dumps(event_data), headers=headers, method='POST', timeout=self.timeout)
+        ingestion_url = (
+            f"{self.dce_url}/dataCollectionRules/{self.dcr_id}/streams/{self.stream_name}?api-version=2023-01-01"
+        )
+        headers = {"Authorization": f"Bearer {self.bearer_token}", "Content-Type": "application/json"}
+        open_url(ingestion_url, data=json.dumps(event_data), headers=headers, method="POST", timeout=self.timeout)
 
     def _rfc1123date(self):
-        return datetime.now(timezone.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        return datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     # This method wraps the private method with the appropriate error handling.
     def send_to_loganalytics(self, playbook_name, result, state):
@@ -233,7 +245,9 @@ class AzureLogAnalyticsIngestionSource():
             if self.disable_on_failure:
                 self.failures += 1
                 if self.failures >= self.disable_attempts:
-                    display.warning(f"{self.fqcn} callback plugin failures exceed maximum of '{self.disable_attempts}'!  Disabling plugin!")
+                    display.warning(
+                        f"{self.fqcn} callback plugin failures exceed maximum of '{self.disable_attempts}'!  Disabling plugin!"
+                    )
                     self.disabled = True
                 else:
                     display.v(f"{self.fqcn} callback plugin failure {self.failures}/{self.disable_attempts}")
@@ -245,26 +259,28 @@ class AzureLogAnalyticsIngestionSource():
 
         # Include/Exclude task args
         if not self.include_task_args:
-            result._task_fields.pop('args', None)
+            result._task_fields.pop("args", None)
 
         # Include/Exclude content
         if not self.include_content:
-            result._result.pop('content', None)
+            result._result.pop("content", None)
 
         # Build the event data
-        event_data = [{
-            "TimeGenerated": self._rfc1123date(),
-            "Host": result._host.name,
-            "User": self.user,
-            "Playbook": playbook_name,
-            "Role": ansible_role,
-            "TaskName": result._task.get_name(),
-            "Task": result._task_fields,
-            "Action": result._task_fields['action'],
-            "State": state,
-            "Result": result._result,
-            "Session": self.session
-        }]
+        event_data = [
+            {
+                "TimeGenerated": self._rfc1123date(),
+                "Host": result._host.name,
+                "User": self.user,
+                "Playbook": playbook_name,
+                "Role": ansible_role,
+                "TaskName": result._task.get_name(),
+                "Task": result._task_fields,
+                "Action": result._task_fields["action"],
+                "State": state,
+                "Result": result._result,
+                "Session": self.session,
+            }
+        ]
 
         # Display event data
         # The data displayed here can be used as a sample file in order to create the table's schema.
@@ -276,8 +292,8 @@ class AzureLogAnalyticsIngestionSource():
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
-    CALLBACK_NAME = 'loganalytics_ingestion'
+    CALLBACK_TYPE = "notification"
+    CALLBACK_NAME = "loganalytics_ingestion"
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self, display=None):
@@ -291,22 +307,32 @@ class CallbackModule(CallbackBase):
         super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         # Set options for the new Azure Logs Ingestion API configuration
-        self.client_id = self.get_option('client_id')
-        self.client_secret = self.get_option('client_secret')
-        self.dce_url = self.get_option('dce_url')
-        self.dcr_id = self.get_option('dcr_id')
-        self.disable_attempts = self.get_option('disable_attempts')
-        self.disable_on_failure = self.get_option('disable_on_failure')
-        self.include_content = self.get_option('include_content')
-        self.include_task_args = self.get_option('include_task_args')
-        self.stream_name = self.get_option('stream_name')
-        self.tenant_id = self.get_option('tenant_id')
-        self.timeout = self.get_option('timeout')
+        self.client_id = self.get_option("client_id")
+        self.client_secret = self.get_option("client_secret")
+        self.dce_url = self.get_option("dce_url")
+        self.dcr_id = self.get_option("dcr_id")
+        self.disable_attempts = self.get_option("disable_attempts")
+        self.disable_on_failure = self.get_option("disable_on_failure")
+        self.include_content = self.get_option("include_content")
+        self.include_task_args = self.get_option("include_task_args")
+        self.stream_name = self.get_option("stream_name")
+        self.tenant_id = self.get_option("tenant_id")
+        self.timeout = self.get_option("timeout")
 
         # Initialize the AzureLogAnalyticsIngestionSource with the new settings
         self.azure_loganalytics = AzureLogAnalyticsIngestionSource(
-            self.dce_url, self.dcr_id, self.disable_attempts, self.disable_on_failure, self.client_id, self.client_secret, self.tenant_id, self.stream_name,
-            self.include_task_args, self.include_content, self.timeout, self.fqcn
+            self.dce_url,
+            self.dcr_id,
+            self.disable_attempts,
+            self.disable_on_failure,
+            self.client_id,
+            self.client_secret,
+            self.tenant_id,
+            self.stream_name,
+            self.include_task_args,
+            self.include_content,
+            self.timeout,
+            self.fqcn,
         )
 
     def v2_playbook_on_start(self, playbook):

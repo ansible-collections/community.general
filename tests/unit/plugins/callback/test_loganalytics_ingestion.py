@@ -8,7 +8,9 @@ import unittest
 import unittest.mock
 import urllib
 
-from ansible_collections.community.general.plugins.callback.loganalytics_ingestion import AzureLogAnalyticsIngestionSource
+from ansible_collections.community.general.plugins.callback.loganalytics_ingestion import (
+    AzureLogAnalyticsIngestionSource,
+)
 
 
 class TestAzureLogAnalyticsIngestion(unittest.TestCase):
@@ -19,18 +21,30 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
     tenant_id = "fake-tenant-id"
     stream_name = "fake-stream-name"
 
-    @unittest.mock.patch("ansible_collections.community.general.plugins.callback.loganalytics_ingestion.open_url", autospec=True)
+    @unittest.mock.patch(
+        "ansible_collections.community.general.plugins.callback.loganalytics_ingestion.open_url", autospec=True
+    )
     def setUp(self, OpenUrlMock):
         # Generate a fake access token.
-        OpenUrlMock.return_value.read.return_value = json.dumps({"expires_in": time.time() + 3600, "access_token": "fake_access_token"}).encode("utf-8")
+        OpenUrlMock.return_value.read.return_value = json.dumps(
+            {"expires_in": time.time() + 3600, "access_token": "fake_access_token"}
+        ).encode("utf-8")
 
         # TODO: How to set plugin default arguments?
         #       I tried instantiating the 'CallbackModule' but all it ever did was complain that 'client_id' wasn't defined.
         self.loganalytics = AzureLogAnalyticsIngestionSource(
-            self.dce_url, self.dcr_id, 3, True,
-            self.client_id, self.client_secret, self.tenant_id,
-            self.stream_name, False, False, 2,
-            "community.general.loganalytics_ingestion"
+            self.dce_url,
+            self.dcr_id,
+            3,
+            True,
+            self.client_id,
+            self.client_secret,
+            self.tenant_id,
+            self.stream_name,
+            False,
+            False,
+            2,
+            "community.general.loganalytics_ingestion",
         )
 
         # Validate POST request for login.
@@ -38,7 +52,9 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
         url = urllib.parse.urlparse(OpenUrlMock.call_args_list[0][0][0])
         assert url.netloc == "login.microsoftonline.com"
 
-    @unittest.mock.patch("ansible_collections.community.general.plugins.callback.loganalytics_ingestion.open_url", autospec=True)
+    @unittest.mock.patch(
+        "ansible_collections.community.general.plugins.callback.loganalytics_ingestion.open_url", autospec=True
+    )
     @unittest.mock.patch("json.dumps")
     @unittest.mock.patch("ansible.executor.task_result.TaskResult")
     def test_sending_data(self, MockTaskResult, MockJsonDumps, OpenUrlMock):
