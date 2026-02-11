@@ -151,8 +151,8 @@ import socket
 import uuid
 from datetime import datetime, timedelta, timezone
 from os.path import basename
+from urllib.parse import urlencode
 
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
