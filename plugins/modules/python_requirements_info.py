@@ -123,15 +123,25 @@ import re
 import sys
 import operator
 
-HAS_DISTUTILS = False
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+
+HAS_IMPORTLIB_METADATA = False
 try:
-    import pkg_resources
-    from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-    HAS_DISTUTILS = True
+    import importlib.metadata
+
+    HAS_IMPORTLIB_METADATA = True
 except ImportError:
     pass
 
-from ansible.module_utils.basic import AnsibleModule
+HAS_DISTUTILS = False
+try:
+    import pkg_resources
+
+    HAS_DISTUTILS = True
+except ImportError:
+    pass
 
 operations = {
     '<=': operator.le,
@@ -157,9 +167,9 @@ def main():
         ),
         supports_check_mode=True,
     )
-    if not HAS_DISTUTILS:
+    if not HAS_DISTUTILS and not HAS_IMPORTLIB_METADATA:
         module.fail_json(
-            msg='Could not import "distutils" and "pkg_resources" libraries to introspect python environment.',
+            msg='Could not import "pkg_resources" or "importlib.metadata" libraries to introspect Python environment.',
             python=sys.executable,
             python_version=sys.version,
             python_version_info=python_version_info,
@@ -180,12 +190,20 @@ def main():
         pkg, op, version = match.groups()
         if op is not None and op not in operations:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
-        try:
-            existing = pkg_resources.get_distribution(pkg).version
-        except pkg_resources.DistributionNotFound:
-            # not there
-            results['not_found'].append(pkg)
-            continue
+        if HAS_DISTUTILS:
+            try:
+                existing = pkg_resources.get_distribution(pkg).version
+            except pkg_resources.DistributionNotFound:
+                # not there
+                results['not_found'].append(pkg)
+                continue
+        else:
+            try:
+                existing = importlib.metadata.version(pkg)
+            except importlib.metadata.PackageNotFoundError:
+                # not there
+                results['not_found'].append(pkg)
+                continue
         if op is None and version is None:
             results['valid'][pkg] = {
                 'installed': existing,
