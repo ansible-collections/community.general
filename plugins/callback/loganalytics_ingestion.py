@@ -248,9 +248,7 @@ class AzureLogAnalyticsIngestionSource:
                     display.v(f"{self.fqcn} callback plugin failure {self.failures}/{self.disable_attempts}")
 
     def _send_to_loganalytics(self, playbook_name, result, state):
-        ansible_role = None
-        if result._task._role:
-            ansible_role = str(result._task._role)
+        ansible_role = str(result._task._role) if result._task._role else None
 
         # Include/Exclude task args
         if not self.include_task_args:
