@@ -11,11 +11,11 @@ from urllib.error import HTTPError
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
-    ModuleTestCase,
     set_module_args,
 )
 
 from ansible_collections.community.general.plugins.modules import icinga2_downtime
+from ansible_collections.community.general.tests.unit.plugins.module_utils.mh.utils import ModuleTestCase
 
 
 class TestIcinga2Downtime(ModuleTestCase):
