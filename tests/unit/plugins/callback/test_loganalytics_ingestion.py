@@ -47,7 +47,6 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
             "community.general.loganalytics_ingestion",
         )
 
-        # Validate POST request for login.
         assert OpenUrlMock.call_count == 1
         url = urllib.parse.urlparse(OpenUrlMock.call_args_list[0][0][0])
         assert url.netloc == "login.microsoftonline.com"

@@ -275,11 +275,9 @@ class AzureLogAnalyticsIngestionSource:
             }
         ]
 
-        # Display event data
         # The data displayed here can be used as a sample file in order to create the table's schema.
         display.vvv(f"Event Data: {json.dumps(event_data)}")
 
-        # Send the event data using the new Logs Ingestion API method
         self.send_event(event_data)
 
 
