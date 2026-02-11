@@ -23,6 +23,7 @@ class ModuleHelperBase:
         "deprecate",
         "debug",
     )
+    unhandled_exceptions: tuple[type[Exception]] = ()
 
     def __init__(self, module=None):
         self._changed = False
@@ -32,6 +33,9 @@ class ModuleHelperBase:
 
         if not isinstance(self.module, AnsibleModule):
             self.module = AnsibleModule(**self.module)
+
+        # Decorate run method
+        type(self).run = module_fails_on_exception(self.unhandled_exceptions)(type(self).run)
 
     @property
     def diff_mode(self):
@@ -79,7 +83,6 @@ class ModuleHelperBase:
     def output(self):
         raise NotImplementedError()
 
-    @module_fails_on_exception(unhandled_exceptions_attribute="_unhandled_exceptions")
     def run(self):
         self.__init_module__()
         self.__run__()

@@ -32,7 +32,7 @@ def cause_changes(when=None):
     return deco
 
 
-def module_fails_on_exception(unhandled_exceptions_attribute: str | None = None):
+def module_fails_on_exception(unhandled_exceptions=()):
     def deco(func):
         conflict_list = ("msg", "exception", "output", "vars", "changed")
 
@@ -44,11 +44,6 @@ def module_fails_on_exception(unhandled_exceptions_attribute: str | None = None)
             def fix_var_conflicts(output):
                 result = {fix_key(k): v for k, v in output.items()}
                 return result
-
-            unhandled_exceptions = ()
-            # check if there are any exception types that should pass through the decorator
-            if unhandled_exceptions_attribute is not None and hasattr(self, unhandled_exceptions_attribute):
-                unhandled_exceptions = getattr(self, unhandled_exceptions_attribute)
 
             try:
                 func(self, *args, **kwargs)
