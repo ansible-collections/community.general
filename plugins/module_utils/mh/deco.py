@@ -32,43 +32,40 @@ def cause_changes(when=None):
     return deco
 
 
-def module_fails_on_exception(unhandled_exceptions=()):
-    def deco(func):
-        conflict_list = ("msg", "exception", "output", "vars", "changed")
+def module_fails_on_exception(func):
+    conflict_list = ("msg", "exception", "output", "vars", "changed")
 
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            def fix_key(k):
-                return k if k not in conflict_list else f"_{k}"
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        def fix_key(k):
+            return k if k not in conflict_list else f"_{k}"
 
-            def fix_var_conflicts(output):
-                result = {fix_key(k): v for k, v in output.items()}
-                return result
+        def fix_var_conflicts(output):
+            result = {fix_key(k): v for k, v in output.items()}
+            return result
 
-            try:
-                func(self, *args, **kwargs)
-            except unhandled_exceptions:
-                # re-raise exception without further processing
-                raise
-            except ModuleHelperException as e:
-                if e.update_output:
-                    self.update_output(**e.update_output)
-                # patchy solution to resolve conflict with output variables
-                output = fix_var_conflicts(self.output)
-                self.module.fail_json(
-                    msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars.output(), **output
-                )
-            except Exception as e:
-                # patchy solution to resolve conflict with output variables
-                output = fix_var_conflicts(self.output)
-                msg = f"Module failed with exception: {str(e).strip()}"
-                self.module.fail_json(
-                    msg=msg, exception=traceback.format_exc(), output=self.output, vars=self.vars.output(), **output
-                )
+        try:
+            func(self, *args, **kwargs)
+        except self.unhandled_exceptions:
+            # re-raise exception without further processing
+            raise
+        except ModuleHelperException as e:
+            if e.update_output:
+                self.update_output(e.update_output)
+            # patchy solution to resolve conflict with output variables
+            output = fix_var_conflicts(self.output)
+            self.module.fail_json(
+                msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars.output(), **output
+            )
+        except Exception as e:
+            # patchy solution to resolve conflict with output variables
+            output = fix_var_conflicts(self.output)
+            msg = f"Module failed with exception: {str(e).strip()}"
+            self.module.fail_json(
+                msg=msg, exception=traceback.format_exc(), output=self.output, vars=self.vars.output(), **output
+            )
 
-        return wrapper
-
-    return deco
+    return wrapper
 
 
 def check_mode_skip(func):
