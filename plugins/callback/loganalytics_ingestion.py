@@ -13,7 +13,7 @@ author:
   - Cyrus Li (@zhcli) <cyrus1006@gmail.com>
 description:
   - This callback plugin will post task results in JSON format to an Azure Log Analytics workspace using the new Logs Ingestion API.
-version_added: "12.3.0"
+version_added: "12.4.0"
 requirements:
   - The callback plugin has been enabled.
   - An Azure Log Analytics workspace has been established.
