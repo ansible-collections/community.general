@@ -42,7 +42,6 @@ options:
       - When O(disable_on_failure=true), number of plugin failures that must occur before the plugin is disabled.
       - This helps prevent outright plugin failure from a single, transient network issue.
     type: int
-    required: false
     default: 3
     env:
       - name: ANSIBLE_LOGANALYTICS_DISABLE_ATTEMPTS
@@ -52,7 +51,6 @@ options:
   disable_on_failure:
     description: Stop trying to send data on plugin failure.
     type: bool
-    required: false
     default: true
     env:
       - name: ANSIBLE_LOGANALYTICS_DISABLE_ON_FAILURE
@@ -80,7 +78,6 @@ options:
   include_content:
     description: Send the content to the Azure Log Analytics workspace.
     type: bool
-    required: false
     default: false
     env:
       - name: ANSIBLE_LOGANALYTICS_INCLUDE_CONTENT
@@ -90,7 +87,6 @@ options:
   include_task_args:
     description: Send the task args to the Azure Log Analytics workspace.
     type: bool
-    required: false
     default: false
     env:
       - name: ANSIBLE_LOGANALYTICS_INCLUDE_TASK_ARGS
@@ -118,7 +114,6 @@ options:
   timeout:
     description: Timeout for the HTTP requests to the Azure Log Analytics API.
     type: int
-    required: false
     default: 2
     env:
       - name: ANSIBLE_LOGANALYTICS_TIMEOUT
