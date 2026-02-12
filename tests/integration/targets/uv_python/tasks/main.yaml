@@ -29,3 +29,19 @@
   uv_python:
     version: 3.13.5
     state: present
+- name: Remove unexisting python 3.15
+  uv_python:
+    version: 3.15
+    state: absent
+- name: Remove globally existing python 3.8
+  uv_python:
+    version: 3.8
+    state: absent
+- name: Remove python 3.13.5
+  uv_python:
+    version: 3.13.5
+    state: absent
+- name: Remove python 3.13.5 again
+  uv_python:
+    version: 3.13.5
+    state: absent

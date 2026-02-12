@@ -51,28 +51,44 @@ python:
   type: dict
 '''
 
+import re
 from ansible.module_utils.basic import AnsibleModule
 
 
 class UV:
+    """
+      Documentation for uv python https://docs.astral.sh/uv/concepts/python-versions/#installing-a-python-version
+    """
     def __init__(self, module, **kwargs):
         self.module = module
+        self.python_version = module.params["version"]
 
     def install_python(self):
-        rc, out = self._find_python()
+        rc, out, _ = self._find_python()
         if rc == 0:
           return False, out
         if self.module.check_mode:
           return True, ""
         
-        cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.module.params["version"]]
+        cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.python_version]
         _, out, _ = self.module.run_command(cmd, check_rc=True)
         return True, out
     
+    def uninstall_python(self):
+      rc, out, _ = self._find_python()
+      if rc != 0:
+          return False, out
+      if self.module.check_mode:
+          return True, ""
+      
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.python_version]
+      _, out, _ = self.module.run_command(cmd, check_rc=True)
+      return True, out
+
     def _find_python(self):
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.module.params["version"]]
-      rc, out, _ = self.module.run_command(cmd)
-      return rc, out
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.python_version]
+      rc, out, err = self.module.run_command(cmd)
+      return rc, out, err
 
 
 def main():
@@ -92,7 +108,9 @@ def main():
     uv = UV(module)
 
     if state == "present":
-        result["changed"], result["msg"] = uv.install_python()
+      result["changed"], result["msg"] = uv.install_python()
+    elif state == "absent":
+      result["changed"], result["msg"] = uv.uninstall_python()
 
     module.exit_json(**result)
 
