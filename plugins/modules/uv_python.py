@@ -59,19 +59,20 @@ class UV:
         self.module = module
 
     def install_python(self):
-        if self.find_python() == 0:
-            return False, ""
+        rc, out = self._find_python()
+        if rc == 0:
+          return False, out
         if self.module.check_mode:
-            return True, ""
+          return True, ""
         
         cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.module.params["version"]]
         _, out, _ = self.module.run_command(cmd, check_rc=True)
         return True, out
     
-    def find_python(self):
+    def _find_python(self):
       cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.module.params["version"]]
-      rc, _, _ = self.module.run_command(cmd)
-      return rc
+      rc, out, _ = self.module.run_command(cmd)
+      return rc, out
 
 
 def main():
@@ -91,7 +92,6 @@ def main():
     uv = UV(module)
 
     if state == "present":
-      if uv.find_python() != 0:
         result["changed"], result["msg"] = uv.install_python()
 
     module.exit_json(**result)
