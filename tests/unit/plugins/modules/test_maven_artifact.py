@@ -152,8 +152,7 @@ snapshot_metadata_no_snapshot_block = b"""<?xml version="1.0" encoding="UTF-8"?>
 @pytest.mark.parametrize("patch_ansible_module", [None])
 def test_find_uri_for_snapshot_resolves_to_latest(mocker):
     """When metadata has multiple snapshotVersion entries per extension,
-    the snapshot block (timestamp + buildNumber) should be used to resolve
-    to the latest version."""
+    the entry with the newest updated timestamp should be resolved."""
     _getContent = mocker.patch(
         "ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent"
     )

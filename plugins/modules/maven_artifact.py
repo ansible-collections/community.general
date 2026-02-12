@@ -465,16 +465,20 @@ class MavenDownloader:
             content = self._getContent(self.base + path, f"Failed to retrieve the maven metadata file: {path}")
             xml = etree.fromstring(content)
 
-            snapshot_value = None
-            for snapshotArtifact in xml.xpath("/metadata/versioning/snapshotVersions/snapshotVersion"):
-                classifier = snapshotArtifact.xpath("classifier/text()")
-                artifact_classifier = classifier[0] if classifier else ""
-                extension = snapshotArtifact.xpath("extension/text()")
-                artifact_extension = extension[0] if extension else ""
-                if artifact_classifier == artifact.classifier and artifact_extension == artifact.extension:
-                    snapshot_value = snapshotArtifact.xpath("value/text()")[0]
-            if snapshot_value:
-                return self._uri_for_artifact(artifact, snapshot_value)
+            candidates = []
+            for snapshot_artifact in xml.xpath("/metadata/versioning/snapshotVersions/snapshotVersion"):
+                classifier = snapshot_artifact.xpath("classifier/text()")
+                extension = snapshot_artifact.xpath("extension/text()")
+                if (classifier[0] if classifier else "") == artifact.classifier and (
+                    extension[0] if extension else ""
+                ) == artifact.extension:
+                    value = snapshot_artifact.xpath("value/text()")
+                    updated = snapshot_artifact.xpath("updated/text()")
+                    if value:
+                        candidates.append((updated[0] if updated else "", value[0]))
+            if candidates:
+                # updated is yyyymmddHHMMSS, so lexical max == newest
+                return self._uri_for_artifact(artifact, max(candidates, key=lambda item: item[0])[1])
             timestamp_xmlpath = xml.xpath("/metadata/versioning/snapshot/timestamp/text()")
             build_number_xmlpath = xml.xpath("/metadata/versioning/snapshot/buildNumber/text()")
             if timestamp_xmlpath and build_number_xmlpath:
