@@ -75,8 +75,8 @@ def test_find_version_by_spec(mocker, version_by_spec, version_choosed):
 
 
 # Metadata with multiple snapshotVersion entries per extension (as produced by GitHub Packages).
-# The <snapshot> block points to build 3 (the latest), but the <snapshotVersions> list
-# contains all historical entries starting from build 1 (the oldest).
+# The entries are deliberately NOT in chronological order to verify that
+# resolution uses the <updated> timestamp rather than relying on list position.
 snapshot_metadata_multiple_entries = b"""<?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <groupId>com.example</groupId>
@@ -91,23 +91,8 @@ snapshot_metadata_multiple_entries = b"""<?xml version="1.0" encoding="UTF-8"?>
     <snapshotVersions>
       <snapshotVersion>
         <extension>jar</extension>
-        <value>1.0.0-20260203.123107-1</value>
-        <updated>20260203123944</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>pom</extension>
-        <value>1.0.0-20260203.123107-1</value>
-        <updated>20260203123943</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>jar</extension>
         <value>1.0.0-20260205.091032-2</value>
         <updated>20260205091858</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>pom</extension>
-        <value>1.0.0-20260205.091032-2</value>
-        <updated>20260205091857</updated>
       </snapshotVersion>
       <snapshotVersion>
         <extension>jar</extension>
@@ -118,6 +103,21 @@ snapshot_metadata_multiple_entries = b"""<?xml version="1.0" encoding="UTF-8"?>
         <extension>pom</extension>
         <value>1.0.0-20260210.152345-3</value>
         <updated>20260210153153</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.0.0-20260203.123107-1</value>
+        <updated>20260203123944</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.0.0-20260203.123107-1</value>
+        <updated>20260203123943</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.0.0-20260205.091032-2</value>
+        <updated>20260205091857</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
