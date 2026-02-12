@@ -52,8 +52,30 @@ python:
 '''
 
 import re
+from enum import Enum
 from ansible.module_utils.basic import AnsibleModule
 
+
+MINOR_RELEASE = re.compile(r"^\d+\.\d+$")
+PATCH_RELEASE = re.compile(r"^\d+\.\d+\.\d+$")
+
+class Release(Enum):
+  PATCH = 1
+  MINOR = 2
+
+def extract_python_version(version: str, module):
+  if PATCH_RELEASE.match(version):
+      return Release.PATCH, version
+  elif MINOR_RELEASE.match(version):
+      return Release.MINOR, version
+  else:
+      module.fail_json(
+          msg=(
+              f"Invalid version '{version}'. "
+              "Expected X.Y or X.Y.Z."
+          )
+      )
+  return None, None
 
 class UV:
     """
@@ -61,15 +83,15 @@ class UV:
     """
     def __init__(self, module, **kwargs):
         self.module = module
-        self.python_version = module.params["version"]
+        self.python_version_type, self.python_version = extract_python_version(module.params["version"], module)
 
     def install_python(self):
-        rc, out, _ = self._find_python()
+        rc, out, _ = self._find_python() 
         if rc == 0:
           return False, out
         if self.module.check_mode:
           return True, ""
-        
+
         cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.python_version]
         _, out, _ = self.module.run_command(cmd, check_rc=True)
         return True, out
