@@ -63,14 +63,14 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
 
         results = ["foo", "bar", "biz"]
         for i, result in enumerate(results, start=1):
-            mock_host = unittest.mock.Mock("MockHost")
-            mock_host.name = "fake-name"
-            mock_task = unittest.mock.Mock("MockTask")
-            mock_task._role = "fake-role"
-            mock_task.get_name = lambda r=result: r
+            host_mock = unittest.mock.Mock("host_mock")
+            host_mock.name = "fake-name"
+            task_mock = unittest.mock.Mock("task_mock")
+            task_mock._role = "fake-role"
+            task_mock.get_name = lambda r=result: r
 
             task_result = TaskResult(
-                host=mock_host, task=mock_task, return_data={}, task_fields={"action": "fake-action", "args": {}}
+                host=host_mock, task=task_mock, return_data={}, task_fields={"action": "fake-action", "args": {}}
             )
             self.loganalytics.send_to_loganalytics("fake-playbook", task_result, "OK")
 
