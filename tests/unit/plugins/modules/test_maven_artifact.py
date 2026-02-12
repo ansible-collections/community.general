@@ -167,9 +167,9 @@ def test_find_uri_for_snapshot_resolves_to_latest(mocker):
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
-def test_find_uri_for_snapshot_falls_back_to_snapshot_versions(mocker):
-    """When metadata lacks a <snapshot> block, fall back to scanning
-    <snapshotVersions> entries."""
+def test_find_uri_for_snapshot_without_snapshot_block_uses_literal_version(mocker):
+    """When metadata lacks a <snapshot> block (non-unique snapshots),
+    use the literal -SNAPSHOT version in the artifact filename."""
     _getContent = mocker.patch(
         "ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent"
     )
@@ -179,7 +179,53 @@ def test_find_uri_for_snapshot_falls_back_to_snapshot_versions(mocker):
     mvn_downloader = maven_artifact.MavenDownloader(basic.AnsibleModule, "https://repo.example.com")
 
     uri = mvn_downloader.find_uri_for_artifact(artifact)
-    assert "1.0.0-20260203.123107-1.jar" in uri
+    assert uri == "https://repo.example.com/com/example/my-lib/1.0.0-SNAPSHOT/my-lib-1.0.0-SNAPSHOT.jar"
+
+
+# Metadata with a <snapshot> block that has <timestamp> but no <buildNumber>.
+# This is schema-valid but non-standard (e.g. produced by non-Maven tools).
+# The module should fall back to <snapshotVersions> scanning.
+snapshot_metadata_incomplete_snapshot_block = b"""<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.example</groupId>
+  <artifactId>my-lib</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20260210.152345</timestamp>
+    </snapshot>
+    <lastUpdated>20260210153158</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.0.0-20260210.152345-3</value>
+        <updated>20260210153154</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.0.0-20260210.152345-3</value>
+        <updated>20260210153153</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
+"""
+
+
+@pytest.mark.parametrize("patch_ansible_module", [None])
+def test_find_uri_for_snapshot_incomplete_snapshot_block_uses_literal_version(mocker):
+    """When the <snapshot> block is incomplete (e.g. missing <buildNumber>),
+    use the literal -SNAPSHOT version instead of raising an error."""
+    _getContent = mocker.patch(
+        "ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent"
+    )
+    _getContent.return_value = snapshot_metadata_incomplete_snapshot_block
+
+    artifact = maven_artifact.Artifact("com.example", "my-lib", "1.0.0-SNAPSHOT", None, "", "jar")
+    mvn_downloader = maven_artifact.MavenDownloader(basic.AnsibleModule, "https://repo.example.com")
+
+    uri = mvn_downloader.find_uri_for_artifact(artifact)
+    assert uri == "https://repo.example.com/com/example/my-lib/1.0.0-SNAPSHOT/my-lib-1.0.0-SNAPSHOT.jar"
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
