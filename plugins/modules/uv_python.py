@@ -59,7 +59,7 @@ class UV:
         self.module = module
 
     def install_python(self):
-        rc, out = self._find_python()
+        rc, out, _ = self._find_python()
         if rc == 0:
           return False, out
         if self.module.check_mode:
@@ -69,10 +69,21 @@ class UV:
         _, out, _ = self.module.run_command(cmd, check_rc=True)
         return True, out
     
+    def uninstall_python(self):
+      rc, out, _ = self._find_python()
+      if rc != 0:
+          return False, out
+      if self.module.check_mode:
+          return True, ""
+      
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.module.params["version"]]
+      _, out, _ = self.module.run_command(cmd, check_rc=True)
+      return True, out
+
     def _find_python(self):
       cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.module.params["version"]]
-      rc, out, _ = self.module.run_command(cmd)
-      return rc, out
+      rc, out, err = self.module.run_command(cmd)
+      return rc, out, err
 
 
 def main():
@@ -92,7 +103,9 @@ def main():
     uv = UV(module)
 
     if state == "present":
-        result["changed"], result["msg"] = uv.install_python()
+      result["changed"], result["msg"] = uv.install_python()
+    elif state == "absent":
+      result["changed"], result["msg"] = uv.uninstall_python()
 
     module.exit_json(**result)
 
