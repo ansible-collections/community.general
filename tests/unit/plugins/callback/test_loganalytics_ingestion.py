@@ -8,6 +8,8 @@ import unittest
 import unittest.mock
 import urllib
 
+from ansible.executor.task_result import TaskResult
+
 from ansible_collections.community.general.plugins.callback.loganalytics_ingestion import (
     AzureLogAnalyticsIngestionSource,
 )
@@ -23,7 +25,6 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
     fake_access_token = None
 
     def setUp(self):
-        # Generate a fake access token here, before the 'json.dumps' method is mocked.
         self.fake_access_token = json.dumps(
             {"expires_in": time.time() + 3600, "access_token": "fake_access_token"}
         ).encode("utf-8")
@@ -31,15 +32,11 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
     @unittest.mock.patch(
         "ansible_collections.community.general.plugins.callback.loganalytics_ingestion.open_url", autospec=True
     )
-    @unittest.mock.patch("json.dumps")
     @unittest.mock.patch("ansible.executor.task_result.TaskResult")
-    def test_sending_data(self, task_result_mock, json_dumps_mock, open_url_mock):
+    def test_sending_data(self, task_result_mock, open_url_mock):
         """
         Tests sending data by verifying that the expected POST requests are submitted to the expected hosts.
         """
-        # Neither the Mock objects nor its attributes are serializable but we don't care about getting accurate JSON in this case so just return fake JSON data.
-        json_dumps_mock.return_value = '{"name": "fake_json"}'
-
         # The data returned from 'open_url' is only ever read during authentication.
         open_url_mock.return_value.read.return_value = self.fake_access_token
 
@@ -64,13 +61,22 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
         url = urllib.parse.urlparse(open_url_mock.call_args_list[0][0][0])
         assert url.netloc == "login.microsoftonline.com"
 
-        self.loganalytics.send_to_loganalytics("fake_playbook", task_result_mock(), "OK")
-        self.loganalytics.send_to_loganalytics("fake_playbook", task_result_mock(), "FAILED")
-        self.loganalytics.send_to_loganalytics("fake_playbook", task_result_mock(), "OK")
+        results = ["foo", "bar", "biz"]
+        for i, result in enumerate(results, start=1):
+            mock_host = unittest.mock.Mock("MockHost")
+            mock_host.name = "fake-name"
+            mock_task = unittest.mock.Mock("MockTask")
+            mock_task._role = "fake-role"
+            mock_task.get_name = lambda r=result: r
 
-        # Validate the three POST requests for sending data (one for each task).
-        assert open_url_mock.call_count == 4
-        # Three POST requests to the DCE.
-        for i in range(1, 4):
+            task_result = TaskResult(
+                host=mock_host, task=mock_task, return_data={}, task_fields={"action": "fake-action", "args": {}}
+            )
+            self.loganalytics.send_to_loganalytics("fake-playbook", task_result, "OK")
+
+            assert open_url_mock.call_count == 1 + i
+
             url = urllib.parse.urlparse(open_url_mock.call_args_list[i][0][0])
             assert url.scheme + "://" + url.netloc == self.dce_url
+
+            assert json.loads(open_url_mock.call_args_list[i].kwargs.get("data"))[0].get("TaskName") == result
