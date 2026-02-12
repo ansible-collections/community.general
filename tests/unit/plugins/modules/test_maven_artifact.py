@@ -167,9 +167,9 @@ def test_find_uri_for_snapshot_resolves_to_latest(mocker):
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
-def test_find_uri_for_snapshot_without_snapshot_block_uses_literal_version(mocker):
-    """When metadata lacks a <snapshot> block (non-unique snapshots),
-    use the literal -SNAPSHOT version in the artifact filename."""
+def test_find_uri_for_snapshot_without_snapshot_block_uses_snapshot_versions(mocker):
+    """When metadata lacks a <snapshot> block, fall back to scanning
+    <snapshotVersions> entries."""
     _getContent = mocker.patch(
         "ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent"
     )
@@ -179,7 +179,7 @@ def test_find_uri_for_snapshot_without_snapshot_block_uses_literal_version(mocke
     mvn_downloader = maven_artifact.MavenDownloader(basic.AnsibleModule, "https://repo.example.com")
 
     uri = mvn_downloader.find_uri_for_artifact(artifact)
-    assert uri == "https://repo.example.com/com/example/my-lib/1.0.0-SNAPSHOT/my-lib-1.0.0-SNAPSHOT.jar"
+    assert "1.0.0-20260203.123107-1.jar" in uri
 
 
 # Metadata with a <snapshot> block that has <timestamp> but no <buildNumber>.
@@ -213,9 +213,9 @@ snapshot_metadata_incomplete_snapshot_block = b"""<?xml version="1.0" encoding="
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
-def test_find_uri_for_snapshot_incomplete_snapshot_block_uses_literal_version(mocker):
+def test_find_uri_for_snapshot_incomplete_snapshot_block_uses_snapshot_versions(mocker):
     """When the <snapshot> block is incomplete (e.g. missing <buildNumber>),
-    use the literal -SNAPSHOT version instead of raising an error."""
+    fall back to <snapshotVersions> instead of raising an error."""
     _getContent = mocker.patch(
         "ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent"
     )
@@ -225,7 +225,7 @@ def test_find_uri_for_snapshot_incomplete_snapshot_block_uses_literal_version(mo
     mvn_downloader = maven_artifact.MavenDownloader(basic.AnsibleModule, "https://repo.example.com")
 
     uri = mvn_downloader.find_uri_for_artifact(artifact)
-    assert uri == "https://repo.example.com/com/example/my-lib/1.0.0-SNAPSHOT/my-lib-1.0.0-SNAPSHOT.jar"
+    assert "1.0.0-20260210.152345-3.jar" in uri
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
