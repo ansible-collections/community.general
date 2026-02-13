@@ -101,10 +101,11 @@ class UV:
     def upgrade_python(self):
       rc, out, _ = self._find_python("--show-version")
       detected_version = out.split()[0]
-      if rc == 0 and detected_version == self._get_latest_patch_release():
+      latest_version = self._get_latest_patch_release()
+      if rc == 0 and detected_version == latest_version:
           return False, out
       if self.module.check_mode:
-          return True, ""
+          return True, latest_version
       
       cmd = [self.module.get_bin_path("uv", required=True), "python", "upgrade", self.python_version_str]
       rc, out, _ = self.module.run_command(cmd, check_rc=True)
