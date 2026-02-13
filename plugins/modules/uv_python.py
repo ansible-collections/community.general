@@ -72,7 +72,7 @@ class UV:
           module.fail_json(
             msg=(
                 f"Invalid version '{python_version}'. "
-                "Expected X.Y or X.Y.Z."
+                "Expected formats are X.Y or X.Y.Z"
             )
           )
 
@@ -97,14 +97,26 @@ class UV:
       cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.python_version_str]
       _, out, _ = self.module.run_command(cmd, check_rc=True)
       return True, out
+    
+    def upgrade_python(self):
+      rc, out, _ = self._find_python("--show-version")
+      detected_version = out.split()[0]
+      if rc == 0 and detected_version == self._get_latest_patch_release():
+          return False, out
+      if self.module.check_mode:
+          return True, ""
+      
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "upgrade", self.python_version_str]
+      rc, out, _ = self.module.run_command(cmd, check_rc=True)
+      return True, out
 
-    def _find_python(self):
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.python_version_str]
+    def _find_python(self, *args):
+      # if multiple similar minor versions exist, find returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.python_version_str, *args]
       rc, out, err = self.module.run_command(cmd)
       return rc, out, err
     
     def _list_python(self):
-      # By default, only the latest patch version is shown for each minor version.
       # https://docs.astral.sh/uv/reference/cli/#uv-python-list
       cmd = [self.module.get_bin_path("uv", required=True), "python", "list", self.python_version_str, "--output-format", "json"]
       rc, out, err = self.module.run_command(cmd)
@@ -113,14 +125,14 @@ class UV:
     def _get_latest_patch_release(self):
       _, out, _ = self._list_python()
       result = json.loads(out)
-      return result[-1]["version"]
+      return result[0]["version"] # uv orders versions in descending order
     
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             version=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
+            state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
         ),
         supports_check_mode=True
     )
@@ -136,6 +148,8 @@ def main():
       result["changed"], result["msg"] = uv.install_python()
     elif state == "absent":
       result["changed"], result["msg"] = uv.uninstall_python()
+    elif state == "latest":
+      result["changed"], result["msg"] = uv.upgrade_python()
 
     module.exit_json(**result)
 

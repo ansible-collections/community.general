@@ -21,6 +21,10 @@
   uv_python:
     version: 3.14
     state: present
+- name: Install latest python 3.14 # installs latest patch version for 3.14
+  uv_python:
+    version: 3.14
+    state: latest
 - name: Install python 3.13.5
   uv_python:
     version: 3.13.5
@@ -55,4 +59,8 @@
   ansible.builtin.assert:
     that:
       - result is failed
-      - "'Expected X.Y or X.Y.Z' in result.msg"
+      - "'Expected formats are X.Y or X.Y.Z' in result.msg"
+- name: Upgrade python 3.13
+  uv_python:
+    version: 3.13
+    state: latest
