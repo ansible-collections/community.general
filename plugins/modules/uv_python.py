@@ -92,7 +92,7 @@ class UV:
       if rc != 0:
           return False, out
       if self.module.check_mode:
-          return True, ""
+          return True, out
       
       cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.python_version_str]
       _, out, _ = self.module.run_command(cmd, check_rc=True)
