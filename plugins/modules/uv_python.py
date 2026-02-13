@@ -52,30 +52,11 @@ python:
 '''
 
 import re
+import json
 from enum import Enum
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.compat.version import StrictVersion
 
-
-MINOR_RELEASE = re.compile(r"^\d+\.\d+$")
-PATCH_RELEASE = re.compile(r"^\d+\.\d+\.\d+$")
-
-class Release(Enum):
-  PATCH = 1
-  MINOR = 2
-
-def extract_python_version(version: str, module):
-  if PATCH_RELEASE.match(version):
-      return Release.PATCH, version
-  elif MINOR_RELEASE.match(version):
-      return Release.MINOR, version
-  else:
-      module.fail_json(
-          msg=(
-              f"Invalid version '{version}'. "
-              "Expected X.Y or X.Y.Z."
-          )
-      )
-  return None, None
 
 class UV:
     """
@@ -83,7 +64,17 @@ class UV:
     """
     def __init__(self, module, **kwargs):
         self.module = module
-        self.python_version_type, self.python_version = extract_python_version(module.params["version"], module)
+        python_version = module.params["version"]
+        try:
+          self.python_version = StrictVersion(python_version)
+          self.python_version_str = self.python_version.__str__()
+        except ValueError:
+          module.fail_json(
+            msg=(
+                f"Invalid version '{python_version}'. "
+                "Expected X.Y or X.Y.Z."
+            )
+          )
 
     def install_python(self):
         rc, out, _ = self._find_python() 
@@ -92,7 +83,7 @@ class UV:
         if self.module.check_mode:
           return True, ""
 
-        cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.python_version]
+        cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.python_version_str]
         _, out, _ = self.module.run_command(cmd, check_rc=True)
         return True, out
     
@@ -103,15 +94,27 @@ class UV:
       if self.module.check_mode:
           return True, ""
       
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.python_version]
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.python_version_str]
       _, out, _ = self.module.run_command(cmd, check_rc=True)
       return True, out
 
     def _find_python(self):
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.python_version]
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.python_version_str]
+      rc, out, err = self.module.run_command(cmd)
+      return rc, out, err
+    
+    def _list_python(self):
+      # By default, only the latest patch version is shown for each minor version.
+      # https://docs.astral.sh/uv/reference/cli/#uv-python-list
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "list", self.python_version_str, "--output-format", "json"]
       rc, out, err = self.module.run_command(cmd)
       return rc, out, err
 
+    def _get_latest_patch_release(self):
+      _, out, _ = self._list_python()
+      result = json.loads(out)
+      return result[-1]["version"]
+    
 
 def main():
     module = AnsibleModule(
