@@ -124,6 +124,9 @@ seealso:
   - name: Logs Ingestion API
     description: Overview of Logs Ingestion API in Azure Monitor
     link: https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview
+notes:
+  - Triple verbosity logging (`-vvv`) can be used to generate JSON sample data for creating the table schema in Azure Log Analytics.
+    Search for the string "Event Data:" in the output in order to locate the data sample.
 """
 
 EXAMPLES = """
