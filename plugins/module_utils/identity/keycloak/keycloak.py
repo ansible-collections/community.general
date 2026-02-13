@@ -1655,13 +1655,12 @@ class KeycloakAPI:
                 # For subgroups: use children endpoint with search parameter
                 search_url = "{url}?search={name}&exact=true".format(
                     url=URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent["id"]),
-                    name=quote(name, safe='')
+                    name=quote(name, safe=""),
                 )
             else:
                 # For top-level groups: use groups endpoint with search parameter
                 search_url = "{url}?search={name}&exact=true".format(
-                    url=URL_GROUPS.format(url=self.baseurl, realm=realm),
-                    name=quote(name, safe='')
+                    url=URL_GROUPS.format(url=self.baseurl, realm=realm), name=quote(name, safe="")
                 )
 
             groups = self._request_and_deserialize(search_url, method="GET")
