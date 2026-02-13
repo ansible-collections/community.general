@@ -107,8 +107,8 @@ class UV:
       if self.module.check_mode:
           return True, latest_version
       
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "upgrade", self.python_version_str]
-      rc, out, _ = self.module.run_command(cmd, check_rc=True)
+      cmd = [self.module.get_bin_path("uv", required=True), "python", "install", latest_version]
+      _, out, _ = self.module.run_command(cmd, check_rc=True)
       return True, out
 
     def _find_python(self, *args):
