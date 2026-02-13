@@ -13,54 +13,78 @@
     curl -LsSf https://astral.sh/uv/install.sh | sh
   environment:
     UV_INSTALL_DIR: /usr/local/bin
+
+- name: Install python 3.14 in check mode
+  uv_python:
+    version: 3.14
+    state: present
+  check_mode: yes
+
 - name: Install python 3.14
   uv_python:
     version: 3.14
     state: present
+
 - name: Re-install python 3.14 # installs latest patch version for 3.14
   uv_python:
     version: 3.14
     state: present
+
 - name: Install latest python 3.14 # installs latest patch version for 3.14
   uv_python:
     version: 3.14
     state: latest
+
 - name: Install python 3.13.5
   uv_python:
     version: 3.13.5
     state: present
+
 - name: Re-install python 3.13.5
   uv_python:
     version: 3.13.5
     state: present
+
 - name: Remove unexisting python 3.15 # removes latest patch version for 3.15 if exists
   uv_python:
     version: 3.15
     state: absent
+
 - name: Remove globally existing python 3.8
   uv_python:
     version: 3.8
     state: absent
+
 - name: Remove python 3.13.5
   uv_python:
     version: 3.13.5
     state: absent
+
 - name: Remove python 3.13.5 again
   uv_python:
     version: 3.13.5
     state: absent
+
 - name: Install python 3
   uv_python:
     version: 3
     state: present
   register: result
   ignore_errors: true
+
 - name: Assert invalid version failed
   ansible.builtin.assert:
     that:
       - result is failed
       - "'Expected formats are X.Y or X.Y.Z' in result.msg"
+
 - name: Upgrade python 3.13
   uv_python:
     version: 3.13
     state: latest
+
+- name: Upgrade python 3.13 in check mode
+  uv_python:
+    version: 3.13
+    state: latest
+  check_mode: yes
