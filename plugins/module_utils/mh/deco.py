@@ -46,6 +46,9 @@ def module_fails_on_exception(func):
 
         try:
             func(self, *args, **kwargs)
+        except self.unhandled_exceptions:
+            # re-raise exception without further processing
+            raise
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)

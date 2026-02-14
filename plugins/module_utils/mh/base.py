@@ -23,6 +23,7 @@ class ModuleHelperBase:
         "deprecate",
         "debug",
     )
+    unhandled_exceptions: tuple[type[Exception], ...] = ()
 
     def __init__(self, module=None):
         self._changed = False
