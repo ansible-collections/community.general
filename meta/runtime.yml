@@ -40,6 +40,7 @@ action_groups:
     - keycloak_realm
     - keycloak_realm_key
     - keycloak_realm_keys_metadata_info
+    - keycloak_realm_localization
     - keycloak_realm_rolemapping
     - keycloak_role
     - keycloak_user
