@@ -661,17 +661,37 @@ class RedfishUtils:
 
         :return: dict containing the status of the service
         """
+        result = {}
+        service_root_data = {}
+        # Get these entries, but does not fail if not found
+        properties = [
+            "Id",
+            "Name",
+            "RedfishVersion",
+            "Vendor",
+            "ServiceIdentification",
+            "ProtocolFeaturesSupported",
+            "UUID",
+        ]
 
         # Get the service root
-        # Override the timeout since the service root is expected to be readily
-        # available.
+        # Override the timeout since the service root is expected to be readily available.
         service_root = self.get_request(self.root_uri + self.service_root, timeout=10)
         if service_root["ret"] is False:
             # Failed, either due to a timeout or HTTP error; not available
             return {"ret": True, "available": False}
 
         # Successfully accessed the service root; available
-        return {"ret": True, "available": True}
+        result["ret"] = True
+        result["available"] = True
+        data = service_root["data"]
+
+        for property in properties:
+            if property in data:
+                service_root_data[property] = data[property]
+
+        result["entries"] = service_root_data
+        return result
 
     def get_logs(self):
         log_svcs_uri_list = []
