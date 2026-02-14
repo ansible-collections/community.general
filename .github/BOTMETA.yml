@@ -917,6 +917,8 @@ files:
     labels: logentries
   $modules/logentries_msg.py:
     maintainers: jcftang
+  $modules/logrotate.py:
+    maintainers: a-gabidullin
   $modules/logstash_plugin.py:
     maintainers: nerzhul
   $modules/lvg.py:
