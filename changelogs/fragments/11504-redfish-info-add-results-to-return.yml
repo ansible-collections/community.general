@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info - add Redfish Root data to results of successful ``CheckAvailability`` command (https://github.com/ansible-collections/community.general/pull/11504).
