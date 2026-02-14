@@ -1,4 +1,3 @@
 ---
 minor_changes:
-  - keycloak_* modules - optimize retrieval of groups by name to use Keycloak search API with exact matching instead of fetching all groups (https://github.com/ansible-collections/community.general/pull/11503).
-    This improves speed on group related modules like `keycloak_client_rolemapping`. `keycloak_realm_rolemapping` and `keycloak_group`.
+  - keycloak_client_rolemapping, keycloak_realm_rolemapping, keycloak_group - optimize retrieval of groups by name to use Keycloak search API with exact matching instead of fetching all groups (https://github.com/ansible-collections/community.general/pull/11503).
