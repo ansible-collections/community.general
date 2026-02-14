@@ -1,0 +1,81 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# test code for toml_file module
+# Copyright (c) 2026, Jose Drowne
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install tomlkit
+  pip:
+    name: tomlkit
+    state: present
+
+- name: Record the output directory
+  set_fact:
+    output_file: "{{ remote_tmp_dir }}/test.toml"
+    non_existing_file: "{{ remote_tmp_dir }}/nonexistent.toml"
+
+- name: Include tasks
+  block:
+    - name: Include tasks to perform basic tests
+      include_tasks: 00-basic.yml
+
+    - name: Reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: Include tasks to perform table tests
+      include_tasks: 01-tables.yml
+
+    - name: Reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: Include tasks to perform nested tests
+      include_tasks: 02-nested.yml
+
+    - name: Reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: Include tasks to perform array tests
+      include_tasks: 03-arrays.yml
+
+    - name: Reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: Include tasks to perform array of tables tests
+      include_tasks: 04-array-tables.yml
+
+    - name: Reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: Include tasks to perform type tests
+      include_tasks: 05-types.yml
+
+    - name: Reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: Include tasks to perform comment preservation tests
+      include_tasks: 06-comments.yml
+
+    - name: Reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: Include tasks to perform backup tests
+      include_tasks: 07-backup.yml

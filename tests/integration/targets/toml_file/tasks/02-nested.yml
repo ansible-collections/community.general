@@ -1,0 +1,148 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Nested tests - dotted paths for tables and keys
+
+- name: test-nested 1 - create nested table with dotted notation
+  toml_file:
+    path: "{{ output_file }}"
+    table: server.database
+    key: port
+    value: 5432
+  register: result_nested_1
+
+- name: test-nested 1 - verify change
+  assert:
+    that:
+      - result_nested_1 is changed
+
+- name: test-nested 1 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_nested_1
+
+- name: test-nested 1 - verify nested table created
+  vars:
+    expected: |
+      [server.database]
+      port = 5432
+  assert:
+    that:
+      - (content_nested_1.content | b64decode) == expected
+
+- name: test-nested 2 - add another key to nested table
+  toml_file:
+    path: "{{ output_file }}"
+    table: server.database
+    key: name
+    value: mydb
+  register: result_nested_2
+
+- name: test-nested 2 - verify change
+  assert:
+    that:
+      - result_nested_2 is changed
+
+- name: test-nested 2 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_nested_2
+
+- name: test-nested 2 - verify key added
+  vars:
+    expected: |
+      [server.database]
+      port = 5432
+      name = "mydb"
+  assert:
+    that:
+      - (content_nested_2.content | b64decode) == expected
+
+- name: test-nested 3 - create deeply nested table
+  toml_file:
+    path: "{{ output_file }}"
+    table: app.config.logging
+    key: level
+    value: debug
+  register: result_nested_3
+
+- name: test-nested 3 - verify change
+  assert:
+    that:
+      - result_nested_3 is changed
+
+- name: test-nested 3 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_nested_3
+
+- name: test-nested 3 - verify deeply nested table
+  vars:
+    expected: |
+      [server.database]
+      port = 5432
+      name = "mydb"
+
+      [app.config.logging]
+      level = "debug"
+  assert:
+    that:
+      - (content_nested_3.content | b64decode) == expected
+
+- name: test-nested 4 - remove key from nested table
+  toml_file:
+    path: "{{ output_file }}"
+    table: server.database
+    key: name
+    state: absent
+  register: result_nested_4
+
+- name: test-nested 4 - verify change
+  assert:
+    that:
+      - result_nested_4 is changed
+
+- name: test-nested 4 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_nested_4
+
+- name: test-nested 4 - verify key removed
+  vars:
+    expected: |
+      [server.database]
+      port = 5432
+
+      [app.config.logging]
+      level = "debug"
+  assert:
+    that:
+      - (content_nested_4.content | b64decode) == expected
+
+- name: test-nested 5 - remove nested table
+  toml_file:
+    path: "{{ output_file }}"
+    table: server.database
+    state: absent
+  register: result_nested_5
+
+- name: test-nested 5 - verify change
+  assert:
+    that:
+      - result_nested_5 is changed
+
+- name: test-nested 5 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_nested_5
+
+- name: test-nested 5 - verify table removed
+  vars:
+    expected: |
+      [app.config.logging]
+      level = "debug"
+  assert:
+    that:
+      - (content_nested_5.content | b64decode) == expected
