@@ -65,6 +65,9 @@ files:
   $callbacks/log_plays.py: {}
   $callbacks/loganalytics.py:
     maintainers: zhcli
+  $callbacks/loganalytics_ingestion.py:
+    ignore: zhcli
+    maintainers: pboushy vsh47 wtcline-intc
   $callbacks/logdna.py: {}
   $callbacks/logentries.py: {}
   $callbacks/logstash.py:
