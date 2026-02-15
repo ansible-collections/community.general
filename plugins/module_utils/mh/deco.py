@@ -6,9 +6,12 @@
 from __future__ import annotations
 
 import traceback
+from contextlib import contextmanager
 from functools import wraps
 
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
+
+unhandled_exceptions: tuple[type[Exception], ...] = ()
 
 
 def cause_changes(when=None):
@@ -32,6 +35,17 @@ def cause_changes(when=None):
     return deco
 
 
+@contextmanager
+def no_handle_exceptions(*exceptions: type[Exception]):
+    global unhandled_exceptions
+    current = unhandled_exceptions
+    unhandled_exceptions = tuple(exceptions) + unhandled_exceptions
+    try:
+        yield
+    finally:
+        unhandled_exceptions = current
+
+
 def module_fails_on_exception(func):
     conflict_list = ("msg", "exception", "output", "vars", "changed")
 
@@ -46,7 +60,7 @@ def module_fails_on_exception(func):
 
         try:
             func(self, *args, **kwargs)
-        except self.unhandled_exceptions:
+        except unhandled_exceptions:
             # re-raise exception without further processing
             raise
         except ModuleHelperException as e:
