@@ -9,9 +9,12 @@ import traceback
 from contextlib import contextmanager
 from functools import wraps
 
-from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
+from ansible_collections.community.general.plugins.module_utils.mh.exceptions import (
+    ModuleHelperException,
+    _UnhandledSentinel,
+)
 
-unhandled_exceptions: tuple[type[Exception], ...] = ()
+_unhandled_exceptions: tuple[type[Exception], ...] = (_UnhandledSentinel,)
 
 
 def cause_changes(when=None):
@@ -37,13 +40,13 @@ def cause_changes(when=None):
 
 @contextmanager
 def no_handle_exceptions(*exceptions: type[Exception]):
-    global unhandled_exceptions
-    current = unhandled_exceptions
-    unhandled_exceptions = tuple(exceptions) + unhandled_exceptions
+    global _unhandled_exceptions
+    current = _unhandled_exceptions
+    _unhandled_exceptions = tuple(exceptions)
     try:
         yield
     finally:
-        unhandled_exceptions = current
+        _unhandled_exceptions = current
 
 
 def module_fails_on_exception(func):
@@ -60,7 +63,7 @@ def module_fails_on_exception(func):
 
         try:
             func(self, *args, **kwargs)
-        except unhandled_exceptions:
+        except _unhandled_exceptions:
             # re-raise exception without further processing
             raise
         except ModuleHelperException as e:
