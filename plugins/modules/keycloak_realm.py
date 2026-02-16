@@ -297,7 +297,7 @@ options:
     aliases:
       - localizationTexts
     type: dict
-    version_added: 12.3.1
+    version_added: 12.4.0
   login_theme:
     description:
       - The realm login theme.
