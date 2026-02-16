@@ -68,8 +68,8 @@ options:
   compress_options:
     description:
       - Options to pass to compression program.
-      - For gzip, use V(-9) for best compression, V(-1) for fastest.
-      - For xz, use V(-9) for best compression.
+      - For O(compression_method=gzip), use V(-9) for best compression, V(-1) for fastest.
+      - For O(compression_method=xz), use V(-9) for best compression.
     type: str
   compression_method:
     description:
@@ -198,8 +198,9 @@ options:
   su:
     description:
       - Set user and group for rotated files.
-      - Format is V(user group) (for example V(www-data adm)).
-      - Set to V(null) or omit to not set user/group.
+      - Format is V(user group) (e.g., V(www-data adm)).
+      - Set to V("") (empty string) to remove the directive from existing configurations.
+      - Set to V(null) or omit to leave the existing value unchanged (when modifying) or not set (when creating).
     type: str
   old_dir:
     description:
@@ -248,9 +249,8 @@ options:
     type: bool
   start:
     description:
-      - Base number for rotated files.
+      - Base number for rotated files. Allowed values are from V(0) to V(999).
       - For example, V(1) gives files C(.1), C(.2), and so on instead of C(.0), C(.1).
-      - Allowed values are from V(0) to V(999).
     type: int
   syslog:
     description:
@@ -420,12 +420,12 @@ RETURN = r"""
 config_file:
   description: Path to the created/updated logrotate configuration file.
   type: str
-  returned: when O(state=present)
+  returned: success when O(state=present)
   sample: /etc/logrotate.d/nginx
 config_content:
   description: The generated logrotate configuration content.
   type: str
-  returned: when O(state=present)
+  returned: success when O(state=present)
   sample: |
     /var/log/nginx/*.log {
         daily
@@ -445,12 +445,12 @@ config_content:
 enabled_state:
   description: Current enabled state of the configuration.
   type: bool
-  returned: always
+  returned: success
   sample: true
 backup_file:
   description: Path to the backup of the original configuration file, if it was backed up.
   type: str
-  returned: when backup was made
+  returned: success when backup was made
   sample: /etc/logrotate.d/nginx.20250101_120000
 """
 
@@ -497,10 +497,14 @@ class LogrotateConfig:
         if self.params.get("size") and self.params.get("max_size"):
             self.module.fail_json(msg="'size' and 'max_size' parameters are mutually exclusive")
 
-        if self.params.get("su"):
-            su_parts = self.params["su"].split()
-            if len(su_parts) != 2:
-                self.module.fail_json(msg="'su' parameter must be in format 'user group'")
+        su_val = self.params.get("su")
+        if su_val is not None:
+            if su_val == "":
+                pass
+            else:
+                su_parts = su_val.split()
+                if len(su_parts) != 2:
+                    self.module.fail_json(msg="'su' parameter must be in format 'user group' or empty string to remove")
 
         if self.params.get("shred_cycles", 1) < 1:
             self.module.fail_json(msg="'shred_cycles' must be a positive integer")
@@ -700,8 +704,10 @@ class LogrotateConfig:
         if shared_scripts_val is not None and shared_scripts_val:
             lines.append("    sharedscripts")
 
-        if self.params.get("su") is not None:
-            lines.append(f"    su {self.params['su']}")
+        su_val = self.params.get("su")
+        if su_val is not None:
+            if su_val != "":
+                lines.append(f"    su {su_val}")
 
         no_old_dir_val = self.params.get("no_old_dir")
         old_dir_val = self.params.get("old_dir")
