@@ -61,6 +61,7 @@ from configparser import ConfigParser
 from io import StringIO
 
 from ansible.errors import AnsibleFilterError
+from ansible.module_utils.common.collections import is_sequence
 
 
 class IniParser(ConfigParser):
