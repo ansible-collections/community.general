@@ -77,39 +77,40 @@ class UV:
           )
 
     def install_python(self):
-        rc, out, _ = self._find_python() 
+        rc, out, _ = self._find_python("--show-version") 
         if rc == 0:
-          return False, out
+          return False, out.split()[0]
         if self.module.check_mode:
-          return True, ""
+          return True, self.python_version_str
 
         cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.python_version_str]
-        _, out, _ = self.module.run_command(cmd, check_rc=True)
-        return True, out
+        self.module.run_command(cmd, check_rc=True)
+        return True, self.python_version_str
     
     def uninstall_python(self):
       rc, out, _ = self._find_python()
       if rc != 0:
           return False, out
       if self.module.check_mode:
-          return True, out
+          return True, ""
       
       cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.python_version_str]
-      _, out, _ = self.module.run_command(cmd, check_rc=True)
-      return True, out
+      self.module.run_command(cmd, check_rc=True)
+      return True, ""
     
     def upgrade_python(self):
       rc, out, _ = self._find_python("--show-version")
-      detected_version = out.split()[0]
       latest_version = self._get_latest_patch_release()
-      if rc == 0 and detected_version == latest_version:
+      if rc == 0:
+        detected_version = out.split()[0]
+        if detected_version == latest_version:
           return False, latest_version
       if self.module.check_mode:
           return True, latest_version
       
       cmd = [self.module.get_bin_path("uv", required=True), "python", "install", latest_version]
-      _, out, _ = self.module.run_command(cmd, check_rc=True)
-      return True, out
+      self.module.run_command(cmd, check_rc=True)
+      return True, latest_version
 
     def _find_python(self, *args):
       # if multiple similar minor versions exist, find returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version
