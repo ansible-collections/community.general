@@ -16,6 +16,10 @@ options:
     description: A string containing an INI document.
     type: string
     required: true
+  delimiters:
+    description: A list of characters used as delimiters in the INI document. Default is ["=", ":"].
+    type: list
+    required: false
 seealso:
   - plugin: community.general.to_ini
     plugin_type: filter
@@ -58,8 +62,8 @@ from ansible.errors import AnsibleFilterError
 class IniParser(ConfigParser):
     """Implements a configparser which is able to return a dict"""
 
-    def __init__(self):
-        super().__init__(interpolation=None)
+    def __init__(self, delimiters=["=", ":"]):
+        super().__init__(interpolation=None, delimiters=delimiters)
         self.optionxform = str
 
     def as_dict(self):
@@ -74,13 +78,13 @@ class IniParser(ConfigParser):
         return d
 
 
-def from_ini(obj):
+def from_ini(obj, delimiters=["=", ":"]):
     """Read the given string as INI file and return a dict"""
 
     if not isinstance(obj, str):
         raise AnsibleFilterError(f"from_ini requires a str, got {type(obj)}")
 
-    parser = IniParser()
+    parser = IniParser(delimiters=delimiters)
 
     try:
         parser.read_file(StringIO(obj))
