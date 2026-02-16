@@ -62,7 +62,9 @@ from ansible.errors import AnsibleFilterError
 class IniParser(ConfigParser):
     """Implements a configparser which is able to return a dict"""
 
-    def __init__(self, delimiters=["=", ":"]):
+    def __init__(self, delimiters=None):
+        if not delimiters:
+            delimiters=("=", ":")
         super().__init__(interpolation=None, delimiters=delimiters)
         self.optionxform = str
 
@@ -78,7 +80,7 @@ class IniParser(ConfigParser):
         return d
 
 
-def from_ini(obj, delimiters=["=", ":"]):
+def from_ini(obj, delimiters=None):
     """Read the given string as INI file and return a dict"""
 
     if not isinstance(obj, str):
