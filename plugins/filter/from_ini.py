@@ -17,8 +17,12 @@ options:
     type: string
     required: true
   delimiters:
-    description: A list of characters used as delimiters in the INI document. Default is ["=", ":"].
+    description: A list of characters used as delimiters in the INI document.
     type: list
+    elements: string
+    default:
+      - "="
+      -  ":"
     required: false
 seealso:
   - plugin: community.general.to_ini
