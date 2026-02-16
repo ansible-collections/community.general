@@ -70,9 +70,9 @@ class UV:
           self.python_version = StrictVersion(python_version)
           self.python_version_str = self.python_version.__str__()
         except ValueError:
-          module.fail_json(
+          self.module.fail_json(
             msg=(
-                f"Invalid version '{python_version}'. "
+                f"Invalid version {python_version}. "
                 "Expected formats are X.Y or X.Y.Z"
             )
           )
@@ -126,11 +126,23 @@ class UV:
       return rc, out, err
 
     def _get_latest_patch_release(self):
+      """
+        Returns latest available patch release for a given python version
+      """
       _, out, _ = self._list_python() # uv returns versions in descending order but we sort them just in case future uv behavior changes
-      results = json.loads(out)
-      versions = [StrictVersion(result["version"]) for result in results]
-      return max(versions).__str__()
-    
+      latest_version = ""
+      try:
+        results = json.loads(out)
+        versions = [StrictVersion(result["version"]) for result in results]
+        latest_version = max(versions).__str__()
+      except ValueError:
+        self.module.fail_json(
+          msg=(
+              f"Version {self.python_version_str} does not exist. "
+          )
+        )
+      return latest_version
+
 
 def main():
     module = AnsibleModule(
