@@ -68,10 +68,10 @@ class IniParser(ConfigParser):
     """Implements a configparser which is able to return a dict"""
 
     def __init__(self, delimiters=None):
-        if delimiters is not None:
-            super().__init__(interpolation=None, delimiters=delimiters)
-        else:
+        if delimiters is None:
             super().__init__(interpolation=None)
+        else:
+            super().__init__(interpolation=None, delimiters=delimiters)
         self.optionxform = str
 
     def as_dict(self):
