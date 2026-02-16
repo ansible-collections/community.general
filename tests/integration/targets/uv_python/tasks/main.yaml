@@ -19,8 +19,8 @@
 - name: Verify python 3.14 installation failed
   assert:
     that:
-      - failed_install["failed"] is true
-      - '"Failed to find required executable" in failed_install["msg"]'
+      - failed_install.failed is true
+      - '"Failed to find required executable" in failed_install.msg'
 
 - name: Install uv
   shell: |
@@ -38,9 +38,9 @@
 - name: Verify python 3.14 installation in check mode
   assert:
     that:
-      - install_check_mode["changed"] is true
-      - install_check_mode["failed"] is false
-      - '"3.14" in install_check_mode["msg"]'
+      - install_check_mode.changed is true
+      - install_check_mode.failed is false
+      - '"3.14" in install_check_mode.msg'
 
 - name: Install python 3.14
   uv_python:
@@ -51,9 +51,9 @@
 - name: Verify python 3.14 installation in check mode
   assert:
     that:
-      - install_python["changed"] is true
-      - install_python["failed"] is false
-      - '"3.14" in install_python["msg"]'
+      - install_python.changed is true
+      - install_python.failed is false
+      - '"3.14" in install_python.msg'
 
 - name: Re-install python 3.14
   uv_python:
@@ -64,9 +64,9 @@
 - name: Verify python 3.14 re-installation
   assert:
     that:
-      - reinstall_python["changed"] is false
-      - reinstall_python["failed"] is false
-      - '"3.14" in reinstall_python["msg"]'
+      - reinstall_python.changed is false
+      - reinstall_python.failed is false
+      - '"3.14" in reinstall_python.msg'
 
 - name: Install latest python 3.15 # installs latest patch version for 3.15
   uv_python:
@@ -78,9 +78,9 @@
 - name: Verify python 3.15 installation
   assert:
     that:
-      - install_latest_python["changed"] is true
-      - install_latest_python["failed"] is false
-      - '"3.15" in install_latest_python["msg"]'
+      - install_latest_python.changed is true
+      - install_latest_python.failed is false
+      - '"3.15" in install_latest_python.msg'
 
 - name: Install python 3.13.5
   uv_python:
@@ -91,9 +91,9 @@
 - name: Verify python 3.13.5 installation
   assert:
     that:
-      - install_python["changed"] is true
-      - install_python["failed"] is false
-      - '"3.13.5" in install_python["msg"]'
+      - install_python.changed is true
+      - install_python.failed is false
+      - '"3.13.5" in install_python.msg'
 
 - name: Re-install python 3.13.5
   uv_python:
@@ -104,9 +104,9 @@
 - name: Verify python 3.13.5 installation
   assert:
     that:
-      - reinstall_python["changed"] is false
-      - reinstall_python["failed"] is false
-      - '"3.13.5" in reinstall_python["msg"]'
+      - reinstall_python.changed is false
+      - reinstall_python.failed is false
+      - '"3.13.5" in reinstall_python.msg'
 
 - name: Remove unexisting python 3.10 # removes latest patch version for 3.10 if exists
   uv_python:
@@ -117,9 +117,9 @@
 - name: Verify python 3.10 deletion
   assert:
     that:
-      - remove_python["changed"] is false
-      - remove_python["failed"] is false
-      - 'remove_python["msg"] == ""'
+      - remove_python.changed is false
+      - remove_python.failed is false
+      - 'remove_python.msg == ""'
 
 - name: Remove python 3.13.5 in check mode
   uv_python:
@@ -131,9 +131,9 @@
 - name: Verify python 3.13.5 deletion in check mode
   assert:
     that:
-      - remove_python_in_check_mode["changed"] is true
-      - remove_python_in_check_mode["failed"] is false
-      - 'remove_python_in_check_mode["msg"] == ""'
+      - remove_python_in_check_mode.changed is true
+      - remove_python_in_check_mode.failed is false
+      - 'remove_python_in_check_mode.msg == ""'
 
 - name: Remove python 3.13.5
   uv_python:
@@ -144,9 +144,9 @@
 - name: Verify python 3.13.5 deletion
   assert:
     that:
-      - remove_python["changed"] is true
-      - remove_python["failed"] is false
-      - 'remove_python["msg"] == ""'
+      - remove_python.changed is true
+      - remove_python.failed is false
+      - 'remove_python.msg == ""'
 
 - name: Remove python 3.13.5 again
   uv_python:
@@ -157,9 +157,9 @@
 - name: Verify python 3.13.5 deletion
   assert:
     that:
-      - remove_python["changed"] is false
-      - remove_python["failed"] is false
-      - 'remove_python["msg"] == ""'
+      - remove_python.changed is false
+      - remove_python.failed is false
+      - 'remove_python.msg == ""'
 
 - name: Install python 3
   uv_python:
@@ -183,9 +183,9 @@
 - name: Verify python 3.13 upgrade
   assert:
     that:
-      - upgrade_python["changed"] is true
-      - upgrade_python["failed"] is false
-      - '"3.13" in upgrade_python["msg"]'
+      - upgrade_python.changed is true
+      - upgrade_python.failed is false
+      - '"3.13" in upgrade_python.msg'
 
 - name: Upgrade python 3.13 in check mode
   uv_python:
@@ -197,9 +197,9 @@
 - name: Verify python 3.13.5 deletion in check mode
   assert:
     that:
-      - upgrade_python["changed"] is false
-      - upgrade_python["failed"] is false
-      - '"3.13" in upgrade_python["msg"]'
+      - upgrade_python.changed is false
+      - upgrade_python.failed is false
+      - '"3.13" in upgrade_python.msg'
 
 - name: Install unexisting python version
   uv_python:
@@ -211,9 +211,9 @@
 - name: Verify python 3.13.5 deletion in check mode
   assert:
     that:
-      - unexisting_python["changed"] is false
-      - unexisting_python["failed"] is true
-      - '"No download found for request" in unexisting_python["msg"]'
+      - unexisting_python.changed is false
+      - unexisting_python.failed is true
+      - '"No download found for request" in unexisting_python.msg'
 
 - name: Install unexisting python version
   uv_python:
@@ -221,11 +221,10 @@
     state: latest
   register: unexisting_python
   ignore_errors: true
-- debug:
-    var: unexisting_python
+
 - name: Verify python 3.13.5 deletion in check mode
   assert:
     that:
-      - unexisting_python["changed"] is false
-      - unexisting_python["failed"] is true
-      - '"Version 3.12.13 does not exist" in unexisting_python["msg"]'
+      - unexisting_python.changed is false
+      - unexisting_python.failed is true
+      - '"Version 3.12.13 does not exist" in unexisting_python.msg'
