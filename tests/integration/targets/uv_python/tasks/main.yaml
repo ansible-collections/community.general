@@ -8,6 +8,20 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Install python 3.14 when no uv executable exists
+  uv_python:
+    version: 3.14
+    state: present
+  check_mode: yes
+  register: failed_install
+  ignore_errors: true
+
+- name: Verify python 3.14 installation failed
+  assert:
+    that:
+      - failed_install["failed"] is true
+      - '"Failed to find required executable" in failed_install["msg"]'
+
 - name: Install uv
   shell: |
     curl -LsSf https://astral.sh/uv/install.sh | sh
