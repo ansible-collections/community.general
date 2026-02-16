@@ -123,9 +123,7 @@ class UV:
       """
       rc, out, _ = self._find_python("--show-version")
       latest_version = self._get_latest_patch_release()
-      if rc == 0:
-        detected_version = out.split()[0]
-        if detected_version == latest_version:
+      if rc == 0 and out.split()[0] == latest_version:
           return False, latest_version
       if self.module.check_mode:
           return True, latest_version
