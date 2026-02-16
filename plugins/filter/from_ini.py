@@ -67,7 +67,7 @@ class IniParser(ConfigParser):
     """Implements a configparser which is able to return a dict"""
 
     def __init__(self, delimiters=None):
-        if delimiters:
+        if delimiters is not None:
             super().__init__(interpolation=None, delimiters=delimiters)
         else:
             super().__init__(interpolation=None)
