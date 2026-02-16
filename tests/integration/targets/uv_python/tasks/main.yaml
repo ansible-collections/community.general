@@ -133,7 +133,7 @@
     that:
       - remove_python_in_check_mode.changed is true
       - remove_python_in_check_mode.failed is false
-      - 'remove_python_in_check_mode.msg == ""'
+      - '"3.13.5" in remove_python_in_check_mode.msg'
 
 - name: Remove python 3.13.5
   uv_python:
@@ -146,7 +146,7 @@
     that:
       - remove_python.changed is true
       - remove_python.failed is false
-      - 'remove_python.msg == ""'
+      - '"3.13.5" in remove_python_in_check_mode.msg'
 
 - name: Remove python 3.13.5 again
   uv_python:
@@ -154,7 +154,7 @@
     state: absent
   register: remove_python
 
-- name: Verify python 3.13.5 deletion
+- name: Verify python 3.13.5 deletion again
   assert:
     that:
       - remove_python.changed is false
@@ -194,7 +194,7 @@
   check_mode: yes
   register: upgrade_python
 
-- name: Verify python 3.13.5 deletion in check mode
+- name: Verify python 3.13 deletion in check mode
   assert:
     that:
       - upgrade_python.changed is false
@@ -208,7 +208,7 @@
   register: unexisting_python
   ignore_errors: true
 
-- name: Verify python 3.13.5 deletion in check mode
+- name: Verify python 3.12.13 deletion
   assert:
     that:
       - unexisting_python.changed is false
@@ -222,9 +222,9 @@
   register: unexisting_python
   ignore_errors: true
 
-- name: Verify python 3.13.5 deletion in check mode
+- name: Verify python 3.12.13 deletion
   assert:
     that:
       - unexisting_python.changed is false
       - unexisting_python.failed is true
-      - '"Version 3.12.13 does not exist" in unexisting_python.msg'
+      - '"Version 3.12.13 is not available" in unexisting_python.msg'
