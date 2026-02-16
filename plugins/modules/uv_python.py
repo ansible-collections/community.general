@@ -146,17 +146,19 @@ def main():
         msg="",
     )
     state = module.params["state"]
-    uv = UV(module)
 
-    if state == "present":
-      result["changed"], result["msg"] = uv.install_python()
-    elif state == "absent":
-      result["changed"], result["msg"] = uv.uninstall_python()
-    elif state == "latest":
-      result["changed"], result["msg"] = uv.upgrade_python()
+    try:
+      uv = UV(module)
+      if state == "present":
+        result["changed"], result["msg"] = uv.install_python()
+      elif state == "absent":
+        result["changed"], result["msg"] = uv.uninstall_python()
+      elif state == "latest":
+        result["changed"], result["msg"] = uv.upgrade_python()
 
-    module.exit_json(**result)
-
+      module.exit_json(**result)
+    except Exception as e:
+      module.fail_json(msg=str(e))
 
 if __name__ == "__main__":
     main()
