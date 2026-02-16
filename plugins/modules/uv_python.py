@@ -78,28 +78,49 @@ class UV:
           )
 
     def install_python(self):
-        rc, out, _ = self._find_python("--show-version") 
-        if rc == 0:
-          return False, out.split()[0]
-        if self.module.check_mode:
-          return True, self.python_version_str
-
-        cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
-        self.module.run_command(cmd, check_rc=True)
+      """
+        Runs command 'uv python install X.Y.Z' which installs specified python version.
+        If patch version is not specified uv installs latest available patch version.
+        Returns: tuple with following elements 
+          - boolean to indicate if method changed state
+          - installed version
+      """
+      rc, out, _ = self._find_python("--show-version") 
+      if rc == 0:
+        return False, out.split()[0]
+      if self.module.check_mode:
         return True, self.python_version_str
+
+      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
+      self.module.run_command(cmd, check_rc=True)
+      return True, self.python_version_str
     
     def uninstall_python(self):
-      rc, out, _ = self._find_python()
+      """
+        Runs command 'uv python uninstall X.Y.Z' which removes specified python version from environment.
+        If patch version is not specified all correspending installed patch versions are removed.
+        Returns: tuple with following elements 
+          - boolean to indicate if method changed state
+          - removed version
+      """
+      rc, _, _ = self._find_python("--show-version")
+      # if "uv python find" fails, it means specified version does not exist
       if rc != 0:
-          return False, out
+          return False, ""
       if self.module.check_mode:
-          return True, ""
+        return True, self.python_version_str
       
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "uninstall", self.python_version_str]
       self.module.run_command(cmd, check_rc=True)
-      return True, ""
+      return True, self.python_version_str
     
     def upgrade_python(self):
+      """
+        Runs command 'uv python install X.Y.Z' which installs specified python version.
+        Returns: tuple with following elements 
+          - boolean to indicate if method changed state
+          - installed version
+      """
       rc, out, _ = self._find_python("--show-version")
       latest_version = self._get_latest_patch_release()
       if rc == 0:
@@ -114,12 +135,26 @@ class UV:
       return True, latest_version
 
     def _find_python(self, *args):
-      # if multiple similar minor versions exist, "uv python find" returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version
+      """
+        Runs command 'uv python find' which returns path of installed patch releases for a given python version.
+        If multiple patch versions are installed, "uv python find" returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version.
+        Returns: tuple with following elements 
+          - return code of executed command
+          - stdout of command
+          - stderr of command
+      """
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "find", self.python_version_str, *args]
       rc, out, err = self.module.run_command(cmd)
       return rc, out, err
     
     def _list_python(self):
+      """
+        Runs command 'uv python list' which returns list of installed patch releases for a given python version.
+        Returns: tuple with following elements 
+          - return code of executed command
+          - stdout of command
+          - stderr of command
+      """
       # https://docs.astral.sh/uv/reference/cli/#uv-python-list
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "list", self.python_version_str, "--output-format", "json"]
       rc, out, err = self.module.run_command(cmd)
@@ -127,7 +162,8 @@ class UV:
 
     def _get_latest_patch_release(self):
       """
-        Returns latest available patch release for a given python version
+        Returns latest available patch release for a given python version.
+        Fails when no available release exists for the specified version.
       """
       _, out, _ = self._list_python() # uv returns versions in descending order but we sort them just in case future uv behavior changes
       latest_version = ""
@@ -138,7 +174,7 @@ class UV:
       except ValueError:
         self.module.fail_json(
           msg=(
-              f"Version {self.python_version_str} does not exist. "
+              f"Version {self.python_version_str} is not available. "
           )
         )
       return latest_version
