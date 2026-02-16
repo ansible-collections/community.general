@@ -1,0 +1,2 @@
+minor_changes:
+  - from_ini - add delimiters parameter to correctly parse INI documents (https://github.com/ansible-collections/community.general/pull/11512)
