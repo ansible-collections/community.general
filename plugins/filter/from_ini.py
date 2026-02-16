@@ -90,6 +90,12 @@ def from_ini(obj, delimiters=None):
 
     if not isinstance(obj, str):
         raise AnsibleFilterError(f"from_ini requires a str, got {type(obj)}")
+    if delimiters is not None:
+        if not is_sequence(delimiters):
+            raise AnsibleFilterError(f"from_ini's delimiters parameter must be a sequence, got {type(delimiters)}")
+        delimiters = tuple(delimiters)
+        if any(not isinstance(elt, str) for elt in delimiters):
+            raise AnsibleFilterError(f"from_ini's delimiters parameter must be a sequence of strings, got {delimiters!r}")
 
     parser = IniParser(delimiters=delimiters)
 
