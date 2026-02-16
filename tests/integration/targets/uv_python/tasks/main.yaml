@@ -19,78 +19,170 @@
     version: 3.14
     state: present
   check_mode: yes
+  register: install_check_mode
+
+- name: Verify python 3.14 installation in check mode
+  assert:
+    that:
+      - install_check_mode["changed"] is true
+      - install_check_mode["failed"] is false
+      - '"3.14" in install_check_mode["msg"]'
 
 - name: Install python 3.14
   uv_python:
     version: 3.14
     state: present
+  register: install_python
 
-- name: Re-install python 3.14 # installs latest patch version for 3.14
+- name: Verify python 3.14 installation in check mode
+  assert:
+    that:
+      - install_python["changed"] is true
+      - install_python["failed"] is false
+      - '"3.14" in install_python["msg"]'
+
+- name: Re-install python 3.14
   uv_python:
     version: 3.14
     state: present
+  register: reinstall_python
 
-- name: Install latest python 3.14 # installs latest patch version for 3.14
+- name: Verify python 3.14 re-installation
+  assert:
+    that:
+      - reinstall_python["changed"] is false
+      - reinstall_python["failed"] is false
+      - '"3.14" in reinstall_python["msg"]'
+
+- name: Install latest python 3.15 # installs latest patch version for 3.15
   uv_python:
-    version: 3.14
+    version: 3.15
     state: latest
+  register: install_latest_python
+- debug:
+    var: install_latest_python
+- name: Verify python 3.15 installation
+  assert:
+    that:
+      - install_latest_python["changed"] is true
+      - install_latest_python["failed"] is false
+      - '"3.15" in install_latest_python["msg"]'
 
 - name: Install python 3.13.5
   uv_python:
     version: 3.13.5
     state: present
+  register: install_python
+
+- name: Verify python 3.13.5 installation
+  assert:
+    that:
+      - install_python["changed"] is true
+      - install_python["failed"] is false
+      - '"3.13.5" in install_python["msg"]'
 
 - name: Re-install python 3.13.5
   uv_python:
     version: 3.13.5
     state: present
+  register: reinstall_python
 
-- name: Remove unexisting python 3.15 # removes latest patch version for 3.15 if exists
+- name: Verify python 3.13.5 installation
+  assert:
+    that:
+      - reinstall_python["changed"] is false
+      - reinstall_python["failed"] is false
+      - '"3.13.5" in reinstall_python["msg"]'
+
+- name: Remove unexisting python 3.10 # removes latest patch version for 3.10 if exists
   uv_python:
-    version: 3.15
+    version: 3.10
     state: absent
+  register: remove_python
 
-- name: Remove globally existing python 3.8 in check mode
+- name: Verify python 3.10 deletion
+  assert:
+    that:
+      - remove_python["changed"] is false
+      - remove_python["failed"] is false
+      - 'remove_python["msg"] == ""'
+
+- name: Remove python 3.13.5 in check mode
   uv_python:
-    version: 3.8
+    version: 3.13.5
     state: absent
   check_mode: true
+  register: remove_python_in_check_mode
 
-- name: Remove globally existing python 3.8
-  uv_python:
-    version: 3.8
-    state: absent
+- name: Verify python 3.13.5 deletion in check mode
+  assert:
+    that:
+      - remove_python_in_check_mode["changed"] is true
+      - remove_python_in_check_mode["failed"] is false
+      - 'remove_python_in_check_mode["msg"] == ""'
 
 - name: Remove python 3.13.5
   uv_python:
     version: 3.13.5
     state: absent
+  register: remove_python
+
+- name: Verify python 3.13.5 deletion
+  assert:
+    that:
+      - remove_python["changed"] is true
+      - remove_python["failed"] is false
+      - 'remove_python["msg"] == ""'
 
 - name: Remove python 3.13.5 again
   uv_python:
     version: 3.13.5
     state: absent
+  register: remove_python
+
+- name: Verify python 3.13.5 deletion
+  assert:
+    that:
+      - remove_python["changed"] is false
+      - remove_python["failed"] is false
+      - 'remove_python["msg"] == ""'
 
 - name: Install python 3
   uv_python:
     version: 3
     state: present
-  register: result
+  register: invalid_version
   ignore_errors: true
 
 - name: Assert invalid version failed
   ansible.builtin.assert:
     that:
-      - result is failed
-      - "'Expected formats are X.Y or X.Y.Z' in result.msg"
+      - invalid_version is failed
+      - "'Expected formats are X.Y or X.Y.Z' in invalid_version.msg"
 
 - name: Upgrade python 3.13
   uv_python:
     version: 3.13
     state: latest
+  register: upgrade_python
+
+- name: Verify python 3.13 upgrade
+  assert:
+    that:
+      - upgrade_python["changed"] is true
+      - upgrade_python["failed"] is false
+      - '"3.13" in upgrade_python["msg"]'
 
 - name: Upgrade python 3.13 in check mode
   uv_python:
     version: 3.13
     state: latest
   check_mode: yes
+  register: upgrade_python
+
+- name: Verify python 3.13.5 deletion in check mode
+  assert:
+    that:
+      - upgrade_python["changed"] is false
+      - upgrade_python["failed"] is false
+      - '"3.13" in upgrade_python["msg"]'
