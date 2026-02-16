@@ -103,7 +103,7 @@ class UV:
       detected_version = out.split()[0]
       latest_version = self._get_latest_patch_release()
       if rc == 0 and detected_version == latest_version:
-          return False, out
+          return False, latest_version
       if self.module.check_mode:
           return True, latest_version
       
@@ -124,9 +124,10 @@ class UV:
       return rc, out, err
 
     def _get_latest_patch_release(self):
-      _, out, _ = self._list_python()
-      result = json.loads(out)
-      return result[0]["version"] # uv orders versions in descending order
+      _, out, _ = self._list_python() # uv returns versions in descending order but we sort them just in case future uv behavior changes
+      results = json.loads(out)
+      versions = [StrictVersion(result["version"]) for result in results]
+      return max(versions).__str__()
     
 
 def main():
