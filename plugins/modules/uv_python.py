@@ -51,17 +51,18 @@ python:
   type: dict
 '''
 
-import re
 import json
-from enum import Enum
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.compat.version import StrictVersion
 
 
 class UV:
     """
-      Documentation for uv python https://docs.astral.sh/uv/concepts/python-versions/#installing-a-python-version
+      Module for "uv python" command
+      Official documentation for uv python https://docs.astral.sh/uv/concepts/python-versions/#installing-a-python-version
     """
+    subcommand = "python"
+
     def __init__(self, module, **kwargs):
         self.module = module
         python_version = module.params["version"]
@@ -83,7 +84,7 @@ class UV:
         if self.module.check_mode:
           return True, self.python_version_str
 
-        cmd = [self.module.get_bin_path("uv", required=True), "python", "install", self.python_version_str]
+        cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
         self.module.run_command(cmd, check_rc=True)
         return True, self.python_version_str
     
@@ -94,7 +95,7 @@ class UV:
       if self.module.check_mode:
           return True, ""
       
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "uninstall", self.python_version_str]
+      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "uninstall", self.python_version_str]
       self.module.run_command(cmd, check_rc=True)
       return True, ""
     
@@ -108,19 +109,19 @@ class UV:
       if self.module.check_mode:
           return True, latest_version
       
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "install", latest_version]
+      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", latest_version]
       self.module.run_command(cmd, check_rc=True)
       return True, latest_version
 
     def _find_python(self, *args):
-      # if multiple similar minor versions exist, find returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "find", self.python_version_str, *args]
+      # if multiple similar minor versions exist, "uv python find" returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version
+      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "find", self.python_version_str, *args]
       rc, out, err = self.module.run_command(cmd)
       return rc, out, err
     
     def _list_python(self):
       # https://docs.astral.sh/uv/reference/cli/#uv-python-list
-      cmd = [self.module.get_bin_path("uv", required=True), "python", "list", self.python_version_str, "--output-format", "json"]
+      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "list", self.python_version_str, "--output-format", "json"]
       rc, out, err = self.module.run_command(cmd)
       return rc, out, err
 
