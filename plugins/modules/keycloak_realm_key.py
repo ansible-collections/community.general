@@ -606,6 +606,16 @@ PROVIDERS_WITHOUT_ALGORITHM = ["aes-generated", "eddsa-generated"]
 # Providers where the RS256 default is valid (for backward compatibility)
 PROVIDERS_WITH_RS256_DEFAULT = ["rsa", "rsa-generated", "java-keystore"]
 
+# Config keys that cannot be compared and must be removed from changesets/diffs.
+# privateKey/certificate: Keycloak doesn't return private keys, certificates are generated dynamically.
+# keystorePassword/keyPassword: Keycloak masks these with "**********" in API responses.
+SENSITIVE_CONFIG_KEYS = ["privateKey", "certificate", "keystorePassword", "keyPassword"]
+
+
+def remove_sensitive_config_keys(config):
+    for key in SENSITIVE_CONFIG_KEYS:
+        config.pop(key, None)
+
 
 def get_keycloak_config_key(param_name, provider_id=None):
     """Convert Ansible parameter name to Keycloak config key.
@@ -626,7 +636,7 @@ def compute_certificate_fingerprint(certificate_pem):
         cert_der = base64.b64decode(certificate_pem)
         fingerprint = hashlib.sha256(cert_der).hexdigest().upper()
         return ":".join(fingerprint[i : i + 2] for i in range(0, len(fingerprint), 2))
-    except (ValueError, binascii.Error):
+    except (ValueError, binascii.Error, TypeError):
         return None
 
 
@@ -774,18 +784,11 @@ def main():
         if provider_id in PROVIDER_ALGORITHMS:
             valid_algorithms = PROVIDER_ALGORITHMS[provider_id]
             if algorithm not in valid_algorithms:
-                # Provide a clearer error message when the default RS256 is not valid
+                msg = f"algorithm '{algorithm}' is not valid for provider_id '{provider_id}'."
                 if algorithm == "RS256" and provider_id not in PROVIDERS_WITH_RS256_DEFAULT:
-                    module.fail_json(
-                        msg=f"config.algorithm is required for provider_id '{provider_id}'. "
-                        f"The default 'RS256' is not valid. "
-                        f"Valid choices are: {', '.join(valid_algorithms)}"
-                    )
-                else:
-                    module.fail_json(
-                        msg=f"algorithm '{algorithm}' is not valid for provider_id '{provider_id}'. "
-                        f"Valid choices are: {', '.join(valid_algorithms)}"
-                    )
+                    msg += " The default 'RS256' is not valid for this provider."
+                msg += f" Valid choices are: {', '.join(valid_algorithms)}"
+                module.fail_json(msg=msg)
         elif provider_id in PROVIDERS_WITHOUT_ALGORITHM and algorithm is not None and algorithm != "RS256":
             # aes-generated and eddsa-generated don't use algorithm - only warn if user explicitly set a non-default value
             module.warn(f"algorithm is ignored for provider_id '{provider_id}'")
@@ -808,8 +811,6 @@ def main():
                     f"Valid choices are: {', '.join(valid_curves)}"
                 )
 
-    # Initialize the result object. Only "changed" seems to have special
-    # meaning for Ansible.
     result = dict(changed=False, msg="", end_state={}, diff=dict(before={}, after={}))
 
     # This will include the current state of the realm key if it is already
@@ -852,9 +853,10 @@ def main():
     #
     for component_param in component_params:
         if component_param == "config":
-            for config_param in module.params.get("config"):
-                raw_value = module.params.get("config")[config_param]
-                # Skip None values
+            for config_param in module.params["config"]:
+                raw_value = module.params["config"][config_param]
+                # Optional params (secret_size, key_size, elliptic_curve) default to None.
+                # Skip them to avoid sending str(None) = "None" as a config value to Keycloak.
                 if raw_value is None:
                     continue
                 # Use custom mapping if available, otherwise camelCase
@@ -869,7 +871,7 @@ def main():
                 changeset["config"][keycloak_key].append(value)
         else:
             # No need for camelcase in here as these are one word parameters
-            new_param_value = module.params.get(component_param)
+            new_param_value = module.params[component_param]
             changeset[camel(component_param)] = new_param_value
 
     # As provider_type is not a module parameter we have to add it to the
@@ -880,33 +882,14 @@ def main():
     # changes to the current state.
     changeset_copy = deepcopy(changeset)
 
-    # It is not possible to compare current keys to desired keys, because the
-    # certificate parameter is a base64-encoded binary blob created on the fly
-    # when a key is added. Moreover, the Keycloak Admin API does not seem to
-    # return the value of the private key for comparison.  So, in effect, it we
-    # just have to ignore changes to the keys.  However, as the privateKey
-    # parameter needs be present in the JSON payload, any changes done to any
-    # other parameters (e.g.  config.priority) will trigger update of the keys
-    # as a side-effect.
-    #
-    # Only remove privateKey and certificate from comparison if they are present
-    # (they won't be for generated providers).
-    if "privateKey" in changeset_copy["config"]:
-        del changeset_copy["config"]["privateKey"]
-    if "certificate" in changeset_copy["config"]:
-        del changeset_copy["config"]["certificate"]
+    # Remove keys that cannot be compared: privateKey/certificate (not returned
+    # by Keycloak API) and keystore passwords (masked with "**********").
+    # The actual values remain in 'changeset' for the API payload.
+    remove_sensitive_config_keys(changeset_copy["config"])
 
-    # Similarly, for java-keystore provider, passwords cannot be compared as
-    # Keycloak returns masked values ("**********"). Remove them from the comparison changeset.
-    if "keystorePassword" in changeset_copy["config"]:
-        del changeset_copy["config"]["keystorePassword"]
-    if "keyPassword" in changeset_copy["config"]:
-        del changeset_copy["config"]["keyPassword"]
-
-    # Make it easier to refer to current module parameters
-    name = module.params.get("name")
-    force = module.params.get("force")
-    parent_id = module.params.get("parent_id")
+    name = module.params["name"]
+    force = module.params["force"]
+    parent_id = module.params["parent_id"]
 
     # Get a list of all Keycloak components that are of keyprovider type.
     realm_keys = kc.get_components(urlencode(dict(type=provider_type)), parent_id)
@@ -976,7 +959,7 @@ def main():
     # returns in API responses. When Keycloak receives this masked value, it
     # preserves the existing password instead of updating it.
     # This makes the module idempotent for password fields.
-    update_password = module.params.get("update_password")
+    update_password = module.params["update_password"]
     if provider_id in KEYSTORE_PROVIDERS and key_id and update_password == "on_create":
         SECRET_VALUE = "**********"
         if "keystorePassword" in changeset["config"]:
@@ -990,16 +973,7 @@ def main():
     if key_id and state == "present":
         if result["changed"]:
             if module._diff:
-                # Only try to delete privateKey/certificate from diff if they exist
-                if "privateKey" in before_realm_key["config"]:
-                    del before_realm_key["config"]["privateKey"]
-                if "certificate" in before_realm_key["config"]:
-                    del before_realm_key["config"]["certificate"]
-                # Similarly for java-keystore passwords
-                if "keystorePassword" in before_realm_key["config"]:
-                    del before_realm_key["config"]["keystorePassword"]
-                if "keyPassword" in before_realm_key["config"]:
-                    del before_realm_key["config"]["keyPassword"]
+                remove_sensitive_config_keys(before_realm_key["config"])
                 result["diff"] = dict(before=before_realm_key, after=changeset_copy)
 
             if module.check_mode:
@@ -1028,23 +1002,13 @@ def main():
                         "valid_to": key_info.get("valid_to"),
                     }
                 else:
-                    # Key component exists but no key loaded - likely wrong password/path/alias
                     module.warn(
                         f"Key component '{name}' exists but no active key was found. "
                         "This may indicate an incorrect keystore password, path, or alias."
                     )
     elif key_id and state == "absent":
         if module._diff:
-            # Only try to delete privateKey/certificate from diff if they exist
-            if "privateKey" in before_realm_key["config"]:
-                del before_realm_key["config"]["privateKey"]
-            if "certificate" in before_realm_key["config"]:
-                del before_realm_key["config"]["certificate"]
-            # Similarly for java-keystore passwords
-            if "keystorePassword" in before_realm_key["config"]:
-                del before_realm_key["config"]["keystorePassword"]
-            if "keyPassword" in before_realm_key["config"]:
-                del before_realm_key["config"]["keyPassword"]
+            remove_sensitive_config_keys(before_realm_key["config"])
             result["diff"] = dict(before=before_realm_key, after={})
 
         if module.check_mode:
