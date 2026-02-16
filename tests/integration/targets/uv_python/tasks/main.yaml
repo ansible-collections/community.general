@@ -172,7 +172,7 @@
   ansible.builtin.assert:
     that:
       - invalid_version is failed
-      - "'Expected formats are X.Y or X.Y.Z' in invalid_version.msg"
+      - '"Expected formats are X.Y or X.Y.Z" in invalid_version.msg'
 
 - name: Upgrade python 3.13
   uv_python:
@@ -200,3 +200,32 @@
       - upgrade_python["changed"] is false
       - upgrade_python["failed"] is false
       - '"3.13" in upgrade_python["msg"]'
+
+- name: Install unexisting python version
+  uv_python:
+    version: 3.12.13
+    state: present
+  register: unexisting_python
+  ignore_errors: true
+
+- name: Verify python 3.13.5 deletion in check mode
+  assert:
+    that:
+      - unexisting_python["changed"] is false
+      - unexisting_python["failed"] is true
+      - '"No download found for request" in unexisting_python["msg"]'
+
+- name: Install unexisting python version
+  uv_python:
+    version: 3.12.13
+    state: latest
+  register: unexisting_python
+  ignore_errors: true
+- debug:
+    var: unexisting_python
+- name: Verify python 3.13.5 deletion in check mode
+  assert:
+    that:
+      - unexisting_python["changed"] is false
+      - unexisting_python["failed"] is true
+      - '"Version 3.12.13 does not exist" in unexisting_python["msg"]'
