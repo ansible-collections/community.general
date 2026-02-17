@@ -1,0 +1,2 @@
+bugfixes:
+  - "keycloak_user_federation: mapper config item can be an array"
