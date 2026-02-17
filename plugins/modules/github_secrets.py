@@ -19,7 +19,7 @@ author:
   - Thomas Sjögren (@konstruktoid)
 version_added: '12.4.0'
 requirements:
-    - pynacl
+  - pynacl
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -47,24 +47,24 @@ options:
     required: false
   value:
     description:
-        - The value of the secret. Required when O(state=present).
+      - The value of the secret. Required when O(state=present).
     type: str
     required: false
   visibility:
     description:
-        - The visibility of the secret when set at the organization level.
-        - Required when O(state=present) and O(repository) is not set.
+      - The visibility of the secret when set at the organization level.
+      - Required when O(state=present) and O(repository) is not set.
     type: str
     choices: ["all", "private", "selected"]
   state:
     description:
-        - The desired state of the secret.
+      - The desired state of the secret.
     type: str
     choices: ["present", "absent"]
     default: "present"
   list_only:
     description:
-        - If C(true), the module will only list available secrets.
+      - If C(true), the module will only list available secrets.
     type: bool
     default: false
   api_url:
@@ -107,18 +107,18 @@ EXAMPLES = r"""
 
 RETURN = r"""
 result:
-    description: The result of the module.
-    type: dict
-    returned: always
-    sample: {
-        "changed": true,
-        "failed": false,
-        "result": {
-            "msg": "OK (2 bytes)",
-            "response": "Secret created",
-            "status": 201
-        }
+  description: The result of the module.
+  type: dict
+  returned: always
+  sample: {
+    "changed": true,
+    "failed": false,
+    "result": {
+      "msg": "OK (2 bytes)",
+      "response": "Secret created",
+      "status": 201
     }
+  }
 """
 
 import json
@@ -140,7 +140,7 @@ def get_public_key(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str | None = None,
+    repository: str,
 ) -> tuple[str, str]:
     """Retrieve the GitHub Actions public key used to encrypt secrets."""
     if repository:
@@ -162,7 +162,7 @@ def encrypt_secret(public_key: str, secret_value: str) -> str:
     """Encrypt a secret value using GitHub's public key."""
     key = public.PublicKey(
         public_key.encode("utf-8"),
-        encoding.Base64Encoder(),
+        encoding.Base64Encoder(),  # type: ignore [arg-type]
     )
     sealed_box = public.SealedBox(key)
     encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
@@ -174,7 +174,7 @@ def upsert_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str | None,
+    repository: str,
     key: str,
     encrypted_value: str,
     key_id: str,
@@ -213,7 +213,7 @@ def delete_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str | None,
+    repository: str,
     key: str,
 ) -> dict[str, Any]:
     """Delete a GitHub Actions secret."""
@@ -242,7 +242,7 @@ def list_secrets(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str | None,
+    repository: str,
 ) -> dict[str, Any]:
     """List GitHub Actions secrets."""
     url = (
@@ -305,10 +305,10 @@ def main() -> None:
         module.fail_json(msg=missing_required_lib("PyNaCl"))
 
     organization: str = module.params["organization"]
-    repository: str | None = module.params["repository"]
-    key: str | None = module.params["key"]
-    value: str | None = module.params["value"]
-    visibility: str | None = module.params.get("visibility")
+    repository: str = module.params["repository"]
+    key: str = module.params["key"]
+    value: str = module.params["value"]
+    visibility: str = module.params.get("visibility")
     state: str = module.params["state"]
     list_only: bool = module.params["list_only"]
     api_url: str = module.params["api_url"]
@@ -331,10 +331,7 @@ def main() -> None:
     if state == "present" and not repository and not visibility and not list_only:
         module.fail_json(
             msg="Invalid parameters",
-            details=(
-                "When state is 'present' and 'repository' is not set, "
-                "'visibility' must be provided"
-            ),
+            details=("When state is 'present' and 'repository' is not set, 'visibility' must be provided"),
             params=module.params,
         )
 
@@ -387,11 +384,7 @@ def main() -> None:
         )
 
         response_created = 201
-        response_msg = (
-            "Secret created"
-            if upsert["status"] == response_created
-            else "Secret updated"
-        )
+        response_msg = "Secret created" if upsert["status"] == response_created else "Secret updated"
 
         result["changed"] = True
         result.update(
