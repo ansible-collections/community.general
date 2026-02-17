@@ -89,6 +89,13 @@ class UV:
       if rc == 0:
         return False, out.split()[0]
       if self.module.check_mode:
+        _, versions_available, _ = self._list_python()
+        # when uv does not find any available patch version the install command will fail
+        try:
+          if not json.loads(versions_available):
+            self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
+        except json.decoder.JSONDecodeError as e:
+          self.module.fail_json(msg=f"Failed to parse 'uv python list' output with error {str(e)}")
         return True, self.python_version_str
 
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
@@ -123,6 +130,8 @@ class UV:
       """
       rc, out, _ = self._find_python("--show-version")
       latest_version = self._get_latest_patch_release()
+      if not latest_version:
+         self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
       if rc == 0 and out.split()[0] == latest_version:
           return False, latest_version
       if self.module.check_mode:
@@ -170,11 +179,7 @@ class UV:
         versions = [StrictVersion(result["version"]) for result in results]
         latest_version = max(versions).__str__()
       except ValueError:
-        self.module.fail_json(
-          msg=(
-              f"Version {self.python_version_str} is not available. "
-          )
-        )
+        pass
       return latest_version
 
 
@@ -190,21 +195,19 @@ def main():
     result = dict(
         changed=False,
         msg="",
+        failed=False
     )
     state = module.params["state"]
 
-    try:
-      uv = UV(module)
-      if state == "present":
-        result["changed"], result["msg"] = uv.install_python()
-      elif state == "absent":
-        result["changed"], result["msg"] = uv.uninstall_python()
-      elif state == "latest":
-        result["changed"], result["msg"] = uv.upgrade_python()
+    uv = UV(module)
+    if state == "present":
+      result["changed"], result["msg"] = uv.install_python()
+    elif state == "absent":
+      result["changed"], result["msg"] = uv.uninstall_python()
+    elif state == "latest":
+      result["changed"], result["msg"] = uv.upgrade_python()
 
-      module.exit_json(**result)
-    except Exception as e:
-      module.fail_json(msg=str(e))
+    module.exit_json(**result)
 
 if __name__ == "__main__":
     main()
