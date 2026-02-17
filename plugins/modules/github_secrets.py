@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2026, Ansible Project
+# Copyright (c) Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -62,11 +62,6 @@ options:
     type: str
     choices: ["present", "absent"]
     default: "present"
-  list_only:
-    description:
-      - If C(true), the module will only list available secrets.
-    type: bool
-    default: false
   api_url:
     description:
       - The base URL for the GitHub API.
@@ -88,13 +83,6 @@ EXAMPLES = r"""
     key: "TEST_SECRET"
     value: "bob"
     state: "present"
-
-- name: List Github secrets
-  github_secrets:
-    token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
-    repository: "ansible"
-    organization: "ansible"
-    list_only: true
 
 - name: Delete Github secret
   github_secrets:
@@ -237,39 +225,6 @@ def delete_secret(
     return info
 
 
-def list_secrets(
-    module: AnsibleModule,
-    api_url: str,
-    headers: dict[str, str],
-    organization: str,
-    repository: str,
-) -> dict[str, Any]:
-    """List GitHub Actions secrets."""
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets"
-    )
-
-    resp, info = fetch_url(
-        module,
-        url,
-        headers=headers,
-        method="GET",
-    )
-
-    list_response_code = 200
-    if info["status"] != list_response_code:
-        module.fail_json(msg=f"Failed to list secrets: {info}")
-
-    body = resp.read()
-    return {
-        "response": resp,
-        "data": json.loads(body),
-        "info": info,
-    }
-
-
 def main() -> None:
     """Ansible module entry point."""
     argument_spec = {
@@ -291,7 +246,6 @@ def main() -> None:
             "choices": ["present", "absent"],
             "default": "present",
         },
-        "list_only": {"type": "bool", "default": False},
         "api_url": {"type": "str", "default": "https://api.github.com"},
         "token": {"type": "str", "required": True, "no_log": True},
     }
@@ -310,7 +264,6 @@ def main() -> None:
     value: str = module.params["value"]
     visibility: str = module.params.get("visibility")
     state: str = module.params["state"]
-    list_only: bool = module.params["list_only"]
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
 
@@ -321,14 +274,14 @@ def main() -> None:
             params=module.params,
         )
 
-    if state == "present" and not value and not list_only:
+    if state == "present" and not value:
         module.fail_json(
             msg="Invalid parameters",
             details="When state is 'present', 'value' must be provided",
             params=module.params,
         )
 
-    if state == "present" and not repository and not visibility and not list_only:
+    if state == "present" and not repository and not visibility:
         module.fail_json(
             msg="Invalid parameters",
             details=("When state is 'present' and 'repository' is not set, 'visibility' must be provided"),
@@ -343,25 +296,7 @@ def main() -> None:
         "Content-Type": "application/json",
     }
 
-    if list_only:
-        secrets = list_secrets(
-            module,
-            api_url,
-            headers,
-            organization,
-            repository,
-        )
-
-        result["changed"] = False
-        result.update(
-            result={
-                "status": secrets["info"]["status"],
-                "msg": secrets["data"]["secrets"],
-                "response": "Secrets listed",
-            },
-        )
-
-    if state == "present" and not list_only:
+    if state == "present":
         key_id, public_key = get_public_key(
             module,
             api_url,
@@ -370,7 +305,7 @@ def main() -> None:
             repository,
         )
 
-        encrypted_value = encrypt_secret(public_key, value) if value else None
+        encrypted_value = encrypt_secret(public_key, value)
 
         upsert = upsert_secret(
             module,
@@ -395,7 +330,7 @@ def main() -> None:
             },
         )
 
-    if state == "absent" and not list_only:
+    if state == "absent":
         delete = delete_secret(
             module,
             api_url,
