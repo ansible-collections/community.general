@@ -33,11 +33,13 @@ options:
       - The GitHub username or organization name.
     type: str
     required: true
+    aliases: ["org", "username"]
   repository:
     description:
       - The name of the repository.
     required: false
     type: str
+    aliases: ["repo"]
   key:
     description:
       - The name of the secret.
@@ -122,9 +124,15 @@ result:
 import json
 from typing import Any
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.urls import fetch_url
-from nacl import encoding, public
+
+try:
+    from nacl import encoding, public
+
+    HAS_PYNACL = True
+except ImportError:
+    HAS_PYNACL = False
 
 
 def get_public_key(
@@ -271,7 +279,7 @@ def main() -> None:
             "required": True,
         },
         "repository": {"type": "str", "aliases": ["repo"], "required": False},
-        "key": {"type": "str", "required": False},
+        "key": {"type": "str", "required": False, "no_log": False},
         "value": {"type": "str", "required": False, "no_log": True},
         "visibility": {
             "type": "str",
@@ -292,6 +300,9 @@ def main() -> None:
         argument_spec=argument_spec,
         supports_check_mode=False,
     )
+
+    if not HAS_PYNACL:
+        module.fail_json(msg=missing_required_lib("PyNaCl"))
 
     organization: str = module.params["organization"]
     repository: str | None = module.params["repository"]
