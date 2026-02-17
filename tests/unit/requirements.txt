@@ -19,6 +19,7 @@ linode_api4  # APIv4
 python-gitlab
 PyGithub
 httmock
+pynacl
 
 # requirement for maven_artifact module
 lxml

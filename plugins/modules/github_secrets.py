@@ -6,7 +6,7 @@
 
 """An Ansible module to manage GitHub repository or organization serets."""
 
-# ruff: noqa: E402,PLR0913
+# ruff: noqa: E402,EXE001,PLR0913,RUF059
 
 from __future__ import annotations
 
@@ -18,6 +18,10 @@ description:
 author:
   - Thomas Sjögren (@konstruktoid)
 version_added: '12.4.0'
+requirements:
+    - pynacl
+extends_documentation_fragment:
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -182,7 +186,7 @@ def upsert_secret(
     if not repository and module.params.get("visibility"):
         payload["visibility"] = module.params["visibility"]
 
-    _, info = fetch_url(
+    resp, info = fetch_url(
         module,
         url,
         headers=headers,
@@ -211,7 +215,7 @@ def delete_secret(
         else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
     )
 
-    _, info = fetch_url(
+    resp, info = fetch_url(
         module,
         url,
         headers=headers,
