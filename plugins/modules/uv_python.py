@@ -87,13 +87,17 @@ class UV:
       """
       rc, out, _ = self._find_python("--show-version") 
       if rc == 0:
-        return False, out.split()[0]
+        return False, out.split()[0], False
       if self.module.check_mode:
-        return True, self.python_version_str
+        _, versions_available, _ = self._list_python()
+        # when uv does not find any available patch version the install command will fail
+        if not json.loads(versions_available):
+          return False, "", True
+        return True, self.python_version_str, False
 
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
       self.module.run_command(cmd, check_rc=True)
-      return True, self.python_version_str
+      return True, self.python_version_str, False
     
     def uninstall_python(self):
       """
@@ -172,7 +176,7 @@ class UV:
       except ValueError:
         self.module.fail_json(
           msg=(
-              f"Version {self.python_version_str} is not available. "
+              f"Version {self.python_version_str} is not available."
           )
         )
       return latest_version
@@ -190,13 +194,14 @@ def main():
     result = dict(
         changed=False,
         msg="",
+        failed=False
     )
     state = module.params["state"]
 
     try:
       uv = UV(module)
       if state == "present":
-        result["changed"], result["msg"] = uv.install_python()
+        result["changed"], result["msg"], result["failed"] = uv.install_python()
       elif state == "absent":
         result["changed"], result["msg"] = uv.uninstall_python()
       elif state == "latest":

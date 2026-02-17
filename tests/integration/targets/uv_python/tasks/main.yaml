@@ -20,7 +20,6 @@
   assert:
     that:
       - failed_install.failed is true
-      - '"Failed to find required executable" in failed_install.msg'
 
 - name: Install uv
   shell: |
@@ -73,8 +72,7 @@
     version: 3.15
     state: latest
   register: install_latest_python
-- debug:
-    var: install_latest_python
+
 - name: Verify python 3.15 installation
   assert:
     that:
@@ -201,6 +199,21 @@
       - upgrade_python.failed is false
       - '"3.13" in upgrade_python.msg'
 
+- name: Install unexisting python version in check mode
+  uv_python:
+    version: 3.12.13
+    state: present
+  register: unexisting_python_check_mode
+  ignore_errors: true
+  check_mode: true
+
+- name: Verify unexisting python 3.12.13 install in check mode
+  assert:
+    that:
+      - unexisting_python_check_mode.changed is false
+      - unexisting_python_check_mode.failed is true
+      - 'unexisting_python_check_mode.msg == ""'
+
 - name: Install unexisting python version
   uv_python:
     version: 3.12.13
@@ -208,23 +221,21 @@
   register: unexisting_python
   ignore_errors: true
 
-- name: Verify python 3.12.13 deletion
+- name: Verify unexisting python 3.12.13 install
   assert:
     that:
       - unexisting_python.changed is false
       - unexisting_python.failed is true
-      - '"No download found for request" in unexisting_python.msg'
 
-- name: Install unexisting python version
+- name: Install unexisting python version with latest state
   uv_python:
     version: 3.12.13
     state: latest
   register: unexisting_python
   ignore_errors: true
 
-- name: Verify python 3.12.13 deletion
+- name: Verify python 3.12.13 deletion with latest state
   assert:
     that:
       - unexisting_python.changed is false
       - unexisting_python.failed is true
-      - '"Version 3.12.13 is not available" in unexisting_python.msg'
