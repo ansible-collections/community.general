@@ -85,10 +85,10 @@ EXAMPLES = r"""
 
 - name: List Github secrets
   github_secrets:
-	token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
-	repository: "ansible"
-	organization: "ansible"
-	list_only: true
+    token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+    repository: "ansible"
+    organization: "ansible"
+    list_only: true
 
 - name: Delete Github secret
   github_secrets:
