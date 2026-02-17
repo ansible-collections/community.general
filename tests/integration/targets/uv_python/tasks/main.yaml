@@ -212,7 +212,7 @@
     that:
       - unexisting_python_check_mode.changed is false
       - unexisting_python_check_mode.failed is true
-      - 'unexisting_python_check_mode.msg == ""'
+      - '"Version 3.12.13 is not available." in unexisting_python_check_mode.msg'
 
 - name: Install unexisting python version
   uv_python:
