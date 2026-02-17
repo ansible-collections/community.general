@@ -39,7 +39,7 @@
     that:
       - install_check_mode.changed is true
       - install_check_mode.failed is false
-      - '"3.14" in install_check_mode.msg'
+      - '"3.14" in install_check_mode.stdout'
 
 - name: Install python 3.14
   uv_python:
@@ -52,7 +52,7 @@
     that:
       - install_python.changed is true
       - install_python.failed is false
-      - '"3.14" in install_python.msg'
+      - '"3.14" in install_python.stdout'
 
 - name: Re-install python 3.14
   uv_python:
@@ -65,7 +65,7 @@
     that:
       - reinstall_python.changed is false
       - reinstall_python.failed is false
-      - '"3.14" in reinstall_python.msg'
+      - '"3.14" in reinstall_python.stdout'
 
 - name: Install latest python 3.15 # installs latest patch version for 3.15
   uv_python:
@@ -78,7 +78,7 @@
     that:
       - install_latest_python.changed is true
       - install_latest_python.failed is false
-      - '"3.15" in install_latest_python.msg'
+      - '"3.15" in install_latest_python.stdout'
 
 - name: Install python 3.13.5
   uv_python:
@@ -91,7 +91,7 @@
     that:
       - install_python.changed is true
       - install_python.failed is false
-      - '"3.13.5" in install_python.msg'
+      - '"3.13.5" in install_python.stdout'
 
 - name: Re-install python 3.13.5
   uv_python:
@@ -104,7 +104,7 @@
     that:
       - reinstall_python.changed is false
       - reinstall_python.failed is false
-      - '"3.13.5" in reinstall_python.msg'
+      - '"3.13.5" in reinstall_python.stdout'
 
 - name: Remove unexisting python 3.10 # removes latest patch version for 3.10 if exists
   uv_python:
@@ -117,7 +117,7 @@
     that:
       - remove_python.changed is false
       - remove_python.failed is false
-      - 'remove_python.msg == ""'
+      - 'remove_python.stdout == ""'
 
 - name: Remove python 3.13.5 in check mode
   uv_python:
@@ -131,7 +131,7 @@
     that:
       - remove_python_in_check_mode.changed is true
       - remove_python_in_check_mode.failed is false
-      - '"3.13.5" in remove_python_in_check_mode.msg'
+      - '"3.13.5" in remove_python_in_check_mode.stdout'
 
 - name: Remove python 3.13.5
   uv_python:
@@ -144,7 +144,7 @@
     that:
       - remove_python.changed is true
       - remove_python.failed is false
-      - '"3.13.5" in remove_python_in_check_mode.msg'
+      - '"3.13.5" in remove_python_in_check_mode.stdout'
 
 - name: Remove python 3.13.5 again
   uv_python:
@@ -157,7 +157,7 @@
     that:
       - remove_python.changed is false
       - remove_python.failed is false
-      - 'remove_python.msg == ""'
+      - 'remove_python.stdout == ""'
 
 - name: Install python 3
   uv_python:
@@ -183,7 +183,7 @@
     that:
       - upgrade_python.changed is true
       - upgrade_python.failed is false
-      - '"3.13" in upgrade_python.msg'
+      - '"3.13" in upgrade_python.stdout'
 
 - name: Upgrade python 3.13 in check mode
   uv_python:
@@ -197,7 +197,7 @@
     that:
       - upgrade_python.changed is false
       - upgrade_python.failed is false
-      - '"3.13" in upgrade_python.msg'
+      - '"3.13" in upgrade_python.stdout'
 
 - name: Install unexisting python version in check mode
   uv_python:
