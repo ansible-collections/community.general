@@ -758,10 +758,7 @@ def sanitize(comp):
 
     compcopy = deepcopy(comp)
     if "config" in compcopy:
-        compcopy["config"] = {
-            k: sanitize_value(v)
-            for k, v in compcopy["config"].items()
-        }
+        compcopy["config"] = {k: sanitize_value(v) for k, v in compcopy["config"].items()}
         # Remove None values (empty lists converted)
         compcopy["config"] = {k: v for k, v in compcopy["config"].items() if v is not None}
         if "bindCredential" in compcopy["config"]:
@@ -769,10 +766,7 @@ def sanitize(comp):
     if "mappers" in compcopy:
         for mapper in compcopy["mappers"]:
             if "config" in mapper:
-                mapper["config"] = {
-                    k: sanitize_value(v)
-                    for k, v in mapper["config"].items()
-                }
+                mapper["config"] = {k: sanitize_value(v) for k, v in mapper["config"].items()}
                 # Remove None values (empty lists converted)
                 mapper["config"] = {k: v for k, v in mapper["config"].items() if v is not None}
     return compcopy
@@ -913,14 +907,9 @@ def main():
                     if v is None:
                         continue
                     if isinstance(v, list):
-                        new_config[k] = [
-                            str(item).lower() if not isinstance(item, str) else item
-                            for item in v
-                        ]
+                        new_config[k] = [str(item).lower() if not isinstance(item, str) else item for item in v]
                     else:
-                        new_config[k] = [
-                            str(v).lower() if not isinstance(v, str) else v
-                        ]
+                        new_config[k] = [str(v).lower() if not isinstance(v, str) else v]
                 mapper["config"] = new_config
 
     # Filter and map the parameters names that apply
