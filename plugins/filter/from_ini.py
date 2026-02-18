@@ -22,8 +22,8 @@ options:
     elements: string
     default:
       - "="
-      -  ":"
-    required: false
+      - ":"
+    version_added: 12.4.0
 seealso:
   - plugin: community.general.to_ini
     plugin_type: filter
@@ -95,7 +95,7 @@ def from_ini(obj, delimiters=None):
         if not is_sequence(delimiters):
             raise AnsibleFilterError(f"from_ini's delimiters parameter must be a sequence, got {type(delimiters)}")
         delimiters = tuple(delimiters)
-        if any(not isinstance(elt, str) for elt in delimiters):
+        if not all(isinstance(elt, str) for elt in delimiters):
             raise AnsibleFilterError(f"from_ini's delimiters parameter must be a sequence of strings, got {delimiters!r}")
 
     parser = IniParser(delimiters=delimiters)
