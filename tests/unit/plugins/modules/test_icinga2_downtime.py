@@ -15,6 +15,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
+from ansible_collections.community.general.plugins.module_utils.mh.deco import no_handle_exceptions
 from ansible_collections.community.general.plugins.modules import icinga2_downtime
 
 
@@ -62,8 +63,9 @@ class TestIcinga2Downtime(ModuleTestCase):
             actions_mock = MagicMock(schedule_downtime=schedule_downtime_mock)
             client_mock.return_value = MagicMock(actions=actions_mock)
 
-            with self.assertRaises(AnsibleExitJson) as result:
-                self.module.main()
+            with no_handle_exceptions(AnsibleExitJson, AnsibleFailJson):
+                with self.assertRaises(AnsibleExitJson) as result:
+                    self.module.main()
 
         self.assertFalse(result.exception.args[0]["failed"])
         self.assertTrue(result.exception.args[0]["changed"])
@@ -114,8 +116,9 @@ class TestIcinga2Downtime(ModuleTestCase):
             actions_mock = MagicMock(schedule_downtime=schedule_downtime_mock)
             client_mock.return_value = MagicMock(actions=actions_mock)
 
-            with self.assertRaises(AnsibleFailJson) as result:
-                self.module.main()
+            with no_handle_exceptions(AnsibleExitJson, AnsibleFailJson):
+                with self.assertRaises(AnsibleFailJson) as result:
+                    self.module.main()
 
         self.assertTrue(result.exception.args[0]["failed"])
         self.assertEqual(
@@ -168,8 +171,9 @@ class TestIcinga2Downtime(ModuleTestCase):
             actions_mock = MagicMock(remove_downtime=remove_downtime_mock)
             client_mock.return_value = MagicMock(actions=actions_mock)
 
-            with self.assertRaises(AnsibleExitJson) as result:
-                self.module.main()
+            with no_handle_exceptions(AnsibleExitJson, AnsibleFailJson):
+                with self.assertRaises(AnsibleExitJson) as result:
+                    self.module.main()
 
         self.assertFalse(result.exception.args[0]["failed"])
         self.assertTrue(result.exception.args[0]["changed"])
@@ -206,8 +210,9 @@ class TestIcinga2Downtime(ModuleTestCase):
             actions_mock = MagicMock(remove_downtime=remove_downtime_mock)
             client_mock.return_value = MagicMock(actions=actions_mock)
 
-            with self.assertRaises(AnsibleExitJson) as result:
-                self.module.main()
+            with no_handle_exceptions(AnsibleExitJson, AnsibleFailJson):
+                with self.assertRaises(AnsibleExitJson) as result:
+                    self.module.main()
 
         self.assertFalse(result.exception.args[0]["failed"])
         self.assertFalse(result.exception.args[0]["changed"])

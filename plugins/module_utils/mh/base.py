@@ -80,13 +80,10 @@ class ModuleHelperBase:
         raise NotImplementedError()
 
     @module_fails_on_exception
-    def _run_with_catch(self):
+    def run(self):
         self.__init_module__()
         self.__run__()
         self.__quit_module__()
-
-    def run(self):
-        self._run_with_catch()
         output = self.output
         if "failed" not in output:
             output["failed"] = False
