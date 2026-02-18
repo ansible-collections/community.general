@@ -4,9 +4,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""An Ansible module to manage GitHub repository or organization serets."""
-
-# ruff: noqa: E402,EXE001,PLR0913,RUF059
+# ruff: noqa: D100,E402,EXE001,PLR0913,RUF059
 
 from __future__ import annotations
 
@@ -37,19 +35,16 @@ options:
   repository:
     description:
       - The name of the repository.
-    required: false
     type: str
     aliases: ["repo"]
   key:
     description:
       - The name of the secret.
     type: str
-    required: false
   value:
     description:
       - The value of the secret. Required when O(state=present).
     type: str
-    required: false
   visibility:
     description:
       - The visibility of the secret when set at the organization level.
@@ -122,6 +117,10 @@ try:
 except ImportError:
     HAS_PYNACL = False
 
+ok_status_code = 200
+created_response_code = 201
+delete_response_code = 204
+
 
 def get_public_key(
     module: AnsibleModule,
@@ -138,7 +137,6 @@ def get_public_key(
 
     response, info = fetch_url(module, url, headers=headers)
 
-    ok_status_code = 200
     if info["status"] != ok_status_code:
         module.fail_json(msg=f"Failed to get public key: {info}")
 
@@ -218,7 +216,6 @@ def delete_secret(
         method="DELETE",
     )
 
-    delete_response_code = 204
     if info["status"] != delete_response_code:
         module.fail_json(msg=f"Failed to delete secret: {info}")
 
@@ -233,14 +230,10 @@ def main() -> None:
             "aliases": ["org", "username"],
             "required": True,
         },
-        "repository": {"type": "str", "aliases": ["repo"], "required": False},
-        "key": {"type": "str", "required": False, "no_log": False},
-        "value": {"type": "str", "required": False, "no_log": True},
-        "visibility": {
-            "type": "str",
-            "choices": ["all", "private", "selected"],
-            "required": False,
-        },
+        "repository": {"type": "str", "aliases": ["repo"]},
+        "key": {"type": "str", "no_log": False},
+        "value": {"type": "str", "no_log": True},
+        "visibility": {"type": "str", "choices": ["all", "private", "selected"]},
         "state": {
             "type": "str",
             "choices": ["present", "absent"],
@@ -277,14 +270,14 @@ def main() -> None:
     if state == "present" and not value:
         module.fail_json(
             msg="Invalid parameters",
-            details="When state is 'present', 'value' must be provided",
+            details="When 'state' is 'present', 'value' must be provided",
             params=module.params,
         )
 
     if state == "present" and not repository and not visibility:
         module.fail_json(
             msg="Invalid parameters",
-            details=("When state is 'present' and 'repository' is not set, 'visibility' must be provided"),
+            details=("When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided"),
             params=module.params,
         )
 
@@ -318,8 +311,7 @@ def main() -> None:
             key_id,
         )
 
-        response_created = 201
-        response_msg = "Secret created" if upsert["status"] == response_created else "Secret updated"
+        response_msg = "Secret created" if upsert["status"] == created_response_code else "Secret updated"
 
         result["changed"] = True
         result.update(
