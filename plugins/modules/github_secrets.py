@@ -107,15 +107,17 @@ result:
 import json
 from typing import Any
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-try:
-    from nacl import encoding, public
+from ansible_collections.community.general.plugins.module_utils import deps
 
-    HAS_PYNACL = True
-except ImportError:
-    HAS_PYNACL = False
+with deps.declare(
+    "pynacl",
+    reason="pynacl is a required dependency",
+    url="https://pypi.org/project/PyNaCl/",
+):
+    from nacl import encoding, public
 
 ok_status_code = 200
 created_response_code = 201
@@ -248,8 +250,7 @@ def main() -> None:
         supports_check_mode=False,
     )
 
-    if not HAS_PYNACL:
-        module.fail_json(msg=missing_required_lib("PyNaCl"))
+    deps.validate(module)
 
     organization: str = module.params["organization"]
     repository: str = module.params["repository"]
@@ -277,7 +278,9 @@ def main() -> None:
     if state == "present" and not repository and not visibility:
         module.fail_json(
             msg="Invalid parameters",
-            details=("When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided"),
+            details=(
+                "When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided"
+            ),
             params=module.params,
         )
 
@@ -311,7 +314,11 @@ def main() -> None:
             key_id,
         )
 
-        response_msg = "Secret created" if upsert["status"] == created_response_code else "Secret updated"
+        response_msg = (
+            "Secret created"
+            if upsert["status"] == created_response_code
+            else "Secret updated"
+        )
 
         result["changed"] = True
         result.update(
