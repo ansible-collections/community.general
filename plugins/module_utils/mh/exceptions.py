@@ -15,3 +15,7 @@ class ModuleHelperException(Exception):
             update_output = {}
         self.update_output: dict[str, t.Any] = update_output
         super().__init__(*args)
+
+
+class _UnhandledSentinel(Exception):
+    pass
