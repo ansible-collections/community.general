@@ -1,0 +1,2 @@
+bugfixes:
+  - nsupdate - fix ``AttributeError`` when using the module without TSIG authentication (https://github.com/ansible-collections/community.general/issues/11460, https://github.com/ansible-collections/community.general/pull/11461).
