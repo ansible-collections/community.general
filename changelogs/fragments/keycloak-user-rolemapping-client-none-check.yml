@@ -1,0 +1,5 @@
+bugfixes:
+  - keycloak_user_rolemapping - fix ``TypeError`` crash when adding a client
+    role to a user who has no existing roles for that client
+    (https://github.com/ansible-collections/community.general/issues/10960,
+    https://github.com/ansible-collections/community.general/pull/11471).
