@@ -767,7 +767,6 @@ def sanitize(comp):
         for mapper in compcopy["mappers"]:
             if "config" in mapper:
                 mapper["config"] = {k: sanitize_value(v) for k, v in mapper["config"].items()}
-                # Remove None values (empty lists converted)
                 mapper["config"] = {k: v for k, v in mapper["config"].items() if v is not None}
     return compcopy
 
