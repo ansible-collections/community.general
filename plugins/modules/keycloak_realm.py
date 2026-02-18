@@ -293,7 +293,7 @@ options:
     type: bool
   localization_texts:
     description:
-      - The custom localization texts for a realm
+      - The custom localization texts for a realm.
     aliases:
       - localizationTexts
     type: dict
