@@ -278,9 +278,7 @@ def main() -> None:
     if state == "present" and not repository and not visibility:
         module.fail_json(
             msg="Invalid parameters",
-            details=(
-                "When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided"
-            ),
+            details=("When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided"),
             params=module.params,
         )
 
@@ -314,11 +312,7 @@ def main() -> None:
             key_id,
         )
 
-        response_msg = (
-            "Secret created"
-            if upsert["status"] == created_response_code
-            else "Secret updated"
-        )
+        response_msg = "Secret created" if upsert["status"] == created_response_code else "Secret updated"
 
         result["changed"] = True
         result.update(
