@@ -87,7 +87,7 @@ class UV:
       """
       rc, out, _ = self._find_python("--show-version") 
       if rc == 0:
-        return False, out.split()[0], "", rc
+        return False, out.strip(), "", rc
       if self.module.check_mode:
         _, versions_available, _ = self._list_python()
         # when uv does not find any available patch version the install command will fail
@@ -134,7 +134,7 @@ class UV:
       latest_version = self._get_latest_patch_release()
       if not latest_version:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
-      if rc == 0 and out.split()[0] == latest_version:
+      if rc == 0 and out.strip() == latest_version:
           return False, latest_version, "", rc
       if self.module.check_mode:
           return True, latest_version, "", 0
