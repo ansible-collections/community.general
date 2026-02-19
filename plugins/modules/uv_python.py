@@ -56,6 +56,14 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.compat.version import StrictVersion
 
 
+def max_version(versions_list):
+  max_version = ""
+  if versions_list:
+    versions = [StrictVersion(result["version"]) for result in versions_list]
+    max_version = max(versions).__str__()
+  return max_version
+
+
 class UV:
     """
       Module for "uv python" command
@@ -85,22 +93,27 @@ class UV:
           - boolean to indicate if method changed state
           - installed version
       """
-      rc, out, _ = self._find_python("--show-version") 
-      if rc == 0:
-        return False, out.strip(), "", rc
+      find_rc, find_out, _ = self._find_python("--show-version")
+      if find_rc == 0:
+        existing_version = find_out.split()[0]
+        return False, "", "", 0, existing_version
       if self.module.check_mode:
-        _, versions_available, _ = self._list_python()
+        _, out_list, _ = self._list_python()
+        versions_available = json.loads(out_list)
+        version = max_version(versions_available)
         # when uv does not find any available patch version the install command will fail
         try:
-          if not json.loads(versions_available):
+          if not versions_available:
             self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
         except json.decoder.JSONDecodeError as e:
           self.module.fail_json(msg=f"Failed to parse 'uv python list' output with error {str(e)}")
-        return True, self.python_version_str, "", 0
+        return True, self.python_version_str, "", 0, version
 
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
-      rc, _, err = self.module.run_command(cmd, check_rc=True)
-      return True, self.python_version_str, err, rc
+      rc, out, err = self.module.run_command(cmd, check_rc=True, expand_user_and_vars=False)
+      _, find_out, _ = self._find_python("--show-version")
+      installed_version = find_out.split()[0]
+      return True, out, err, rc, installed_version
     
     def uninstall_python(self):
       """
@@ -153,7 +166,7 @@ class UV:
           - stderr of command
       """
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "find", self.python_version_str, *args]
-      rc, out, err = self.module.run_command(cmd)
+      rc, out, err = self.module.run_command(cmd, expand_user_and_vars=False)
       return rc, out, err
     
     def _list_python(self):
@@ -175,13 +188,8 @@ class UV:
         Fails when no available release exists for the specified version.
       """
       _, out, _ = self._list_python() # uv returns versions in descending order but we sort them just in case future uv behavior changes
-      latest_version = ""
-      try:
-        results = json.loads(out)
-        versions = [StrictVersion(result["version"]) for result in results]
-        latest_version = max(versions).__str__()
-      except ValueError:
-        pass
+      results = json.loads(out)
+      latest_version = max_version(results)
       return latest_version
 
 
@@ -199,13 +207,14 @@ def main():
         stdout="",
         stderr="",
         rc=0,
+        python_version="",
         failed=False
     )
     state = module.params["state"]
 
     uv = UV(module)
     if state == "present":
-      result["changed"], result["stdout"], result["stderr"], result["rc"] = uv.install_python()
+      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_version"] = uv.install_python()
     elif state == "absent":
       result["changed"], result["stdout"], result["stderr"], result["rc"] = uv.uninstall_python()
     elif state == "latest":
