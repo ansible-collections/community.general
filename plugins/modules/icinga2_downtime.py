@@ -139,7 +139,7 @@ EXAMPLES = r"""
     downtime_duration: "{{ downtime_end_time | int - downtime_start_time | int }}"
 
 - name: Remove scheduled host downtime
-  edloc.general.icinga2_downtime:
+  community.general.icinga2_downtime:
     url: "https://icinga2.example.com:5665"
     url_username: icingadmin
     url_password: secret
