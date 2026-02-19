@@ -1,0 +1,573 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Type tests - explicit type coercion
+
+## Group 1: Basic types (integer, float, boolean, string)
+
+- name: test-type 1 - set integer value
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: count
+    value: 42
+    value_type: integer
+  register: result_type_1
+
+- name: test-type 1 - verify change
+  assert:
+    that:
+      - result_type_1 is changed
+
+- name: test-type 1 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_1
+
+- name: test-type 1 - verify integer
+  vars:
+    expected: |
+      [types]
+      count = 42
+  assert:
+    that:
+      - (content_type_1.content | b64decode) == expected
+
+- name: test-type 2 - set float value
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: ratio
+    value: 3.14159
+    value_type: float
+  register: result_type_2
+
+- name: test-type 2 - verify change
+  assert:
+    that:
+      - result_type_2 is changed
+
+- name: test-type 2 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_2
+
+- name: test-type 2 - verify float
+  vars:
+    expected: |
+      [types]
+      count = 42
+      ratio = 3.14159
+  assert:
+    that:
+      - (content_type_2.content | b64decode) == expected
+
+- name: test-type 3 - set boolean true
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: enabled
+    value: true
+    value_type: boolean
+  register: result_type_3
+
+- name: test-type 3 - verify change
+  assert:
+    that:
+      - result_type_3 is changed
+
+- name: test-type 3 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_3
+
+- name: test-type 3 - verify boolean
+  vars:
+    expected: |
+      [types]
+      count = 42
+      ratio = 3.14159
+      enabled = true
+  assert:
+    that:
+      - (content_type_3.content | b64decode) == expected
+
+- name: test-type 4 - set boolean false
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: disabled
+    value: false
+    value_type: boolean
+  register: result_type_4
+
+- name: test-type 4 - verify change
+  assert:
+    that:
+      - result_type_4 is changed
+
+- name: test-type 4 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_4
+
+- name: test-type 4 - verify boolean false
+  vars:
+    expected: |
+      [types]
+      count = 42
+      ratio = 3.14159
+      enabled = true
+      disabled = false
+  assert:
+    that:
+      - (content_type_4.content | b64decode) == expected
+
+- name: test-type 5 - set string value (force string)
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: number_as_string
+    value: "12345"
+    value_type: string
+  register: result_type_5
+
+- name: test-type 5 - verify change
+  assert:
+    that:
+      - result_type_5 is changed
+
+- name: test-type 5 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_5
+
+- name: test-type 5 - verify string (should be quoted)
+  vars:
+    expected: |
+      [types]
+      count = 42
+      ratio = 3.14159
+      enabled = true
+      disabled = false
+      number_as_string = "12345"
+  assert:
+    that:
+      - (content_type_5.content | b64decode) == expected
+
+## Group 2: Reset and test datetime, inline_table, array
+
+- name: Reset output file for group 2
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: test-type 6 - set datetime value
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: timestamp
+    value: "2026-01-17T12:00:00"
+    value_type: datetime
+  register: result_type_6
+
+- name: test-type 6 - verify change
+  assert:
+    that:
+      - result_type_6 is changed
+
+- name: test-type 6 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_6
+
+- name: test-type 6 - verify datetime
+  assert:
+    that:
+      - "'timestamp = 2026-01-17' in (content_type_6.content | b64decode)"
+
+- name: test-type 7 - set inline table
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: point
+    value:
+      x: 10
+      y: 20
+    value_type: inline_table
+  register: result_type_7
+
+- name: test-type 7 - verify change
+  assert:
+    that:
+      - result_type_7 is changed
+
+- name: test-type 7 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_7
+
+- name: test-type 7 - verify inline table
+  assert:
+    that:
+      - "'point = {' in (content_type_7.content | b64decode)"
+      - "'x = 10' in (content_type_7.content | b64decode)"
+      - "'y = 20' in (content_type_7.content | b64decode)"
+
+- name: test-type 8 - force value to array
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: single_as_array
+    value: single_value
+    value_type: array
+  register: result_type_8
+
+- name: test-type 8 - verify change
+  assert:
+    that:
+      - result_type_8 is changed
+
+- name: test-type 8 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_8
+
+- name: test-type 8 - verify array
+  assert:
+    that:
+      - "'single_as_array = [\"single_value\"]' in (content_type_8.content | b64decode)"
+
+## Group 3: Reset and test special floats (inf, -inf, nan)
+
+- name: Reset output file for group 3
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: test-type 9 - set positive infinity
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: max_limit
+    value: inf
+    value_type: float
+  register: result_type_9
+
+- name: test-type 9 - verify change
+  assert:
+    that:
+      - result_type_9 is changed
+
+- name: test-type 9 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_9
+
+- name: test-type 9 - verify infinity in file
+  vars:
+    expected: |
+      [types]
+      max_limit = inf
+  assert:
+    that:
+      - (content_type_9.content | b64decode) == expected
+
+- name: test-type 10 - set negative infinity
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: min_limit
+    value: "-inf"
+    value_type: float
+  register: result_type_10
+
+- name: test-type 10 - verify change
+  assert:
+    that:
+      - result_type_10 is changed
+
+- name: test-type 10 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_10
+
+- name: test-type 10 - verify negative infinity in file
+  vars:
+    expected: |
+      [types]
+      max_limit = inf
+      min_limit = -inf
+  assert:
+    that:
+      - (content_type_10.content | b64decode) == expected
+
+- name: test-type 11 - set nan
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: undefined
+    value: nan
+    value_type: float
+  register: result_type_11
+
+- name: test-type 11 - verify change
+  assert:
+    that:
+      - result_type_11 is changed
+
+- name: test-type 11 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_11
+
+- name: test-type 11 - verify nan in file
+  vars:
+    expected: |
+      [types]
+      max_limit = inf
+      min_limit = -inf
+      undefined = nan
+  assert:
+    that:
+      - (content_type_11.content | b64decode) == expected
+
+## Group 4: Reset and test date and time
+
+- name: Reset output file for group 4
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: test-type 12 - set local date
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: birthday
+    value: "1990-05-15"
+    value_type: date
+  register: result_type_12
+
+- name: test-type 12 - verify change
+  assert:
+    that:
+      - result_type_12 is changed
+
+- name: test-type 12 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_12
+
+- name: test-type 12 - verify date in file
+  vars:
+    expected: |
+      [types]
+      birthday = 1990-05-15
+  assert:
+    that:
+      - (content_type_12.content | b64decode) == expected
+
+- name: test-type 13 - set local time
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: alarm
+    value: "07:30:00"
+    value_type: time
+  register: result_type_13
+
+- name: test-type 13 - verify change
+  assert:
+    that:
+      - result_type_13 is changed
+
+- name: test-type 13 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_13
+
+- name: test-type 13 - verify time in file
+  vars:
+    expected: |
+      [types]
+      birthday = 1990-05-15
+      alarm = 07:30:00
+  assert:
+    that:
+      - (content_type_13.content | b64decode) == expected
+
+## Group 5: Reset and test string variants
+
+- name: Reset output file for group 5
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: test-type 14 - set literal string
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: regex_pattern
+    value: '\d+\.\d+'
+    value_type: literal_string
+  register: result_type_14
+
+- name: test-type 14 - verify change
+  assert:
+    that:
+      - result_type_14 is changed
+
+- name: test-type 14 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_14
+
+- name: test-type 14 - verify literal string uses single quotes
+  assert:
+    that:
+      - >-
+        "regex_pattern = '" in (content_type_14.content | b64decode)
+
+- name: test-type 15 - set multiline string
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: description
+    value: "Line one\nLine two"
+    value_type: multiline_string
+  register: result_type_15
+
+- name: test-type 15 - verify change
+  assert:
+    that:
+      - result_type_15 is changed
+
+- name: test-type 15 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_15
+
+- name: test-type 15 - verify multiline string uses triple quotes
+  assert:
+    that:
+      - "'description = \"\"\"' in (content_type_15.content | b64decode)"
+
+- name: test-type 16 - set multiline literal string
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: raw_block
+    value: "Raw\ntext\nblock"
+    value_type: multiline_literal_string
+  register: result_type_16
+
+- name: test-type 16 - verify change
+  assert:
+    that:
+      - result_type_16 is changed
+
+- name: test-type 16 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_16
+
+- name: test-type 16 - verify multiline literal string uses triple single quotes
+  assert:
+    that:
+      - "\"raw_block = '''\" in (content_type_16.content | b64decode)"
+
+## Group 6: Reset and test integer variants
+
+- name: Reset output file for group 6
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: test-type 17 - set hexadecimal integer
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: hex_color
+    value: 16777215
+    value_type: hex_integer
+  register: result_type_17
+
+- name: test-type 17 - verify change
+  assert:
+    that:
+      - result_type_17 is changed
+
+- name: test-type 17 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_17
+
+- name: test-type 17 - verify hex integer in file
+  vars:
+    expected: |
+      [types]
+      hex_color = 0xffffff
+  assert:
+    that:
+      - (content_type_17.content | b64decode) == expected
+
+- name: test-type 18 - set octal integer
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: file_mode
+    value: 493
+    value_type: octal_integer
+  register: result_type_18
+
+- name: test-type 18 - verify change
+  assert:
+    that:
+      - result_type_18 is changed
+
+- name: test-type 18 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_18
+
+- name: test-type 18 - verify octal integer in file
+  vars:
+    expected: |
+      [types]
+      hex_color = 0xffffff
+      file_mode = 0o755
+  assert:
+    that:
+      - (content_type_18.content | b64decode) == expected
+
+- name: test-type 19 - set binary integer
+  toml_file:
+    path: "{{ output_file }}"
+    table: types
+    key: flags
+    value: 170
+    value_type: binary_integer
+  register: result_type_19
+
+- name: test-type 19 - verify change
+  assert:
+    that:
+      - result_type_19 is changed
+
+- name: test-type 19 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_type_19
+
+- name: test-type 19 - verify binary integer in file
+  vars:
+    expected: |
+      [types]
+      hex_color = 0xffffff
+      file_mode = 0o755
+      flags = 0b10101010
+  assert:
+    that:
+      - (content_type_19.content | b64decode) == expected

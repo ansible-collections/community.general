@@ -1,0 +1,188 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Basic tests - create, update, remove key
+
+- name: test-basic 1 - set "create=false" on non-existing file and fail
+  toml_file:
+    path: "{{ non_existing_file }}"
+    table: server
+    key: host
+    value: localhost
+    create: false
+  register: result_basic_1
+  ignore_errors: true
+
+- name: test-basic 1 - verify error message
+  assert:
+    that:
+      - result_basic_1 is not changed
+      - result_basic_1 is failed
+      - "'does not exist' in result_basic_1.msg"
+
+- name: test-basic 2 - create a new TOML file with a key
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: host
+    value: localhost
+  register: result_basic_2
+
+- name: test-basic 2 - verify file created
+  assert:
+    that:
+      - result_basic_2 is changed
+      - result_basic_2.msg == "key added"
+
+- name: test-basic 2 - read and verify content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_basic_2
+
+- name: test-basic 2 - verify TOML content
+  vars:
+    expected: |
+      [server]
+      host = "localhost"
+  assert:
+    that:
+      - (content_basic_2.content | b64decode) == expected
+
+- name: test-basic 3 - set the same key again (idempotent)
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: host
+    value: localhost
+  register: result_basic_3
+
+- name: test-basic 3 - verify no change
+  assert:
+    that:
+      - result_basic_3 is not changed
+
+- name: test-basic 4 - update the key value
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: host
+    value: "192.168.1.1"
+  register: result_basic_4
+
+- name: test-basic 4 - verify change
+  assert:
+    that:
+      - result_basic_4 is changed
+
+- name: test-basic 4 - read and verify content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_basic_4
+
+- name: test-basic 4 - verify updated TOML content
+  vars:
+    expected: |
+      [server]
+      host = "192.168.1.1"
+  assert:
+    that:
+      - (content_basic_4.content | b64decode) == expected
+
+- name: test-basic 5 - remove the key
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: host
+    state: absent
+  register: result_basic_5
+
+- name: test-basic 5 - verify removal
+  assert:
+    that:
+      - result_basic_5 is changed
+      - result_basic_5.msg == "key removed"
+
+- name: test-basic 5 - read and verify content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_basic_5
+
+- name: test-basic 5 - verify key removed from TOML
+  vars:
+    expected: |
+      [server]
+  assert:
+    that:
+      - (content_basic_5.content | b64decode) == expected
+
+- name: test-basic 6 - remove non-existing key (idempotent)
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: nonexistent
+    state: absent
+  register: result_basic_6
+
+- name: test-basic 6 - verify no change
+  assert:
+    that:
+      - result_basic_6 is not changed
+      - result_basic_6.msg == "key not found"
+
+- name: test-basic 7 - set key at document root
+  toml_file:
+    path: "{{ output_file }}"
+    key: title
+    value: "My Application"
+  register: result_basic_7
+
+- name: test-basic 7 - verify change
+  assert:
+    that:
+      - result_basic_7 is changed
+
+- name: test-basic 7 - read and verify content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_basic_7
+
+- name: test-basic 7 - verify root-level key
+  vars:
+    expected: |
+      title = "My Application"
+
+      [server]
+  assert:
+    that:
+      - (content_basic_7.content | b64decode) == expected
+
+- name: test-basic 8 - check mode test (no actual change)
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: port
+    value: 8080
+  check_mode: true
+  register: result_basic_8
+
+- name: test-basic 8 - verify check mode reports change
+  assert:
+    that:
+      - result_basic_8 is changed
+
+- name: test-basic 8 - verify file was not actually modified
+  slurp:
+    src: "{{ output_file }}"
+  register: content_basic_8
+
+- name: test-basic 8 - verify port not in file
+  vars:
+    expected: |
+      title = "My Application"
+
+      [server]
+  assert:
+    that:
+      - (content_basic_8.content | b64decode) == expected

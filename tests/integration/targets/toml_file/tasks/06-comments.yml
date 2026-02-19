@@ -1,0 +1,127 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## Comment preservation tests
+
+- name: test-comment 1 - create a TOML file with comments
+  copy:
+    dest: "{{ output_file }}"
+    content: |
+      # This is a file-level comment
+      title = "My App"
+
+      # Server configuration
+      [server]
+      # The host to bind to
+      host = "localhost"
+      # The port to listen on
+      port = 8080
+
+- name: test-comment 2 - modify a value (should preserve comments)
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: port
+    value: 9090
+  register: result_comment_2
+
+- name: test-comment 2 - verify change
+  assert:
+    that:
+      - result_comment_2 is changed
+
+- name: test-comment 2 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_comment_2
+
+- name: test-comment 2 - verify comments preserved
+  vars:
+    expected: |
+      # This is a file-level comment
+      title = "My App"
+
+      # Server configuration
+      [server]
+      # The host to bind to
+      host = "localhost"
+      # The port to listen on
+      port = 9090
+  assert:
+    that:
+      - (content_comment_2.content | b64decode) == expected
+
+- name: test-comment 3 - add a new key (should preserve existing comments)
+  toml_file:
+    path: "{{ output_file }}"
+    table: server
+    key: timeout
+    value: 30
+  register: result_comment_3
+
+- name: test-comment 3 - verify change
+  assert:
+    that:
+      - result_comment_3 is changed
+
+- name: test-comment 3 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_comment_3
+
+- name: test-comment 3 - verify comments still preserved
+  vars:
+    expected: |
+      # This is a file-level comment
+      title = "My App"
+
+      # Server configuration
+      [server]
+      # The host to bind to
+      host = "localhost"
+      # The port to listen on
+      port = 9090
+      timeout = 30
+  assert:
+    that:
+      - (content_comment_3.content | b64decode) == expected
+
+- name: test-comment 4 - add a new table (should preserve existing comments)
+  toml_file:
+    path: "{{ output_file }}"
+    table: database
+    key: host
+    value: db.example.com
+  register: result_comment_4
+
+- name: test-comment 4 - verify change
+  assert:
+    that:
+      - result_comment_4 is changed
+
+- name: test-comment 4 - read content
+  slurp:
+    src: "{{ output_file }}"
+  register: content_comment_4
+
+- name: test-comment 4 - verify original structure preserved
+  vars:
+    expected: |
+      # This is a file-level comment
+      title = "My App"
+
+      # Server configuration
+      [server]
+      # The host to bind to
+      host = "localhost"
+      # The port to listen on
+      port = 9090
+      timeout = 30
+
+      [database]
+      host = "db.example.com"
+  assert:
+    that:
+      - (content_comment_4.content | b64decode) == expected
