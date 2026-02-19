@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Christoph Fiehe <christoph.fiehe@gmail.com>
 
+# Note that this module util is **PRIVATE** to the collection. It can have breaking changes at any time.
+# Do not use this from other collections or standalone plugins/modules!
+
 from __future__ import annotations
 
 import json
