@@ -73,7 +73,7 @@ class Actions:
         trigger_name: str | None = None,
         child_options: str | None = None,
     ) -> tuple[HTTPResponse | HTTPError, dict[str, t.Any]]:
-        path = "{}/{}".format(self.base_path, "schedule-downtime")
+        path = f"{self.base_path}/schedule-downtime"
 
         data: dict[str, t.Any] = {
             "type": object_type,
