@@ -96,7 +96,7 @@ class UV:
       find_rc, find_out, _ = self._find_python("--show-version")
       if find_rc == 0:
         existing_version = find_out.split()[0]
-        return False, "", "", 0, existing_version
+        return False, "", "", 0, [existing_version]
       if self.module.check_mode:
         _, out_list, _ = self._list_python()
         versions_available = json.loads(out_list)
@@ -107,13 +107,13 @@ class UV:
             self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
         except json.decoder.JSONDecodeError as e:
           self.module.fail_json(msg=f"Failed to parse 'uv python list' output with error {str(e)}")
-        return True, self.python_version_str, "", 0, version
+        return True, "", "", 0, [version]
 
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
       rc, out, err = self.module.run_command(cmd, check_rc=True, expand_user_and_vars=False)
       _, find_out, _ = self._find_python("--show-version")
       installed_version = find_out.split()[0]
-      return True, out, err, rc, installed_version
+      return True, out, err, rc, [installed_version]
     
     def uninstall_python(self):
       """
@@ -126,15 +126,16 @@ class UV:
       rc, _, err = self._find_python("--show-version")
       # if "uv python find" fails with return code 2, it means specified version is not installed or is not available
       if rc == 2:
-        return False, "", "", 0
+        return False, "", "", 0, []
       elif rc != 0:
         self.module.fail_json(msg=err)
+      installed_versions = self._get_installed_versions()
       if self.module.check_mode:
-        return True, self.python_version_str, "", 0
+        return True, "", "", 0, installed_versions
       
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "uninstall", self.python_version_str]
-      rc, _, err = self.module.run_command(cmd, check_rc=True)
-      return True, self.python_version_str, err, rc
+      rc, out, err = self.module.run_command(cmd, check_rc=True)
+      return True, out, err, rc, installed_versions
     
     def upgrade_python(self):
       """
@@ -169,7 +170,7 @@ class UV:
       rc, out, err = self.module.run_command(cmd, expand_user_and_vars=False)
       return rc, out, err
     
-    def _list_python(self):
+    def _list_python(self, *args):
       """
         Runs command 'uv python list' which returns list of installed patch releases for a given python version.
         Returns: tuple with following elements 
@@ -178,7 +179,7 @@ class UV:
           - stderr of command
       """
       # https://docs.astral.sh/uv/reference/cli/#uv-python-list
-      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "list", self.python_version_str, "--output-format", "json"]
+      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "list", self.python_version_str, "--output-format", "json", *args]
       rc, out, err = self.module.run_command(cmd)
       return rc, out, err
 
@@ -191,6 +192,10 @@ class UV:
       results = json.loads(out)
       latest_version = max_version(results)
       return latest_version
+    
+    def _get_installed_versions(self):
+      _, out_list, _ = self._list_python("--only-installed")
+      return [result["version"] for result in json.loads(out_list)]
 
 
 def main():
@@ -207,7 +212,7 @@ def main():
         stdout="",
         stderr="",
         rc=0,
-        python_version="",
+        python_version=[],
         failed=False
     )
     state = module.params["state"]
@@ -216,7 +221,7 @@ def main():
     if state == "present":
       result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_version"] = uv.install_python()
     elif state == "absent":
-      result["changed"], result["stdout"], result["stderr"], result["rc"] = uv.uninstall_python()
+      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_version"] = uv.uninstall_python()
     elif state == "latest":
       result["changed"], result["stdout"], result["stderr"], result["rc"] = uv.upgrade_python()
 
