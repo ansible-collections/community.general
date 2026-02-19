@@ -203,7 +203,7 @@ error:
 import json
 from contextlib import suppress
 
-from ansible_collections.community.general.plugins.module_utils.icinga2 import (
+from ansible_collections.community.general.plugins.module_utils._icinga2 import (
     Icinga2Client,
     icinga2_argument_spec,
 )

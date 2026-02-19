@@ -362,7 +362,7 @@ files:
     keywords: cloud huawei hwc
     labels: huawei hwc_utils networking
     maintainers: $team_huawei
-  $module_utils/icinga2.py:
+  $module_utils/_icinga2.py:
     maintainers: cfiehe
   $module_utils/identity/keycloak/keycloak.py:
     maintainers: $team_keycloak

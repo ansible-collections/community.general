@@ -104,7 +104,7 @@ class Actions:
         filter: str | None = None,
         filter_vars: dict[str, t.Any] | None = None,
     ) -> tuple[HTTPResponse | HTTPError, dict[str, t.Any]]:
-        path = "{}/{}".format(self.base_path, "remove-downtime")
+        path = f"{self.base_path}/remove-downtime"
 
         data: dict[str, t.Any] = {"type": object_type}
         if name:
