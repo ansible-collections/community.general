@@ -20,6 +20,4 @@ documentation: https://docs.ansible.com/projects/ansible/latest/collections/comm
 homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
 build_ignore:
-  - .git
-  - .github
   - .nox
