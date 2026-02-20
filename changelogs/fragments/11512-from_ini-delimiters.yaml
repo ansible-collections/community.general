@@ -1,0 +1,2 @@
+minor_changes:
+  - from_ini filter plugin - add ``delimiters`` parameter to allow correctly parsing more INI documents (https://github.com/ansible-collections/community.general/issues/11506, https://github.com/ansible-collections/community.general/pull/11512).
