@@ -19,3 +19,5 @@ repository: https://github.com/ansible-collections/community.general
 documentation: https://docs.ansible.com/projects/ansible/latest/collections/community/general/
 homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
+build_ignore:
+  - .nox
