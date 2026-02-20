@@ -56,14 +56,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.compat.version import StrictVersion
 
 
-def max_version(versions_list):
-  max_version = ""
-  if versions_list:
-    versions = [StrictVersion(result["version"]) for result in versions_list]
-    max_version = max(versions).__str__()
-  return max_version
-
-
 class UV:
     """
       Module for "uv python" command
@@ -93,27 +85,21 @@ class UV:
           - boolean to indicate if method changed state
           - installed version
       """
-      find_rc, find_out, _ = self._find_python("--show-version")
+      find_rc, find_version, _ = self._find_python("--show-version")
       if find_rc == 0:
-        existing_version = find_out.split()[0]
-        return False, "", "", 0, [existing_version]
+        _, find_out, _ = self._find_python()
+        return False, "", "", 0, [find_version.split()[0]], [find_out.split()[0]]
       if self.module.check_mode:
-        _, out_list, _ = self._list_python()
-        versions_available = json.loads(out_list)
-        version = max_version(versions_available)
+        latest_version, _ = self._get_latest_patch_release()
         # when uv does not find any available patch version the install command will fail
-        try:
-          if not versions_available:
-            self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
-        except json.decoder.JSONDecodeError as e:
-          self.module.fail_json(msg=f"Failed to parse 'uv python list' output with error {str(e)}")
-        return True, "", "", 0, [version]
+        if not latest_version:
+          self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
+        return True, "", "", 0, [latest_version], [""]
 
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
       rc, out, err = self.module.run_command(cmd, check_rc=True, expand_user_and_vars=False)
-      _, find_out, _ = self._find_python("--show-version")
-      installed_version = find_out.split()[0]
-      return True, out, err, rc, [installed_version]
+      latest_version, path = self._get_latest_patch_release("--only-installed")
+      return True, out, err, rc, [latest_version], [path]
     
     def uninstall_python(self):
       """
@@ -129,7 +115,7 @@ class UV:
         return False, "", "", 0, []
       elif rc != 0:
         self.module.fail_json(msg=err)
-      installed_versions = self._get_installed_versions()
+      installed_versions, _ = self._get_installed_versions()
       if self.module.check_mode:
         return True, "", "", 0, installed_versions
       
@@ -145,7 +131,7 @@ class UV:
           - installed version
       """
       rc, out, _ = self._find_python("--show-version")
-      latest_version = self._get_latest_patch_release()
+      latest_version, _ = self._get_latest_patch_release()
       if not latest_version:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
       if rc == 0 and out.strip() == latest_version:
@@ -183,19 +169,27 @@ class UV:
       rc, out, err = self.module.run_command(cmd)
       return rc, out, err
 
-    def _get_latest_patch_release(self):
+    def _get_latest_patch_release(self, *args):
       """
         Returns latest available patch release for a given python version.
         Fails when no available release exists for the specified version.
       """
-      _, out, _ = self._list_python() # uv returns versions in descending order but we sort them just in case future uv behavior changes
-      results = json.loads(out)
-      latest_version = max_version(results)
-      return latest_version
+      latest_version = path = ""
+      try:
+        _, out, _ = self._list_python(*args) # uv returns versions in descending order but we sort them just in case future uv behavior changes
+        results = json.loads(out)
+        if results:
+          version = max(results, key=lambda item: (item["version_parts"]["major"], item["version_parts"]["minor"], item["version_parts"]["patch"]))
+          latest_version = version["version"]
+          path = version["path"]
+      except json.decoder.JSONDecodeError as e:
+         self.module.fail_json(msg=f"Failed to parse 'uv python list' output with error {str(e)}")
+      return latest_version, path
     
     def _get_installed_versions(self):
       _, out_list, _ = self._list_python("--only-installed")
-      return [result["version"] for result in json.loads(out_list)]
+      results = json.loads(out_list)
+      return [result["version"] for result in results], [result["path"] for result in results]
 
 
 def main():
@@ -213,13 +207,14 @@ def main():
         stderr="",
         rc=0,
         python_versions=[],
+        python_paths=[],
         failed=False
     )
     state = module.params["state"]
 
     uv = UV(module)
     if state == "present":
-      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"] = uv.install_python()
+      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.install_python()
     elif state == "absent":
       result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"] = uv.uninstall_python()
     elif state == "latest":
