@@ -291,6 +291,13 @@ options:
     aliases:
       - internationalizationEnabled
     type: bool
+  localization_texts:
+    description:
+      - The custom localization texts for a realm.
+    aliases:
+      - localizationTexts
+    type: dict
+    version_added: 12.4.0
   login_theme:
     description:
       - The realm login theme.
@@ -917,6 +924,7 @@ def main():
         events_listeners=dict(type="list", elements="str", aliases=["eventsListeners"]),
         failure_factor=dict(type="int", aliases=["failureFactor"]),
         internationalization_enabled=dict(type="bool", aliases=["internationalizationEnabled"]),
+        localization_texts=dict(type="dict", aliases=["localizationTexts"]),
         login_theme=dict(type="str", aliases=["loginTheme"]),
         login_with_email_allowed=dict(type="bool", aliases=["loginWithEmailAllowed"]),
         max_delta_time_seconds=dict(type="int", aliases=["maxDeltaTimeSeconds"]),
