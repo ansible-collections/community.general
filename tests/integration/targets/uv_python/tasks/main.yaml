@@ -39,46 +39,52 @@
     that:
       - install_check_mode.changed is true
       - install_check_mode.failed is false
-      - 'install_check_mode.python_versions != []'
+      - install_check_mode.python_versions | length >= 1
 
 - name: Install python 3.14
   uv_python:
     version: 3.14
     state: present
   register: install_python
-
+- debug:
+    var: install_python
 - name: Verify python 3.14 installation
   assert:
     that:
       - install_python.changed is true
       - install_python.failed is false
-      - 'install_python.python_versions != []'
+      - install_python.python_versions | length >= 1
+      - install_python.python_paths | length >= 1
 
 - name: Re-install python 3.14
   uv_python:
     version: 3.14
     state: present
   register: reinstall_python
-
+- debug:
+    var: install_python
 - name: Verify python 3.14 re-installation
   assert:
     that:
       - reinstall_python.changed is false
       - reinstall_python.failed is false
-      - 'reinstall_python.python_versions != []'
+      - reinstall_python.python_versions | length >= 1
+      - reinstall_python.python_paths | length >= 1
 
 - name: Install latest python 3.15 # installs latest patch version for 3.15
   uv_python:
     version: 3.15
     state: latest
   register: install_latest_python
-
+- debug:
+    var: install_latest_python
 - name: Verify python 3.15 installation
   assert:
     that:
       - install_latest_python.changed is true
       - install_latest_python.failed is false
-      - 'install_latest_python.stdout != []'
+      - install_latest_python.python_versions | length >= 1
+      - install_latest_python.python_paths | length >= 1
 
 - name: Install python 3.13.5
   uv_python:
@@ -91,33 +97,37 @@
     that:
       - install_python.changed is true
       - install_python.failed is false
-      - 'install_python.python_versions != []'
+      # - install_python.python_versions | length >= 1
+      - '"3.13.5" in install_python.python_versions'
+      - install_python.python_paths | length >= 1
 
 - name: Re-install python 3.13.5
   uv_python:
     version: 3.13.5
     state: present
   register: reinstall_python
-
+- debug:
+    var: reinstall_python
 - name: Verify python 3.13.5 installation
   assert:
     that:
       - reinstall_python.changed is false
       - reinstall_python.failed is false
-      - 'reinstall_python.python_versions != []'
+      - '"3.13.5" in reinstall_python.python_versions'
 
-- name: Remove unexisting python 3.10 # removes latest patch version for 3.10 if exists
+- name: Remove uninstalled python 3.10 # removes latest patch version for 3.10 if exists
   uv_python:
     version: 3.10
     state: absent
   register: remove_python
-
+- debug:
+    var: remove_python
 - name: Verify python 3.10 deletion
   assert:
     that:
       - remove_python.changed is false
       - remove_python.failed is false
-      - 'remove_python.python_versions == []'
+      - remove_python.python_versions | length == 0
 
 - name: Remove python 3.13.5 in check mode
   uv_python:
@@ -125,39 +135,45 @@
     state: absent
   check_mode: true
   register: remove_python_in_check_mode
-
+- debug:
+    var: remove_python_in_check_mode
 - name: Verify python 3.13.5 deletion in check mode
   assert:
     that:
       - remove_python_in_check_mode.changed is true
       - remove_python_in_check_mode.failed is false
-      - 'remove_python_in_check_mode.python_versions != []'
+      - '"3.13.5" in remove_python_in_check_mode.python_versions'
+      - remove_python_in_check_mode.python_paths | length >= 1
 
 - name: Remove python 3.13.5
   uv_python:
     version: 3.13.5
     state: absent
   register: remove_python
-
+- debug:
+    var: remove_python
 - name: Verify python 3.13.5 deletion
   assert:
     that:
       - remove_python.changed is true
       - remove_python.failed is false
-      - 'remove_python_in_check_mode.python_versions != []'
+      - remove_python.python_paths | length >= 1
+      - '"3.13.5" in remove_python.python_versions'
 
 - name: Remove python 3.13.5 again
   uv_python:
     version: 3.13.5
     state: absent
   register: remove_python
-
+- debug:
+    var: remove_python
 - name: Verify python 3.13.5 deletion again
   assert:
     that:
       - remove_python.changed is false
       - remove_python.failed is false
-      - 'remove_python.python_versions == []'
+      - remove_python.python_versions | length == 0
+      - remove_python.python_paths | length == 0
 
 - name: Install python 3
   uv_python:
@@ -177,13 +193,15 @@
     version: 3.13
     state: latest
   register: upgrade_python
-
+- debug:
+    var: upgrade_python
 - name: Verify python 3.13 upgrade
   assert:
     that:
       - upgrade_python.changed is true
       - upgrade_python.failed is false
-      - 'upgrade_python.python_versions != []'
+      - upgrade_python.python_versions | length >= 1
+      - upgrade_python.python_paths | length >= 1
 
 - name: Upgrade python 3.13 in check mode
   uv_python:
@@ -191,13 +209,14 @@
     state: latest
   check_mode: yes
   register: upgrade_python
-
+- debug:
+    var: upgrade_python
 - name: Verify python 3.13 upgrade in check mode
   assert:
     that:
       - upgrade_python.changed is false
       - upgrade_python.failed is false
-      - 'upgrade_python.python_versions != []'
+      - upgrade_python.python_versions | length >= 1
 
 - name: Upgrade python 3.13 again
   uv_python:
@@ -205,13 +224,14 @@
     state: latest
   check_mode: yes
   register: upgrade_python
-
+- debug:
+    var: upgrade_python
 - name: Verify python 3.13 upgrade again
   assert:
     that:
       - upgrade_python.changed is false
       - upgrade_python.failed is false
-      - 'upgrade_python.python_versions != []'
+      - upgrade_python.python_versions | length >= 1
 
 - name: Install unexisting python version in check mode
   uv_python:
@@ -220,7 +240,8 @@
   register: unexisting_python_check_mode
   ignore_errors: true
   check_mode: true
-
+- debug:
+    var: unexisting_python_check_mode
 - name: Verify unexisting python 3.12.13 install in check mode
   assert:
     that:
@@ -234,7 +255,8 @@
     state: present
   register: unexisting_python
   ignore_errors: true
-
+- debug:
+    var: unexisting_python
 - name: Verify unexisting python 3.12.13 install
   assert:
     that:
@@ -247,9 +269,32 @@
     state: latest
   register: unexisting_python
   ignore_errors: true
-
-- name: Verify python 3.12.13 deletion with latest state
+- debug:
+    var: unexisting_python
+- name: Verify python 3.12.13 install with latest state
   assert:
     that:
       - unexisting_python.changed is false
       - unexisting_python.failed is true
+
+- name: Install python 3.13.11 version
+  uv_python:
+    version: 3.13.11
+    state: present
+
+- name: Delete python 3.13 version
+  uv_python:
+    version: 3.13
+    state: absent
+  register: uninstall_result
+
+- debug:
+    var: uninstall_result
+
+- name: Verify python 3.13 deletion
+  assert:
+    that:
+      - uninstall_result.changed is true
+      - uninstall_result.failed is false
+      - '"3.13.11" in uninstall_result.python_versions'
+      - uninstall_result.python_versions | length >= 2
