@@ -6,31 +6,28 @@
 DOCUMENTATION = r'''
 ---
 module: uv_python
-short_description: Manage Python installations using uv
+short_description: Manage Python installations using uv.
 description:
-  - Install or remove Python versions managed by uv.
-# requirements:
-#   - uv must be installed and available on PATH
+  - Install, remove or upgrade Python versions managed by uv.
+version_added: "X.Y"
+requirements:
+  - uv must be installed and available on PATH
+  - uv >= 0.8.0
 options:
   version:
-    description: Python version to manage
+    description: 
+      - Python version to manage. 
+      - Expected formats are "X.Y" or "X.Y.Z".
     type: str
     required: true
   state:
-    description: Desired state
+    description: Desired state of the specified Python version.
     type: str
-    choices: [present, absent]
+    choices: [present, absent, latest]
     default: present
-  force:
-    description: Force reinstall
-    type: bool
-    default: false
-  uv_path:
-    description: Path to uv binary
-    type: str
-    default: uv
 author:
-  - Your Name
+  - Mariam Ahhttouche (@mriamah)
+deprecated:
 '''
 
 EXAMPLES = r'''
