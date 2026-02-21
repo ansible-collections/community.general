@@ -90,7 +90,7 @@ class UV:
         _, find_out, _ = self._find_python()
         return False, "", "", 0, [find_version.split()[0]], [find_out.split()[0]]
       if self.module.check_mode:
-        latest_version, _ = self._get_latest_patch_release()
+        latest_version, _ = self._get_latest_patch_release("--managed-python")
         # when uv does not find any available patch version the install command will fail
         if not latest_version:
           self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
@@ -98,7 +98,7 @@ class UV:
 
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
       rc, out, err = self.module.run_command(cmd, check_rc=True, expand_user_and_vars=False)
-      latest_version, path = self._get_latest_patch_release("--only-installed")
+      latest_version, path = self._get_latest_patch_release("--only-installed", "--managed-python")
       return True, out, err, rc, [latest_version], [path]
     
     def uninstall_python(self):
@@ -109,7 +109,7 @@ class UV:
           - boolean to indicate if method changed state
           - removed version
       """
-      installed_versions, install_paths = self._get_installed_versions()
+      installed_versions, install_paths = self._get_installed_versions("--managed-python")
       if not installed_versions:
         return False, "", "", 0, [], []
       if self.module.check_mode:
@@ -127,17 +127,19 @@ class UV:
           - installed version
       """
       rc, out, _ = self._find_python("--show-version")
-      latest_version, latest_path = self._get_latest_patch_release()
+      installed_version = out.strip()
+      latest_version, latest_path = self._get_latest_patch_release("--managed-python")
       if not latest_version:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
-      if rc == 0 and out.strip() == latest_version:
-          return False, "", "", rc, [latest_version], [latest_path]
+      if rc == 0 and StrictVersion(installed_version) >= StrictVersion(latest_version):
+          _, install_path, _ = self._find_python()
+          return False, "", "", rc, [installed_version], [install_path.strip()]
       if self.module.check_mode:
           return True, "", "", 0, [latest_version], []
       # it's possible to have latest version already installed but not used as default so in this case 'uv python install' will set latest version as default
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", latest_version]
       rc, out, err = self.module.run_command(cmd, check_rc=True)
-      latest_version, latest_path = self._get_latest_patch_release("--only-installed")
+      latest_version, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
       return True, out, err, rc, [latest_version], [latest_path]
 
     def _find_python(self, *args):
@@ -184,8 +186,8 @@ class UV:
       return latest_version, path
     
     def _get_installed_versions(self, *args):
-      _, out_list, _ = self._list_python("--only-installed", *args)
       try:
+        _, out_list, _ = self._list_python("--only-installed", *args)
         if out_list:
           results = json.loads(out_list)
           return [result["version"] for result in results], [result["path"] for result in results]
