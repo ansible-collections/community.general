@@ -109,19 +109,15 @@ class UV:
           - boolean to indicate if method changed state
           - removed version
       """
-      rc, _, err = self._find_python("--show-version")
-      # if "uv python find" fails with return code 2, it means specified version is not installed or is not available
-      if rc == 2:
-        return False, "", "", 0, []
-      elif rc != 0:
-        self.module.fail_json(msg=err)
-      installed_versions, _ = self._get_installed_versions()
+      installed_versions, install_paths = self._get_installed_versions()
+      if not installed_versions:
+        return False, "", "", 0, [], []
       if self.module.check_mode:
-        return True, "", "", 0, installed_versions
+        return True, "", "", 0, installed_versions, install_paths
       
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "uninstall", self.python_version_str]
       rc, out, err = self.module.run_command(cmd, check_rc=True)
-      return True, out, err, rc, installed_versions
+      return True, out, err, rc, installed_versions, install_paths
     
     def upgrade_python(self):
       """
@@ -188,9 +184,13 @@ class UV:
     
     def _get_installed_versions(self):
       _, out_list, _ = self._list_python("--only-installed")
-      results = json.loads(out_list)
-      return [result["version"] for result in results], [result["path"] for result in results]
-
+      try:
+        if out_list:
+          results = json.loads(out_list)
+          return [result["version"] for result in results], [result["path"] for result in results]
+      except json.decoder.JSONDecodeError:
+         self.module.fail_json(msg=f"Failed to parse 'uv python list' output")
+      return [], []
 
 def main():
     module = AnsibleModule(
@@ -216,7 +216,7 @@ def main():
     if state == "present":
       result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.install_python()
     elif state == "absent":
-      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"] = uv.uninstall_python()
+      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"]  = uv.uninstall_python()
     elif state == "latest":
       result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"] = uv.upgrade_python()
 
