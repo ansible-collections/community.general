@@ -61,9 +61,8 @@ class UV:
       Module for "uv python" command
       Official documentation for uv python https://docs.astral.sh/uv/concepts/python-versions/#installing-a-python-version
     """
-    subcommand = "python"
 
-    def __init__(self, module, **kwargs):
+    def __init__(self, module):
         self.module = module
         python_version = module.params["version"]
         try:
@@ -77,18 +76,28 @@ class UV:
             )
           )
 
+
     def install_python(self):
       """
         Runs command 'uv python install X.Y.Z' which installs specified python version.
         If patch version is not specified uv installs latest available patch version.
-        Returns: tuple with following elements 
+        Returns: 
+          tuple [bool, str, str, int, list, list] 
           - boolean to indicate if method changed state
-          - installed version
+          - command's stdout
+          - command's stderr
+          - command's return code
+          - list of installed versions
+          - list of installation paths for each installed version
+        Raises:
+          AnsibleModuleFailJson:
+              If the install command exits with a non-zero return code.
+              If specified version is not available for download.
       """
-      find_rc, find_version, _ = self._find_python("--show-version")
+      find_rc, existing_version, _ = self._find_python(self.python_version_str, "--show-version")
       if find_rc == 0:
-        _, find_out, _ = self._find_python()
-        return False, "", "", 0, [find_version.split()[0]], [find_out.split()[0]]
+        _, version_path, _ = self._find_python(self.python_version_str)
+        return False, "", "", 0, [existing_version], [version_path]
       if self.module.check_mode:
         latest_version, _ = self._get_latest_patch_release("--managed-python")
         # when uv does not find any available patch version the install command will fail
@@ -96,18 +105,26 @@ class UV:
           self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
         return True, "", "", 0, [latest_version], [""]
 
-      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", self.python_version_str]
-      rc, out, err = self.module.run_command(cmd, check_rc=True, expand_user_and_vars=False)
+      rc, out, err = self._exec(self.python_version_str, "install", check_rc=True)
       latest_version, path = self._get_latest_patch_release("--only-installed", "--managed-python")
       return True, out, err, rc, [latest_version], [path]
-    
+
+
     def uninstall_python(self):
       """
         Runs command 'uv python uninstall X.Y.Z' which removes specified python version from environment.
         If patch version is not specified all correspending installed patch versions are removed.
-        Returns: tuple with following elements 
+        Returns: 
+          tuple [bool, str, str, int, list, list] 
           - boolean to indicate if method changed state
-          - removed version
+          - command's stdout
+          - command's stderr
+          - command's return code
+          - list of uninstalled versions
+          - list of previous installation paths for each uninstalled version
+        Raises:
+          AnsibleModuleFailJson:
+              If the uninstall command exits with a non-zero return code.
       """
       installed_versions, install_paths = self._get_installed_versions("--managed-python")
       if not installed_versions:
@@ -115,85 +132,141 @@ class UV:
       if self.module.check_mode:
         return True, "", "", 0, installed_versions, install_paths
       
-      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "uninstall", self.python_version_str]
-      rc, out, err = self.module.run_command(cmd, check_rc=True)
+      rc, out, err = self._exec(self.python_version_str, "uninstall", check_rc=True)
       return True, out, err, rc, installed_versions, install_paths
     
+
     def upgrade_python(self):
       """
-        Runs command 'uv python install X.Y.Z' which installs specified python version.
-        Returns: tuple with following elements 
+        Runs command 'uv python install X.Y.Z' with latest patch version available.
+        Returns: 
+          tuple [bool, str, str, int, list, list] 
           - boolean to indicate if method changed state
-          - installed version
+          - command's stdout
+          - command's stderr
+          - command's return code
+          - list of installed versions
+          - list of installation paths for each installed version
+        Raises:
+          AnsibleModuleFailJson:
+              If the install command exits with a non-zero return code.
+              If resolved patch version is not available for download.
       """
-      rc, out, _ = self._find_python("--show-version")
-      installed_version = out.strip()
-      latest_version, latest_path = self._get_latest_patch_release("--managed-python")
+      rc, installed_version, _ = self._find_python(self.python_version_str, "--show-version")
+      latest_version, _ = self._get_latest_patch_release("--managed-python")
       if not latest_version:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
       if rc == 0 and StrictVersion(installed_version) >= StrictVersion(latest_version):
-          _, install_path, _ = self._find_python()
-          return False, "", "", rc, [installed_version], [install_path.strip()]
+          _, install_path, _ = self._find_python(self.python_version_str)
+          return False, "", "", rc, [installed_version], [install_path]
       if self.module.check_mode:
           return True, "", "", 0, [latest_version], []
       # it's possible to have latest version already installed but not used as default so in this case 'uv python install' will set latest version as default
-      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", latest_version]
-      rc, out, err = self.module.run_command(cmd, check_rc=True)
+      rc, out, err = self._exec(latest_version, "install", check_rc=True)
       latest_version, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
       return True, out, err, rc, [latest_version], [latest_path]
 
-    def _find_python(self, *args):
+
+    def _exec(self, python_version, command, *args, check_rc=False):
+      """
+        Execute a uv python subcommand.
+        Args:
+          python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
+          command (str): uv python subcommand (e.g. "install", "uninstall", "find").
+          *args: Additional positional arguments passed to the command.
+          check_rc (bool): Whether to fail if the command exits with non-zero return code.
+        Returns:
+          tuple[int, str, str]:
+            A tuple containing (rc, stdout, stderr).
+        Raises:
+          AnsibleModuleFailJson:
+              If check_rc is True and the command exits with a non-zero return code.
+      """
+      cmd = [self.module.get_bin_path("uv", required=True), "python", command, python_version, *args]
+      rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
+      return rc, out, err
+
+
+    def _find_python(self, python_version, *args, check_rc=False):
       """
         Runs command 'uv python find' which returns path of installed patch releases for a given python version.
         If multiple patch versions are installed, "uv python find" returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version.
-        Returns: tuple with following elements 
-          - return code of executed command
-          - stdout of command
-          - stderr of command
+        Args:
+          python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
+          *args: Additional positional arguments passed to _exec.
+          check_rc (bool): Whether to fail if the command exits with non-zero return code.
+        Returns:
+          tuple[int, str, str]:
+            A tuple containing (rc, stdout, stderr).
+        Raises:
+          AnsibleModuleFailJson:
+            If check_rc is True and the command exits with a non-zero return code.
       """
-      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "find", self.python_version_str, *args]
-      rc, out, err = self.module.run_command(cmd, expand_user_and_vars=False)
+      rc, out, err = self._exec(python_version, "find", *args, check_rc=check_rc)
+      if rc == 0:
+        out = out.strip()
       return rc, out, err
-    
-    def _list_python(self, *args):
+
+
+    def _list_python(self, python_version, *args, check_rc=False):
       """
-        Runs command 'uv python list' which returns list of installed patch releases for a given python version.
-        Returns: tuple with following elements 
-          - return code of executed command
-          - stdout of command
-          - stderr of command
+        Runs command 'uv python list' (which returns list of installed patch releases for a given python version).
+        Official documentation https://docs.astral.sh/uv/reference/cli/#uv-python-list
+        Args:
+          python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
+          *args: Additional positional arguments passed to _exec.
+          check_rc (bool): Whether to fail if the command exits with non-zero return code.
+        Returns:
+          tuple[int, str, str]:
+            A tuple containing (rc, stdout, stderr).
+        Raises:
+          AnsibleModuleFailJson:
+            If check_rc is True and the command exits with a non-zero return code.
       """
-      # https://docs.astral.sh/uv/reference/cli/#uv-python-list
-      cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "list", self.python_version_str, "--output-format", "json", *args]
-      rc, out, err = self.module.run_command(cmd)
+      rc, out, err = self._exec(python_version, "list", "--output-format", "json", *args, check_rc=check_rc)
+      try:
+        out = json.loads(out)
+      except json.decoder.JSONDecodeError:
+        # This happens when no version is found
+        pass
       return rc, out, err
+
 
     def _get_latest_patch_release(self, *args):
       """
         Returns latest available patch release for a given python version.
-        Fails when no available release exists for the specified version.
+        Args:
+          *args: Additional positional arguments passed to _list_python.
+        Returns:
+          tuple[str, str]:
+            - latest found patch version in format X.Y.Z
+            - installation path of latest patch version if version exists
       """
       latest_version = path = ""
-      try:
-        _, out, _ = self._list_python(*args) # uv returns versions in descending order but we sort them just in case future uv behavior changes
-        results = json.loads(out)
-        if results:
-          version = max(results, key=lambda item: (item["version_parts"]["major"], item["version_parts"]["minor"], item["version_parts"]["patch"]))
-          latest_version = version["version"]
-          path = version["path"]
-      except json.decoder.JSONDecodeError as e:
-         self.module.fail_json(msg=f"Failed to parse 'uv python list' output with error {str(e)}")
+      _, results, _ = self._list_python(self.python_version_str, *args) # uv returns versions in descending order but we sort them just in case future uv behavior changes
+      if results:
+        version = max(results, key=lambda item: (item["version_parts"]["major"], item["version_parts"]["minor"], item["version_parts"]["patch"]))
+        latest_version = version["version"]
+        path = version["path"] if version["path"] else ""
       return latest_version, path
-    
+
+
     def _get_installed_versions(self, *args):
-      try:
-        _, out_list, _ = self._list_python("--only-installed", *args)
-        if out_list:
-          results = json.loads(out_list)
-          return [result["version"] for result in results], [result["path"] for result in results]
-      except json.decoder.JSONDecodeError:
-         self.module.fail_json(msg=f"Failed to parse 'uv python list' output")
+      """
+        Returns installed patch releases for a given python version.
+        Args:
+          *args: Additional positional arguments passed to _list_python.
+        Returns:
+          tuple[list, list]:
+            - list of latest found patch versions
+            - list of installation paths of installed versions
+      """
+      _, results, _ = self._list_python(self.python_version_str, "--only-installed", *args)
+      if results:
+        return [result["version"] for result in results], [result["path"] for result in results]
       return [], []
+
+
 
 def main():
     module = AnsibleModule(
@@ -219,11 +292,12 @@ def main():
     if state == "present":
       result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.install_python()
     elif state == "absent":
-      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"]  = uv.uninstall_python()
+      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.uninstall_python()
     elif state == "latest":
       result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.upgrade_python()
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()
