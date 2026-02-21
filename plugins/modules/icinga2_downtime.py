@@ -13,6 +13,8 @@ version_added: "12.4.0"
 description:
   - Manages downtimes in Icinga 2 through its REST API.
   - Options as described at U(https://icinga.com/docs/icinga-2/latest/doc/12-icinga2-api/#schedule-downtime).
+  - Check mode is not supported. In case of a complex filter expression, it may become very complex to decide
+    whether downtime creation or removal will succeed and trigger a change.
 author:
   - Christoph Fiehe (@cfiehe)
 attributes:
