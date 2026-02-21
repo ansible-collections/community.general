@@ -127,17 +127,18 @@ class UV:
           - installed version
       """
       rc, out, _ = self._find_python("--show-version")
-      latest_version, _ = self._get_latest_patch_release()
+      latest_version, latest_path = self._get_latest_patch_release()
       if not latest_version:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
       if rc == 0 and out.strip() == latest_version:
-          return False, "", "", rc, [latest_version]
+          return False, "", "", rc, [latest_version], [latest_path]
       if self.module.check_mode:
-          return True, "", "", 0, [latest_version]
-      
+          return True, "", "", 0, [latest_version], []
+      # it's possible to have latest version already installed but not used as default so in this case 'uv python install' will set latest version as default
       cmd = [self.module.get_bin_path("uv", required=True), self.subcommand, "install", latest_version]
       rc, out, err = self.module.run_command(cmd, check_rc=True)
-      return True, out, err, rc, [latest_version]
+      latest_version, latest_path = self._get_latest_patch_release("--only-installed")
+      return True, out, err, rc, [latest_version], [latest_path]
 
     def _find_python(self, *args):
       """
@@ -182,8 +183,8 @@ class UV:
          self.module.fail_json(msg=f"Failed to parse 'uv python list' output with error {str(e)}")
       return latest_version, path
     
-    def _get_installed_versions(self):
-      _, out_list, _ = self._list_python("--only-installed")
+    def _get_installed_versions(self, *args):
+      _, out_list, _ = self._list_python("--only-installed", *args)
       try:
         if out_list:
           results = json.loads(out_list)
@@ -218,7 +219,7 @@ def main():
     elif state == "absent":
       result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"]  = uv.uninstall_python()
     elif state == "latest":
-      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"] = uv.upgrade_python()
+      result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.upgrade_python()
 
     module.exit_json(**result)
 
