@@ -84,15 +84,15 @@ class Actions:
             "end_time": end_time,
             "duration": duration,
         }
-        if filter_vars:
+        if filter_vars is not None:
             data["filter_vars"] = filter_vars
-        if fixed:
+        if fixed is not None:
             data["fixed"] = fixed
-        if all_services:
+        if all_services is not None:
             data["all_services"] = all_services
-        if trigger_name:
+        if trigger_name is not None:
             data["trigger_name"] = trigger_name
-        if child_options:
+        if child_options is not None:
             data["child_options"] = child_options
 
         return self.client.send_request(method="POST", path=path, data=data)
@@ -107,11 +107,11 @@ class Actions:
         path = f"{self.base_path}/remove-downtime"
 
         data: dict[str, t.Any] = {"type": object_type}
-        if name:
+        if name is not None:
             data[object_type.lower()] = name
-        if filter:
+        if filter is not None:
             data["filter"] = filter
-        if filter_vars:
+        if filter_vars is not None:
             data["filter_vars"] = filter_vars
 
         return self.client.send_request(method="POST", path=path, data=data)
