@@ -113,8 +113,7 @@ EXAMPLES = r"""
     duration: "{{ downtime_duration }}"
     fixed: true
     object_type: Host
-    filter: |-
-      host.name=="host.example.com"
+    filter: host.name=="host.example.com"
   delegate_to: localhost
   register: icinga2_downtime_response
   vars:
