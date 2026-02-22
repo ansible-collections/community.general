@@ -122,6 +122,8 @@ with deps.declare(
     from nacl import encoding, public
 
 ok_status_code = 200
+missing_status_code = 404
+
 created_response_code = 201
 delete_response_code = 204
 
@@ -219,6 +221,9 @@ def delete_secret(
         headers=headers,
         method="DELETE",
     )
+
+    if info["status"] != delete_response_code and info["status"] != missing_status_code:
+        module.fail_json(msg=f"Failed to delete secret: {info}")
 
     return info
 
@@ -341,15 +346,17 @@ def main() -> None:
                     "response": "Secret deleted",
                 },
             )
-        else:
+
+        if delete["status"] == missing_status_code:
             result["changed"] = False
             result.update(
                 result={
                     "status": delete["status"],
                     "msg": delete.get("msg"),
-                    "response": "Failed to delete secret",
+                    "response": "Secret not found",
                 },
             )
+
     module.exit_json(**result)
 
 
