@@ -6,37 +6,47 @@
 DOCUMENTATION = r'''
 ---
 module: uv_python
-short_description: Manage Python versions and installations using uv.
+short_description: Manage Python versions and installations using uv Python package manager.
 description:
-  - Install, uninstall or upgrade Python versions managed by uv. 
-version_added: "1.0.0"
+  - Install, uninstall or upgrade Python versions managed by C(uv).
+version_added: "0.1.8"
 requirements:
-  - uv must be installed and available on PATH
-  - uv version should be at least 0.8.0
-deprecated:
-author: Mariam Ahhttouche (@mriamah)
+  - uv must be installed and available in PATH.
+  - uv version must be at least 0.8.0.
 options:
   version:
-    description: 
-      - Python version to manage. 
-      - Expected formats are "X", "X.Y" or "X.Y.Z".
+    description:
+      - Python version to manage.
+      - Only L(canonical Python versions, https://peps.python.org/pep-0440/) are supported in this release such as C(3), C(3.12), C(3.12.3), C(3.15.0a5).
+      - Advanced uv selectors such as C(>=3.12,<3.13) or C(cpython@3.12) are not supported in this release.
+      - When specifying only a major or major.minor version, behavior depends on the O(state) parameter.
     type: str
     required: true
   state:
-    description: Desired state of the specified Python version.
+    description:
+      - Desired state of the specified Python version.
+      - C(present) ensures the specified version is installed. If a full patch version is specified (for example C(3.12.3)), that exact version will be installed if not already present. If only a minor version is specified (for example 3.12), the latest available patch version for that minor release is installed only if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)). RV(python_versions) and RV(python_paths) lengths are always equal to one for this state. Uses C(uv python install) command.
+      - C(absent) ensures the specified version is removed. If a full patch version is specified, only that exact patch version is removed. If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed. If the specified version is not installed, no changes are made. RV(python_versions) and RV(python_paths) lengths can be higher or equal to one for this state. Uses C(uv python uninstall) command.
+      - C(latest) ensures the latest available patch version for the specified version is installed. If only a minor version is specified (for example C(3.12)), the latest available patch version for that minor release is always installed. If another patch version is already installed but is not the latest, the latest patch version is installed. The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release. RV(python_versions) and RV(python_paths) lengths are always equal to one for this state. This state does not use C(uv python upgrade).
     type: str
     choices: [present, absent, latest]
     default: present
-seealso: 
-  - https://docs.astral.sh/uv/concepts/python-versions/
-  - https://docs.astral.sh/uv/reference/cli/#uv-python
 attributes:
-  - check_mode:
+  check_mode:
       description: Can run in check_mode and return changed status prediction without modifying target.
       support: full
-  - diff_mode:
+  diff_mode:
       description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
       support: none
+notes:
+seealso:
+- name: uv documentation
+  description: Python versions management with uv.
+  link: https://docs.astral.sh/uv/concepts/python-versions/
+- name: uv CLI documentation
+  description: uv CLI reference guide.
+  link: https://docs.astral.sh/uv/reference/cli/#uv-python
+author: Mariam Ahhttouche (@mriamah)
 
 '''
 
@@ -47,7 +57,7 @@ EXAMPLES = r'''
 
 - name: Remove Python 3.13.5
   mriamah.uv_python:
-    version: "3.13.5"
+    version: 3.13.5
     state: absent
 
 - name: Upgrade python 3
@@ -66,29 +76,39 @@ python_paths:
   returned: success
   type: list
 stdout:
-  description: Stdout of command run.
+  description: Stdout of the executed command.
   returned: success
   type: str
 stderr:
-  description: Stderr of command run.
+  description: Stderr of the executed command.
   returned: success
   type: str
 rc:
-  description: Return code of command run.
+  description: Return code of the executed command.
   returned: success
   type: int
 '''
 
 import json
+import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.compat.version import LooseVersion
+from ansible.module_utils.basic import missing_required_lib
+
+LIB_IMP_ERR = None
+HAS_LIB = False
+try:
+    from packaging.version import Version, InvalidVersion
+    HAS_LIB = True
+except:
+    LIB_IMP_ERR = traceback.format_exc()
 
 
 MINIMUM_UV_VERSION = "0.8.0"
 
 class UV:
     """
-      Module for "uv python" command
+      Module for managing Python versions and installations using "uv python" command
     """
 
     def __init__(self, module):
@@ -96,13 +116,12 @@ class UV:
         self._ensure_min_uv_version()
         python_version = module.params["version"]
         try:
-          self.python_version = LooseVersion(python_version)
+          self.python_version = Version(python_version)
           self.python_version_str = self.python_version.__str__()
-        except ValueError as err:
+        except InvalidVersion:
           self.module.fail_json(
-            msg=err
+            msg="Unsupported version format. Only canonical Python versions (e.g. 3, 3.12, 3.12.3, 3.15.0a5) are supported in this release."
           )
-
 
     def _ensure_min_uv_version(self):
       cmd = [self.module.get_bin_path("uv", required=True), "--version", "--color", "never"]
@@ -114,7 +133,6 @@ class UV:
               detected_version=detected,
               required_version=MINIMUM_UV_VERSION,
           )
-
 
     def install_python(self):
       """
@@ -133,9 +151,9 @@ class UV:
               If the install command exits with a non-zero return code.
               If specified version is not available for download.
       """
-      find_rc, existing_version, _ = self._find_python(self.python_version_str, "--show-version")
+      find_rc, existing_version, _ = self._find_python("--show-version")
       if find_rc == 0:
-        _, version_path, _ = self._find_python(self.python_version_str)
+        _, version_path, _ = self._find_python()
         return False, "", "", 0, [existing_version], [version_path]
       if self.module.check_mode:
         latest_version, _ = self._get_latest_patch_release("--managed-python")
@@ -143,11 +161,9 @@ class UV:
         if not latest_version:
           self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
         return True, "", "", 0, [latest_version], [""]
-
       rc, out, err = self._exec(self.python_version_str, "install", check_rc=True)
       latest_version, path = self._get_latest_patch_release("--only-installed", "--managed-python")
       return True, out, err, rc, [latest_version], [path]
-
 
     def uninstall_python(self):
       """
@@ -170,10 +186,8 @@ class UV:
         return False, "", "", 0, [], []
       if self.module.check_mode:
         return True, "", "", 0, installed_versions, install_paths
-      
       rc, out, err = self._exec(self.python_version_str, "uninstall", check_rc=True)
       return True, out, err, rc, installed_versions, install_paths
-    
 
     def upgrade_python(self):
       """
@@ -191,21 +205,21 @@ class UV:
               If the install command exits with a non-zero return code.
               If resolved patch version is not available for download.
       """
-      rc, installed_version, _ = self._find_python(self.python_version_str, "--show-version")
-      latest_version, _ = self._get_latest_patch_release("--managed-python")
-      if not latest_version:
+      rc, installed_version_str, _ = self._find_python("--show-version")
+      installed_version = self._parse_version(installed_version_str)
+      latest_version_str, _ = self._get_latest_patch_release("--managed-python")
+      if not latest_version_str:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
-      if rc == 0 and LooseVersion(installed_version) >= LooseVersion(latest_version):
-          _, install_path, _ = self._find_python(self.python_version_str)
-          return False, "", "", rc, [installed_version], [install_path]
+      if rc == 0 and installed_version >= Version(latest_version_str):
+          _, install_path, _ = self._find_python()
+          return False, "", "", rc, [installed_version.__str__()], [install_path]
       if self.module.check_mode:
-          return True, "", "", 0, [latest_version], []
+          return True, "", "", 0, [latest_version_str], []
       # it's possible to have latest version already installed but not used as default 
       # so in this case 'uv python install' will set latest version as default
-      rc, out, err = self._exec(latest_version, "install", check_rc=True)
-      latest_version, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
-      return True, out, err, rc, [latest_version], [latest_path]
-
+      rc, out, err = self._exec(latest_version_str, "install", check_rc=True)
+      latest_version_str, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
+      return True, out, err, rc, [latest_version_str], [latest_path]
 
     def _exec(self, python_version, command, *args, check_rc=False):
       """
@@ -226,14 +240,12 @@ class UV:
       rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
       return rc, out, err
 
-
-    def _find_python(self, python_version, *args, check_rc=False):
+    def _find_python(self, *args, check_rc=False):
       """
         Runs command 'uv python find' which returns path of installed patch releases for a given python version.
         If multiple patch versions are installed, "uv python find" returns the one used by default 
         if inside a virtualenv otherwise it returns latest installed patch version.
         Args:
-          python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
           *args: Additional positional arguments passed to _exec.
           check_rc (bool): Whether to fail if the command exits with non-zero return code.
         Returns:
@@ -243,18 +255,16 @@ class UV:
           AnsibleModuleFailJson:
             If check_rc is True and the command exits with a non-zero return code.
       """
-      rc, out, err = self._exec(python_version, "find", *args, check_rc=check_rc)
+      rc, out, err = self._exec(self.python_version_str, "find", *args, check_rc=check_rc)
       if rc == 0:
         out = out.strip()
       return rc, out, err
 
-
-    def _list_python(self, python_version, *args, check_rc=False):
+    def _list_python(self, *args, check_rc=False):
       """
         Runs command 'uv python list' (which returns list of installed patch releases for a given python version).
         Official documentation https://docs.astral.sh/uv/reference/cli/#uv-python-list
         Args:
-          python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
           *args: Additional positional arguments passed to _exec.
           check_rc (bool): Whether to fail if the command exits with non-zero return code.
         Returns:
@@ -264,14 +274,13 @@ class UV:
           AnsibleModuleFailJson:
             If check_rc is True and the command exits with a non-zero return code.
       """
-      rc, out, err = self._exec(python_version, "list", "--output-format", "json", *args, check_rc=check_rc)
+      rc, out, err = self._exec(self.python_version_str, "list", "--output-format", "json", *args, check_rc=check_rc)
       try:
         out = json.loads(out)
       except json.decoder.JSONDecodeError:
         # This happens when no version is found
         pass
       return rc, out, err
-
 
     def _get_latest_patch_release(self, *args):
       """
@@ -284,13 +293,13 @@ class UV:
             - installation path of latest patch version if version exists
       """
       latest_version = path = ""
-      _, results, _ = self._list_python(self.python_version_str, *args) # uv returns versions in descending order but we sort them just in case future uv behavior changes
-      if results:
-        version = max(results, key=lambda item: (item["version_parts"]["major"], item["version_parts"]["minor"], item["version_parts"]["patch"]))
-        latest_version = version["version"]
-        path = version["path"] if version["path"] else ""
+      _, results, _ = self._list_python(*args) # uv returns versions in descending order but we sort them just in case future uv behavior changes
+      valid_results = self._parse_versions(results)
+      if valid_results:
+        version = max(valid_results, key=lambda result: result["parsed_version"])
+        latest_version = version.get("version", "")
+        path = version.get("path", "")
       return latest_version, path
-
 
     def _get_installed_versions(self, *args):
       """
@@ -302,11 +311,28 @@ class UV:
             - list of latest found patch versions
             - list of installation paths of installed versions
       """
-      _, results, _ = self._list_python(self.python_version_str, "--only-installed", *args)
+      _, results, _ = self._list_python("--only-installed", *args)
       if results:
         return [result["version"] for result in results], [result["path"] for result in results]
       return [], []
 
+    @staticmethod
+    def _parse_versions(results):
+      valid_results =[]
+      for result in results:
+        try:
+          result["parsed_version"] = Version(result.get("version", ""))
+          valid_results.append(result)
+        except InvalidVersion:
+            continue
+      return valid_results
+
+    @staticmethod
+    def _parse_version(version_str):
+      try:
+          return Version(version_str)
+      except InvalidVersion:
+          return Version("0")
 
 
 def main():
@@ -318,6 +344,10 @@ def main():
         supports_check_mode=True
     )
 
+    if not HAS_LIB:
+      module.fail_json(msg=missing_required_lib("packaging"),
+                     exception=LIB_IMP_ERR)
+    
     result = dict(
         changed=False,
         stdout="",
