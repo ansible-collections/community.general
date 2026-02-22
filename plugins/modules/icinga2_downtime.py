@@ -51,7 +51,7 @@ options:
     type: int
   end_time:
     description:
-      - End time of the downtime as Unix timestamp.
+      - End time of the downtime as UNIX timestamp.
     type: int
   filter_vars:
     description:
