@@ -63,6 +63,7 @@ class UV:
 
     def __init__(self, module):
         self.module = module
+        self._ensure_min_uv_version()
         python_version = module.params["version"]
         try:
           self.python_version = LooseVersion(python_version)
@@ -70,6 +71,18 @@ class UV:
         except ValueError as err:
           self.module.fail_json(
             msg=err
+          )
+
+
+    def _ensure_min_uv_version(self):
+      cmd = [self.module.get_bin_path("uv", required=True), "--version"]
+      _, out, _ = self.module.run_command(cmd, check_rc=True)
+      detected = out.strip().split()[-1]
+      if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
+          self.module.fail_json(
+              msg=f"uv_python module requires uv >= {MINIMUM_UV_VERSION}",
+              detected_version=detected,
+              required_version=MINIMUM_UV_VERSION,
           )
 
 
