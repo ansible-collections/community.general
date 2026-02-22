@@ -4,8 +4,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# ruff: noqa: D100,E402,EXE001,PLR0913,RUF059
-
 from __future__ import annotations
 
 DOCUMENTATION = r"""
