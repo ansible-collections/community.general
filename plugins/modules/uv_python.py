@@ -80,15 +80,26 @@ rc:
 '''
 
 import json
+import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.compat.version import LooseVersion
+from ansible.module_utils.basic import missing_required_lib
+
+LIB_IMP_ERR = None
+HAS_LIB = False
+try:
+    from packaging.version import Version, InvalidVersion
+    HAS_LIB = True
+except:
+    HAS_LIB = False
+    LIB_IMP_ERR = traceback.format_exc()
 
 
 MINIMUM_UV_VERSION = "0.8.0"
 
 class UV:
     """
-      Module for "uv python" command
+      Module for managing Python versions and installations using "uv python" command
     """
 
     def __init__(self, module):
@@ -96,13 +107,12 @@ class UV:
         self._ensure_min_uv_version()
         python_version = module.params["version"]
         try:
-          self.python_version = LooseVersion(python_version)
+          self.python_version = Version(python_version)
           self.python_version_str = self.python_version.__str__()
-        except ValueError as err:
+        except InvalidVersion:
           self.module.fail_json(
-            msg=err
+            msg="Unsupported version format. Only canonical Python versions (e.g. 3, 3.12, 3.12.3) are supported in this release."
           )
-
 
     def _ensure_min_uv_version(self):
       cmd = [self.module.get_bin_path("uv", required=True), "--version", "--color", "never"]
@@ -114,7 +124,6 @@ class UV:
               detected_version=detected,
               required_version=MINIMUM_UV_VERSION,
           )
-
 
     def install_python(self):
       """
@@ -143,11 +152,9 @@ class UV:
         if not latest_version:
           self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
         return True, "", "", 0, [latest_version], [""]
-
       rc, out, err = self._exec(self.python_version_str, "install", check_rc=True)
       latest_version, path = self._get_latest_patch_release("--only-installed", "--managed-python")
       return True, out, err, rc, [latest_version], [path]
-
 
     def uninstall_python(self):
       """
@@ -170,10 +177,8 @@ class UV:
         return False, "", "", 0, [], []
       if self.module.check_mode:
         return True, "", "", 0, installed_versions, install_paths
-      
       rc, out, err = self._exec(self.python_version_str, "uninstall", check_rc=True)
       return True, out, err, rc, installed_versions, install_paths
-    
 
     def upgrade_python(self):
       """
@@ -191,21 +196,21 @@ class UV:
               If the install command exits with a non-zero return code.
               If resolved patch version is not available for download.
       """
-      rc, installed_version, _ = self._find_python(self.python_version_str, "--show-version")
-      latest_version, _ = self._get_latest_patch_release("--managed-python")
-      if not latest_version:
+      rc, installed_version_str, _ = self._find_python(self.python_version_str, "--show-version")
+      installed_version = self._parse_version(installed_version_str)
+      latest_version_str, _ = self._get_latest_patch_release("--managed-python")
+      if not latest_version_str:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
-      if rc == 0 and LooseVersion(installed_version) >= LooseVersion(latest_version):
+      if rc == 0 and installed_version >= Version(latest_version_str):
           _, install_path, _ = self._find_python(self.python_version_str)
-          return False, "", "", rc, [installed_version], [install_path]
+          return False, "", "", rc, [installed_version.__str__()], [install_path]
       if self.module.check_mode:
-          return True, "", "", 0, [latest_version], []
+          return True, "", "", 0, [latest_version_str], []
       # it's possible to have latest version already installed but not used as default 
       # so in this case 'uv python install' will set latest version as default
-      rc, out, err = self._exec(latest_version, "install", check_rc=True)
-      latest_version, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
-      return True, out, err, rc, [latest_version], [latest_path]
-
+      rc, out, err = self._exec(latest_version_str, "install", check_rc=True)
+      latest_version_str, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
+      return True, out, err, rc, [latest_version_str], [latest_path]
 
     def _exec(self, python_version, command, *args, check_rc=False):
       """
@@ -225,7 +230,6 @@ class UV:
       cmd = [self.module.get_bin_path("uv", required=True), "python", command, python_version, "--color", "never", *args]
       rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
       return rc, out, err
-
 
     def _find_python(self, python_version, *args, check_rc=False):
       """
@@ -247,7 +251,6 @@ class UV:
       if rc == 0:
         out = out.strip()
       return rc, out, err
-
 
     def _list_python(self, python_version, *args, check_rc=False):
       """
@@ -272,7 +275,6 @@ class UV:
         pass
       return rc, out, err
 
-
     def _get_latest_patch_release(self, *args):
       """
         Returns latest available patch release for a given python version.
@@ -285,12 +287,12 @@ class UV:
       """
       latest_version = path = ""
       _, results, _ = self._list_python(self.python_version_str, *args) # uv returns versions in descending order but we sort them just in case future uv behavior changes
-      if results:
-        version = max(results, key=lambda item: (item["version_parts"]["major"], item["version_parts"]["minor"], item["version_parts"]["patch"]))
+      valid_results = self._parse_versions(results)
+      if valid_results:
+        version = max(valid_results, key=lambda result: result["parsed_version"])
         latest_version = version["version"]
         path = version["path"] if version["path"] else ""
       return latest_version, path
-
 
     def _get_installed_versions(self, *args):
       """
@@ -307,6 +309,23 @@ class UV:
         return [result["version"] for result in results], [result["path"] for result in results]
       return [], []
 
+    @staticmethod
+    def _parse_versions(results):
+      valid_results =[]
+      for result in results:
+        try:
+          result["parsed_version"] = Version(result["version"])
+          valid_results.append(result)
+        except InvalidVersion:
+            continue
+      return valid_results
+
+    @staticmethod
+    def _parse_version(version_str):
+      try:
+          return Version(version_str)
+      except InvalidVersion:
+          return Version("0")
 
 
 def main():
@@ -318,6 +337,10 @@ def main():
         supports_check_mode=True
     )
 
+    if not HAS_LIB:
+      module.fail_json(msg=missing_required_lib("packaging"),
+                     exception=LIB_IMP_ERR)
+    
     result = dict(
         changed=False,
         stdout="",
