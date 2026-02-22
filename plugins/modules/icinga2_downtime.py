@@ -70,7 +70,7 @@ options:
     type: int
   end_time:
     description:
-      - End time of the downtime as unix timestamp.
+      - End time of the downtime as Unix timestamp.
     type: int
   filter_vars:
     description:
@@ -99,7 +99,7 @@ options:
     default: Host
   start_time:
     description:
-      - Start time of the downtime as unix timestamp.
+      - Start time of the downtime as Unix timestamp.
     type: int
   state:
     description:
@@ -154,7 +154,7 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-# Returns the results of downtime scheduling as a list of JSON dictionaries from the Icinga 2 API under the C(downtimes) key.
+# Returns the results of downtime scheduling as a list of JSON dictionaries from the Icinga 2 API under the C(results) key.
 # Refer to https://icinga.com/docs/icinga-2/latest/doc/12-icinga2-api/#schedule-downtime for more details.
 results:
   description: Results of downtime scheduling or removal
