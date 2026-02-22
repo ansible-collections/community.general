@@ -80,7 +80,7 @@ options:
     default: Host
   start_time:
     description:
-      - Start time of the downtime as Unix timestamp.
+      - Start time of the downtime as UNIX timestamp.
     type: int
   state:
     description:
