@@ -13,36 +13,17 @@ version_added: "12.4.0"
 description:
   - Manages downtimes in Icinga 2 through its REST API.
   - Options as described at U(https://icinga.com/docs/icinga-2/latest/doc/12-icinga2-api/#schedule-downtime).
-  - Check mode is not supported. In case of a complex filter expression, it may become very complex to decide
-    whether downtime creation or removal will succeed and trigger a change.
 author:
   - Christoph Fiehe (@cfiehe)
 attributes:
   check_mode:
     support: none
+    details:
+      - In case of a complex filter expression, it may become very complex to decide
+        whether downtime creation or removal will succeed and trigger a change.
   diff_mode:
     support: none
 options:
-  url:
-    description:
-      - URL of the Icinga 2 API.
-    type: str
-    required: true
-  ca_path:
-    description:
-      - CA certificates bundle to use to verify the Icinga 2 server certificate.
-    type: path
-  validate_certs:
-    description:
-      - If V(false), SSL certificates will not be validated.
-      - This should only be used on personally controlled sites using self-signed certificates.
-    type: bool
-    default: true
-  timeout:
-    description:
-      - How long to wait for the server to send data before giving up.
-    type: int
-    default: 10
   all_services:
     description:
       - Whether downtimes should be created for all services of the matched host objects.
@@ -112,8 +93,9 @@ options:
       - Name of the downtime trigger.
     type: str
 extends_documentation_fragment:
-  - ansible.builtin.url
+  - community.general.icinga2_api
   - community.general.attributes
+  - ansible.builtin.url
 """
 
 EXAMPLES = r"""
