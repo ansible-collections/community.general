@@ -178,7 +178,7 @@ def test_delete_dne_repo_secret(fetch_url_mock):
     result = exc.value.args[0]
     assert result["changed"] is False
     assert result["result"]["status"] == 404
-    assert result["result"]["response"] == "Failed to delete secret"
+    assert result["result"]["response"] == "Secret not found"
 
 
 def test_fail_get_public_key(fetch_url_mock):
@@ -218,3 +218,20 @@ def test_fail_upsert_secret(fetch_url_mock):
         with pytest.raises(AnsibleFailJson) as exc:
             github_secrets.main()
     assert "Failed to upsert secret" in exc.value.args[0]["msg"]
+
+
+def test_fail_delete_secret(fetch_url_mock):
+    fetch_url_mock.return_value = make_fetch_url_response({}, status=503)
+
+    with set_module_args(
+        {
+            "organization": "myorg",
+            "repository": "myrepo",
+            "key": "MY_SECRET",
+            "state": "absent",
+            "token": "ghp_test_token",
+        }
+    ):
+        with pytest.raises(AnsibleFailJson) as exc:
+            github_secrets.main()
+    assert "Failed to delete secret" in exc.value.args[0]["msg"]
