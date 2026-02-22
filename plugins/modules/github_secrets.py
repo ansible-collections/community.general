@@ -220,9 +220,6 @@ def delete_secret(
         method="DELETE",
     )
 
-    if info["status"] != delete_response_code:
-        module.fail_json(msg=f"Failed to delete secret: {info}")
-
     return info
 
 
@@ -335,15 +332,24 @@ def main() -> None:
             key,
         )
 
-        result["changed"] = True
-        result.update(
-            result={
-                "status": delete["status"],
-                "msg": delete.get("msg"),
-                "response": "Secret deleted",
-            },
-        )
-
+        if delete["status"] == delete_response_code:
+            result["changed"] = True
+            result.update(
+                result={
+                    "status": delete["status"],
+                    "msg": delete.get("msg"),
+                    "response": "Secret deleted",
+                },
+            )
+        else:
+            result["changed"] = False
+            result.update(
+                result={
+                    "status": delete["status"],
+                    "msg": delete.get("msg"),
+                    "response": "Failed to delete secret",
+                },
+            )
     module.exit_json(**result)
 
 
