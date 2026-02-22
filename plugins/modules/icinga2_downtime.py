@@ -93,7 +93,7 @@ options:
       - Name of the downtime trigger.
     type: str
 extends_documentation_fragment:
-  - community.general.icinga2_api
+  - community.general._icinga2_api
   - community.general.attributes
   - ansible.builtin.url
 """
