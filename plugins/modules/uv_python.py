@@ -17,7 +17,7 @@ options:
   version:
     description: 
       - Python version to manage. 
-      - Expected formats are "X.Y" or "X.Y.Z".
+      - Expected formats are "X", "X.Y" or "X.Y.Z".
     type: str
     required: true
   state:
@@ -50,8 +50,10 @@ python:
 
 import json
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.compat.version import StrictVersion
+from ansible.module_utils.compat.version import LooseVersion
 
+
+MINIMUM_UV_VERSION = "0.8.0"
 
 class UV:
     """
@@ -63,14 +65,11 @@ class UV:
         self.module = module
         python_version = module.params["version"]
         try:
-          self.python_version = StrictVersion(python_version)
+          self.python_version = LooseVersion(python_version)
           self.python_version_str = self.python_version.__str__()
-        except ValueError:
+        except ValueError as err:
           self.module.fail_json(
-            msg=(
-                f"Invalid version {python_version}. "
-                "Expected formats are X.Y or X.Y.Z"
-            )
+            msg=err
           )
 
 
@@ -153,12 +152,13 @@ class UV:
       latest_version, _ = self._get_latest_patch_release("--managed-python")
       if not latest_version:
          self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
-      if rc == 0 and StrictVersion(installed_version) >= StrictVersion(latest_version):
+      if rc == 0 and LooseVersion(installed_version) >= LooseVersion(latest_version):
           _, install_path, _ = self._find_python(self.python_version_str)
           return False, "", "", rc, [installed_version], [install_path]
       if self.module.check_mode:
           return True, "", "", 0, [latest_version], []
-      # it's possible to have latest version already installed but not used as default so in this case 'uv python install' will set latest version as default
+      # it's possible to have latest version already installed but not used as default 
+      # so in this case 'uv python install' will set latest version as default
       rc, out, err = self._exec(latest_version, "install", check_rc=True)
       latest_version, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
       return True, out, err, rc, [latest_version], [latest_path]
@@ -187,7 +187,8 @@ class UV:
     def _find_python(self, python_version, *args, check_rc=False):
       """
         Runs command 'uv python find' which returns path of installed patch releases for a given python version.
-        If multiple patch versions are installed, "uv python find" returns the one used by default if inside a virtualenv otherwise it returns latest installed patch version.
+        If multiple patch versions are installed, "uv python find" returns the one used by default 
+        if inside a virtualenv otherwise it returns latest installed patch version.
         Args:
           python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
           *args: Additional positional arguments passed to _exec.
