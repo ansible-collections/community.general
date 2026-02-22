@@ -8,7 +8,7 @@ DOCUMENTATION = r'''
 module: uv_python
 short_description: Manage Python versions and installations using uv.
 description:
-  - Install, remove or upgrade Python versions managed by uv. 
+  - Install, uninstall or upgrade Python versions managed by uv. 
 version_added: "X.Y"
 requirements:
   - uv must be installed and available on PATH
@@ -105,7 +105,7 @@ class UV:
 
 
     def _ensure_min_uv_version(self):
-      cmd = [self.module.get_bin_path("uv", required=True), "--version"]
+      cmd = [self.module.get_bin_path("uv", required=True), "--version", "--color", "never"]
       _, out, _ = self.module.run_command(cmd, check_rc=True)
       detected = out.strip().split()[-1]
       if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
@@ -222,7 +222,7 @@ class UV:
           AnsibleModuleFailJson:
               If check_rc is True and the command exits with a non-zero return code.
       """
-      cmd = [self.module.get_bin_path("uv", required=True), "python", command, python_version, *args]
+      cmd = [self.module.get_bin_path("uv", required=True), "python", command, python_version, "--color", "never", *args]
       rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
       return rc, out, err
 
