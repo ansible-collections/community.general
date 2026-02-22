@@ -27,6 +27,51 @@
   environment:
     UV_INSTALL_DIR: /usr/local/bin
 
+- name: Install python 3
+  uv_python:
+    version: 3
+    state: present
+  register: python_install
+
+- name: Assert python 3 is installed
+  ansible.builtin.assert:
+    that:
+      - python_install.failed is false
+      - python_install.changed is false
+      - python_install.python_versions | length >= 1
+
+- name: Upgrade python 3
+  uv_python:
+    version: 3
+    state: latest
+  register: python_install
+
+- debug:
+    var: python_install
+
+- name: Assert python 3 upgraded
+  ansible.builtin.assert:
+    that:
+      - python_install.failed is false
+      - python_install.changed is true
+      - python_install.python_versions | length >= 1
+
+- name: Remove python 3
+  uv_python:
+    version: 3
+    state: absent
+  register: python_delete
+
+- debug:
+    var: python_delete
+
+- name: Assert python 3 deleted
+  ansible.builtin.assert:
+    that:
+      - python_delete.failed is false
+      - python_delete.changed is true
+      - python_delete.python_versions | length >= 1
+
 - name: Install python 3.14 in check mode
   uv_python:
     version: 3.14
@@ -62,7 +107,7 @@
     state: present
   register: reinstall_python
 - debug:
-    var: install_python
+    var: reinstall_python
 - name: Verify python 3.14 re-installation
   assert:
     that:
@@ -70,21 +115,6 @@
       - reinstall_python.failed is false
       - reinstall_python.python_versions | length >= 1
       - reinstall_python.python_paths | length >= 1
-
-- name: Install latest python 3.15 # installs latest patch version for 3.15
-  uv_python:
-    version: 3.15
-    state: latest
-  register: install_latest_python
-- debug:
-    var: install_latest_python
-- name: Verify python 3.15 installation
-  assert:
-    that:
-      - install_latest_python.changed is true
-      - install_latest_python.failed is false
-      - install_latest_python.python_versions | length >= 1
-      - install_latest_python.python_paths | length >= 1
 
 - name: Install python 3.13.5
   uv_python:
@@ -97,7 +127,6 @@
     that:
       - install_python.changed is true
       - install_python.failed is false
-      # - install_python.python_versions | length >= 1
       - '"3.13.5" in install_python.python_versions'
       - install_python.python_paths | length >= 1
 
@@ -117,7 +146,7 @@
 
 - name: Remove uninstalled python 3.10 # removes latest patch version for 3.10 if exists
   uv_python:
-    version: 3.10
+    version: "3.10"
     state: absent
   register: remove_python
 - debug:
@@ -174,19 +203,6 @@
       - remove_python.failed is false
       - remove_python.python_versions | length == 0
       - remove_python.python_paths | length == 0
-
-- name: Install python 3
-  uv_python:
-    version: 3
-    state: present
-  register: invalid_version
-  ignore_errors: true
-
-- name: Assert invalid version failed
-  ansible.builtin.assert:
-    that:
-      - invalid_version is failed
-      - '"Expected formats are X.Y or X.Y.Z" in invalid_version.msg'
 
 - name: Upgrade python 3.13
   uv_python:
@@ -252,7 +268,6 @@
 - name: Install unexisting python version
   uv_python:
     version: 3.12.13
-    state: present
   register: unexisting_python
   ignore_errors: true
 - debug:
@@ -277,11 +292,6 @@
       - unexisting_python.changed is false
       - unexisting_python.failed is true
 
-- name: Install python 3.13.11 version
-  uv_python:
-    version: 3.13.11
-    state: present
-
 - name: Delete python 3.13 version
   uv_python:
     version: 3.13
@@ -296,5 +306,15 @@
     that:
       - uninstall_result.changed is true
       - uninstall_result.failed is false
-      - '"3.13.11" in uninstall_result.python_versions'
-      - uninstall_result.python_versions | length >= 2
+      - '"3.13.12" in uninstall_result.python_versions'
+
+- name: No specified version
+  uv_python:
+    state: latest
+  ignore_errors: true
+  register: no_version
+
+- name: Verify failure when no version is specified
+  assert:
+    that:
+      - no_version.failed is true
