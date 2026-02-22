@@ -23,6 +23,7 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: none
+    details: The module needs to interact with the GitHub API, which does not support check mode.
   diff_mode:
     support: none
 options:
@@ -35,6 +36,7 @@ options:
   repository:
     description:
       - The name of the repository.
+      - If not provided, the secret will be managed at the organization level.
     type: str
     aliases: ["repo"]
   key:
