@@ -194,7 +194,7 @@ results:
 error:
   description: Error message as JSON dictionary returned from the Icinga 2 API.
   type: dict
-  returned: if downtime scheduling or removal did not succeed.
+  returned: if downtime scheduling or removal did not succeed
   sample:
     {
       "error": 404,
