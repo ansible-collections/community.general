@@ -6,24 +6,30 @@
 DOCUMENTATION = r'''
 ---
 module: uv_python
-short_description: Manage Python versions and installations using uv.
+short_description: Manage Python versions and installations using C(uv) Python package manager.
 description:
-  - Install, uninstall or upgrade Python versions managed by uv. 
+  - Install, uninstall or upgrade Python versions managed by C(uv). 
 version_added: "1.0.0"
 requirements:
-  - uv must be installed and available on PATH
-  - uv version should be at least 0.8.0
+  - C(uv) must be installed and available on PATH.
+  - C(uv) version should be at least C(0.8.0).
 deprecated:
 author: Mariam Ahhttouche (@mriamah)
 options:
   version:
     description: 
       - Python version to manage. 
-      - Expected formats are "X", "X.Y" or "X.Y.Z".
+      - Only canonical Python versions are supported in this release such as C(3), C(3.12), or C(3.12.3).
+      - Advanced uv selectors such as C(>=3.12,<3.13) or C(cpython@3.12) are not supported in this release.
+      - When specifying only a major or major.minor version, behavior depends on state parameter.
     type: str
     required: true
   state:
-    description: Desired state of the specified Python version.
+    description: 
+      - Desired state of the specified Python version.
+      - C(present) ensures the specified version is installed.
+      - C(absent) ensures the specified version is removed.
+      - C(latest) ensures the latest available patch version for the specified version is installed.
     type: str
     choices: [present, absent, latest]
     default: present
@@ -37,7 +43,24 @@ attributes:
   - diff_mode:
       description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
       support: none
+notes:
+  - |
+    State behavior:
 
+    * O(state=present)
+      - If a full patch version is specified (for example 3.12.3), that exact version will be installed if not already present.
+      - If only a minor version is specified (for example 3.12), the latest available patch version for that minor release will be installed ONLY if no patch version for that minor release is currently installed including patch versions not managed by C(uv).
+
+    * O(state=absent)
+      - If a full patch version is specified, only that exact patch version is removed.
+      - If only a minor version is specified (for example 3.12), all installed patch versions for that minor release are removed.
+      - If the specified version is not installed, no changes are made.
+
+    * O(state=latest)
+      - If only a minor version is specified (for example 3.12), the latest available patch version for that minor release will always be installed.
+      - If another patch version is already installed but is not the latest, the latest patch version will be installed.
+      - This state does not use C(uv python upgrade).
+      - The latest patch installed depends on the uv version, since available Python versions are frozen per uv release.
 '''
 
 EXAMPLES = r'''
