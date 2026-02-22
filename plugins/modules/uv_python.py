@@ -6,13 +6,15 @@
 DOCUMENTATION = r'''
 ---
 module: uv_python
-short_description: Manage Python installations using uv.
+short_description: Manage Python versions and installations using uv.
 description:
-  - Install, remove or upgrade Python versions managed by uv.
+  - Install, remove or upgrade Python versions managed by uv. 
 version_added: "X.Y"
 requirements:
   - uv must be installed and available on PATH
-  - uv >= 0.8.0
+  - uv version should be at least 0.8.0
+deprecated:
+author: Mariam Ahhttouche (@mriamah)
 options:
   version:
     description: 
@@ -25,27 +27,56 @@ options:
     type: str
     choices: [present, absent, latest]
     default: present
-author:
-  - Mariam Ahhttouche (@mriamah)
-deprecated:
+seealso: 
+  - https://docs.astral.sh/uv/concepts/python-versions/
+  - https://docs.astral.sh/uv/reference/cli/#uv-python
+attributes:
+  - check_mode:
+      description: Can run in check_mode and return changed status prediction without modifying target.
+      support: full
+  - diff_mode:
+      description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
+      support: none
+
 '''
 
 EXAMPLES = r'''
-- name: Install Python 3.12
-  uv_python:
-    version: "3.12"
+- name: Install Python 3.14
+  mriamah.uv_python:
+    version: "3.14"
 
-- name: Remove Python 3.11
-  uv_python:
-    version: "3.11"
+- name: Remove Python 3.13.5
+  mriamah.uv_python:
+    version: "3.13.5"
     state: absent
+
+- name: Upgrade python 3
+  mriamah.uv_python:
+    version: 3
+    state: latest
 '''
 
 RETURN = r'''
-python:
-  description: Installed Python info
-  returned: when state=present
-  type: dict
+python_versions:
+  description: List of Python versions changed.
+  returned: success
+  type: list
+python_paths:
+  description: List of installation paths of Python versions changed.
+  returned: success
+  type: list
+stdout:
+  description: Stdout of command run.
+  returned: success
+  type: str
+stderr:
+  description: Stderr of command run.
+  returned: success
+  type: str
+rc:
+  description: Return code of command run.
+  returned: success
+  type: int
 '''
 
 import json
@@ -58,7 +89,6 @@ MINIMUM_UV_VERSION = "0.8.0"
 class UV:
     """
       Module for "uv python" command
-      Official documentation for uv python https://docs.astral.sh/uv/concepts/python-versions/#installing-a-python-version
     """
 
     def __init__(self, module):
