@@ -73,7 +73,7 @@ def test_fail_present_without_value():
             }
         ):
             github_secrets.main()
-    assert "'value' must be provided" in exc.value.args[0]
+    assert "value' parameter cannot be empty" in exc.value.args[0]["details"]
 
 
 def test_fail_org_secret_present_without_visibility():

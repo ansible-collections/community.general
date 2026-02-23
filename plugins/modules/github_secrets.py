@@ -265,6 +265,13 @@ def main() -> None:
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
 
+    if state == "present" and value is None:
+        module.fail_json(
+            msg="Invalid parameters",
+            details="The 'value' parameter cannot be empty",
+            params=module.params,
+        )
+
     if state == "present" and not repository and not visibility:
         module.fail_json(
             msg="Invalid parameters",
