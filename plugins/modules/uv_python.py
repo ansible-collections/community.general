@@ -64,7 +64,7 @@ notes:
       - This state does not use C(uv python upgrade).
       - The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.
       - RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
-      
+
 author: Mariam Ahhttouche (@mriamah)
 '''
 
@@ -316,8 +316,8 @@ class UV:
       valid_results = self._parse_versions(results)
       if valid_results:
         version = max(valid_results, key=lambda result: result["parsed_version"])
-        latest_version = version["version"]
-        path = version["path"] if version["path"] else ""
+        latest_version = version.get("version", "")
+        path = version.get("path", "")
       return latest_version, path
 
     def _get_installed_versions(self, *args):
@@ -340,7 +340,7 @@ class UV:
       valid_results =[]
       for result in results:
         try:
-          result["parsed_version"] = Version(result["version"])
+          result["parsed_version"] = Version(result.get("version", ""))
           valid_results.append(result)
         except InvalidVersion:
             continue
