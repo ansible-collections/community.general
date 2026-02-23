@@ -67,12 +67,13 @@ def test_fail_present_without_value():
                 "organization": "myorg",
                 "repository": "myrepo",
                 "key": "MY_SECRET",
+                "value": None,
                 "state": "present",
                 "token": "ghp_test_token",
             }
         ):
             github_secrets.main()
-    assert "value" in exc.value.args[0]["details"].lower()
+    assert "'value' must be provided" in exc.value.args[0]["details"]
 
 
 def test_fail_org_secret_present_without_visibility():
@@ -87,7 +88,7 @@ def test_fail_org_secret_present_without_visibility():
             }
         ):
             github_secrets.main()
-    assert "visibility" in exc.value.args[0]["details"].lower()
+    assert "'visibility' must be provided" in exc.value.args[0]["details"]
 
 
 def test_create_repo_secret(fetch_url_mock):
@@ -137,6 +138,51 @@ def test_update_repo_secret(fetch_url_mock):
     result = exc.value.args[0]
     assert result["changed"] is True
     assert result["result"]["response"] == "Secret updated"
+
+
+def test_update_empty_repo_secret(fetch_url_mock):
+    fetch_url_mock.side_effect = [
+        make_fetch_url_response(PUBLIC_KEY_PAYLOAD),
+        make_fetch_url_response({}, status=204),
+    ]
+
+    with set_module_args(
+        {
+            "organization": "myorg",
+            "repository": "myrepo",
+            "key": "MY_SECRET",
+            "value": "",
+            "state": "present",
+            "token": "ghp_test_token",
+        }
+    ):
+        with pytest.raises(AnsibleExitJson) as exc:
+            github_secrets.main()
+
+    result = exc.value.args[0]
+    assert result["changed"] is True
+    assert result["result"]["response"] == "Secret updated"
+
+
+def test_update_missing_value_repo_secret(fetch_url_mock):
+    fetch_url_mock.side_effect = [
+        make_fetch_url_response(PUBLIC_KEY_PAYLOAD),
+        make_fetch_url_response({}, status=204),
+    ]
+
+    with set_module_args(
+        {
+            "organization": "myorg",
+            "repository": "myrepo",
+            "key": "MY_SECRET",
+            "state": "present",
+            "token": "ghp_test_token",
+        }
+    ):
+        with pytest.raises(AnsibleFailJson) as exc:
+            github_secrets.main()
+
+    assert "the following are missing: value" in exc.value.args[0]["msg"]
 
 
 def test_delete_repo_secret(fetch_url_mock):
