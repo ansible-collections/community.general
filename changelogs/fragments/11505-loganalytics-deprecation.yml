@@ -1,0 +1,2 @@
+deprecated_features:
+  - loganalytics callback plugin - is deprecated in favor of ``community.general.loganalytics_ingestion`` due to upcoming API changes in Azure Monitor (https://github.com/ansible-collections/community.general/pull/11505).
