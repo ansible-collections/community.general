@@ -2122,3 +2122,15 @@ releases:
       - 10.7.7.yml
       - 11255-monit-integrationtests.yml
     release_date: '2025-12-29'
+  10.7.8:
+    changes:
+      bugfixes:
+        - python_requirements_info - use ``importlib.metadata`` if ``pkg_resources``
+          from ``setuptools`` cannot be imported. That module has been removed from
+          setuptools 82.0.0 (https://github.com/ansible-collections/community.general/issues/11491,
+          https://github.com/ansible-collections/community.general/pull/11492).
+      release_summary: Bugfix release.
+    fragments:
+      - 10.7.8.yml
+      - 11492-python_requires_info.yml
+    release_date: '2026-02-23'
