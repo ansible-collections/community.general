@@ -265,24 +265,10 @@ def main() -> None:
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
 
-    if value is not None and not key:
-        module.fail_json(
-            msg="Invalid parameters",
-            details="When 'value' is provided, 'key' must also be set",
-            params=module.params,
-        )
-
-    if state == "present" and value is None:
-        module.fail_json(
-            msg="Invalid parameters",
-            details="When 'state' is 'present', 'value' must be provided",
-            params=module.params,
-        )
-
     if state == "present" and not repository and not visibility:
         module.fail_json(
             msg="Invalid parameters",
-            details=("When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided"),
+            details="When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided",
             params=module.params,
         )
 
