@@ -136,6 +136,8 @@ files:
   $doc_fragments/hwc.py:
     labels: hwc
     maintainers: $team_huawei
+  $doc_fragments/_icinga2_api.py:
+    maintainers: cfiehe
   $doc_fragments/nomad.py:
     maintainers: chris93111 apecnascimento
   $doc_fragments/pipx.py:
@@ -365,6 +367,8 @@ files:
     keywords: cloud huawei hwc
     labels: huawei hwc_utils networking
     maintainers: $team_huawei
+  $module_utils/_icinga2.py:
+    maintainers: cfiehe
   $module_utils/identity/keycloak/keycloak.py:
     maintainers: $team_keycloak
   $module_utils/identity/keycloak/keycloak_clientsecret.py:
@@ -716,6 +720,8 @@ files:
     maintainers: $team_huawei huaweicloud
   $modules/ibm_sa_:
     maintainers: tzure
+  $modules/icinga2_downtime.py:
+    maintainers: cfiehe
   $modules/icinga2_feature.py:
     maintainers: nerzhul
   $modules/icinga2_host.py:
