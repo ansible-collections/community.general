@@ -46,9 +46,6 @@
     state: latest
   register: python_install
 
-- debug:
-    var: python_install
-
 - name: Assert python 3 upgraded
   ansible.builtin.assert:
     that:
@@ -61,9 +58,6 @@
     version: 3
     state: absent
   register: python_delete
-
-- debug:
-    var: python_delete
 
 - name: Assert python 3 deleted
   ansible.builtin.assert:
@@ -91,8 +85,7 @@
     version: 3.14
     state: present
   register: install_python
-- debug:
-    var: install_python
+
 - name: Verify python 3.14 installation
   assert:
     that:
@@ -106,8 +99,7 @@
     version: 3.14
     state: present
   register: reinstall_python
-- debug:
-    var: reinstall_python
+
 - name: Verify python 3.14 re-installation
   assert:
     that:
@@ -135,8 +127,7 @@
     version: 3.13.5
     state: present
   register: reinstall_python
-- debug:
-    var: reinstall_python
+
 - name: Verify python 3.13.5 installation
   assert:
     that:
@@ -149,8 +140,7 @@
     version: "3.10"
     state: absent
   register: remove_python
-- debug:
-    var: remove_python
+
 - name: Verify python 3.10 deletion
   assert:
     that:
@@ -164,8 +154,7 @@
     state: absent
   check_mode: true
   register: remove_python_in_check_mode
-- debug:
-    var: remove_python_in_check_mode
+
 - name: Verify python 3.13.5 deletion in check mode
   assert:
     that:
@@ -179,8 +168,7 @@
     version: 3.13.5
     state: absent
   register: remove_python
-- debug:
-    var: remove_python
+
 - name: Verify python 3.13.5 deletion
   assert:
     that:
@@ -194,8 +182,7 @@
     version: 3.13.5
     state: absent
   register: remove_python
-- debug:
-    var: remove_python
+
 - name: Verify python 3.13.5 deletion again
   assert:
     that:
@@ -209,8 +196,7 @@
     version: 3.13
     state: latest
   register: upgrade_python
-- debug:
-    var: upgrade_python
+
 - name: Verify python 3.13 upgrade
   assert:
     that:
@@ -225,8 +211,7 @@
     state: latest
   check_mode: yes
   register: upgrade_python
-- debug:
-    var: upgrade_python
+
 - name: Verify python 3.13 upgrade in check mode
   assert:
     that:
@@ -240,8 +225,7 @@
     state: latest
   check_mode: yes
   register: upgrade_python
-- debug:
-    var: upgrade_python
+
 - name: Verify python 3.13 upgrade again
   assert:
     that:
@@ -256,8 +240,7 @@
   register: unexisting_python_check_mode
   ignore_errors: true
   check_mode: true
-- debug:
-    var: unexisting_python_check_mode
+
 - name: Verify unexisting python 3.12.13 install in check mode
   assert:
     that:
@@ -270,8 +253,7 @@
     version: 3.12.13
   register: unexisting_python
   ignore_errors: true
-- debug:
-    var: unexisting_python
+
 - name: Verify unexisting python 3.12.13 install
   assert:
     that:
@@ -284,8 +266,7 @@
     state: latest
   register: unexisting_python
   ignore_errors: true
-- debug:
-    var: unexisting_python
+
 - name: Verify python 3.12.13 install with latest state
   assert:
     that:
@@ -297,9 +278,6 @@
     version: 3.13
     state: absent
   register: uninstall_result
-
-- debug:
-    var: uninstall_result
 
 - name: Verify python 3.13 deletion
   assert:
