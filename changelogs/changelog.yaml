@@ -1917,3 +1917,15 @@ releases:
       - 11377-cloudflare_dns-caa.yml
       - 11440-logstash-plugin-fix-version-argument-order.yml
     release_date: '2026-01-26'
+  11.4.5:
+    changes:
+      bugfixes:
+        - python_requirements_info - use ``importlib.metadata`` if ``pkg_resources``
+          from ``setuptools`` cannot be imported. That module has been removed from
+          setuptools 82.0.0 (https://github.com/ansible-collections/community.general/issues/11491,
+          https://github.com/ansible-collections/community.general/pull/11492).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 11.4.5.yml
+      - 11492-python_requires_info.yml
+    release_date: '2026-02-23'

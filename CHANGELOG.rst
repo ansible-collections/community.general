@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.5
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- python_requirements_info - use ``importlib.metadata`` if ``pkg_resources`` from ``setuptools`` cannot be imported. That module has been removed from setuptools 82.0.0 (https://github.com/ansible-collections/community.general/issues/11491, https://github.com/ansible-collections/community.general/pull/11492).
+
 v11.4.4
 =======
 
