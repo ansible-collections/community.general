@@ -1787,3 +1787,102 @@ releases:
           name: to_toml
           namespace: null
     release_date: '2026-01-26'
+  12.4.0:
+    changes:
+      bugfixes:
+        - keycloak module utils - fix ``TypeError`` crash when managing users whose
+          username or email contains special characters such as ``+`` (https://github.com/ansible-collections/community.general/issues/10305,
+          https://github.com/ansible-collections/community.general/pull/11472).
+        - keycloak module utils - use proper URL encoding (``urllib.parse.quote``)
+          for query parameters in authorization permission name searches, replacing
+          fragile manual space replacement (https://github.com/ansible-collections/community.general/pull/11472).
+        - keycloak_client - fix idempotency bug caused by ``null`` flow overrides
+          value differences for non-existing flow overrides (https://github.com/ansible-collections/community.general/issues/11430,
+          https://github.com/ansible-collections/community.general/pull/11455).
+        - keycloak_client - remove IDs as change from diff result for protocol mappers
+          (https://github.com/ansible-collections/community.general/issues/11453,
+          https://github.com/ansible-collections/community.general/pull/11454).
+        - keycloak_realm_key - fix ``KeyError`` crash when managing realm keys where
+          Keycloak does not return ``active``, ``enabled``, or ``algorithm`` fields
+          in the config response (https://github.com/ansible-collections/community.general/issues/11459,
+          https://github.com/ansible-collections/community.general/pull/11470).
+        - keycloak_user_federation - mapper config item can be an array (https://github.com/ansible-collections/community.general/issues/11502,
+          https://github.com/ansible-collections/community.general/pull/11515).
+        - keycloak_user_rolemapping - fix ``TypeError`` crash when adding a client
+          role to a user who has no existing roles for that client (https://github.com/ansible-collections/community.general/issues/10960,
+          https://github.com/ansible-collections/community.general/pull/11471).
+        - maven_artifact - fix SNAPSHOT version resolution to pick the newest matching
+          ``<snapshotVersion>`` entry by ``<updated>`` timestamp instead of the first.
+          Repositories like GitHub Packages keep all historical entries in ``<snapshotVersions>``
+          (oldest first), causing the module to resolve to the oldest snapshot instead
+          of the latest (https://github.com/ansible-collections/community.general/issues/5117,
+          https://github.com/ansible-collections/community.general/issues/11489, https://github.com/ansible-collections/community.general/pull/11501).
+        - nsupdate - fix ``AttributeError`` when using the module without TSIG authentication
+          (https://github.com/ansible-collections/community.general/issues/11460,
+          https://github.com/ansible-collections/community.general/pull/11461).
+        - python_requirements_info - use ``importlib.metadata`` if ``pkg_resources``
+          from ``setuptools`` cannot be imported. That module has been removed from
+          setuptools 82.0.0 (https://github.com/ansible-collections/community.general/issues/11491,
+          https://github.com/ansible-collections/community.general/pull/11492).
+        - splunk callback plugin - replace deprecated callback function (https://github.com/ansible-collections/community.general/pull/11485).
+      minor_changes:
+        - ModuleHelper module utils - allow to ignore specific exceptions in ``module_fails_on_exception``
+          decorator (https://github.com/ansible-collections/community.general/pull/11488).
+        - from_ini filter plugin - add ``delimiters`` parameter to allow correctly
+          parsing more INI documents (https://github.com/ansible-collections/community.general/issues/11506,
+          https://github.com/ansible-collections/community.general/pull/11512).
+        - keycloak_client - add ``valid_post_logout_redirect_uris`` option to configure
+          post logout redirect URIs for a client, and ``backchannel_logout_url`` option
+          to configure the backchannel logout URL for a client (https://github.com/ansible-collections/community.general/issues/6812,
+          https://github.com/ansible-collections/community.general/issues/4892, https://github.com/ansible-collections/community.general/pull/11473).
+        - keycloak_client_rolemapping, keycloak_realm_rolemapping, keycloak_group
+          - optimize retrieval of groups by name to use Keycloak search API with exact
+          matching instead of fetching all groups (https://github.com/ansible-collections/community.general/pull/11503).
+        - keycloak_realm - add support for ``localizationTexts`` option in Keycloak
+          realms (https://github.com/ansible-collections/community.general/pull/11513).
+        - keycloak_realm_key - add support for auto-generated key providers (``rsa-generated``,
+          ``rsa-enc-generated``, ``hmac-generated``, ``aes-generated``, ``ecdsa-generated``,
+          ``ecdh-generated``, ``eddsa-generated``), ``java-keystore`` provider, additional
+          algorithms (HMAC, ECDSA, ECDH, EdDSA, AES), and new config options (``secret_size``,
+          ``key_size``, ``elliptic_curve``, ``keystore``, ``keystore_password``, ``key_alias``,
+          ``key_password``). Also makes ``config.private_key`` and ``config.certificate``
+          optional as they are only required for imported key providers (https://github.com/ansible-collections/community.general/pull/11468).
+        - redfish_info - add Redfish Root data to results of successful ``CheckAvailability``
+          command (https://github.com/ansible-collections/community.general/pull/11504).
+        - seport - adds support for DCCP and SCTP protocols (https://github.com/ansible-collections/community.general/pull/11486).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+      - 11430-fix-keycloak-client-diff-for-flow-overrides.yml
+      - 11453-keycloak-client-protocol-mapper-ids.yml
+      - 11485-avoid-deprected-callback.yml
+      - 11486-seport-dccp-sctp.yaml
+      - 11488-mh-ensure-compatibiliy-with-module-tests.yml
+      - 11492-python_requires_info.yml
+      - 11502-keycloak-config-mapper.yaml
+      - 11503-keycloak-group-search-optimization.yml
+      - 11504-redfish-info-add-results-to-return.yml
+      - 11512-from_ini-delimiters.yaml
+      - 11513-keycloak-realm-localizationTexts-support.yml
+      - 12.4.0.yml
+      - 5117-maven-artifact-snapshot-resolution.yml
+      - fix-nsupdate-keyring.yml
+      - keycloak-client-add-missing-fields.yml
+      - keycloak-realm-key-generated-providers.yml
+      - keycloak-realm-key-keyerror-bugfix.yml
+      - keycloak-url-encode-query-params.yml
+      - keycloak-user-rolemapping-client-none-check.yml
+    modules:
+      - description: Manages Icinga 2 downtimes.
+        name: icinga2_downtime
+        namespace: ''
+      - description: Allows management of Keycloak realm localization overrides via
+          the Keycloak API.
+        name: keycloak_realm_localization
+        namespace: ''
+    plugins:
+      callback:
+        - description: Posts task results to an Azure Log Analytics workspace using
+            the new Logs Ingestion API.
+          name: loganalytics_ingestion
+          namespace: null
+    release_date: '2026-02-23'

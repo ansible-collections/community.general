@@ -1,2 +1,0 @@
-bugfixes:
-  - keycloak_client - fix idempotency bug caused by ``null`` flow overrides value differences for non-existing flow overrides (https://github.com/ansible-collections/community.general/issues/11430, https://github.com/ansible-collections/community.general/pull/11455).

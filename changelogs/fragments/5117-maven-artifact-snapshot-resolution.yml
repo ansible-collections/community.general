@@ -1,2 +1,0 @@
-bugfixes:
-  - maven_artifact - fix SNAPSHOT version resolution to pick the newest matching ``<snapshotVersion>`` entry by ``<updated>`` timestamp instead of the first. Repositories like GitHub Packages keep all historical entries in ``<snapshotVersions>`` (oldest first), causing the module to resolve to the oldest snapshot instead of the latest (https://github.com/ansible-collections/community.general/issues/5117, https://github.com/ansible-collections/community.general/issues/11489, https://github.com/ansible-collections/community.general/pull/11501).
