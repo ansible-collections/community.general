@@ -249,6 +249,8 @@ def main() -> None:
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        required_if=[("state", "present", ["value"])],
+        required_by={"value": "key"},
         supports_check_mode=False,
     )
 
