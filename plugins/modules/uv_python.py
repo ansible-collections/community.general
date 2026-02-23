@@ -11,17 +11,16 @@ description:
   - Install, uninstall or upgrade Python versions managed by C(uv). 
 version_added: "1.0.0"
 requirements:
-  - C(uv) must be installed and available on PATH.
-  - C(uv) version should be at least C(0.8.0).
+  - C(uv) must be installed and available in C(PATH).
+  - C(uv) version must be at least C(0.8.0).
 deprecated:
-author: Mariam Ahhttouche (@mriamah)
 options:
   version:
     description: 
       - Python version to manage. 
-      - Only canonical Python versions are supported in this release such as C(3), C(3.12), or C(3.12.3).
+      - Only L(canonical Python versions, https://peps.python.org/pep-0440/) are supported in this release such as C(3), C(3.12), C(3.12.3), C(3.15.0a5).
       - Advanced uv selectors such as C(>=3.12,<3.13) or C(cpython@3.12) are not supported in this release.
-      - When specifying only a major or major.minor version, behavior depends on state parameter.
+      - When specifying only a major or major.minor version, behavior depends on the O(state) parameter.
     type: str
     required: true
   state:
@@ -49,18 +48,24 @@ notes:
 
     * O(state=present)
       - If a full patch version is specified (for example 3.12.3), that exact version will be installed if not already present.
-      - If only a minor version is specified (for example 3.12), the latest available patch version for that minor release will be installed ONLY if no patch version for that minor release is currently installed including patch versions not managed by C(uv).
+      - If only a minor version is specified (for example 3.12), the latest available patch version for that minor release is installed 
+      only if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)).
+      - RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
 
     * O(state=absent)
       - If a full patch version is specified, only that exact patch version is removed.
-      - If only a minor version is specified (for example 3.12), all installed patch versions for that minor release are removed.
+      - If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed.
       - If the specified version is not installed, no changes are made.
+      - RV(python_versions) and RV(python_paths) lengths can be higher or equal to one for this state.
 
     * O(state=latest)
-      - If only a minor version is specified (for example 3.12), the latest available patch version for that minor release will always be installed.
-      - If another patch version is already installed but is not the latest, the latest patch version will be installed.
+      - If only a minor version is specified (for example C(3.12)), the latest available patch version for that minor release is always installed.
+      - If another patch version is already installed but is not the latest, the latest patch version is installed.
       - This state does not use C(uv python upgrade).
-      - The latest patch installed depends on the uv version, since available Python versions are frozen per uv release.
+      - The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.
+      - RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
+      
+author: Mariam Ahhttouche (@mriamah)
 '''
 
 EXAMPLES = r'''
@@ -70,7 +75,7 @@ EXAMPLES = r'''
 
 - name: Remove Python 3.13.5
   mriamah.uv_python:
-    version: "3.13.5"
+    version: 3.13.5
     state: absent
 
 - name: Upgrade python 3
@@ -89,15 +94,15 @@ python_paths:
   returned: success
   type: list
 stdout:
-  description: Stdout of command run.
+  description: Stdout of the executed command.
   returned: success
   type: str
 stderr:
-  description: Stderr of command run.
+  description: Stderr of the executed command.
   returned: success
   type: str
 rc:
-  description: Return code of command run.
+  description: Return code of the executed command.
   returned: success
   type: int
 '''
