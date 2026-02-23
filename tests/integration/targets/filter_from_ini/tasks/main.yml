@@ -41,6 +41,32 @@
       - 'ini_file_content.content | b64decode | community.general.from_ini ==
          ini_test_dict'
 
+- name: 'Define another ini_test_dict'
+  ansible.builtin.set_fact:
+    ini_test_dict:
+      section_name:
+        'key_name * : with spaces': 'key value'
+
+- name: 'Write another INI file that reflects ini_test_dict to {{ ini_test_file }}'
+  ansible.builtin.copy:
+    dest: '{{ ini_test_file }}'
+    content: |
+      [section_name]
+      key_name * : with spaces = key value
+
+- name: 'Slurp the other test file: {{ ini_test_file }}'
+  ansible.builtin.slurp:
+    src: '{{ ini_test_file }}'
+  register: 'ini_file_content'
+
+- name: >-
+    Ensure defined ini_test_dict is the same when retrieved
+    from other {{ ini_test_file }}
+  ansible.builtin.assert:
+    that:
+      - 'ini_file_content.content | b64decode | community.general.from_ini(delimiters=["="]) ==
+         ini_test_dict'
+
 - name: 'Create a file that is not INI formatted: {{ ini_bad_file }}'
   ansible.builtin.copy:
     dest: '{{ ini_bad_file }}'

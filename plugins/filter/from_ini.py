@@ -16,6 +16,14 @@ options:
     description: A string containing an INI document.
     type: string
     required: true
+  delimiters:
+    description: A list of characters used as delimiters in the INI document.
+    type: list
+    elements: string
+    default:
+      - "="
+      - ":"
+    version_added: 12.4.0
 seealso:
   - plugin: community.general.to_ini
     plugin_type: filter
@@ -53,13 +61,17 @@ from configparser import ConfigParser
 from io import StringIO
 
 from ansible.errors import AnsibleFilterError
+from ansible.module_utils.common.collections import is_sequence
 
 
 class IniParser(ConfigParser):
     """Implements a configparser which is able to return a dict"""
 
-    def __init__(self):
-        super().__init__(interpolation=None)
+    def __init__(self, delimiters=None):
+        if delimiters is None:
+            super().__init__(interpolation=None)
+        else:
+            super().__init__(interpolation=None, delimiters=delimiters)
         self.optionxform = str
 
     def as_dict(self):
@@ -74,13 +86,21 @@ class IniParser(ConfigParser):
         return d
 
 
-def from_ini(obj):
+def from_ini(obj, delimiters=None):
     """Read the given string as INI file and return a dict"""
 
     if not isinstance(obj, str):
         raise AnsibleFilterError(f"from_ini requires a str, got {type(obj)}")
+    if delimiters is not None:
+        if not is_sequence(delimiters):
+            raise AnsibleFilterError(f"from_ini's delimiters parameter must be a sequence, got {type(delimiters)}")
+        delimiters = tuple(delimiters)
+        if not all(isinstance(elt, str) for elt in delimiters):
+            raise AnsibleFilterError(
+                f"from_ini's delimiters parameter must be a sequence of strings, got {delimiters!r}"
+            )
 
-    parser = IniParser()
+    parser = IniParser(delimiters=delimiters)
 
     try:
         parser.read_file(StringIO(obj))
