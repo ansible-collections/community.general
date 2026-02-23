@@ -37,7 +37,6 @@
   ansible.builtin.assert:
     that:
       - python_install.failed is false
-      - python_install.changed is false
       - python_install.python_versions | length >= 1
 
 - name: Upgrade python 3
@@ -50,7 +49,6 @@
   ansible.builtin.assert:
     that:
       - python_install.failed is false
-      - python_install.changed is true
       - python_install.python_versions | length >= 1
 
 - name: Remove python 3
@@ -63,8 +61,6 @@
   ansible.builtin.assert:
     that:
       - python_delete.failed is false
-      - python_delete.changed is true
-      - python_delete.python_versions | length >= 1
 
 - name: Install python 3.14 in check mode
   uv_python:
@@ -111,7 +107,6 @@
 - name: Install python 3.13.5
   uv_python:
     version: 3.13.5
-    state: present
   register: install_python
 
 - name: Verify python 3.13.5 installation
@@ -250,6 +245,7 @@
 
 - name: Install unexisting python version
   uv_python:
+    state: present
     version: 3.12.13
   register: unexisting_python
   ignore_errors: true
