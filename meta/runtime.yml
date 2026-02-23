@@ -97,7 +97,7 @@ plugin_routing:
     loganalytics:
       deprecation:
         removal_version: 14.0.0
-        warning_text: The "HTTP Data Collector API" used by the plugin has been deprecated in Azure and replaced with the "Logs Ingestion API".  Please migrate to the 'loganalytics_ingestion' plugin.
+        warning_text: The "HTTP Data Collector API" used by the plugin has been deprecated in Azure and replaced with the "Logs Ingestion API".  Please migrate to the 'community.general.loganalytics_ingestion' plugin.
     osx_say:
       redirect: community.general.say
     stderr:
