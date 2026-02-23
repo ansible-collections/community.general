@@ -254,7 +254,7 @@ class CallbackModule(CallbackBase):
             self._runtime(result),
         )
 
-    def runner_on_async_failed(self, result, **kwargs):
+    def v2_runner_on_async_failed(self, result, **kwargs):
         self.splunk.send_event(
             self.url,
             self.authtoken,
