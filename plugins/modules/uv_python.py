@@ -9,11 +9,10 @@ module: uv_python
 short_description: Manage Python versions and installations using uv Python package manager.
 description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
-version_added: "0.1.5"
+version_added: "0.1.7"
 requirements:
   - uv must be installed and available in PATH.
   - uv version must be at least 0.8.0.
-deprecated:
 options:
   version:
     description:
@@ -33,16 +32,20 @@ options:
     choices: [present, absent, latest]
     default: present
 attributes:
-  - check_mode:
+  check_mode:
       description: Can run in check_mode and return changed status prediction without modifying target.
       support: full
-  - diff_mode:
+  diff_mode:
       description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
       support: none
 notes:
 seealso:
-  - https://docs.astral.sh/uv/concepts/python-versions/
-  - https://docs.astral.sh/uv/reference/cli/#uv-python
+- name: uv documentation
+  description: Python versions management with uv.
+  link: https://docs.astral.sh/uv/concepts/python-versions/
+- name: uv CLI documentation
+  description: uv CLI reference guide.
+  link: https://docs.astral.sh/uv/reference/cli/#uv-python
 author: Mariam Ahhttouche (@mriamah)
 
 '''
