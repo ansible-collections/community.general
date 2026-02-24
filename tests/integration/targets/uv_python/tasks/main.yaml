@@ -8,11 +8,11 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Install python 3.14 when no uv executable exists
+- name: Install Python 3.14 when no uv executable exists
   uv_python:
     version: 3.14
     state: present
-  check_mode: yes
+  check_mode: true
   register: failed_install
   ignore_errors: true
 
@@ -23,7 +23,7 @@
 
 - name: Install uv
   shell: |
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/astral-sh/uv/releases/download/0.10.5/uv-installer.sh | sh
   environment:
     UV_INSTALL_DIR: /usr/local/bin
 
@@ -66,7 +66,7 @@
   uv_python:
     version: 3.14
     state: present
-  check_mode: yes
+  check_mode: true
   register: install_check_mode
 
 - name: Verify python 3.14 installation in check mode
@@ -204,7 +204,7 @@
   uv_python:
     version: 3.13
     state: latest
-  check_mode: yes
+  check_mode: true
   register: upgrade_python
 
 - name: Verify python 3.13 upgrade in check mode
@@ -218,7 +218,7 @@
   uv_python:
     version: 3.13
     state: latest
-  check_mode: yes
+  check_mode: true
   register: upgrade_python
 
 - name: Verify python 3.13 upgrade again
