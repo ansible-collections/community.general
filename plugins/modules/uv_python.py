@@ -101,7 +101,6 @@ try:
     from packaging.version import Version, InvalidVersion
     HAS_LIB = True
 except:
-    HAS_LIB = False
     LIB_IMP_ERR = traceback.format_exc()
 
 
