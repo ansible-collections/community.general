@@ -5,36 +5,33 @@
 
 DOCUMENTATION = r'''
 ---
-module: uv_python
-short_description: Manage Python versions and installations using C(uv) Python package manager.
+module: uv.python
+short_description: Manage Python versions and installations using uv Python package manager.
 description:
-  - Install, uninstall or upgrade Python versions managed by C(uv). 
-version_added: "0.1.0"
+  - Install, uninstall or upgrade Python versions managed by C(uv).
+version_added: "0.1.5"
 requirements:
-  - C(uv) must be installed and available in C(PATH).
-  - C(uv) version must be at least C(0.8.0).
+  - uv must be installed and available in PATH.
+  - uv version must be at least 0.8.0.
 deprecated:
 options:
   version:
-    description: 
-      - Python version to manage. 
+    description:
+      - Python version to manage.
       - Only L(canonical Python versions, https://peps.python.org/pep-0440/) are supported in this release such as C(3), C(3.12), C(3.12.3), C(3.15.0a5).
       - Advanced uv selectors such as C(>=3.12,<3.13) or C(cpython@3.12) are not supported in this release.
       - When specifying only a major or major.minor version, behavior depends on the O(state) parameter.
     type: str
     required: true
   state:
-    description: 
+    description:
       - Desired state of the specified Python version.
-      - C(present) ensures the specified version is installed.
-      - C(absent) ensures the specified version is removed.
-      - C(latest) ensures the latest available patch version for the specified version is installed.
+      - C(present) ensures the specified version is installed. If a full patch version is specified (for example C(3.12.3)), that exact version will be installed if not already present. If only a minor version is specified (for example 3.12), the latest available patch version for that minor release is installed only if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)). RV(python_versions) and RV(python_paths) lengths are always equal to one for this state. Uses C(uv python install) command.
+      - C(absent) ensures the specified version is removed. If a full patch version is specified, only that exact patch version is removed. If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed. If the specified version is not installed, no changes are made. RV(python_versions) and RV(python_paths) lengths can be higher or equal to one for this state. Uses C(uv python uninstall) command.
+      - C(latest) ensures the latest available patch version for the specified version is installed. If only a minor version is specified (for example C(3.12)), the latest available patch version for that minor release is always installed. If another patch version is already installed but is not the latest, the latest patch version is installed. The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release. RV(python_versions) and RV(python_paths) lengths are always equal to one for this state. This state does not use C(uv python upgrade).
     type: str
     choices: [present, absent, latest]
     default: present
-seealso: 
-  - https://docs.astral.sh/uv/concepts/python-versions/
-  - https://docs.astral.sh/uv/reference/cli/#uv-python
 attributes:
   - check_mode:
       description: Can run in check_mode and return changed status prediction without modifying target.
@@ -43,29 +40,11 @@ attributes:
       description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
       support: none
 notes:
-  - |
-    State behavior:
-
-    * O(state=present)
-      - If a full patch version is specified (for example 3.12.3), that exact version will be installed if not already present.
-      - If only a minor version is specified (for example 3.12), the latest available patch version for that minor release is installed 
-      only if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)).
-      - RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
-
-    * O(state=absent)
-      - If a full patch version is specified, only that exact patch version is removed.
-      - If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed.
-      - If the specified version is not installed, no changes are made.
-      - RV(python_versions) and RV(python_paths) lengths can be higher or equal to one for this state.
-
-    * O(state=latest)
-      - If only a minor version is specified (for example C(3.12)), the latest available patch version for that minor release is always installed.
-      - If another patch version is already installed but is not the latest, the latest patch version is installed.
-      - This state does not use C(uv python upgrade).
-      - The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.
-      - RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
-
+seealso:
+  - https://docs.astral.sh/uv/concepts/python-versions/
+  - https://docs.astral.sh/uv/reference/cli/#uv-python
 author: Mariam Ahhttouche (@mriamah)
+
 '''
 
 EXAMPLES = r'''
