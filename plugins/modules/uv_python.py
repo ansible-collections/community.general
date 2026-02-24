@@ -19,7 +19,7 @@ options:
       - Python version to manage.
       - Only L(canonical Python versions, https://peps.python.org/pep-0440/) are supported in this release such as C(3), C(3.12), C(3.12.3), C(3.15.0a5).
       - Advanced uv selectors such as C(>=3.12,<3.13) or C(cpython@3.12) are not supported in this release.
-      - When specifying only a major or major.minor version, behavior depends on the O(state) parameter.
+      - When you specify only a major or major.minor version, behavior depends on the O(state) parameter.
     type: str
     required: true
   state:
@@ -27,23 +27,22 @@ options:
       - Desired state of the specified Python version.
       - |
         V(present) ensures the specified version is installed.
-        If a full patch version is specified (for example C(3.12.3)), that exact version will be installed if not already present.
-        If only a minor version is specified (for example 3.12), the latest available patch version for that minor release is installed only
+        If you specify a full patch version (for example C(3.12.3)), that exact version will be installed if not already present.
+        If you only specify a minor version (for example C(3.12)), the latest available patch version for that minor release is installed only
         if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)).
         RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
-        This state uses C(uv python install) command.
       - |
-        V(absent) ensures the specified version is removed. If a full patch version is specified, only that exact patch version is removed.
-        If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed.
-        If the specified version is not installed, no changes are made.
-        RV(python_versions) and RV(python_paths) lengths can be higher or equal to one for this state.
-        This state uses C(uv python uninstall) command.
+        V(absent) ensures the specified version is removed.
+        If you specify a full patch version, only that exact patch version is removed.
+        If you only specify a minor version (for example C(3.12)), all installed patch versions for that minor release are removed.
+        If you specify a version that is not installed, no changes are made.
+        RV(python_versions) and RV(python_paths) lengths can be higher or equal to one in this state.
       - |
         V(latest) ensures the latest available patch version for the specified version is installed.
-        If only a minor version is specified (for example C(3.12)), the latest available patch version for that minor release is always installed.
+        If you only specify a minor version (for example C(3.12)), the latest available patch version for that minor release is always installed.
         If another patch version is already installed but is not the latest, the latest patch version is installed.
         The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.
-        RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
+        RV(python_versions) and RV(python_paths) lengths are always equal to one in this state.
         This state does not use C(uv python upgrade).
     type: str
     choices: [present, absent, latest]
@@ -118,7 +117,7 @@ try:
     from packaging.version import Version, InvalidVersion
 
     HAS_LIB = True
-except:
+except ImportError:
     LIB_IMP_ERR = traceback.format_exc()
 
 
@@ -144,7 +143,7 @@ class UV:
 
     def _ensure_min_uv_version(self):
         cmd = [self.module.get_bin_path("uv", required=True), "--version", "--color", "never"]
-        _, out, _ = self.module.run_command(cmd, check_rc=True)
+        ignored_rc, out, ignored_err = self.module.run_command(cmd, check_rc=True)
         detected = out.strip().split()[-1]
         if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
             self.module.fail_json(
@@ -170,12 +169,12 @@ class UV:
               If the install command exits with a non-zero return code.
               If specified version is not available for download.
         """
-        find_rc, existing_version, _ = self._find_python("--show-version")
+        find_rc, existing_version, ignored_err = self._find_python("--show-version")
         if find_rc == 0:
-            _, version_path, _ = self._find_python()
+            ignored_rc, version_path, ignored_err = self._find_python()
             return False, "", "", 0, [existing_version], [version_path]
         if self.module.check_mode:
-            latest_version, _ = self._get_latest_patch_release("--managed-python")
+            latest_version, ignored_path = self._get_latest_patch_release("--managed-python")
             # when uv does not find any available patch version the install command will fail
             if not latest_version:
                 self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
@@ -224,13 +223,13 @@ class UV:
               If the install command exits with a non-zero return code.
               If resolved patch version is not available for download.
         """
-        rc, installed_version_str, _ = self._find_python("--show-version")
+        rc, installed_version_str, ignored_err = self._find_python("--show-version")
         installed_version = self._parse_version(installed_version_str)
-        latest_version_str, _ = self._get_latest_patch_release("--managed-python")
+        latest_version_str, ignored_path = self._get_latest_patch_release("--managed-python")
         if not latest_version_str:
             self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
         if rc == 0 and installed_version >= Version(latest_version_str):
-            _, install_path, _ = self._find_python()
+            ignored_rc, install_path, ignored_err = self._find_python()
             return False, "", "", rc, [installed_version.__str__()], [install_path]
         if self.module.check_mode:
             return True, "", "", 0, [latest_version_str], []
@@ -312,7 +311,8 @@ class UV:
             - installation path of latest patch version if version exists
         """
         latest_version = path = ""
-        _, results, _ = self._list_python(*args)  # uv returns versions in descending order but we sort them just in case future uv behavior changes
+        # 'uv python list' returns versions in descending order but we sort them just in case future uv behavior changes
+        ignored_rc, results, ignored_err = self._list_python(*args)
         valid_results = self._parse_versions(results)
         if valid_results:
             version = max(valid_results, key=lambda result: result["parsed_version"])
@@ -330,7 +330,7 @@ class UV:
             - list of latest found patch versions
             - list of installation paths of installed versions
         """
-        _, results, _ = self._list_python("--only-installed", *args)
+        ignored_rc, results, ignored_err = self._list_python("--only-installed", *args)
         if results:
             return [result["version"] for result in results], [result["path"] for result in results]
         return [], []
