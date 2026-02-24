@@ -25,9 +25,26 @@ options:
   state:
     description:
       - Desired state of the specified Python version.
-      - C(present) ensures the specified version is installed. If a full patch version is specified (for example C(3.12.3)), that exact version will be installed if not already present. If only a minor version is specified (for example 3.12), the latest available patch version for that minor release is installed only if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)). RV(python_versions) and RV(python_paths) lengths are always equal to one for this state. Uses C(uv python install) command.
-      - C(absent) ensures the specified version is removed. If a full patch version is specified, only that exact patch version is removed. If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed. If the specified version is not installed, no changes are made. RV(python_versions) and RV(python_paths) lengths can be higher or equal to one for this state. Uses C(uv python uninstall) command.
-      - C(latest) ensures the latest available patch version for the specified version is installed. If only a minor version is specified (for example C(3.12)), the latest available patch version for that minor release is always installed. If another patch version is already installed but is not the latest, the latest patch version is installed. The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release. RV(python_versions) and RV(python_paths) lengths are always equal to one for this state. This state does not use C(uv python upgrade).
+      - |
+        C(present) ensures the specified version is installed.
+        If a full patch version is specified (for example C(3.12.3)), that exact version will be installed if not already present.
+        If only a minor version is specified (for example 3.12), the latest available patch version for that minor release is installed only
+        if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)).
+        RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
+        This state uses C(uv python install) command.
+      - |
+        C(absent) ensures the specified version is removed. If a full patch version is specified, only that exact patch version is removed.
+        If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed.
+        If the specified version is not installed, no changes are made. RV(python_versions) and RV(python_paths)
+        lengths can be higher or equal to one for this state.
+        This state uses C(uv python uninstall) command.
+      - |
+        C(latest) ensures the latest available patch version for the specified version is installed.
+        If only a minor version is specified (for example C(3.12)), the latest available patch version for that minor release is always installed.
+        If another patch version is already installed but is not the latest, the latest patch version is installed.
+        The latest patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.
+        RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
+        This state does not use C(uv python upgrade).
     type: str
     choices: [present, absent, latest]
     default: present
@@ -106,22 +123,23 @@ except:
 
 MINIMUM_UV_VERSION = "0.8.0"
 
+
 class UV:
     """
       Module for managing Python versions and installations using "uv python" command
     """
 
     def __init__(self, module):
-        self.module = module
-        self._ensure_min_uv_version()
-        python_version = module.params["version"]
-        try:
-          self.python_version = Version(python_version)
-          self.python_version_str = self.python_version.__str__()
-        except InvalidVersion:
-          self.module.fail_json(
-            msg="Unsupported version format. Only canonical Python versions (e.g. 3, 3.12, 3.12.3, 3.15.0a5) are supported in this release."
-          )
+      self.module = module
+      self._ensure_min_uv_version()
+      python_version = module.params["version"]
+      try:
+        self.python_version = Version(python_version)
+        self.python_version_str = self.python_version.__str__()
+      except InvalidVersion:
+        self.module.fail_json(
+          msg="Unsupported version format. Only canonical Python versions (e.g. 3, 3.12, 3.12.3, 3.15.0a5) are supported in this release."
+        )
 
     def _ensure_min_uv_version(self):
       cmd = [self.module.get_bin_path("uv", required=True), "--version", "--color", "never"]
