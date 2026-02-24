@@ -23,7 +23,7 @@
 
 - name: Install uv
   shell: |
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/astral-sh/uv/releases/download/0.10.5/uv-installer.sh | sh
   environment:
     UV_INSTALL_DIR: /usr/local/bin
 
