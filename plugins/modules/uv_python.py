@@ -5,7 +5,7 @@
 
 DOCUMENTATION = r'''
 ---
-module: uv.python
+module: uv_python
 short_description: Manage Python versions and installations using uv Python package manager.
 description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
@@ -118,7 +118,7 @@ class UV:
           self.python_version_str = self.python_version.__str__()
         except InvalidVersion:
           self.module.fail_json(
-            msg="Unsupported version format. Only canonical Python versions (e.g. 3, 3.12, 3.12.3) are supported in this release."
+            msg="Unsupported version format. Only canonical Python versions (e.g. 3, 3.12, 3.12.3, 3.15.0a5) are supported in this release."
           )
 
     def _ensure_min_uv_version(self):
