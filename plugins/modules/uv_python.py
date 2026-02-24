@@ -9,7 +9,7 @@ module: uv_python
 short_description: Manage Python versions and installations using uv Python package manager.
 description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
-version_added: "0.1.8"
+version_added: "0.1.9"
 requirements:
   - uv must be installed and available in PATH.
   - uv version must be at least 0.8.0.
@@ -35,8 +35,8 @@ options:
       - |
         V(absent) ensures the specified version is removed. If a full patch version is specified, only that exact patch version is removed.
         If only a minor version is specified (for example C(3.12)), all installed patch versions for that minor release are removed.
-        If the specified version is not installed, no changes are made. RV(python_versions) and RV(python_paths)
-        lengths can be higher or equal to one for this state.
+        If the specified version is not installed, no changes are made.
+        RV(python_versions) and RV(python_paths) lengths can be higher or equal to one for this state.
         This state uses C(uv python uninstall) command.
       - |
         V(latest) ensures the latest available patch version for the specified version is installed.
@@ -69,16 +69,16 @@ author: Mariam Ahhttouche (@mriamah)
 
 EXAMPLES = r'''
 - name: Install Python 3.14
-  mriamah.uv_python:
+  community.general.uv_python:
     version: "3.14"
 
 - name: Remove Python 3.13.5
-  mriamah.uv_python:
+  community.general.uv_python:
     version: 3.13.5
     state: absent
 
 - name: Upgrade python 3
-  mriamah.uv_python:
+  community.general.uv_python:
     version: 3
     state: latest
 '''
