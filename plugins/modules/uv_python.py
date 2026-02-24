@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: uv_python
 short_description: Manage Python versions and installations using uv Python package manager.
@@ -65,9 +65,9 @@ seealso:
     link: https://docs.astral.sh/uv/reference/cli/#uv-python
 author: Mariam Ahhttouche (@mriamah)
 
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install Python 3.14
   community.general.uv_python:
     version: "3.14"
@@ -81,9 +81,9 @@ EXAMPLES = r'''
   community.general.uv_python:
     version: 3
     state: latest
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 python_versions:
   description: List of Python versions changed.
   returned: success
@@ -104,7 +104,7 @@ rc:
   description: Return code of the executed command.
   returned: success
   type: int
-'''
+"""
 
 import json
 import traceback
