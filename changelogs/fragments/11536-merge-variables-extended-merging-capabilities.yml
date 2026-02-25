@@ -1,2 +1,2 @@
 minor_changes:
-  - merge_variables - extended merging capabilities added (https://github.com/ansible-collections/community.general/pull/11536).
+  - merge_variables lookup plugin - extended merging capabilities added (https://github.com/ansible-collections/community.general/pull/11536).
