@@ -231,7 +231,7 @@ class UV:
             self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
         if rc == 0 and installed_version >= Version(latest_version_str):
             ignored_rc, install_path, ignored_err = self._find_python()
-            return False, "", "", rc, [installed_version.__str__()], [install_path]
+            return False, "", "", rc, [installed_version_str], [install_path]
         if self.module.check_mode:
             return True, "", "", 0, [latest_version_str], []
         # it's possible to have latest version already installed but not used as default
