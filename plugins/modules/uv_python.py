@@ -77,7 +77,7 @@ EXAMPLES = r"""
     version: 3.13.5
     state: absent
 
-- name: Upgrade python 3
+- name: Upgrade Python 3
   community.general.uv_python:
     version: 3
     state: latest
