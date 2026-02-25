@@ -12,8 +12,8 @@ description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
 version_added: "12.5.0"
 requirements:
-  - uv must be installed and available in PATH.
-  - uv version must be at least 0.8.0.
+  - uv >= 0.8.0 must be installed and available in PATH
+  - packaging
 options:
   version:
     description:
