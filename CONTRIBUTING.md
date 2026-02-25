@@ -56,7 +56,7 @@ The easiest way to format the code, and to run sanity and unit tests locally is 
 
 ### Format code
 
-The following commands show how to run ansible-test sanity tests:
+The following commands show how to run ruff format:
 
 ```.bash
 # Run all configured formatters:
