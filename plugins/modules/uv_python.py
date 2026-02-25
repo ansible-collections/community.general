@@ -7,7 +7,7 @@
 DOCUMENTATION = r"""
 ---
 module: uv_python
-short_description: Manage Python versions and installations using uv Python package manager.
+short_description: Manage Python versions and installations using uv Python package manager
 description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
 version_added: "12.5.0"
