@@ -14,7 +14,7 @@ short_description: Configure AIX LVM logical volumes
 description:
   - This module creates, removes or resizes AIX logical volumes. Inspired by M(community.general.lvol) module.
 deprecated:
-  removed_in: 14.0.0
+  removed_in: 15.0.0
   why: The module is not actively maintained.
   alternative: >-
     Use C(ibm.power_aix.lvol) instead.

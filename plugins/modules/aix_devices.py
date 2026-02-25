@@ -14,7 +14,7 @@ short_description: Manages AIX devices
 description:
   - This module discovers, defines, removes and modifies attributes of AIX devices.
 deprecated:
-  removed_in: 14.0.0
+  removed_in: 15.0.0
   why: The module is not actively maintained.
   alternative: >-
     Use C(ibm.power_aix.devices) instead.

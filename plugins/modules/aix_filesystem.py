@@ -15,7 +15,7 @@ description:
   - This module creates, removes, mount and unmount LVM and NFS file system for AIX using C(/etc/filesystems).
   - For LVM file systems is possible to resize a file system.
 deprecated:
-  removed_in: 14.0.0
+  removed_in: 15.0.0
   why: The module is not actively maintained.
   alternative: >-
     Use C(ibm.power_aix.filesystem) instead.

@@ -377,23 +377,23 @@ plugin_routing:
         warning_text: Use community.general.hpilo_info instead.
     aix_devices:
       deprecation:
-        removal_version: 14.0.0
+        removal_version: 15.0.0
         warning_text: Use ibm.power_aix.devices instead.
     aix_filesystem:
       deprecation:
-        removal_version: 14.0.0
+        removal_version: 15.0.0
         warning_text: Use ibm.power_aix.filesystem instead.
     aix_inittab:
       deprecation:
-        removal_version: 14.0.0
+        removal_version: 15.0.0
         warning_text: Use ibm.power_aix.inittab instead.
     aix_lvg:
       deprecation:
-        removal_version: 14.0.0
+        removal_version: 15.0.0
         warning_text: Use ibm.power_aix.lvg instead.
     aix_lvol:
       deprecation:
-        removal_version: 14.0.0
+        removal_version: 15.0.0
         warning_text: Use ibm.power_aix.lvol instead.
     idrac_firmware:
       redirect: dellemc.openmanage.idrac_firmware

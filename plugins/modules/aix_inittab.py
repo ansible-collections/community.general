@@ -14,7 +14,7 @@ short_description: Manages the C(inittab) on AIX
 description:
   - Manages the C(inittab) on AIX.
 deprecated:
-  removed_in: 14.0.0
+  removed_in: 15.0.0
   why: The module is not actively maintained.
   alternative: >-
     Use C(ibm.power_aix.inittab) instead.
