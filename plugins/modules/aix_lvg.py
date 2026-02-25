@@ -13,6 +13,12 @@ module: aix_lvg
 short_description: Manage LVM volume groups on AIX
 description:
   - This module creates, removes or resize volume groups on AIX LVM.
+deprecated:
+  removed_in: 14.0.0
+  why: The module is not actively maintained.
+  alternative: >-
+    Use C(ibm.power_aix.lvg) instead.
+    See U(https://ibm.github.io/ansible-power-aix/modules/lvg.html) for details.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

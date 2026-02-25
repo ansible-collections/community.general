@@ -13,6 +13,12 @@ module: aix_devices
 short_description: Manages AIX devices
 description:
   - This module discovers, defines, removes and modifies attributes of AIX devices.
+deprecated:
+  removed_in: 14.0.0
+  why: The module is not actively maintained.
+  alternative: >-
+    Use C(ibm.power_aix.devices) instead.
+    See U(https://ibm.github.io/ansible-power-aix/modules/devices.html) for details.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
