@@ -74,9 +74,9 @@ options:
     default: deep
     choices:
       deep: merge dictionaries recursively.
-      shallow: merge only top-level values
-      replace: overwrite older dict with newer one
-      keep: discard newer dict
+      shallow: merge only top-level values.
+      replace: overwrite older dict with newer one.
+      keep: discard newer dict.
     version_added: 12.5.0
   list_merge:
     description:
@@ -84,13 +84,13 @@ options:
     type: str
     default: append
     choices:
-      replace: overwrite older entries with newer ones
-      keep: discard newer entries
-      append: append newer entries to the older ones
-      prepend: insert newer entries in front of the older ones
-      append_rp: append newer entries to the older ones, overwrite duplicates
-      prepend_rp: insert newer entries in front of the older ones, discard duplicates
-      merge: take the index as key and merge the entries
+      replace: overwrite older entries with newer ones.
+      keep: discard newer entries.
+      append: append newer entries to the older ones.
+      prepend: insert newer entries in front of the older ones.
+      append_rp: append newer entries to the older ones, overwrite duplicates.
+      prepend_rp: insert newer entries in front of the older ones, discard duplicates.
+      merge: take the index as key and merge the entries.
     version_added: 12.5.0
   type_conflict_merge:
     description:
@@ -98,8 +98,8 @@ options:
     type: str
     default: replace
     choices:
-      replace: overwrite older value with newer one
-      keep: discard newer value
+      replace: overwrite older value with newer one.
+      keep: discard newer value.
     version_added: 12.5.0
   default_merge:
     description:
@@ -107,8 +107,8 @@ options:
     type: str
     default: replace
     choices:
-      replace: overwrite older value with newer one
-      keep: discard newer value
+      replace: overwrite older value with newer one.
+      keep: discard newer value.
     version_added: 12.5.0
   list_transformations:
     description:
@@ -123,8 +123,8 @@ options:
         required: true
         type: str
         choices:
-          flatten: flatten lists, converting nested lists into single lists
-          dedup: remove duplicates from lists
+          flatten: flatten lists, converting nested lists into single lists.
+          dedup: remove duplicates from lists.
       options:
         description:
           - Options as key value pairs. V(flatten) and V(dedup) do not support any additional options.
