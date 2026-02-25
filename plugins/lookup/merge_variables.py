@@ -73,7 +73,7 @@ options:
     type: str
     default: deep
     choices:
-      deep: merge dictionaries recursively
+      deep: merge dictionaries recursively.
       shallow: merge only top-level values
       replace: overwrite older dict with newer one
       keep: discard newer dict
