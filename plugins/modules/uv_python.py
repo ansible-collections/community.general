@@ -107,9 +107,6 @@ rc:
 
 import json
 import traceback
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.compat.version import LooseVersion
-from ansible.module_utils.basic import missing_required_lib
 
 LIB_IMP_ERR = None
 HAS_LIB = False
@@ -119,6 +116,9 @@ try:
     HAS_LIB = True
 except ImportError:
     LIB_IMP_ERR = traceback.format_exc()
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.compat.version import LooseVersion
 
 
 MINIMUM_UV_VERSION = "0.8.0"
