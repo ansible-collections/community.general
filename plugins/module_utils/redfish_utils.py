@@ -2401,10 +2401,10 @@ class RedfishUtils:
                 if annotation in boot:
                     allowable_values = boot[annotation]
                     if isinstance(allowable_values, list) and boot_override_mode not in allowable_values:
-                    return {
-                        "ret": False,
-                        "msg": f"BootSourceOverrideMode: {boot_override_mode} not in list of allowable values ({allowable_values})",
-                    }
+                        return {
+                            "ret": False,
+                            "msg": f"BootSourceOverrideMode: {boot_override_mode} not in list of allowable values ({allowable_values})",
+                        }
                 payload["Boot"]["BootSourceOverrideMode"] = boot_override_mode
         elif bootdevice == "UefiTarget":
             if not uefi_target:
