@@ -2396,6 +2396,16 @@ class RedfishUtils:
         # Build the request payload based on the desired boot override options
         if override_enabled == "Disabled":
             payload = {"Boot": {"BootSourceOverrideEnabled": override_enabled, "BootSourceOverrideTarget": "None"}}
+            if boot_override_mode:
+                annotation = "BootSourceOverrideMode@Redfish.AllowableValues"
+                if annotation in boot:
+                    allowable_values = boot[annotation]
+                    if isinstance(allowable_values, list) and boot_override_mode not in allowable_values:
+                    return {
+                        "ret": False,
+                        "msg": f"BootSourceOverrideMode: {boot_override_mode} not in list of allowable values ({allowable_values})",
+                    }
+                payload["Boot"]["BootSourceOverrideMode"] = boot_override_mode
         elif bootdevice == "UefiTarget":
             if not uefi_target:
                 return {"ret": False, "msg": "uefi_target option required to SetOneTimeBoot for UefiTarget"}

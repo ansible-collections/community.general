@@ -394,6 +394,13 @@ EXAMPLES = r"""
     category: Systems
     command: DisableBootOverride
 
+- name: Disable persistent boot device override with additional params
+  community.general.redfish_command:
+    category: Systems
+    command: DisableBootOverride
+    boot_override_mode: UEFI
+    resource_id: 437XR1138R2
+
 - name: Set system indicator LED to blink using security token for auth
   community.general.redfish_command:
     category: Systems
