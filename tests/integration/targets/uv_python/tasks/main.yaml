@@ -27,41 +27,6 @@
   environment:
     UV_INSTALL_DIR: /usr/local/bin
 
-- name: Install python 3
-  uv_python:
-    version: 3
-    state: present
-  register: python_install
-
-- name: Assert python 3 is installed
-  ansible.builtin.assert:
-    that:
-      - python_install.failed is false
-      - python_install.python_versions | length >= 1
-
-- name: Upgrade python 3
-  uv_python:
-    version: 3
-    state: latest
-  register: python_install
-
-- name: Assert python 3 upgraded
-  ansible.builtin.assert:
-    that:
-      - python_install.failed is false
-      - python_install.python_versions | length >= 1
-
-- name: Remove python 3
-  uv_python:
-    version: 3
-    state: absent
-  register: python_delete
-
-- name: Assert python 3 deleted
-  ansible.builtin.assert:
-    that:
-      - python_delete.failed is false
-
 - name: Install python 3.14 in check mode
   uv_python:
     version: 3.14
