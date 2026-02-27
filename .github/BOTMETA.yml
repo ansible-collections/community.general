@@ -312,7 +312,7 @@ files:
   $lookups/lmdb_kv.py:
     maintainers: jpmens
   $lookups/merge_variables.py:
-    maintainers: rlenferink m-a-r-k-e alpex8
+    maintainers: rlenferink m-a-r-k-e alpex8 cfiehe
   $lookups/onepass:
     labels: onepassword
     maintainers: samdoran
