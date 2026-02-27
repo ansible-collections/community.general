@@ -8,6 +8,8 @@ automerge: true
 files:
   plugins/:
     supershipit: quidame
+  plugins/modules/web_infrastructure/ssl_certificate_deploy.py:
+    maintainers: mangesh-shinde
   changelogs/: {}
   changelogs/fragments/:
     support: community
