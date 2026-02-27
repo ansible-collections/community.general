@@ -99,6 +99,14 @@ options:
                 type: str
                 required: true
 
+              default_value:
+                description:
+                  - The default value for the attribute.
+                aliases:
+                  - defaultValue
+                type: str
+                required: false
+
               validations:
                 description:
                   - The validations to be applied to the attribute.
@@ -542,6 +550,7 @@ def main():
                             options={
                                 "name": dict(type="str", required=True),
                                 "display_name": dict(type="str", aliases=["displayName"], required=True),
+                                "default_value": dict(type="str", aliases=["defaultValue"]),
                                 "validations": dict(
                                     type="dict",
                                     options={
