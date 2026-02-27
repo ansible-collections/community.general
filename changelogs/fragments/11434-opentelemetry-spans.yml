@@ -1,0 +1,2 @@
+bugfixes:
+  - opentelemetry callback plugin - set span start to the actual start time of the task for the given host instead of the task start time for the first host of that task (https://github.com/ansible-collections/community.general/pull/11434).

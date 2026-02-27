@@ -185,6 +185,7 @@ class TaskData:
                 # concatenate task include output from multiple items
                 host.result = f"{self.host_data[host.uuid].result}\n{host.result}"
             else:
+                self.host_data[host.uuid].update(host.status, host.result)
                 return
 
         self.host_data[host.uuid] = host
@@ -195,9 +196,15 @@ class HostData:
     Data about an individual host.
     """
 
-    def __init__(self, uuid, name, status, result):
+    def __init__(self, uuid, name, status, result=None):
         self.uuid = uuid
         self.name = name
+        self.status = status
+        self.result = result
+        self.finish = None
+        self.start = time_ns()
+
+    def update(self, status, result):
         self.status = status
         self.result = result
         self.finish = time_ns()
@@ -221,12 +228,13 @@ class OpenTelemetrySource:
         carrier["traceparent"] = traceparent
         return TraceContextTextMapPropagator().extract(carrier=carrier)
 
-    def start_task(self, tasks_data, hide_task_arguments, play_name, task):
+    def start_task(self, tasks_data, hide_task_arguments, play_name, task, host):
         """record the start of a task for one or more hosts"""
 
         uuid = task._uuid
 
         if uuid in tasks_data:
+            tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started"))
             return
 
         name = task.get_name().strip()
@@ -238,6 +246,7 @@ class OpenTelemetrySource:
             args = task.args
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
+        tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started"))
 
     def finish_task(self, tasks_data, status, result, dump):
         """record the results of a task for a single host"""
@@ -310,7 +319,8 @@ class OpenTelemetrySource:
             parent.set_attribute("ansible.host.user", self.user)
             for task in tasks:
                 for host_data in task.host_data.values():
-                    with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
+                    start = host_data.start or task.start
+                    with tracer.start_as_current_span(task.name, start_time=start, end_on_exit=False) as span:
                         self.update_span_data(task, host_data, span, disable_logs, disable_attributes_in_logs)
 
         return otel_exporter
@@ -327,13 +337,13 @@ class OpenTelemetrySource:
         if host_data.status != "included":
             # Support loops
             enriched_error_message = None
-            if "results" in host_data.result._result:
+            if host_data.result and "results" in host_data.result._result:
                 if host_data.status == "failed":
                     message = self.get_error_message_from_results(host_data.result._result["results"], task_data.action)
                     enriched_error_message = self.enrich_error_message_from_results(
                         host_data.result._result["results"], task_data.action
                     )
-            else:
+            elif host_data.result:
                 res = host_data.result._result
                 rc = res.get("rc", 0)
                 if host_data.status == "failed":
@@ -559,17 +569,8 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_play_start(self, play):
         self.play_name = play.get_name()
 
-    def v2_runner_on_no_hosts(self, task):
-        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
-
-    def v2_playbook_on_task_start(self, task, is_conditional):
-        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
-
-    def v2_playbook_on_cleanup_task_start(self, task):
-        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
-
-    def v2_playbook_on_handler_task_start(self, task):
-        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task)
+    def v2_runner_on_start(self, host, task):
+        self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task, host)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if ignore_errors:
@@ -590,6 +591,12 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_skipped(self, result):
         self.opentelemetry.finish_task(
             self.tasks_data, "skipped", result, self.dump_results(self.tasks_data[result._task._uuid], result)
+        )
+
+    def v2_runner_on_unreachable(self, result):
+        self.errors += 1
+        self.opentelemetry.finish_task(
+            self.tasks_data, "failed", result, self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_playbook_on_include(self, included_file):
