@@ -38,6 +38,13 @@ options:
     default: false
 requirements:
   - jc installed as a Python library (U(https://pypi.org/project/jc/))
+seealso:
+  - name: jc.parsers.ini
+    description: Parses standard INI files
+    link: https://kellyjonbrazil.github.io/jc/docs/parsers/ini
+  - name: jc.parsers.ini_dup
+    description: Parses standard INI files and preserves duplicate values. All values are contained in lists/arrays
+    link: https://kellyjonbrazil.github.io/jc/docs/parsers/ini_dup
 """
 
 EXAMPLES = r"""
