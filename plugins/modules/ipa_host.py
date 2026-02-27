@@ -192,17 +192,26 @@ class HostIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
         super().__init__(module, host, port, protocol)
 
+    def _append_keytab_status(self, result, name):
+        """Append has_keytab status to result from host_show"""
+        if result:
+            show_result = self.host_show(name=name)
+            result["has_keytab"] = show_result.get("has_keytab", False)
+        return result
+
     def host_show(self, name):
         return self._post_json(method="host_show", name=name)
 
     def host_find(self, name):
-        return self._post_json(method="host_find", name=None, item={"all": True, "fqdn": name})
+        return self._append_keytab_status(
+            self._post_json(method="host_find", name=None, item={"all": True, "fqdn": name}), name
+        )
 
     def host_add(self, name, host):
-        return self._post_json(method="host_add", name=name, item=host)
+        return self._append_keytab_status(self._post_json(method="host_add", name=name, item=host), name)
 
     def host_mod(self, name, host):
-        return self._post_json(method="host_mod", name=name, item=host)
+        return self._append_keytab_status(self._post_json(method="host_mod", name=name, item=host), name)
 
     def host_del(self, name, update_dns):
         return self._post_json(method="host_del", name=name, item={"updatedns": update_dns})
@@ -289,11 +298,16 @@ def ensure(module, client):
                 # so, return directly from here.
                 return changed, client.host_add(name=name, host=module_host)
         else:
-            if state in ["disabled", "enabled"]:
-                module.fail_json(msg=f"No host with name {ipa_host} found")
+            if not ipa_host and state in ["disabled", "enabled"]:
+                module.fail_json(msg="No host with name " + name + " found")
 
             diff = get_host_diff(client, ipa_host, module_host)
-            if len(diff) > 0:
+            host_needs_to_be_disabled = (
+                True
+                if (ipa_host.get("has_keytab", True) and (state == "disabled" or module.params.get("random_password")))
+                else False
+            )
+            if len(diff) > 0 or host_needs_to_be_disabled:
                 changed = True
                 if not module.check_mode:
                     data = {}
@@ -301,12 +315,12 @@ def ensure(module, client):
                         data[key] = module_host.get(key)
                     if "usercertificate" not in data:
                         data["usercertificate"] = [cert["__base64__"] for cert in ipa_host.get("usercertificate", [])]
-                    ipa_host_show = client.host_show(name=name)
-                    if ipa_host_show.get("has_keytab", True) and (
-                        state == "disabled" or module.params.get("random_password")
-                    ):
+                    if host_needs_to_be_disabled:
                         client.host_disable(name=name)
-                    return changed, client.host_mod(name=name, host=data)
+                    if len(diff) > 0:
+                        return changed, client.host_mod(name=name, host=data)
+                    else:
+                        return changed, client.host_find(name=name)
     elif state == "absent":
         if ipa_host:
             changed = True
