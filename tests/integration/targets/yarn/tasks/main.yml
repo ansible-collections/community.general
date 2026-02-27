@@ -14,10 +14,12 @@
 - include_tasks: run.yml
   vars:
     nodejs_version: '{{ item.node_version }}'
-    nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_system|lower }}-x{{ ansible_userspace_bits }}'
+    nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_facts.system|lower }}-{{ nodejs_arch }}'
+    nodejs_arch: '{{ "x64" if ansible_architecture == "x86_64" else "arm64" if ansible_architecture in ("arm64", "aarch64") else ansible_architecture }}'
+    nodejs_ext: '{{ ".tar.xz" if ansible_system == "Linux" else ".tar.gz" }}'
+    nodejs_download: 'https://nodejs.org/dist/v{{ nodejs_version }}/{{ nodejs_path }}{{ nodejs_ext }}'
     yarn_version: '{{ item.yarn_version }}'
   with_items:
-    - {node_version: 4.8.0, yarn_version: 1.6.0}  # Lowest compatible nodejs version
-    - {node_version: 8.0.0, yarn_version: 1.6.0}
+    - {node_version: 16.20.2, yarn_version: 1.22.22}  # oldest node version with macOS arm64 support
   when:
     - not (ansible_os_family == 'Alpine')  # TODO
