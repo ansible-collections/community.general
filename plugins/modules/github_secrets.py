@@ -20,8 +20,7 @@ extends_documentation_fragment:
   - community.general.attributes
 attributes:
   check_mode:
-    support: none
-    details: The module needs to interact with the GitHub API, which does not support check mode.
+    support: full
   diff_mode:
     support: none
 options:
@@ -184,13 +183,19 @@ def upsert_secret(
     if not repository and module.params.get("visibility"):
         payload["visibility"] = module.params["visibility"]
 
-    resp, info = fetch_url(
-        module,
-        url,
-        headers=headers,
-        data=json.dumps(payload).encode("utf-8"),
-        method="PUT",
-    )
+    if module.check_mode:
+        info = {
+            "status": created_response_code,
+            "msg": "OK (2 bytes)",
+        }
+    else:
+        resp, info = fetch_url(
+            module,
+            url,
+            headers=headers,
+            data=json.dumps(payload).encode("utf-8"),
+            method="PUT",
+        )
 
     if info["status"] not in (201, 204):
         module.fail_json(msg=f"Failed to upsert secret: {info}")
@@ -213,12 +218,18 @@ def delete_secret(
         else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
     )
 
-    resp, info = fetch_url(
-        module,
-        url,
-        headers=headers,
-        method="DELETE",
-    )
+    if module.check_mode:
+        info = {
+            "status": delete_response_code,
+            "msg": "OK (unknown bytes)",
+        }
+    else:
+        resp, info = fetch_url(
+            module,
+            url,
+            headers=headers,
+            method="DELETE",
+        )
 
     if info["status"] != delete_response_code and info["status"] != missing_status_code:
         module.fail_json(msg=f"Failed to delete secret: {info}")
@@ -251,7 +262,7 @@ def main() -> None:
         argument_spec=argument_spec,
         required_if=[("state", "present", ["value"])],
         required_by={"value": "key"},
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     deps.validate(module)

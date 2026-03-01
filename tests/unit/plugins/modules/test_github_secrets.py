@@ -140,6 +140,32 @@ def test_update_repo_secret(fetch_url_mock):
     assert result["result"]["response"] == "Secret updated"
 
 
+def test_update_repo_secret_check_mode(fetch_url_mock):
+    fetch_url_mock.side_effect = [
+        make_fetch_url_response(PUBLIC_KEY_PAYLOAD),
+        make_fetch_url_response({}, status=204),
+    ]
+
+    with set_module_args(
+        {
+            "organization": "myorg",
+            "repository": "myrepo",
+            "key": "MY_SECRET",
+            "value": "new_value",
+            "state": "present",
+            "token": "ghp_test_token",
+            "_ansible_check_mode": True,
+        }
+    ):
+        with pytest.raises(AnsibleExitJson) as exc:
+            github_secrets.main()
+
+    result = exc.value.args[0]
+    assert result["changed"] is True
+    assert result["result"]["msg"] == "OK (2 bytes)"
+    assert result["result"]["response"] == "Secret created"
+
+
 def test_update_empty_repo_secret(fetch_url_mock):
     fetch_url_mock.side_effect = [
         make_fetch_url_response(PUBLIC_KEY_PAYLOAD),
