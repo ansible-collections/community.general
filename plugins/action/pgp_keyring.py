@@ -73,31 +73,28 @@ class ActionModule(ActionBase):
                 raise AnsibleActionFail("%s: %s" % (type(e).__name__, to_text(e)))
 
             new_task = self._task.copy()
-            local_tempdir = tempfile.mkdtemp(dir=C.DEFAULT_LOCAL_TMP)
 
-            try:
-                result_file = os.path.join(local_tempdir, os.path.basename(source))
-                with open(to_bytes(result_file, errors='surrogate_or_strict'), 'wb') as f:
-                    f.write(bytes(key))
+            with tempfile.NamedTemporaryFile('wb', delete=True, delete_on_close=False) as f:
+                f.write(bytes(key))
+                f.flush()
+                f.close()
 
                 new_task.args.update(
                     dict(
-                        src=result_file,
+                        src=f.file.name,
                         dest=dest,
                         follow=follow,
                     ),
                 )
                 # call with ansible.legacy prefix to eliminate collisions with collections while still allowing local override
                 copy_action = self._shared_loader_obj.action_loader.get('ansible.legacy.copy',
-                                                                        task=new_task,
-                                                                        connection=self._connection,
-                                                                        play_context=self._play_context,
-                                                                        loader=self._loader,
-                                                                        templar=self._templar,
-                                                                        shared_loader_obj=self._shared_loader_obj)
+                    task=new_task,
+                    connection=self._connection,
+                    play_context=self._play_context,
+                    loader=self._loader,
+                    templar=self._templar,
+                    shared_loader_obj=self._shared_loader_obj)
                 return copy_action.run(task_vars=task_vars)
-            finally:
-                shutil.rmtree(to_bytes(local_tempdir, errors='surrogate_or_strict'))
 
         finally:
             self._remove_tmp_path(self._connection._shell.tmpdir)
