@@ -1,5 +1,5 @@
 # test code for the pgp_keyring action
-# (c) 2025, Eero Aaltonen
+# (c) 2025–2026, Eero Aaltonen
 
 - name: Install Microsoft Package signing key
   pgp_keyring:

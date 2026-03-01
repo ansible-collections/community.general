@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2025, Eero Aaltonen
+# Copyright: (c) 2025–2026, Eero Aaltonen
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 # This module is implemented as an action plugin and runs on the controller
