@@ -18,8 +18,10 @@ from ansible.plugins.action import ActionBase
 
 try:
     import pgpy
-except Exception as e:
-    raise AnsibleError('PGPym~=0.6.1 must be installed to use pgp_keyring plugin') from e
+except ImportError as imp_exc:
+    PGPY_IMPORT_ERROR = imp_exc
+else:
+    PGPY_IMPORT_ERROR = None
 
 
 class ActionModule(ActionBase):
@@ -28,6 +30,9 @@ class ActionModule(ActionBase):
 
     def run(self, tmp=None, task_vars=None):
         """ Install PGP keyrings in binary format """
+
+        if PGPY_IMPORT_ERROR:
+            raise AnsibleError('PGPym~=0.6.1 must be installed to use pgp_keyring plugin') from PGPY_IMPORT_ERROR
 
         if task_vars is None:
             task_vars = dict()
