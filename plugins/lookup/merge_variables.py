@@ -464,6 +464,7 @@ class DictMergeStrategies(MergeStrategies):
 
     strategies = {
         "deep": Merge,
+        "merge": Merge,
         "replace": BaseMergeStrategies.Replace,
         "keep": BaseMergeStrategies.Keep,
     }
