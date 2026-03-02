@@ -199,7 +199,8 @@ example_b: "{{ lookup('community.general.merge_variables', '^.+__test_list$', in
 #   - "test a item 1"
 #   - "test b item 1"
 
-# Shallow merge variables that end with '__test' and store the result in a variable 'example_c'
+# Shallow merge variables that end with '__test', insert newer list elements in front of older ones,
+# remove duplicates from lists, and store the result in a variable 'example_c'
 example_c: "{{
   lookup(
     'community.general.merge_variables',
@@ -222,8 +223,8 @@ example_c: "{{
 #   - 1
 #   - 2
 
-# Deep merge variables that end with '__test', merge list elements by index, ignore overrides,
-# apply the strategies 'keep' for type conflicts and 'replace' for other types
+# Deep merge variables that end with '__test', merge list elements by index, ignore overrides, apply the strategies
+# 'keep' for type conflicts and 'replace' for other types, and store the result in a variable 'example_d'
 example_d: "{{
   lookup(
     'community.general.merge_variables',
