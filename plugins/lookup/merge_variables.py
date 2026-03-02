@@ -367,10 +367,9 @@ class LookupModule(LookupBase):
 
         merger = builder.build()
 
-        if self._templar is not None:
-            templar = self._templar.copy_with_new_env(available_variables=variables)
-        else:
-            templar = Templar(loader=self._loader, variables=variables)
+        if self._templar is None:
+            raise AssertionError("Templar is not available")
+        templar = self._templar.copy_with_new_env(available_variables=variables)
 
         for var_name in var_merge_names:
             var_value = templar.template(variables[var_name])  # Render jinja2 templates
