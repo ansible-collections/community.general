@@ -273,7 +273,7 @@ def create_or_update_executions(kc, config, realm="master"):
         after = ""
         before = ""
         execution = None
-        if "authenticationExecutions" in config:
+        if "authenticationExecutions" in config and config["authenticationExecutions"] is not None:
             # Get existing executions on the Keycloak server for this alias
             existing_executions = kc.get_executions_representation(config, realm=realm)
             for new_exec_index, new_exec in enumerate(config["authenticationExecutions"], start=0):
