@@ -94,7 +94,8 @@ options:
     version_added: 12.5.0
   type_conflict_merge:
     description:
-      - Merge strategy to apply on type conflicts.
+      - Merge strategy to apply on type conflicts. This value is only considered in case of
+        O(override=warn) or O(override=ignore).
     type: str
     default: replace
     choices:
@@ -103,7 +104,8 @@ options:
     version_added: 12.5.0
   default_merge:
     description:
-      - Merge strategy applied to other types.
+      - Merge strategy applied to other types. This value is only considered in case of
+        O(override=warn) or O(override=ignore).
     type: str
     default: replace
     choices:
@@ -153,6 +155,32 @@ testb__test_dict:
   ports:
     - 3
 
+testa_low_prio__test:
+  a:
+    a:
+      x: low_value
+      y: low_value
+      list:
+        - low_value
+  b:
+    - 1
+    - 1
+    - 2
+    - 3
+
+testb_high_prio__test:
+  a:
+    a:
+      y: high_value
+      z: high_value
+      list:
+        - high_value
+  b:
+    - 3
+    - 4
+    - 4
+    - '5': value
+
 # Merge variables that end with '__test_dict' and store the result in a variable 'example_a'
 example_a: "{{ lookup('community.general.merge_variables', '__test_dict', pattern_type='suffix') }}"
 
@@ -170,6 +198,55 @@ example_b: "{{ lookup('community.general.merge_variables', '^.+__test_list$', in
 #   - "list init item 2"
 #   - "test a item 1"
 #   - "test b item 1"
+
+# Shallow merge variables that end with '__test' and store the result in a variable 'example_c'
+example_c: "{{
+  lookup(
+    'community.general.merge_variables',
+    '^.+__test$',
+    dict_merge='shallow',
+    list_merge='prepend',
+    list_transformations=['dedup']) }}"
+
+# The variable example_c now contains:
+# a:
+#   a:
+#     y: high_value
+#     z: high_value
+#     list:
+#       - high_value
+# b:
+#   - 3
+#   - 4
+#   - '5': value
+#   - 1
+#   - 2
+
+# Deep merge variables that end with '__test', merge list elements by index, ignore overrides,
+# apply the strategies 'keep' for type conflicts and 'replace' for other types
+example_d: "{{
+  lookup(
+    'community.general.merge_variables',
+    '^.+__test$',
+    dict_merge='deep',
+    list_merge='merge',
+    override='ignore',
+    type_conflict_merge='keep',
+    default_merge='replace') }}"
+
+# The variable example_d now contains:
+# a:
+#   a:
+#     x: low_value
+#     y: high_value
+#     list:
+#       - high_value
+#     z: high_value
+# b:
+#   - 3
+#   - 4
+#   - 4
+#   - 3
 """
 
 RETURN = r"""
@@ -271,9 +348,7 @@ class LookupModule(LookupBase):
             .with_override_behavior(self._override_behavior)
         )
 
-        if self._dict_merge == "deep":
-            builder.with_type_strategy(dict, DictMergeStrategies.Merge())
-        elif self._dict_merge == "shallow":
+        if self._dict_merge == "shallow":
             builder.with_shallow_merge()
         else:
             builder.with_type_strategy(dict, DictMergeStrategies.from_name(self._dict_merge))
@@ -389,7 +464,7 @@ class DictMergeStrategies(MergeStrategies):
             return result
 
     strategies = {
-        "merge": Merge,
+        "deep": Merge,
         "replace": BaseMergeStrategies.Replace,
         "keep": BaseMergeStrategies.Keep,
     }
@@ -607,7 +682,6 @@ class ObjectMerger(Merger):
             and not isinstance(new_value, list)
             and old_value != new_value
         ):
-            # This behavior has been implemented for reasons of backward compatibility.
             # An override is regarded as a value type conflict or
             # when both values are neither dicts nor lists and
             # have different values
