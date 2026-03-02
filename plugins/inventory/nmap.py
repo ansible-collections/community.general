@@ -178,7 +178,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _is_plugin_interposer(self):
         return self._cache._plugin._persistent
 
-
     def _get_value_from_cache(self, cache_key):
         if not self._is_plugin_interposer():
             self._cache[cache_key] = self._cache._plugin.get(cache_key)
