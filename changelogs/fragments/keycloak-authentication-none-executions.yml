@@ -1,0 +1,6 @@
+bugfixes:
+  - keycloak_authentication - fix ``TypeError`` crash when a flow is defined without
+    ``authenticationExecutions``; the key exists in the config dict with value ``None``
+    after ``module.params.get()``, causing ``enumerate(None)`` to raise
+    (https://github.com/ansible-collections/community.general/issues/11547,
+    https://github.com/ansible-collections/community.general/pull/XXXXX).
