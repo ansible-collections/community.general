@@ -266,7 +266,6 @@ if t.TYPE_CHECKING:
 
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
-from ansible.template import Templar
 from ansible.utils.display import Display
 
 display = Display()
