@@ -73,10 +73,10 @@ options:
     type: str
     default: deep
     choices:
-      deep: merge dictionaries recursively.
-      shallow: merge only top-level values.
-      replace: overwrite older dict with newer one.
-      keep: discard newer dict.
+      deep: Merge dictionaries recursively.
+      shallow: Merge only top-level values.
+      replace: Overwrite older dict with newer one.
+      keep: Discard newer dict.
     version_added: 12.5.0
   list_merge:
     description:
