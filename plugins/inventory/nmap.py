@@ -174,15 +174,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 valid = True
 
         return valid
-    
+
     def _is_plugin_interposer(self):
         return self._cache._plugin._persistent
-    
+
+
     def _get_value_from_cache(self, cache_key):
         if not self._is_plugin_interposer():
             self._cache[cache_key] = self._cache._plugin.get(cache_key)
-            self._cache._retrieved = self._cache 
-        
+            self._cache._retrieved = self._cache
+
         return self._cache[cache_key]
 
     def parse(self, inventory, loader, path, cache=True):
