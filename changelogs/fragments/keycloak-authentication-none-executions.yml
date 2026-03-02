@@ -3,4 +3,4 @@ bugfixes:
     ``authenticationExecutions``; the key exists in the config dict with value ``None``
     after ``module.params.get()``, causing ``enumerate(None)`` to raise
     (https://github.com/ansible-collections/community.general/issues/11547,
-    https://github.com/ansible-collections/community.general/pull/XXXXX).
+    https://github.com/ansible-collections/community.general/pull/11548).
