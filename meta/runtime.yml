@@ -371,6 +371,26 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.hpilo_info instead.
+    aix_devices:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.devices instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_filesystem:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.filesystem instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_inittab:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.inittab instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_lvg:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.lvg instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_lvol:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.lvol instead. The C(ibm.power_aix) collection is actively maintained by IBM.
     idrac_firmware:
       redirect: dellemc.openmanage.idrac_firmware
     idrac_redfish_facts:
