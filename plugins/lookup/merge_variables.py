@@ -115,22 +115,11 @@ options:
   list_transformations:
     description:
       - List transformations applied to list types. The definition order corresponds to the order in which these transformations are applied.
-      - Elements can be a dict with the keys mentioned below or a string naming the transformation to apply.
     type: list
-    elements: raw
-    suboptions:
-      name:
-        description:
-          - Name of the list transformation.
-        required: true
-        type: str
-        choices:
-          flatten: Flatten lists, converting nested lists into single lists.
-          dedup: Remove duplicates from lists.
-      options:
-        description:
-          - Options as key value pairs. V(flatten) and V(dedup) do not support any additional options.
-        type: dict
+    elements: str
+    choices:
+      - flatten
+      - dedup
     default: []
     version_added: 12.5.0
 """
@@ -356,16 +345,7 @@ class LookupModule(LookupBase):
             builder.with_type_strategy(dict, DictMergeStrategies.from_name(self._dict_merge))
 
         for transformation in self._list_transformations:
-            if isinstance(transformation, str):
-                builder.with_transformation(list, ListTransformations.from_name(transformation))
-            elif isinstance(transformation, dict):
-                name = transformation["name"]
-                options = transformation.get("options", {})
-                builder.with_transformation(list, ListTransformations.from_name(name, **options))
-            else:
-                raise AnsibleError(
-                    f"Transformations must be specified through values of type 'str' or 'dict', but a value of type '{type(transformation)}' was given."
-                )
+            builder.with_transformation(list, ListTransformations.from_name(transformation))
 
         merger = builder.build()
 

@@ -732,7 +732,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
     @patch.object(
         AnsiblePlugin,
         "get_option",
-        side_effect=[None, "ignore", "suffix", None, "deep", "append", "replace", "replace", [{"name": "dedup"}]],
+        side_effect=[None, "ignore", "suffix", None, "deep", "append", "replace", "replace", ["dedup"]],
     )
     @patch.object(
         Templar, "template", side_effect=[deepcopy(merge_hash_data["low_prio"]), deepcopy(merge_hash_data["high_prio"])]
