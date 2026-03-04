@@ -13,7 +13,7 @@ description:
   - Create, update, or delete secrets in a GitHub repository or organization.
 author:
   - Thomas Sjögren (@konstruktoid)
-version_added: '12.4.0'
+version_added: '12.5.0'
 requirements:
   - pynacl
 extends_documentation_fragment:
