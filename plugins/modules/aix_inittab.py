@@ -13,6 +13,12 @@ module: aix_inittab
 short_description: Manages the C(inittab) on AIX
 description:
   - Manages the C(inittab) on AIX.
+deprecated:
+  removed_in: 15.0.0
+  why: The module is not actively maintained.
+  alternative: >-
+    Use C(ibm.power_aix.inittab) instead.
+    See U(https://ibm.github.io/ansible-power-aix/modules/inittab.html) for details.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
