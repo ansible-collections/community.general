@@ -348,7 +348,9 @@ class LookupModule(LookupBase):
             .with_override_behavior(self._override_behavior)
         )
 
-        if self._dict_merge == "shallow":
+        if self._dict_merge == "deep":
+            builder.with_type_strategy(dict, DictMergeStrategies.Merge())
+        elif self._dict_merge == "shallow":
             builder.with_shallow_merge()
         else:
             builder.with_type_strategy(dict, DictMergeStrategies.from_name(self._dict_merge))
@@ -463,7 +465,6 @@ class DictMergeStrategies(MergeStrategies):
             return result
 
     strategies = {
-        "deep": Merge,
         "merge": Merge,
         "replace": BaseMergeStrategies.Replace,
         "keep": BaseMergeStrategies.Keep,
@@ -477,7 +478,7 @@ class ListMergeStrategies(MergeStrategies):
 
     class Append(MergeStrategy):
         """
-        Append newer entries to the older ones.
+        Append elements from the right list to elements from the left list.
         """
 
         def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
@@ -485,7 +486,7 @@ class ListMergeStrategies(MergeStrategies):
 
     class Prepend(MergeStrategy):
         """
-        Insert newer entries in front of the older ones.
+        Insert elements from the right list at the beginning of the left list.
         """
 
         def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
@@ -493,7 +494,7 @@ class ListMergeStrategies(MergeStrategies):
 
     class AppendRp(MergeStrategy):
         """
-        Append newer entries to the older ones, overwrite duplicates.
+        Append elements from the right list to elements from the left list, overwrite duplicates.
         """
 
         def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
@@ -501,7 +502,7 @@ class ListMergeStrategies(MergeStrategies):
 
     class PrependRp(MergeStrategy):
         """
-        Insert newer entries in front of the older ones, discard duplicates.
+        Insert elements from the right list at the beginning of the left list, discard duplicates.
         """
 
         def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
