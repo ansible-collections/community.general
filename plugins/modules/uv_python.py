@@ -13,6 +13,15 @@ description:
 version_added: "12.5.0"
 requirements:
   - uv must be installed and available in PATH and uv version must be >= 0.8.0.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    description: Can run in check_mode and return changed status prediction without modifying target.
+    support: full
+  diff_mode:
+    description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
+    support: none
 options:
   version:
     description:
@@ -49,13 +58,6 @@ options:
     type: str
     choices: [present, absent, latest]
     default: present
-attributes:
-  check_mode:
-    description: Can run in check_mode and return changed status prediction without modifying target.
-    support: full
-  diff_mode:
-    description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
-    support: none
 notes:
 seealso:
   - name: uv documentation
