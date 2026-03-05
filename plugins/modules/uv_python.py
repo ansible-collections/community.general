@@ -119,9 +119,10 @@ class UV:
 
     def __init__(self, module):
         self.module = module
+        self.bin_path = self.module.get_bin_path("uv", required=True)
         self._ensure_min_uv_version()
-        python_version = module.params["version"]
         try:
+            python_version = module.params["version"]
             self.python_version = StrictVersion(python_version)
             self.python_version_str = self.python_version.__str__()
         except ValueError:
@@ -131,7 +132,7 @@ class UV:
             )
 
     def _ensure_min_uv_version(self):
-        cmd = [self.module.get_bin_path("uv", required=True), "--version", "--color", "never"]
+        cmd = [self.bin_path, "--version", "--color", "never"]
         ignored_rc, out, ignored_err = self.module.run_command(cmd, check_rc=True)
         detected = out.strip().split()[-1]
         if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
@@ -243,7 +244,7 @@ class UV:
           AnsibleModuleFailJson:
               If check_rc is True and the command exits with a non-zero return code.
         """
-        cmd = [self.module.get_bin_path("uv", required=True), "python", command, python_version, "--color", "never", *args]
+        cmd = [self.bin_path, "python", command, python_version, "--color", "never", *args]
         rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
         return rc, out, err
 
