@@ -2273,6 +2273,35 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(e, msg=f"Unable get authentication flow {alias}: {e}")
 
+    def get_authentication_flow_by_id(self, id, realm: str = "master"):
+        """
+        Get an authentication flow by its id
+        :param id: id of the authentication flow to get.
+        :param realm: Realm.
+        :return: Authentication flow representation.
+        """
+        flow_url = URL_AUTHENTICATION_FLOW.format(url=self.baseurl, realm=realm, id=id)
+
+        try:
+            return json.load(self._request(flow_url, method="GET"))
+        except Exception as e:
+            self.fail_request(e, msg=f"Could not get authentication flow {id} in realm {realm}: {e}")
+
+    def update_authentication_flow(self, id, config, realm: str = "master"):
+        """
+        Updates an authentication flow
+        :param id: id of the authentication flow to update.
+        :param config: Authentication flow configuration.
+        :param realm: Realm.
+        :return: Authentication flow representation.
+        """
+        flow_url = URL_AUTHENTICATION_FLOW.format(url=self.baseurl, realm=realm, id=id)
+
+        try:
+            return self._request(flow_url, method="PUT", data=json.dumps(config))
+        except Exception as e:
+            self.fail_request(e, msg=f"Could not get authentication flow {id} in realm {realm}: {e}")
+
     def delete_authentication_flow_by_id(self, id, realm: str = "master"):
         """
         Delete an authentication flow from Keycloak
@@ -2377,6 +2406,22 @@ class KeycloakAPI:
             )
         except Exception as e:
             self.fail_request(e, msg=f"Unable to add authenticationConfig {executionId}: {e}")
+
+    def update_authentication_config(self, configId, authenticationConfig, realm: str = "master"):
+        """
+        Updates an authentication config
+        :param configId: id of the authentication config
+        :param authenticationConfig: The authentication config
+        :param realm: realm of authentication config
+        """
+        try:
+            self._request(
+                URL_AUTHENTICATION_CONFIG.format(url=self.baseurl, realm=realm, id=configId),
+                method="PUT",
+                data=json.dumps(authenticationConfig),
+            )
+        except Exception as e:
+            self.fail_request(e, msg=f"Unable to update the authentication config {configId}: {e}")
 
     def delete_authentication_config(self, configId, realm: str = "master"):
         """Delete authenticator config
