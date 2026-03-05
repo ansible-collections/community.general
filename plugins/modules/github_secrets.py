@@ -231,7 +231,7 @@ def delete_secret(
             method="DELETE",
         )
 
-    if info["status"] != delete_response_code and info["status"] != missing_status_code:
+    if info["status"] not in (delete_response_code, missing_status_code):
         module.fail_json(msg=f"Failed to delete secret: {info}")
 
     return info
