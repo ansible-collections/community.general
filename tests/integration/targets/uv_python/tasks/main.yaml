@@ -27,6 +27,11 @@
   environment:
     UV_INSTALL_DIR: /usr/local/bin
 
+- name: Check if Python 3.14 exists already
+  command: uv python find 3.14
+  ignore_errors: true
+  register: check_python_314_exists
+
 - name: Install python 3.14 in check mode
   uv_python:
     version: 3.14
@@ -37,7 +42,7 @@
 - name: Verify python 3.14 installation in check mode
   assert:
     that:
-      - install_check_mode.changed is true
+      - install_check_mode.changed == check_python_314_exists.failed
       - install_check_mode.failed is false
       - install_check_mode.python_versions | length >= 1
 
@@ -50,7 +55,7 @@
 - name: Verify python 3.14 installation
   assert:
     that:
-      - install_python.changed is true
+      - install_python.changed == check_python_314_exists.failed
       - install_python.failed is false
       - install_python.python_versions | length >= 1
       - install_python.python_paths | length >= 1
