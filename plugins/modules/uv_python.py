@@ -124,7 +124,7 @@ class UV:
         try:
             python_version = module.params["version"]
             self.python_version = StrictVersion(python_version)
-            self.python_version_str = self.python_version.__str__()
+            self.python_version_str = str(self.python_version)
         except ValueError:
             self.module.fail_json(
                 msg="Unsupported version format. Valid version numbers consist of two or three dot-separated numeric components, \
