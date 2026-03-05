@@ -74,6 +74,11 @@ EXAMPLES = r"""
   community.general.uv_python:
     version: "3.14"
 
+- name: Upgrade Python 3.14
+  community.general.uv_python:
+    version: 3.14
+    state: latest
+
 - name: Remove Python 3.13.5
   community.general.uv_python:
     version: 3.13.5
