@@ -38,7 +38,7 @@ options:
       - Desired state of the specified Python version.
       - |
         V(present) ensures the specified version is installed.
-        If you specify a full patch version (for example C(3.12.3)), that exact version will be installed if not already present.
+        If you specify a full patch version (for example O(version=3.12.3)), that exact version will be installed if not already present.
         If you only specify a minor version (for example C(3.12)), the latest available patch version for that minor release is installed only
         if no patch version for that minor release is currently installed (including patch versions not managed by C(uv)).
         RV(python_versions) and RV(python_paths) lengths are always equal to one for this state.
