@@ -28,7 +28,7 @@ options:
       - Python version to manage.
       - |
         Not all canonical Python versions are supported in this release. Valid version numbers consist of two or three dot-separated numeric components,
-        with an optional 'pre-release' tag on the end such as C(3.12), C(3.12.3), C(3.15.0a5).
+        with an optional 'pre-release' tag on the end such as V(3.12), V(3.12.3), V(3.15.0a5).
       - Advanced uv selectors such as C(>=3.12,<3.13) or C(cpython@3.12) are not supported in this release.
       - When you specify only a major.minor version, behavior depends on the O(state) parameter.
     type: str
