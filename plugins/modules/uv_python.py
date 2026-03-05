@@ -58,7 +58,6 @@ options:
     type: str
     choices: [present, absent, latest]
     default: present
-notes:
 seealso:
   - name: uv documentation
     description: Python versions management with uv.
