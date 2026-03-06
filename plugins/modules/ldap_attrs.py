@@ -42,6 +42,21 @@ options:
       - The state of the attribute values. If V(present), all given attribute values are added if they are missing. If V(absent),
         all given attribute values are removed if present. If V(exact), the set of attribute values is forced to exactly those
         provided and no others. If O(state=exact) and the attribute value is empty, all values for this attribute are removed.
+  binary_attributes:
+    description:
+      - If O(state=present), attributes whose values must be handled as raw sequences of bytes must be listed here.
+      - The values provided for the attributes will be converted from Base64.
+    type: list
+    elements: str
+    default: []
+    version_added: 12.5.0
+  honor_binary_option:
+    description:
+      - If O(state=present) and this option is V(true), attributes whose name end with V(;binary) will be treated as
+        Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
+    type: bool
+    default: true
+    version_added: 12.5.0
   attributes:
     required: true
     type: dict
@@ -156,6 +171,7 @@ modlist:
     - [2, "olcRootDN", ["cn=root,dc=example,dc=com"]]
 """
 
+import base64
 import re
 import traceback
 
@@ -187,6 +203,11 @@ class LdapAttrs(LdapGeneric):
         self.attrs = self.module.params["attributes"]
         self.state = self.module.params["state"]
         self.ordered = self.module.params["ordered"]
+        self.binary = set(attr.lower() for attr in self.module.params["binary_attributes"])
+        self.honor_binary_option = self.module.params["honor_binary_option"]
+
+        # Cached attribute values
+        self._cached_values = {}
 
     def _order_values(self, values):
         """Prepend X-ORDERED index numbers to attribute's values."""
@@ -199,17 +220,27 @@ class LdapAttrs(LdapGeneric):
 
         return ordered_values
 
-    def _normalize_values(self, values):
+    def _is_binary(self, attr_name):
+        """Check if an attribute must be considered binary."""
+        lc_name = attr_name.lower()
+        return (self.honor_binary_option and lc_name.endswith(";binary")) or lc_name in self.binary
+
+    def _normalize_values(self, values, binary):
         """Normalize attribute's values."""
+        if binary:
+            converter = base64.b64decode
+        else:
+            converter = to_bytes
+
         norm_values = []
 
         if isinstance(values, list):
-            if self.ordered:
+            if self.ordered and not binary:
                 norm_values = list(map(to_bytes, self._order_values(list(map(str, values)))))
             else:
-                norm_values = list(map(to_bytes, values))
+                norm_values = list(map(converter, values))
         else:
-            norm_values = [to_bytes(str(values))]
+            norm_values = [converter(str(values))]
 
         return norm_values
 
@@ -217,7 +248,7 @@ class LdapAttrs(LdapGeneric):
         modlist = []
         new_attrs = {}
         for name, values in self.module.params["attributes"].items():
-            norm_values = self._normalize_values(values)
+            norm_values = self._normalize_values(values, self._is_binary(name))
             added_values = []
             for value in norm_values:
                 if self._is_value_absent(name, value):
@@ -232,7 +263,7 @@ class LdapAttrs(LdapGeneric):
         old_attrs = {}
         new_attrs = {}
         for name, values in self.module.params["attributes"].items():
-            norm_values = self._normalize_values(values)
+            norm_values = self._normalize_values(values, self._is_binary(name))
             removed_values = []
             for value in norm_values:
                 if self._is_value_present(name, value):
@@ -248,13 +279,8 @@ class LdapAttrs(LdapGeneric):
         old_attrs = {}
         new_attrs = {}
         for name, values in self.module.params["attributes"].items():
-            norm_values = self._normalize_values(values)
-            try:
-                results = self.connection.search_s(self.dn, ldap.SCOPE_BASE, attrlist=[name])
-            except ldap.LDAPError as e:
-                self.fail(f"Cannot search for attribute {name}", e)
-
-            current = results[0][1].get(name, [])
+            norm_values = self._normalize_values(values, self._is_binary(name))
+            current = self._get_all_values_of(name)
 
             if frozenset(norm_values) != frozenset(current):
                 if len(current) == 0:
@@ -273,6 +299,9 @@ class LdapAttrs(LdapGeneric):
 
     def _is_value_present(self, name, value):
         """True if the target attribute has the given value."""
+        if self._is_binary(name):
+            return value in self._get_all_values_of(name)
+
         try:
             escaped_value = ldap.filter.escape_filter_chars(to_text(value))
             filterstr = f"({name}={escaped_value})"
@@ -283,15 +312,53 @@ class LdapAttrs(LdapGeneric):
 
         return is_present
 
+    def _get_all_values_of(self, name):
+        """Return all values of an attribute."""
+        lc_name = name.lower()
+        if lc_name not in self._cached_values:
+            try:
+                results = self.connection.search_s(self.dn, ldap.SCOPE_BASE, attrlist=[name])
+            except ldap.LDAPError as e:
+                self.fail(f"Cannot search for attribute {name}", e)
+            self._cached_values[lc_name] = results[0][1].get(name, [])
+        return self._cached_values[lc_name]
+
     def _is_value_absent(self, name, value):
         """True if the target attribute doesn't have the given value."""
         return not self._is_value_present(name, value)
+
+    def _reencode_modlist(self, modlist):
+        """Re-encode binary attribute values in the modlist into Base64 in
+        order to avoid crashing the plugin when returning the modlist to
+        Ansible."""
+        output = []
+        for entry in modlist:
+            values = entry[2]
+            if self._is_binary(entry[1]) and values is not None:
+                values = [base64.b64encode(value) for value in values]
+            output.append((entry[0], entry[1], values))
+        return output
+
+    def _reencode_attributes(self, attributes):
+        """Re-encode binary attribute values in an attribute dict into Base64 in
+        order to avoid crashing the plugin when returning the dict to Ansible."""
+        output = {}
+        for name, values in attributes.items():
+            if self._is_binary(name):
+                if isinstance(values, list):
+                    values = [base64.b64encode(value) for value in values]
+                else:
+                    values = base64.b64encode(values)
+            output[name] = values
+        return output
 
 
 def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
             attributes=dict(type="dict", required=True),
+            binary_attributes=dict(default=[], type="list", elements="str"),
+            honor_binary_option=dict(default=True, type="bool"),
             ordered=dict(type="bool", default=False),
             state=dict(type="str", default="present", choices=["absent", "exact", "present"]),
         ),
@@ -306,6 +373,7 @@ def main():
     ldap = LdapAttrs(module)
     old_attrs = None
     new_attrs = None
+    modlist = []
 
     state = module.params["state"]
 
@@ -327,6 +395,12 @@ def main():
                 ldap.connection.modify_s(ldap.dn, modlist)
             except Exception as e:
                 module.fail_json(msg="Attribute action failed.", details=f"{e}")
+
+    # If the data contain binary attributes/changes, we need to re-encode them
+    # using Base64.
+    modlist = ldap._reencode_modlist(modlist)
+    old_attrs = ldap._reencode_attributes(old_attrs)
+    new_attrs = ldap._reencode_attributes(new_attrs)
 
     module.exit_json(changed=changed, modlist=modlist, diff={"before": old_attrs, "after": new_attrs})
 

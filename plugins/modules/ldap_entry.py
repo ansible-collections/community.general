@@ -35,6 +35,21 @@ options:
         (float), make sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
     type: dict
     default: {}
+  binary_attributes:
+    description:
+      - If O(state=present), attributes whose values must be handled as raw sequences of bytes must be listed here.
+      - The values provided for the attributes will be converted from Base64.
+    type: list
+    elements: str
+    default: []
+    version_added: 12.5.0
+  honor_binary_option:
+    description:
+      - If O(state=present) and this option is V(true), attributes whose name end with V(;binary) will be treated as
+        Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
+    type: bool
+    default: true
+    version_added: 12.5.0
   objectClass:
     description:
       - If O(state=present), value or list of values to use when creating the entry. It can either be a string or an actual
@@ -128,6 +143,7 @@ RETURN = r"""
 # Default return values
 """
 
+import base64
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -157,6 +173,8 @@ class LdapEntry(LdapGeneric):
         # Shortcuts
         self.state = self.module.params["state"]
         self.recursive = self.module.params["recursive"]
+        self.binary = set(attr.lower() for attr in self.module.params["binary_attributes"])
+        self.honor_binary_option = self.module.params["honor_binary_option"]
 
         # Add the objectClass into the list of attributes
         self.module.params["attributes"]["objectClass"] = self.module.params["objectClass"]
@@ -166,14 +184,21 @@ class LdapEntry(LdapGeneric):
             self.attrs = self._load_attrs()
 
     def _load_attrs(self):
-        """Turn attribute's value to array."""
+        """Turn attribute's value to array. Attribute values are converted to
+        raw bytes, either by encoding the string itself, or by decoding it from
+        base 64, depending on the binary attributes settings."""
         attrs = {}
 
         for name, value in self.module.params["attributes"].items():
-            if isinstance(value, list):
-                attrs[name] = list(map(to_bytes, value))
+            lc_name = name.lower()
+            if (self.honor_binary_option and lc_name.endswith(";binary")) or lc_name in self.binary:
+                converter = base64.b64decode
             else:
-                attrs[name] = [to_bytes(value)]
+                converter = to_bytes
+            if isinstance(value, list):
+                attrs[name] = list(map(converter, value))
+            else:
+                attrs[name] = [converter(value)]
 
         return attrs
 
@@ -236,6 +261,8 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
             attributes=dict(default={}, type="dict"),
+            binary_attributes=dict(default=[], type="list", elements="str"),
+            honor_binary_option=dict(default=True, type="bool"),
             objectClass=dict(type="list", elements="str"),
             state=dict(default="present", choices=["present", "absent"]),
             recursive=dict(default=False, type="bool"),
