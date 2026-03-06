@@ -12,47 +12,38 @@ module: keycloak_authentication_v2
 short_description: Configure authentication flows in Keycloak in an idempotent and safe manner.
 
 description:
-  - This module allows the creation, deletion, and modification of Keycloak authentication flows
-    using the Keycloak REST API. 
-
+  - This module allows the creation, deletion, and modification of Keycloak authentication flows using the Keycloak REST API.
   - Rather than modifying an existing flow in place, the module re-creates the flow using the
     B(Safe Swap) mechanism described below.
-
-  - B(Safe Swap mechanism):
-  - When an authentication flow needs to be updated, the module never modifies the existing flow
-    in place. Instead it follows a multi-step swap procedure to ensure the flow is never left in
-    an intermediate or unsafe state during the update. This is especially important when the flow
-    is actively bound to a realm binding or a client override, because a partially-updated flow
-    could inadvertently allow unauthorised access.
-
-  - The Safe Swap procedure is as follows:
-  - '1. A new flow is created under a temporary name (the original alias plus a configurable
-       suffix, for example C(myflow_tmp_for_swap)).'
-  - '2. All executions and their configurations are added to the new temporary flow.'
-  - '3. If the existing flow is currently bound to a realm or a client, all bindings are
-       redirected to the new temporary flow. This ensures continuity and avoids any gap in
-       active authentication coverage.'
-  - '4. The old flow is deleted.'
-  - '5. The temporary flow is renamed to the original alias, restoring the expected name.'
-
-  - B(Why in-place updates are unsafe):
-  - Consider a flow that validates a password. If the desired state replaces the keycloak's default password check
-    with a custom password check, an in-place update would first remove the keycloak's default password execution and then add
-    the custom password execution. During the brief window between those two operations, users could log in
-    without any credential validation. The Safe Swap approach avoids this window entirely,
-    because both the old and the new flow exist in a fully-formed state before any rebinding
-    occurs.
-
-  - B(Handling pre-existing temporary swap flows):
-  - If a temporary swap flow already exists (for example, from a previously interrupted run),
-    the module can optionally delete it before proceeding. This behaviour is controlled by the
-    C(force_temporary_swap_flow_deletion) option. If the option is C(false) and a temporary flow
-    already exists, the module will fail to prevent accidental data loss.
-
-  - B(Idempotency):
-  - If the existing flow already matches the desired configuration, no changes are made. The
-    module compares a normalised representation of the existing flow against the desired state
-    before deciding whether to trigger the Safe Swap procedure.
+  - B(Safe Swap mechanism)
+      - When an authentication flow needs to be updated, the module never modifies the existing flow
+        in place. Instead it follows a multi-step swap procedure to ensure the flow is never left in
+        an intermediate or unsafe state during the update. This is especially important when the flow
+        is actively bound to a realm binding or a client override, because a partially-updated flow
+        could inadvertently allow unauthorised access.
+  - The Safe Swap procedure is as follows
+      - '1. A new flow is created under a temporary name (the original alias plus a configurable suffix, for example C(myflow_tmp_for_swap)).'
+      - '2. All executions and their configurations are added to the new temporary flow.'
+      - '3. If the existing flow is currently bound to a realm or a client, all bindings are redirected to the new temporary flow.
+        This ensures continuity and avoids any gap in active authentication coverage.'
+      - '4. The old flow is deleted.'
+      - '5. The temporary flow is renamed to the original alias, restoring the expected name.'
+  - B(Why in-place updates are unsafe)
+      - Consider a flow that validates a password. If the desired state replaces the keycloak's default password check
+        with a custom password check, an in-place update would first remove the keycloak's default password execution and then add
+        the custom password execution. During the brief window between those two operations, users could log in
+        without any credential validation. The Safe Swap approach avoids this window entirely,
+        because both the old and the new flow exist in a fully-formed state before any rebinding
+        occurs.
+  - B(Handling pre-existing temporary swap flows)
+      - If a temporary swap flow already exists (for example, from a previously interrupted run),
+        the module can optionally delete it before proceeding. This behaviour is controlled by the
+        C(force_temporary_swap_flow_deletion) option. If the option is C(false) and a temporary flow
+        already exists, the module will fail to prevent accidental data loss.
+  - B(Idempotency)
+      - If the existing flow already matches the desired configuration, no changes are made. The
+        module compares a normalised representation of the existing flow against the desired state
+        before deciding whether to trigger the Safe Swap procedure.
 
 attributes:
   check_mode:
