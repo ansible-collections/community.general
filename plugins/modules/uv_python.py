@@ -118,10 +118,9 @@ class UV:
         self.bin_path = self.module.get_bin_path("uv", required=True)
         self._ensure_min_uv_version()
         try:
-            python_version = module.params["version"]
-            self.python_version = StrictVersion(python_version)
+            self.python_version = StrictVersion(module.params["version"])
             self.python_version_str = str(self.python_version)
-        except ValueError:
+        except (ValueError, AttributeError):
             self.module.fail_json(
                 msg="Unsupported version format. Valid version numbers consist of two or three dot-separated numeric components, \
                   with an optional 'pre-release' tag on the end (e.g. 3.12, 3.12.3, 3.15.0a5) are supported in this release."

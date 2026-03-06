@@ -257,6 +257,7 @@
 - name: No specified version
   uv_python:
     state: latest
+    version: ""
   ignore_errors: true
   register: no_version
 
@@ -264,3 +265,17 @@
   assert:
     that:
       - no_version.failed is true
+      - '"Unsupported version format" in no_version.msg'
+
+- name: Unsupported version format given
+  uv_python:
+    state: latest
+    version: "3.8.post2"
+  ignore_errors: true
+  register: wrong_version
+
+- name: Verify failure when unsupported version format is specified
+  assert:
+    that:
+      - wrong_version.failed is true
+      - '"Unsupported version format" in wrong_version.msg'
