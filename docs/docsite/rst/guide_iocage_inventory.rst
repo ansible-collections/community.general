@@ -12,7 +12,7 @@ The inventory plugin :ansplugin:`community.general.iocage#inventory` gets the in
 
 See:
 
-* `iocage - A FreeBSD Jail Manager <https://iocage.readthedocs.io/en/latest>`_
+* `iocage - A FreeBSD Jail Manager <https://freebsd.github.io/iocage/>`_
 * `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_
 * `Jails and Containers <https://docs.freebsd.org/en/books/handbook/jails>`_
 
