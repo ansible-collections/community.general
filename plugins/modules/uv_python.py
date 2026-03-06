@@ -12,7 +12,6 @@ description:
 version_added: "12.5.0"
 requirements:
   - uv must be installed and available in PATH and uv version must be >= 0.8.0.
-  - Python 3.9 or higher is required on the target system.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
