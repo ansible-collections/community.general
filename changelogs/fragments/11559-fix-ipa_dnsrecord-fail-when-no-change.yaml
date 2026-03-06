@@ -1,0 +1,2 @@
+bugfixes:
+  - ipa_dnsrecord - fix idempotency bug when using ``dnsttl`` due to wrong python types (https://github.com/ansible-collections/community.general/pull/11559).
