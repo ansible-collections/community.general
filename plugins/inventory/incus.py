@@ -34,7 +34,8 @@ options:
     default: []
   host_domain:
     description:
-      - Domain to append to the host FQDN.
+      - Domain to append to the host.
+      - This is also used when O(host_fqdn) is not set since community.general 12.5.0.
     type: string
   host_fqdn:
     description:
@@ -170,9 +171,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                     if self.get_option("host_fqdn"):
                         host_name = f"{host_name}.{project}.{remote_name}"
 
-                        domain = self.get_option("host_domain")
-                        if domain:
-                            host_name = f"{host_name}.{domain}"
+                    domain = self.get_option("host_domain")
+                    if domain:
+                        host_name = f"{host_name}.{domain}"
 
                     # Add some extra variables.
                     host_vars = {}
