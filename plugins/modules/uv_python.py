@@ -17,10 +17,8 @@ extends_documentation_fragment:
   - community.general.attributes
 attributes:
   check_mode:
-    description: Can run in check_mode and return changed status prediction without modifying target.
     support: full
   diff_mode:
-    description: Returns details on what has changed (or possibly needs changing in check_mode), when in diff mode.
     support: none
 options:
   version:
