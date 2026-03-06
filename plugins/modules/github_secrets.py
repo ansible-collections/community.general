@@ -138,12 +138,12 @@ def get_public_key(
     else:
         url = f"{api_url}/orgs/{organization}/actions/secrets/public-key"
 
-    response, info = fetch_url(module, url, headers=headers)
+    resp, info = fetch_url(module, url, headers=headers)
 
     if info["status"] != ok_status_code:
         module.fail_json(msg=f"Failed to get public key: {info}")
 
-    data = json.loads(response.read())
+    data = json.loads(resp.read())
     return data["key_id"], data["key"]
 
 
@@ -156,6 +156,28 @@ def encrypt_secret(public_key: str, secret_value: str) -> str:
     sealed_box = public.SealedBox(key)
     encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
     return encoding.Base64Encoder.encode(encrypted).decode("utf-8")
+
+
+def check_secret(
+    module: AnsibleModule,
+    api_url: str,
+    headers: dict[str, str],
+    organization: str,
+    repository: str,
+    key: str,
+) -> int:
+    url = (
+        f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
+        if repository
+        else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
+    )
+
+    resp, info = fetch_url(module, url, headers=headers)
+
+    if info["status"] in (ok_status_code, missing_status_code):
+        return info["status"]
+    else:
+        module.fail_json(msg=f"Failed to check secret: {info}")
 
 
 def upsert_secret(
@@ -184,9 +206,15 @@ def upsert_secret(
         payload["visibility"] = module.params["visibility"]
 
     if module.check_mode:
+        secret_status = check_secret(module, api_url, headers, organization, repository, key)
+        if secret_status == missing_status_code:
+            secret_status = created_response_code
+        else:
+            secret_status = delete_response_code
+        check_mode_msg = "OK (unknown bytes)" if secret_status == delete_response_code else "OK (2 bytes)"
         info = {
-            "status": created_response_code,
-            "msg": "OK (2 bytes)",
+            "msg": check_mode_msg,
+            "status": secret_status,
         }
     else:
         resp, info = fetch_url(
@@ -197,7 +225,7 @@ def upsert_secret(
             method="PUT",
         )
 
-    if info["status"] not in (201, 204):
+    if info["status"] not in (created_response_code, delete_response_code):
         module.fail_json(msg=f"Failed to upsert secret: {info}")
 
     return info
@@ -219,9 +247,10 @@ def delete_secret(
     )
 
     if module.check_mode:
+        secret_status = check_secret(module, api_url, headers, organization, repository, key)
         info = {
-            "status": delete_response_code,
-            "msg": "OK (unknown bytes)",
+            "msg": ("HTTP Error 404: Not Found" if secret_status == missing_status_code else "OK (unknown bytes)"),
+            "status": (delete_response_code if secret_status == ok_status_code else secret_status),
         }
     else:
         resp, info = fetch_url(
@@ -322,7 +351,7 @@ def main() -> None:
 
         response_msg = "Secret created" if upsert["status"] == created_response_code else "Secret updated"
 
-        result["changed"] = True
+        result["changed"] = True if not module.check_mode else False
         result.update(
             result={
                 "status": upsert["status"],
@@ -342,7 +371,7 @@ def main() -> None:
         )
 
         if delete["status"] == delete_response_code:
-            result["changed"] = True
+            result["changed"] = True if not module.check_mode else False
             result.update(
                 result={
                     "status": delete["status"],
