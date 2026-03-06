@@ -13,6 +13,7 @@ description:
 version_added: "12.5.0"
 requirements:
   - uv must be installed and available in PATH and uv version must be >= 0.8.0.
+  - Python 3.9 or higher is required on the target system.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -68,7 +69,6 @@ seealso:
     description: uv CLI reference guide.
     link: https://docs.astral.sh/uv/reference/cli/#uv-python
 author: Mariam Ahhttouche (@mriamah)
-
 """
 
 EXAMPLES = r"""
@@ -111,7 +111,6 @@ rc:
 """
 
 import json
-from typing import Tuple
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.compat.version import LooseVersion, StrictVersion
 
@@ -149,7 +148,7 @@ class UV:
                 required_version=MINIMUM_UV_VERSION,
             )
 
-    def install_python(self) -> Tuple[bool, str, str, int, list, list]:
+    def install_python(self) -> tuple[bool, str, str, int, list, list]:
         """
         Runs command 'uv python install X.Y.Z' which installs specified python version.
         If patch version is not specified uv installs latest available patch version.
@@ -176,7 +175,7 @@ class UV:
         latest_version, path = self._get_latest_patch_release("--only-installed", "--managed-python")
         return True, out, err, rc, [latest_version], [path]
 
-    def uninstall_python(self) -> Tuple[bool, str, str, int, list, list]:
+    def uninstall_python(self) -> tuple[bool, str, str, int, list, list]:
         """
         Runs command 'uv python uninstall X.Y.Z' which removes specified python version from environment.
         If patch version is not specified all correspending installed patch versions are removed.
@@ -197,7 +196,7 @@ class UV:
         rc, out, err = self._exec(self.python_version_str, "uninstall", check_rc=True)
         return True, out, err, rc, installed_versions, install_paths
 
-    def upgrade_python(self) -> Tuple[bool, str, str, int, list, list]:
+    def upgrade_python(self) -> tuple[bool, str, str, int, list, list]:
         """
         Runs command 'uv python install X.Y.Z' with latest patch version available.
         Returns:
@@ -225,7 +224,7 @@ class UV:
         latest_version_str, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
         return True, out, err, rc, [latest_version_str], [latest_path]
 
-    def _exec(self, python_version, command, *args, check_rc=False) -> Tuple[int, str, str]:
+    def _exec(self, python_version, command, *args, check_rc=False) -> tuple[int, str, str]:
         """
         Execute a uv python subcommand.
         Args:
@@ -241,7 +240,7 @@ class UV:
         rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
         return rc, out, err
 
-    def _find_python(self, *args, check_rc=False) -> Tuple[int, str, str]:
+    def _find_python(self, *args, check_rc=False) -> tuple[int, str, str]:
         """
         Runs command 'uv python find' which returns path of installed patch releases for a given python version.
         If multiple patch versions are installed, "uv python find" returns the one used by default
@@ -258,7 +257,7 @@ class UV:
             out = out.strip()
         return rc, out, err
 
-    def _list_python(self, *args, check_rc=False) -> Tuple[int, list, str]:
+    def _list_python(self, *args, check_rc=False) -> tuple[int, list, str]:
         """
         Runs command 'uv python list' (which returns list of installed patch releases for a given python version).
         Official documentation https://docs.astral.sh/uv/reference/cli/#uv-python-list
@@ -278,7 +277,7 @@ class UV:
             pass
         return rc, pythons_installed, err
 
-    def _get_latest_patch_release(self, *args) -> Tuple[str, str]:
+    def _get_latest_patch_release(self, *args) -> tuple[str, str]:
         """
         Returns latest available patch release for a given python version.
         Args:
@@ -298,7 +297,7 @@ class UV:
             path = version.get("path", "")
         return latest_version, path
 
-    def _get_installed_versions(self, *args) -> Tuple[list, list]:
+    def _get_installed_versions(self, *args) -> tuple[list, list]:
         """
         Returns installed patch releases for a given python version.
         Args:

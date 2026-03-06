@@ -6,4 +6,5 @@ uv_python
 uv
 python
 skip/python2
+skip/python3.8
 skip/windows
