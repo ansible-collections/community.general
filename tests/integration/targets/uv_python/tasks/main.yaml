@@ -66,22 +66,18 @@
   ignore_errors: true
   register: check_python_3135_exists
 
-- name: Check if Python
-  command: uv python list
-  ignore_errors: true
-
 - name: Install Python 3.13.5
   uv_python:
     version: 3.13.5
-  register: install_python
+  register: install_python_3135
 
 - name: Verify Python 3.13.5 installation
   assert:
     that:
-      - install_python.changed == check_python_3135_exists.failed
-      - install_python.failed is false
-      - '"3.13.5" in install_python.python_versions'
-      - install_python.python_paths | length >= 1
+      - install_python_3135.changed == check_python_3135_exists.failed
+      - install_python_3135.failed is false
+      - '"3.13.5" in install_python_3135.python_versions'
+      - install_python_3135.python_paths | length >= 1
 
 - name: Re-install Python 3.13.5
   uv_python:
@@ -119,8 +115,13 @@
 - name: Verify Python 3.13.5 deletion in check mode
   assert:
     that:
-      - remove_python_in_check_mode.changed is true
+      - remove_python_in_check_mode.changed == install_python_3135.changed
       - remove_python_in_check_mode.failed is false
+
+- name: Additional check for Python 3.13.5 deletion in check mode
+  when: install_python_3135.changed is true
+  assert:
+    that:
       - '"3.13.5" in remove_python_in_check_mode.python_versions'
       - remove_python_in_check_mode.python_paths | length >= 1
 
@@ -133,8 +134,13 @@
 - name: Verify Python 3.13.5 deletion
   assert:
     that:
-      - remove_python.changed is true
+      - remove_python.changed == install_python_3135.changed
       - remove_python.failed is false
+
+- name: Additional check for Python 3.13.5 deletion
+  when: install_python_3135.changed is true
+  assert:
+    that:
       - remove_python.python_paths | length >= 1
       - '"3.13.5" in remove_python.python_versions'
 
