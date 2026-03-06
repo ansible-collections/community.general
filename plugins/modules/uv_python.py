@@ -101,9 +101,9 @@ rc:
 """
 
 import json
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.compat.version import LooseVersion, StrictVersion
-
 
 MINIMUM_UV_VERSION = "0.8.0"
 
