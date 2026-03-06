@@ -7,3 +7,5 @@ destructive
 skip/python2
 skip/python3.8
 skip/windows
+skip/freebsd
+skip/rhel
