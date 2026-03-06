@@ -399,7 +399,7 @@ class BaseMergeStrategies(MergeStrategies):
 
     class Replace(MergeStrategy):
         """
-        Overwrite older value with newer one.
+        Overwrite left value with right one.
         """
 
         def merge(self, merger: ObjectMerger, path: list[str], left: t.Any, right: t.Any) -> t.Any:
@@ -407,7 +407,7 @@ class BaseMergeStrategies(MergeStrategies):
 
     class Keep(MergeStrategy):
         """
-        Discard newer value.
+        Discard right value, keep left one.
         """
 
         def merge(self, merger: ObjectMerger, path: list[str], left: t.Any, right: t.Any) -> t.Any:
