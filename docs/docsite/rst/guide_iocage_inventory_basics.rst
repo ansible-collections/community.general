@@ -20,7 +20,7 @@ As root at the iocage host, create three VNET jails with a DHCP interface from t
    shell> iocage create --template ansible_client --name srv_3 bpf=1 dhcp=1 vnet=1
    srv_3 successfully created!
 
-See: `Configuring a VNET Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-vnet-jail>`_.
+See: `Configuring VNET <https://freebsd.github.io/iocage/networking.html#vimage-vnet>`_.
 
 As admin at the controller, list the jails:
 
@@ -115,7 +115,7 @@ Optionally, create shared IP jails:
    | None | srv_3 | off  | down  | jail | 14.2-RELEASE-p3 | em0|10.1.0.103/24 | -   | ansible_client | no       |
    +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
 
-See: `Configuring a Shared IP Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-shared-ip-jail>`_
+See: `Configuring a Shared IP Jail <https://freebsd.github.io/iocage/networking.html#shared-ip>`_
 
 If iocage needs environment variable(s), use the option :ansopt:`community.general.iocage#inventory:env`. For example,
 
