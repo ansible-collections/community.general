@@ -642,6 +642,8 @@ files:
     maintainers: adrianmoisey
   $modules/github_repo.py:
     maintainers: atorrescogollo
+  $modules/github_secrets.py:
+    maintainers: konstruktoid
   $modules/gitlab_:
     keywords: gitlab source_control
     maintainers: $team_gitlab
