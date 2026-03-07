@@ -6,13 +6,13 @@
 
 DOCUMENTATION = r"""
 module: uv_python
-short_description: Manage Python versions and installations using uv Python package manager
+short_description: Manage Python versions and installations using the C(uv) Python package manager
 description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
 version_added: "12.5.0"
 requirements:
   - uv must be installed and available in PATH and uv version must be at least 0.8.0.
-  - Python version must be at least 3.9
+  - Python version must be at least 3.9.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -27,8 +27,8 @@ options:
       - "Not all canonical Python versions are supported in this release. Valid version numbers consist of two or three dot-separated
         numeric components, with an optional 'pre-release' tag at the end such as V(3.12), V(3.12.3), V(3.15.0a5)."
       - Advanced uv selectors such as V(>=3.12,<3.13) or V(cpython@3.12) are not supported in this release.
-      - "When you specify only a major.minor version, make sure the number is enclosed in quotes so that it gets parsed correctly.\n\
-        Note that in case only a major.minor version are specified behavior depends on the O(state) parameter."
+      - When you specify only a major.minor version, make sure the number is enclosed in quotes so that it gets parsed correctly.
+        Note that in case only a major.minor version are specified behavior depends on the O(state) parameter.
     type: str
     required: true
   state:
@@ -43,21 +43,20 @@ options:
         is removed. If you only specify a minor version (for example V(3.12)), all installed patch versions for that minor
         release are removed. If you specify a version that is not installed, no changes are made. RV(python_versions) and
         RV(python_paths) lengths can be higher or equal to one in this state."
-      - "V(latest) ensures the latest available patch version for the specified version is installed. If you only specify
-        a minor version (for example V(3.12)), the latest available patch version for that minor release is always installed. \
+      - V(latest) ensures the latest available patch version for the specified version is installed. If you only specify
+        a minor version (for example V(3.12)), the latest available patch version for that minor release is always installed.
         If another patch version is already installed but is not the latest, the latest patch version is installed. The latest
-        patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release. \
-        RV(python_versions) and RV(python_paths) lengths are always equal to one in this state. This state does not use C(uv
-        python upgrade)."
+        patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.
+        RV(python_versions) and RV(python_paths) lengths are always equal to one in this state. This state does not use C(uv python upgrade).
     type: str
     choices: [present, absent, latest]
     default: present
 seealso:
-  - name: uv documentation
-    description: Python versions management with uv.
+  - name: C(uv) documentation
+    description: Python versions management with C(uv).
     link: https://docs.astral.sh/uv/concepts/python-versions/
-  - name: uv CLI documentation
-    description: uv CLI reference guide.
+  - name: C(uv) CLI documentation
+    description: C(uv) CLI reference guide.
     link: https://docs.astral.sh/uv/reference/cli/#uv-python
 author: Mariam Ahhttouche (@mriamah)
 """
@@ -123,8 +122,10 @@ class UV:
             self.python_version_str = str(self.python_version)
         except (ValueError, AttributeError):
             self.module.fail_json(
-                msg="Unsupported version format. Valid version numbers consist of two or three dot-separated numeric components, \
-                  with an optional 'pre-release' tag on the end (for example 3.12, 3.12.3, 3.15.0a5) are supported in this release."
+                msg=(
+                    "Unsupported version format. Valid version numbers consist of two or three dot-separated numeric components"
+                    " with an optional 'pre-release' tag on the end (for example 3.12, 3.12.3, 3.15.0a5) are supported in this release."
+                )
             )
 
     def _ensure_min_uv_version(self):
@@ -214,11 +215,11 @@ class UV:
         latest_version_str, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
         return True, out, err, rc, [latest_version_str], [latest_path]
 
-    def _exec(self, python_version, command, *args, check_rc=False) -> tuple[int, str, str]:
+    def _exec(self, python_version: str, command, *args, check_rc=False) -> tuple[int, str, str]:
         """
         Execute a uv python subcommand.
         Args:
-          python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
+          python_version: Python version specifier (e.g. "3.12", "3.12.3").
           command (str): uv python subcommand (e.g. "install", "uninstall", "find").
           *args: Additional positional arguments passed to the command.
           check_rc (bool): Whether to fail if the command exits with non-zero return code.
