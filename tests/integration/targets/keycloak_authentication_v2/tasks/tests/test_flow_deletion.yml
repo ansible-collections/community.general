@@ -24,7 +24,7 @@
 - name: Assert that the flow deletion result
   ansible.builtin.assert:
     that:
-      - flow_deletion_result.changed == true
+      - flow_deletion_result is changed
       - flow_deletion_result.diff is defined
     msg: "Expected changes and a diff but got: changed={{ flow_deletion_result.changed }}, diff={{ flow_deletion_result.get('diff') }}"
 

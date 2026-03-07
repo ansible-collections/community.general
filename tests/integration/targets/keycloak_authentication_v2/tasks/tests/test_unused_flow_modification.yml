@@ -17,7 +17,7 @@
 - name: Assert the flow creation modification result
   ansible.builtin.assert:
     that:
-      - flow_v2_result.changed == true
+      - flow_v2_result is changed
       - flow_v2_result.diff is defined
     msg: "Expected changes and a diff but got: changed={{ flow_v2_result.changed }}, diff={{ flow_v2_result.get('diff') }}"
 
@@ -33,7 +33,7 @@
 - name: Assert the flow modification result
   ansible.builtin.assert:
     that:
-      - flow_v1_result.changed == true
+      - flow_v1_result is changed
       - flow_v1_result.diff is defined
     msg: "Expected changes and a diff but got: changed={{ flow_v1_result.changed }}, diff={{ flow_v1_result.get('diff') }}"
 

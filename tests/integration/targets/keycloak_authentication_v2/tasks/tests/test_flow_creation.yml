@@ -13,7 +13,7 @@
 - name: Assert the flow creation result
   ansible.builtin.assert:
     that:
-      - flow_v1_result.changed == true
+      - flow_v1_result is changed
       - flow_v1_result.diff is defined
     msg: "Expected changes and a diff but got: changed={{ flow_v1_result.changed }}, diff={{ flow_v1_result.get('diff') }}"
 
@@ -29,6 +29,6 @@
 - name: Assert that the task didn't re-create the flow, because the flow didn't change
   ansible.builtin.assert:
     that:
-      - flow_v1_result.changed == false
+      - flow_v1_result is not changed
       - flow_v1_result.diff is not defined
     msg: "Expected no changes and no diff but got: changed={{ flow_v1_result.changed }}, diff={{ flow_v1_result.get('diff') }}"
