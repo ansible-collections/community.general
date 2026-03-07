@@ -48,7 +48,7 @@ options:
       - If O(state=present) and this option is V(true), attributes whose name end with V(;binary) will be treated as
         Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
     type: bool
-    default: true
+    default: false
     version_added: 12.5.0
   objectClass:
     description:
@@ -183,6 +183,11 @@ class LdapEntry(LdapGeneric):
         if self.state == "present":
             self.attrs = self._load_attrs()
 
+    def _is_binary(self, attr_name):
+        """Check if an attribute must be considered binary."""
+        lc_name = attr_name.lower()
+        return (self.honor_binary_option and "binary" in lc_name.split(";")) or lc_name in self.binary
+
     def _load_attrs(self):
         """Turn attribute's value to array. Attribute values are converted to
         raw bytes, either by encoding the string itself, or by decoding it from
@@ -190,15 +195,13 @@ class LdapEntry(LdapGeneric):
         attrs = {}
 
         for name, value in self.module.params["attributes"].items():
-            lc_name = name.lower()
-            if (self.honor_binary_option and lc_name.endswith(";binary")) or lc_name in self.binary:
+            if self._is_binary(name):
                 converter = base64.b64decode
             else:
                 converter = to_bytes
-            if isinstance(value, list):
-                attrs[name] = list(map(converter, value))
-            else:
-                attrs[name] = [converter(value)]
+            if not isinstance(value, list):
+                value = [value]
+            attrs[name] = [converter(v) for v in value]
 
         return attrs
 
@@ -262,7 +265,7 @@ def main():
         argument_spec=gen_specs(
             attributes=dict(default={}, type="dict"),
             binary_attributes=dict(default=[], type="list", elements="str"),
-            honor_binary_option=dict(default=True, type="bool"),
+            honor_binary_option=dict(default=False, type="bool"),
             objectClass=dict(type="list", elements="str"),
             state=dict(default="present", choices=["present", "absent"]),
             recursive=dict(default=False, type="bool"),

@@ -55,7 +55,7 @@ options:
       - If O(state=present) and this option is V(true), attributes whose name end with V(;binary) will be treated as
         Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
     type: bool
-    default: true
+    default: false
     version_added: 12.5.0
   attributes:
     required: true
@@ -223,26 +223,21 @@ class LdapAttrs(LdapGeneric):
     def _is_binary(self, attr_name):
         """Check if an attribute must be considered binary."""
         lc_name = attr_name.lower()
-        return (self.honor_binary_option and lc_name.endswith(";binary")) or lc_name in self.binary
+        return (self.honor_binary_option and "binary" in lc_name.split(";")) or lc_name in self.binary
 
-    def _normalize_values(self, values, binary):
+    def _normalize_values(self, values, is_binary):
         """Normalize attribute's values."""
-        if binary:
+        if is_binary:
             converter = base64.b64decode
         else:
             converter = to_bytes
 
-        norm_values = []
+        if not isinstance(values, list):
+            values = [values]
+        elif self.ordered and not is_binary:
+            values = self._order_values([str(value) for value in values])
 
-        if isinstance(values, list):
-            if self.ordered and not binary:
-                norm_values = list(map(to_bytes, self._order_values(list(map(str, values)))))
-            else:
-                norm_values = list(map(converter, values))
-        else:
-            norm_values = [converter(str(values))]
-
-        return norm_values
+        return [converter(value) for value in values]
 
     def add(self):
         modlist = []
@@ -332,11 +327,10 @@ class LdapAttrs(LdapGeneric):
         order to avoid crashing the plugin when returning the modlist to
         Ansible."""
         output = []
-        for entry in modlist:
-            values = entry[2]
-            if self._is_binary(entry[1]) and values is not None:
+        for mod_op, attr, values in modlist:
+            if self._is_binary(attr) and values is not None:
                 values = [base64.b64encode(value) for value in values]
-            output.append((entry[0], entry[1], values))
+            output.append((mod_op, attr, values))
         return output
 
     def _reencode_attributes(self, attributes):
@@ -358,7 +352,7 @@ def main():
         argument_spec=gen_specs(
             attributes=dict(type="dict", required=True),
             binary_attributes=dict(default=[], type="list", elements="str"),
-            honor_binary_option=dict(default=True, type="bool"),
+            honor_binary_option=dict(default=False, type="bool"),
             ordered=dict(type="bool", default=False),
             state=dict(type="str", default="present", choices=["absent", "exact", "present"]),
         ),
