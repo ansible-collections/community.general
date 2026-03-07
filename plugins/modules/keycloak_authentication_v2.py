@@ -373,6 +373,7 @@ end_state:
 
 import copy
 import traceback
+from typing import Any, TypedDict
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -384,7 +385,56 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 )
 
 
-def rename_auth_flow(kc, realm, flow_id, new_alias):
+class AuthenticationConfig(TypedDict):
+    alias: str
+    config: dict[str, str]
+
+
+class Execution(TypedDict):
+    requirement: str
+    providerId: str
+    authenticationConfig: AuthenticationConfig
+    subFlow: str
+    subFlowType: str
+    authenticationExecutions: list[Execution]
+
+
+class ExecutionDiffRepr(TypedDict):
+    requirement: str
+    index: int
+    priority: int
+    level: int
+    providerId: str
+    authenticationFlow: bool
+    authenticationConfig: AuthenticationConfig
+
+
+class AuthenticationFlow(TypedDict):
+    alias: str
+    providerId: str
+    description: str | None
+    authenticationExecutions: list[Execution]
+
+
+class AuthenticationFlowResponse(TypedDict):
+    id: str
+    alias: str
+    providerId: str
+    description: str | None
+    topLevel: bool
+    builtIn: bool
+    authenticationExecutions: list[Execution]
+
+
+class AuthenticationFlowDiffRepr(TypedDict):
+    alias: str
+    providerId: str
+    description: str | None
+    topLevel: bool
+    authenticationExecutions: list[ExecutionDiffRepr]
+
+
+def rename_auth_flow(kc: KeycloakAPI, realm: str, flow_id: str, new_alias: str) -> None:
     """Rename an existing authentication flow to a new alias.
 
     :param kc: a KeycloakAPI instance.
@@ -401,7 +451,7 @@ def rename_auth_flow(kc, realm, flow_id, new_alias):
         kc.update_authentication_flow(flow_id, config=updated, realm=realm)
 
 
-def append_suffix_to_executions(executions, suffix):
+def append_suffix_to_executions(executions: list[Execution], suffix: str) -> None:
     """Recursively append a suffix to all sub-flow and authentication config aliases.
 
     :param executions: a list of execution dicts to process.
@@ -416,7 +466,7 @@ def append_suffix_to_executions(executions, suffix):
                 append_suffix_to_executions(execution["authenticationExecutions"], suffix)
 
 
-def append_suffix_to_flow_names(desired_auth, suffix):
+def append_suffix_to_flow_names(desired_auth: AuthenticationFlow, suffix: str) -> None:
     """Append a suffix to the top-level alias and all nested aliases in a flow definition.
 
     This is used during the Safe Swap procedure to give the temporary flow a distinct name.
@@ -428,7 +478,7 @@ def append_suffix_to_flow_names(desired_auth, suffix):
     append_suffix_to_executions(desired_auth["authenticationExecutions"], suffix)
 
 
-def remove_suffix_from_flow_names(kc, realm, auth, suffix):
+def remove_suffix_from_flow_names(kc: KeycloakAPI, realm: str, auth: AuthenticationFlowResponse, suffix: str) -> None:
     """Remove a previously-added suffix from the top-level flow alias, all sub-flow aliases,
     and all authentication config aliases.
 
@@ -460,7 +510,13 @@ def remove_suffix_from_flow_names(kc, realm, auth, suffix):
                 )
 
 
-def update_execution_requirement_and_config(kc, realm, top_level_auth, execution, parent_flow_alias):
+def update_execution_requirement_and_config(
+    kc: KeycloakAPI,
+    realm: str,
+    top_level_auth: AuthenticationFlowResponse,
+    execution: Execution,
+    parent_flow_alias: str,
+) -> None:
     """Update a newly-created execution to set its requirement and, if present, its configuration.
 
     Keycloak ignores the requirement value on execution creation and defaults all new executions
@@ -495,7 +551,13 @@ def update_execution_requirement_and_config(kc, realm, top_level_auth, execution
         )
 
 
-def create_executions(kc, realm, top_level_auth, executions, parent_flow_alias):
+def create_executions(
+    kc: KeycloakAPI,
+    realm: str,
+    top_level_auth: AuthenticationFlowResponse,
+    executions: list[Execution],
+    parent_flow_alias: str,
+) -> None:
     """Recursively create all executions and sub-flows under the given parent flow.
 
     :param kc: a KeycloakAPI instance.
@@ -528,7 +590,7 @@ def create_executions(kc, realm, top_level_auth, executions, parent_flow_alias):
             update_execution_requirement_and_config(kc, realm, top_level_auth, exec_payload, parent_flow_alias)
 
 
-def create_empty_flow(kc, realm, auth_flow_config):
+def create_empty_flow(kc: KeycloakAPI, realm: str, auth_flow_config: AuthenticationFlow) -> AuthenticationFlowResponse:
     """Create an empty authentication flow from the given configuration dict.
 
     :param kc: a KeycloakAPI instance.
@@ -544,7 +606,7 @@ def create_empty_flow(kc, realm, auth_flow_config):
     return created_auth
 
 
-def desired_auth_to_diff_repr(desired_auth):
+def desired_auth_to_diff_repr(desired_auth: AuthenticationFlow) -> AuthenticationFlowDiffRepr:
     """Convert a desired authentication flow dict into the normalized representation used for
     diff comparison.
 
@@ -557,11 +619,11 @@ def desired_auth_to_diff_repr(desired_auth):
     return desired_copy
 
 
-def desired_executions_to_diff_repr(desired_executions):
+def desired_executions_to_diff_repr(desired_executions: list[Execution]) -> list[ExecutionDiffRepr]:
     return desired_executions_to_diff_repr_rec(executions=desired_executions, level=0)
 
 
-def desired_executions_to_diff_repr_rec(executions, level):
+def desired_executions_to_diff_repr_rec(executions: list[Execution], level: int) -> list[ExecutionDiffRepr]:
     """Recursively flatten and normalize a nested execution list into the same flat structure
     that the Keycloak API returns, so that the two representations can be compared directly.
 
@@ -569,7 +631,7 @@ def desired_executions_to_diff_repr_rec(executions, level):
     :param level: the current nesting depth (0 for top-level executions).
     :returns: a flat list of normalized execution dicts.
     """
-    converted = []
+    converted: list[ExecutionDiffRepr] = []
     for index, execution in enumerate(executions):
         converted.append(execution)
         execution["index"] = index
@@ -592,7 +654,9 @@ def desired_executions_to_diff_repr_rec(executions, level):
     return converted
 
 
-def existing_auth_to_diff_repr(kc, realm, existing_auth):
+def existing_auth_to_diff_repr(
+    kc: KeycloakAPI, realm: str, existing_auth: AuthenticationFlowResponse
+) -> AuthenticationFlowDiffRepr:
     """Build a normalized representation of an existing flow that can be compared with the
     output of C(desired_auth_to_diff_repr).
 
@@ -630,7 +694,7 @@ def existing_auth_to_diff_repr(kc, realm, existing_auth):
     return existing_copy
 
 
-def is_auth_flow_in_use(kc, realm, existing_auth):
+def is_auth_flow_in_use(kc: KeycloakAPI, realm: str, existing_auth: AuthenticationFlowResponse) -> bool:
     """Determine whether the given flow is currently bound to a realm binding or a client
     authentication flow override.
 
@@ -666,7 +730,14 @@ def is_auth_flow_in_use(kc, realm, existing_auth):
     return False
 
 
-def rebind_auth_flow_bindings(kc, realm, from_id, from_alias, to_id, to_alias):
+def rebind_auth_flow_bindings(
+    kc: KeycloakAPI,
+    realm: str,
+    from_id: str,
+    from_alias: str,
+    to_id: str,
+    to_alias: str,
+) -> None:
     """Re-point all realm bindings and client overrides that reference the source flow to the
     target flow.
 
@@ -715,7 +786,13 @@ def rebind_auth_flow_bindings(kc, realm, from_id, from_alias, to_id, to_alias):
             kc.update_client(id=client["id"], clientrep=client, realm=realm)
 
 
-def delete_tmp_swap_flow_if_exists(kc, realm, tmp_swap_alias, fallback_id, fallback_alias):
+def delete_tmp_swap_flow_if_exists(
+    kc: KeycloakAPI,
+    realm: str,
+    tmp_swap_alias: str,
+    fallback_id: str,
+    fallback_alias: str,
+) -> None:
     """Delete a pre-existing temporary swap flow, rebinding any of its bindings back to the
     fallback flow first to avoid orphaned bindings.
 
@@ -738,7 +815,7 @@ def delete_tmp_swap_flow_if_exists(kc, realm, tmp_swap_alias, fallback_id, fallb
         kc.delete_authentication_flow_by_id(id=existing_tmp["id"], realm=realm)
 
 
-def create_authentication_execution_spec_options(depth):
+def create_authentication_execution_spec_options(depth: int) -> dict[str, Any]:
     options = dict(
         providerId=dict(type="str", required=depth == 0),
         requirement=dict(type="str", required=True, choices=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]),
