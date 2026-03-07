@@ -43,10 +43,10 @@ options:
     elements: str
     default: []
     version_added: 12.5.0
-  honor_binary_option:
+  honor_binary:
     description:
-      - If O(state=present) and this option is V(true), attributes whose name end with V(;binary) will be treated as
-        Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
+      - If O(state=present) and this option is V(true), attributes whose name include the V(binary) option
+        will be treated as Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
     type: bool
     default: false
     version_added: 12.5.0
@@ -174,7 +174,7 @@ class LdapEntry(LdapGeneric):
         self.state = self.module.params["state"]
         self.recursive = self.module.params["recursive"]
         self.binary = set(attr.lower() for attr in self.module.params["binary_attributes"])
-        self.honor_binary_option = self.module.params["honor_binary_option"]
+        self.honor_binary = self.module.params["honor_binary"]
 
         # Add the objectClass into the list of attributes
         self.module.params["attributes"]["objectClass"] = self.module.params["objectClass"]
@@ -186,7 +186,7 @@ class LdapEntry(LdapGeneric):
     def _is_binary(self, attr_name):
         """Check if an attribute must be considered binary."""
         lc_name = attr_name.lower()
-        return (self.honor_binary_option and "binary" in lc_name.split(";")) or lc_name in self.binary
+        return (self.honor_binary and "binary" in lc_name.split(";")) or lc_name in self.binary
 
     def _load_attrs(self):
         """Turn attribute's value to array. Attribute values are converted to
@@ -265,7 +265,7 @@ def main():
         argument_spec=gen_specs(
             attributes=dict(default={}, type="dict"),
             binary_attributes=dict(default=[], type="list", elements="str"),
-            honor_binary_option=dict(default=False, type="bool"),
+            honor_binary=dict(default=False, type="bool"),
             objectClass=dict(type="list", elements="str"),
             state=dict(default="present", choices=["present", "absent"]),
             recursive=dict(default=False, type="bool"),

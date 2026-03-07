@@ -50,10 +50,10 @@ options:
     elements: str
     default: []
     version_added: 12.5.0
-  honor_binary_option:
+  honor_binary:
     description:
-      - If O(state=present) and this option is V(true), attributes whose name end with V(;binary) will be treated as
-        Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
+      - If O(state=present) and this option is V(true), attributes whose name include the V(binary) option
+        will be treated as Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
     type: bool
     default: false
     version_added: 12.5.0
@@ -204,7 +204,7 @@ class LdapAttrs(LdapGeneric):
         self.state = self.module.params["state"]
         self.ordered = self.module.params["ordered"]
         self.binary = set(attr.lower() for attr in self.module.params["binary_attributes"])
-        self.honor_binary_option = self.module.params["honor_binary_option"]
+        self.honor_binary = self.module.params["honor_binary"]
 
         # Cached attribute values
         self._cached_values = {}
@@ -223,7 +223,7 @@ class LdapAttrs(LdapGeneric):
     def _is_binary(self, attr_name):
         """Check if an attribute must be considered binary."""
         lc_name = attr_name.lower()
-        return (self.honor_binary_option and "binary" in lc_name.split(";")) or lc_name in self.binary
+        return (self.honor_binary and "binary" in lc_name.split(";")) or lc_name in self.binary
 
     def _normalize_values(self, values, is_binary):
         """Normalize attribute's values."""
@@ -352,7 +352,7 @@ def main():
         argument_spec=gen_specs(
             attributes=dict(type="dict", required=True),
             binary_attributes=dict(default=[], type="list", elements="str"),
-            honor_binary_option=dict(default=False, type="bool"),
+            honor_binary=dict(default=False, type="bool"),
             ordered=dict(type="bool", default=False),
             state=dict(type="str", default="present", choices=["absent", "exact", "present"]),
         ),
