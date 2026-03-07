@@ -214,11 +214,11 @@ class UV:
         latest_version_str, latest_path = self._get_latest_patch_release("--only-installed", "--managed-python")
         return True, out, err, rc, [latest_version_str], [latest_path]
 
-    def _exec(self, python_version, command, *args, check_rc=False) -> tuple[int, str, str]:
+    def _exec(self, python_version: str, command, *args, check_rc=False) -> tuple[int, str, str]:
         """
         Execute a uv python subcommand.
         Args:
-          python_version (str): Python version specifier (e.g. "3.12", "3.12.3").
+          python_version: Python version specifier (e.g. "3.12", "3.12.3").
           command (str): uv python subcommand (e.g. "install", "uninstall", "find").
           *args: Additional positional arguments passed to the command.
           check_rc (bool): Whether to fail if the command exits with non-zero return code.
