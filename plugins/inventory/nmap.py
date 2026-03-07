@@ -175,6 +175,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         return valid
 
+    def _is_plugin_interposer(self):
+        return self._cache._plugin._persistent
+
+    def _get_value_from_cache(self, cache_key):
+        if not self._is_plugin_interposer():
+            self._cache[cache_key] = self._cache._plugin.get(cache_key)
+            self._cache._retrieved = self._cache
+
+        return self._cache[cache_key]
+
     def parse(self, inventory, loader, path, cache=True):
         try:
             self._nmap = get_bin_path("nmap")
@@ -198,7 +208,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         if attempt_to_read_cache:
             try:
-                results = self._cache[cache_key]
+                results = self._get_value_from_cache(cache_key)
             except KeyError:
                 # This occurs if the cache_key is not in the cache or if the cache_key expired, so the cache needs to be updated
                 cache_needs_update = True
