@@ -54,9 +54,9 @@ options:
   providerId:
     description:
       - The C(providerId) for the new flow.
-    choices: ["basic-flow", "client-flow"]
+    choices: [basic-flow, client-flow]
     type: str
-    default: "basic-flow"
+    default: basic-flow
   authenticationExecutions:
     description:
       - The desired execution configuration for the flow.
@@ -67,7 +67,7 @@ options:
       requirement:
         description:
           - The requirement status of the execution or sub-flow.
-        choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+        choices: [REQUIRED, ALTERNATIVE, DISABLED, CONDITIONAL]
         type: str
         required: true
       providerId:
@@ -94,8 +94,8 @@ options:
       subFlowType:
         description:
           - The type of the sub-flow.
-        choices: ["basic-flow", "form-flow"]
-        default: "basic-flow"
+        choices: [basic-flow, form-flow]
+        default: basic-flow
         type: str
       authenticationExecutions:
         description:
@@ -107,7 +107,7 @@ options:
           requirement:
             description:
               - The requirement status of the execution or sub-flow.
-            choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+            choices: [REQUIRED, ALTERNATIVE, DISABLED, CONDITIONAL]
             type: str
             required: true
           providerId:
@@ -134,8 +134,8 @@ options:
           subFlowType:
             description:
               - The type of the sub-flow.
-            choices: ["basic-flow", "form-flow"]
-            default: "basic-flow"
+            choices: [basic-flow, form-flow]
+            default: basic-flow
             type: str
           authenticationExecutions:
             description:
@@ -147,7 +147,7 @@ options:
               requirement:
                 description:
                   - The requirement status of the execution or sub-flow.
-                choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+                choices: [REQUIRED, ALTERNATIVE, DISABLED, CONDITIONAL]
                 type: str
                 required: true
               providerId:
@@ -174,8 +174,8 @@ options:
               subFlowType:
                 description:
                   - The type of the sub-flow.
-                choices: ["basic-flow", "form-flow"]
-                default: "basic-flow"
+                choices: [basic-flow, form-flow]
+                default: basic-flow
                 type: str
               authenticationExecutions:
                 description:
@@ -187,7 +187,7 @@ options:
                   requirement:
                     description:
                       - The requirement status of the execution or sub-flow.
-                    choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+                    choices: [REQUIRED, ALTERNATIVE, DISABLED, CONDITIONAL]
                     type: str
                     required: true
                   providerId:
@@ -214,8 +214,8 @@ options:
                   subFlowType:
                     description:
                       - The type of the sub-flow.
-                    choices: ["basic-flow", "form-flow"]
-                    default: "basic-flow"
+                    choices: [basic-flow, form-flow]
+                    default: basic-flow
                     type: str
                   authenticationExecutions:
                     description:
@@ -227,7 +227,7 @@ options:
                       requirement:
                         description:
                           - The requirement status of the execution or sub-flow.
-                        choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+                        choices: [REQUIRED, ALTERNATIVE, DISABLED, CONDITIONAL]
                         type: str
                         required: true
                       providerId:
@@ -251,7 +251,7 @@ options:
   state:
     description:
       - Whether the authentication flow should exist or not.
-    choices: ["present", "absent"]
+    choices: [present, absent]
     default: present
     type: str
   temporary_swap_flow_suffix:
@@ -287,7 +287,7 @@ EXAMPLES = r"""
     auth_username: admin
     auth_password: password
     realm: master
-    alias: "My Login Flow"
+    alias: My Login Flow
     authenticationExecutions:
       - providerId: idp-review-profile
         requirement: REQUIRED
@@ -322,7 +322,7 @@ EXAMPLES = r"""
     auth_username: admin
     auth_password: password
     realm: master
-    alias: "My Login Flow"
+    alias: My Login Flow
     state: absent
 """
 
@@ -766,10 +766,6 @@ def create_authentication_execution_spec_options(depth):
 def main():
     """Module entry point."""
     argument_spec = keycloak_argument_spec()
-
-    authenticationExecutionConfig_spec = dict(
-        alias=dict(type="str", required=True), config=dict(type="dict", required=True)
-    )
 
     meta_args = dict(
         realm=dict(type="str", required=True),
