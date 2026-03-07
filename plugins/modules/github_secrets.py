@@ -118,11 +118,12 @@ with deps.declare(
 ):
     from nacl import encoding, public
 
-ok_status_code = 200
-missing_status_code = 404
+OK_STATUS_CODE = 200
+MISSING_STATUS_CODE = 404
 
-created_response_code = 201
-delete_response_code = 204
+CREATE_RESPONSE_CODE = 201
+DELETE_RESPONSE_CODE = 204
+UPDATE_RESPONSE_CODE = 204
 
 
 def get_public_key(
@@ -140,7 +141,7 @@ def get_public_key(
 
     resp, info = fetch_url(module, url, headers=headers)
 
-    if info["status"] != ok_status_code:
+    if info["status"] != OK_STATUS_CODE:
         module.fail_json(msg=f"Failed to get public key: {info}")
 
     data = json.loads(resp.read())
@@ -165,7 +166,7 @@ def check_secret(
     organization: str,
     repository: str,
     key: str,
-) -> int:
+) -> dict[str, int]:
     url = (
         f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
         if repository
@@ -174,8 +175,8 @@ def check_secret(
 
     resp, info = fetch_url(module, url, headers=headers)
 
-    if info["status"] in (ok_status_code, missing_status_code):
-        return info["status"]
+    if info["status"] in (OK_STATUS_CODE, MISSING_STATUS_CODE):
+        return {"status": info["status"]}
     else:
         module.fail_json(msg=f"Failed to check secret: {info}")
 
@@ -206,16 +207,23 @@ def upsert_secret(
         payload["visibility"] = module.params["visibility"]
 
     if module.check_mode:
-        secret_status = check_secret(module, api_url, headers, organization, repository, key)
-        if secret_status == missing_status_code:
-            secret_status = created_response_code
+        secret_present = check_secret(module, api_url, headers, organization, repository, key)
+        if secret_present["status"] == MISSING_STATUS_CODE:
+            check_mode_msg = "OK (2 bytes)"
+            check_mode_status = CREATE_RESPONSE_CODE
+
+            info = {
+                "msg": check_mode_msg,
+                "status": check_mode_status,
+            }
         else:
-            secret_status = delete_response_code
-        check_mode_msg = "OK (unknown bytes)" if secret_status == delete_response_code else "OK (2 bytes)"
-        info = {
-            "msg": check_mode_msg,
-            "status": secret_status,
-        }
+            check_mode_msg = "OK (unknown bytes)"
+            check_mode_status = UPDATE_RESPONSE_CODE
+
+            info = {
+                "msg": check_mode_msg,
+                "status": check_mode_status,
+            }
     else:
         resp, info = fetch_url(
             module,
@@ -225,7 +233,7 @@ def upsert_secret(
             method="PUT",
         )
 
-    if info["status"] not in (created_response_code, delete_response_code):
+    if info["status"] not in (CREATE_RESPONSE_CODE, UPDATE_RESPONSE_CODE):
         module.fail_json(msg=f"Failed to upsert secret: {info}")
 
     return info
@@ -247,10 +255,14 @@ def delete_secret(
     )
 
     if module.check_mode:
-        secret_status = check_secret(module, api_url, headers, organization, repository, key)
+        secret_present = check_secret(module, api_url, headers, organization, repository, key)
         info = {
-            "msg": ("HTTP Error 404: Not Found" if secret_status == missing_status_code else "OK (unknown bytes)"),
-            "status": (delete_response_code if secret_status == ok_status_code else secret_status),
+            "msg": (
+                "HTTP Error 404: Not Found" if secret_present["status"] == MISSING_STATUS_CODE else "OK (unknown bytes)"
+            ),
+            "status": (
+                DELETE_RESPONSE_CODE if secret_present["status"] == OK_STATUS_CODE else secret_present["status"]
+            ),
         }
     else:
         resp, info = fetch_url(
@@ -260,7 +272,7 @@ def delete_secret(
             method="DELETE",
         )
 
-    if info["status"] not in (delete_response_code, missing_status_code):
+    if info["status"] not in (DELETE_RESPONSE_CODE, MISSING_STATUS_CODE):
         module.fail_json(msg=f"Failed to delete secret: {info}")
 
     return info
@@ -349,7 +361,7 @@ def main() -> None:
             key_id,
         )
 
-        response_msg = "Secret created" if upsert["status"] == created_response_code else "Secret updated"
+        response_msg = "Secret created" if upsert["status"] == CREATE_RESPONSE_CODE else "Secret updated"
 
         result["changed"] = True if not module.check_mode else False
         result.update(
@@ -370,7 +382,7 @@ def main() -> None:
             key,
         )
 
-        if delete["status"] == delete_response_code:
+        if delete["status"] == DELETE_RESPONSE_CODE:
             result["changed"] = True if not module.check_mode else False
             result.update(
                 result={
@@ -380,7 +392,7 @@ def main() -> None:
                 },
             )
 
-        if delete["status"] == missing_status_code:
+        if delete["status"] == MISSING_STATUS_CODE:
             result["changed"] = False
             result.update(
                 result={
