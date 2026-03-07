@@ -1432,6 +1432,10 @@ files:
   $modules/utm_proxy_exception.py:
     keywords: sophos utm
     maintainers: $team_e_spirit RickS-C137
+  $modules/uv_python.py:
+    labels: uv python
+    keywords: uv python
+    maintainers: mriamah
   $modules/vdo.py:
     maintainers: rhawalsh bgurney-rh
   $modules/vertica_:
