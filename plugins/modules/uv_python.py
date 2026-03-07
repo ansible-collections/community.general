@@ -128,7 +128,7 @@ class UV:
 
     def _ensure_min_uv_version(self):
         cmd = [self.bin_path, "--version", "--color", "never"]
-        ignored_rc, out, ignored_err = self.module.run_command(cmd, check_rc=True)
+        dummy_rc, out, dummy_err = self.module.run_command(cmd, check_rc=True)
         detected = out.strip().split()[-1]
         if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
             self.module.fail_json(
@@ -150,12 +150,12 @@ class UV:
           - list of installed versions
           - list of installation paths for each installed version
         """
-        find_rc, existing_version, ignored_err = self._find_python("--show-version")
+        find_rc, existing_version, dummy_err = self._find_python("--show-version")
         if find_rc == 0:
-            ignored_rc, version_path, ignored_err = self._find_python()
+            dummy_rc, version_path, dummy_err = self._find_python()
             return False, "", "", 0, [existing_version], [version_path]
         if self.module.check_mode:
-            latest_version, ignored_path = self._get_latest_patch_release("--managed-python")
+            latest_version, dummy_path = self._get_latest_patch_release("--managed-python")
             # when uv does not find any available patch version the install command will fail
             if not latest_version:
                 self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
@@ -197,13 +197,13 @@ class UV:
           - list of installed versions
           - list of installation paths for each installed version
         """
-        rc, installed_version_str, ignored_err = self._find_python("--show-version")
+        rc, installed_version_str, dummy_err = self._find_python("--show-version")
         installed_version = self._parse_version(installed_version_str)
-        latest_version_str, ignored_path = self._get_latest_patch_release("--managed-python")
+        latest_version_str, dummy_path = self._get_latest_patch_release("--managed-python")
         if not latest_version_str:
             self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
         if rc == 0 and installed_version >= StrictVersion(latest_version_str):
-            ignored_rc, install_path, ignored_err = self._find_python()
+            dummy_rc, install_path, dummy_err = self._find_python()
             return False, "", "", rc, [installed_version_str], [install_path]
         if self.module.check_mode:
             return True, "", "", 0, [latest_version_str], []
@@ -278,7 +278,7 @@ class UV:
         """
         latest_version = path = ""
         # 'uv python list' returns versions in descending order but we sort them just in case future uv behavior changes
-        ignored_rc, results, ignored_err = self._list_python(*args)
+        dummy_rc, results, dummy_err = self._list_python(*args)
         valid_results = self._parse_versions(results)
         if valid_results:
             version = max(valid_results, key=lambda result: result["parsed_version"])
@@ -296,7 +296,7 @@ class UV:
             - list of latest found patch versions
             - list of installation paths of installed versions
         """
-        ignored_rc, results, ignored_err = self._list_python("--only-installed", *args)
+        dummy_rc, results, dummy_err = self._list_python("--only-installed", *args)
         if results:
             return [result.get("version") for result in results], [result.get("path") for result in results]
         return [], []
