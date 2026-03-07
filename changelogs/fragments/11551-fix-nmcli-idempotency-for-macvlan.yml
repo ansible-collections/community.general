@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - nmcli - fix idempotency for macvlan interfaces
+    (https://github.com/ansible-collections/community.general/pull/11551).
