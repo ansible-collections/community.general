@@ -28,6 +28,7 @@ description:
      If the option is C(false) and a temporary flow already exists, the module will fail to prevent accidental data loss.
   - B(Idempotency) - If the existing flow already matches the desired configuration, no changes are made.
      The module compares a normalised representation of the existing flow against the desired state before deciding whether to trigger the Safe Swap procedure.
+  - A depth of 4 sub-flows is supported.
 
 attributes:
   check_mode:
@@ -59,6 +60,7 @@ options:
   authenticationExecutions:
     description:
       - The desired execution configuration for the flow.
+      - Executions at root level
     type: list
     elements: dict
     suboptions:
@@ -76,6 +78,15 @@ options:
         description:
           - The configuration for the execution.
         type: dict
+        suboptions:
+          alias:
+            description: Name of the execution config
+            type: str
+            required: true
+          config:
+            description: Key Value Tuples
+            required: true
+            type: dict
       subFlow:
         description:
           - The name of the sub-flow.
@@ -89,8 +100,154 @@ options:
       authenticationExecutions:
         description:
           - The execution configuration for executions within the sub-flow.
+          - Sub-Level 1
         type: list
         elements: dict
+        suboptions:
+          requirement:
+            description:
+              - The requirement status of the execution or sub-flow.
+            choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+            type: str
+            required: true
+          providerId:
+            description:
+              - The C(providerId) of the execution.
+            type: str
+          authenticationConfig:
+            description:
+              - The configuration for the execution.
+            type: dict
+            suboptions:
+              alias:
+                description: Name of the execution config
+                type: str
+                required: true
+              config:
+                description: Key Value Tuples
+                required: true
+                type: dict
+          subFlow:
+            description:
+              - The name of the sub-flow.
+            type: str
+          subFlowType:
+            description:
+              - The type of the sub-flow.
+            choices: ["basic-flow", "form-flow"]
+            default: "basic-flow"
+            type: str
+          authenticationExecutions:
+            description:
+              - The execution configuration for executions within the sub-flow.
+              - Sub-Level 2
+            type: list
+            elements: dict
+            suboptions:
+              requirement:
+                description:
+                  - The requirement status of the execution or sub-flow.
+                choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+                type: str
+                required: true
+              providerId:
+                description:
+                  - The C(providerId) of the execution.
+                type: str
+              authenticationConfig:
+                description:
+                  - The configuration for the execution.
+                type: dict
+                suboptions:
+                  alias:
+                    description: Name of the execution config
+                    type: str
+                    required: true
+                  config:
+                    description: Key Value Tuples
+                    required: true
+                    type: dict
+              subFlow:
+                description:
+                  - The name of the sub-flow.
+                type: str
+              subFlowType:
+                description:
+                  - The type of the sub-flow.
+                choices: ["basic-flow", "form-flow"]
+                default: "basic-flow"
+                type: str
+              authenticationExecutions:
+                description:
+                  - The execution configuration for executions within the sub-flow.
+                  - Sub-Level 3
+                type: list
+                elements: dict
+                suboptions:
+                  requirement:
+                    description:
+                      - The requirement status of the execution or sub-flow.
+                    choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+                    type: str
+                    required: true
+                  providerId:
+                    description:
+                      - The C(providerId) of the execution.
+                    type: str
+                  authenticationConfig:
+                    description:
+                      - The configuration for the execution.
+                    type: dict
+                    suboptions:
+                      alias:
+                        description: Name of the execution config
+                        type: str
+                        required: true
+                      config:
+                        description: Key Value Tuples
+                        required: true
+                        type: dict
+                  subFlow:
+                    description:
+                      - The name of the sub-flow.
+                    type: str
+                  subFlowType:
+                    description:
+                      - The type of the sub-flow.
+                    choices: ["basic-flow", "form-flow"]
+                    default: "basic-flow"
+                    type: str
+                  authenticationExecutions:
+                    description:
+                      - The execution configuration for executions within the sub-flow.
+                      - Sub-Level 4 (last sub-level)
+                    type: list
+                    elements: dict
+                    suboptions:
+                      requirement:
+                        description:
+                          - The requirement status of the execution or sub-flow.
+                        choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
+                        type: str
+                        required: true
+                      providerId:
+                        description:
+                          - The C(providerId) of the execution.
+                        type: str
+                        required: true
+                      authenticationConfig:
+                        description:
+                          - The configuration for the execution.
+                        type: dict
+                        suboptions:
+                          alias:
+                            description: Name of the execution config
+                            type: str
+                            required: true
+                          config:
+                            description: Key Value Tuples
+                            required: true
+                            type: dict
   state:
     description:
       - Whether the authentication flow should exist or not.
@@ -581,6 +738,31 @@ def delete_tmp_swap_flow_if_exists(kc, realm, tmp_swap_alias, fallback_id, fallb
         kc.delete_authentication_flow_by_id(id=existing_tmp["id"], realm=realm)
 
 
+def create_authentication_execution_spec_options(depth):
+    options = dict(
+        providerId=dict(type="str", required=depth == 0),
+        requirement=dict(type="str", required=True, choices=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]),
+        authenticationConfig=dict(
+            type="dict",
+            options=dict(
+                alias=dict(type="str", required=True),
+                config=dict(type="dict", required=True),
+            ),
+        ),
+    )
+    if depth > 0:
+        options.update(
+            subFlow=dict(type="str"),
+            subFlowType=dict(type="str", choices=["basic-flow", "form-flow"], default="basic-flow"),
+            authenticationExecutions=dict(
+                type="list",
+                elements="dict",
+                options=create_authentication_execution_spec_options(depth - 1),
+            ),
+        )
+    return options
+
+
 def main():
     """Module entry point."""
     argument_spec = keycloak_argument_spec()
@@ -589,27 +771,16 @@ def main():
         alias=dict(type="str", required=True), config=dict(type="dict", required=True)
     )
 
-    authenticationExecutions_spec = dict(
-        type="list",
-        elements="dict",
-        options=dict(
-            providerId=dict(type="str"),
-            requirement=dict(choices=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"], type="str", required=True),
-            authenticationConfig=dict(type="dict", options=authenticationExecutionConfig_spec),
-            subFlow=dict(type="str"),
-            subFlowType=dict(choices=["basic-flow", "form-flow"], default="basic-flow", type="str"),
-        ),
-    )
-    authenticationExecutions_spec["options"]["authenticationExecutions"] = dict(
-        type="list", elements="dict", options=authenticationExecutions_spec["options"]
-    )
-
     meta_args = dict(
         realm=dict(type="str", required=True),
         alias=dict(type="str", required=True),
         providerId=dict(type="str", choices=["basic-flow", "client-flow"], default="basic-flow"),
         description=dict(type="str"),
-        authenticationExecutions=authenticationExecutions_spec,
+        authenticationExecutions=dict(
+            type="list",
+            elements="dict",
+            options=create_authentication_execution_spec_options(4),
+        ),
         state=dict(choices=["absent", "present"], default="present"),
         force_temporary_swap_flow_deletion=dict(type="bool", default=True),
         temporary_swap_flow_suffix=dict(type="str", default="_tmp_for_swap"),

@@ -9,4 +9,3 @@ plugins/modules/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt
 plugins/modules/udm_user.py import-3.12  # Uses deprecated stdlib library 'crypt'
 plugins/modules/xfconf.py validate-modules:return-syntax-error
 tests/unit/plugins/modules/test_gio_mime.yaml no-smart-quotes
-plugins/modules/keycloak_authentication_v2.py validate-modules!skip # sanity check runs into a recursion, because the spec allows a recursion
