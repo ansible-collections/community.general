@@ -1,0 +1,2 @@
+minor_changes:
+  - incus inventory plugin - add support for constructing project-independent FQDNs (https://github.com/ansible-collections/community.general/pull/11555).
