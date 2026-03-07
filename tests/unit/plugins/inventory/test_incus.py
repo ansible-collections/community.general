@@ -46,23 +46,11 @@ def test_verify_file_bad_config(inventory):
     assert inventory.verify_file("foobar.wrongcloud.yml") is False
 
 
-def get_option(option):
-    if option == "default_groups":
-        return True
+def _build_get_option(options):
+    def _get_option(option):
+        return options.get(option, False)
 
-    if option == "remotes":
-        return ["r1", "r2", "r3:proj1", "r3:proj2"]
-
-    if option == "filters":
-        return ["status=running"]
-
-    if option == "host_fqdn":
-        return True
-
-    if option == "host_domain":
-        return "example.net"
-
-    return False
+    return _get_option
 
 
 def _make_host(name):
@@ -110,6 +98,15 @@ def run_incus(*args):
 
 
 def test_build_inventory(inventory, mocker):
+    get_option = _build_get_option(
+        {
+            "default_groups": True,
+            "remotes": ["r1", "r2", "r3:proj1", "r3:proj2"],
+            "filters": ["status=running"],
+            "host_fqdn": True,
+            "host_domain": "example.net",
+        },
+    )
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory._run_incus = mocker.MagicMock(side_effect=run_incus)
     inventory.populate()
@@ -131,6 +128,49 @@ def test_build_inventory(inventory, mocker):
     assert "ansible_incus_status" in c4.get_vars()
 
     c5 = inventory.inventory.get_host("c5.proj2.r3.example.net")
+    assert c5
+    assert "ansible_incus_status" in c5.get_vars()
+
+    assert len(inventory.inventory.groups["all"].hosts) == 5
+    assert len(inventory.inventory.groups["incus"].child_groups) == 3
+    assert len(inventory.inventory.groups["incus_r1"].child_groups) == 1
+    assert len(inventory.inventory.groups["incus_r2"].child_groups) == 1
+    assert len(inventory.inventory.groups["incus_r3"].child_groups) == 2
+    assert len(inventory.inventory.groups["incus_r3_proj1"].hosts) == 1
+    assert len(inventory.inventory.groups["incus_r3_proj2"].hosts) == 2
+
+
+def test_build_inventory_fqdn_from_host_domain(inventory, mocker):
+    get_option = _build_get_option(
+        {
+            "default_groups": True,
+            "remotes": ["r1", "r2", "r3:proj1", "r3:proj2"],
+            "filters": ["status=running"],
+            "host_fqdn": False,
+            "host_domain": "example.net",
+        },
+    )
+    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    inventory._run_incus = mocker.MagicMock(side_effect=run_incus)
+    inventory.populate()
+
+    c1 = inventory.inventory.get_host("c1.example.net")
+    assert c1
+    assert "ansible_incus_status" in c1.get_vars()
+
+    c2 = inventory.inventory.get_host("c2.example.net")
+    assert c2
+    assert "ansible_incus_status" in c2.get_vars()
+
+    c3 = inventory.inventory.get_host("c3.example.net")
+    assert c3
+    assert "ansible_incus_status" in c3.get_vars()
+
+    c4 = inventory.inventory.get_host("c4.example.net")
+    assert c4
+    assert "ansible_incus_status" in c4.get_vars()
+
+    c5 = inventory.inventory.get_host("c5.example.net")
     assert c5
     assert "ansible_incus_status" in c5.get_vars()
 
