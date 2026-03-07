@@ -206,9 +206,15 @@ class DNSRecordIPAClient(IPAClient):
 
     def dnsrecord_find(self, zone_name, record_name):
         if record_name == "@":
-            return self._post_json(method="dnsrecord_show", name=zone_name, item={"idnsname": record_name, "all": True})
+            result = self._post_json(
+                method="dnsrecord_show", name=zone_name, item={"idnsname": record_name, "all": True}
+            )
         else:
-            return self._post_json(method="dnsrecord_find", name=zone_name, item={"idnsname": record_name, "all": True})
+            result = self._post_json(
+                method="dnsrecord_find", name=zone_name, item={"idnsname": record_name, "all": True}
+            )
+        result["dnsttl"] = [int(v) for v in result["dnsttl"]]
+        return result
 
     def dnsrecord_add(self, zone_name=None, record_name=None, details=None):
         item = dict(idnsname=record_name)
