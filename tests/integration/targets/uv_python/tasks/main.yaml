@@ -8,11 +8,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Install uv
-  shell: |
-    curl --proto '=https' --tlsv1.2 -LsSf https://github.com/astral-sh/uv/releases/download/0.10.5/uv-installer.sh | sh
-  environment:
-    UV_INSTALL_DIR: /usr/local/bin
+- name: Install uv python package
+  ansible.builtin.pip:
+    name: uv
 
 - name: Check if Python 3.14 exists already
   command: uv python find 3.14
@@ -200,46 +198,46 @@
       - upgrade_python.failed is false
       - upgrade_python.python_versions | length >= 1
 
-- name: Install unexisting Python version in check mode
+- name: Install unsupported Python version in check mode
   uv_python:
-    version: 3.12.13
+    version: 2.0
     state: present
-  register: unexisting_python_check_mode
+  register: unsupported_python_check_mode
   ignore_errors: true
   check_mode: true
 
-- name: Verify unexisting Python 3.12.13 install in check mode
+- name: Verify unsupported Python 2.0 install in check mode
   assert:
     that:
-      - unexisting_python_check_mode.changed is false
-      - unexisting_python_check_mode.failed is true
-      - '"Version 3.12.13 is not available." in unexisting_python_check_mode.msg'
+      - unsupported_python_check_mode.changed is false
+      - unsupported_python_check_mode.failed is true
+      - '"Version 2.0 is not available." in unsupported_python_check_mode.msg'
 
-- name: Install unexisting Python version
+- name: Install unsupported Python version
   uv_python:
     state: present
-    version: 3.12.13
-  register: unexisting_python
+    version: 2.0
+  register: unsupported_python
   ignore_errors: true
 
-- name: Verify unexisting Python 3.12.13 install
+- name: Verify unsupported Python 2.0 install
   assert:
     that:
-      - unexisting_python.changed is false
-      - unexisting_python.failed is true
+      - unsupported_python.changed is false
+      - unsupported_python.failed is true
 
-- name: Install unexisting Python version with latest state
+- name: Install unsupported Python version with latest state
   uv_python:
-    version: 3.12.13
+    version: 2.0
     state: latest
-  register: unexisting_python
+  register: unsupported_python
   ignore_errors: true
 
-- name: Verify Python 3.12.13 install with latest state
+- name: Verify Python 2.0 install with latest state
   assert:
     that:
-      - unexisting_python.changed is false
-      - unexisting_python.failed is true
+      - unsupported_python.changed is false
+      - unsupported_python.failed is true
 
 - name: Delete Python 3.13 version
   uv_python:
