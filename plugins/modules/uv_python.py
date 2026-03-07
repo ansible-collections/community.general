@@ -11,7 +11,8 @@ description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
 version_added: "12.5.0"
 requirements:
-  - uv must be installed and available in PATH and uv version must be >= 0.8.0.
+  - uv must be installed and available in PATH and uv version must be at least 0.8.0.
+  - Python version must be at least 3.9
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -24,7 +25,7 @@ options:
     description:
       - Python version to manage.
       - "Not all canonical Python versions are supported in this release. Valid version numbers consist of two or three dot-separated
-        numeric components,\nwith an optional 'pre-release' tag at the end such as V(3.12), V(3.12.3), V(3.15.0a5)."
+        numeric components, with an optional 'pre-release' tag at the end such as V(3.12), V(3.12.3), V(3.15.0a5)."
       - Advanced uv selectors such as V(>=3.12,<3.13) or V(cpython@3.12) are not supported in this release.
       - "When you specify only a major.minor version, make sure the number is enclosed in quotes so that it gets parsed correctly.\n\
         Note that in case only a major.minor version are specified behavior depends on the O(state) parameter."
@@ -33,20 +34,20 @@ options:
   state:
     description:
       - Desired state of the specified Python version.
-      - "V(present) ensures the specified version is installed.\nIf you specify a full patch version (for example O(version=3.12.3)),
-        that exact version is be installed if not already present.\nIf you only specify a minor version (for example V(3.12)),
-        the latest available patch version for that minor release is installed only\nif no patch version for that minor release
-        is currently installed (including patch versions not managed by C(uv)).\nRV(python_versions) and RV(python_paths)
+      - "V(present) ensures the specified version is installed. If you specify a full patch version (for example O(version=3.12.3)),
+        that exact version is be installed if not already present. If you only specify a minor version (for example V(3.12)),
+        the latest available patch version for that minor release is installed only if no patch version for that minor release
+        is currently installed (including patch versions not managed by C(uv)). RV(python_versions) and RV(python_paths)
         lengths are always equal to one for this state."
-      - "V(absent) ensures the specified version is removed.\nIf you specify a full patch version, only that exact patch version
-        is removed.\nIf you only specify a minor version (for example V(3.12)), all installed patch versions for that minor
-        release are removed.\nIf you specify a version that is not installed, no changes are made.\nRV(python_versions) and
+      - "V(absent) ensures the specified version is removed. If you specify a full patch version, only that exact patch version
+        is removed. If you only specify a minor version (for example V(3.12)), all installed patch versions for that minor
+        release are removed. If you specify a version that is not installed, no changes are made. RV(python_versions) and
         RV(python_paths) lengths can be higher or equal to one in this state."
-      - "V(latest) ensures the latest available patch version for the specified version is installed.\nIf you only specify
-        a minor version (for example V(3.12)), the latest available patch version for that minor release is always installed.\n\
-        If another patch version is already installed but is not the latest, the latest patch version is installed.\nThe latest
-        patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.\n\
-        RV(python_versions) and RV(python_paths) lengths are always equal to one in this state.\nThis state does not use C(uv
+      - "V(latest) ensures the latest available patch version for the specified version is installed. If you only specify
+        a minor version (for example V(3.12)), the latest available patch version for that minor release is always installed. \
+        If another patch version is already installed but is not the latest, the latest patch version is installed. The latest
+        patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release. \
+        RV(python_versions) and RV(python_paths) lengths are always equal to one in this state. This state does not use C(uv
         python upgrade)."
     type: str
     choices: [present, absent, latest]
@@ -123,12 +124,12 @@ class UV:
         except (ValueError, AttributeError):
             self.module.fail_json(
                 msg="Unsupported version format. Valid version numbers consist of two or three dot-separated numeric components, \
-                  with an optional 'pre-release' tag on the end (e.g. 3.12, 3.12.3, 3.15.0a5) are supported in this release."
+                  with an optional 'pre-release' tag on the end (for example 3.12, 3.12.3, 3.15.0a5) are supported in this release."
             )
 
     def _ensure_min_uv_version(self):
         cmd = [self.bin_path, "--version", "--color", "never"]
-        ignored_rc, out, ignored_err = self.module.run_command(cmd, check_rc=True)
+        dummy_rc, out, dummy_err = self.module.run_command(cmd, check_rc=True)
         detected = out.strip().split()[-1]
         if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
             self.module.fail_json(
@@ -150,12 +151,12 @@ class UV:
           - list of installed versions
           - list of installation paths for each installed version
         """
-        find_rc, existing_version, ignored_err = self._find_python("--show-version")
+        find_rc, existing_version, dummy_err = self._find_python("--show-version")
         if find_rc == 0:
-            ignored_rc, version_path, ignored_err = self._find_python()
+            dummy_rc, version_path, dummy_err = self._find_python()
             return False, "", "", 0, [existing_version], [version_path]
         if self.module.check_mode:
-            latest_version, ignored_path = self._get_latest_patch_release("--managed-python")
+            latest_version, dummy_path = self._get_latest_patch_release("--managed-python")
             # when uv does not find any available patch version the install command will fail
             if not latest_version:
                 self.module.fail_json(msg=(f"Version {self.python_version_str} is not available."))
@@ -197,13 +198,13 @@ class UV:
           - list of installed versions
           - list of installation paths for each installed version
         """
-        rc, installed_version_str, ignored_err = self._find_python("--show-version")
+        rc, installed_version_str, dummy_err = self._find_python("--show-version")
         installed_version = self._parse_version(installed_version_str)
-        latest_version_str, ignored_path = self._get_latest_patch_release("--managed-python")
+        latest_version_str, dummy_path = self._get_latest_patch_release("--managed-python")
         if not latest_version_str:
             self.module.fail_json(msg=f"Version {self.python_version_str} is not available.")
         if rc == 0 and installed_version >= StrictVersion(latest_version_str):
-            ignored_rc, install_path, ignored_err = self._find_python()
+            dummy_rc, install_path, dummy_err = self._find_python()
             return False, "", "", rc, [installed_version_str], [install_path]
         if self.module.check_mode:
             return True, "", "", 0, [latest_version_str], []
@@ -278,7 +279,7 @@ class UV:
         """
         latest_version = path = ""
         # 'uv python list' returns versions in descending order but we sort them just in case future uv behavior changes
-        ignored_rc, results, ignored_err = self._list_python(*args)
+        dummy_rc, results, dummy_err = self._list_python(*args)
         valid_results = self._parse_versions(results)
         if valid_results:
             version = max(valid_results, key=lambda result: result["parsed_version"])
@@ -296,7 +297,7 @@ class UV:
             - list of latest found patch versions
             - list of installation paths of installed versions
         """
-        ignored_rc, results, ignored_err = self._list_python("--only-installed", *args)
+        dummy_rc, results, dummy_err = self._list_python("--only-installed", *args)
         if results:
             return [result.get("version") for result in results], [result.get("path") for result in results]
         return [], []
