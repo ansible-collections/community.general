@@ -655,6 +655,8 @@ def is_auth_flow_in_use(kc: KeycloakAPI, realm: str, existing_auth: dict) -> boo
     flow_id = existing_auth["id"]
     flow_alias = existing_auth["alias"]
     realm_data = kc.get_realm_by_id(realm)
+    if realm_data is None:
+        raise RuntimeError(f"realm '{realm}' does not exist")
 
     realm_binding_keys = [
         "browserFlow",
@@ -701,6 +703,8 @@ def rebind_auth_flow_bindings(
     :param to_alias: the alias of the flow to rebind to.
     """
     realm_data = kc.get_realm_by_id(realm)
+    if realm_data is None:
+        raise RuntimeError(f"realm '{realm}' does not exist")
     realm_changed = False
 
     realm_binding_keys = [
