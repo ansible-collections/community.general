@@ -33,6 +33,9 @@ options:
         by using YAML block modifiers as seen in the examples for this module.
       - Note that when using values that YAML/ansible-core interprets as other types, like V(yes), V(no) (booleans), or V(2.10)
         (float), make sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
+      - If O(honor_binary=true), an attribute that includes the C(binary) option as per RFC 4522 will be considered as binary.
+        Its contents must be specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary
+        without including the C(binary) option, it can be listed in O(binary_attributes).
     type: dict
     default: {}
   binary_attributes:
