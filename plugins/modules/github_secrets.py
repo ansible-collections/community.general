@@ -104,6 +104,7 @@ result:
 """
 
 import json
+from http import HTTPStatus
 from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
@@ -118,10 +119,6 @@ with deps.declare(
 ):
     from nacl import encoding, public
 
-OK_STATUS_CODE = 200
-MISSING_STATUS_CODE = 404
-
-CREATE_RESPONSE_CODE = 201
 DELETE_RESPONSE_CODE = 204
 UPDATE_RESPONSE_CODE = 204
 
@@ -141,7 +138,7 @@ def get_public_key(
 
     resp, info = fetch_url(module, url, headers=headers)
 
-    if info["status"] != OK_STATUS_CODE:
+    if info["status"] != HTTPStatus.OK:
         module.fail_json(msg=f"Failed to get public key: {info}")
 
     data = json.loads(resp.read())
@@ -175,7 +172,7 @@ def check_secret(
 
     resp, info = fetch_url(module, url, headers=headers)
 
-    if info["status"] in (OK_STATUS_CODE, MISSING_STATUS_CODE):
+    if info["status"] in (HTTPStatus.OK, HTTPStatus.NOT_FOUND):
         return {"status": info["status"]}
     else:
         module.fail_json(msg=f"Failed to check secret: {info}")
@@ -208,9 +205,9 @@ def upsert_secret(
 
     if module.check_mode:
         secret_present = check_secret(module, api_url, headers, organization, repository, key)
-        if secret_present["status"] == MISSING_STATUS_CODE:
+        if secret_present["status"] == HTTPStatus.NOT_FOUND:
             check_mode_msg = "OK (2 bytes)"
-            check_mode_status = CREATE_RESPONSE_CODE
+            check_mode_status = HTTPStatus.CREATED.value
 
             info = {
                 "msg": check_mode_msg,
@@ -233,7 +230,7 @@ def upsert_secret(
             method="PUT",
         )
 
-    if info["status"] not in (CREATE_RESPONSE_CODE, UPDATE_RESPONSE_CODE):
+    if info["status"] not in (HTTPStatus.CREATED, UPDATE_RESPONSE_CODE):
         module.fail_json(msg=f"Failed to upsert secret: {info}")
 
     return info
@@ -258,11 +255,11 @@ def delete_secret(
         secret_present = check_secret(module, api_url, headers, organization, repository, key)
         info = {
             "msg": (
-                "HTTP Error 404: Not Found" if secret_present["status"] == MISSING_STATUS_CODE else "OK (unknown bytes)"
+                "HTTP Error 404: Not Found"
+                if secret_present["status"] == HTTPStatus.NOT_FOUND
+                else "OK (unknown bytes)"
             ),
-            "status": (
-                DELETE_RESPONSE_CODE if secret_present["status"] == OK_STATUS_CODE else secret_present["status"]
-            ),
+            "status": (DELETE_RESPONSE_CODE if secret_present["status"] == HTTPStatus.OK else secret_present["status"]),
         }
     else:
         resp, info = fetch_url(
@@ -272,7 +269,7 @@ def delete_secret(
             method="DELETE",
         )
 
-    if info["status"] not in (DELETE_RESPONSE_CODE, MISSING_STATUS_CODE):
+    if info["status"] not in (DELETE_RESPONSE_CODE, HTTPStatus.NOT_FOUND):
         module.fail_json(msg=f"Failed to delete secret: {info}")
 
     return info
@@ -361,7 +358,7 @@ def main() -> None:
             key_id,
         )
 
-        response_msg = "Secret created" if upsert["status"] == CREATE_RESPONSE_CODE else "Secret updated"
+        response_msg = "Secret created" if upsert["status"] == HTTPStatus.CREATED else "Secret updated"
 
         result["changed"] = True if not module.check_mode else False
         result.update(
@@ -392,7 +389,7 @@ def main() -> None:
                 },
             )
 
-        if delete["status"] == MISSING_STATUS_CODE:
+        if delete["status"] == HTTPStatus.NOT_FOUND:
             result["changed"] = False
             result.update(
                 result={
