@@ -8,6 +8,7 @@ import copy
 import json
 import re
 import typing as t
+from http import HTTPStatus
 from urllib import error as urllib_error
 from urllib.parse import urlencode
 
@@ -41,7 +42,8 @@ class RequestError(Exception):
 
 
 def handle_consul_response_error(response):
-    if 400 <= response.status_code < 600:
+    status = HTTPStatus(response.status_code)
+    if status.is_client_error or status.is_server_error:
         raise RequestError(f"{response.status_code} {response.content}")
 
 
@@ -242,9 +244,9 @@ class _ConsulModule:
         try:
             return self.get(url)
         except RequestError as e:
-            if e.status == 404:
+            if e.status == HTTPStatus.NOT_FOUND:
                 return
-            elif e.status == 403 and b"ACL not found" in e.response_data:
+            elif e.status == HTTPStatus.FORBIDDEN and b"ACL not found" in e.response_data:
                 return
             raise
 
@@ -321,7 +323,8 @@ class _ConsulModule:
                 )
                 raise
 
-        if 400 <= status < 600:
+        _status = HTTPStatus(status)
+        if _status.is_client_error or _status.is_server_error:
             raise RequestError(status, response_data)
 
         if response_data:

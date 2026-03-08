@@ -11,6 +11,7 @@ import random
 import string
 import time
 import typing as t
+from http import HTTPStatus
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 
@@ -442,7 +443,8 @@ class RedfishUtils:
         """
         msg = http_client.responses.get(error.code, "")
         data = None
-        if error.code >= 400:
+        code = HTTPStatus(error.code)
+        if code.is_client_error or code.is_server_error:
             try:
                 body = error.read().decode("utf-8")
                 data = json.loads(body)
@@ -1498,8 +1500,8 @@ class RedfishUtils:
 
         response = self.post_request(self.root_uri + self.accounts_uri, payload)
         if not response["ret"]:
-            if response.get("status") == 405:
-                # if POST returned a 405, try to add via PATCH
+            if response.get("status") == HTTPStatus.METHOD_NOT_ALLOWED:
+                # if POST is not allowed, try to add via PATCH
                 return self.add_user_via_patch(user)
             else:
                 return response
@@ -1549,8 +1551,8 @@ class RedfishUtils:
 
         response = self.delete_request(self.root_uri + uri)
         if not response["ret"]:
-            if response.get("status") == 405:
-                # if DELETE returned a 405, try to delete via PATCH
+            if response.get("status") == HTTPStatus.METHOD_NOT_ALLOWED:
+                # if DELETE is not allowed, try to delete via PATCH
                 return self.delete_user_via_patch(user, uri=uri, data=data)
             else:
                 return response
@@ -1868,7 +1870,7 @@ class RedfishUtils:
 
         operation_results = {"status": None, "messages": [], "handle": None, "ret": True, "resets_requested": []}
 
-        if response.status == 204:
+        if response.status == HTTPStatus.NO_CONTENT:
             # No content; successful, but nothing to return
             # Use the Redfish "Completed" enum from TaskState for the operation status
             operation_results["status"] = "Completed"
@@ -1877,7 +1879,7 @@ class RedfishUtils:
 
             # Determine the next handle, if any
             operation_results["handle"] = handle
-            if response.status == 202:
+            if response.status == HTTPStatus.ACCEPTED:
                 # Task generated; get the task monitor URI
                 operation_results["handle"] = response.getheader("Location", handle)
 
@@ -1891,15 +1893,17 @@ class RedfishUtils:
                 else:
                     # Error response body, which is a bit of a misnomer since it is used in successful action responses
                     operation_results["status"] = "Completed"
-                    if response.status >= 400:
+                    _status = HTTPStatus(response.status)
+                    if _status.is_client_error or _status.is_server_error:
                         operation_results["status"] = "Exception"
                     operation_results["messages"] = data.get("error", {}).get("@Message.ExtendedInfo", [])
             else:
                 # No response body (or malformed); build based on status code
                 operation_results["status"] = "Completed"
-                if response.status == 202:
+                _status = HTTPStatus(response.status)
+                if _status == HTTPStatus.ACCEPTED:
                     operation_results["status"] = "New"
-                elif response.status >= 400:
+                elif _status.is_client_error or _status.is_server_error:
                     operation_results["status"] = "Exception"
 
             # Clear out the handle if the operation is complete

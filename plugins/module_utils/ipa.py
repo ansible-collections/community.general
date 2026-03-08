@@ -17,6 +17,7 @@ import re
 import socket
 import typing as t
 import uuid
+from http import HTTPStatus
 from urllib.parse import quote
 
 from ansible.module_utils.basic import AnsibleFallbackNotFound, env_fallback
@@ -90,7 +91,7 @@ class IPAClient:
                     module=self.module, url=url, data=to_bytes(data), headers=headers, timeout=self.timeout
                 )
                 status_code = info["status"]
-                if status_code not in [200, 201, 204]:
+                if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.NO_CONTENT):
                     self._fail("login", info["msg"])
 
                 self.headers = {"Cookie": info.get("set-cookie")}
@@ -145,7 +146,7 @@ class IPAClient:
                 use_gssapi=self.use_gssapi,
             )
             status_code = info["status"]
-            if status_code not in [200, 201, 204]:
+            if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.NO_CONTENT):
                 self._fail(method, info["msg"])
         except Exception as e:
             self._fail(f"post {method}", f"{e}")
