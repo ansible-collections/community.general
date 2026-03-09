@@ -430,50 +430,6 @@ class TestMergeVariablesLookup(unittest.TestCase):
     @patch.object(
         AnsiblePlugin,
         "get_option",
-        side_effect=[None, "ignore", "suffix", None, "shallow", "append_rp", "replace", "replace", []],
-    )
-    @patch.object(
-        Templar, "template", side_effect=[deepcopy(merge_hash_data["low_prio"]), deepcopy(merge_hash_data["high_prio"])]
-    )
-    def test_merge_dict_shallow_and_list_append_rp(self, mock_set_options, mock_get_option, mock_template):
-        results = self.merge_vars_lookup.run(
-            ["__merge_dict_shallow_and_list_append_rp"],
-            {
-                "testdict1__merge_dict_shallow_and_list_append_rp": merge_hash_data["low_prio"],
-                "testdict2__merge_dict_shallow_and_list_append_rp": merge_hash_data["high_prio"],
-            },
-        )
-
-        self.assertEqual(
-            results, [{"a": merge_hash_data["high_prio"]["a"], "b": [1, 1, 2] + merge_hash_data["high_prio"]["b"]}]
-        )
-
-    @patch.object(AnsiblePlugin, "set_options")
-    @patch.object(
-        AnsiblePlugin,
-        "get_option",
-        side_effect=[None, "ignore", "suffix", None, "shallow", "prepend_rp", "replace", "replace", []],
-    )
-    @patch.object(
-        Templar, "template", side_effect=[deepcopy(merge_hash_data["low_prio"]), deepcopy(merge_hash_data["high_prio"])]
-    )
-    def test_merge_dict_shallow_and_list_prepend_rp(self, mock_set_options, mock_get_option, mock_template):
-        results = self.merge_vars_lookup.run(
-            ["__merge_dict_shallow_and_list_prepend_rp"],
-            {
-                "testdict1__merge_dict_shallow_and_list_prepend_rp": merge_hash_data["low_prio"],
-                "testdict2__merge_dict_shallow_and_list_prepend_rp": merge_hash_data["high_prio"],
-            },
-        )
-
-        self.assertEqual(
-            results, [{"a": merge_hash_data["high_prio"]["a"], "b": merge_hash_data["high_prio"]["b"] + [1, 1, 2]}]
-        )
-
-    @patch.object(AnsiblePlugin, "set_options")
-    @patch.object(
-        AnsiblePlugin,
-        "get_option",
         side_effect=[None, "ignore", "suffix", None, "deep", "replace", "replace", "replace", []],
     )
     @patch.object(
@@ -600,76 +556,6 @@ class TestMergeVariablesLookup(unittest.TestCase):
     @patch.object(
         AnsiblePlugin,
         "get_option",
-        side_effect=[None, "ignore", "suffix", None, "deep", "append_rp", "replace", "replace", []],
-    )
-    @patch.object(
-        Templar, "template", side_effect=[deepcopy(merge_hash_data["low_prio"]), deepcopy(merge_hash_data["high_prio"])]
-    )
-    def test_merge_dict_deep_and_list_append_rp(self, mock_set_options, mock_get_option, mock_template):
-        results = self.merge_vars_lookup.run(
-            ["__merge_dict_deep_and_list_append_rp"],
-            {
-                "testdict1__merge_dict_deep_and_list_append_rp": merge_hash_data["low_prio"],
-                "testdict2__merge_dict_deep_and_list_append_rp": merge_hash_data["high_prio"],
-            },
-        )
-
-        self.assertEqual(
-            results,
-            [
-                {
-                    "a": {
-                        "a": {
-                            "x": "low_value",
-                            "y": "high_value",
-                            "z": "high_value",
-                            "list": ["low_value", "high_value"],
-                        }
-                    },
-                    "b": [1, 1, 2] + merge_hash_data["high_prio"]["b"],
-                }
-            ],
-        )
-
-    @patch.object(AnsiblePlugin, "set_options")
-    @patch.object(
-        AnsiblePlugin,
-        "get_option",
-        side_effect=[None, "ignore", "suffix", None, "deep", "prepend_rp", "replace", "replace", []],
-    )
-    @patch.object(
-        Templar, "template", side_effect=[deepcopy(merge_hash_data["low_prio"]), deepcopy(merge_hash_data["high_prio"])]
-    )
-    def test_merge_dict_deep_and_list_prepend_rp(self, mock_set_options, mock_get_option, mock_template):
-        results = self.merge_vars_lookup.run(
-            ["__merge_dict_deep_and_list_prepend_rp"],
-            {
-                "testdict1__merge_dict_deep_and_list_prepend_rp": merge_hash_data["low_prio"],
-                "testdict2__merge_dict_deep_and_list_prepend_rp": merge_hash_data["high_prio"],
-            },
-        )
-
-        self.assertEqual(
-            results,
-            [
-                {
-                    "a": {
-                        "a": {
-                            "x": "low_value",
-                            "y": "high_value",
-                            "z": "high_value",
-                            "list": ["high_value", "low_value"],
-                        }
-                    },
-                    "b": merge_hash_data["high_prio"]["b"] + [1, 1, 2],
-                }
-            ],
-        )
-
-    @patch.object(AnsiblePlugin, "set_options")
-    @patch.object(
-        AnsiblePlugin,
-        "get_option",
         side_effect=[None, "ignore", "suffix", None, "replace", "append", "keep", "keep", []],
     )
     @patch.object(
@@ -737,12 +623,14 @@ class TestMergeVariablesLookup(unittest.TestCase):
     @patch.object(
         Templar, "template", side_effect=[deepcopy(merge_hash_data["low_prio"]), deepcopy(merge_hash_data["high_prio"])]
     )
-    def test_merge_dict_deep_and_list_dedup(self, mock_set_options, mock_get_option, mock_template):
+    def test_merge_dict_deep_and_list_append_with_dedup_keep_first(
+        self, mock_set_options, mock_get_option, mock_template
+    ):
         results = self.merge_vars_lookup.run(
-            ["__merge_dict_deep_and_list_dedup"],
+            ["__merge_dict_deep_and_list_append_with_dedup_keep_first"],
             {
-                "testdict1__merge_dict_deep_and_list_dedup": merge_hash_data["low_prio"],
-                "testdict2__merge_dict_deep_and_list_dedup": merge_hash_data["high_prio"],
+                "testdict1__merge_dict_deep_and_list_append_with_dedup_keep_first": merge_hash_data["low_prio"],
+                "testdict2__merge_dict_deep_and_list_append_with_dedup_keep_first": merge_hash_data["high_prio"],
             },
         )
 
@@ -759,6 +647,53 @@ class TestMergeVariablesLookup(unittest.TestCase):
                         }
                     },
                     "b": [1, 2, 3, 4, {"5": "value"}],
+                }
+            ],
+        )
+
+    @patch.object(AnsiblePlugin, "set_options")
+    @patch.object(
+        AnsiblePlugin,
+        "get_option",
+        side_effect=[
+            None,
+            "ignore",
+            "suffix",
+            None,
+            "deep",
+            "prepend",
+            "replace",
+            "replace",
+            [{"name": "dedup", "options": {"keep": "last"}}],
+        ],
+    )
+    @patch.object(
+        Templar, "template", side_effect=[deepcopy(merge_hash_data["low_prio"]), deepcopy(merge_hash_data["high_prio"])]
+    )
+    def test_merge_dict_deep_and_list_prepend_with_dedup_keep_last(
+        self, mock_set_options, mock_get_option, mock_template
+    ):
+        results = self.merge_vars_lookup.run(
+            ["__merge_dict_deep_and_list_prepend_with_dedup_keep_last"],
+            {
+                "testdict1__merge_dict_deep_and_list_prepend_with_dedup_keep_last": merge_hash_data["low_prio"],
+                "testdict2__merge_dict_deep_and_list_prepend_with_dedup_keep_last": merge_hash_data["high_prio"],
+            },
+        )
+
+        self.assertEqual(
+            results,
+            [
+                {
+                    "a": {
+                        "a": {
+                            "x": "low_value",
+                            "y": "high_value",
+                            "list": ["high_value", "low_value"],
+                            "z": "high_value",
+                        }
+                    },
+                    "b": [4, {"5": "value"}, 1, 2, 3],
                 }
             ],
         )

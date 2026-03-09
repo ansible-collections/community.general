@@ -88,8 +88,6 @@ options:
       keep: Discard newer entries.
       append: Append newer entries to the older ones.
       prepend: Insert newer entries in front of the older ones.
-      append_rp: Append newer entries to the older ones, overwrite duplicates.
-      prepend_rp: Insert newer entries in front of the older ones, discard duplicates.
       merge: Take the index as key and merge the entries.
     version_added: 12.5.0
   type_conflict_merge:
@@ -115,11 +113,23 @@ options:
   list_transformations:
     description:
       - List transformations applied to list types. The definition order corresponds to the order in which these transformations are applied.
+      - Elements can be a dict with the keys mentioned below or a string naming the transformation to apply.
     type: list
-    elements: str
-    choices:
-      - flatten
-      - dedup
+    elements: raw
+    suboptions:
+      name:
+        description:
+          - Name of the list transformation.
+        required: true
+        type: str
+        choices:
+          flatten: Flatten lists, converting nested lists into single lists. Does not support any additional options.
+          dedup: Remove duplicates from lists. Supported options are C(keep) (str) with C(first) (default) for dropping duplicates
+                 except for the first occurrence or C(last) for the last occurrence.
+      options:
+        description:
+          - Options as key value pairs.
+        type: dict
     default: []
     version_added: 12.5.0
 """
@@ -246,16 +256,18 @@ _raw:
   elements: raw
 """
 
+
 import re
 import typing as t
 from abc import ABC, abstractmethod
 
-if t.TYPE_CHECKING:
-    from collections.abc import Callable
-
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+
+if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 display = Display()
 
@@ -345,12 +357,22 @@ class LookupModule(LookupBase):
             builder.with_type_strategy(dict, DictMergeStrategies.from_name(self._dict_merge))
 
         for transformation in self._list_transformations:
-            builder.with_transformation(list, ListTransformations.from_name(transformation))
+            if isinstance(transformation, str):
+                builder.with_transformation(list, ListTransformations.from_name(transformation))
+            elif isinstance(transformation, dict):
+                name = transformation["name"]
+                options = transformation.get("options", {})
+                builder.with_transformation(list, ListTransformations.from_name(name, **options))
+            else:
+                raise AnsibleError(
+                    f"Transformations must be specified through values of type 'str' or 'dict', but a value of type '{type(transformation)}' was given"
+                )
 
         merger = builder.build()
 
         if self._templar is None:
-            raise AssertionError("Templar is not available")
+            raise AnsibleError("Templar is not available")
+
         templar = self._templar.copy_with_new_env(available_variables=variables)
 
         for var_name in var_merge_names:
@@ -372,10 +394,6 @@ class LookupModule(LookupBase):
 
 
 class MergeStrategy(ABC):
-    """
-    Implements custom merge logic for combining two values.
-    """
-
     @abstractmethod
     def merge(self, merger: ObjectMerger, path: list[str], left: t.Any, right: t.Any) -> t.Any:
         raise NotImplementedError
@@ -393,23 +411,11 @@ class MergeStrategies:
 
 
 class BaseMergeStrategies(MergeStrategies):
-    """
-    Collection of base merge strategies.
-    """
-
     class Replace(MergeStrategy):
-        """
-        Overwrite left value with right one.
-        """
-
         def merge(self, merger: ObjectMerger, path: list[str], left: t.Any, right: t.Any) -> t.Any:
             return right
 
     class Keep(MergeStrategy):
-        """
-        Discard right value, keep left one.
-        """
-
         def merge(self, merger: ObjectMerger, path: list[str], left: t.Any, right: t.Any) -> t.Any:
             return left
 
@@ -420,15 +426,7 @@ class BaseMergeStrategies(MergeStrategies):
 
 
 class DictMergeStrategies(MergeStrategies):
-    """
-    Collection of dictionary merge strategies.
-    """
-
     class Merge(MergeStrategy):
-        """
-        Recursively merge dictionaries.
-        """
-
         def merge(
             self, merger: ObjectMerger, path: list[str], left: dict[str, t.Any], right: dict[str, t.Any]
         ) -> dict[str, t.Any]:
@@ -452,47 +450,15 @@ class DictMergeStrategies(MergeStrategies):
 
 
 class ListMergeStrategies(MergeStrategies):
-    """
-    Collection of list merge strategies.
-    """
-
     class Append(MergeStrategy):
-        """
-        Append elements from the right list to elements from the left list.
-        """
-
         def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
             return left + right
 
     class Prepend(MergeStrategy):
-        """
-        Insert elements from the right list at the beginning of the left list.
-        """
-
         def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
             return right + left
 
-    class AppendRp(MergeStrategy):
-        """
-        Append elements from the right list to elements from the left list, overwrite duplicates.
-        """
-
-        def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
-            return [item for item in left if item not in right] + right
-
-    class PrependRp(MergeStrategy):
-        """
-        Insert elements from the right list at the beginning of the left list, discard duplicates.
-        """
-
-        def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
-            return right + [item for item in left if item not in right]
-
     class Merge(MergeStrategy):
-        """
-        Take the index as key and merge the entries.
-        """
-
         def merge(self, merger: ObjectMerger, path: list[str], left: list[t.Any], right: list[t.Any]) -> list[t.Any]:
             result = left
             for i, value in enumerate(right):
@@ -510,8 +476,6 @@ class ListMergeStrategies(MergeStrategies):
     strategies = {
         "append": Append,
         "prepend": Prepend,
-        "append_rp": AppendRp,
-        "prepend_rp": PrependRp,
         "merge": Merge,
         "replace": BaseMergeStrategies.Replace,
         "keep": BaseMergeStrategies.Keep,
@@ -519,10 +483,6 @@ class ListMergeStrategies(MergeStrategies):
 
 
 class Transformation(ABC):
-    """
-    Implements custom transformation logic for converting a value to another representation.
-    """
-
     @abstractmethod
     def transform(self, merger: ObjectMerger, value: t.Any) -> t.Any:
         raise NotImplementedError
@@ -540,28 +500,28 @@ class Transformations:
 
 
 class ListTransformations(Transformations):
-    """
-    Collection of list transformations.
-    """
-
     class Dedup(Transformation):
-        """
-        Removes duplicates from a list.
-        """
+        def __init__(self, keep: str = "first"):
+            self.keep = keep
 
         def transform(self, merger: ObjectMerger, value: list[t.Any]) -> list[t.Any]:
             result = []
-            for item in value:
-                if item not in result:
-                    result.append(item)
+            if self.keep == "first":
+                for item in value:
+                    if item not in result:
+                        result.append(item)
+            elif self.keep == "last":
+                for item in reversed(value):
+                    if item not in result:
+                        result.insert(0, item)
+            else:
+                raise AnsibleError(
+                    f"Unsupported 'keep' value for deduplication transformation. Given was '{self.keep}', but must be either 'first' or 'last'"
+                )
+
             return result
 
     class Flatten(Transformation):
-        """
-        Takes a list and replaces any elements that are lists with a flattened sequence of the list contents.
-        If any of the nested lists also contain directly-nested lists, these are flattened recursively.
-        """
-
         def transform(self, merger: ObjectMerger, value: list[t.Any]) -> list[t.Any]:
             result = []
             for item in value:
@@ -578,10 +538,6 @@ class ListTransformations(Transformations):
 
 
 class MergerBuilder:
-    """
-    Helper that builds a merger based on provided strategies.
-    """
-
     def __init__(self) -> None:
         self.type_strategies: list[tuple[type, MergeStrategy]] = []
         self.type_conflict_strategy: MergeStrategy = BaseMergeStrategies.Replace()
@@ -637,10 +593,6 @@ class Merger(ABC):
 
 
 class ObjectMerger(Merger):
-    """
-    Merges objects based on provided strategies.
-    """
-
     def __init__(
         self,
         type_strategies: list[tuple[type, MergeStrategy]],
@@ -696,10 +648,6 @@ class ObjectMerger(Merger):
 
 
 class ShallowMerger(Merger):
-    """
-    Wrapper around merger that combines the top-level values of two given dictionaries.
-    """
-
     def __init__(self, merger: ObjectMerger) -> None:
         self.merger = merger
 
