@@ -24,8 +24,8 @@ description:
      all bindings are redirected to the new temporary flow. This ensures continuity and avoids any gap in active authentication coverage.
      4. The old flow is deleted. 5. The temporary flow is renamed to the original alias, restoring the expected name.
   - B(Handling pre-existing temporary swap flows) - If a temporary swap flow already exists (for example, from a previously interrupted run),
-     the module can optionally delete it before proceeding. This behaviour is controlled by the C(force_temporary_swap_flow_deletion) option.
-     If the option is C(false) and a temporary flow already exists, the module will fail to prevent accidental data loss.
+     the module can optionally delete it before proceeding. This behaviour is controlled by the O(force_temporary_swap_flow_deletion) option.
+     If the option is V(false) and a temporary flow already exists, the module will fail to prevent accidental data loss.
   - B(Idempotency) - If the existing flow already matches the desired configuration, no changes are made.
      The module compares a normalised representation of the existing flow against the desired state before deciding whether to trigger the Safe Swap procedure.
   - A depth of 4 sub-flows is supported.
