@@ -119,9 +119,6 @@ with deps.declare(
 ):
     from nacl import encoding, public
 
-DELETE_RESPONSE_CODE = 204
-UPDATE_RESPONSE_CODE = 204
-
 
 def get_public_key(
     module: AnsibleModule,
@@ -215,7 +212,7 @@ def upsert_secret(
             }
         else:
             check_mode_msg = "OK (unknown bytes)"
-            check_mode_status = UPDATE_RESPONSE_CODE
+            check_mode_status = HTTPStatus.NO_CONTENT
 
             info = {
                 "msg": check_mode_msg,
@@ -230,7 +227,7 @@ def upsert_secret(
             method="PUT",
         )
 
-    if info["status"] not in (HTTPStatus.CREATED, UPDATE_RESPONSE_CODE):
+    if info["status"] not in (HTTPStatus.CREATED, HTTPStatus.NO_CONTENT):
         module.fail_json(msg=f"Failed to upsert secret: {info}")
 
     return info
@@ -259,7 +256,9 @@ def delete_secret(
                 if secret_present["status"] == HTTPStatus.NOT_FOUND
                 else "OK (unknown bytes)"
             ),
-            "status": (DELETE_RESPONSE_CODE if secret_present["status"] == HTTPStatus.OK else secret_present["status"]),
+            "status": (
+                HTTPStatus.NO_CONTENT if secret_present["status"] == HTTPStatus.OK else secret_present["status"]
+            ),
         }
     else:
         resp, info = fetch_url(
@@ -269,7 +268,7 @@ def delete_secret(
             method="DELETE",
         )
 
-    if info["status"] not in (DELETE_RESPONSE_CODE, HTTPStatus.NOT_FOUND):
+    if info["status"] not in (HTTPStatus.NO_CONTENT, HTTPStatus.NOT_FOUND):
         module.fail_json(msg=f"Failed to delete secret: {info}")
 
     return info
@@ -379,7 +378,7 @@ def main() -> None:
             key,
         )
 
-        if delete["status"] == DELETE_RESPONSE_CODE:
+        if delete["status"] == HTTPStatus.NO_CONTENT:
             result["changed"] = True if not module.check_mode else False
             result.update(
                 result={
