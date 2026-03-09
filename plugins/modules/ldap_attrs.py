@@ -143,6 +143,17 @@ EXAMPLES = r"""
       olcRootPW: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
     state: exact
 
+- name: Replace a CA certificate
+  community.general.ldap_attrs:
+    dn: cn=ISRG Root X1,ou=ca,ou=certificates,dc=example,dc=org
+    honor_binary: true
+    state: exact
+    attributes:
+      cACertificate;binary: >-
+        MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+        TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+        # ...
+
 - name: Remove an attribute with a specific value
   community.general.ldap_attrs:
     dn: uid=jdoe,ou=people,dc=example,dc=com

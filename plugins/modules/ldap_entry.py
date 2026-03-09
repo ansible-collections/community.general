@@ -89,9 +89,30 @@ EXAMPLES = r"""
     objectClass:
       - simpleSecurityObject
       - organizationalRole
+      - myPhotoObject
+    binary_attributes:
+      - myPhoto
     attributes:
       description: An LDAP administrator
       userPassword: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
+      myPhoto: >-
+        /9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNt
+        cwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAA
+        # ...
+
+- name: Make sure a CA certificate is present
+  community.general.ldap_attrs:
+    dn: cn=ISRG Root X1,ou=ca,ou=certificates,dc=example,dc=org
+    honor_binary: true
+    objectClass:
+      - pkiCA
+      - applicationProcess
+    attributes:
+      cn: ISRG Root X1
+      cACertificate;binary: >-
+        MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+        TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+        # ...
 
 - name: Set possible values for attributes elements
   community.general.ldap_entry:
