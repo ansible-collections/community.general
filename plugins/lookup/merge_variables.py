@@ -75,8 +75,8 @@ options:
     choices:
       deep: Merge dictionaries recursively.
       shallow: Merge only top-level values.
-      replace: Overwrite older dict with newer one.
-      keep: Discard newer dict.
+      replace: Overwrite existing dictionaries.
+      keep: Keep existing dictionaries.
     version_added: 12.5.0
   list_merge:
     description:
@@ -84,35 +84,36 @@ options:
     type: str
     default: append
     choices:
-      replace: Overwrite older entries with newer ones.
-      keep: Discard newer entries.
-      append: Append newer entries to the older ones.
-      prepend: Insert newer entries in front of the older ones.
-      merge: Take the index as key and merge the entries.
+      replace: Overwrite existing lists.
+      keep: Keep existing lists.
+      append: Append elements to the end of an existing list.
+      prepend: Insert elements at the beginning of an existing list.
+      merge: Take the index as key and merge each element.
     version_added: 12.5.0
   type_conflict_merge:
     description:
-      - Merge strategy to apply on type conflicts. This value is only considered in case of
-        O(override=warn) or O(override=ignore).
+      - Merge strategy to apply on type conflicts.
+      - This value is only considered in case of O(override=warn) or O(override=ignore).
     type: str
     default: replace
     choices:
-      replace: Overwrite older value with newer one.
-      keep: Discard newer value.
+      replace: Overwrite existing values.
+      keep: Keep existing values.
     version_added: 12.5.0
   default_merge:
     description:
-      - Merge strategy applied to other types. This value is only considered in case of
-        O(override=warn) or O(override=ignore).
+      - Merge strategy applied to other types.
+      - This value is only considered in case of O(override=warn) or O(override=ignore).
     type: str
     default: replace
     choices:
-      replace: Overwrite older value with newer one.
-      keep: Discard newer value.
+      replace: Overwrite existing values.
+      keep: Keep existing values.
     version_added: 12.5.0
   list_transformations:
     description:
-      - List transformations applied to list types. The definition order corresponds to the order in which these transformations are applied.
+      - List transformations applied to list types.
+      - The definition order corresponds to the order in which these transformations are applied.
       - Elements can be a dict with the keys mentioned below or a string naming the transformation to apply.
     type: list
     elements: raw
@@ -207,8 +208,8 @@ example_b: "{{ lookup('community.general.merge_variables', '^.+__test_list$', in
 #   - "test a item 1"
 #   - "test b item 1"
 
-# Shallow merge variables that end with '__test', insert newer list elements in front of older ones,
-# remove duplicates from lists, and store the result in a variable 'example_c'
+# Shallow merge variables that end with '__test', insert list elements at the beginning of the list,
+# remove duplicates from lists (keep the first occurrence), and store the result in a variable 'example_c'
 example_c: "{{
   lookup(
     'community.general.merge_variables',
