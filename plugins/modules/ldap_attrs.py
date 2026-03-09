@@ -23,6 +23,7 @@ notes:
     server for maximum accuracy. For O(state=exact) or binary attributes, values have to be compared in Python, which
     obviously ignores LDAP matching rules. This should work out in most cases, but it is theoretically possible to see
     spurious changes when target and actual values are semantically identical but lexically distinct.
+  - Support for binary values was added in community.general 12.5.0
 version_added: '0.2.0'
 author:
   - Jiri Tyr (@jtyr)
