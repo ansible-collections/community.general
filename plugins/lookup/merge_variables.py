@@ -124,12 +124,21 @@ options:
         type: str
         choices:
           flatten: Flatten lists, converting nested lists into single lists. Does not support any additional options.
-          dedup: Remove duplicates from lists. Supported options are C(keep) (str) with C(first) (default) for dropping duplicates
-                 except for the first occurrence or C(last) for the last occurrence.
+          dedup: Remove duplicates from lists. Supported option is C(keep).
       options:
         description:
           - Options as key value pairs.
         type: dict
+        suboptions:
+          keep:
+            description:
+              - Determines which duplicates (if any) to keep.
+              - Only valid in combination with the V(dedup) list transformation.
+            type: str
+            default: first
+            choices:
+              first: Drop duplicates except for the first occurrence.
+              last: Drop duplicates except for the last occurrence.
     default: []
     version_added: 12.5.0
 """
