@@ -36,7 +36,7 @@ options:
       - If O(honor_binary=true), an attribute that includes the C(binary) option as per RFC 4522 will be considered as binary.
         Its contents must be specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary
         without including the C(binary) option, it can be listed in O(binary_attributes).
-        Support for binary values was added in community.general 12.5.0
+        Support for binary values was added in community.general 12.5.0.
     type: dict
     default: {}
   binary_attributes:
