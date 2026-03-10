@@ -327,11 +327,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: A message describing the action that was taken.
-  returned: always
-  type: str
-
 end_state:
   description: Representation of the authentication flow after module execution.
   returned: on success
