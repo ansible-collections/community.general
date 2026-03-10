@@ -1,7 +1,7 @@
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
----
+
 # - adding a new execution inside the sub flow 'Integration Test Flow - User creation or linking' after the execution 'idp-create-user-if-unique'
 # - disable auth-cookie at the end of the flow
 # - change the config require.password.update.after.registration to "true"
