@@ -53,11 +53,11 @@ options:
     choices: [present, absent, latest]
     default: present
 seealso:
-  - name: uv documentation
-    description: Python versions management with uv.
+  - name: C(uv) documentation
+    description: Python versions management with C(uv).
     link: https://docs.astral.sh/uv/concepts/python-versions/
-  - name: uv CLI documentation
-    description: uv CLI reference guide.
+  - name: C(uv) CLI documentation
+    description: C(uv) CLI reference guide.
     link: https://docs.astral.sh/uv/reference/cli/#uv-python
 author: Mariam Ahhttouche (@mriamah)
 """
