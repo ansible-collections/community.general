@@ -3,6 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: uv_python
@@ -11,7 +12,7 @@ description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
 version_added: "12.5.0"
 requirements:
-  - uv must be installed and available in PATH and uv version must be at least 0.8.0.
+  - C(uv) must be installed and available in E(PATH) and must be at least 0.8.0.
   - Python version must be at least 3.9.
 extends_documentation_fragment:
   - community.general.attributes
@@ -82,22 +83,31 @@ python_versions:
   description: List of Python versions changed.
   returned: success
   type: list
+  elements: str
+  sample:
+    - "3.13.5"
 python_paths:
   description: List of installation paths of Python versions changed.
   returned: success
   type: list
+  elements: str
+  sample:
+    - "/root/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/bin/python3.13"
 stdout:
   description: Stdout of the executed command.
   returned: success
   type: str
+  sample: ""
 stderr:
   description: Stderr of the executed command.
   returned: success
   type: str
+  sample: ""
 rc:
   description: Return code of the executed command.
   returned: success
   type: int
+  sample: 0
 """
 
 import json
@@ -113,7 +123,7 @@ class UV:
     Module for managing Python versions and installations using "uv python" command
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.bin_path = self.module.get_bin_path("uv", required=True)
         self._ensure_min_uv_version()
@@ -128,7 +138,7 @@ class UV:
                 )
             )
 
-    def _ensure_min_uv_version(self):
+    def _ensure_min_uv_version(self) -> None:
         cmd = [self.bin_path, "--version", "--color", "never"]
         dummy_rc, out, dummy_err = self.module.run_command(cmd, check_rc=True)
         detected = out.strip().split()[-1]
@@ -139,12 +149,11 @@ class UV:
                 required_version=MINIMUM_UV_VERSION,
             )
 
-    def install_python(self) -> tuple[bool, str, str, int, list, list]:
+    def install_python(self) -> tuple[bool, str, str, int, list[str], list[str]]:
         """
         Runs command 'uv python install X.Y.Z' which installs specified python version.
         If patch version is not specified uv installs latest available patch version.
         Returns:
-          tuple [bool, str, str, int, list, list]
           - boolean to indicate if method changed state
           - command's stdout
           - command's stderr
@@ -281,7 +290,7 @@ class UV:
         latest_version = path = ""
         # 'uv python list' returns versions in descending order but we sort them just in case future uv behavior changes
         dummy_rc, results, dummy_err = self._list_python(*args)
-        valid_results = self._parse_versions(results)
+        valid_results = self._filter_valid_versions(results)
         if valid_results:
             version = max(valid_results, key=lambda result: result["parsed_version"])
             latest_version = version.get("version", "")
@@ -303,15 +312,15 @@ class UV:
             return [result.get("version") for result in results], [result.get("path") for result in results]
         return [], []
 
-    @staticmethod
-    def _parse_versions(results):
+    def _filter_valid_versions(self, results):
         valid_results = []
         for result in results:
+            version = result.get("version", "")
             try:
-                result["parsed_version"] = StrictVersion(result.get("version", ""))
+                result["parsed_version"] = StrictVersion(version)
                 valid_results.append(result)
             except ValueError:
-                continue
+                self.module.debug(f"Found {version} available, but it's not yet supported by uv_python module.")
         return valid_results
 
     @staticmethod
@@ -333,14 +342,17 @@ def main():
 
     result = dict(changed=False, stdout="", stderr="", rc=0, python_versions=[], python_paths=[], failed=False)
     state = module.params["state"]
-
+    exec_result = {}
     uv = UV(module)
+
     if state == "present":
-        result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.install_python()
+        exec_result = dict(zip(["changed", "stdout", "stderr", "rc", "python_versions", "python_paths"], uv.install_python()))
     elif state == "absent":
-        result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.uninstall_python()
+        exec_result = dict(zip(["changed", "stdout", "stderr", "rc", "python_versions", "python_paths"], uv.uninstall_python()))
     elif state == "latest":
-        result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.upgrade_python()
+        exec_result = dict(zip(["changed", "stdout", "stderr", "rc", "python_versions", "python_paths"], uv.upgrade_python()))
+
+    result.update(exec_result)
 
     module.exit_json(**result)
 
