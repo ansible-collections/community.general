@@ -16,9 +16,10 @@ description:
   - Add or remove multiple LDAP attribute values.
 notes:
   - This only deals with attributes on existing entries. To add or remove whole entries, see M(community.general.ldap_entry).
-  - If O(honor_binary=true), an attribute that includes the C(binary) option as per RFC 4522 will be considered as binary.
-    Its contents must be specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary
-    without including the C(binary) option, it can be listed in O(binary_attributes).
+  - If O(honor_binary=true), an attribute that includes the C(binary) option as per
+    L(RFC 4522, https://www.rfc-editor.org/rfc/rfc4522.html#section-3) will be considered as binary.  Its contents must be
+    specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary without including
+    the C(binary) option, it can be listed in O(binary_attributes).
   - For O(state=present) and O(state=absent), when handling text attributes, all value comparisons are performed on the
     server for maximum accuracy. For O(state=exact) or binary attributes, values have to be compared in Python, which
     obviously ignores LDAP matching rules. This should work out in most cases, but it is theoretically possible to see
