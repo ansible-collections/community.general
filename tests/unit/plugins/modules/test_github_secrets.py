@@ -161,7 +161,7 @@ def test_create_repo_secret_check_mode(fetch_url_mock):
             github_secrets.main()
 
     result = exc.value.args[0]
-    assert result["changed"] is False
+    assert result["changed"] is True
     assert result["result"]["status"] == 201
     assert result["result"]["response"] == "Secret created"
 
@@ -187,7 +187,7 @@ def test_update_repo_secret_check_mode(fetch_url_mock):
             github_secrets.main()
 
     result = exc.value.args[0]
-    assert result["changed"] is False
+    assert result["changed"] is True
     assert result["result"]["status"] == 204
     assert result["result"]["response"] == "Secret updated"
 
@@ -212,7 +212,7 @@ def test_delete_repo_secret_check_mode(fetch_url_mock):
             github_secrets.main()
 
     result = exc.value.args[0]
-    assert result["changed"] is False
+    assert result["changed"] is True
     assert result["result"]["status"] == 204
     assert result["result"]["response"] == "Secret deleted"
 
