@@ -24,3 +24,7 @@
 - name: Executing Flow Deletion tests
   ansible.builtin.include_tasks:
     file: tests/test_flow_deletion.yml
+
+- name: Invalid providerIds in execution tests
+  ansible.builtin.include_tasks:
+    file: tests/test_invalid_poviderid_flow_creation.yml

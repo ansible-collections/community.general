@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_authentication_v2 - validate whether providerIds exist in keycloak (https://github.com/ansible-collections/community.general/issues/11583).
