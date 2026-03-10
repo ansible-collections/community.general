@@ -97,6 +97,7 @@ except ImportError:
 
 import json
 import time
+from http import HTTPStatus
 from urllib.error import HTTPError
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
@@ -177,9 +178,9 @@ def post_request(generated_jwt, installation_id, api_base):
             display.vvv(f"Error returned: {error_body}")
         except Exception:
             error_body = {}
-        if e.code == 404:
+        if e.code == HTTPStatus.NOT_FOUND:
             raise AnsibleError("Github return error. Please confirm your installation_id value is valid") from e
-        elif e.code == 401:
+        elif e.code == HTTPStatus.UNAUTHORIZED:
             raise AnsibleError("Github return error. Please confirm your private key is valid") from e
         raise AnsibleError(f"Unexpected data returned: {e} -- {error_body}") from e
     response_body = response.read()

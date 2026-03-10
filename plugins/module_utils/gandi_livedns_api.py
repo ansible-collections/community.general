@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import typing as t
+from http import HTTPStatus
 
 from ansible.module_utils.urls import fetch_url
 
@@ -60,7 +61,7 @@ class GandiLiveDNSAPI:
         resp, info = fetch_url(self.module, self.api_endpoint + api_call, headers=headers, data=data, method=method)
 
         error_msg = ""
-        if info["status"] >= 400 and (info["status"] != 404 or error_on_404):
+        if info["status"] >= HTTPStatus.BAD_REQUEST and (info["status"] != HTTPStatus.NOT_FOUND or error_on_404):
             err_s = self.error_strings.get(info["status"], "")
 
             error_msg = f"API Error {err_s}: {self._build_error_message(self.module, info)}"
@@ -112,7 +113,7 @@ class GandiLiveDNSAPI:
 
         records, status = self._gandi_api_call(url, error_on_404=False)
 
-        if status == 404:
+        if status == HTTPStatus.NOT_FOUND:
             return []
 
         if not isinstance(records, list):
@@ -135,8 +136,8 @@ class GandiLiveDNSAPI:
         record, status = self._gandi_api_call(url, method="POST", payload=new_record)
 
         if status in (
-            200,
-            201,
+            HTTPStatus.OK,
+            HTTPStatus.CREATED,
         ):
             return new_record
 

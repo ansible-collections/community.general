@@ -18,6 +18,7 @@ import typing as t
 
 # (TODO: remove next line!)
 from datetime import datetime  # noqa: F401, pylint: disable=unused-import
+from http import HTTPStatus
 from operator import eq
 
 try:
@@ -1381,7 +1382,7 @@ def delete_and_wait(
                         except MaximumWaitTimeExceeded as ex:
                             module.fail_json(msg=str(ex))
                         except ServiceError as ex:
-                            if ex.status != 404:
+                            if ex.status != HTTPStatus.NOT_FOUND:
                                 module.fail_json(msg=ex.message)
                             else:
                                 # While waiting for resource to get into terminated state, if the resource is not found.
@@ -1405,9 +1406,9 @@ def delete_and_wait(
         # DNS API throws a 400 InvalidParameter when a zone id is provided for zone_name_or_id and if the zone
         # resource is not available, instead of the expected 404. So working around this for now.
         if isinstance(client, oci.dns.DnsClient):
-            if ex.status == 400 and ex.code == "InvalidParameter":
+            if ex.status == HTTPStatus.BAD_REQUEST and ex.code == "InvalidParameter":
                 _debug(f"Resource {resource_type} with {kwargs_get} already deleted. So returning changed=False")
-        elif ex.status != 404:
+        elif ex.status != HTTPStatus.NOT_FOUND:
             module.fail_json(msg=ex.message)
         result[resource_type] = dict()
     return result
@@ -1654,7 +1655,7 @@ def get_existing_resource(target_fn, module: AnsibleModule, **kwargs):
         response = call_with_backoff(target_fn, **kwargs)
         existing_resource = response.data
     except ServiceError as ex:
-        if ex.status != 404:
+        if ex.status != HTTPStatus.NOT_FOUND:
             module.fail_json(msg=ex.message)
 
     return existing_resource
@@ -1682,7 +1683,7 @@ def get_attached_instance_info(
 
             # Pass ServiceError due to authorization issue in accessing volume attachments of a compartment
             except ServiceError as ex:
-                if ex.status == 404:
+                if ex.status == HTTPStatus.NOT_FOUND:
                     pass
 
     else:

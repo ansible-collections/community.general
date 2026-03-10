@@ -15,6 +15,7 @@ import json
 import time
 import typing as t
 import uuid
+from http import HTTPStatus
 
 from ansible.module_utils.urls import open_url
 
@@ -158,7 +159,7 @@ def list_pritunl_organizations(
         validate_certs=validate_certs,
     )
 
-    if response.getcode() != 200:
+    if response.getcode() != HTTPStatus.OK:
         raise PritunlException("Could not retrieve organizations from Pritunl")
     else:
         for org in json.loads(response.read()):
@@ -190,7 +191,7 @@ def list_pritunl_users(
         organization_id=organization_id,
     )
 
-    if response.getcode() != 200:
+    if response.getcode() != HTTPStatus.OK:
         raise PritunlException("Could not retrieve users from Pritunl")
     else:
         for user in json.loads(response.read()):
@@ -220,7 +221,7 @@ def post_pritunl_organization(
         validate_certs=validate_certs,
     )
 
-    if response.getcode() != 200:
+    if response.getcode() != HTTPStatus.OK:
         raise PritunlException(f"Could not add organization {organization_name} to Pritunl")
     # The user PUT request returns the updated user object
     return json.loads(response.read())
@@ -246,7 +247,7 @@ def post_pritunl_user(
             validate_certs=validate_certs,
         )
 
-        if response.getcode() != 200:
+        if response.getcode() != HTTPStatus.OK:
             raise PritunlException(f"Could not remove user {user_id} from organization {organization_id} from Pritunl")
         # user POST request returns an array of a single item,
         # so return this item instead of the list
@@ -262,7 +263,7 @@ def post_pritunl_user(
             validate_certs=validate_certs,
         )
 
-        if response.getcode() != 200:
+        if response.getcode() != HTTPStatus.OK:
             raise PritunlException(f"Could not update user {user_id} from organization {organization_id} from Pritunl")
         # The user PUT request returns the updated user object
         return json.loads(response.read())
@@ -279,7 +280,7 @@ def delete_pritunl_organization(
         validate_certs=validate_certs,
     )
 
-    if response.getcode() != 200:
+    if response.getcode() != HTTPStatus.OK:
         raise PritunlException(f"Could not remove organization {organization_id} from Pritunl")
 
     return json.loads(response.read())
@@ -297,7 +298,7 @@ def delete_pritunl_user(
         validate_certs=validate_certs,
     )
 
-    if response.getcode() != 200:
+    if response.getcode() != HTTPStatus.OK:
         raise PritunlException(f"Could not remove user {user_id} from organization {organization_id} from Pritunl")
 
     return json.loads(response.read())

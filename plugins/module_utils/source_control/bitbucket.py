@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import typing as t
+from http import HTTPStatus
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import basic_auth_header, fetch_url
@@ -56,7 +57,7 @@ class BitbucketHelper:
                 headers=headers,
             )
 
-            if info["status"] == 200:
+            if info["status"] == HTTPStatus.OK:
                 self.access_token = content["access_token"]
             else:
                 self.module.fail_json(msg=f"Failed to retrieve access token: {info}")
