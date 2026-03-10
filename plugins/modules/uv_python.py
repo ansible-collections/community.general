@@ -43,12 +43,11 @@ options:
         is removed. If you only specify a minor version (for example V(3.12)), all installed patch versions for that minor
         release are removed. If you specify a version that is not installed, no changes are made. RV(python_versions) and
         RV(python_paths) lengths can be higher or equal to one in this state."
-      - "V(latest) ensures the latest available patch version for the specified version is installed. If you only specify
-        a minor version (for example V(3.12)), the latest available patch version for that minor release is always installed. \
+      - V(latest) ensures the latest available patch version for the specified version is installed. If you only specify
+        a minor version (for example V(3.12)), the latest available patch version for that minor release is always installed.
         If another patch version is already installed but is not the latest, the latest patch version is installed. The latest
-        patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release. \
-        RV(python_versions) and RV(python_paths) lengths are always equal to one in this state. This state does not use C(uv
-        python upgrade)."
+        patch version installed depends on the C(uv) version, since available Python versions are frozen per C(uv) release.
+        RV(python_versions) and RV(python_paths) lengths are always equal to one in this state. This state does not use C(uv python upgrade).
     type: str
     choices: [present, absent, latest]
     default: present
