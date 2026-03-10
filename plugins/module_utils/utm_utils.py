@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import typing as t
+from http import HTTPStatus
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -116,7 +117,8 @@ class UTM:
         returns the info for an object in utm
         """
         info, result = self._lookup_entry(self.module, self.request_url)
-        if info["status"] >= 400:
+        _status = HTTPStatus(info["status"])
+        if _status.is_client_error or _status.is_server_error:
             self.module.fail_json(result=json.loads(info))
         else:
             if result is None:
@@ -133,7 +135,8 @@ class UTM:
 
         is_changed = False
         info, result = self._lookup_entry(self.module, self.request_url)
-        if info["status"] >= 400:
+        _status = HTTPStatus(info["status"])
+        if _status.is_client_error or _status.is_server_error:
             self.module.fail_json(result=json.loads(info))
         else:
             data_as_json_string = self.module.jsonify(self.module.params)
@@ -141,7 +144,8 @@ class UTM:
                 response, info = fetch_url(
                     self.module, self.request_url, method="POST", headers=combined_headers, data=data_as_json_string
                 )
-                if info["status"] >= 400:
+                _status = HTTPStatus(info["status"])
+                if _status.is_client_error or _status.is_server_error:
                     self.module.fail_json(msg=json.loads(info["body"]))
                 is_changed = True
                 result = self._clean_result(json.loads(response.read()))
@@ -154,7 +158,8 @@ class UTM:
                         headers=combined_headers,
                         data=data_as_json_string,
                     )
-                    if info["status"] >= 400:
+                    _status = HTTPStatus(info["status"])
+                    if _status.is_client_error or _status.is_server_error:
                         self.module.fail_json(msg=json.loads(info["body"]))
                     is_changed = True
                     result = self._clean_result(json.loads(response.read()))
@@ -187,7 +192,8 @@ class UTM:
                 headers={"Accept": "application/json", "X-Restd-Err-Ack": "all"},
                 data=self.module.jsonify(self.module.params),
             )
-            if info["status"] >= 400:
+            _status = HTTPStatus(info["status"])
+            if _status.is_client_error or _status.is_server_error:
                 self.module.fail_json(msg=json.loads(info["body"]))
             else:
                 is_changed = True

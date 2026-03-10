@@ -8,6 +8,7 @@ import copy
 import json
 import traceback
 import typing as t
+from http import HTTPStatus
 from urllib.error import HTTPError
 from urllib.parse import quote, urlencode
 
@@ -418,7 +419,7 @@ class KeycloakAPI:
                     validate_certs=self.validate_certs,
                 )
             except HTTPError as e:
-                if e.code != 401:
+                if e.code != HTTPStatus.UNAUTHORIZED:
                     raise e
                 return e
 
@@ -440,7 +441,7 @@ class KeycloakAPI:
                     r = make_request_catching_401(headers)
                 except KeycloakError as e:
                     # Token refresh returns 400 if token is expired/invalid, so continue on if we get a 400
-                    if e.authError is not None and e.authError.code != 400:  # type: ignore # TODO!
+                    if e.authError is not None and e.authError.code != HTTPStatus.BAD_REQUEST:  # type: ignore # TODO!
                         raise e
 
         if isinstance(r, Exception):
@@ -465,7 +466,7 @@ class KeycloakAPI:
                     r = make_request_catching_401(headers)
                 except KeycloakError as e:
                     # Token refresh returns 400 if token is expired/invalid, so continue on if we get a 400
-                    if e.authError is not None and e.authError.code != 400:  # type: ignore # TODO!
+                    if e.authError is not None and e.authError.code != HTTPStatus.BAD_REQUEST:  # type: ignore # TODO!
                         raise e
 
         if isinstance(r, Exception):
@@ -496,7 +497,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(realm_info_url, method="GET")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not obtain realm {realm}: {e}", exception=traceback.format_exc())
@@ -525,7 +526,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(realm_keys_metadata_url, method="GET")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not obtain realm {realm}: {e}", exception=traceback.format_exc())
@@ -551,7 +552,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(realm_url, method="GET")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not obtain realm {realm}: {e}", exception=traceback.format_exc())
@@ -718,7 +719,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(client_url, method="GET")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not obtain client {id} for realm {realm}: {e}")
@@ -1310,7 +1311,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(clientscope_url, method="GET")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not fetch clientscope {cid} in realm {realm}: {e}")
@@ -1434,7 +1435,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(protocolmapper_url, method="GET")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not fetch protocolmapper {pid} in realm {realm}: {e}")
@@ -1641,7 +1642,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(clientsecret_url, method="POST")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not obtain clientsecret of client {id} for realm {realm}: {e}")
@@ -1661,7 +1662,7 @@ class KeycloakAPI:
             return self._request_and_deserialize(clientsecret_url, method="GET")
 
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not obtain clientsecret of client {id} for realm {realm}: {e}")
@@ -1695,7 +1696,7 @@ class KeycloakAPI:
         try:
             return self._request_and_deserialize(groups_url, method="GET")
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not fetch group {gid} in realm {realm}: {e}")
@@ -1967,7 +1968,7 @@ class KeycloakAPI:
         try:
             return self._request_and_deserialize(role_url, method="GET")
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not fetch role {name} in realm {realm}: {e}")
@@ -2169,7 +2170,7 @@ class KeycloakAPI:
         try:
             return self._request_and_deserialize(role_url, method="GET")
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not fetch role {name} in client {clientid} of realm {realm}: {e}")
@@ -2597,7 +2598,7 @@ class KeycloakAPI:
         try:
             return self._request_and_deserialize(idp_url, method="GET")
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not fetch identity provider {alias} in realm {realm}: {e}")
@@ -2682,7 +2683,7 @@ class KeycloakAPI:
         try:
             return self._request_and_deserialize(mapper_url, method="GET")
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(
@@ -2767,7 +2768,7 @@ class KeycloakAPI:
         try:
             return self._request_and_deserialize(comp_url, method="GET")
         except HTTPError as e:
-            if e.code == 404:
+            if e.code == HTTPStatus.NOT_FOUND:
                 return None
             else:
                 self.fail_request(e, msg=f"Could not fetch component {cid} in realm {realm}: {e}")

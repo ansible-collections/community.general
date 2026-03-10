@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import traceback
 import typing as t
+from http import HTTPStatus
 
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 
@@ -74,13 +75,15 @@ def api_request(
         },
     )
 
-    if info["status"] == 403:
+    _status = HTTPStatus(info["status"])
+
+    if _status == HTTPStatus.FORBIDDEN:
         module.fail_json(msg="Token authorization failed", execution_info=json.loads(info["body"]))
-    elif info["status"] == 404:
+    elif _status == HTTPStatus.NOT_FOUND:
         return None, info
-    elif info["status"] == 409:
+    elif _status == HTTPStatus.CONFLICT:
         module.fail_json(msg="Job executions limit reached", execution_info=json.loads(info["body"]))
-    elif info["status"] >= 500:
+    elif _status.is_server_error:
         module.fail_json(msg="Rundeck API error", execution_info=json.loads(info["body"]))
 
     try:

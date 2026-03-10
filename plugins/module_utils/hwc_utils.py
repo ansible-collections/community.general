@@ -8,6 +8,7 @@ import re
 import time
 import traceback
 import typing as t
+from http import HTTPStatus
 
 THIRD_LIBRARIES_IMP_ERR = None
 try:
@@ -70,7 +71,7 @@ def session_method_wrapper(f):
                 raise HwcClientException(0, f"Parsing response to json failed, error: {ex}") from ex
 
         code = r.status_code
-        if code not in [200, 201, 202, 203, 204, 205, 206, 207, 208, 226]:
+        if not HTTPStatus(code).is_success:
             msg = ""
             for i in ["message", "error.message"]:
                 try:
@@ -81,7 +82,7 @@ def session_method_wrapper(f):
             else:
                 msg = str(result)
 
-            if code == 404:
+            if code == HTTPStatus.NOT_FOUND:
                 raise HwcClientException404(msg)
 
             raise HwcClientException(code, msg)
