@@ -359,7 +359,7 @@ def main() -> None:
 
         response_msg = "Secret created" if upsert["status"] == HTTPStatus.CREATED else "Secret updated"
 
-        result["changed"] = True if not module.check_mode else False
+        result["changed"] = True
         result.update(
             result={
                 "status": upsert["status"],
