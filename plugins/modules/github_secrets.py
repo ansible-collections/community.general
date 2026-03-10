@@ -379,7 +379,7 @@ def main() -> None:
         )
 
         if delete["status"] == HTTPStatus.NO_CONTENT:
-            result["changed"] = True if not module.check_mode else False
+            result["changed"] = True
             result.update(
                 result={
                     "status": delete["status"],
