@@ -281,7 +281,7 @@ class UV:
         latest_version = path = ""
         # 'uv python list' returns versions in descending order but we sort them just in case future uv behavior changes
         dummy_rc, results, dummy_err = self._list_python(*args)
-        valid_results = self._parse_versions(results)
+        valid_results = self._filter_valid_versions(results)
         if valid_results:
             version = max(valid_results, key=lambda result: result["parsed_version"])
             latest_version = version.get("version", "")
@@ -303,15 +303,15 @@ class UV:
             return [result.get("version") for result in results], [result.get("path") for result in results]
         return [], []
 
-    @staticmethod
-    def _parse_versions(results):
+    def _filter_valid_versions(self, results):
         valid_results = []
         for result in results:
+            version = result.get("version", "")
             try:
-                result["parsed_version"] = StrictVersion(result.get("version", ""))
+                result["parsed_version"] = StrictVersion(version)
                 valid_results.append(result)
             except ValueError:
-                continue
+                self.module.debug(f"Found {version} available, but it's not yet supported by uv_python module.")
         return valid_results
 
     @staticmethod
