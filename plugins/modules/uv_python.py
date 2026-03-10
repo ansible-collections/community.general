@@ -27,8 +27,8 @@ options:
       - "Not all canonical Python versions are supported in this release. Valid version numbers consist of two or three dot-separated
         numeric components, with an optional 'pre-release' tag at the end such as V(3.12), V(3.12.3), V(3.15.0a5)."
       - Advanced uv selectors such as V(>=3.12,<3.13) or V(cpython@3.12) are not supported in this release.
-      - "When you specify only a major.minor version, make sure the number is enclosed in quotes so that it gets parsed correctly.\n\
-        Note that in case only a major.minor version are specified behavior depends on the O(state) parameter."
+      - When you specify only a major.minor version, make sure the number is enclosed in quotes so that it gets parsed correctly.
+        Note that in case only a major.minor version are specified behavior depends on the O(state) parameter.
     type: str
     required: true
   state:
