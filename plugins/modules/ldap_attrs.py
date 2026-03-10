@@ -188,6 +188,7 @@ modlist:
 """
 
 import base64
+import binascii
 import re
 import traceback
 
@@ -253,13 +254,20 @@ class LdapAttrs(LdapGeneric):
         elif self.ordered and not is_binary:
             values = self._order_values([str(value) for value in values])
 
-        return [converter(value) for value in values]
+        try:
+            return [converter(value) for value in values]
+        except binascii.Error:
+            return None
 
     def add(self):
         modlist = []
         new_attrs = {}
+        bad_bin_attrs = []
         for name, values in self.module.params["attributes"].items():
             norm_values = self._normalize_values(values, self._is_binary(name))
+            if norm_values is None:
+                bad_bin_attrs.append(name)
+                continue
             added_values = []
             for value in norm_values:
                 if self._is_value_absent(name, value):
@@ -267,14 +275,18 @@ class LdapAttrs(LdapGeneric):
                     added_values.append(value)
             if added_values:
                 new_attrs[name] = norm_values
-        return modlist, {}, new_attrs
+        return modlist, {}, new_attrs, bad_bin_attrs
 
     def delete(self):
         modlist = []
         old_attrs = {}
         new_attrs = {}
+        bad_bin_attrs = []
         for name, values in self.module.params["attributes"].items():
             norm_values = self._normalize_values(values, self._is_binary(name))
+            if norm_values is None:
+                bad_bin_attrs.append(name)
+                continue
             removed_values = []
             for value in norm_values:
                 if self._is_value_present(name, value):
@@ -283,14 +295,18 @@ class LdapAttrs(LdapGeneric):
             if removed_values:
                 old_attrs[name] = norm_values
                 new_attrs[name] = [value for value in norm_values if value not in removed_values]
-        return modlist, old_attrs, new_attrs
+        return modlist, old_attrs, new_attrs, bad_bin_attrs
 
     def exact(self):
         modlist = []
         old_attrs = {}
         new_attrs = {}
+        bad_bin_attrs = []
         for name, values in self.module.params["attributes"].items():
             norm_values = self._normalize_values(values, self._is_binary(name))
+            if norm_values is None:
+                bad_bin_attrs.append(name)
+                continue
             current = self._get_all_values_of(name)
 
             if frozenset(norm_values) != frozenset(current):
@@ -306,7 +322,7 @@ class LdapAttrs(LdapGeneric):
                     old_attrs[name] = current[0]
                     new_attrs[name] = norm_values[0]
 
-        return modlist, old_attrs, new_attrs
+        return modlist, old_attrs, new_attrs, bad_bin_attrs
 
     def _is_value_present(self, name, value):
         """True if the target attribute has the given value."""
@@ -389,11 +405,14 @@ def main():
 
     # Perform action
     if state == "present":
-        modlist, old_attrs, new_attrs = ldap.add()
+        modlist, old_attrs, new_attrs, bad_bin_attrs = ldap.add()
     elif state == "absent":
-        modlist, old_attrs, new_attrs = ldap.delete()
+        modlist, old_attrs, new_attrs, bad_bin_attrs = ldap.delete()
     elif state == "exact":
-        modlist, old_attrs, new_attrs = ldap.exact()
+        modlist, old_attrs, new_attrs, bad_bin_attrs = ldap.exact()
+
+    if bad_bin_attrs:
+        module.fail_json(msg="Incorrect binary attribute values for " + ", ".join(bad_bin_attrs))
 
     changed = False
 

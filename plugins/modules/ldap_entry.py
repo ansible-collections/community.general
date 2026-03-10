@@ -170,6 +170,7 @@ RETURN = r"""
 """
 
 import base64
+import binascii
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -207,7 +208,9 @@ class LdapEntry(LdapGeneric):
 
         # Load attributes
         if self.state == "present":
-            self.attrs = self._load_attrs()
+            self.attrs, bad_attrs = self._load_attrs()
+            if bad_attrs:
+                self.module.fail_json(msg="Incorrect attribute values for " + ", ".join(bad_attrs))
 
     def _is_binary(self, attr_name):
         """Check if an attribute must be considered binary."""
@@ -219,6 +222,7 @@ class LdapEntry(LdapGeneric):
         raw bytes, either by encoding the string itself, or by decoding it from
         base 64, depending on the binary attributes settings."""
         attrs = {}
+        bad_attrs = []
 
         for name, value in self.module.params["attributes"].items():
             if self._is_binary(name):
@@ -227,9 +231,12 @@ class LdapEntry(LdapGeneric):
                 converter = to_bytes
             if not isinstance(value, list):
                 value = [value]
-            attrs[name] = [converter(v) for v in value]
+            try:
+                attrs[name] = [converter(v) for v in value]
+            except binascii.Error:
+                bad_attrs.append(name)
 
-        return attrs
+        return attrs, bad_attrs
 
     def add(self):
         """If self.dn does not exist, returns a callable that will add it."""
