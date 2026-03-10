@@ -12,6 +12,7 @@ import sys
 import time
 import traceback
 import typing as t
+from http import HTTPStatus
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
@@ -199,7 +200,12 @@ class Response:
 
     @property
     def ok(self):
-        return self.status_code in (200, 201, 202, 204)
+        return self.status_code in (
+            HTTPStatus.OK,
+            HTTPStatus.CREATED,
+            HTTPStatus.ACCEPTED,
+            HTTPStatus.NO_CONTENT,
+        )
 
 
 class Scaleway:
@@ -302,7 +308,7 @@ class Scaleway:
         self.module.debug(f"fetch_state of resource: {resource['id']}")
         response = self.get(path=f"{self.api_path}/{resource['id']}")
 
-        if response.status_code == 404:
+        if response.status_code == HTTPStatus.NOT_FOUND:
             return "absent"
 
         if not response.ok:

@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import sys
 import typing as t
+from http import HTTPStatus
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
@@ -60,7 +61,12 @@ class Response:
 
     @property
     def ok(self):
-        return self.status_code in (200, 201, 202, 204)
+        return self.status_code in (
+            HTTPStatus.OK,
+            HTTPStatus.CREATED,
+            HTTPStatus.ACCEPTED,
+            HTTPStatus.NO_CONTENT,
+        )
 
 
 class Online:

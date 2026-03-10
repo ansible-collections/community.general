@@ -9,6 +9,7 @@ import json
 import os
 import typing as t
 import uuid
+from http import HTTPStatus
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 
@@ -91,7 +92,7 @@ class OcapiUtils:
                 use_proxy=True,
                 timeout=self.timeout,
             )
-            if resp.status != 204:
+            if resp.status != HTTPStatus.NO_CONTENT:
                 data = json.loads(resp.read())
             else:
                 data = ""
@@ -390,7 +391,7 @@ class OcapiUtils:
         job_uri = self.get_uri_with_slot_number_query_param(job_uri)
         response = self.get_request(job_uri)
         if response["ret"] is False:
-            if response.get("status") == 404:
+            if response.get("status") == HTTPStatus.NOT_FOUND:
                 # Job not found -- assume 0%
                 return {
                     "ret": True,
@@ -436,7 +437,7 @@ class OcapiUtils:
                 return {"ret": False, "changed": False, "msg": "Cannot delete job because it is in progress."}
 
         if response["ret"] is False:
-            if response["status"] == 404:
+            if response["status"] == HTTPStatus.NOT_FOUND:
                 return {"ret": True, "changed": False, "msg": "Job already deleted."}
             return response
         if self.module.check_mode:
@@ -445,9 +446,9 @@ class OcapiUtils:
         # Do the DELETE (unless we are in check mode)
         response = self.delete_request(job_uri, etag)
         if response["ret"] is False:
-            if response["status"] == 404:
+            if response["status"] == HTTPStatus.NOT_FOUND:
                 return {"ret": True, "changed": False}
-            elif response["status"] == 409:
+            elif response["status"] == HTTPStatus.CONFLICT:
                 return {"ret": False, "changed": False, "msg": "Cannot delete job because it is in progress."}
             return response
         return {"ret": True, "changed": True}

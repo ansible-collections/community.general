@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import urllib.error as urllib_error
+from http import HTTPStatus
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import json
@@ -93,7 +94,7 @@ def check_zone_domain(data, domain):
     """
     exists = False
 
-    if data.status_code in [201, 200]:
+    if data.status_code in (HTTPStatus.CREATED, HTTPStatus.OK):
         for zone_domain in data.json():
             if zone_domain["domain"] == domain:
                 exists = True
@@ -108,7 +109,7 @@ def check_zone(data, name):
     counter = 0
     exists = False
 
-    if data.status_code in [201, 200]:
+    if data.status_code in (HTTPStatus.CREATED, HTTPStatus.OK):
         for zone in data.json():
             if zone["nickname"] == name:
                 counter += 1
