@@ -333,14 +333,17 @@ def main():
 
     result = dict(changed=False, stdout="", stderr="", rc=0, python_versions=[], python_paths=[], failed=False)
     state = module.params["state"]
-
+    exec_result = {}
     uv = UV(module)
+
     if state == "present":
-        result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.install_python()
+        exec_result = dict(zip(["changed", "stdout", "stderr", "rc", "python_versions", "python_paths"], uv.install_python()))
     elif state == "absent":
-        result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.uninstall_python()
+        exec_result = dict(zip(["changed", "stdout", "stderr", "rc", "python_versions", "python_paths"], uv.uninstall_python()))
     elif state == "latest":
-        result["changed"], result["stdout"], result["stderr"], result["rc"], result["python_versions"], result["python_paths"] = uv.upgrade_python()
+        exec_result = dict(zip(["changed", "stdout", "stderr", "rc", "python_versions", "python_paths"], uv.upgrade_python()))
+
+    result.update(exec_result)
 
     module.exit_json(**result)
 
