@@ -123,8 +123,10 @@ class UV:
             self.python_version_str = str(self.python_version)
         except (ValueError, AttributeError):
             self.module.fail_json(
-                msg="Unsupported version format. Valid version numbers consist of two or three dot-separated numeric components, \
-                  with an optional 'pre-release' tag on the end (for example 3.12, 3.12.3, 3.15.0a5) are supported in this release."
+                msg=(
+                    "Unsupported version format. Valid version numbers consist of two or three dot-separated numeric components"
+                    " with an optional 'pre-release' tag on the end (for example 3.12, 3.12.3, 3.15.0a5) are supported in this release."
+                )
             )
 
     def _ensure_min_uv_version(self):
