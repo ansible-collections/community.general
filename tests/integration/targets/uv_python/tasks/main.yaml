@@ -12,10 +12,15 @@
   ansible.builtin.pip:
     name: uv
 
+- name: Add uv installation directory to PATH in macOS
+  shell: export PATH="$(python3 -m site --user-base)/bin:$PATH"
+  when: ansible_facts['os_family'] == "Darwin"
+  
 - name: Check if Python 3.14 exists already
   command: uv python find 3.14
   ignore_errors: true
   register: check_python_314_exists
+  changed_when: false
 
 - name: Install Python 3.14 in check mode
   uv_python:
@@ -63,6 +68,7 @@
   command: uv python find 3.13.5
   ignore_errors: true
   register: check_python_3135_exists
+  changed_when: false
 
 - name: Install Python 3.13.5
   uv_python:
