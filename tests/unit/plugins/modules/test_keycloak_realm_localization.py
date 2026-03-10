@@ -3,6 +3,8 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 from contextlib import contextmanager
 from io import StringIO
 from itertools import count
