@@ -139,7 +139,7 @@ class UV:
                 required_version=MINIMUM_UV_VERSION,
             )
 
-    def install_python(self) -> tuple[bool, str, str, int, list, list]:
+    def install_python(self) -> tuple[bool, str, str, int, list[str], list[str]]:
         """
         Runs command 'uv python install X.Y.Z' which installs specified python version.
         If patch version is not specified uv installs latest available patch version.
