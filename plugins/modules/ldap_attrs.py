@@ -405,14 +405,15 @@ def main():
 
     # Perform action
     if state == "present":
-        modlist, old_attrs, new_attrs, bad_bin_attrs = ldap.add()
+        modlist, old_attrs, new_attrs, bad_attrs = ldap.add()
     elif state == "absent":
-        modlist, old_attrs, new_attrs, bad_bin_attrs = ldap.delete()
+        modlist, old_attrs, new_attrs, bad_attrs = ldap.delete()
     elif state == "exact":
-        modlist, old_attrs, new_attrs, bad_bin_attrs = ldap.exact()
+        modlist, old_attrs, new_attrs, bad_attrs = ldap.exact()
 
-    if bad_bin_attrs:
-        module.fail_json(msg="Incorrect binary attribute values for " + ", ".join(bad_bin_attrs))
+    if bad_attrs:
+        s_bad_attrs = ", ".join(bad_attrs)
+        module.fail_json(msg=f"Invalid Base64-encoded attribute values for {s_bad_attrs}")
 
     changed = False
 

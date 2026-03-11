@@ -210,7 +210,8 @@ class LdapEntry(LdapGeneric):
         if self.state == "present":
             self.attrs, bad_attrs = self._load_attrs()
             if bad_attrs:
-                self.module.fail_json(msg="Incorrect attribute values for " + ", ".join(bad_attrs))
+                s_bad_attrs = ", ".join(bad_attrs)
+                self.module.fail_json(msg=f"Invalid Base64-encoded attribute values for {s_bad_attrs}")
 
     def _is_binary(self, attr_name):
         """Check if an attribute must be considered binary."""
