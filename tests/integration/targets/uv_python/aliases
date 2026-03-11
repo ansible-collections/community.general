@@ -4,8 +4,4 @@
 
 azp/posix/2
 destructive
-skip/python2
-skip/python3.8
-skip/windows
-skip/freebsd
-skip/rhel
+skip/macos  # TODO executables are installed in /Library/Frameworks/Python.framework/Versions/3.x/bin, which isn't part of $PATH
