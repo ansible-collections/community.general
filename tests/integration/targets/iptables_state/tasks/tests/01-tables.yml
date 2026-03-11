@@ -272,7 +272,7 @@
   assert:
     that:
       - iptables_state is failed
-      - "iptables_state.msg == 'Table mangle to restore not defined in {{ iptables_tests }}'"
+      - "iptables_state.msg == ('Table mangle to restore not defined in ' ~ iptables_tests)"
     success_msg: >-
       The previous error has been triggered by trying to restore a table
       that is missing in the file provided to iptables-restore.
