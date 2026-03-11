@@ -144,7 +144,6 @@ class UV:
         Runs command 'uv python install X.Y.Z' which installs specified python version.
         If patch version is not specified uv installs latest available patch version.
         Returns:
-          tuple [bool, str, str, int, list, list]
           - boolean to indicate if method changed state
           - command's stdout
           - command's stderr
