@@ -83,22 +83,31 @@ python_versions:
   description: List of Python versions changed.
   returned: success
   type: list
+  elements: str
+  sample:
+    - "3.13.5"
 python_paths:
   description: List of installation paths of Python versions changed.
   returned: success
   type: list
+  elements: str
+  sample:
+    - "/root/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu/bin/python3.13"
 stdout:
   description: Stdout of the executed command.
   returned: success
   type: str
+  sample: ""
 stderr:
   description: Stderr of the executed command.
   returned: success
   type: str
+  sample: ""
 rc:
   description: Return code of the executed command.
   returned: success
   type: int
+  sample: 0
 """
 
 import json
