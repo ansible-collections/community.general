@@ -128,7 +128,7 @@ class UV:
                 )
             )
 
-    def _ensure_min_uv_version(self):
+    def _ensure_min_uv_version(self) -> None:
         cmd = [self.bin_path, "--version", "--color", "never"]
         dummy_rc, out, dummy_err = self.module.run_command(cmd, check_rc=True)
         detected = out.strip().split()[-1]
