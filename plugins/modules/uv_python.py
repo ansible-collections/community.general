@@ -113,7 +113,7 @@ class UV:
     Module for managing Python versions and installations using "uv python" command
     """
 
-    def __init__(self, module):
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.bin_path = self.module.get_bin_path("uv", required=True)
         self._ensure_min_uv_version()
