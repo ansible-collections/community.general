@@ -8,12 +8,21 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: ensure iptables package is installed
+- name: ensure iptables package is installed (non-RHEL)
   package:
     name:
       - iptables
   become: true
+  when: not (ansible_facts.distribution == 'RedHat' and ansible_facts.distribution_major_version|int >= 10)
 
+- name: ensure iptables package is installed (RHEL 10+)
+  package:
+    name:
+      - "kernel-modules-extra-matched-{{ ansible_facts.kernel }}"
+      - "iptables-nft"
+      - "kernel-modules-extra-{{ ansible_facts.kernel }}"
+  become: true
+  when: ansible_facts.distribution == 'RedHat' and ansible_facts.distribution_major_version|int >= 10
 
 - name: include tasks
   vars:
