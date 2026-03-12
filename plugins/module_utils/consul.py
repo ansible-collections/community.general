@@ -42,8 +42,7 @@ class RequestError(Exception):
 
 
 def handle_consul_response_error(response):
-    status = HTTPStatus(response.status_code)
-    if status.is_client_error or status.is_server_error:
+    if response.status_code >= HTTPStatus.BAD_REQUEST:  # 4xx and 5xx errors
         raise RequestError(f"{response.status_code} {response.content}")
 
 
@@ -323,8 +322,7 @@ class _ConsulModule:
                 )
                 raise
 
-        _status = HTTPStatus(status)
-        if _status.is_client_error or _status.is_server_error:
+        if status >= HTTPStatus.BAD_REQUEST:  # 4xx and 5xx errors
             raise RequestError(status, response_data)
 
         if response_data:

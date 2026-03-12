@@ -71,7 +71,7 @@ def session_method_wrapper(f):
                 raise HwcClientException(0, f"Parsing response to json failed, error: {ex}") from ex
 
         code = r.status_code
-        if not HTTPStatus(code).is_success:
+        if not (HTTPStatus.OK <= code < HTTPStatus.MULTIPLE_CHOICES):  # not 2xx codes
             msg = ""
             for i in ["message", "error.message"]:
                 try:
