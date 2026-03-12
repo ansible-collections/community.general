@@ -21,6 +21,7 @@ action_groups:
   keycloak:
     - keycloak_authentication
     - keycloak_authentication_required_actions
+    - keycloak_authentication_v2
     - keycloak_authz_authorization_scope
     - keycloak_authz_custom_policy
     - keycloak_authz_permission
