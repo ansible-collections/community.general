@@ -29,7 +29,7 @@ options:
     type: str
     description:
       - Scaleway region to use (for example C(par1)).
-    required: true
+    required: false
     choices:
       - ams1
       - EMEA-NL-EVS
@@ -44,16 +44,36 @@ options:
       - EMEA-PL-WAW1
       - waw2
       - waw3
+   zone
+    type: str
+    description:
+      - Scaleway zone to use (for example (nl-ams-1))
+    required: false
+    choices:
+      - fr-par-1
+      - fr-par-2
+      - fr-par-3
+      - nl-ams-1
+      - nl-ams-2
+      - nl-ams-3
+      - pl-waw-1
+      - pl-waw-2
+      - pl-waw-3
 """
 
 EXAMPLES = r"""
 - name: Gather Scaleway IPs information
   community.general.scaleway_ip_info:
-    region: par1
+    zone: fr-par-1
   register: result
 
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_ip_info }}"
+
+- name: Gather Scaleway IPs information (deprecated)
+  community.general.scaleway_ip_info:
+    region: par-1
+  register: result
 """
 
 RETURN = r"""
@@ -83,6 +103,9 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_LOCATION,
+    SCALEWAY_ENDPOINT,
+    SCALEWAY_REGIONS,
+    SCALEWAY_ZONES,
     Scaleway,
     ScalewayException,
     scaleway_argument_spec,
@@ -94,26 +117,49 @@ class ScalewayIpInfo(Scaleway):
         super().__init__(module)
         self.name = "ips"
 
-        region = module.params["region"]
-        self.module.params["api_url"] = SCALEWAY_LOCATION[region]["api_endpoint"]
+        if self.module.params.get("zone"):
+            self.module.params["api_url"] = SCALEWAY_ENDPOINT
+        else:
+            self.module.params["api_url"] = SCALEWAY_LOCATION[self.module.params.get("region")]["api_endpoint"]
 
 
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(
         dict(
-            region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
+            region=dict(required=False, choices=list(SCALEWAY_LOCATION.keys())),
+            zone=dict(required=False, choices=list(SCALEWAY_ZONES)),
         )
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        mutually_exclusive=[
+            ("zone", "region"),
+        ],
+        required_one_of=[
+            ("zone", "region"),
+        ],
     )
 
-    try:
-        module.exit_json(scaleway_ip_info=ScalewayIpInfo(module).get_resources())
-    except ScalewayException as exc:
-        module.fail_json(msg=exc.message)
+    api = ScalewayIpInfo(module=module)
+
+    if module.params["zone"]:
+      zone = module.params["zone"]
+      api_path = f"instance/v1/zones/{zone}/ips"
+      response = scaleway_ip_info=api.get(path=api_path)
+      module.exit_json(scaleway_ip_info=response.json.get('ips'))
+    else:
+      module.deprecate(
+          msg="The 'region' parameter is deprecated. Use 'zone' to specify the Scaleway zone instead.",
+          version="14.0.0",
+          collection_name="community.general",
+      )
+
+      try:
+          module.exit_json(scaleway_ip_info=ScalewayIpInfo(module).get_resources())
+      except ScalewayException as exc:
+          module.fail_json(msg=exc.message)
 
 
 if __name__ == "__main__":
