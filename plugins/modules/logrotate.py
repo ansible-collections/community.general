@@ -7,7 +7,7 @@ from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: logrotate
-version_added: 12.4.0
+version_added: 12.5.0
 short_description: Manage logrotate configurations
 description:
   - Manage C(logrotate) configuration files and settings.
@@ -51,8 +51,8 @@ options:
   rotation_period:
     description:
       - How often to rotate the logs.
-      - If not specified, existing value be preserved when modifying configuration.
-      - When creating new configuration, be used if not specified.
+      - If not specified when modifying an existing configuration, the existing value is preserved.
+      - When creating a new configuration, this option is only included if specified.
     type: str
     choices: [daily, weekly, monthly, yearly]
   rotate_count:
