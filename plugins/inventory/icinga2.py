@@ -174,7 +174,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         response_body = response.read()
         json_data = json.loads(response_body.decode("utf-8"))
         self.display.vvv(f"Returned Data: {json.dumps(json_data, indent=4, sort_keys=True)}")
-        if HTTPStatus(response.status).is_success:
+        if HTTPStatus.OK <= response.status < HTTPStatus.MULTIPLE_CHOICES:  # 2xx codes
             return json_data
         if response.status == HTTPStatus.NOT_FOUND and json_data["status"] == "No objects found.":
             raise AnsibleParserError(f"API returned no data -- Response: {response.status} - {json_data['status']}")

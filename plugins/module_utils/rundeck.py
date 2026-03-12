@@ -83,7 +83,7 @@ def api_request(
         return None, info
     elif _status == HTTPStatus.CONFLICT:
         module.fail_json(msg="Job executions limit reached", execution_info=json.loads(info["body"]))
-    elif _status.is_server_error:
+    elif _status >= HTTPStatus.INTERNAL_SERVER_ERROR:  # 5xx errors
         module.fail_json(msg="Rundeck API error", execution_info=json.loads(info["body"]))
 
     try:
