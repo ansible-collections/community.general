@@ -89,8 +89,8 @@ options:
     type: bool
   shred:
     description:
-      - Use shred to securely delete rotated log files.
-      - Uses V(shred -u) to overwrite files before deleting.
+      - Use C(shred) to securely delete rotated log files.
+      - Uses C(shred -u) to overwrite files before deleting.
     type: bool
   shred_cycles:
     description:
@@ -198,7 +198,7 @@ options:
   su:
     description:
       - Set user and group for rotated files.
-      - Format is V(user group) (e.g., V(www-data adm)).
+      - Format is V(user group) (for example, V(www-data adm)).
       - Set to V("") (empty string) to remove the directive from existing configurations.
       - Set to V(null) or omit to leave the existing value unchanged (when modifying) or not set (when creating).
     type: str
