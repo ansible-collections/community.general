@@ -33,8 +33,28 @@ options:
         by using YAML block modifiers as seen in the examples for this module.
       - Note that when using values that YAML/ansible-core interprets as other types, like V(yes), V(no) (booleans), or V(2.10)
         (float), make sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
+      - If O(honor_binary=true), an attribute that includes the C(binary) option as per
+        L(RFC 4522, https://www.rfc-editor.org/rfc/rfc4522.html#section-3) will be considered as binary. Its contents must be
+        specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary without including
+        the C(binary) option, it can be listed in O(binary_attributes).
+        Support for binary values was added in community.general 12.5.0.
     type: dict
     default: {}
+  binary_attributes:
+    description:
+      - If O(state=present), attributes whose values must be handled as raw sequences of bytes must be listed here.
+      - The values provided for the attributes will be converted from Base64.
+    type: list
+    elements: str
+    default: []
+    version_added: 12.5.0
+  honor_binary:
+    description:
+      - If O(state=present) and this option is V(true), attributes whose name include the V(binary) option
+        will be treated as Base64-encoded byte sequences automatically, even if they are not listed in O(binary_attributes).
+    type: bool
+    default: false
+    version_added: 12.5.0
   objectClass:
     description:
       - If O(state=present), value or list of values to use when creating the entry. It can either be a string or an actual
@@ -71,9 +91,30 @@ EXAMPLES = r"""
     objectClass:
       - simpleSecurityObject
       - organizationalRole
+      - myPhotoObject
+    binary_attributes:
+      - myPhoto
     attributes:
       description: An LDAP administrator
       userPassword: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
+      myPhoto: >-
+        /9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNt
+        cwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAA
+        # ...
+
+- name: Make sure a CA certificate is present
+  community.general.ldap_attrs:
+    dn: cn=ISRG Root X1,ou=ca,ou=certificates,dc=example,dc=org
+    honor_binary: true
+    objectClass:
+      - pkiCA
+      - applicationProcess
+    attributes:
+      cn: ISRG Root X1
+      cACertificate;binary: >-
+        MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+        TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+        # ...
 
 - name: Set possible values for attributes elements
   community.general.ldap_entry:
@@ -128,6 +169,8 @@ RETURN = r"""
 # Default return values
 """
 
+import base64
+import binascii
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -157,25 +200,44 @@ class LdapEntry(LdapGeneric):
         # Shortcuts
         self.state = self.module.params["state"]
         self.recursive = self.module.params["recursive"]
+        self.binary = set(attr.lower() for attr in self.module.params["binary_attributes"])
+        self.honor_binary = self.module.params["honor_binary"]
 
         # Add the objectClass into the list of attributes
         self.module.params["attributes"]["objectClass"] = self.module.params["objectClass"]
 
         # Load attributes
         if self.state == "present":
-            self.attrs = self._load_attrs()
+            self.attrs, bad_attrs = self._load_attrs()
+            if bad_attrs:
+                s_bad_attrs = ", ".join(bad_attrs)
+                self.module.fail_json(msg=f"Invalid Base64-encoded attribute values for {s_bad_attrs}")
+
+    def _is_binary(self, attr_name):
+        """Check if an attribute must be considered binary."""
+        lc_name = attr_name.lower()
+        return (self.honor_binary and "binary" in lc_name.split(";")) or lc_name in self.binary
 
     def _load_attrs(self):
-        """Turn attribute's value to array."""
+        """Turn attribute's value to array. Attribute values are converted to
+        raw bytes, either by encoding the string itself, or by decoding it from
+        base 64, depending on the binary attributes settings."""
         attrs = {}
+        bad_attrs = []
 
         for name, value in self.module.params["attributes"].items():
-            if isinstance(value, list):
-                attrs[name] = list(map(to_bytes, value))
+            if self._is_binary(name):
+                converter = base64.b64decode
             else:
-                attrs[name] = [to_bytes(value)]
+                converter = to_bytes
+            if not isinstance(value, list):
+                value = [value]
+            try:
+                attrs[name] = [converter(v) for v in value]
+            except binascii.Error:
+                bad_attrs.append(name)
 
-        return attrs
+        return attrs, bad_attrs
 
     def add(self):
         """If self.dn does not exist, returns a callable that will add it."""
@@ -236,6 +298,8 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
             attributes=dict(default={}, type="dict"),
+            binary_attributes=dict(default=[], type="list", elements="str"),
+            honor_binary=dict(default=False, type="bool"),
             objectClass=dict(type="list", elements="str"),
             state=dict(default="present", choices=["present", "absent"]),
             recursive=dict(default=False, type="bool"),
