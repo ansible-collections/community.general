@@ -10,7 +10,7 @@ DOCUMENTATION = r"""
 module: keycloak_authentication_v2
 
 short_description: Configure authentication flows in Keycloak in an idempotent and safe manner.
-
+version_added: 12.5.0
 description:
   - This module allows the creation, deletion, and modification of Keycloak authentication flows using the Keycloak REST API.
   - Rather than modifying an existing flow in place, the module re-creates the flow using the B(Safe Swap) mechanism described below.
@@ -60,7 +60,7 @@ options:
   authenticationExecutions:
     description:
       - The desired execution configuration for the flow.
-      - Executions at root level
+      - Executions at root level.
     type: list
     elements: dict
     suboptions:
@@ -80,11 +80,11 @@ options:
         type: dict
         suboptions:
           alias:
-            description: Name of the execution config
+            description: Name of the execution config.
             type: str
             required: true
           config:
-            description: Key Value Tuples
+            description: Options for the execution config.
             required: true
             type: dict
       subFlow:
@@ -100,7 +100,7 @@ options:
       authenticationExecutions:
         description:
           - The execution configuration for executions within the sub-flow.
-          - Sub-Level 1
+          - Executions at sub level 1.
         type: list
         elements: dict
         suboptions:
@@ -120,11 +120,11 @@ options:
             type: dict
             suboptions:
               alias:
-                description: Name of the execution config
+                description: Name of the execution config.
                 type: str
                 required: true
               config:
-                description: Key Value Tuples
+                description: Options for the execution config.
                 required: true
                 type: dict
           subFlow:
@@ -140,7 +140,7 @@ options:
           authenticationExecutions:
             description:
               - The execution configuration for executions within the sub-flow.
-              - Sub-Level 2
+              - Executions at sub level 2.
             type: list
             elements: dict
             suboptions:
@@ -160,11 +160,11 @@ options:
                 type: dict
                 suboptions:
                   alias:
-                    description: Name of the execution config
+                    description: Name of the execution config.
                     type: str
                     required: true
                   config:
-                    description: Key Value Tuples
+                    description: Options for the execution config.
                     required: true
                     type: dict
               subFlow:
@@ -180,7 +180,7 @@ options:
               authenticationExecutions:
                 description:
                   - The execution configuration for executions within the sub-flow.
-                  - Sub-Level 3
+                  - Executions at sub level 3.
                 type: list
                 elements: dict
                 suboptions:
@@ -200,11 +200,11 @@ options:
                     type: dict
                     suboptions:
                       alias:
-                        description: Name of the execution config
+                        description: Name of the execution config.
                         type: str
                         required: true
                       config:
-                        description: Key Value Tuples
+                        description: Options for the execution config.
                         required: true
                         type: dict
                   subFlow:
@@ -220,7 +220,7 @@ options:
                   authenticationExecutions:
                     description:
                       - The execution configuration for executions within the sub-flow.
-                      - Sub-Level 4 (last sub-level)
+                      - Executions at sub level 4 (last sub level).
                     type: list
                     elements: dict
                     suboptions:
@@ -241,11 +241,11 @@ options:
                         type: dict
                         suboptions:
                           alias:
-                            description: Name of the execution config
+                            description: Name of the execution config.
                             type: str
                             required: true
                           config:
-                            description: Key Value Tuples
+                            description: Options for the execution config.
                             required: true
                             type: dict
   state:
@@ -264,7 +264,7 @@ options:
   force_temporary_swap_flow_deletion:
     description:
       - If C(true), any pre-existing temporary swap flow (identified by the original alias plus
-        C(temporary_swap_flow_suffix)) is deleted before the Safe Swap procedure begins.
+        O(temporary_swap_flow_suffix)) is deleted before the Safe Swap procedure begins.
       - Set this to C(false) to cause the module to fail instead of silently removing a
         pre-existing temporary flow, for example to avoid accidental data loss after an
         interrupted run.
@@ -471,8 +471,8 @@ def update_execution_requirement_and_config(
     :param kc: a KeycloakAPI instance.
     :param realm: the realm in which the flow resides.
     :param top_level_auth: the top-level authentication flow dict used to look up executions.
-    :param execution: the desired execution dict containing C(requirement) and optionally
-                      C(authenticationConfig).
+    :param execution: the desired execution dict containing 'requirement' and optionally
+                      'authenticationConfig'.
     :param parent_flow_alias: the alias of the flow or sub-flow that owns this execution.
     """
     # The most recently added execution is always last in the list.
@@ -541,7 +541,7 @@ def create_empty_flow(kc: KeycloakAPI, realm: str, auth_flow_config: dict) -> di
 
     :param kc: a KeycloakAPI instance.
     :param realm: the realm in which to create the flow.
-    :param auth_flow_config: the flow configuration dict (must include at least C(alias)).
+    :param auth_flow_config: the flow configuration dict (must include at least 'alias').
     :returns: the newly-created flow dict as returned by the Keycloak API.
     :raises RuntimeError: if the created flow cannot be retrieved immediately after creation.
     """
@@ -557,7 +557,7 @@ def desired_auth_to_diff_repr(desired_auth: dict) -> dict:
     diff comparison.
 
     :param desired_auth: the desired flow dict as provided by the module parameters.
-    :returns: a normalized dict suitable for comparison with C(existing_auth_to_diff_repr).
+    :returns: a normalized dict suitable for comparison with 'existing_auth_to_diff_repr'.
     """
     desired_copy = copy.deepcopy(desired_auth)
     desired_copy["topLevel"] = True
@@ -602,10 +602,10 @@ def desired_executions_to_diff_repr_rec(executions: list, level: int) -> list:
 
 def existing_auth_to_diff_repr(kc: KeycloakAPI, realm: str, existing_auth: dict) -> dict:
     """Build a normalized representation of an existing flow that can be compared with the
-    output of C(desired_auth_to_diff_repr).
+    output of 'desired_auth_to_diff_repr'.
 
-    Server-side fields that have no equivalent in the desired state (such as C(id),
-    C(builtIn), C(requirementChoices), and C(configurable)) are stripped so that the
+    Server-side fields that have no equivalent in the desired state (such as 'id',
+    'builtIn', 'requirementChoices', and 'configurable') are stripped so that the
     comparison is not skewed by fields the user cannot control.
 
     :param kc: a KeycloakAPI instance.
@@ -644,8 +644,8 @@ def is_auth_flow_in_use(kc: KeycloakAPI, realm: str, existing_auth: dict) -> boo
 
     :param kc: a KeycloakAPI instance.
     :param realm: the realm to inspect.
-    :param existing_auth: the existing flow dict (must include C(id) and C(alias)).
-    :returns: C(True) if the flow is bound anywhere, C(False) otherwise.
+    :param existing_auth: the existing flow dict (must include 'id' and 'alias').
+    :returns: True if the flow is bound anywhere, False otherwise.
     """
     flow_id = existing_auth["id"]
     flow_alias = existing_auth["alias"]
