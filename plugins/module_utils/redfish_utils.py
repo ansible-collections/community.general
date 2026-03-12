@@ -443,8 +443,7 @@ class RedfishUtils:
         """
         msg = http_client.responses.get(error.code, "")
         data = None
-        code = HTTPStatus(error.code)
-        if code.is_client_error or code.is_server_error:
+        if error.code >= HTTPStatus.BAD_REQUEST:  # 4xx and 5xx errors
             try:
                 body = error.read().decode("utf-8")
                 data = json.loads(body)
@@ -1893,17 +1892,15 @@ class RedfishUtils:
                 else:
                     # Error response body, which is a bit of a misnomer since it is used in successful action responses
                     operation_results["status"] = "Completed"
-                    _status = HTTPStatus(response.status)
-                    if _status.is_client_error or _status.is_server_error:
+                    if response.status >= HTTPStatus.BAD_REQUEST:  # 4xx and 5xx errors
                         operation_results["status"] = "Exception"
                     operation_results["messages"] = data.get("error", {}).get("@Message.ExtendedInfo", [])
             else:
                 # No response body (or malformed); build based on status code
                 operation_results["status"] = "Completed"
-                _status = HTTPStatus(response.status)
-                if _status == HTTPStatus.ACCEPTED:
+                if response.status == HTTPStatus.ACCEPTED:
                     operation_results["status"] = "New"
-                elif _status.is_client_error or _status.is_server_error:
+                elif response.status >= HTTPStatus.BAD_REQUEST:  # 4xx and 5xx errors
                     operation_results["status"] = "Exception"
 
             # Clear out the handle if the operation is complete
