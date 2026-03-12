@@ -82,9 +82,26 @@ options:
       - name: ansible_doas_prompt_l10n
     env:
       - name: ANSIBLE_DOAS_PROMPT_L10N
+  allow_pipelining:
+    description:
+      - When set to V(true), do allow pipelining with ansible-core 2.19+.
+      - This should only be used when doas is configured to not ask for a password (C(nopass)).
+    type: boolean
+    default: false
+    version_added: 12.4.0
+    ini:
+      - section: doas_become_plugin
+        key: allow_pipelining
+    vars:
+      - name: ansible_doas_allow_pipelining
+    env:
+      - name: ANSIBLE_DOAS_ALLOW_PIPELINING
 notes:
-  - This become plugin does not work when connection pipelining is enabled. With ansible-core 2.19+, using it automatically
-    disables pipelining. On ansible-core 2.18 and before, pipelining must explicitly be disabled by the user.
+  - This become plugin does not work when connection pipelining is enabled
+    and doas requests a password.
+    With ansible-core 2.19+, using this plugin automatically disables pipelining,
+    unless O(allow_pipelining=true) is explicitly set by the user.
+    On ansible-core 2.18 and before, pipelining must explicitly be disabled by the user.
 """
 
 import re
@@ -101,8 +118,11 @@ class BecomeModule(BecomeBase):
     missing = ("Authorization required",)
 
     # See https://github.com/ansible-collections/community.general/issues/9977,
-    # https://github.com/ansible/ansible/pull/78111
-    pipelining = False
+    # https://github.com/ansible/ansible/pull/78111,
+    # https://github.com/ansible-collections/community.general/issues/11411
+    @property
+    def pipelining(self) -> bool:  # type: ignore[override]
+        return self.get_option("allow_pipelining")
 
     def check_password_prompt(self, b_output):
         """checks if the expected password prompt exists in b_output"""
