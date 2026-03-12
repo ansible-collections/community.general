@@ -20,10 +20,10 @@
 - name: Extract flow id for alias 'Integration Test Flow'
   ansible.builtin.set_fact:
     test_flow_id: >-
-      {{ (keycloak_flows_response.json
+      {{ keycloak_flows_response.json
           | selectattr('alias', 'equalto', 'Integration Test Flow')
           | map(attribute='id')
-          | first) }}
+          | first }}
   no_log: true
 
 - name: Fetch basic flow data for 'Integration Test Flow'
