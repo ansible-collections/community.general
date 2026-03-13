@@ -48,8 +48,8 @@ options:
 
 EXAMPLES = r"""
 - name: List Github secret
-  github_secrets_info:
-    token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+  community.general.github_secrets_info:
+    token: "{{ lookup('ansible.builtin.env', 'GITHUB_TOKEN') }}"
     repository: "ansible"
     organization: "ansible"
 """
