@@ -1,7 +1,0 @@
-bugfixes:
-  - icinga2 inventory plugin - remove Python 3.11 constructs added by mistake (https://github.com/ansible-collections/community.general/pull/11573).
-  - consul module utils - remove Python 3.11 constructs added by mistake (https://github.com/ansible-collections/community.general/pull/11573).
-  - hwc_utils module utils - remove Python 3.11 constructs added by mistake (https://github.com/ansible-collections/community.general/pull/11573).
-  - redfish_utils module utils - remove Python 3.11 constructs added by mistake (https://github.com/ansible-collections/community.general/pull/11573).
-  - rundeck module utils - remove Python 3.11 constructs added by mistake (https://github.com/ansible-collections/community.general/pull/11573).
-  - utm_utils module utils - remove Python 3.11 constructs added by mistake (https://github.com/ansible-collections/community.general/pull/11573).
