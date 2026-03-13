@@ -79,7 +79,7 @@ EXAMPLES = r"""
     state: "present"
 
 - name: Delete Github secret
-  github_secrets:
+  community.general.github_secrets:
     token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
     repository: "ansible"
     organization: "ansible"
