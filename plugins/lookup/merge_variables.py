@@ -164,7 +164,7 @@ testb__test_dict:
   ports:
     - 3
 
-testa_low_prio__test:
+testa_low_dict__test:
   a:
     a:
       x: low_value
@@ -177,7 +177,7 @@ testa_low_prio__test:
     - 2
     - 3
 
-testb_high_prio__test:
+testb_high_dict__test:
   a:
     a:
       y: high_value
