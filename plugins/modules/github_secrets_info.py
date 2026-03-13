@@ -60,8 +60,6 @@ result:
   type: dict
   returned: always
   sample: {
-    "changed": false,
-    "failed": false,
     "result": {
       "secrets": [
         {
