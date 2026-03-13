@@ -14,8 +14,6 @@ description:
 author:
   - Thomas Sjögren (@konstruktoid)
 version_added: '12.5.0'
-requirements:
-  - pynacl
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -86,13 +84,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.community.general.plugins.module_utils import deps
-
-with deps.declare(
-    "pynacl",
-    reason="pynacl is a required dependency",
-    url="https://pypi.org/project/PyNaCl/",
-):
-    pass
 
 
 def list_secrets(
