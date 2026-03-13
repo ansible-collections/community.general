@@ -93,13 +93,9 @@ result:
   type: dict
   returned: always
   sample: {
-    "changed": true,
-    "failed": false,
-    "result": {
-      "msg": "OK (2 bytes)",
-      "response": "Secret created",
-      "status": 201
-    }
+    "msg": "OK (2 bytes)",
+    "response": "Secret created",
+    "status": 201
   }
 """
 
