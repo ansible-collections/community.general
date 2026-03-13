@@ -134,7 +134,7 @@ options:
           keep:
             description:
               - Determines which duplicates (if any) to keep.
-              - Only valid in combination with the V(dedup) list transformation.
+              - Only valid in combination with the O(list_transformations[].name=dedup) list transformation.
             type: str
             default: first
             choices:
