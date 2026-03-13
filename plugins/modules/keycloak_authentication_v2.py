@@ -795,7 +795,7 @@ def validate_executions(kc: KeycloakAPI, realm: str, executions: dict) -> None:
     invalid_provider_ids = validate_executions_rec(valid_provider_ids, executions)
     if len(invalid_provider_ids) > 0:
         invalid_provider_ids_str = ", ".join(f"'{item}'" for item in invalid_provider_ids)
-        raise RuntimeError(
+        raise ValueError(
             f"The following execution providerIds are unknown and therefore invalid: {invalid_provider_ids_str}"
         )
 
@@ -876,14 +876,14 @@ def main() -> None:
         existing_auth_diff_repr = existing_auth_to_diff_repr(kc, realm, existing_auth)
 
     try:
-        validate_executions(kc, realm, desired_auth["authenticationExecutions"])
-    except Exception as e:
-        module.fail_json(
-            msg=f"Validation of executions failed: {e}",
-            exception=traceback.format_exc(),
-        )
+        try:
+            validate_executions(kc, realm, desired_auth["authenticationExecutions"])
+        except ValueError as e:
+            module.fail_json(
+                msg=f"Validation of executions failed: {e}",
+                exception=traceback.format_exc(),
+            )
 
-    try:
         if not existing_auth:
             if state == "absent":
                 # The flow does not exist and is not required; nothing to do.
