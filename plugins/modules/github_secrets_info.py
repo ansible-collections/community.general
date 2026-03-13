@@ -63,8 +63,6 @@ result:
     "changed": false,
     "failed": false,
     "result": {
-      "info": 200,
-      "response": "Secrets listed",
       "secrets": [
         {
           "created_at": "2026-01-11T23:19:00Z",
@@ -92,7 +90,7 @@ def list_secrets(
     headers: dict[str, str],
     organization: str,
     repository: str,
-) -> dict[str, int]:
+) -> dict[str, list]:
     url = (
         f"{api_url}/repos/{organization}/{repository}/actions/secrets"
         if repository
@@ -105,14 +103,10 @@ def list_secrets(
         body = resp.read()
         return {
             "secrets": json.loads(body).get("secrets", []),
-            "info": info["status"],
-            "response": "Secrets listed",
         }
     elif info["status"] == HTTPStatus.NOT_FOUND:
         return {
             "secrets": [],
-            "info": info["status"],
-            "response": "No secrets found",
         }
     else:
         module.fail_json(msg=f"Failed to list secrets: {info}")
