@@ -1,0 +1,4 @@
+bugfixes:
+  - nictagadm - fix ``'NoneType' object has no attribute 'lower'`` errors when creating etherstubs.
+    Module always calls ``nictag.is_valid_mac()``, but if ``etherstub`` is set to True then mac is necessarily null.
+    Adds a condition to the if statement so that ``is_valid_mac()`` doesn't get called if ``etherstub`` is false.
