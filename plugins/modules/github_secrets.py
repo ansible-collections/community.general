@@ -80,7 +80,7 @@ EXAMPLES = r"""
 
 - name: Delete Github secret
   community.general.github_secrets:
-    token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+    token: "{{ lookup('ansible.builtin.env', 'GITHUB_TOKEN') }}"
     repository: "ansible"
     organization: "ansible"
     key: "TEST_SECRET"
