@@ -60,15 +60,13 @@ result:
   type: dict
   returned: always
   sample: {
-    "result": {
-      "secrets": [
-        {
-          "created_at": "2026-01-11T23:19:00Z",
-          "name": "ANSIBLE",
-          "updated_at": "2026-02-15T22:18:16Z"
-        },
-      ]
-    },
+    "secrets": [
+      {
+        "created_at": "2026-01-11T23:19:00Z",
+        "name": "ANSIBLE",
+        "updated_at": "2026-02-15T22:18:16Z"
+      },
+    ]
   }
 """
 
@@ -147,7 +145,7 @@ def main() -> None:
 
     result["changed"] = False
     result.update(
-        result=secrets,
+        secrets=secrets["secrets"],
     )
 
     module.exit_json(**result)

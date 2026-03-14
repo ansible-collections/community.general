@@ -75,7 +75,7 @@ def test_list_repo_secrets(fetch_url_mock):
 
     result = exc.value.args[0]
     assert result["changed"] is False
-    assert result["result"]["secrets"] == GITHUB_SECRETS_RESPONSE["secrets"]
+    assert result["secrets"] == GITHUB_SECRETS_RESPONSE["secrets"]
 
 
 def test_fail_list_repo_secrets(fetch_url_mock):
@@ -95,4 +95,4 @@ def test_fail_list_repo_secrets(fetch_url_mock):
 
     result = exc.value.args[0]
     assert result["changed"] is False
-    assert result["result"]["secrets"] == []
+    assert result["secrets"] == []
