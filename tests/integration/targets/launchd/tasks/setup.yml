@@ -9,6 +9,11 @@
     dest: "{{ launchd_plist_location }}"
   become: true
 
+- name: ensure target directory exists
+  file:
+    path: /usr/local/sbin
+    state: directory
+
 - name: install the test daemon script
   copy:
     src: ansible_test_service.py
