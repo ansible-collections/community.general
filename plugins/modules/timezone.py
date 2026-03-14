@@ -660,7 +660,7 @@ class DarwinTimezone(Timezone):
         # Lookup the list of supported timezones via `systemsetup -listtimezones`.
         # Note: Skip the first line that contains the label 'Time Zones:'
         out = self.execute(self.systemsetup, "-listtimezones").splitlines()[1:]
-        tz_list = list(map(lambda x: x.strip(), out))
+        tz_list = [x.strip() for x in out]
         if tz not in tz_list:
             self.abort(f'given timezone "{tz}" is not available')
         return tz
