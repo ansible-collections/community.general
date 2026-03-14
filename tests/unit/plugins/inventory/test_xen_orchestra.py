@@ -138,10 +138,6 @@ def get_option(option):
         return None
 
 
-def serialize_groups(groups):
-    return list(map(str, groups))
-
-
 @pytest.fixture(scope="module")
 def inventory():
     r = InventoryModule()

@@ -2505,7 +2505,7 @@ def test_create_bridge(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "ipv4.addresses",
         "10.10.10.10/24",
@@ -2542,7 +2542,7 @@ def test_mod_bridge(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "ipv4.addresses",
         "10.10.10.10/24",
@@ -2596,7 +2596,7 @@ def test_create_bridge_slave(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["bridge-port.path-cost", "100"]:
         assert param in args_text
 
@@ -2624,7 +2624,7 @@ def test_mod_bridge_slave(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["bridge-port.path-cost", "100"]:
         assert param in args_text
 
@@ -2843,7 +2843,7 @@ def test_create_vlan_con(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "vlan.id", "10"]:
         assert param in args_text
 
@@ -2871,7 +2871,7 @@ def test_mod_vlan_conn(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "vlan.id", "10"]:
         assert param in args_text
 
@@ -2915,7 +2915,7 @@ def test_create_vxlan(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "connection.interface-name",
         "vxlan-existent_nw_device",
@@ -2951,7 +2951,7 @@ def test_vxlan_mod(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["vxlan.local", "192.168.225.5", "vxlan.remote", "192.168.225.6", "vxlan.id", "11"]:
         assert param in args_text
 
@@ -2995,7 +2995,7 @@ def test_create_vxlan_multicast(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "vxlan_multicast_test"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "connection.interface-name",
         "vxlan-device",
@@ -3040,7 +3040,7 @@ def test_create_ipip(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "connection.interface-name",
         "ipip-existent_nw_device",
@@ -3078,7 +3078,7 @@ def test_ipip_mod(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["ip-tunnel.local", "192.168.225.5", "ip-tunnel.remote", "192.168.225.6"]:
         assert param in args_text
 
@@ -3122,7 +3122,7 @@ def test_create_sit(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "connection.interface-name",
         "sit-existent_nw_device",
@@ -3160,7 +3160,7 @@ def test_sit_mod(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["ip-tunnel.local", "192.168.225.5", "ip-tunnel.remote", "192.168.225.6"]:
         assert param in args_text
 
@@ -3224,7 +3224,7 @@ def test_create_gre(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "connection.interface-name",
         "gre-existent_nw_device",
@@ -3266,7 +3266,7 @@ def test_gre_mod(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["ip-tunnel.local", "192.168.225.5", "ip-tunnel.remote", "192.168.225.6"]:
         assert param in args_text
 
@@ -3351,7 +3351,7 @@ def test_create_ethernet_static(mocked_generic_connection_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "ethernet_non_existant",
@@ -3410,7 +3410,7 @@ def test_ethernet_connection_static_ipv4_address_static_route_with_metric_modify
     assert add_args[0][2] == "modify"
     assert add_args[0][3] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in ["ipv4.routes", "192.168.200.0/24 192.168.1.1", "ipv4.route-metric", "10"]:
         assert param in add_args_text
@@ -3444,7 +3444,7 @@ def test_ethernet_connection_static_ipv4_address_static_route_with_metric_clear(
     assert add_args[0][2] == "modify"
     assert add_args[0][3] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in ["ipv4.routes", ""]:
         assert param in add_args_text
@@ -3483,7 +3483,7 @@ def test_ethernet_connection_static_ipv6_address_static_route_create(
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in [
         "connection.interface-name",
@@ -3525,7 +3525,7 @@ def test_ethernet_connection_static_ipv6_address_static_route_metric_modify(
     assert add_args[0][2] == "modify"
     assert add_args[0][3] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in ["ipv6.routes", "fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2", "ipv6.route-metric", "10"]:
         assert param in add_args_text
@@ -3561,7 +3561,7 @@ def test_ethernet_connection_static_ipv6_address_multiple_static_routes_with_met
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in [
         "connection.interface-name",
@@ -3603,7 +3603,7 @@ def test_ethernet_connection_sriov_vfs_create(mocked_ethernet_connection_with_sr
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in [
         "connection.interface-name",
@@ -3647,7 +3647,7 @@ def test_ethernet_connection_static_ipv6_address_static_route_with_metric_create
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in [
         "connection.interface-name",
@@ -3697,7 +3697,7 @@ def test_ethernet_connection_static_ipv6_address_static_route_create_2(
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in [
         "connection.interface-name",
@@ -3753,7 +3753,7 @@ def test_create_wireless(mocked_wireless_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "wireless_non_existant",
@@ -3806,7 +3806,7 @@ def test_create_secure_wireless(mocked_secure_wireless_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "wireless_non_existant",
@@ -3867,7 +3867,7 @@ def test_create_secure_wireless_failure(mocked_secure_wireless_create_failure, c
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "wireless_non_existant",
@@ -3921,7 +3921,7 @@ def test_modify_secure_wireless(mocked_secure_wireless_modify, capfd):
     assert add_args[0][2] == "modify"
     assert add_args[0][3] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "wireless_non_existant",
@@ -3986,7 +3986,7 @@ def test_modify_secure_wireless_failure(mocked_secure_wireless_modify_failure, c
     assert add_args[0][2] == "modify"
     assert add_args[0][3] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "wireless_non_existant",
@@ -4026,7 +4026,7 @@ def test_create_dummy_static(mocked_generic_connection_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "dummy_non_existant",
@@ -4099,7 +4099,7 @@ def test_dummy_connection_static_with_custom_mtu_modify(mocked_dummy_connection_
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["802-3-ethernet.mtu", "0"]:
         assert param in args_text
 
@@ -4129,7 +4129,7 @@ def test_create_gsm(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in [
         "connection.interface-name",
         "gsm_non_existant",
@@ -4167,7 +4167,7 @@ def test_gsm_mod(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["gsm.username", "t-mobile", "gsm.password", "tm"]:
         assert param in args_text
 
@@ -4214,7 +4214,7 @@ def test_create_ethernet_with_multiple_ip4_addresses_static(mocked_generic_conne
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "ethernet_non_existant",
@@ -4262,7 +4262,7 @@ def test_create_ethernet_with_multiple_ip6_addresses_static(mocked_generic_conne
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "ethernet_non_existant",
@@ -4374,7 +4374,7 @@ def test_create_ethernet_addr_gen_mode_and_ip6_privacy_static(mocked_generic_con
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "ethernet_non_existant",
@@ -4442,7 +4442,7 @@ def test_create_wireguard(mocked_generic_connection_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "wg_non_existant",
@@ -4498,7 +4498,7 @@ def test_wireguard_mod(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["wireguard.listen-port", "51820"]:
         assert param in args_text
 
@@ -4557,7 +4557,7 @@ def test_create_vpn_l2tp(mocked_generic_connection_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "vpn_l2tp"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in [
         "connection.autoconnect",
@@ -4608,7 +4608,7 @@ def test_create_vpn_pptp(mocked_generic_connection_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "vpn_pptp"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in [
         "connection.autoconnect",
@@ -4666,7 +4666,7 @@ def test_infiniband_connection_static_transport_mode_connected(
     assert add_args[0][2] == "modify"
     assert add_args[0][3] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
 
     for param in ["infiniband.transport-mode", "connected"]:
         assert param in add_args_text
@@ -4721,7 +4721,7 @@ def test_create_macvlan(mocked_generic_connection_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "non_existent_nw_device"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in [
         "connection.interface-name",
         "macvlan_non_existant",
@@ -4777,7 +4777,7 @@ def test_macvlan_mod(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["macvlan.mode", "2"]:
         assert param in args_text
 
@@ -5115,7 +5115,7 @@ def test_create_loopback(mocked_generic_connection_create, capfd):
     assert add_args[0][5] == "con-name"
     assert add_args[0][6] == "lo"
 
-    add_args_text = list(map(to_text, add_args[0]))
+    add_args_text = [to_text(x) for x in add_args[0]]
     for param in ["connection.interface-name", "lo", "ipv4.addresses", "127.0.0.1/8"]:
         assert param in add_args_text
 
@@ -5186,7 +5186,7 @@ def test_create_vrf_con(mocked_generic_connection_create, capfd):
     assert args[0][5] == "con-name"
     assert args[0][6] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "table", "10"]:
         assert param in args_text
 
@@ -5214,7 +5214,7 @@ def test_mod_vrf_conn(mocked_generic_connection_modify, capfd):
     assert args[0][2] == "modify"
     assert args[0][3] == "non_existent_nw_device"
 
-    args_text = list(map(to_text, args[0]))
+    args_text = [to_text(x) for x in args[0]]
     for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "table", "10"]:
         assert param in args_text
 
