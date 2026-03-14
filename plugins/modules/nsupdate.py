@@ -268,7 +268,7 @@ class RecordManager:
             self.fqdn = module.params["record"]
 
         if self.module.params["type"].lower() == "txt" and self.module.params["value"] is not None:
-            self.value = list(map(self.txt_helper, self.module.params["value"]))
+            self.value = [self.txt_helper(x) for x in self.module.params["value"]]
         else:
             self.value = self.module.params["value"]
 
