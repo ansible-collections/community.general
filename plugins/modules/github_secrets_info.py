@@ -73,7 +73,7 @@ secrets:
 
 import json
 from http import HTTPStatus
-from typing import Any
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
