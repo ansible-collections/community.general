@@ -1,0 +1,52 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Setup Test
+  ansible.builtin.include_tasks:
+    file: test_setup.yml
+
+- name: Create the new flow <Integration Test Flow>
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v1.yml
+
+- name: Assign the flow <Integration Test Flow> as default browser flow
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+    browser_flow: Integration Test Flow
+
+- name: Modify the flow <Integration Test Flow> although it is bound as realm browser flow
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v2.yml
+
+- name: Assert the flow modification result
+  ansible.builtin.assert:
+    that:
+      - flow_v2_result is changed
+      - flow_v2_result.diff is defined
+    msg: "Expected changes and a diff but got: changed={{ flow_v2_result.changed }}, diff={{ flow_v2_result.get('diff') }}"
+
+- name: Assert the flow <Integration Test Flow> after the modifications
+  ansible.builtin.include_tasks:
+    file: ../assertions/assertion_flow_v2.yml
+
+- name: Fetch realm data to validate if the browser flow is still set to <Integration Test Flow>
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+  register: realm_result
+
+- name: Assert realm browser flow binding
+  ansible.builtin.assert:
+    that:
+      - realm_result.end_state.browserFlow == "Integration Test Flow"
