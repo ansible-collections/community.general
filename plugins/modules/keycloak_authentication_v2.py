@@ -673,6 +673,12 @@ def is_auth_flow_in_use(kc: KeycloakAPI, realm: str, existing_auth: dict) -> boo
         if overrides.get("direct_grant") == flow_id:
             return True
 
+    for identity_provider in kc.get_identity_providers(realm):
+        first_broker_login_flow_alias = identity_provider.get("firstBrokerLoginFlowAlias")
+        post_broker_login_flow_alias = identity_provider.get("postBrokerLoginFlowAlias")
+        if first_broker_login_flow_alias == flow_alias or post_broker_login_flow_alias == flow_alias:
+            return True
+
     return False
 
 
@@ -732,6 +738,22 @@ def rebind_auth_flow_bindings(
 
         if client_changed:
             kc.update_client(id=client["id"], clientrep=client, realm=realm)
+
+    for identity_provider in kc.get_identity_providers(realm):
+        first_broker_login_flow_alias = identity_provider.get("firstBrokerLoginFlowAlias")
+        post_broker_login_flow_alias = identity_provider.get("postBrokerLoginFlowAlias")
+        identity_provider_changed = False
+
+        if first_broker_login_flow_alias == from_alias:
+            identity_provider["firstBrokerLoginFlowAlias"] = to_alias
+            identity_provider_changed = True
+
+        if post_broker_login_flow_alias == from_alias:
+            identity_provider["postBrokerLoginFlowAlias"] = to_alias
+            identity_provider_changed = True
+
+        if identity_provider_changed:
+            kc.update_identity_provider(idprep=identity_provider, realm=realm)
 
 
 def delete_tmp_swap_flow_if_exists(

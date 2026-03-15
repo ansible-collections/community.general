@@ -1,0 +1,66 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Setup Test
+  ansible.builtin.include_tasks:
+    file: test_setup.yml
+
+- name: Create the new flow <Integration Test Flow>
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v1.yml
+
+- name: Create an identity-provider with first and post login flow override <Integration Test Flow>
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: oidc-idp-integration-test
+    state: present
+    display_name: OpenID Connect IdP - Integration Test
+    enabled: true
+    provider_id: oidc
+    first_broker_login_flow_alias: Integration Test Flow
+    post_broker_login_flow_alias: Integration Test Flow
+    config:
+      issuer: https://idp.example.com
+      authorizationUrl: https://idp.example.com/auth
+      tokenUrl: https://idp.example.com/token
+      userInfoUrl: https://idp.example.com/userinfo
+      clientAuthMethod: client_secret_post
+      clientId: my-client
+      clientSecret: secret
+      syncMode: FORCE
+
+- name: Modify the flow <Integration Test Flow> although it is bound as identity-provider first and post login flow
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v2.yml
+
+- name: Assert the flow modification result
+  ansible.builtin.assert:
+    that:
+      - flow_v2_result is changed
+      - flow_v2_result.diff is defined
+    msg: "Expected changes and a diff but got: changed={{ flow_v2_result.changed }}, diff={{ flow_v2_result.get('diff') }}"
+
+- name: Assert the flow <Integration Test Flow> after the modifications
+  ansible.builtin.include_tasks:
+    file: ../assertions/assertion_flow_v2.yml
+
+- name: Fetch identity-provider data
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: oidc-idp-integration-test
+    state: present
+  register: identity_provider_result
+
+- name: Assert identity-provider first and post flow binding
+  ansible.builtin.assert:
+    that:
+      - identity_provider_result.end_state.firstBrokerLoginFlowAlias == "Integration Test Flow"
+      - identity_provider_result.end_state.postBrokerLoginFlowAlias == "Integration Test Flow"
