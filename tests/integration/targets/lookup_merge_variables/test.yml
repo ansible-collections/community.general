@@ -44,6 +44,62 @@
       vars:
         merged_dict: "{{ lookup('community.general.merge_variables', '^.+__merge_dict$') }}"
 
+    - name: Test shallow dict merge with 'list_merge=append' and 'dedup'
+      block:
+        - name: Print the merged dict
+          ansible.builtin.debug:
+            msg: "{{ merged_dict }}"
+
+        - name: Validate the merged dict
+          ansible.builtin.assert:
+            that: "merged_dict == expected_dict"
+          vars:
+            expected_dict:
+              a: "{{ testdict4__test['a'] }}"
+              b:
+                - 3
+                - 4
+                - "5": value
+                - 1
+                - 2
+      vars:
+        merged_dict: "{{
+          lookup(
+            'community.general.merge_variables', '__test', pattern_type='suffix', override='ignore',
+            dict_merge='shallow', list_merge='prepend', list_transformations=['dedup']) }}"
+
+    - name: Test deep dict merge with 'list_merge=prepend' and 'dedup' with 'keep=last'
+      block:
+        - name: Print the merged dict
+          ansible.builtin.debug:
+            msg: "{{ merged_dict }}"
+
+        - name: Validate the merged dict
+          ansible.builtin.assert:
+            that: "merged_dict == expected_dict"
+          vars:
+            expected_dict:
+              a:
+                a:
+                  x: low_value
+                  y: high_value
+                  list:
+                    - high_value
+                    - low_value
+                  z: high_value
+              b:
+                - 4
+                - "5": value
+                - 1
+                - 2
+                - 3
+      vars:
+        merged_dict: "{{
+          lookup(
+            'community.general.merge_variables', '__test', pattern_type='suffix', override='ignore',
+            dict_merge='deep', list_merge='prepend',
+            list_transformations=[{'name': 'dedup', 'options': {'keep': 'last'}}]) }}"
+
     # Test the behavior when no results are found
     - name: Test merge without results
       block:
