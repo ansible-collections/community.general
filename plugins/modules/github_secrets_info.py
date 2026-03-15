@@ -16,11 +16,7 @@ author:
 version_added: '12.5.0'
 extends_documentation_fragment:
   - community.general.attributes
-attributes:
-  check_mode:
-    support: full
-  diff_mode:
-    support: none
+  - community.general.attributes.info_module
 options:
   organization:
     description:
