@@ -68,12 +68,20 @@ secrets:
     },
   ]
   contains:
-    ... describe the fields inside the dictionaries here ...
+    name:
+      description: The name of the secret.
+      type: str
+    created_at:
+      description: The date and time when the secret was created.
+      type: str
+    updated_at:
+      description: The date and time when the secret was last updated.
+      type: str
 """
 
 import json
-from http import HTTPStatus
 import typing as t
+from http import HTTPStatus
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -98,7 +106,7 @@ def list_secrets(
 
     if info["status"] == HTTPStatus.OK:
         body = resp.read()
-        return json.loads(body).get("secrets", [])
+        return {"secrets": json.loads(body).get("secrets", [])}
     elif info["status"] == HTTPStatus.NOT_FOUND:
         return {
             "secrets": [],
@@ -132,7 +140,7 @@ def main() -> None:
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
 
-    result: dict[str, Any] = {}
+    result: dict[str, t.Any] = {}
 
     headers = {
         "Accept": "application/vnd.github+json",
