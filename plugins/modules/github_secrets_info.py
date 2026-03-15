@@ -55,19 +55,20 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-result:
-  description: The result of the module.
-  type: dict
-  returned: always
-  sample: {
-    "secrets": [
-      {
-        "created_at": "2026-01-11T23:19:00Z",
-        "name": "ANSIBLE",
-        "updated_at": "2026-02-15T22:18:16Z"
-      },
-    ]
-  }
+secrets:
+  description: The list of currently existing secrets.
+  type: list
+  elements: dict
+  returned: success
+  sample: [
+    {
+      "created_at": "2026-01-11T23:19:00Z",
+      "name": "ANSIBLE",
+      "updated_at": "2026-02-15T22:18:16Z"
+    },
+  ]
+  contains:
+    ... describe the fields inside the dictionaries here ...
 """
 
 import json
