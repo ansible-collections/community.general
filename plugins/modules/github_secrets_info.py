@@ -98,9 +98,7 @@ def list_secrets(
 
     if info["status"] == HTTPStatus.OK:
         body = resp.read()
-        return {
-            "secrets": json.loads(body).get("secrets", []),
-        }
+        return json.loads(body).get("secrets", [])
     elif info["status"] == HTTPStatus.NOT_FOUND:
         return {
             "secrets": [],
