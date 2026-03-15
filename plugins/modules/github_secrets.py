@@ -100,8 +100,8 @@ result:
 """
 
 import json
+import typing as t
 from http import HTTPStatus
-from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -180,7 +180,7 @@ def upsert_secret(
     key: str,
     encrypted_value: str,
     key_id: str,
-) -> dict[str, Any]:
+) -> dict[str, t.Any]:
     """Create or update a GitHub Actions secret."""
     url = (
         f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
@@ -236,7 +236,7 @@ def delete_secret(
     organization: str,
     repository: str,
     key: str,
-) -> dict[str, Any]:
+) -> dict[str, t.Any]:
     """Delete a GitHub Actions secret."""
     url = (
         f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
@@ -323,7 +323,7 @@ def main() -> None:
             params=module.params,
         )
 
-    result: dict[str, Any] = {}
+    result: dict[str, t.Any] = {}
 
     headers = {
         "Accept": "application/vnd.github+json",
