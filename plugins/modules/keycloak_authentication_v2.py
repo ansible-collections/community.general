@@ -368,7 +368,7 @@ end_state:
 
 import copy
 import traceback
-from typing import Any
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -763,8 +763,8 @@ def delete_tmp_swap_flow_if_exists(
         kc.delete_authentication_flow_by_id(id=existing_tmp["id"], realm=realm)
 
 
-def create_authentication_execution_spec_options(depth: int) -> dict[str, Any]:
-    options: dict[str, Any] = dict(
+def create_authentication_execution_spec_options(depth: int) -> dict[str, t.Any]:
+    options: dict[str, t.Any] = dict(
         providerId=dict(type="str", required=depth == 0),
         requirement=dict(type="str", required=True, choices=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]),
         authenticationConfig=dict(
