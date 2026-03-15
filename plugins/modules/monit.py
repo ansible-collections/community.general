@@ -40,7 +40,7 @@ author:
   - Darryl Stoflet (@dstoflet)
   - Simon Kelly (@snopoke)
 requirements:
-  - Monit. Support for versions 5.18 and older is deprecated and will be removed in community.general 13.0.0.
+  - Monit. Support for versions 5.18 and older is deprecated and will be removed in community.general 14.0.0.
 """
 
 EXAMPLES = r"""
@@ -129,8 +129,8 @@ class Monit:
 
         if self.monit_version() <= (5, 18):
             module.deprecate(
-                "Support for monit 5.18 and older is deprecated and will be removed in community.general 13.0.0.",
-                version="13.0.0",
+                "Support for monit 5.18 and older is deprecated and will be removed in community.general 14.0.0.",
+                version="14.0.0",
                 collection_name="community.general",
             )
 
