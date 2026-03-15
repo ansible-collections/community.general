@@ -15,11 +15,6 @@ author: "Aleksandr Gabidullin (@a-gabidullin)"
 requirements:
   - dbus
   - SSSD needs to be running
-attributes:
-  check_mode:
-    support: full
-  diff_mode:
-    support: none
 options:
   action:
     description:
@@ -46,6 +41,7 @@ options:
     choices: ['IPA', 'AD']
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.attributes.info_module
 """
 
 EXAMPLES = r"""
