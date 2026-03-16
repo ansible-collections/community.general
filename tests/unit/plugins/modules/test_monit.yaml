@@ -357,7 +357,7 @@ test_cases:
 
   # ------------------------------------------------------------------ reload
   - id: state_reloaded
-    # reload exits before any presence/status checks; no version check either
+    # reload exits before any presence/status checks; version check happens in __init__
     input:
       name: processX
       state: reloaded
@@ -366,6 +366,7 @@ test_cases:
       state: reloaded
     mocks:
       run_command:
+        - *version_526
         - command: [/testbin/monit, reload]
           environ: {}
           rc: 0
@@ -396,7 +397,7 @@ test_cases:
 
   # ------------------------------------------------------------------ failure cases
   - id: state_reloaded_fail
-    # reload returns rc=1 → fail_json("monit reload failed")
+    # reload returns rc=1 → fail_json("monit reload failed"); version check happens in __init__
     input:
       name: processX
       state: reloaded
@@ -404,6 +405,7 @@ test_cases:
       failed: true
     mocks:
       run_command:
+        - *version_526
         - command: [/testbin/monit, reload]
           environ: {}
           rc: 1

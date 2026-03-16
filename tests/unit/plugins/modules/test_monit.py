@@ -24,6 +24,7 @@ class MonitTest(unittest.TestCase):
         self.module = mock.MagicMock()
         self.module.exit_json.side_effect = AnsibleExitJson
         self.module.fail_json.side_effect = AnsibleFailJson
+        self.module.run_command.return_value = (0, "This is monit version 5.26.0", "")
         self.monit = monit.Monit(self.module, "monit", "processX", 1)
         self.monit._status_change_retry_count = 1
         mock_sleep = mock.patch("time.sleep")
