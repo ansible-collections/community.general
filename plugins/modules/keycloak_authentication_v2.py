@@ -16,8 +16,8 @@ description:
   - Rather than modifying an existing flow in place, the module re-creates the flow using the B(Safe Swap) mechanism described below.
   - B(Safe Swap mechanism) - When an authentication flow needs to be updated, the module never modifies the existing flow in place.
      Instead it follows a multi-step swap procedure to ensure the flow is never left in an intermediate or unsafe state during the update.
-     This is especially important when the flow is actively bound to a realm binding or a client override,
-     because a partially-updated flow could inadvertently allow unauthorised access.
+     This is especially important when the flow is actively bound to a realm binding, a client override, or as an identity-provider
+     login-flow or post-flow, because a partially-updated flow could inadvertently allow unauthorised access.
   - The B(Safe Swap mechanism) is as follows. 1. A new flow is created under a temporary name (the original alias plus a configurable suffix,
      for example C(myflow_tmp_for_swap)).
      2. All executions and their configurations are added to the new temporary flow. 3. If the existing flow is currently bound to a realm or a client,
@@ -639,8 +639,8 @@ def existing_auth_to_diff_repr(kc: KeycloakAPI, realm: str, existing_auth: dict)
 
 
 def is_auth_flow_in_use(kc: KeycloakAPI, realm: str, existing_auth: dict) -> bool:
-    """Determine whether the given flow is currently bound to a realm binding or a client
-    authentication flow override.
+    """Determine whether the given flow is currently bound to a realm binding, a client
+    authentication flow override or as an identity-provider login-flow or post-flow.
 
     :param kc: a KeycloakAPI instance.
     :param realm: the realm to inspect.
@@ -690,8 +690,8 @@ def rebind_auth_flow_bindings(
     to_id: str,
     to_alias: str,
 ) -> None:
-    """Re-point all realm bindings and client overrides that reference the source flow to the
-    target flow.
+    """Re-point all realm bindings, client flow overrides and identity-provider login-flows or post-flows
+    that reference the source flow to the target flow.
 
     This is the critical step in the Safe Swap procedure that transfers live bindings from the
     old flow to the newly-created temporary flow without any gap in coverage.
