@@ -9,18 +9,19 @@
   ansible.builtin.include_tasks:
     file: ../actions/flow_v1.yml
 
-- name: Assign the flow <Integration Test Flow> as default browser flow
-  community.general.keycloak_realm:
+- name: Create a client with browser override <Integration Test Flow>
+  community.general.keycloak_client:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
     auth_username: "{{ admin_user }}"
     auth_password: "{{ admin_password }}"
-    id: "{{ realm }}"
     realm: "{{ realm }}"
+    client_id: "test_client"
     state: present
-    browser_flow: Integration Test Flow
+    authentication_flow_binding_overrides:
+      browser_name: "Integration Test Flow"
 
-- name: Modify the flow <Integration Test Flow> although it is bound as realm browser flow
+- name: Modify the flow <Integration Test Flow> although it is bound as client override flow
   ansible.builtin.include_tasks:
     file: ../actions/flow_v2.yml
 
@@ -34,49 +35,6 @@
 - name: Assert the flow <Integration Test Flow> after the modifications
   ansible.builtin.include_tasks:
     file: ../assertions/assertion_flow_v2.yml
-
-- name: Fetch realm data to validate if the browser flow is still set to <Integration Test Flow>
-  community.general.keycloak_realm:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    id: "{{ realm }}"
-    realm: "{{ realm }}"
-    state: present
-  register: realm_result
-
-- name: Assert realm browser flow binding
-  ansible.builtin.assert:
-    that:
-      - realm_result.end_state.browserFlow == "Integration Test Flow"
-
-- name: Create a client with browser override <Integration Test Flow>
-  community.general.keycloak_client:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    client_id: "test_client"
-    state: present
-    authentication_flow_binding_overrides:
-      browser_name: "Integration Test Flow"
-
-- name: Revert the flow modifications of <Integration Test Flow> although it is bound as realm browser and client override flow
-  ansible.builtin.include_tasks:
-    file: ../actions/flow_v1.yml
-
-- name: Assert the flow modification result
-  ansible.builtin.assert:
-    that:
-      - flow_v1_result is changed
-      - flow_v1_result.diff is defined
-    msg: "Expected changes and a diff but got: changed={{ flow_v1_result.changed }}, diff={{ flow_v1_result.get('diff') }}"
-
-- name: Assert the flow <Integration Test Flow> after the revert
-  ansible.builtin.include_tasks:
-    file: ../assertions/assertion_flow_v1.yml
 
 - name: Fetch client data
   community.general.keycloak_client:
@@ -93,7 +51,7 @@
   ansible.builtin.include_tasks:
     file: ../actions/fetch_access_token.yml
 
-- name: Fetch authentication flow
+- name: Fetch authentication flow (browser override={{ client_result.end_state.authenticationFlowBindingOverrides.browser }})
   ansible.builtin.uri:
     url: "{{ url }}/admin/realms/{{ realm }}/authentication/flows/{{ client_result.end_state.authenticationFlowBindingOverrides.browser }}"
     method: GET
