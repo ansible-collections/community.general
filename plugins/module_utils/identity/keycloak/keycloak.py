@@ -103,6 +103,7 @@ URL_REALM_GROUP_ROLEMAPPINGS = "{url}/admin/realms/{realm}/groups/{group}/role-m
 
 URL_CLIENTSECRET = "{url}/admin/realms/{realm}/clients/{id}/client-secret"
 
+URL_AUTHENTICATION_AUTHENTICATOR_PROVIDERS = "{url}/admin/realms/{realm}/authentication/authenticator-providers"
 URL_AUTHENTICATION_FLOWS = "{url}/admin/realms/{realm}/authentication/flows"
 URL_AUTHENTICATION_FLOW = "{url}/admin/realms/{realm}/authentication/flows/{id}"
 URL_AUTHENTICATION_FLOW_COPY = "{url}/admin/realms/{realm}/authentication/flows/{copyfrom}/copy"
@@ -2252,6 +2253,19 @@ class KeycloakAPI:
             return self._request(role_url, method="DELETE")
         except Exception as e:
             self.fail_request(e, msg=f"Unable to delete role {name} for client {clientid} in realm {realm}: {e}")
+
+    def get_authenticator_providers(self, realm: str = "master"):
+        """
+        Get all available authenticator providers of the realm.
+        :param realm: Realm.
+        :return: List of authenticator provider representations.
+        """
+        try:
+            return self._request_and_deserialize(
+                URL_AUTHENTICATION_AUTHENTICATOR_PROVIDERS.format(url=self.baseurl, realm=realm), method="GET"
+            )
+        except Exception as e:
+            self.fail_request(e, msg=f"Unable get authenticator providers in realm {realm}: {e}")
 
     def get_authentication_flow_by_alias(self, alias, realm: str = "master"):
         """
