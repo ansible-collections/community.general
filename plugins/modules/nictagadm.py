@@ -193,7 +193,7 @@ def main():
         state=nictag.state,
     )
 
-    if not nictag.is_valid_mac():
+    if not nictag.etherstub and not nictag.is_valid_mac():
         module.fail_json(msg="Invalid MAC Address Value", name=nictag.name, mac=nictag.mac, etherstub=nictag.etherstub)
 
     if nictag.state == "absent":
