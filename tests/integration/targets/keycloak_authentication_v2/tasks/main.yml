@@ -9,18 +9,26 @@
   register: result
   until: result is success
 
-- name: Executing Flow Creation tests
+- name: Executing flow creation tests
   ansible.builtin.include_tasks:
     file: tests/test_flow_creation.yml
 
-- name: Executing unused Flow Modification tests
+- name: Executing unused flow modification tests
   ansible.builtin.include_tasks:
     file: tests/test_unused_flow_modification.yml
 
-- name: Executing used Flow Modification tests
+- name: Executing used default browser flow modification tests
   ansible.builtin.include_tasks:
-    file: tests/test_used_flow_modification.yml
+    file: tests/test_used_default_browser_flow_modification.yml
 
-- name: Executing Flow Deletion tests
+- name: Executing client flow override flow modification tests
+  ansible.builtin.include_tasks:
+    file: tests/test_client_flow_override_flow_modification.yml
+
+- name: Executing identity provider first and post flow override flow modification tests
+  ansible.builtin.include_tasks:
+    file: tests/test_identity_provider_flow_overrides_flow_modification.yml
+
+- name: Executing flow deletion tests
   ansible.builtin.include_tasks:
     file: tests/test_flow_deletion.yml
