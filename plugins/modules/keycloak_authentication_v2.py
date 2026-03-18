@@ -810,6 +810,35 @@ def create_authentication_execution_spec_options(depth: int) -> dict[str, t.Any]
     return options
 
 
+def validate_executions(kc: KeycloakAPI, realm: str, executions: dict) -> None:
+    valid_providers = kc.get_authenticator_providers(realm)
+    valid_provider_ids = {provider["id"] for provider in valid_providers}
+
+    invalid_provider_ids = validate_executions_rec(valid_provider_ids, executions)
+    if len(invalid_provider_ids) > 0:
+        invalid_provider_ids_str = ", ".join(f"'{item}'" for item in invalid_provider_ids)
+        raise ValueError(
+            f"The following execution providerIds are unknown and therefore invalid: {invalid_provider_ids_str}"
+        )
+
+
+def validate_executions_rec(valid_provider_ids: set, executions: dict) -> list:
+    invalid_provider_ids = []
+    for execution in executions:
+        provider_id = execution["providerId"]
+        sub_flow = execution["subFlow"]
+        if provider_id is not None:
+            if provider_id not in valid_provider_ids:
+                invalid_provider_ids.append(provider_id)
+
+        if sub_flow is not None:
+            invalid_provider_ids.extend(
+                validate_executions_rec(valid_provider_ids, execution["authenticationExecutions"])
+            )
+
+    return invalid_provider_ids
+
+
 def main() -> None:
     """Module entry point."""
     argument_spec = keycloak_argument_spec()
@@ -869,6 +898,14 @@ def main() -> None:
         existing_auth_diff_repr = existing_auth_to_diff_repr(kc, realm, existing_auth)
 
     try:
+        try:
+            validate_executions(kc, realm, desired_auth["authenticationExecutions"])
+        except ValueError as e:
+            module.fail_json(
+                msg=f"Validation of executions failed: {e}",
+                exception=traceback.format_exc(),
+            )
+
         if not existing_auth:
             if state == "absent":
                 # The flow does not exist and is not required; nothing to do.
