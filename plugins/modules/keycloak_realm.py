@@ -285,6 +285,12 @@ options:
     aliases:
       - failureFactor
     type: int
+  first_broker_login_flow:
+    description:
+      - The realm first broker login flow.
+    aliases:
+      - firstBrokerLoginFlow
+    type: str
   internationalization_enabled:
     description:
       - The realm internationalization enabled option.
@@ -923,6 +929,7 @@ def main():
         events_expiration=dict(type="int", aliases=["eventsExpiration"]),
         events_listeners=dict(type="list", elements="str", aliases=["eventsListeners"]),
         failure_factor=dict(type="int", aliases=["failureFactor"]),
+        first_broker_login_flow=dict(type="str", aliases=["firstBrokerLoginFlow"]),
         internationalization_enabled=dict(type="bool", aliases=["internationalizationEnabled"]),
         localization_texts=dict(type="dict", aliases=["localizationTexts"]),
         login_theme=dict(type="str", aliases=["loginTheme"]),
