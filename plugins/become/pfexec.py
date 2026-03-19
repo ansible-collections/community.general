@@ -46,7 +46,7 @@ options:
   become_flags:
     description: Options to pass to C(pfexec).
     type: string
-    default: -H -S -n
+    default: ""
     ini:
       - section: privilege_escalation
         key: become_flags
@@ -73,8 +73,12 @@ options:
       - section: pfexec_become_plugin
         key: password
   wrap_exe:
-    description: Toggle to wrap the command C(pfexec) calls in C(shell -c) or not.
-    default: false
+    description:
+      - Toggle to wrap the command C(pfexec) calls in C(shell -c) or not.
+      - Unlike C(sudo), C(pfexec) does not interpret shell constructs internally,
+        so commands containing shell operators must be wrapped in a shell invocation.
+      - This should generally be left enabled.
+    default: true
     type: bool
     ini:
       - section: pfexec_become_plugin
@@ -103,4 +107,7 @@ class BecomeModule(BecomeBase):
 
         flags = self.get_option("become_flags")
         noexe = not self.get_option("wrap_exe")
-        return f"{exe} {flags} {self._build_success_command(cmd, shell, noexe=noexe)}"
+        become_cmd = self._build_success_command(cmd, shell, noexe=noexe)
+        if flags:
+            return f"{exe} {flags} {become_cmd}"
+        return f"{exe} {become_cmd}"
