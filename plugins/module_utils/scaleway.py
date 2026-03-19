@@ -460,6 +460,7 @@ SCALEWAY_REGIONS = [
     "fr-par",
     "nl-ams",
     "pl-waw",
+    "it-mil"
 ]
 
 SCALEWAY_ZONES = [
@@ -472,4 +473,5 @@ SCALEWAY_ZONES = [
     "pl-waw-1",
     "pl-waw-2",
     "pl-waw-3",
+    "it-mil-1"
 ]
