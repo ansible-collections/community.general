@@ -16,14 +16,37 @@
     - ndg-httpsclient
     - pyasn1
 
-- name: Add InfluxDB public GPG key
-  apt_key: url=https://repos.influxdata.com/influxdb.key state=present
+- name: Make sure python3-debian is installed
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
 
 - name: Add InfluxDB repository
-  apt_repository: repo='deb https://repos.influxdata.com/ubuntu trusty stable' filename='influxdb' state=present update_cache=yes
+  ansible.builtin.deb822_repository:
+    update_cache: true
+    name: influxdb
+    types: deb
+    signed_by: https://repos.influxdata.com/influxdb.key
+    uris:
+      - https://repos.influxdata.com/ubuntu
+    suites:
+      - trusty
+    components:
+      - stable
+    state: present
+  register: apt_repo
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: apt_repo is changed
 
 - name: Install InfluxDB
-  apt: name=influxdb state=latest
+  ansible.builtin.apt:
+    name: influxdb
+    state: latest
 
 - name: Start InfluxDB service
-  service: name=influxdb state=started
+  ansible.builtin.service:
+    name: influxdb
+    state: started
