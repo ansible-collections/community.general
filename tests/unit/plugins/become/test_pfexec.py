@@ -77,7 +77,9 @@ def test_pfexec_custom_flags(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match(f"""{pfexec_exe} {pfexec_flags} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
+    assert (
+        re.match(f"""{pfexec_exe} {pfexec_flags} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
+    )
 
 
 def test_pfexec_varoptions(mocker, parser, reset_cli_args):
