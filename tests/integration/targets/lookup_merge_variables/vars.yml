@@ -21,6 +21,31 @@ testdict2__merge_dict:
   list_item:
     - test2
 
+testdict3__test:
+  a:
+    a:
+      x: low_value
+      y: low_value
+      list:
+        - low_value
+  b:
+    - 1
+    - 1
+    - 2
+    - 3
+testdict4__test:
+  a:
+    a:
+      y: high_value
+      z: high_value
+      list:
+        - high_value
+  b:
+    - 3
+    - 4
+    - 4
+    - "5": value
+
 override_warn_init:
   key_to_override: Initial value
 override__override_warn:
