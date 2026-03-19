@@ -45,16 +45,37 @@
       ansible.builtin.get_url:
         url: https://packages.gopass.pw/repos/gopass/gopass-archive-keyring.gpg
         dest: /usr/share/keyrings/gopass-archive-keyring.gpg
-    - name: Add gopass repo
-      ansible.builtin.apt_repository:
-        repo: "deb [arch=amd64,arm64,armhf \
-          signed-by=/usr/share/keyrings/gopass-archive-keyring.gpg] \
-          https://packages.gopass.pw/repos/gopass stable main"
+    - name: Make sure python3-debian is installed
+      ansible.builtin.apt:
+        name: python3-debian
         state: present
-    - name: Update apt-cache and install gopass package
+    - name: Add gopass repo
+      ansible.builtin.deb822_repository:
+        name: gopass
+        types: deb
+        architectures:
+          - amd64
+          - arm64
+          - armhf
+        signed_by: /usr/share/keyrings/gopass-archive-keyring.gpg
+        uris:
+          - https://packages.gopass.pw/repos/gopass
+        suites:
+          - stable
+        components:
+          - main
+        state: present
+      register: apt_repo
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+      when: apt_repo is changed
+
+    - name: Install gopass package
       ansible.builtin.apt:
         name: gopass
-        update_cache: true
+        state: present
 
 - name: Install on macOS
   when: ansible_facts.distribution == 'MacOSX'
