@@ -67,6 +67,7 @@ options:
       - nl-ams
       - fr-par
       - pl-waw
+      - it-mil
 
   tags:
     type: list
