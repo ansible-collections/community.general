@@ -10,19 +10,10 @@
   become: true
   when: ansible_facts.distribution == 'Fedora'
 
-- block:
-    - name: Activate flatpak ppa on Ubuntu
-      apt_repository:
-        repo: ppa:alexlarsson/flatpak
-        state: present
-        mode: '0644'
-      when: ansible_facts.lsb.major_release | int < 18
-
-    - name: Install flatpak package on Ubuntu
-      apt:
-        name: flatpak
-        state: present
-
+- name: Install flatpak package on Ubuntu
+  apt:
+    name: flatpak
+    state: present
   when: ansible_facts.distribution == 'Ubuntu'
 
 - name: Install dummy remote for user
