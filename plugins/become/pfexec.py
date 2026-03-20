@@ -77,7 +77,6 @@ options:
       - Toggle to wrap the command C(pfexec) calls in C(shell -c) or not.
       - Unlike C(sudo), C(pfexec) does not interpret shell constructs internally,
         so commands containing shell operators must be wrapped in a shell invocation.
-      - This should generally be left enabled.
     default: true
     type: bool
     ini:
@@ -108,6 +107,4 @@ class BecomeModule(BecomeBase):
         flags = self.get_option("become_flags")
         noexe = not self.get_option("wrap_exe")
         become_cmd = self._build_success_command(cmd, shell, noexe=noexe)
-        if flags:
-            return f"{exe} {flags} {become_cmd}"
-        return f"{exe} {become_cmd}"
+        return f"{exe} {flags} {become_cmd}"
