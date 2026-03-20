@@ -28,7 +28,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example C(par1)).
+      - Scaleway region to use (for example C(par1)) (deprecated).
     required: false
     choices:
       - ams1
@@ -44,7 +44,8 @@ options:
       - EMEA-PL-WAW1
       - waw2
       - waw3
-   zone
+
+  zone:
     type: str
     description:
       - Scaleway zone to use (for example (nl-ams-1))
@@ -59,6 +60,7 @@ options:
       - pl-waw-1
       - pl-waw-2
       - pl-waw-3
+      - it-mil-1
 """
 
 EXAMPLES = r"""
@@ -104,7 +106,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_LOCATION,
     SCALEWAY_ENDPOINT,
-    SCALEWAY_REGIONS,
     SCALEWAY_ZONES,
     Scaleway,
     ScalewayException,
@@ -145,21 +146,21 @@ def main():
     api = ScalewayIpInfo(module=module)
 
     if module.params["zone"]:
-      zone = module.params["zone"]
-      api_path = f"instance/v1/zones/{zone}/ips"
-      response = scaleway_ip_info=api.get(path=api_path)
-      module.exit_json(scaleway_ip_info=response.json.get('ips'))
+        zone = module.params["zone"]
+        api_path = f"instance/v1/zones/{zone}/ips"
+        response = scaleway_ip_info=api.get(path=api_path)
+        module.exit_json(scaleway_ip_info=response.json.get('ips'))
     else:
-      module.deprecate(
-          msg="The 'region' parameter is deprecated. Use 'zone' to specify the Scaleway zone instead.",
-          version="14.0.0",
-          collection_name="community.general",
-      )
+        module.deprecate(
+            msg="The 'region' parameter is deprecated. Use 'zone' to specify the Scaleway zone instead.",
+            version="14.0.0",
+            collection_name="community.general",
+        )
 
-      try:
-          module.exit_json(scaleway_ip_info=ScalewayIpInfo(module).get_resources())
-      except ScalewayException as exc:
-          module.fail_json(msg=exc.message)
+        try:
+            module.exit_json(scaleway_ip_info=ScalewayIpInfo(module).get_resources())
+        except ScalewayException as exc:
+            module.fail_json(msg=exc.message)
 
 
 if __name__ == "__main__":
