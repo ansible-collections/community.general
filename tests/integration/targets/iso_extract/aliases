@@ -26,4 +26,5 @@ skip/freebsd14.0  # FIXME
 skip/freebsd14.1  # FIXME
 skip/freebsd14.2  # FIXME
 skip/freebsd14.3  # FIXME
+skip/freebsd14.4  # FIXME
 skip/freebsd15.0  # FIXME

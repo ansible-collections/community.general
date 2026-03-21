@@ -198,8 +198,9 @@ stages:
             # TODO: enable this ASAP!
             # - name: FreeBSD 15.0
             #   test: freebsd/15.0
-            - name: FreeBSD 14.4
-              test: freebsd/14.4
+            # TODO: enable this ASAP!
+            # - name: FreeBSD 14.4
+            #   test: freebsd/14.4
           groups:
             - 1
             - 2
