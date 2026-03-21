@@ -1,0 +1,2 @@
+minor_changes:
+  - supervisorctl - added an additional condition for generating the error 'no such process' (https://github.com/ansible-collections/community.general/issues/11621)
