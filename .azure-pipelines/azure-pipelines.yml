@@ -189,8 +189,8 @@ stages:
         parameters:
           testFormat: devel/{0}
           targets:
-            - name: macOS 15.3
-              test: macos/15.3
+            - name: macOS 26.3
+              test: macos/26.3
             - name: RHEL 10.1
               test: rhel/10.1
             - name: RHEL 9.7
@@ -198,8 +198,9 @@ stages:
             # TODO: enable this ASAP!
             # - name: FreeBSD 15.0
             #   test: freebsd/15.0
-            - name: FreeBSD 14.3
-              test: freebsd/14.3
+            # TODO: enable this ASAP!
+            # - name: FreeBSD 14.4
+            #   test: freebsd/14.4
           groups:
             - 1
             - 2
@@ -212,6 +213,8 @@ stages:
         parameters:
           testFormat: 2.20/{0}
           targets:
+            - name: macOS 15.3
+              test: macos/15.3
             - name: RHEL 10.1
               test: rhel/10.1
             - name: FreeBSD 14.3
