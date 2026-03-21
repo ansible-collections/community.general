@@ -273,7 +273,7 @@ def main():
             module.fail_json(msg=out, name=name, state=state)
 
     # from this point onwards, if there are no matching processes, module cannot go on.
-    if len(processes) == 0:
+    if len(processes) == 0 and name != 'all':
         module.fail_json(name=name, msg="ERROR (no such process)")
 
     if state == "started":
