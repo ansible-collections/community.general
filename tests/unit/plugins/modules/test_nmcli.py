@@ -2260,6 +2260,8 @@ def test_generic_connection_modify_routing_rules6(mocked_generic_connection_crea
     args, kwargs = arg_list[0]
 
     assert "ipv6.routing-rules" in args[0]
+    idx = args[0].index("ipv6.routing-rules")
+    assert args[0][idx + 1] == "priority 5 from fd00::/24 table 5000,priority 10 from fd01::/24 table 5001"
 
     out, err = capfd.readouterr()
     results = json.loads(out)
