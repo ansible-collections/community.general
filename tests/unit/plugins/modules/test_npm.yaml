@@ -1,0 +1,240 @@
+# Copyright (c) 2026 Alexei Znamensky (russoz@gmail.com)
+# Copyright (c) 2021 Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  env_list: &env-list {check_rc: false, cwd: null, environ_update: {LANGUAGE: C, LC_ALL: C}}
+  env_exec: &env-exec {check_rc: true, cwd: null, environ_update: {LANGUAGE: C, LC_ALL: C}}
+
+test_cases:
+  - id: present
+    input:
+      name: coffee-script
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{}'
+          err: ''
+        - command: [/testbin/npm, install, --global, coffee-script]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_missing
+    input:
+      name: coffee-script
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{"dependencies": {"coffee-script": {"missing": true}}}'
+          err: ''
+        - command: [/testbin/npm, install, --global, coffee-script]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_version
+    input:
+      name: coffee-script
+      global: true
+      state: present
+      version: '2.5.1'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{}'
+          err: ''
+        - command: [/testbin/npm, install, --global, 'coffee-script@2.5.1']
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_version_update
+    input:
+      name: coffee-script
+      global: true
+      state: present
+      version: '2.5.1'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{"dependencies": {"coffee-script": {"version": "2.5.0"}}}'
+          err: ''
+        - command: [/testbin/npm, install, --global, 'coffee-script@2.5.1']
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_version_exists
+    input:
+      name: coffee-script
+      global: true
+      state: present
+      version: '2.5.1'
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{"dependencies": {"coffee-script": {"version": "2.5.1"}}}'
+          err: ''
+
+  - id: absent
+    input:
+      name: coffee-script
+      global: true
+      state: absent
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{"dependencies": {"coffee-script": {"version": "2.5.1"}}}'
+          err: ''
+        - command: [/testbin/npm, uninstall, --global, coffee-script]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: absent_version
+    input:
+      name: coffee-script
+      global: true
+      state: absent
+      version: '2.5.1'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{"dependencies": {"coffee-script": {"version": "2.5.1"}}}'
+          err: ''
+        - command: [/testbin/npm, uninstall, --global, coffee-script]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: absent_version_different
+    input:
+      name: coffee-script
+      global: true
+      state: absent
+      version: '2.5.1'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{"dependencies": {"coffee-script": {"version": "2.5.0"}}}'
+          err: ''
+        - command: [/testbin/npm, uninstall, --global, coffee-script]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_package_json
+    input:
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{}'
+          err: ''
+        - command: [/testbin/npm, install, --global]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_package_json_production
+    input:
+      production: true
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: '{}'
+          err: ''
+        - command: [/testbin/npm, install, --global, --production]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_package_json_ci
+    input:
+      ci: true
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, ci, --global]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_package_json_ci_production
+    input:
+      ci: true
+      production: true
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, ci, --global, --production]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
