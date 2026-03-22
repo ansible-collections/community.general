@@ -174,6 +174,8 @@ version:
   version_added: 10.2.0
 """
 
+from ansible.module_utils.parsing.convert_bool import boolean
+
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.xfconf import get_xfconf_version, xfconf_runner
 
@@ -239,9 +241,6 @@ class XFConfProperty(StateModuleHelper):
         self.vars.value = None
 
     def state_present(self):
-        # stringify all values - in the CLI they will all be happy strings anyway
-        # and by doing this here the rest of the code can be agnostic to it
-        self.vars.value = [str(v) for v in self.vars.value]
         value_type = self.vars.value_type
 
         values_len = len(self.vars.value)
@@ -253,6 +252,14 @@ class XFConfProperty(StateModuleHelper):
         elif types_len != values_len:
             # or complain if lists' lengths are different
             self.do_raise('Number of elements in "value" and "value_type" must be the same')
+
+        # stringify all values - in the CLI they will all be happy strings anyway
+        # and by doing this here the rest of the code can be agnostic to it
+        # bool values are normalized to 'true'/'false' to match xfconf-query output format
+        self.vars.value = [
+            ("true" if boolean(v) else "false") if vt == "bool" else str(v)
+            for v, vt in zip(self.vars.value, value_type)
+        ]
 
         # calculates if it is an array
         self.vars.is_array = bool(self.vars.force_array) or isinstance(self.vars.previous_value, list) or values_len > 1
