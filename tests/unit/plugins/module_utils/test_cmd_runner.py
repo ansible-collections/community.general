@@ -93,6 +93,42 @@ TC_FORMATS = dict(
         ["--answer=42", "--answer=17"],
         None,
     ),
+    unpack_args_plain=(
+        lambda: cmd_runner_fmt.unpack_args(lambda a, b: [f"--{a}={b}"]),
+        ("food", "potatoes"),
+        ["--food=potatoes"],
+        None,
+    ),
+    unpack_args_argformat=(
+        lambda: cmd_runner_fmt.unpack_args(cmd_runner_fmt.as_optval("-t")),
+        ("potatoes",),
+        ["-tpotatoes"],
+        None,
+    ),
+    unpack_args_argformat_inner_none=(
+        lambda: cmd_runner_fmt.unpack_args(cmd_runner_fmt.as_optval("-t")),
+        (None,),
+        [],
+        None,
+    ),
+    unpack_kwargs_plain=(
+        lambda: cmd_runner_fmt.unpack_kwargs(lambda a, b: [f"--{a}={b}"]),
+        {"a": "food", "b": "potatoes"},
+        ["--food=potatoes"],
+        None,
+    ),
+    unpack_kwargs_argformat=(
+        lambda: cmd_runner_fmt.unpack_kwargs(cmd_runner_fmt.as_opt_val("--food")),
+        {"value": "potatoes"},
+        ["--food", "potatoes"],
+        None,
+    ),
+    unpack_kwargs_argformat_inner_none=(
+        lambda: cmd_runner_fmt.unpack_kwargs(cmd_runner_fmt.as_opt_val("--food")),
+        {"value": None},
+        [],
+        None,
+    ),
 )
 TC_FORMATS_IDS = sorted(TC_FORMATS.keys())
 
