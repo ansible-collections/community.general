@@ -1,8 +1,0 @@
-deprecated_features:
-  - "All module utils, plugin utils, and doc fragments will be made **private** in community.general 13.0.0.
-     This means that they will no longer be part of the public API of the collection, and can have breaking
-     changes even in bugfix releases. If you depend on importing code from the module or plugin utils,
-     or use one of the doc fragments, please
-     `comment in the issue to discuss this <https://github.com/ansible-collections/community.general/issues/11312>`__.
-     Note that this does not affect any use of community.general in task files, roles, or playbooks
-     (https://github.com/ansible-collections/community.general/issues/11312, https://github.com/ansible-collections/community.general/pull/11320)."
