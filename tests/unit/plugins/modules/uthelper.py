@@ -68,24 +68,25 @@ class UTHelper:
         return Runner(self.ansible_module.main)
 
     def set_test_func(self):
-        @pytest.mark.parametrize("test_case", self.test_cases, ids=[tc.id for tc in self.test_cases])
-        @pytest.mark.usefixtures(*self.fixtures)
-        def _test_module(mocker, capfd, patch_ansible_module_uthelper, test_case):
-            """
-            Run unit tests for each test case in self.test_cases
-            """
-            args = {}
-            args.update(test_case.input)
-            if test_case.flags.get("check"):
-                args["_ansible_check_mode"] = test_case.flags.get("check")
-            if test_case.flags.get("diff"):
-                args["_ansible_diff"] = test_case.flags.get("diff")
-            with patch_ansible_module_uthelper(args):
-                self.runner.run(mocker, capfd, test_case)
+        def make_test_func(tc):
+            @pytest.mark.usefixtures(*self.fixtures)
+            def _test_func(mocker, capfd, patch_ansible_module_uthelper):
+                args = {}
+                args.update(tc.input)
+                if tc.flags.get("check"):
+                    args["_ansible_check_mode"] = tc.flags.get("check")
+                if tc.flags.get("diff"):
+                    args["_ansible_diff"] = tc.flags.get("diff")
+                with patch_ansible_module_uthelper(args):
+                    self.runner.run(mocker, capfd, tc)
 
-        self.add_func_to_test_module("test_module", _test_module)
+            return _test_func
 
-        return _test_module
+        for test_case in self.test_cases:
+            func_name = test_case.id if test_case.id.startswith("test_") else f"test_{test_case.id}"
+            if hasattr(self.test_module, func_name):
+                raise ValueError(f"Name conflict: '{func_name}' already exists in module '{self.test_module.__name__}'")
+            self.add_func_to_test_module(func_name, make_test_func(test_case))
 
     def set_fixtures(self, fixtures):
         for name, fixture in fixtures.items():
