@@ -32,7 +32,7 @@
   ansible.builtin.command:
     cmd: >-
       {{ tmp_python_runner.path }}/venv/bin/django-admin startproject testproject
-    chdir: {{ tmp_python_runner.path }}
+    chdir: "{{ tmp_python_runner.path }}"
 
 - name: Run django_command check on the created project (issue 8884 scenario)
   community.general.django_command:
