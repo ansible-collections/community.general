@@ -72,6 +72,12 @@ options:
       - Please notice that C(ansible-galaxy) does not install collections with O(type=both), when O(requirements_file) contains
         both roles and collections and O(dest) is specified.
     type: path
+  executable:
+    description:
+      - Path to the C(ansible-galaxy) executable.
+      - When not specified, the module uses C(ansible-galaxy) found by Ansible.
+    type: path
+    version_added: 12.5.0
   no_deps:
     description:
       - Refrain from installing dependencies.
@@ -202,7 +208,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
     )
     ansible_version = None
 
-    output_params = ("type", "name", "dest", "requirements_file", "force", "no_deps")
+    output_params = ("type", "name", "dest", "requirements_file", "executable", "force", "no_deps")
     module = dict(
         argument_spec=dict(
             state=dict(type="str", choices=["present", "latest"], default="present"),
@@ -210,6 +216,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
             name=dict(type="str"),
             requirements_file=dict(type="path"),
             dest=dict(type="path"),
+            executable=dict(type="path"),
             force=dict(type="bool", default=False),
             no_deps=dict(type="bool", default=False),
         ),
@@ -234,7 +241,11 @@ class AnsibleGalaxyInstall(ModuleHelper):
 
     def _make_runner(self, lang):
         return CmdRunner(
-            self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang, check_rc=True
+            self.module,
+            command=self.vars.executable or self.command,
+            arg_formats=self.command_args_formats,
+            force_lang=lang,
+            check_rc=True,
         )
 
     def _get_ansible_galaxy_version(self):
@@ -264,7 +275,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
         self.runner, self.vars.version = self._get_ansible_galaxy_version()
         self.ansible_version = tuple(int(x) for x in self.vars.version.split(".")[:3])
         if self.ansible_version < (2, 11):
-            self.module.fail_json(msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed.")
+            self.do_raise(msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed.")
         self.vars.set("new_collections", {}, change=True)
         self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
