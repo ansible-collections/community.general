@@ -79,6 +79,36 @@ test_cases:
           rc: 0
           out: ''
           err: ''
+  - id: test_property_set_property_bool_same_value
+    input:
+      channel: xfce4-session
+      property: /general/SaveOnExit
+      state: present
+      value_type: bool
+      value: false
+    output:
+      changed: false
+      previous_value: 'false'
+      type: bool
+      value: 'false'
+      version: 4.18.1
+    mocks:
+      run_command:
+        - command: [/testbin/xfconf-query, --version]
+          environ: *env-def
+          rc: 0
+          out: *version-output
+          err: ''
+        - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit]
+          environ: *env-def
+          rc: 0
+          out: "false\n"
+          err: ''
+        - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit, --create, --type, bool, --set, 'false']
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
   - id: test_property_set_property_bool_false
     input:
       channel: xfce4-session
@@ -90,7 +120,7 @@ test_cases:
       changed: true
       previous_value: 'true'
       type: bool
-      value: 'False'
+      value: 'false'
       version: 4.18.1
     mocks:
       run_command:
