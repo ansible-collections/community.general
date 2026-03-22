@@ -2,27 +2,17 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Create temporary directory
-  ansible.builtin.tempfile:
-    state: directory
-    suffix: .python_runner
-  register: tmp_python_runner
-
-- name: Create virtualenv
-  ansible.builtin.command:
-    cmd: "python3 -m venv {{ tmp_python_runner.path }}/venv"
-
 - name: Update pip in virtualenv
   ansible.builtin.pip:
     name: pip
     state: latest
-    virtualenv: "{{ tmp_python_runner.path }}/venv"
+    virtualenv: "{{ remote_tmp_dir }}/venv"
 
 - name: Install django in virtualenv
   ansible.builtin.pip:
     name: django
     state: present
-    virtualenv: "{{ tmp_python_runner.path }}/venv"
+    virtualenv: "{{ remote_tmp_dir }}/venv"
 
 # Regression test for https://github.com/ansible-collections/community.general/issues/8884
 # Bug: PythonRunner was setting path_prefix to a string instead of a list, corrupting PATH
@@ -30,16 +20,15 @@
 # The original reporter was running `migrate`; we use `check` to avoid needing a database.
 - name: Create Django project using venv django-admin
   ansible.builtin.command:
-    cmd: >-
-      {{ tmp_python_runner.path }}/venv/bin/django-admin startproject testproject
-    chdir: "{{ tmp_python_runner.path }}"
+    cmd: "{{ remote_tmp_dir }}/venv/bin/django-admin startproject testproject"
+    chdir: "{{ remote_tmp_dir }}"
 
 - name: Run django_command check on the created project (issue 8884 scenario)
   community.general.django_command:
     command: check
     settings: testproject.settings
-    pythonpath: "{{ tmp_python_runner.path }}/testproject"
-    venv: "{{ tmp_python_runner.path }}/venv"
+    pythonpath: "{{ remote_tmp_dir }}/testproject"
+    venv: "{{ remote_tmp_dir }}/venv"
   register: result_project_check
 
 - name: Assert project check succeeded and returned a version
