@@ -261,7 +261,11 @@ display = Display()
 
 def run_backend_cmd(cmd, *, input=None, env=None):
     result = subprocess.run(
-        cmd, capture_output=True, input=to_bytes(input, errors="surrogate_or_strict") if input else None, env=env
+        cmd,
+        check=False,
+        capture_output=True,
+        input=to_bytes(input, errors="surrogate_or_strict") if input else None,
+        env=env,
     )
     b_out, b_err = result.stdout, result.stderr
     retcode = result.returncode
