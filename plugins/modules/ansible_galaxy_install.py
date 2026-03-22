@@ -18,6 +18,7 @@ notes:
   - Support for B(Ansible 2.9/2.10) was removed in community.general 8.0.0.
   - The module tries to run using the C(C.UTF-8) locale. If that fails, it tries C(en_US.UTF-8). If that one also fails, the
     module fails.
+  - test
 seealso:
   - name: C(ansible-galaxy) command manual page
     description: Manual page for the command.
