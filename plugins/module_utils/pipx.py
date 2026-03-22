@@ -7,6 +7,8 @@ from __future__ import annotations
 import json
 import typing as t
 
+from ansible.module_utils.facts.compat import ansible_facts
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 if t.TYPE_CHECKING:
@@ -38,7 +40,7 @@ _state_map = dict(
 )
 
 
-def pipx_runner(module: AnsibleModule, command, **kwargs) -> CmdRunner:
+def pipx_runner(module: AnsibleModule, executable, **kwargs) -> CmdRunner:
     arg_formats = dict(
         state=cmd_runner_fmt.as_map(_state_map),
         name=cmd_runner_fmt.as_list(),
@@ -59,6 +61,11 @@ def pipx_runner(module: AnsibleModule, command, **kwargs) -> CmdRunner:
         version=cmd_runner_fmt.as_fixed("--version"),
     )
     arg_formats["global"] = cmd_runner_fmt.as_bool("--global")
+    if executable:
+        command = [executable]
+    else:
+        facts = ansible_facts(module, gather_subset=["python"])
+        command = [facts["python"]["executable"], "-m", "pipx"]
 
     runner = CmdRunner(
         module,

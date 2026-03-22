@@ -211,8 +211,6 @@ version:
 """
 
 
-from ansible.module_utils.facts.compat import ansible_facts
-
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import (
     make_process_dict,
@@ -223,7 +221,7 @@ from ansible_collections.community.general.plugins.module_utils.pkg_req import P
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
-def _make_name(name, suffix):
+def make_installed_name(name, suffix):
     return name if suffix is None else f"{name}{suffix}"
 
 
@@ -300,17 +298,12 @@ class PipX(StateModuleHelper):
         return {k: v for k, v in installed.items() if k == self.app_name}
 
     def __init_module__(self):
-        if self.vars.executable:
-            self.command = [self.vars.executable]
-        else:
-            facts = ansible_facts(self.module, gather_subset=["python"])
-            self.command = [facts["python"]["executable"], "-m", "pipx"]
-        self.runner = pipx_runner(self.module, self.command)
+        self.runner = pipx_runner(self.module, self.vars.executable)
 
         pkg_req = PackageRequirement(self.module, self.vars.name)
         self.parsed_name = pkg_req.parsed_name
         self.parsed_req = pkg_req.requirement
-        self.app_name = _make_name(self.parsed_name, self.vars.suffix)
+        self.app_name = make_installed_name(self.parsed_name, self.vars.suffix)
 
         self.vars.set("application", self._retrieve_installed(), change=True, diff=True)
 
@@ -371,7 +364,7 @@ class PipX(StateModuleHelper):
             self._capture_results(ctx)
 
     def state_upgrade(self):
-        name = _make_name(self.vars.name, self.vars.suffix)
+        name = make_installed_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
             self.do_raise(f"Trying to upgrade a non-existent application: {name}")
         if self.vars.force:
@@ -385,7 +378,7 @@ class PipX(StateModuleHelper):
 
     def state_uninstall(self):
         if self.vars.application:
-            name = _make_name(self.vars.name, self.vars.suffix)
+            name = make_installed_name(self.vars.name, self.vars.suffix)
             with self.runner("state global name", check_mode_skip=True) as ctx:
                 ctx.run(name=name)
                 self._capture_results(ctx)
@@ -393,7 +386,7 @@ class PipX(StateModuleHelper):
     state_absent = state_uninstall
 
     def state_reinstall(self):
-        name = _make_name(self.vars.name, self.vars.suffix)
+        name = make_installed_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
             self.do_raise(f"Trying to reinstall a non-existent application: {name}")
         self.changed = True
@@ -402,7 +395,7 @@ class PipX(StateModuleHelper):
             self._capture_results(ctx)
 
     def state_inject(self):
-        name = _make_name(self.vars.name, self.vars.suffix)
+        name = make_installed_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
             self.do_raise(f"Trying to inject packages into a non-existent application: {name}")
         if self.vars.force:
@@ -415,7 +408,7 @@ class PipX(StateModuleHelper):
             self._capture_results(ctx)
 
     def state_uninject(self):
-        name = _make_name(self.vars.name, self.vars.suffix)
+        name = make_installed_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
             self.do_raise(f"Trying to uninject packages into a non-existent application: {name}")
         with self.runner("state global name inject_packages", check_mode_skip=True) as ctx:
