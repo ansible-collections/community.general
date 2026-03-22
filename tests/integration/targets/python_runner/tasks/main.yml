@@ -1,0 +1,73 @@
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: .python_runner
+  register: tmp_python_runner
+
+- name: Create virtualenv
+  ansible.builtin.command:
+    cmd: "python3 -m venv {{ tmp_python_runner.path }}/venv"
+
+- name: Update pip in virtualenv
+  ansible.builtin.pip:
+    name: pip
+    state: latest
+    virtualenv: "{{ tmp_python_runner.path }}/venv"
+
+- name: Install django in virtualenv
+  ansible.builtin.pip:
+    name: django
+    state: present
+    virtualenv: "{{ tmp_python_runner.path }}/venv"
+
+- name: Copy settings file to temporary directory
+  ansible.builtin.copy:
+    src: settings.py
+    dest: "{{ tmp_python_runner.path }}/settings.py"
+    mode: "0644"
+
+# Regression test for https://github.com/ansible-collections/community.general/issues/8884
+# Bug: PythonRunner was setting path_prefix to a string instead of a list, corrupting PATH
+# when venv was specified, so the venv's python could not be found.
+- name: Run django_command check using virtualenv (regression test for issue 8884)
+  community.general.django_command:
+    command: check
+    settings: settings
+    pythonpath: "{{ tmp_python_runner.path }}"
+    venv: "{{ tmp_python_runner.path }}/venv"
+  register: result_check
+
+- name: Assert django_command succeeded and returned a version
+  ansible.builtin.assert:
+    that:
+      - result_check is success
+      - result_check.version is defined
+      - result_check.version != ""
+
+# Second test: mirrors the scenario from issue 8884 — a real Django project created
+# with django-admin startproject, then checked via django_command with a venv.
+# The original reporter was running `migrate`; we use `check` to avoid needing a database.
+- name: Create Django project using venv django-admin
+  ansible.builtin.command:
+    cmd: >-
+      {{ tmp_python_runner.path }}/venv/bin/django-admin startproject
+      testproject {{ tmp_python_runner.path }}/testproject
+
+- name: Run django_command check on the created project (issue 8884 scenario)
+  community.general.django_command:
+    command: check
+    settings: testproject.settings
+    pythonpath: "{{ tmp_python_runner.path }}/testproject"
+    venv: "{{ tmp_python_runner.path }}/venv"
+  register: result_project_check
+
+- name: Assert project check succeeded and returned a version
+  ansible.builtin.assert:
+    that:
+      - result_project_check is success
+      - result_project_check.version is defined
+      - result_project_check.version != ""
