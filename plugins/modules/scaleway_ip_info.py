@@ -28,7 +28,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example C(par1)) (deprecated).
+      - Scaleway region to use (for example V(par1)).
     required: false
     choices:
       - ams1
@@ -72,7 +72,7 @@ EXAMPLES = r"""
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_ip_info }}"
 
-- name: Gather Scaleway IPs information (deprecated)
+- name: Gather Scaleway IPs information
   community.general.scaleway_ip_info:
     region: par-1
   register: result
@@ -151,12 +151,6 @@ def main():
         scaleway_ip_info = api.get(path=api_path)
         module.exit_json(scaleway_ip_info=scaleway_ip_info.json.get('ips'))
     else:
-        module.deprecate(
-            msg="The 'region' parameter is deprecated. Use 'zone' to specify the Scaleway zone instead.",
-            version="14.0.0",
-            collection_name="community.general",
-        )
-
         try:
             module.exit_json(scaleway_ip_info=ScalewayIpInfo(module).get_resources())
         except ScalewayException as exc:
