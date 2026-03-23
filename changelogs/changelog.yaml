@@ -1886,3 +1886,147 @@ releases:
           name: loganalytics_ingestion
           namespace: null
     release_date: '2026-02-23'
+  12.5.0:
+    changes:
+      bugfixes:
+        - counter_enabled callback plugin - fix plugin not observing ``display_ok_hosts``
+          option (https://github.com/ansible-collections/community.general/issues/3978,
+          https://github.com/ansible-collections/community.general/pull/11656).
+        - ipa_dnsrecord - fix idempotency bug when using ``dnsttl`` due to wrong Python
+          types (https://github.com/ansible-collections/community.general/pull/11559).
+        - keycloak_authentication - fix ``TypeError`` crash when a flow is defined
+          without ``authenticationExecutions`` (https://github.com/ansible-collections/community.general/issues/11547,
+          https://github.com/ansible-collections/community.general/pull/11548).
+        - nictagadm - add a condition to the if statement so that ``is_valid_mac()``
+          does not get called if ``etherstub`` is false (https://github.com/ansible-collections/community.general/pull/11589).
+        - nmcli - add missing ``ipv6.routing-rules`` to ``settings_type()`` list type,
+          preventing ``routing_rules6`` list from being corrupted (https://github.com/ansible-collections/community.general/issues/11630,
+          https://github.com/ansible-collections/community.general/pull/11635).
+        - open_iscsi - fix IPv6 portal address formatting; iscsiadm requires bracket
+          notation for IPv6 addresses but the module was producing an incorrect format
+          (https://github.com/ansible-collections/community.general/issues/4467, https://github.com/ansible-collections/community.general/pull/11657).
+        - xfconf - representation of boolean properties was not consistent between
+          Python and ``xfconf-query``, leading to broken idempotency (https://github.com/ansible-collections/community.general/pull/11645).
+      deprecated_features:
+        - aix_devices - module is superseded by equivalent in ``ibm.power_aix`` collection.
+          It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290,
+          https://github.com/ansible-collections/community.general/pull/11540).
+        - aix_filesystem - module is superseded by equivalent in ``ibm.power_aix``
+          collection. It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290,
+          https://github.com/ansible-collections/community.general/pull/11540).
+        - aix_inittab - module is superseded by equivalent in ``ibm.power_aix`` collection.
+          It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290,
+          https://github.com/ansible-collections/community.general/pull/11540).
+        - aix_lvg - module is superseded by equivalent in ``ibm.power_aix`` collection.
+          It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290,
+          https://github.com/ansible-collections/community.general/pull/11540).
+        - aix_lvol - module is superseded by equivalent in ``ibm.power_aix`` collection.
+          It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290,
+          https://github.com/ansible-collections/community.general/pull/11540).
+        - monit - support for Monit version 5.18 or older is deprecated and will be
+          removed in community.general 14.0.0 (https://github.com/ansible-collections/community.general/pull/11254).
+        - puppet - the ``timeout`` parameter is deprecated and will be removed in
+          community.general 14.0.0. (https://github.com/ansible-collections/community.general/pull/11658).
+      minor_changes:
+        - ansible_galaxy_install - add parameter ``executable`` (https://github.com/ansible-collections/community.general/issues/7261,
+          https://github.com/ansible-collections/community.general/pull/11646).
+        - api module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+        - bitbucket module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561).
+        - consul module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+        - doas become plugin - add new option ``allow_pipelining`` to explicitly allow
+          the use of pipelining with this plugin. This should only be set to ``true``
+          with ansible-core 2.19+ when ``doas`` does not require a password (https://github.com/ansible-collections/community.general/issues/11411,
+          https://github.com/ansible-collections/community.general/pull/11481).
+        - gandi_livedns_api module utils - use Python-defined constants for HTTP return
+          codes (https://github.com/ansible-collections/community.general/pull/11561).
+        - github_app_access_token lookup plugin - use Python-defined constants for
+          HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+        - hwc_utils module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+        - icinga2 inventory plugin - use Python-defined constants for HTTP return
+          codes (https://github.com/ansible-collections/community.general/pull/11561,
+          https://github.com/ansible-collections/community.general/pull/11573).
+        - incus inventory plugin - add support for constructing project-independent
+          FQDNs (https://github.com/ansible-collections/community.general/pull/11555).
+        - ipa module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+        - keycloak module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561).
+        - keycloak_realm - add ``first_broker_login_flow`` parameter (https://github.com/ansible-collections/community.general/pull/11622).
+        - ldap_attrs - add ``binary_attributes`` and ``honor_binary`` parameters to
+          handle binary attribute values (https://github.com/ansible-collections/community.general/pull/11558).
+        - ldap_entry - add ``binary_attributes`` and ``honor_binary`` parameters to
+          handle creating objects with attributes set to binary values (https://github.com/ansible-collections/community.general/pull/11558).
+        - lookup plugin passwordstore - modernize internal ``check_output2()`` helper
+          using ``subprocess.run()`` and rename it to ``run_backend_cmd()`` (https://github.com/ansible-collections/community.general/pull/11655).
+        - memset module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561).
+        - merge_variables lookup plugin - extended merging capabilities added (https://github.com/ansible-collections/community.general/pull/11536).
+        - nmcli - fix idempotency for MAC VLAN interfaces when using ``macvlan.tap``
+          (https://github.com/ansible-collections/community.general/pull/11551).
+        - nsupdate - replace ``list(map(...))`` constructs with Python comprehensions
+          (https://github.com/ansible-collections/community.general/pull/11590).
+        - ocapi_utils module utils - use Python-defined constants for HTTP return
+          codes (https://github.com/ansible-collections/community.general/pull/11561).
+        - oci_utils module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561).
+        - online module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561).
+        - osx_defaults - add support for ``dict`` type values, including ``dict_mode``
+          option to merge keys into an existing dictionary (https://github.com/ansible-collections/community.general/issues/238,
+          https://github.com/ansible-collections/community.general/pull/11659).
+        - redfish_utils module utils - use Python-defined constants for HTTP return
+          codes (https://github.com/ansible-collections/community.general/pull/11561,
+          https://github.com/ansible-collections/community.general/pull/11573).
+        - rundeck module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+        - scaleway module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561).
+        - supervisorctl - added an additional condition for generating the error 'no
+          such process' (https://github.com/ansible-collections/community.general/issues/11621,
+          https://github.com/ansible-collections/community.general/pull/11632).
+        - timezone - replace ``list(map(...))`` constructs with Python comprehensions
+          (https://github.com/ansible-collections/community.general/pull/11590).
+        - utm_utils module utils - use Python-defined constants for HTTP return codes
+          (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+      release_summary: Bugfix and feature release.
+    fragments:
+      - 11254-monit-deprecate-old.yml
+      - 11481-doas-pipelining.yml
+      - 11536-merge-variables-extended-merging-capabilities.yml
+      - 11540-deprecate-aix.yml
+      - 11551-fix-nmcli-idempotency-for-macvlan.yml
+      - 11555-incus-domain-name.yml
+      - 11558-binary-ldap-attributes.yml
+      - 11559-fix-ipa_dnsrecord-fail-when-no-change.yaml
+      - 11561-use-httpstatus-1.yml
+      - 11584-keycloak-first-roker-login-parameter.yml
+      - 11590-list-map.yml
+      - 11621-skip-no_such_process-for-name-all.yml
+      - 11630-nmcli-ipv6-routing-rules.yml
+      - 11645-xfconf-bool.yml
+      - 11646-galaxy-executable.yml
+      - 11655-passwordstore-cleanup.yml
+      - 11656-counter_enabled-display_ok_hosts.yml
+      - 11657-open-iscsi-ipv6.yml
+      - 11658-puppet-timeout-deprecation.yml
+      - 11659-osx-defaults-dict.yml
+      - 12.5.0.yml
+      - keycloak-authentication-none-executions.yml
+      - nictagadm-etherstub-nonetype-bugfix.yml
+    modules:
+      - description: Manage GitHub repository or organization secrets.
+        name: github_secrets
+        namespace: ''
+      - description: List GitHub repository or organization secrets.
+        name: github_secrets_info
+        namespace: ''
+      - description: Configure authentication flows in Keycloak in an idempotent and
+          safe manner.
+        name: keycloak_authentication_v2
+        namespace: ''
+      - description: Manage logrotate configurations.
+        name: logrotate
+        namespace: ''
+    release_date: '2026-03-23'

@@ -1,2 +1,0 @@
-deprecated_features:
-  - monit - support for Monit version 5.18 or older is deprecated and will be removed in community.general 14.0.0 (https://github.com/ansible-collections/community.general/pull/11254).

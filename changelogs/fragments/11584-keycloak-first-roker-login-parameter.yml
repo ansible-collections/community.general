@@ -1,2 +1,0 @@
-minor_changes:
-  - keycloak_realm - add ``first_broker_login_flow`` parameter (https://github.com/ansible-collections/community.general/pull/11622).
