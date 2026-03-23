@@ -4,7 +4,6 @@
 
 
 # requirement for the memcached cache plugin
-python-memcached < 1.60 ; python_version < '3.6'
 python-memcached ; python_version >= '3.6'
 
 # requirement for the redis cache plugin
@@ -30,7 +29,6 @@ datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
 
 # requirement for dnsimple module
 dnsimple >= 2 ; python_version >= '3.6'
-dataclasses ; python_version == '3.6'
 
 # requirement for the opentelemetry callback plugin
 # WARNING: these libraries rely on Protobuf for Python, which regularly stops installing.
@@ -46,7 +44,6 @@ elastic-apm ; python_version >= '3.6'
 passlib[argon2]
 
 #requirements for nomad_token modules
-python-nomad < 2.0.0 ; python_version <= '3.6'
 python-nomad >= 2.0.0 ; python_version >= '3.7'
 
 # requirement for jenkins_build, jenkins_node, jenkins_plugin modules
