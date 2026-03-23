@@ -305,7 +305,7 @@
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     type: dict
-    dict_add: true
+    dict_mode: add
     value:
       Privileges: true
   register: test_dict_add
@@ -318,7 +318,7 @@
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     type: dict
-    dict_add: true
+    dict_mode: add
     value:
       Privileges: true
   register: test_dict_add
@@ -331,7 +331,7 @@
     domain: com.ansible.fake_dict_value
     key: ExampleDictKeyNew
     type: dict
-    dict_add: true
+    dict_mode: add
     value:
       Alpha: true
   register: test_dict_add_new

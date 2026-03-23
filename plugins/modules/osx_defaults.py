@@ -59,11 +59,14 @@ options:
       - Add new elements to the array for a key which has an array as its value.
     type: bool
     default: false
-  dict_add:
+  dict_mode:
     description:
-      - Add new elements to the dictionary for a key which has a dict as its value.
-    type: bool
-    default: false
+      - Defines the write behavior for O(type=dict) values.
+      - V(replace) writes the full dictionary, replacing any existing value.
+      - V(add) merges only the specified keys into the existing dictionary, leaving other keys untouched.
+    type: str
+    choices: [replace, add]
+    default: replace
     version_added: "12.5.0"
   value:
     description:
@@ -184,7 +187,7 @@ class OSXDefaults:
         self.check_type = module.params["check_type"]
         self.type = module.params["type"]
         self.array_add = module.params["array_add"]
-        self.dict_add = module.params["dict_add"]
+        self.dict_mode = module.params["dict_mode"]
         self.value = module.params["value"]
         self.state = module.params["state"]
         self.path = module.params["path"]
@@ -359,7 +362,7 @@ class OSXDefaults:
     def write(self):
         """Writes value to this domain & key to defaults"""
         if self.type == "dict":
-            effective_type = "dict-add" if (self.dict_add and self.current_value is not None) else "dict"
+            effective_type = "dict-add" if (self.dict_mode == "add" and self.current_value is not None) else "dict"
             tokens = []
             for k, v in self.value.items():
                 tokens.extend(self._dict_value_to_args(str(k), v))
@@ -452,7 +455,7 @@ class OSXDefaults:
         elif (
             self.type == "dict"
             and self.current_value is not None
-            and self.dict_add
+            and self.dict_mode == "add"
             and all(self.current_value.get(k) == v for k, v in self.value.items())
         ):
             return False
@@ -486,7 +489,7 @@ def main():
                 choices=["array", "bool", "boolean", "date", "dict", "float", "int", "integer", "string"],
             ),
             array_add=dict(type="bool", default=False),
-            dict_add=dict(type="bool", default=False),
+            dict_mode=dict(type="str", default="replace", choices=["replace", "add"]),
             value=dict(type="raw"),
             state=dict(type="str", default="present", choices=["absent", "list", "present"]),
             path=dict(type="str", default="/usr/bin:/usr/local/bin"),
