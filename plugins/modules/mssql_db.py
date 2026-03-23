@@ -183,7 +183,7 @@ def main():
         )
 
     login_querystring = login_host
-    if "\\" not in login_host and login_port is not None:
+    if r"\" not in login_host and login_port is not None:
         login_querystring = f"{login_host}:{login_port}"
 
     if login_user != "" and login_password == "":
