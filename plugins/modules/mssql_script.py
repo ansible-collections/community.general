@@ -39,12 +39,16 @@ options:
     description: The password used to authenticate with.
     type: str
   login_host:
-    description: Host running the database.
+    description:
+      - Host running the database.
+      - For named instances, use the format V(server\\instance). In that case, do not use O(login_port).
     type: str
     required: true
   login_port:
-    description: Port of the MSSQL server. Requires O(login_host) be defined as well.
-    default: 1433
+    description:
+      - Port of the MSSQL server. Requires O(login_host) to be defined as well.
+      - Cannot be used together with a named instance in O(login_host) (that is, V(server\\instance) format).
+      - If O(login_host) is not a named instance and O(login_port) is not specified, it defaults to V(1433).
     type: int
   script:
     description:
@@ -287,7 +291,7 @@ def run_module():
         login_user=dict(),
         login_password=dict(no_log=True),
         login_host=dict(required=True),
-        login_port=dict(type="int", default=1433),
+        login_port=dict(type="int"),
         script=dict(required=True),
         output=dict(default="default", choices=["dict", "default"]),
         params=dict(type="dict"),
@@ -313,8 +317,14 @@ def run_module():
     # Added param to set the transactional mode (true/false)
     transaction = module.params["transaction"]
 
+    if "\\" in login_host and login_port is not None:
+        module.fail_json(
+            msg="login_port cannot be used with a named instance in login_host (server\\\\instance format). "
+            "Named instances use the SQL Server Browser service to resolve the port automatically."
+        )
+
     login_querystring = login_host
-    if login_port != 1433:
+    if "\\" not in login_host and login_port is not None:
         login_querystring = f"{login_host}:{login_port}"
 
     if login_user is not None and login_password is None:

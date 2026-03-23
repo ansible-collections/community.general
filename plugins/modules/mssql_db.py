@@ -39,12 +39,14 @@ options:
   login_host:
     description:
       - Host running the database.
+      - For named instances, use the format V(server\\instance). In that case, do not use O(login_port).
     type: str
     required: true
   login_port:
     description:
       - Port of the MSSQL server. Requires login_host be defined as other than localhost if login_port is used.
-    default: '1433'
+      - Cannot be used together with a named instance in O(login_host) (that is, V(server\\instance) format).
+      - If O(login_host) is not a named instance and O(login_port) is not specified, it defaults to V(1433).
     type: str
   state:
     description:
@@ -154,7 +156,7 @@ def main():
             login_user=dict(default=""),
             login_password=dict(default="", no_log=True),
             login_host=dict(required=True),
-            login_port=dict(default="1433"),
+            login_port=dict(),
             target=dict(),
             autocommit=dict(type="bool", default=False),
             state=dict(default="present", choices=["present", "absent", "import"]),
@@ -174,8 +176,14 @@ def main():
     login_host = module.params["login_host"]
     login_port = module.params["login_port"]
 
+    if "\\" in login_host and login_port is not None:
+        module.fail_json(
+            msg="login_port cannot be used with a named instance in login_host (server\\\\instance format). "
+            "Named instances use the SQL Server Browser service to resolve the port automatically."
+        )
+
     login_querystring = login_host
-    if login_port != "1433":
+    if "\\" not in login_host and login_port is not None:
         login_querystring = f"{login_host}:{login_port}"
 
     if login_user != "" and login_password == "":
