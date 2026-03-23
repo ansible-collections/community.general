@@ -44,6 +44,7 @@ options:
   type:
     description:
       - The type of value to write.
+      - V(dict) has been added in community.general 12.5.0.
     type: str
     choices: [array, bool, boolean, date, dict, float, int, integer, string]
     default: string
