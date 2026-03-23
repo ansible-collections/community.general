@@ -164,6 +164,8 @@ class CallbackModule(CallbackBase):
                 msg = f"changed: {self._host_counter}/{self._host_total} [{result._host.get_name()}]"
             color = C.COLOR_CHANGED
         else:
+            if not self._plugin_options.get("display_ok_hosts", True):
+                return
             if delegated_vars:
                 msg = f"ok: {self._host_counter}/{self._host_total} [{result._host.get_name()} -> {delegated_vars['ansible_host']}]"
             else:
