@@ -22,6 +22,9 @@ options:
   timeout:
     description:
       - How long to wait for C(puppet) to finish.
+      - This parameter is deprecated and will be removed in community.general 14.0.0.
+        Use the task-level C(timeout) keyword instead.
+        To suppress this deprecation warning, set O(timeout) to V("").
     type: str
     default: 30m
   puppetmaster:
@@ -239,6 +242,15 @@ def main():
         ],
     )
     p = module.params
+
+    if p["timeout"]:
+        module.deprecate(
+            'The "timeout" parameter is deprecated and will be removed in community.general 14.0.0. '
+            'Use the task-level "timeout" keyword instead. '
+            "To suppress this warning, set \"timeout: ''\" in the task.",
+            version="14.0.0",
+            collection_name="community.general",
+        )
 
     if p["manifest"]:
         if not os.path.exists(p["manifest"]):
