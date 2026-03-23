@@ -45,7 +45,7 @@ options:
     description:
       - The type of value to write.
     type: str
-    choices: [array, bool, boolean, date, float, int, integer, string]
+    choices: [array, bool, boolean, date, dict, float, int, integer, string]
     default: string
   check_type:
     description:
@@ -59,6 +59,12 @@ options:
       - Add new elements to the array for a key which has an array as its value.
     type: bool
     default: false
+  dict_add:
+    description:
+      - Add new elements to the dictionary for a key which has a dict as its value.
+    type: bool
+    default: false
+    version_added: "12.5.0"
   value:
     description:
       - The value to write.
@@ -127,6 +133,16 @@ EXAMPLES = r"""
       - en
       - nl
 
+- name: Setting a dict valued key
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXInfoPanesExpanded
+    type: dict
+    value:
+      General: true
+      OpenWith: true
+      Privileges: true
+
 - name: Removing a key
   community.general.osx_defaults:
     domain: com.geekchimp.macable
@@ -134,6 +150,7 @@ EXAMPLES = r"""
     state: absent
 """
 
+import json
 import re
 from datetime import datetime
 
@@ -165,6 +182,7 @@ class OSXDefaults:
         self.check_type = module.params["check_type"]
         self.type = module.params["type"]
         self.array_add = module.params["array_add"]
+        self.dict_add = module.params["dict_add"]
         self.value = module.params["value"]
         self.state = module.params["state"]
         self.path = module.params["path"]
@@ -178,6 +196,15 @@ class OSXDefaults:
 
         if not self.executable:
             raise OSXDefaultsException("Unable to locate defaults executable.")
+
+        self.plutil = self.module.get_bin_path(
+            "plutil",
+            required=False,
+            opt_dirs=self.path.split(":"),
+        )
+
+        if self.type == "dict" and not self.plutil:
+            raise OSXDefaultsException("Unable to locate plutil executable (required for dict type).")
 
         # Ensure the value is the correct type
         if self.state != "absent":
@@ -226,6 +253,10 @@ class OSXDefaults:
             if not isinstance(value, list):
                 raise OSXDefaultsException("Invalid value. Expected value to be an array")
             return value
+        elif data_type in ["dict", "dictionary"]:
+            if not isinstance(value, dict):
+                raise OSXDefaultsException("Invalid value. Expected value to be a dict")
+            return value
 
         raise OSXDefaultsException(f"Type is not supported: {data_type}")
 
@@ -241,6 +272,18 @@ class OSXDefaults:
     def _base_command(self):
         """Returns a list containing the "defaults" executable and any common base arguments"""
         return [self.executable] + self._host_args()
+
+    @staticmethod
+    def _dict_value_to_args(key, val):
+        """Returns the [key, -type, value] tokens for a single dict entry when writing"""
+        if isinstance(val, bool):
+            return [key, "-bool", "TRUE" if val else "FALSE"]
+        elif isinstance(val, int):
+            return [key, "-int", str(val)]
+        elif isinstance(val, float):
+            return [key, "-float", str(val)]
+        else:
+            return [key, "-string", str(val)]
 
     @staticmethod
     def _convert_defaults_str_to_list(value):
@@ -289,12 +332,33 @@ class OSXDefaults:
         # Convert string to list when type is array
         if data_type == "array":
             out = self._convert_defaults_str_to_list(out)
+        elif data_type == "dictionary":
+            rc2, out2, err2 = self.module.run_command(
+                [self.plutil, "-convert", "json", "-o", "-", "-"],
+                data=out,
+            )
+            if rc2 != 0:
+                raise OSXDefaultsException(f"An error occurred while converting dict value via plutil: {err2}")
+            out = json.loads(out2)
 
         # Store the current_value
         self.current_value = self._convert_type(data_type, out)
 
     def write(self):
         """Writes value to this domain & key to defaults"""
+        if self.type == "dict":
+            effective_type = "dict-add" if (self.dict_add and self.current_value is not None) else "dict"
+            tokens = []
+            for k, v in self.value.items():
+                tokens.extend(self._dict_value_to_args(str(k), v))
+            rc, out, err = self.module.run_command(
+                self._base_command() + ["write", self.domain, self.key, f"-{effective_type}"] + tokens,
+                expand_user_and_vars=False,
+            )
+            if rc != 0:
+                raise OSXDefaultsException(f"An error occurred while writing value to defaults: {err}")
+            return
+
         # We need to convert some values so the defaults commandline understands it
         if isinstance(self.value, bool):
             if self.value:
@@ -373,6 +437,13 @@ class OSXDefaults:
             and len(list(set(self.value) - set(self.current_value))) == 0
         ):
             return False
+        elif (
+            self.type == "dict"
+            and self.current_value is not None
+            and self.dict_add
+            and all(self.current_value.get(k) == v for k, v in self.value.items())
+        ):
+            return False
         elif self.current_value == self.value:
             return False
 
@@ -400,9 +471,10 @@ def main():
             type=dict(
                 type="str",
                 default="string",
-                choices=["array", "bool", "boolean", "date", "float", "int", "integer", "string"],
+                choices=["array", "bool", "boolean", "date", "dict", "float", "int", "integer", "string"],
             ),
             array_add=dict(type="bool", default=False),
+            dict_add=dict(type="bool", default=False),
             value=dict(type="raw"),
             state=dict(type="str", default="present", choices=["absent", "list", "present"]),
             path=dict(type="str", default="/usr/bin:/usr/local/bin"),
