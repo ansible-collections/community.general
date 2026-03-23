@@ -291,6 +291,7 @@ options:
     aliases:
       - firstBrokerLoginFlow
     type: str
+    version_added: 12.5.0
   internationalization_enabled:
     description:
       - The realm internationalization enabled option.
