@@ -1,2 +1,0 @@
-deprecated_features:
-  - scaleway_ip_info plugin - use of ``region`` is deprecated and will be disallowed in ``community.general`` 14.0.0 (https://github.com/ansible-collections/community.general/issues/11351).
