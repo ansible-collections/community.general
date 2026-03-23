@@ -4,7 +4,6 @@
 
 azp/posix/1
 destructive
-skip/aix
 skip/rhel
 skip/osx  # FIXME https://github.com/ansible-collections/community.general/issues/2978
 skip/macos  # FIXME https://github.com/ansible-collections/community.general/issues/2978
