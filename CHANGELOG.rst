@@ -6,6 +6,21 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.6
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- counter_enabled callback plugin - fix plugin not observing ``display_ok_hosts`` option (https://github.com/ansible-collections/community.general/issues/3978, https://github.com/ansible-collections/community.general/pull/11656).
+- keycloak_authentication - fix ``TypeError`` crash when a flow is defined without ``authenticationExecutions`` (https://github.com/ansible-collections/community.general/issues/11547, https://github.com/ansible-collections/community.general/pull/11548).
+- xfconf - representation of boolean properties was not consistent between Python and ``xfconf-query``, leading to broken idempotency (https://github.com/ansible-collections/community.general/pull/11645).
+
 v11.4.5
 =======
 

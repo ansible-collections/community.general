@@ -1929,3 +1929,21 @@ releases:
       - 11.4.5.yml
       - 11492-python_requires_info.yml
     release_date: '2026-02-23'
+  11.4.6:
+    changes:
+      bugfixes:
+        - counter_enabled callback plugin - fix plugin not observing ``display_ok_hosts``
+          option (https://github.com/ansible-collections/community.general/issues/3978,
+          https://github.com/ansible-collections/community.general/pull/11656).
+        - keycloak_authentication - fix ``TypeError`` crash when a flow is defined
+          without ``authenticationExecutions`` (https://github.com/ansible-collections/community.general/issues/11547,
+          https://github.com/ansible-collections/community.general/pull/11548).
+        - xfconf - representation of boolean properties was not consistent between
+          Python and ``xfconf-query``, leading to broken idempotency (https://github.com/ansible-collections/community.general/pull/11645).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 11.4.6.yml
+      - 11645-xfconf-bool.yml
+      - 11656-counter_enabled-display_ok_hosts.yml
+      - keycloak-authentication-none-executions.yml
+    release_date: '2026-03-23'
