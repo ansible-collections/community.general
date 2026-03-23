@@ -151,7 +151,9 @@ EXAMPLES = r"""
 """
 
 import json
+import os
 import re
+import tempfile
 from datetime import datetime
 
 from ansible.module_utils.basic import AnsibleModule
@@ -333,13 +335,23 @@ class OSXDefaults:
         if data_type == "array":
             out = self._convert_defaults_str_to_list(out)
         elif data_type == "dictionary":
-            rc2, out2, err2 = self.module.run_command(
-                [self.plutil, "-convert", "json", "-o", "-", "-"],
-                data=out,
-            )
-            if rc2 != 0:
-                raise OSXDefaultsException(f"An error occurred while converting dict value via plutil: {err2}")
-            out = json.loads(out2)
+            # Export domain plist to a temp file and use plutil -extract for type-preserving JSON conversion.
+            # Reading via 'defaults read' loses boolean type info (booleans appear as 1/0 in old-style plist text).
+            tmp_fd, tmp_path = tempfile.mkstemp(suffix=".plist")
+            os.close(tmp_fd)
+            try:
+                rc2, out2, err2 = self.module.run_command(self._base_command() + ["export", self.domain, tmp_path])
+                if rc2 != 0:
+                    raise OSXDefaultsException(f"An error occurred while exporting domain plist: {err2}")
+                rc3, out3, err3 = self.module.run_command(
+                    [self.plutil, "-extract", self.key, "json", "-o", "-", tmp_path]
+                )
+                if rc3 != 0:
+                    raise OSXDefaultsException(f"An error occurred while extracting dict value via plutil: {err3}")
+                out = json.loads(out3)
+            finally:
+                if os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
 
         # Store the current_value
         self.current_value = self._convert_type(data_type, out)
