@@ -1,0 +1,307 @@
+# Copyright (c) 2026 Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  target: &target "iqn.2006-01.com.example:storage.disk1"
+  target_iscsi_node_out: &target-node-out "10.1.2.3:3260,1 iqn.2006-01.com.example:storage.disk1\n"
+  target_session_out: &target-session-out "tcp: [1] 10.1.2.3:3260,1 iqn.2006-01.com.example:storage.disk1 (non-flash)\n"
+
+  iscsiadm_node_cached: &iscsiadm-node-cached
+    command: [/testbin/iscsiadm, --mode, node]
+    environ: {}
+    rc: 0
+    out: *target-node-out
+    err: ''
+  iscsiadm_node_empty: &iscsiadm-node-empty
+    command: [/testbin/iscsiadm, --mode, node]
+    environ: {}
+    rc: 21
+    out: ''
+    err: 'iscsiadm: No records found'
+  iscsiadm_session_active: &iscsiadm-session-active
+    command: [/testbin/iscsiadm, --mode, session]
+    environ: {}
+    rc: 0
+    out: *target-session-out
+    err: ''
+  iscsiadm_session_empty: &iscsiadm-session-empty
+    command: [/testbin/iscsiadm, --mode, session]
+    environ: {}
+    rc: 21
+    out: ''
+    err: ''
+  ipv6_target_node_out: &ipv6-target-node-out "fd00::1:3260,1 iqn.2006-01.com.example:storage.disk1\n"
+
+test_cases:
+  # --- show_nodes ---
+
+  - id: show_nodes_only
+    input:
+      show_nodes: true
+    output:
+      changed: false
+      nodes:
+        - *target
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+
+  - id: show_nodes_empty
+    input:
+      show_nodes: true
+    output:
+      changed: false
+      nodes: []
+    mocks:
+      run_command:
+        - *iscsiadm-node-empty
+
+  # --- discover ---
+
+  - id: discover_new_nodes
+    input:
+      portal: "10.1.2.3"
+      discover: true
+      show_nodes: true
+    output:
+      changed: true
+      cache_updated: true
+      nodes:
+        - *target
+    mocks:
+      socket_getaddrinfo:
+        return: "10.1.2.3"
+      run_command:
+        - *iscsiadm-node-empty
+        - command: [/testbin/iscsiadm, --mode, discovery, --type, sendtargets, --portal, "10.1.2.3:3260"]
+          environ: {check_rc: true}
+          rc: 0
+          out: *target-node-out
+          err: ''
+        - *iscsiadm-node-cached
+
+  - id: discover_no_change
+    input:
+      portal: "10.1.2.3"
+      discover: true
+    output:
+      changed: false
+    mocks:
+      socket_getaddrinfo:
+        return: "10.1.2.3"
+      run_command:
+        - *iscsiadm-node-cached
+        - command: [/testbin/iscsiadm, --mode, discovery, --type, sendtargets, --portal, "10.1.2.3:3260"]
+          environ: {check_rc: true}
+          rc: 0
+          out: *target-node-out
+          err: ''
+        - *iscsiadm-node-cached
+
+  # --- login ---
+
+  - id: login_already_loggedon
+    input:
+      login: true
+      target: *target
+    output:
+      changed: false
+      devicenodes: []
+    mocks:
+      glob_glob:
+        return: []
+      run_command:
+        - *iscsiadm-node-cached
+        - *iscsiadm-session-active
+
+  - id: login_needed
+    # Note: target_login() is called as target_login(module, target, portal, port)
+    # where portal=None is passed as check_rc — a known bug at line 484.
+    # The login command therefore has check_rc=None and no --portal flag appended.
+    input:
+      login: true
+      target: *target
+    output:
+      changed: true
+      connection_changed: true
+      devicenodes: []
+    mocks:
+      glob_glob:
+        return: []
+      time_sleep: true
+      run_command:
+        - *iscsiadm-node-cached
+        - *iscsiadm-session-empty
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target, --login]
+          environ: {check_rc: null}
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: logout_already_off
+    input:
+      login: false
+      target: *target
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - *iscsiadm-session-empty
+
+  - id: logout_needed
+    input:
+      login: false
+      target: *target
+    output:
+      changed: true
+      connection_changed: true
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - *iscsiadm-session-active
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target, --logout]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: check_mode_login
+    flags:
+      check: true
+    input:
+      login: true
+      target: *target
+    output:
+      changed: true
+      connection_changed: true
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - *iscsiadm-session-empty
+
+  # --- auto_node_startup ---
+
+  - id: auto_node_startup_already_auto
+    input:
+      auto_node_startup: true
+      target: *target
+    output:
+      changed: false
+      automatic_changed: false
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target]
+          environ: {check_rc: true}
+          rc: 0
+          out: "node.startup = automatic\n"
+          err: ''
+
+  - id: auto_node_startup_set_auto
+    input:
+      auto_node_startup: true
+      target: *target
+    output:
+      changed: true
+      automatic_changed: true
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target]
+          environ: {check_rc: true}
+          rc: 0
+          out: "node.startup = manual\n"
+          err: ''
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target, --op=update, --name, node.startup, --value, automatic]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: auto_node_startup_set_manual
+    input:
+      auto_node_startup: false
+      target: *target
+    output:
+      changed: true
+      automatic_changed: true
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target]
+          environ: {check_rc: true}
+          rc: 0
+          out: "node.startup = automatic\n"
+          err: ''
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target, --op=update, --name, node.startup, --value, manual]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+
+  # --- rescan ---
+
+  - id: rescan_target
+    input:
+      rescan: true
+      target: *target
+    output:
+      changed: true
+      sessions: ''
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - command: [/testbin/iscsiadm, --mode, node, --rescan, -T, *target]
+          environ: {}
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: rescan_all
+    input:
+      rescan: true
+    output:
+      changed: true
+      sessions: ''
+    mocks:
+      run_command:
+        - *iscsiadm-node-cached
+        - command: [/testbin/iscsiadm, --mode, session, --rescan]
+          environ: {}
+          rc: 0
+          out: ''
+          err: ''
+
+  # --- IPv6 portal ---
+
+  - id: discover_ipv6_portal
+    # Verifies that the discovery command uses RFC-2732 bracket notation for IPv6:
+    # --portal [fd00::1]:3260  (not --portal fd00::1:3260)
+    # Note: post-discover node-list filtering is also broken for IPv6 (separate issue):
+    # iscsi_get_cached_nodes splits on ':' so target_portal="fd00" != portal="fd00::1",
+    # meaning nodes is always [] for IPv6 portals and changed stays false.
+    input:
+      portal: "fd00::1"
+      discover: true
+      show_nodes: true
+    output:
+      changed: false
+      nodes: []
+    mocks:
+      socket_getaddrinfo:
+        return: "fd00::1"
+      run_command:
+        - *iscsiadm-node-empty
+        - command: [/testbin/iscsiadm, --mode, discovery, --type, sendtargets, --portal, "[fd00::1]:3260"]
+          environ: {check_rc: true}
+          rc: 0
+          out: *ipv6-target-node-out
+          err: ''
+        - command: [/testbin/iscsiadm, --mode, node]
+          environ: {}
+          rc: 0
+          out: *ipv6-target-node-out
+          err: ''
