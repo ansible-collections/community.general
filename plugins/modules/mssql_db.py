@@ -176,9 +176,9 @@ def main():
     login_host = module.params["login_host"]
     login_port = module.params["login_port"]
 
-    if "\\" in login_host and login_port is not None:
+    if r"\" in login_host and login_port is not None:
         module.fail_json(
-            msg="login_port cannot be used with a named instance in login_host (server\\\\instance format). "
+            msg=r"login_port cannot be used with a named instance in login_host (server\instance format). "
             "Named instances use the SQL Server Browser service to resolve the port automatically."
         )
 
