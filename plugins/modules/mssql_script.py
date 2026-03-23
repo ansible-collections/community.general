@@ -324,7 +324,7 @@ def run_module():
         )
 
     login_querystring = login_host
-    if "\\" not in login_host and login_port is not None:
+    if r"\" not in login_host and login_port is not None:
         login_querystring = f"{login_host}:{login_port}"
 
     if login_user is not None and login_password is None:
