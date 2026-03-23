@@ -15,7 +15,7 @@ description:
   - Discover targets on given portal, (dis)connect targets, mark targets to manually or auto start, return device nodes of
     connected targets.
 requirements:
-  - open_iscsi library and tools (iscsiadm)
+  - C(open_iscsi) library and tools C(iscsiadm)
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -153,6 +153,13 @@ ISCSIADM = "iscsiadm"
 iscsiadm_cmd = None
 
 
+def format_portal(portal, port):
+    """Format portal address and port for iscsiadm, handling IPv6 bracket notation."""
+    if ":" in portal:
+        return f"[{portal}]:{port}"
+    return f"{portal}:{port}"
+
+
 def compare_nodelists(l1, l2):
     l1.sort()
     l2.sort()
@@ -190,7 +197,7 @@ def iscsi_get_cached_nodes(module, portal=None):
 
 
 def iscsi_discover(module, portal, port):
-    cmd = [iscsiadm_cmd, "--mode", "discovery", "--type", "sendtargets", "--portal", f"{portal}:{port}"]
+    cmd = [iscsiadm_cmd, "--mode", "discovery", "--type", "sendtargets", "--portal", format_portal(portal, port)]
     module.run_command(cmd, check_rc=True)
 
 
@@ -269,7 +276,7 @@ def target_login(module, target, check_rc, portal=None, port=None):
     cmd = [iscsiadm_cmd, "--mode", "node", "--targetname", target, "--login"]
     if portal is not None and port is not None:
         cmd.append("--portal")
-        cmd.append(f"{portal}:{port}")
+        cmd.append(format_portal(portal, port))
 
     rc, out, err = module.run_command(cmd, check_rc=check_rc)
     return rc
@@ -301,7 +308,7 @@ def target_isauto(module, target, portal=None, port=None):
 
     if portal is not None and port is not None:
         cmd.append("--portal")
-        cmd.append(f"{portal}:{port}")
+        cmd.append(format_portal(portal, port))
 
     dummy, out, dummy = module.run_command(cmd, check_rc=True)
 
@@ -328,7 +335,7 @@ def target_setauto(module, target, portal=None, port=None):
 
     if portal is not None and port is not None:
         cmd.append("--portal")
-        cmd.append(f"{portal}:{port}")
+        cmd.append(format_portal(portal, port))
 
     module.run_command(cmd, check_rc=True)
 
@@ -349,7 +356,7 @@ def target_setmanual(module, target, portal=None, port=None):
 
     if portal is not None and port is not None:
         cmd.append("--portal")
-        cmd.append(f"{portal}:{port}")
+        cmd.append(format_portal(portal, port))
 
     module.run_command(cmd, check_rc=True)
 
