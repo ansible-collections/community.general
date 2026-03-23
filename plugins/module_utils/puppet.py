@@ -52,12 +52,11 @@ def puppet_runner(module: AnsibleModule) -> CmdRunner:
     # If this can be replaced with ansible `timeout` parameter in playbook,
     # then this function could be removed.
     def _prepare_base_cmd():
-        _tout_cmd = module.get_bin_path("timeout", False)
-        if _tout_cmd:
-            cmd = ["timeout", "-s", "9", module.params["timeout"], _puppet_cmd(module)]
-        else:
-            cmd = ["puppet"]
-        return cmd
+        if module.params["timeout"]:
+            _tout_cmd = module.get_bin_path("timeout", False)
+            if _tout_cmd:
+                return ["timeout", "-s", "9", module.params["timeout"], _puppet_cmd(module)]
+        return ["puppet"]
 
     def noop_func(v):
         return ["--noop"] if module.check_mode or v else ["--no-noop"]
