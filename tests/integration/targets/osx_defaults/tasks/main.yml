@@ -253,3 +253,97 @@
 
 - assert:
     that: test_array_add.changed
+
+
+- name: Ensure dict test key does not exist
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: ExampleDictKey
+    state: absent
+
+- name: Write dict value for the first time
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: ExampleDictKey
+    type: dict
+    value:
+      General: true
+      OpenWith: true
+  register: test_dict_write
+
+- assert:
+    that: test_dict_write.changed
+
+- name: Write same dict value again, should not change
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: ExampleDictKey
+    type: dict
+    value:
+      General: true
+      OpenWith: true
+  register: test_dict_write
+
+- assert:
+    that: not test_dict_write.changed
+
+- name: Write different dict value, should change
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: ExampleDictKey
+    type: dict
+    value:
+      General: true
+      OpenWith: false
+  register: test_dict_write
+
+- assert:
+    that: test_dict_write.changed
+
+- name: Add new key via dict_add
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: ExampleDictKey
+    type: dict
+    dict_mode: add
+    value:
+      Privileges: true
+  register: test_dict_add
+
+- assert:
+    that: test_dict_add.changed
+
+- name: Add same key via dict_add again, should not change
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: ExampleDictKey
+    type: dict
+    dict_mode: add
+    value:
+      Privileges: true
+  register: test_dict_add
+
+- assert:
+    that: not test_dict_add.changed
+
+- name: Use dict_add on non-existent key, should create it
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: ExampleDictKeyNew
+    type: dict
+    dict_mode: add
+    value:
+      Alpha: true
+  register: test_dict_add_new
+
+- assert:
+    that: test_dict_add_new.changed
+
+- name: Clean up dict test keys
+  osx_defaults:
+    domain: com.ansible.fake_dict_value
+    key: "{{ item }}"
+    state: absent
+  loop:
+    - ExampleDictKey
+    - ExampleDictKeyNew
