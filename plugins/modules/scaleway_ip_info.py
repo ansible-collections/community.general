@@ -148,8 +148,8 @@ def main():
     if module.params["zone"]:
         zone = module.params["zone"]
         api_path = f"instance/v1/zones/{zone}/ips"
-        response = scaleway_ip_info=api.get(path=api_path)
-        module.exit_json(scaleway_ip_info=response.json.get('ips'))
+        scaleway_ip_info = api.get(path=api_path)
+        module.exit_json(scaleway_ip_info=scaleway_ip_info.json.get('ips'))
     else:
         module.deprecate(
             msg="The 'region' parameter is deprecated. Use 'zone' to specify the Scaleway zone instead.",
