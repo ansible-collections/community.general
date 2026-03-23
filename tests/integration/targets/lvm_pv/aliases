@@ -7,7 +7,6 @@ azp/posix/1
 azp/posix/vm
 destructive
 needs/privileged
-skip/aix
 skip/freebsd
 skip/osx
 skip/macos

@@ -5,7 +5,6 @@
 azp/posix/1
 needs/target/setup_epel
 destructive
-skip/aix
 skip/osx  # FIXME
 skip/rhel9.0  # FIXME
 skip/rhel9.1  # FIXME
