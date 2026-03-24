@@ -29,7 +29,6 @@ options:
     type: str
     description:
       - Scaleway region to use (for example V(par1)).
-    required: false
     choices:
       - ams1
       - EMEA-NL-EVS
