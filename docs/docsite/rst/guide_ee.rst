@@ -27,8 +27,8 @@ target, not in the EE.
     Modules delegated to ``localhost`` (for example, those that interact with a remote API) are an exception:
     they run on the controller and their dependencies must therefore be available in the EE.
 
-Why community.general does not ship an EE
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Why community.general does not provide EE metadata
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``community.general`` ships dozens of controller-side plugins covering a very broad range of technologies.
 Bundling the dependencies for all of them into a single EE image would almost certainly create irreconcilable
