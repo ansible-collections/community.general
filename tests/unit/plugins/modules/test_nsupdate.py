@@ -7,11 +7,9 @@ from __future__ import annotations
 import json
 
 import pytest
-from pytest_mock import MockerFixture
 
 dns = pytest.importorskip("dns")
 
-import dns.exception
 import dns.message
 import dns.name
 import dns.rcode
@@ -127,7 +125,7 @@ def route_query(query, update_rcodes):
 # ---------------------------------------------------------------------------
 
 
-def test_resolve_server_ipv4(mocker: MockerFixture, run_module) -> None:
+def test_resolve_server_ipv4(mocker, run_module):
     """IPv4 server is used directly without any DNS resolution."""
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
     mocker.patch("dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
@@ -135,7 +133,7 @@ def test_resolve_server_ipv4(mocker: MockerFixture, run_module) -> None:
     assert result["changed"] is True
 
 
-def test_resolve_server_ipv6(mocker: MockerFixture, run_module) -> None:
+def test_resolve_server_ipv6(mocker, run_module):
     """IPv6 server is used directly without any DNS resolution."""
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
     mocker.patch("dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
@@ -143,7 +141,7 @@ def test_resolve_server_ipv6(mocker: MockerFixture, run_module) -> None:
     assert result["changed"] is True
 
 
-def test_resolve_server_fqdn(mocker: MockerFixture, run_module) -> None:
+def test_resolve_server_fqdn(mocker, run_module):
     """FQDN server is resolved to an IP address before making DNS queries."""
     MockResolver = mocker.patch("dns.resolver.Resolver")
     MockResolver.return_value.resolve.side_effect = (
@@ -157,7 +155,7 @@ def test_resolve_server_fqdn(mocker: MockerFixture, run_module) -> None:
     assert result["changed"] is True
 
 
-def test_resolve_server_fqdn_unresolvable_fails(mocker: MockerFixture, run_module) -> None:
+def test_resolve_server_fqdn_unresolvable_fails(mocker, run_module):
     """Module fails with a clear message when the FQDN server cannot be resolved."""
     MockResolver = mocker.patch("dns.resolver.Resolver")
     MockResolver.return_value.resolve.side_effect = dns.resolver.NXDOMAIN
@@ -171,7 +169,7 @@ def test_resolve_server_fqdn_unresolvable_fails(mocker: MockerFixture, run_modul
 # ---------------------------------------------------------------------------
 
 
-def test_lookup_zone_auto_detects_zone(mocker: MockerFixture, run_module) -> None:
+def test_lookup_zone_auto_detects_zone(mocker, run_module):
     """Zone is correctly auto-detected from the SOA in the authority section."""
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
     mocker.patch("dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
@@ -179,7 +177,7 @@ def test_lookup_zone_auto_detects_zone(mocker: MockerFixture, run_module) -> Non
     assert result["record"]["zone"] == "example.org."
 
 
-def test_lookup_zone_tsig_key_attached_when_keyring_set(mocker: MockerFixture, run_module) -> None:
+def test_lookup_zone_tsig_key_attached_when_keyring_set(mocker, run_module):
     """Zone lookup attaches the TSIG key so split-view DNS servers pick the right view.
 
     Regression test for issue #749.
@@ -199,7 +197,7 @@ def test_lookup_zone_tsig_key_attached_when_keyring_set(mocker: MockerFixture, r
     assert soa_queries[0].keyring is not None, "SOA query must carry the TSIG key"
 
 
-def test_lookup_zone_no_tsig_without_key(mocker: MockerFixture, run_module) -> None:
+def test_lookup_zone_no_tsig_without_key(mocker, run_module):
     """Zone lookup sends no TSIG key when no key_name is configured."""
     soa_queries = []
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
@@ -221,7 +219,7 @@ def test_lookup_zone_no_tsig_without_key(mocker: MockerFixture, run_module) -> N
 # ---------------------------------------------------------------------------
 
 
-def test_creates_record_when_absent(mocker: MockerFixture, run_module) -> None:
+def test_creates_record_when_absent(mocker, run_module):
     """Record is created and changed=True when it does not exist."""
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
     mocker.patch("dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
@@ -229,7 +227,7 @@ def test_creates_record_when_absent(mocker: MockerFixture, run_module) -> None:
     assert result["changed"] is True
 
 
-def test_no_change_when_record_matches(mocker: MockerFixture, run_module) -> None:
+def test_no_change_when_record_matches(mocker, run_module):
     """No change when the record already exists with the correct value and TTL."""
     mocker.patch(
         "dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, [dns.rcode.NOERROR, dns.rcode.NOERROR])
@@ -243,7 +241,7 @@ def test_no_change_when_record_matches(mocker: MockerFixture, run_module) -> Non
 # ---------------------------------------------------------------------------
 
 
-def test_deletes_record_when_present(mocker: MockerFixture, run_module) -> None:
+def test_deletes_record_when_present(mocker, run_module):
     """Record is deleted and changed=True when it exists."""
     rcodes = [dns.rcode.NOERROR, dns.rcode.NOERROR]
     mocker.patch("dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
@@ -251,7 +249,7 @@ def test_deletes_record_when_present(mocker: MockerFixture, run_module) -> None:
     assert result["changed"] is True
 
 
-def test_no_change_when_record_already_absent(mocker: MockerFixture, run_module) -> None:
+def test_no_change_when_record_already_absent(mocker, run_module):
     """No change when the record does not exist and state=absent."""
     rcodes = [dns.rcode.NXDOMAIN]
     mocker.patch("dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
@@ -264,7 +262,7 @@ def test_no_change_when_record_already_absent(mocker: MockerFixture, run_module)
 # ---------------------------------------------------------------------------
 
 
-def test_check_mode_reports_changed_without_updating(mocker: MockerFixture, run_module) -> None:
+def test_check_mode_reports_changed_without_updating(mocker, run_module):
     """Check mode returns changed=True but does not send the actual DNS update."""
     tcp_mock = mocker.patch(
         "dns.query.tcp",
