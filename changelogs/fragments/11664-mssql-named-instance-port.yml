@@ -1,0 +1,9 @@
+bugfixes:
+  - mssql_db - fail with a clear error message when a named instance (``server\instance`` format)
+    is used together with ``login_port``, since these are mutually exclusive connection methods
+    (https://github.com/ansible-collections/community.general/issues/5693,
+    https://github.com/ansible-collections/community.general/pull/11664).
+  - mssql_script - fail with a clear error message when a named instance (``server\instance`` format)
+    is used together with ``login_port``, since these are mutually exclusive connection methods
+    (https://github.com/ansible-collections/community.general/issues/5693,
+    https://github.com/ansible-collections/community.general/pull/11664).
