@@ -127,8 +127,8 @@ def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(
         dict(
-            region=dict(required=False, choices=list(SCALEWAY_LOCATION.keys())),
-            zone=dict(required=False, choices=list(SCALEWAY_ZONES)),
+            region=dict(choices=list(SCALEWAY_LOCATION.keys())),
+            zone=dict(choices=list(SCALEWAY_ZONES)),
         )
     )
     module = AnsibleModule(
