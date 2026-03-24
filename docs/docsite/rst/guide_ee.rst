@@ -11,6 +11,7 @@ Execution Environment Guide
 `Ansible Execution Environments <https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html>`_
 (EEs) are container images that bundle ansible-core, collections, and their Python and system dependencies.
 They are the standard runtime for Red Hat Ansible Automation Platform and AWX, replacing the older virtualenv model.
+They can also be used outside of RHAAP and AWX by using `ansible-navigator <https://docs.ansible.com/projects/navigator/>`__, or by using ansible-runner directly.
 
 What runs in the EE
 ^^^^^^^^^^^^^^^^^^^
@@ -34,8 +35,8 @@ Bundling the dependencies for all of them into a single EE image would almost ce
 conflicts — both within the collection and with other collections or tools (such as ``ansible-lint``) that
 share the same image.
 
-For that reason, ``community.general`` does **not** provide a ``requirements.txt`` or ``bindep.txt`` at the
-collection root. Users are expected to build purpose-built, minimal EEs containing only the dependencies
+For that reason, ``community.general`` does **not** provide Python or system package dependency metadata.
+Users are expected to build purpose-built, minimal EEs containing only the dependencies
 required by the specific plugins they actually use.
 
 Finding the dependencies you need
@@ -98,7 +99,6 @@ that includes only the dependencies needed for the plugins you use:
         - requests
       system:
         - libxml2-devel [platform:rpm]
-        - libxml2-dev [platform:deb]
 
     images:
       base_image:
