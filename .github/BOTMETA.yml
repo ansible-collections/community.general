@@ -661,10 +661,10 @@ files:
     maintainers: zvaraondrej
   $modules/gitlab_milestone.py:
     maintainers: gpongelli
-  $modules/gitlab_project_variable.py:
-    maintainers: markuman
   $modules/gitlab_instance_variable.py:
     maintainers: benibr
+  $modules/gitlab_project_variable.py:
+    maintainers: markuman
   $modules/gitlab_runner.py:
     maintainers: SamyCoenen
   $modules/gitlab_user.py:
@@ -773,14 +773,14 @@ files:
     maintainers: abakanovskii
   $modules/ipa_dnsrecord.py:
     maintainers: $team_ipa jwbernin
-  $modules/ipbase_info.py:
-    maintainers: dominikkukacka
   $modules/ipa_pwpolicy.py:
     maintainers: adralioh
   $modules/ipa_service.py:
     maintainers: cprh
   $modules/ipa_vault.py:
     maintainers: jparrill
+  $modules/ipbase_info.py:
+    maintainers: dominikkukacka
   $modules/ipify_facts.py:
     maintainers: resmo
   $modules/ipinfoio_facts.py:
@@ -838,20 +838,22 @@ files:
     maintainers: $team_keycloak
   $modules/keycloak_authentication.py:
     maintainers: elfelip Gaetan2907
-  $modules/keycloak_authentication_v2.py:
-    maintainers: thomasbargetz
   $modules/keycloak_authentication_required_actions.py:
     maintainers: Skrekulko
+  $modules/keycloak_authentication_v2.py:
+    maintainers: thomasbargetz
   $modules/keycloak_authz_authorization_scope.py:
     maintainers: mattock
-  $modules/keycloak_authz_permission.py:
-    maintainers: mattock
   $modules/keycloak_authz_custom_policy.py:
+    maintainers: mattock
+  $modules/keycloak_authz_permission.py:
     maintainers: mattock
   $modules/keycloak_authz_permission_info.py:
     maintainers: mattock
   $modules/keycloak_client_rolemapping.py:
     maintainers: Gaetan2907
+  $modules/keycloak_client_rolescope.py:
+    maintainers: desand01
   $modules/keycloak_clientscope.py:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope_type.py:
@@ -862,6 +864,8 @@ files:
     maintainers: fynncfchen johncant
   $modules/keycloak_component.py:
     maintainers: fivetide
+  $modules/keycloak_component_info.py:
+    maintainers: desand01
   $modules/keycloak_group.py:
     maintainers: adamgoossens
   $modules/keycloak_identity_provider.py:
@@ -874,24 +878,20 @@ files:
     maintainers: mattock
   $modules/keycloak_realm_localization.py:
     maintainers: danekja
+  $modules/keycloak_realm_rolemapping.py:
+    maintainers: agross mhuysamen Gaetan2907
   $modules/keycloak_role.py:
     maintainers: laurpaum
   $modules/keycloak_user.py:
     maintainers: elfelip
-  $modules/keycloak_user_federation.py:
-    maintainers: laurpaum
-  $modules/keycloak_userprofile.py:
-    maintainers: yeoldegrove
-  $modules/keycloak_component_info.py:
-    maintainers: desand01
-  $modules/keycloak_client_rolescope.py:
-    maintainers: desand01
-  $modules/keycloak_user_rolemapping.py:
-    maintainers: bratwurzt
-  $modules/keycloak_realm_rolemapping.py:
-    maintainers: agross mhuysamen Gaetan2907
   $modules/keycloak_user_execute_actions_email.py:
     maintainers: mariusbertram
+  $modules/keycloak_user_federation.py:
+    maintainers: laurpaum
+  $modules/keycloak_user_rolemapping.py:
+    maintainers: bratwurzt
+  $modules/keycloak_userprofile.py:
+    maintainers: yeoldegrove
   $modules/keyring.py:
     maintainers: ahussey-redhat
   $modules/keyring_info.py:
@@ -1514,11 +1514,11 @@ files:
     ignore: matze
     labels: zypper
     maintainers: $team_suse
-  $plugin_utils/ansible_type.py:
-    maintainers: vbotka
   $modules/zypper_repository_info.py:
     labels: zypper
     maintainers: $team_suse TobiasZeuch181
+  $plugin_utils/ansible_type.py:
+    maintainers: vbotka
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
