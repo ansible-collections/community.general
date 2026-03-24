@@ -44,7 +44,7 @@ Finding the dependencies you need
 Every plugin that has external dependencies documents them in its ``requirements`` field.
 You can inspect those with ``ansible-doc``:
 
-.. code-block:: shell-session
+.. code-block:: shell
 
     $ ansible-doc -t lookup community.general.some_lookup | grep -A 10 "REQUIREMENTS"
 
@@ -78,7 +78,7 @@ Building a minimal EE with ansible-builder
 
 Install it with:
 
-.. code-block:: shell-session
+.. code-block:: shell
 
     $ pip install ansible-builder
 
@@ -106,7 +106,7 @@ that includes only the dependencies needed for the plugins you use:
 
 Then build the image:
 
-.. code-block:: shell-session
+.. code-block:: shell
 
     $ ansible-builder build -t my-custom-ee:latest
 
