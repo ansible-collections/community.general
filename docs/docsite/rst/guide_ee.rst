@@ -67,11 +67,6 @@ An inventory plugin backed by a REST API might list:
       - some-sdk
 
 These are the packages you need to add to your EE.
-
-For a more complete picture, you can also read the plugin's source code directly and look at its
-top-level ``import`` statements. The ``requirements`` field documents the intended public dependencies, but inspecting
-the imports reveals the exact Python packages that are actually used.
-
 Building a minimal EE with ansible-builder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
