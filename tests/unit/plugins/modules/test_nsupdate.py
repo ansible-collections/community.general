@@ -149,7 +149,7 @@ def test_resolve_server_fqdn(mocker: MockerFixture, run_module) -> None:
     MockResolver.return_value.resolve.side_effect = (
         lambda name, rdatatype: ["192.168.1.1"]
         if rdatatype == dns.rdatatype.A
-        else (_ for _ in ()).throw(dns.resolver.NoAnswer())
+        else (dummy for dummy in ()).throw(dns.resolver.NoAnswer())
     )
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
     mocker.patch("dns.query.tcp", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
