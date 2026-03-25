@@ -109,7 +109,6 @@ Then build the image:
 .. seealso::
 
     - `ansible-builder documentation <https://docs.ansible.com/projects/builder/en/latest/>`_
-    - `Ansible Execution Environments overview <https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html>`_
     - `Building EEs with ansible-builder <https://ansible-builder.readthedocs.io/en/latest/definition/>`_
     - `Issue #2968 — original request for EE requirements support <https://github.com/ansible-collections/community.general/issues/2968>`_
     - `Issue #4512 — design discussion for EE support in community.general <https://github.com/ansible-collections/community.general/issues/4512>`_
