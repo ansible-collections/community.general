@@ -15,7 +15,7 @@ short_description: Retrieve facts for a device using SNMP
 description:
   - Retrieve facts for a device using SNMP. The facts are inserted to the RV(ansible_facts) key.
 requirements:
-  - pysnmp < 6.2.4 - that version removed components used by this module.
+  - pysnmp >= 7.1
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.facts
@@ -189,16 +189,33 @@ ansible_facts:
         }
 """
 
+import asyncio
 import binascii
 from collections import defaultdict
+
+SNMP_DEFAULT_PORT = 161
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils import deps
 
-with deps.declare("pysnmp"):
-    from pysnmp.entity.rfc3413.oneliner import cmdgen
+with deps.declare("pysnmp", reason="pysnmp >= 7.1 is required", url="https://github.com/lextudio/pysnmp"):
+    from pysnmp.hlapi.v3arch.asyncio import (
+        CommunityData,
+        ContextData,
+        ObjectIdentity,
+        ObjectType,
+        SnmpEngine,
+        UdpTransportTarget,
+        UsmUserData,
+        get_cmd,
+        next_cmd,
+        USM_AUTH_HMAC96_MD5,
+        USM_AUTH_HMAC96_SHA,
+        USM_PRIV_CBC56_DES,
+        USM_PRIV_CFB128_AES,
+    )
     from pysnmp.proto.rfc1905 import EndOfMibView
 
 
@@ -298,7 +315,10 @@ def main():
 
     deps.validate(module)
 
-    cmdGen = cmdgen.CommandGenerator()
+    asyncio.run(_async_main(module, m_args))
+
+
+async def _async_main(module, m_args):
     transport_opts = {k: m_args[k] for k in ("timeout", "retries") if m_args[k] is not None}
 
     integrity_proto = None
@@ -308,26 +328,26 @@ def main():
             module.fail_json(msg="Privacy algorithm not set when using authPriv")
 
         if m_args["integrity"] == "sha":
-            integrity_proto = cmdgen.usmHMACSHAAuthProtocol
+            integrity_proto = USM_AUTH_HMAC96_SHA
         elif m_args["integrity"] == "md5":
-            integrity_proto = cmdgen.usmHMACMD5AuthProtocol
+            integrity_proto = USM_AUTH_HMAC96_MD5
 
         if m_args["privacy"] == "aes":
-            privacy_proto = cmdgen.usmAesCfb128Protocol
+            privacy_proto = USM_PRIV_CFB128_AES
         elif m_args["privacy"] == "des":
-            privacy_proto = cmdgen.usmDESPrivProtocol
+            privacy_proto = USM_PRIV_CBC56_DES
 
     # Use SNMP Version 2
     if m_args["version"] in ("v2", "v2c"):
-        snmp_auth = cmdgen.CommunityData(m_args["community"])
+        snmp_auth = CommunityData(m_args["community"])
 
     # Use SNMP Version 3 with authNoPriv
     elif m_args["level"] == "authNoPriv":
-        snmp_auth = cmdgen.UsmUserData(m_args["username"], authKey=m_args["authkey"], authProtocol=integrity_proto)
+        snmp_auth = UsmUserData(m_args["username"], authKey=m_args["authkey"], authProtocol=integrity_proto)
 
     # Use SNMP Version 3 with authPriv
     else:
-        snmp_auth = cmdgen.UsmUserData(
+        snmp_auth = UsmUserData(
             m_args["username"],
             authKey=m_args["authkey"],
             privKey=m_args["privkey"],
@@ -345,27 +365,20 @@ def main():
 
     results = Tree()
 
-    errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+    transport = await UdpTransportTarget.create((m_args["host"], SNMP_DEFAULT_PORT), **transport_opts)
+    snmpEngine = SnmpEngine()
+
+    errorIndication, errorStatus, errorIndex, varBinds = await get_cmd(
+        snmpEngine,
         snmp_auth,
-        cmdgen.UdpTransportTarget((m_args["host"], 161), **transport_opts),
-        cmdgen.MibVariable(
-            p.sysDescr,
-        ),
-        cmdgen.MibVariable(
-            p.sysObjectId,
-        ),
-        cmdgen.MibVariable(
-            p.sysUpTime,
-        ),
-        cmdgen.MibVariable(
-            p.sysContact,
-        ),
-        cmdgen.MibVariable(
-            p.sysName,
-        ),
-        cmdgen.MibVariable(
-            p.sysLocation,
-        ),
+        transport,
+        ContextData(),
+        ObjectType(ObjectIdentity(p.sysDescr)),
+        ObjectType(ObjectIdentity(p.sysObjectId)),
+        ObjectType(ObjectIdentity(p.sysUpTime)),
+        ObjectType(ObjectIdentity(p.sysContact)),
+        ObjectType(ObjectIdentity(p.sysName)),
+        ObjectType(ObjectIdentity(p.sysLocation)),
         lookupMib=False,
     )
 
@@ -388,47 +401,49 @@ def main():
         elif current_oid == v.sysLocation:
             results["ansible_syslocation"] = current_val
 
-    errorIndication, errorStatus, errorIndex, varTable = cmdGen.nextCmd(
-        snmp_auth,
-        cmdgen.UdpTransportTarget((m_args["host"], 161), **transport_opts),
-        cmdgen.MibVariable(
-            p.ifIndex,
-        ),
-        cmdgen.MibVariable(
-            p.ifDescr,
-        ),
-        cmdgen.MibVariable(
-            p.ifMtu,
-        ),
-        cmdgen.MibVariable(
-            p.ifSpeed,
-        ),
-        cmdgen.MibVariable(
-            p.ifPhysAddress,
-        ),
-        cmdgen.MibVariable(
-            p.ifAdminStatus,
-        ),
-        cmdgen.MibVariable(
-            p.ifOperStatus,
-        ),
-        cmdgen.MibVariable(
-            p.ipAdEntAddr,
-        ),
-        cmdgen.MibVariable(
-            p.ipAdEntIfIndex,
-        ),
-        cmdgen.MibVariable(
-            p.ipAdEntNetMask,
-        ),
-        cmdgen.MibVariable(
-            p.ifAlias,
-        ),
-        lookupMib=False,
-    )
+    oids = [
+        ObjectType(ObjectIdentity(p.ifIndex)),
+        ObjectType(ObjectIdentity(p.ifDescr)),
+        ObjectType(ObjectIdentity(p.ifMtu)),
+        ObjectType(ObjectIdentity(p.ifSpeed)),
+        ObjectType(ObjectIdentity(p.ifPhysAddress)),
+        ObjectType(ObjectIdentity(p.ifAdminStatus)),
+        ObjectType(ObjectIdentity(p.ifOperStatus)),
+        ObjectType(ObjectIdentity(p.ipAdEntAddr)),
+        ObjectType(ObjectIdentity(p.ipAdEntIfIndex)),
+        ObjectType(ObjectIdentity(p.ipAdEntNetMask)),
+        ObjectType(ObjectIdentity(p.ifAlias)),
+    ]
+    base_oids = [v.ifIndex, v.ifDescr, v.ifMtu, v.ifSpeed, v.ifPhysAddress,
+                 v.ifAdminStatus, v.ifOperStatus, v.ipAdEntAddr, v.ipAdEntIfIndex,
+                 v.ipAdEntNetMask, v.ifAlias]
 
-    if errorIndication:
-        module.fail_json(msg=str(errorIndication))
+    varTable = []
+    while True:
+        errorIndication, errorStatus, errorIndex, varBinds = await next_cmd(
+            snmpEngine,
+            snmp_auth,
+            transport,
+            ContextData(),
+            *oids,
+            lookupMib=False,
+        )
+
+        if errorIndication:
+            module.fail_json(msg=str(errorIndication))
+
+        if errorStatus:
+            break
+
+        # Stop when all OIDs have left their base subtree or hit EndOfMibView
+        if all(
+            isinstance(vb[1], EndOfMibView) or not vb[0].prettyPrint().startswith(base + ".")
+            for vb, base in zip(varBinds, base_oids)
+        ):
+            break
+
+        varTable.append(varBinds)
+        oids = varBinds
 
     interface_indexes = []
 
