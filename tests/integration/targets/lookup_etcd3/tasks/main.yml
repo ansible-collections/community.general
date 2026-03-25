@@ -5,12 +5,12 @@
 ####################################################################
 
 # lookup_etcd3 integration tests
-# Copyright 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
+# Copyright (c) 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: put key/values with an etcd prefix
-  etcd3:
+- name: Put key/values with an etcd prefix
+  community.general.etcd3:
     key: "{{ etcd3_prefix }}foo{{ item }}"
     value: "bar{{ item }}"
     state: present
@@ -19,10 +19,11 @@
     - 2
     - 3
 
-- name: put a single key/values in etcd
-  etcd3:
+- name: Put a single key/value in etcd
+  community.general.etcd3:
     key: "{{ etcd3_singlekey }}"
     value: "foobar"
     state: present
 
-- import_tasks: tests.yml
+- name: Import lookup tests
+  ansible.builtin.import_tasks: tests.yml

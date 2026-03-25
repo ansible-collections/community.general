@@ -4,6 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 set -eux
 
+# The etcd3 Python library uses protobuf-generated code that is incompatible
+# with protobuf >= 4.x unless the pure-Python implementation is selected.
+# This must be set in the controller process so that lookup plugins are affected.
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+
 ANSIBLE_ROLES_PATH=../ \
     ansible-playbook dependencies.yml -v "$@"
 
