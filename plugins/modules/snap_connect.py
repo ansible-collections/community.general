@@ -120,13 +120,7 @@ class SnapConnect(StateModuleHelper):
             for line in out.splitlines()[1:]:
                 match = self._RE_CONNECTIONS.match(line.strip())
                 if match:
-                    connections.append(
-                        dict(
-                            interface=match.group("interface"),
-                            plug=match.group("plug"),
-                            slot=match.group("slot"),
-                        )
-                    )
+                    connections.append(match.groupdict())
             return connections
 
         with self.runner("_connections", output_process=process) as ctx:
