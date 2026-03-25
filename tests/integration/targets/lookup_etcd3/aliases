@@ -4,9 +4,7 @@
 
 azp/posix/1
 destructive
-needs/file/tests/utils/constraints.txt
 needs/target/setup_etcd3
 skip/osx
 skip/macos
 skip/freebsd
-disabled  # see https://github.com/ansible-collections/community.general/issues/322
