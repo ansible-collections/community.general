@@ -1,0 +1,3 @@
+minor_changes:
+  - pacman - add ``root``, ``cachedir``, and ``config`` options to support installing packages into an alternative root directory
+    (https://github.com/ansible-collections/community.general/issues/438, https://github.com/ansible-collections/community.general/pull/11681).
