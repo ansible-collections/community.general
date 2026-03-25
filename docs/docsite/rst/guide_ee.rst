@@ -8,7 +8,7 @@
 Execution Environment Guide
 ===========================
 
-`Ansible Execution Environments <https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html>`_
+`Ansible Execution Environments <https://docs.ansible.com/projects/ansible/latest/getting_started_ee/index.html>`_
 (EEs) are container images that bundle ansible-core, collections, and their Python and system dependencies.
 They are the standard runtime for Red Hat Ansible Automation Platform and AWX, replacing the older virtualenv model.
 They can also be used outside of RHAAP and AWX by using `ansible-navigator <https://docs.ansible.com/projects/navigator/>`__, or by using ansible-runner directly.
@@ -67,6 +67,7 @@ An inventory plugin backed by a REST API might list:
       - some-sdk
 
 These are the packages you need to add to your EE.
+
 Building a minimal EE with ansible-builder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -107,7 +108,7 @@ Then build the image:
 
 .. seealso::
 
-    - `ansible-builder documentation <https://ansible-builder.readthedocs.io/>`_
+    - `ansible-builder documentation <https://docs.ansible.com/projects/builder/en/latest/>`_
     - `Ansible Execution Environments overview <https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html>`_
     - `Building EEs with ansible-builder <https://ansible-builder.readthedocs.io/en/latest/definition/>`_
     - `Issue #2968 — original request for EE requirements support <https://github.com/ansible-collections/community.general/issues/2968>`_
