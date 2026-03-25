@@ -60,6 +60,24 @@ EXAMPLES = r"""
   become: true
   community.general.timezone:
     name: Asia/Tokyo
+
+  - name: Set timezone to Asia/Kolkata
+  community.general.timezone:
+    name: Asia/Kolkata
+
+- name: Set timezone to UTC
+  community.general.timezone:
+    name: UTC
+
+- name: Ensure timezone is Europe/London
+  community.general.timezone:
+    name: Europe/London
+    state: present
+    
+  - name: Set timezone dynamically using a variable
+  community.general.timezone:
+    name: "{{ system_timezone }}"
+  
 """
 
 import errno
