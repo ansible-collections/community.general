@@ -7,4 +7,3 @@ destructive
 skip/osx
 skip/macos
 skip/freebsd
-disabled  # see https://github.com/ansible-collections/community.general/issues/322
