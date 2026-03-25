@@ -76,6 +76,26 @@ options:
     default: ''
     type: str
 
+  root:
+    description:
+      - An alternative installation root directory, passed as C(--root) to all pacman commands.
+      - Useful for installing packages into a chroot or a new system root, similarly to how C(pacstrap) works.
+    type: path
+    version_added: 12.6.0
+
+  cachedir:
+    description:
+      - An alternative package cache directory, passed as C(--cachedir) to all pacman commands.
+      - Only used when O(root) is also specified.
+    type: path
+    version_added: 12.6.0
+
+  config:
+    description:
+      - Path to an alternative pacman configuration file, passed as C(--config) to all pacman commands.
+    type: path
+    version_added: 12.6.0
+
   update_cache:
     description:
       - Whether or not to refresh the master package lists.
@@ -239,6 +259,18 @@ EXAMPLES = r"""
     state: present
     reason: explicit
     reason_for: all
+
+- name: Install packages into a new root (similar to pacstrap)
+  community.general.pacman:
+    name:
+      - base
+      - base-devel
+      - python
+    state: present
+    root: /mnt
+    cachedir: /mnt/var/cache/pacman/pkg
+    config: /path/to/another/pacman.conf
+    update_cache: true
 """
 
 import re
@@ -281,6 +313,14 @@ class Pacman:
         self.exit_params = {}
 
         self.pacman_path = self.m.get_bin_path(p["executable"], True)
+
+        self.pacman_cmd = [self.pacman_path]
+        if p["config"]:
+            self.pacman_cmd += ["--config", p["config"]]
+        if p["root"]:
+            self.pacman_cmd += ["--root", p["root"]]
+            if p["cachedir"]:
+                self.pacman_cmd += ["--cachedir", p["cachedir"]]
 
         self._cached_database = None
 
@@ -375,8 +415,7 @@ class Pacman:
             self.add_exit_infos("package(s) already installed")
             return
 
-        cmd_base = [
-            self.pacman_path,
+        cmd_base = self.pacman_cmd + [
             "--noconfirm",
             "--noprogressbar",
             "--needed",
@@ -469,7 +508,7 @@ class Pacman:
 
         # set reason
         if pkgs_to_set_reason:
-            cmd = [self.pacman_path, "--noconfirm", "--database"]
+            cmd = self.pacman_cmd + ["--noconfirm", "--database"]
             if self.m.params["reason"] == "dependency":
                 cmd.append("--asdeps")
             else:
@@ -496,7 +535,7 @@ class Pacman:
         # There's something to do, set this in advance
         self.changed = True
 
-        cmd_base = [self.pacman_path, "--remove", "--noconfirm", "--noprogressbar"]
+        cmd_base = self.pacman_cmd + ["--remove", "--noconfirm", "--noprogressbar"]
         cmd_base += self.m.params["extra_args"]
         cmd_base += ["--nodeps", "--nodeps"] if self.m.params["force"] else []
         # nosave_args conflicts with --print-format. Added later.
@@ -554,8 +593,7 @@ class Pacman:
         if self.m.check_mode:
             self.add_exit_infos(f"{len(self.inventory['upgradable_pkgs'])} packages would have been upgraded")
         else:
-            cmd = [
-                self.pacman_path,
+            cmd = self.pacman_cmd + [
                 "--sync",
                 "--sysupgrade",
                 "--quiet",
@@ -573,7 +611,7 @@ class Pacman:
     def _list_database(self):
         """runs pacman --sync --list with some caching"""
         if self._cached_database is None:
-            dummy, packages, dummy = self.m.run_command([self.pacman_path, "--sync", "--list"], check_rc=True)
+            dummy, packages, dummy = self.m.run_command(self.pacman_cmd + ["--sync", "--list"], check_rc=True)
             self._cached_database = packages.splitlines()
         return self._cached_database
 
@@ -589,8 +627,7 @@ class Pacman:
             self.exit_params["cache_updated"] = True
             return
 
-        cmd = [
-            self.pacman_path,
+        cmd = self.pacman_cmd + [
             "--sync",
             "--refresh",
         ]
@@ -646,11 +683,11 @@ class Pacman:
                 # pkg is possibly in the <repo>/<pkgname> format, or a filename or a URL
 
                 # Start with <repo>/<pkgname> case
-                cmd = [self.pacman_path, "--sync", "--print-format", "%n", pkg]
+                cmd = self.pacman_cmd + ["--sync", "--print-format", "%n", pkg]
                 rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
                 if rc != 0:
                     # fallback to filename / URL
-                    cmd = [self.pacman_path, "--upgrade", "--print-format", "%n", pkg]
+                    cmd = self.pacman_cmd + ["--upgrade", "--print-format", "%n", pkg]
                     rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
                     if rc != 0:
                         if self.target_state == "absent":
@@ -688,7 +725,7 @@ class Pacman:
         """
 
         installed_pkgs = {}
-        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query"], check_rc=True)
+        dummy, stdout, dummy = self.m.run_command(self.pacman_cmd + ["--query"], check_rc=True)
         # Format of a line: "pacman 6.0.1-2"
         query_re = re.compile(r"^\s*(?P<pkg>\S+)\s+(?P<ver>\S+)\s*$")
         for l in stdout.splitlines():
@@ -699,7 +736,7 @@ class Pacman:
             installed_pkgs[pkg] = ver
 
         installed_groups = defaultdict(set)
-        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query", "--groups"], check_rc=True)
+        dummy, stdout, dummy = self.m.run_command(self.pacman_cmd + ["--query", "--groups"], check_rc=True)
         # Format of lines:
         #     base-devel file
         #     base-devel findutils
@@ -723,7 +760,7 @@ class Pacman:
             available_pkgs[pkg] = ver
 
         available_groups = defaultdict(set)
-        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--sync", "--groups", "--groups"], check_rc=True)
+        dummy, stdout, dummy = self.m.run_command(self.pacman_cmd + ["--sync", "--groups", "--groups"], check_rc=True)
         # Format of lines:
         #     vim-plugins vim-airline
         #     vim-plugins vim-airline-themes
@@ -738,7 +775,7 @@ class Pacman:
             available_groups[group].add(pkg)
 
         upgradable_pkgs = {}
-        rc, stdout, stderr = self.m.run_command([self.pacman_path, "--query", "--upgrades"], check_rc=False)
+        rc, stdout, stderr = self.m.run_command(self.pacman_cmd + ["--query", "--upgrades"], check_rc=False)
 
         stdout = stdout.splitlines()
         if stdout and "Avoid running" in stdout[0]:
@@ -777,7 +814,7 @@ class Pacman:
             )
 
         pkg_reasons = {}
-        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query", "--explicit"], check_rc=True)
+        dummy, stdout, dummy = self.m.run_command(self.pacman_cmd + ["--query", "--explicit"], check_rc=True)
         # Format of a line: "pacman 6.0.1-2"
         for l in stdout.splitlines():
             l = l.strip()
@@ -785,7 +822,7 @@ class Pacman:
                 continue
             pkg = l.split()[0]
             pkg_reasons[pkg] = "explicit"
-        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query", "--deps"], check_rc=True)
+        dummy, stdout, dummy = self.m.run_command(self.pacman_cmd + ["--query", "--deps"], check_rc=True)
         # Format of a line: "pacman 6.0.1-2"
         for l in stdout.splitlines():
             l = l.strip()
@@ -817,6 +854,9 @@ def setup_module():
             remove_nosave=dict(type="bool", default=False),
             executable=dict(type="str", default="pacman"),
             extra_args=dict(type="str", default=""),
+            root=dict(type="path"),
+            cachedir=dict(type="path"),
+            config=dict(type="path"),
             upgrade=dict(type="bool"),
             upgrade_extra_args=dict(type="str", default=""),
             update_cache=dict(type="bool"),
