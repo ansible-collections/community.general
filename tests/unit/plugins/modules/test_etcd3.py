@@ -50,9 +50,8 @@ def test_present_new_key(capfd, fake_etcd3):
     """state=present with a new key: should put and report changed."""
     mock_client = make_client(fake_etcd3, existing_value=None)
 
-    with set_module_args(BASE_ARGS):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(BASE_ARGS):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -65,9 +64,8 @@ def test_present_same_value(capfd, fake_etcd3):
     """state=present with existing key and same value: no change."""
     mock_client = make_client(fake_etcd3, existing_value="bar")
 
-    with set_module_args(BASE_ARGS):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(BASE_ARGS):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -80,9 +78,8 @@ def test_present_different_value(capfd, fake_etcd3):
     """state=present with existing key and different value: should put and report changed."""
     mock_client = make_client(fake_etcd3, existing_value="old_value")
 
-    with set_module_args(BASE_ARGS):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(BASE_ARGS):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -100,9 +97,8 @@ def test_absent_existing_key(capfd, fake_etcd3):
     """state=absent with existing key: should delete and report changed."""
     mock_client = make_client(fake_etcd3, existing_value="bar")
 
-    with set_module_args(dict(BASE_ARGS, state="absent")):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(dict(BASE_ARGS, state="absent")):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -114,9 +110,8 @@ def test_absent_nonexistent_key(capfd, fake_etcd3):
     """state=absent with key not present: no change."""
     mock_client = make_client(fake_etcd3, existing_value=None)
 
-    with set_module_args(dict(BASE_ARGS, state="absent")):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(dict(BASE_ARGS, state="absent")):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -133,9 +128,8 @@ def test_present_check_mode_new_key(capfd, fake_etcd3):
     """state=present in check mode with new key: reports changed but no actual put."""
     mock_client = make_client(fake_etcd3, existing_value=None)
 
-    with set_module_args(dict(BASE_ARGS, _ansible_check_mode=True)):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(dict(BASE_ARGS, _ansible_check_mode=True)):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -147,9 +141,8 @@ def test_present_check_mode_same_value(capfd, fake_etcd3):
     """state=present in check mode with same value: no change, no put."""
     mock_client = make_client(fake_etcd3, existing_value="bar")
 
-    with set_module_args(dict(BASE_ARGS, _ansible_check_mode=True)):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(dict(BASE_ARGS, _ansible_check_mode=True)):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -161,9 +154,8 @@ def test_absent_check_mode_existing_key(capfd, fake_etcd3):
     """state=absent in check mode with existing key: reports changed but no actual delete."""
     mock_client = make_client(fake_etcd3, existing_value="bar")
 
-    with set_module_args(dict(BASE_ARGS, state="absent", _ansible_check_mode=True)):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(dict(BASE_ARGS, state="absent", _ansible_check_mode=True)):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -175,9 +167,8 @@ def test_absent_check_mode_nonexistent_key(capfd, fake_etcd3):
     """state=absent in check mode with missing key: no change, no delete."""
     mock_client = make_client(fake_etcd3, existing_value=None)
 
-    with set_module_args(dict(BASE_ARGS, state="absent", _ansible_check_mode=True)):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(dict(BASE_ARGS, state="absent", _ansible_check_mode=True)):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -194,9 +185,8 @@ def test_connection_failure(capfd, fake_etcd3):
     """Connection to etcd cluster fails: module should fail."""
     fake_etcd3.client.side_effect = Exception("connection refused")
 
-    with set_module_args(BASE_ARGS):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(BASE_ARGS):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -210,9 +200,8 @@ def test_get_failure(capfd, fake_etcd3):
     mock_client.get.side_effect = Exception("read timeout")
     fake_etcd3.client.return_value = mock_client
 
-    with set_module_args(BASE_ARGS):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(BASE_ARGS):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
@@ -224,9 +213,8 @@ def test_missing_library(capfd, mocker):
     """etcd3 library not installed: module should fail."""
     mocker.patch.object(etcd3_module, "HAS_ETCD", False)
 
-    with set_module_args(BASE_ARGS):
-        with pytest.raises(SystemExit):
-            etcd3_module.main()
+    with pytest.raises(SystemExit), set_module_args(BASE_ARGS):
+        etcd3_module.main()
 
     out, dummy = capfd.readouterr()
     result = json.loads(out)
