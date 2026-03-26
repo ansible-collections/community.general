@@ -13,8 +13,8 @@
       include_role:
         name: setup_epel
       when:
-        - ansible_facts.distribution == 'RedHat'
-        - ansible_facts.distribution_major_version is version('11', '<')
+        - ansible_facts.distribution in ['RedHat', 'CentOS']
+        - ansible_facts.distribution_major_version is version('9', '<')
 
     - name: create required directories
       become: true

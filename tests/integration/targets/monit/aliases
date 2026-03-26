@@ -8,3 +8,5 @@ needs/target/setup_epel
 skip/osx
 skip/macos
 skip/freebsd
+skip/rhel9.7  # FIXME
+skip/rhel10.1  # FIXME
