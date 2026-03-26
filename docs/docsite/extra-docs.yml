@@ -8,6 +8,9 @@ sections:
     toctree:
       - filter_guide
       - test_guide
+  - title: Deployment Guides
+    toctree:
+      - guide_ee
   - title: Technology Guides
     toctree:
       - guide_alicloud
