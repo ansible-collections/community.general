@@ -1570,6 +1570,8 @@ files:
     maintainers: russoz
   docs/docsite/rst/guide_deps.rst:
     maintainers: russoz
+  docs/docsite/rst/guide_ee.rst:
+    maintainers: russoz
   docs/docsite/rst/guide_iocage.rst:
     maintainers: russoz felixfontein
   docs/docsite/rst/guide_iocage_inventory.rst:
