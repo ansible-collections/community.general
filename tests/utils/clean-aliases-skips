@@ -11,14 +11,13 @@ from pathlib import Path
 def sanitize(filepath, remotes_re):
     with open(filepath) as fileread:
         lines = fileread.readlines()
-    changed = False
 
+    changed = False
     out_lines = []
     for ll in lines:
         if not ll.startswith("skip/") or any(r.match(ll) for r in remotes_re):
             out_lines.append(ll)
             continue
-
         changed = True
 
     if changed:
