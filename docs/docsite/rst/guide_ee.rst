@@ -71,7 +71,7 @@ These are the packages you need to add to your EE.
 Building a minimal EE with ansible-builder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`ansible-builder <https://ansible-builder.readthedocs.io/>`_ is the standard tool for creating EEs.
+`ansible-builder <https://docs.ansible.com/projects/builder/en/latest/>`_ is the standard tool for creating EEs.
 
 Install it with:
 
