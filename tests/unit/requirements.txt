@@ -31,6 +31,9 @@ datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
 dnsimple >= 2 ; python_version >= '3.6'
 dataclasses ; python_version == '3.6'
 
+# requirement for the nsupdate module
+dnspython
+
 # requirement for the opentelemetry callback plugin
 # WARNING: these libraries rely on Protobuf for Python, which regularly stops installing.
 #          That's why they are disabled for now.
