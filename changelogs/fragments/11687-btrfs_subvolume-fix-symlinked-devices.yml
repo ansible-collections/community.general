@@ -1,0 +1,3 @@
+bugfixes:
+  - btrfs_subvolume - devices that are symlinked (i.e. when using LUKS) were not found and lead to an error (https://github.com/ansible-collections/community.general/pull/11687)
+  
