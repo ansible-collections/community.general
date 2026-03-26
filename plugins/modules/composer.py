@@ -98,6 +98,14 @@ options:
         these.
     default: false
     type: bool
+  force:
+    description:
+      - When O(command) is V(create-project), the module checks whether a V(composer.json) already
+        exists in O(working_dir) and skips the command if it does, making the task idempotent.
+      - Set to V(true) to always run the command regardless.
+    default: false
+    type: bool
+    version_added: 12.6.0
   composer_executable:
     type: path
     description:
@@ -139,6 +147,7 @@ EXAMPLES = r"""
     arguments: my/package
 """
 
+import os
 import re
 import shlex
 
@@ -212,6 +221,7 @@ def main():
             optimize_autoloader=dict(default=True, type="bool"),
             classmap_authoritative=dict(default=False, type="bool"),
             ignore_platform_reqs=dict(default=False, type="bool"),
+            force=dict(default=False, type="bool"),
             composer_executable=dict(type="path"),
         ),
         required_if=[("global_command", False, ["working_dir"])],
@@ -256,6 +266,12 @@ def main():
         if module.params.get(param) and option in available_options:
             option = f"--{option}"
             options.append(option)
+
+    working_dir = module.params["working_dir"]
+
+    if command == "create-project" and not module.params["force"]:
+        if working_dir and os.path.exists(os.path.join(working_dir, "composer.json")):
+            module.exit_json(changed=False, msg="composer.json already exists in working_dir, skipping create-project")
 
     if module.check_mode:
         if "dry-run" in available_options:

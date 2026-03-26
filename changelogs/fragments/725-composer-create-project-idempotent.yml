@@ -1,0 +1,5 @@
+minor_changes:
+  - composer - add ``force`` parameter; when ``command=create-project``, the module now checks
+    whether a ``composer.json`` already exists in ``working_dir`` and skips the command if so,
+    making the task idempotent. Set ``force=true`` to always run the command regardless
+    (https://github.com/ansible-collections/community.general/issues/725).
