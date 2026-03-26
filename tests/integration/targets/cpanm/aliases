@@ -5,5 +5,4 @@
 azp/posix/3
 destructive
 skip/macos
-skip/osx
 skip/freebsd

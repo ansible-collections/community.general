@@ -5,5 +5,4 @@
 azp/posix/1
 needs/root
 skip/docker
-skip/osx
 skip/rhel
