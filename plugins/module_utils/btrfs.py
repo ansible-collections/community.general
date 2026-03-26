@@ -146,7 +146,7 @@ class BtrfsInfoProvider:
     def __filter_mountpoints_for_devices(
         self, mountpoints: list[dict[str, t.Any]], devices: list[str]
     ) -> list[dict[str, t.Any]]:
-        return [m for m in mountpoints if bool(set(m["devices"]).intersection(devices))]
+        return [m for m in mountpoints if set(m["devices"]).intersection(devices)]
 
     def __find_mountpoints(self) -> list[dict[str, t.Any]]:
         command = [self.__findmnt_path, "-t", "btrfs", "-nvP", "--output", "TARGET,SOURCES,OPTIONS"]
