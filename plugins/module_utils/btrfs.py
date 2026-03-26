@@ -146,10 +146,10 @@ class BtrfsInfoProvider:
     def __filter_mountpoints_for_devices(
         self, mountpoints: list[dict[str, t.Any]], devices: list[str]
     ) -> list[dict[str, t.Any]]:
-        return [m for m in mountpoints if (m["device"] in devices)]
+        return [m for m in mountpoints if bool(set(m["devices"]).intersection(devices))]
 
     def __find_mountpoints(self) -> list[dict[str, t.Any]]:
-        command = [self.__findmnt_path, "-t", "btrfs", "-nvP"]
+        command = [self.__findmnt_path, "-t", "btrfs", "-nvP", "--output", "TARGET,SOURCES,OPTIONS"]
         result = self.__module.run_command(command)
         mountpoints = []
         if result[0] == 0:
@@ -161,15 +161,16 @@ class BtrfsInfoProvider:
 
     def __parse_mountpoint_pairs(self, line) -> dict[str, t.Any]:
         pattern = re.compile(
-            r'^TARGET="(?P<target>.*)"\s+SOURCE="(?P<source>.*)"\s+FSTYPE="(?P<fstype>.*)"\s+OPTIONS="(?P<options>.*)"\s*$'
+            r'^TARGET="(?P<target>.*)"\s+SOURCES="(?P<sources>.*)"\s+OPTIONS="(?P<options>.*)"\s*$'
         )
         match = pattern.search(line)
         if match is not None:
             groups = match.groupdict()
 
+            # when devices are symlinked (e.g. LUKS), the devices are separated by encoded newlines (\x0a)
             return {
                 "mountpoint": groups["target"],
-                "device": groups["source"],
+                "devices": groups["sources"].split("\\x0a"),
                 "subvolid": self.__extract_mount_subvolid(groups["options"]),
             }
         else:
