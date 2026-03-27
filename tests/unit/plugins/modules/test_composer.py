@@ -9,6 +9,17 @@ from __future__ import annotations
 
 from ansible_collections.community.general.plugins.modules import composer
 
-from .uthelper import RunCommandMock, UTHelper
+from .uthelper import RunCommandMock, TestCaseMock, UTHelper
 
-UTHelper.from_module(composer, __name__, mocks=[RunCommandMock])
+
+class OsPathExistsMock(TestCaseMock):
+    name = "os_path_exists"
+
+    def setup(self, mocker):
+        mocker.patch("os.path.exists", return_value=self.mock_specs.get("return_value", False))
+
+    def check(self, test_case, results):
+        pass
+
+
+UTHelper.from_module(composer, __name__, mocks=[RunCommandMock, OsPathExistsMock])
