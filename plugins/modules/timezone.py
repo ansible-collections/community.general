@@ -60,6 +60,11 @@ EXAMPLES = r"""
   become: true
   community.general.timezone:
     name: Asia/Tokyo
+
+- name: Set timezone and hardware clock to UTC
+  community.general.timezone:
+    name: UTC
+    hwclock: UTC
 """
 
 import errno
