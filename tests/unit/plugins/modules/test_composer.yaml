@@ -3,6 +3,25 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  help_install: &help_install
+    command: ["/testbin/php", "/testbin/composer", "help", "install", "--working-dir", "/var/www/foo", "--no-interaction", "--format=json"]
+    rc: 0
+    out: |
+      {"definition": {"options": ["a", "b", "c"]}}
+    err: ''
+  help_create_project: &help_create_project
+    command: ["/testbin/php", "/testbin/composer", "help", "create-project", "--working-dir", "/var/www/foo", "--no-interaction", "--format=json"]
+    rc: 0
+    out: |
+      {"definition": {"options": ["a", "b", "c"]}}
+    err: ''
+  run_create_project: &run_create_project
+    command: ["/testbin/php", "/testbin/composer", "create-project", "--working-dir", "/var/www/foo", "vendor/package"]
+    rc: 0
+    out: ''
+    err: ''
+
 test_cases:
   - id: composer
     input:
@@ -12,12 +31,50 @@ test_cases:
       changed: true
     mocks:
       run_command:
-        - command: ["/testbin/php", "/testbin/composer", "help", "install", "--working-dir", "/var/www/foo", "--no-interaction", "--format=json"]
-          rc: 0
-          out: |
-            {"definition": {"options": ["a", "b", "c"]}}
-          err: ''
+        - *help_install
         - command: ["/testbin/php", "/testbin/composer", "install", "--working-dir", "/var/www/foo"]
           rc: 0
           out: ''
           err: ''
+
+  - id: create_project_runs
+    input:
+      command: create-project
+      arguments: "vendor/package"
+      working_dir: "/var/www/foo"
+    output:
+      changed: true
+    mocks:
+      os_path_exists:
+        return_value: false
+      run_command:
+        - *help_create_project
+        - *run_create_project
+
+  - id: create_project_skips_when_exists
+    input:
+      command: create-project
+      arguments: "vendor/package"
+      working_dir: "/var/www/foo"
+    output:
+      changed: false
+    mocks:
+      os_path_exists:
+        return_value: true
+      run_command:
+        - *help_create_project
+
+  - id: create_project_force
+    input:
+      command: create-project
+      arguments: "vendor/package"
+      working_dir: "/var/www/foo"
+      force: true
+    output:
+      changed: true
+    mocks:
+      os_path_exists:
+        return_value: true
+      run_command:
+        - *help_create_project
+        - *run_create_project
