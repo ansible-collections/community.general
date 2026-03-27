@@ -203,6 +203,10 @@ from ansible_collections.community.general.plugins.module_utils import deps
 HAS_PYSNMP_7 = False
 try:
     from pysnmp.hlapi.v3arch.asyncio import (
+        USM_AUTH_HMAC96_MD5,
+        USM_AUTH_HMAC96_SHA,
+        USM_PRIV_CBC56_DES,
+        USM_PRIV_CFB128_AES,
         CommunityData,
         ContextData,
         ObjectIdentity,
@@ -212,10 +216,6 @@ try:
         UsmUserData,
         get_cmd,
         next_cmd,
-        USM_AUTH_HMAC96_MD5,
-        USM_AUTH_HMAC96_SHA,
-        USM_PRIV_CBC56_DES,
-        USM_PRIV_CFB128_AES,
     )
     from pysnmp.proto.rfc1905 import EndOfMibView
 
