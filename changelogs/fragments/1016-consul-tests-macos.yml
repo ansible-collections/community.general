@@ -1,4 +1,4 @@
 bugfixes:
   - consul integration tests - add C(arm64)/C(aarch64) architecture support, fix macOS Gatekeeper
     quarantine on downloaded binary, add wait for Consul HTTP API before ACL bootstrap, and update
-    Consul to v1.22.6 (https://github.com/ansible-collections/community.general/issues/1016).
+    Consul to v1.22.6 (https://github.com/ansible-collections/community.general/pull/11697).
