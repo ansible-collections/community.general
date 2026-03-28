@@ -193,8 +193,6 @@ import asyncio
 import binascii
 from collections import defaultdict
 
-SNMP_DEFAULT_PORT = 161
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
 
@@ -227,6 +225,8 @@ if not HAS_PYSNMP_7:
     with deps.declare("pysnmp", url="https://pypi.org/project/pysnmp/"):
         from pysnmp.entity.rfc3413.oneliner import cmdgen
         from pysnmp.proto.rfc1905 import EndOfMibView
+
+SNMP_DEFAULT_PORT = 161
 
 
 class DefineOid:
