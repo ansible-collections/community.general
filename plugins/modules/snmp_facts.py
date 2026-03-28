@@ -201,8 +201,7 @@ from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils import deps
 
-HAS_PYSNMP_7 = False
-try:
+with deps.declare("pysnmp", url="https://pypi.org/project/pysnmp/"):
     from pysnmp.hlapi.v3arch.asyncio import (
         USM_AUTH_HMAC96_MD5,
         USM_AUTH_HMAC96_SHA,
@@ -220,14 +219,9 @@ try:
     )
     from pysnmp.proto.rfc1905 import EndOfMibView
 
-    HAS_PYSNMP_7 = True
-except ImportError:
-    pass
-
-if not HAS_PYSNMP_7:
-    with deps.declare("pysnmp", url="https://pypi.org/project/pysnmp/"):
-        from pysnmp.entity.rfc3413.oneliner import cmdgen
-        from pysnmp.proto.rfc1905 import EndOfMibView
+with deps.declare("pysnmp6", url="https://pypi.org/project/pysnmp/"):
+    from pysnmp.entity.rfc3413.oneliner import cmdgen
+    from pysnmp.proto.rfc1905 import EndOfMibView
 
 SNMP_DEFAULT_PORT = 161
 
@@ -326,10 +320,10 @@ def main():
 
     m_args = module.params
 
-    if HAS_PYSNMP_7:
+    if not deps.failed("pysnmp"):
         return asyncio.run(_async_main(module, m_args))
 
-    deps.validate(module)
+    deps.validate(module, "pysnmp6")
 
     cmdGen = cmdgen.CommandGenerator()
     transport_opts = {k: m_args[k] for k in ("timeout", "retries") if m_args[k] is not None}
