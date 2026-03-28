@@ -1,0 +1,5 @@
+bugfixes:
+  - xenserver_guest - fix an issue where booting from ISO is not possible
+    because CD-ROM device is placed in position above number 3. Position
+    number 3 is now reserved for CD-ROM device and cannot be occupied by
+    a disk.
