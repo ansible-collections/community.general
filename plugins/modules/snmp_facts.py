@@ -83,6 +83,8 @@ options:
       - Maximum number of request retries, 0 retries means just a single request.
     type: int
     version_added: 2.3.0
+notes:
+  - Upgrading to pysnmp 7.1+ is recommended. Support for pysnmp 6.2 will be deprecated.
 """
 
 EXAMPLES = r"""
