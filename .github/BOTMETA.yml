@@ -646,6 +646,8 @@ files:
     maintainers: konstruktoid
   $modules/github_secrets_info.py:
     maintainers: konstruktoid
+  $modules/github_team_members.py:
+    maintainers: john-westcott-iv
   $modules/gitlab_:
     keywords: gitlab source_control
     maintainers: $team_gitlab
