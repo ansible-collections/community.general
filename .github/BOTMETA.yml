@@ -638,6 +638,8 @@ files:
     ignore: erydo
     labels: github_key
     maintainers: erydo
+  $modules/github_label.py:
+    maintainers: john-westcott-iv
   $modules/github_release.py:
     maintainers: adrianmoisey
   $modules/github_repo.py:
