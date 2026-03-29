@@ -1,0 +1,2 @@
+minor_changes:
+  - github_repo - add parameters for managing wiki, projects, discussions, issues, merge strategies, auto-merge, branch deletion, commit title/message defaults, homepage, and topics (https://github.com/ansible-collections/community.general/pull/XXXX).

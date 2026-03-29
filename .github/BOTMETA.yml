@@ -630,6 +630,8 @@ files:
     maintainers: guenhter
   $modules/github_:
     maintainers: stpierre
+  $modules/github_branch_protection.py:
+    maintainers: john-westcott-iv
   $modules/github_deploy_key.py:
     maintainers: bincyber
   $modules/github_issue.py:
@@ -638,14 +640,22 @@ files:
     ignore: erydo
     labels: github_key
     maintainers: erydo
+  $modules/github_label.py:
+    maintainers: john-westcott-iv
   $modules/github_release.py:
     maintainers: adrianmoisey
   $modules/github_repo.py:
-    maintainers: atorrescogollo
+    maintainers: atorrescogollo john-westcott-iv
+  $modules/github_repo_ruleset.py:
+    maintainers: john-westcott-iv
   $modules/github_secrets.py:
     maintainers: konstruktoid
   $modules/github_secrets_info.py:
     maintainers: konstruktoid
+  $modules/github_team.py:
+    maintainers: john-westcott-iv
+  $modules/github_team_members.py:
+    maintainers: john-westcott-iv
   $modules/gitlab_:
     keywords: gitlab source_control
     maintainers: $team_gitlab
