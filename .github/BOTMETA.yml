@@ -644,6 +644,8 @@ files:
     maintainers: atorrescogollo
   $modules/github_secrets.py:
     maintainers: konstruktoid
+  $modules/github_repo_ruleset.py:
+    maintainers: john-westcott-iv
   $modules/github_secrets_info.py:
     maintainers: konstruktoid
   $modules/gitlab_:
