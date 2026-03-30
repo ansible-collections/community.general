@@ -7,4 +7,3 @@ skip/freebsd
 skip/rhel
 skip/docker
 skip/macos14.3
-skip/macos13.2

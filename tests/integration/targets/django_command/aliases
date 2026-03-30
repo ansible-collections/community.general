@@ -5,8 +5,6 @@
 azp/posix/2
 skip/freebsd
 skip/macos
-skip/rhel8.7
-skip/rhel9.1
 skip/rhel9.3
 skip/rhel9.7
 skip/rhel10.0
