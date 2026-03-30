@@ -15,6 +15,5 @@ skip/docker
 skip/fedora  # TODO: make this work (not running in CI right now)
 skip/freebsd
 skip/macos
-skip/osx
 skip/rhel    # TODO: make this work
 skip/ubuntu22.04

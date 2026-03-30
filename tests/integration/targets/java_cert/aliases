@@ -4,7 +4,6 @@
 
 azp/posix/3
 destructive
-skip/osx
 skip/macos
 skip/freebsd
 needs/root
