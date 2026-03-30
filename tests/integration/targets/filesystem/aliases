@@ -5,5 +5,4 @@
 azp/posix/1
 azp/posix/vm
 destructive
-skip/osx
 skip/macos

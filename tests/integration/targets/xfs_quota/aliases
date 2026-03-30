@@ -6,6 +6,5 @@ azp/posix/1
 azp/posix/vm
 needs/privileged
 needs/root
-skip/osx
 skip/macos
 skip/freebsd
