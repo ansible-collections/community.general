@@ -159,6 +159,9 @@ class IPAClient:
 
         if "result" in resp:
             result = resp.get("result")
+            failed = result.get("failed")
+            if failed:
+                self._fail(f"response {method}", failed)
             if "result" in result:
                 result = result.get("result")
                 if isinstance(result, list):
