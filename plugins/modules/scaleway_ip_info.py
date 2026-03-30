@@ -103,8 +103,8 @@ scaleway_ip_info:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_LOCATION,
     SCALEWAY_ENDPOINT,
+    SCALEWAY_LOCATION,
     SCALEWAY_ZONES,
     Scaleway,
     ScalewayException,
@@ -148,7 +148,7 @@ def main():
         zone = module.params["zone"]
         api_path = f"instance/v1/zones/{zone}/ips"
         scaleway_ip_info = api.get(path=api_path)
-        module.exit_json(scaleway_ip_info=scaleway_ip_info.json.get('ips'))
+        module.exit_json(scaleway_ip_info=scaleway_ip_info.json.get("ips"))
     else:
         try:
             module.exit_json(scaleway_ip_info=ScalewayIpInfo(module).get_resources())
