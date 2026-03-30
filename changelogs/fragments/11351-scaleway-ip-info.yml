@@ -1,0 +1,2 @@
+minor_changes:
+  - scaleway_ip_info - now accepts a ``zone`` parameter, detailing the Scaleway zone to use in the lookup. This is mutually exclusive of the existing ``region`` parameter (https://github.com/ansible-collections/community.general/issues/11351).
