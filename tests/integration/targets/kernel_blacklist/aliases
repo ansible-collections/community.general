@@ -4,5 +4,4 @@
 
 azp/posix/1
 skip/freebsd
-skip/osx
 skip/macos

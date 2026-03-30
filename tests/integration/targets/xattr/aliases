@@ -6,6 +6,5 @@ azp/posix/2
 azp/posix/vm
 skip/docker
 skip/freebsd
-skip/osx
 skip/macos
 destructive

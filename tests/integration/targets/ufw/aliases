@@ -4,17 +4,9 @@
 
 azp/posix/2
 azp/posix/vm
-skip/osx
 skip/macos
 skip/freebsd
-skip/rhel8.0  # FIXME
-skip/rhel9.0  # FIXME
-skip/rhel9.1  # FIXME
-skip/rhel9.2  # FIXME
 skip/rhel9.3  # FIXME
-skip/rhel9.4  # FIXME
-skip/rhel9.5  # FIXME
-skip/rhel9.6  # FIXME
 skip/rhel9.7  # FIXME
 skip/rhel10.0  # FIXME
 skip/rhel10.1  # FIXME

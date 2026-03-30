@@ -4,8 +4,6 @@
 
 azp/posix/1
 destructive
-skip/osx
 skip/macos
-skip/windows
 skip/freebsd
 unsupported

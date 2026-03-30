@@ -5,7 +5,6 @@
 azp/posix/1
 destructive
 skip/freebsd
-skip/osx
 skip/macos
 skip/rhel
 needs/root
