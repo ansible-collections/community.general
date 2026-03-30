@@ -11,11 +11,12 @@ DOCUMENTATION = r"""
 module: snmp_facts
 author:
   - Patrick Ogenstad (@ogenstad)
+  - Laurenz Altenmueller (@lalten)
 short_description: Retrieve facts for a device using SNMP
 description:
   - Retrieve facts for a device using SNMP. The facts are inserted to the RV(ansible_facts) key.
 requirements:
-  - pysnmp < 6.2.4 - that version removed components used by this module.
+  - pysnmp (either pysnmp < 6.2.4 or pysnmp >= 7.1)
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.facts
@@ -83,6 +84,8 @@ options:
       - Maximum number of request retries, 0 retries means just a single request.
     type: int
     version_added: 2.3.0
+notes:
+  - Upgrading to pysnmp 7.1+ is recommended. Support for pysnmp 6.2 will be deprecated.
 """
 
 EXAMPLES = r"""
@@ -189,6 +192,7 @@ ansible_facts:
         }
 """
 
+import asyncio
 import binascii
 from collections import defaultdict
 
@@ -197,9 +201,29 @@ from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils import deps
 
-with deps.declare("pysnmp"):
+with deps.declare("pysnmp", url="https://pypi.org/project/pysnmp/"):
+    from pysnmp.hlapi.v3arch.asyncio import (
+        USM_AUTH_HMAC96_MD5,
+        USM_AUTH_HMAC96_SHA,
+        USM_PRIV_CBC56_DES,
+        USM_PRIV_CFB128_AES,
+        CommunityData,
+        ContextData,
+        ObjectIdentity,
+        ObjectType,
+        SnmpEngine,
+        UdpTransportTarget,
+        UsmUserData,
+        get_cmd,
+        next_cmd,
+    )
+    from pysnmp.proto.rfc1905 import EndOfMibView
+
+with deps.declare("pysnmp6", url="https://pypi.org/project/pysnmp/"):
     from pysnmp.entity.rfc3413.oneliner import cmdgen
     from pysnmp.proto.rfc1905 import EndOfMibView
+
+SNMP_DEFAULT_PORT = 161
 
 
 class DefineOid:
@@ -296,7 +320,10 @@ def main():
 
     m_args = module.params
 
-    deps.validate(module)
+    if not deps.failed("pysnmp"):
+        return asyncio.run(_async_main(module, m_args))
+
+    deps.validate(module, "pysnmp6")
 
     cmdGen = cmdgen.CommandGenerator()
     transport_opts = {k: m_args[k] for k in ("timeout", "retries") if m_args[k] is not None}
@@ -429,6 +456,216 @@ def main():
 
     if errorIndication:
         module.fail_json(msg=str(errorIndication))
+
+    interface_indexes = []
+
+    all_ipv4_addresses = []
+    ipv4_networks = Tree()
+
+    for varBinds in varTable:
+        for oid, val in varBinds:
+            if isinstance(val, EndOfMibView):
+                continue
+            current_oid = oid.prettyPrint()
+            current_val = val.prettyPrint()
+            if v.ifIndex in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["ifindex"] = current_val
+                interface_indexes.append(ifIndex)
+            if v.ifDescr in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["name"] = current_val
+            if v.ifMtu in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["mtu"] = current_val
+            if v.ifSpeed in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["speed"] = current_val
+            if v.ifPhysAddress in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["mac"] = decode_mac(current_val)
+            if v.ifAdminStatus in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["adminstatus"] = lookup_adminstatus(int(current_val))
+            if v.ifOperStatus in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["operstatus"] = lookup_operstatus(int(current_val))
+            if v.ipAdEntAddr in current_oid:
+                curIPList = current_oid.rsplit(".", 4)[-4:]
+                curIP = ".".join(curIPList)
+                ipv4_networks[curIP]["address"] = current_val
+                all_ipv4_addresses.append(current_val)
+            if v.ipAdEntIfIndex in current_oid:
+                curIPList = current_oid.rsplit(".", 4)[-4:]
+                curIP = ".".join(curIPList)
+                ipv4_networks[curIP]["interface"] = current_val
+            if v.ipAdEntNetMask in current_oid:
+                curIPList = current_oid.rsplit(".", 4)[-4:]
+                curIP = ".".join(curIPList)
+                ipv4_networks[curIP]["netmask"] = current_val
+
+            if v.ifAlias in current_oid:
+                ifIndex = int(current_oid.rsplit(".", 1)[-1])
+                results["ansible_interfaces"][ifIndex]["description"] = current_val
+
+    interface_to_ipv4 = {}
+    for ipv4_network in ipv4_networks:
+        current_interface = ipv4_networks[ipv4_network]["interface"]
+        current_network = {
+            "address": ipv4_networks[ipv4_network]["address"],
+            "netmask": ipv4_networks[ipv4_network]["netmask"],
+        }
+        if current_interface not in interface_to_ipv4:
+            interface_to_ipv4[current_interface] = []
+            interface_to_ipv4[current_interface].append(current_network)
+        else:
+            interface_to_ipv4[current_interface].append(current_network)
+
+    for interface in interface_to_ipv4:
+        results["ansible_interfaces"][int(interface)]["ipv4"] = interface_to_ipv4[interface]
+
+    results["ansible_all_ipv4_addresses"] = all_ipv4_addresses
+
+    module.exit_json(ansible_facts=results)
+
+
+async def _async_main(module, m_args):
+    """SNMP facts retrieval using pysnmp >= 7.1 async v3arch API."""
+    transport_opts = {k: m_args[k] for k in ("timeout", "retries") if m_args[k] is not None}
+
+    integrity_proto = None
+    privacy_proto = None
+    if m_args["version"] == "v3":
+        if m_args["level"] == "authPriv" and m_args["privacy"] is None:
+            module.fail_json(msg="Privacy algorithm not set when using authPriv")
+
+        if m_args["integrity"] == "sha":
+            integrity_proto = USM_AUTH_HMAC96_SHA
+        elif m_args["integrity"] == "md5":
+            integrity_proto = USM_AUTH_HMAC96_MD5
+
+        if m_args["privacy"] == "aes":
+            privacy_proto = USM_PRIV_CFB128_AES
+        elif m_args["privacy"] == "des":
+            privacy_proto = USM_PRIV_CBC56_DES
+
+    # Use SNMP Version 2
+    if m_args["version"] in ("v2", "v2c"):
+        snmp_auth = CommunityData(m_args["community"])
+
+    # Use SNMP Version 3 with authNoPriv
+    elif m_args["level"] == "authNoPriv":
+        snmp_auth = UsmUserData(m_args["username"], authKey=m_args["authkey"], authProtocol=integrity_proto)
+
+    # Use SNMP Version 3 with authPriv
+    else:
+        snmp_auth = UsmUserData(
+            m_args["username"],
+            authKey=m_args["authkey"],
+            privKey=m_args["privkey"],
+            authProtocol=integrity_proto,
+            privProtocol=privacy_proto,
+        )
+
+    # Use p to prefix OIDs with a dot for polling
+    p = DefineOid(dotprefix=True)
+    # Use v without a prefix to use with return values
+    v = DefineOid(dotprefix=False)
+
+    def Tree():
+        return defaultdict(Tree)
+
+    results = Tree()
+
+    transport = await UdpTransportTarget.create((m_args["host"], SNMP_DEFAULT_PORT), **transport_opts)
+    snmpEngine = SnmpEngine()
+
+    errorIndication, errorStatus, errorIndex, varBinds = await get_cmd(
+        snmpEngine,
+        snmp_auth,
+        transport,
+        ContextData(),
+        ObjectType(ObjectIdentity(p.sysDescr)),
+        ObjectType(ObjectIdentity(p.sysObjectId)),
+        ObjectType(ObjectIdentity(p.sysUpTime)),
+        ObjectType(ObjectIdentity(p.sysContact)),
+        ObjectType(ObjectIdentity(p.sysName)),
+        ObjectType(ObjectIdentity(p.sysLocation)),
+        lookupMib=False,
+    )
+
+    if errorIndication:
+        module.fail_json(msg=str(errorIndication))
+
+    for oid, val in varBinds:
+        current_oid = oid.prettyPrint()
+        current_val = val.prettyPrint()
+        if current_oid == v.sysDescr:
+            results["ansible_sysdescr"] = decode_hex(current_val)
+        elif current_oid == v.sysObjectId:
+            results["ansible_sysobjectid"] = current_val
+        elif current_oid == v.sysUpTime:
+            results["ansible_sysuptime"] = current_val
+        elif current_oid == v.sysContact:
+            results["ansible_syscontact"] = current_val
+        elif current_oid == v.sysName:
+            results["ansible_sysname"] = current_val
+        elif current_oid == v.sysLocation:
+            results["ansible_syslocation"] = current_val
+
+    oids = [
+        ObjectType(ObjectIdentity(p.ifIndex)),
+        ObjectType(ObjectIdentity(p.ifDescr)),
+        ObjectType(ObjectIdentity(p.ifMtu)),
+        ObjectType(ObjectIdentity(p.ifSpeed)),
+        ObjectType(ObjectIdentity(p.ifPhysAddress)),
+        ObjectType(ObjectIdentity(p.ifAdminStatus)),
+        ObjectType(ObjectIdentity(p.ifOperStatus)),
+        ObjectType(ObjectIdentity(p.ipAdEntAddr)),
+        ObjectType(ObjectIdentity(p.ipAdEntIfIndex)),
+        ObjectType(ObjectIdentity(p.ipAdEntNetMask)),
+        ObjectType(ObjectIdentity(p.ifAlias)),
+    ]
+    base_oids = [
+        v.ifIndex,
+        v.ifDescr,
+        v.ifMtu,
+        v.ifSpeed,
+        v.ifPhysAddress,
+        v.ifAdminStatus,
+        v.ifOperStatus,
+        v.ipAdEntAddr,
+        v.ipAdEntIfIndex,
+        v.ipAdEntNetMask,
+        v.ifAlias,
+    ]
+
+    varTable = []
+    while True:
+        errorIndication, errorStatus, errorIndex, varBinds_walk = await next_cmd(
+            snmpEngine,
+            snmp_auth,
+            transport,
+            ContextData(),
+            *oids,
+            lookupMib=False,
+        )
+
+        if errorIndication:
+            module.fail_json(msg=str(errorIndication))
+
+        if errorStatus:
+            break
+
+        # Stop when all OIDs have left their base subtree or hit EndOfMibView
+        if all(
+            isinstance(vb[1], EndOfMibView) or not vb[0].prettyPrint().startswith(base + ".")
+            for vb, base in zip(varBinds_walk, base_oids)
+        ):
+            break
+
+        varTable.append(varBinds_walk)
+        oids = varBinds_walk
 
     interface_indexes = []
 

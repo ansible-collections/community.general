@@ -1339,7 +1339,7 @@ files:
     labels: snap
     maintainers: russoz
   $modules/snmp_facts.py:
-    maintainers: ogenstad ujwalkomarla
+    maintainers: ogenstad ujwalkomarla lalten
   $modules/solaris_zone.py:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
     labels: solaris
