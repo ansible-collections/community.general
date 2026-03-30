@@ -3,4 +3,4 @@ minor_changes:
     new search endpoint ``/rest/api/2/search/jql``, since
     the legacy ``/rest/api/2/search`` endpoint has been
     removed on Jira Cloud
-    (https://github.com/ansible-collections/community.general/issues/10786).
+    (https://github.com/ansible-collections/community.general/issues/10786, https://github.com/ansible-collections/community.general/pull/11701).
