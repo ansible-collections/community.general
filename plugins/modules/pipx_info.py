@@ -130,8 +130,6 @@ version:
   version_added: 10.1.0
 """
 
-from ansible.module_utils.facts.compat import ansible_facts
-
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import (
     make_process_dict,
@@ -156,12 +154,7 @@ class PipXInfo(ModuleHelper):
     )
 
     def __init_module__(self):
-        if self.vars.executable:
-            self.command = [self.vars.executable]
-        else:
-            facts = ansible_facts(self.module, gather_subset=["python"])
-            self.command = [facts["python"]["executable"], "-m", "pipx"]
-        self.runner = pipx_runner(self.module, self.command)
+        self.runner = pipx_runner(self.module, self.vars.executable)
         with self.runner("version") as ctx:
             rc, out, err = ctx.run()
             self.vars.version = out.strip()

@@ -1,0 +1,4 @@
+minor_changes:
+  - pipx module utils - small refactor, no behavior affected (https://github.com/ansible-collections/community.general/pull/11640).
+  - pipx - small refactor, no behavior affected (https://github.com/ansible-collections/community.general/pull/11640).
+  - pipx_info - small refactor, no behavior affected (https://github.com/ansible-collections/community.general/pull/11640).
