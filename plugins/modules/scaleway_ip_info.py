@@ -48,7 +48,7 @@ options:
     type: str
     description:
       - Scaleway zone to use (for example V(nl-ams-1)).
-    version_added: 12.5.0
+    version_added: 12.6.0
     choices:
       - fr-par-1
       - fr-par-2
