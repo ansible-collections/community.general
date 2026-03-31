@@ -10,7 +10,7 @@
 
 - name: Skip unsupported platforms
   meta: end_play
-  when: ansible_facts.distribution not in ['CentOS', 'Fedora', 'Debian', 'Ubuntu']
+  when: ansible_facts.distribution not in ['Fedora', 'Debian', 'Ubuntu']
 
 - name: Include OS-specific variables
   include_vars: '{{ ansible_facts.os_family }}.yml'

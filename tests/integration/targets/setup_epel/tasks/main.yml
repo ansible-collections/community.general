@@ -13,4 +13,4 @@
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_facts.distribution_major_version }}.noarch.rpm
     disable_gpg_check: true
   when:
-    - ansible_facts.distribution in ['RedHat', 'CentOS']
+    - ansible_facts.distribution == 'RedHat'
