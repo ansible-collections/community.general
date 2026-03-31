@@ -18,6 +18,9 @@
       import_tasks: tests.yml
 
   when: >
-    ansible_facts.distribution in ['RedHat', 'Fedora', 'Ubuntu', 'Archlinux'] or
+    (ansible_facts.distribution in ['RedHat', 'CentOS', 'ScientificLinux'] and ansible_facts.distribution_major_version is version('7', '>=')) or
+    ansible_facts.distribution == 'Fedora' or
+    (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('15.04', '>=')) or
     (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_version is version('8', '>=')) or
     ansible_facts.os_family == 'Suse' or
+    ansible_facts.distribution == 'Archlinux'
