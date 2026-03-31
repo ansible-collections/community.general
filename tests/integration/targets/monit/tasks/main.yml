@@ -9,12 +9,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-    - name: Install EPEL repository (RHEL only)
+    - name: Install EPEL repository (only effective in RHEL)
       include_role:
         name: setup_epel
-      when:
-        - ansible_facts.distribution in ['RedHat', 'CentOS']
-        - ansible_facts.distribution_major_version is version('9', '<')
 
     - name: create required directories
       become: true
@@ -67,9 +64,10 @@
       pip:
         name: "{{ item }}"
         virtualenv: "{{ process_venv }}"
+        virtualenv_command: "{{ virtualenv_command }}"
         extra_args: "-c {{ remote_constraints }}"
       loop:
-        - setuptools==44
+        - setuptools
         - python-daemon
 
     - name: restart monit
