@@ -7,4 +7,3 @@ destructive
 needs/target/setup_epel
 skip/macos
 skip/freebsd
-skip/rhel  # FIXME
