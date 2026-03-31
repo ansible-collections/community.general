@@ -10,7 +10,7 @@
 
 - name: Skip unsupported platforms
   meta: end_play
-  when: ansible_facts.distribution != 'CentOS'
+  # Not being effectively tested and bound to be removed in 14.0.0 with jboss module deprecation
 
 - name: Install java
   package:
