@@ -9,10 +9,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - when:
-    # setuptools is too old on RHEL/CentOS 6 (https://github.com/Supervisor/meld3/issues/23)
-    - ansible_facts.os_family != 'RedHat' or ansible_facts.distribution_major_version|int > 6
     # For some reason CentOS 7 and OpenSuSE 15 do not work on ansible-core 2.16
-    - ansible_version.minor != 16 or ansible_facts.distribution not in ['CentOS', 'openSUSE Leap']
+    - ansible_facts.distribution not in ['CentOS', 'openSUSE Leap']
   block:
     - block:
         - tempfile:
