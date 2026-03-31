@@ -197,6 +197,8 @@ options:
         since the legacy C(/rest/api/2/search) endpoint has been removed.
       - When set to V(false) (the default), the legacy endpoint is used, which is still required for Jira Data Center / Server.
       - See U(https://developer.atlassian.com/changelog/#CHANGE-2046) for details about the endpoint deprecation.
+      - In the future, if this option is set to V(true), other endpoints might also be replaced to address
+        Jira Cloud deprecations.
     type: bool
     default: false
     version_added: '12.6.0'
