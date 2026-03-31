@@ -261,7 +261,7 @@ def _match_installed_flat_name(module, binary, name, method):
     global result  # pylint: disable=global-variable-not-assigned
     parsed_name = _parse_flatpak_name(name)
     # Try running flatpak list with columns feature
-    command = [binary, "list", f"--{method}", "--app", "--columns=application"]
+    command = [binary, "list", f"--{method}", "--columns=application"]
     _flatpak_command(module, False, command, ignore_failure=True)
     if result["rc"] != 0 and OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE in result["stderr"]:
         # Probably flatpak before 1.2
@@ -283,7 +283,7 @@ def _match_installed_flat_name(module, binary, name, method):
 
 def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, method):
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "list", f"--{method}", "--app", "--columns=application"]
+    command = [binary, "list", f"--{method}", "--columns=application"]
     output = _flatpak_command(module, False, command)
     for row in output.split("\n"):
         if parsed_name.lower() == row.lower():
@@ -292,7 +292,7 @@ def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, metho
 
 def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method):
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "list", f"--{method}", "--app"]
+    command = [binary, "list", f"--{method}"]
     output = _flatpak_command(module, False, command)
     for row in output.split("\n"):
         if parsed_name.lower() in row.lower():
