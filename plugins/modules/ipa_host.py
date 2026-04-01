@@ -294,8 +294,13 @@ def ensure(module, client):
 
             diff = get_host_diff(client, ipa_host, module_host)
             ipa_host_show = client.host_show(name=name)
-            host_needs_to_be_disabled = ipa_host_show.get("has_keytab", True) and module.params.get(
-                "random_password", state == "disabled"
+            host_needs_to_be_disabled = (
+                True
+                if (
+                    ipa_host_show.get("has_keytab", True)
+                    and (state == "disabled" or module.params.get("random_password"))
+                )
+                else False
             )
             if diff or host_needs_to_be_disabled:
                 changed = True
