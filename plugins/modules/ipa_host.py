@@ -297,7 +297,7 @@ def ensure(module, client):
             host_needs_to_be_disabled = (
                 ipa_host_show.get("has_keytab", True) and module.params.get("random_password", state == "disabled")
             )
-            if len(diff) > 0 or host_needs_to_be_disabled:
+            if diff or host_needs_to_be_disabled:
                 changed = True
                 if not module.check_mode:
                     data = {}
@@ -307,7 +307,7 @@ def ensure(module, client):
                         data["usercertificate"] = [cert["__base64__"] for cert in ipa_host.get("usercertificate", [])]
                     if host_needs_to_be_disabled:
                         client.host_disable(name=name)
-                    if len(diff) > 0:
+                    if diff:
                         return changed, client.host_mod(name=name, host=data)
                     else:
                         return changed, client.host_find(name=name)
