@@ -1,2 +1,2 @@
 bugfixes:
-  - ipa_host - fix logic to disable host that exists (https://github.com/ansible-collections/community.general/issues/11483, https://github.com/ansible-collections/community.general/pull/11487).
+  - ipa_host - fix logic to disable existing hosts (https://github.com/ansible-collections/community.general/issues/11483, https://github.com/ansible-collections/community.general/pull/11487).
