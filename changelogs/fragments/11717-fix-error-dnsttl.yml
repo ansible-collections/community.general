@@ -1,0 +1,2 @@
+bugfixes:
+  - ipa_dnsrecord - The module failed with error message "dnsttl".
