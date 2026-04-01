@@ -190,6 +190,19 @@ options:
     default: true
     type: bool
 
+  cloud:
+    description:
+      - Enable when using Jira Cloud.
+      - When set to V(true), O(operation=search) uses the C(/rest/api/2/search/jql) endpoint required by Jira Cloud,
+        since the legacy C(/rest/api/2/search) endpoint has been removed.
+      - When set to V(false) (the default), the legacy endpoint is used, which is still required for Jira Data Center / Server.
+      - See U(https://developer.atlassian.com/changelog/#CHANGE-2046) for details about the endpoint deprecation.
+      - In the future, if this option is set to V(true), other endpoints might also be replaced to address
+        Jira Cloud deprecations.
+    type: bool
+    default: false
+    version_added: '12.6.0'
+
   attachment:
     type: dict
     version_added: 2.5.0
@@ -214,6 +227,8 @@ options:
 notes:
   - Currently this only works with basic-auth, or tokens.
   - To use with JIRA Cloud, pass the login e-mail as the O(username) and the API token as O(password).
+  - Jira Cloud has removed the legacy C(/rest/api/2/search) endpoint. Set O(cloud=true) when using
+    O(operation=search) against Jira Cloud so that the module uses the replacement C(/rest/api/2/search/jql) endpoint instead.
 author:
   - "Steve Smith (@tarka)"
   - "Per Abildgaard Toft (@pertoft)"
@@ -378,7 +393,7 @@ EXAMPLES = r"""
     issue: ANS-63
   register: issue
 
-# Search for an issue
+# Search for an issue on Jira Data Center / Server
 # You can limit the search for specific fields by adding optional args. Note! It must be a dict, hence, lastViewed: null
 - name: Search for an issue
   community.general.jira:
@@ -387,6 +402,22 @@ EXAMPLES = r"""
     password: '{{ pass }}'
     project: ANS
     operation: search
+    maxresults: 10
+    jql: project=cmdb AND cf[13225]="test"
+  args:
+    fields:
+      lastViewed:
+  register: issue
+
+# Search for an issue on Jira Cloud (uses the /search/jql endpoint)
+- name: Search for an issue on Jira Cloud
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: search
+    cloud: true
     maxresults: 10
     jql: project=cmdb AND cf[13225]="test"
   args:
@@ -549,6 +580,7 @@ class JIRA(StateModuleHelper):
             jql=dict(
                 type="str",
             ),
+            cloud=dict(type="bool", default=False),
             maxresults=dict(type="int"),
             timeout=dict(type="float", default=10),
             validate_certs=dict(default=True, type="bool"),
@@ -655,10 +687,17 @@ class JIRA(StateModuleHelper):
         self.vars.meta = self.get(url)
 
     def operation_search(self):
-        url = f"{self.vars.restbase}/search?jql={pathname2url(self.vars.jql)}"
+        if self.vars.cloud:
+            url = f"{self.vars.restbase}/search/jql?jql={pathname2url(self.vars.jql)}"
+        else:
+            url = f"{self.vars.restbase}/search?jql={pathname2url(self.vars.jql)}"
+
         if self.vars.fields:
             fields = self.vars.fields.keys()
             url = f"{url}&fields={'&fields='.join([pathname2url(f) for f in fields])}"
+        elif self.vars.cloud:
+            url = f"{url}&fields=*navigable"
+
         if self.vars.maxresults:
             url = f"{url}&maxResults={self.vars.maxresults}"
 
