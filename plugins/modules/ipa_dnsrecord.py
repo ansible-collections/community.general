@@ -74,7 +74,7 @@ options:
       - Set the TTL for the record.
       - Applies only when adding a new or changing the value of O(record_value) or O(record_values).
     type: int
-  solo:
+  exclusive:
     description:
       - Whether the record should be the only one for that record type and record name.
       - Only relevant when O(state=present).
@@ -169,7 +169,7 @@ EXAMPLES = r"""
     record_name: _etcd-server-ssl._tcp.cloud.example.com.
     record_type: 'SRV'
     record_value: '0 10 2380 etcd-0.cloud.example.com.'
-    solo: false
+    exclusive: false
 
 - name: Ensure that dns record is removed
   community.general.ipa_dnsrecord:
@@ -337,7 +337,7 @@ def ensure(module, client):
     record_name = module.params["record_name"]
     record_ttl = module.params.get("record_ttl")
     state = module.params["state"]
-    solo = module.params["solo"]
+    exclusive = module.params["exclusive"]
 
     ipa_dnsrecord = client.dnsrecord_find(zone_name, record_name)
 
@@ -361,7 +361,7 @@ def ensure(module, client):
             changed = True
             if not module.check_mode:
                 client.dnsrecord_add(zone_name=zone_name, record_name=record_name, details=module_dnsrecord)
-        elif solo:
+        elif exclusive:
             diff = get_dnsrecord_diff(client, ipa_dnsrecord, module_dnsrecord)
             if len(diff) > 0:
                 changed = True
@@ -396,7 +396,7 @@ def main():
         record_values=dict(type="list", elements="str"),
         state=dict(type="str", default="present", choices=["present", "absent"]),
         record_ttl=dict(type="int"),
-        solo=dict(type="bool", default=True),
+        exclusive=dict(type="bool", default=True),
     )
 
     module = AnsibleModule(
