@@ -1,2 +1,2 @@
 bugfixes:
-  - ipa_dnsrecord - The module failed with error message "dnsttl".
+  - ipa_dnsrecord - fix errors when module is used with existing record with default TTL (https://github.com/ansible-collections/community.general/pull/11717).
