@@ -76,7 +76,7 @@ options:
     type: int
   exclusive:
     description:
-      - Whether the record should be the only one for that record type and record name.
+      - Whether the provided record value(s) should be the only ones for that record type and record name.
       - Only relevant when O(state=present).
       - When V(true), the specified O(record_value) or O(record_values) will replace all existing
         records of the same type and name.
