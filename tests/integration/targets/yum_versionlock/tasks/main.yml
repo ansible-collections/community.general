@@ -83,4 +83,4 @@
         name: yum-plugin-versionlock
         state: absent
       when: yum_versionlock_install is changed
-  when: ansible_facts.distribution in ['RedHat', 'Fedora']
+  when: ansible_facts.distribution in ['CentOS', 'RedHat', 'Fedora']
