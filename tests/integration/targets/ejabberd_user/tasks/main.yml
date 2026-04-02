@@ -14,7 +14,7 @@
   # TODO: remove Ubuntu 24.04 (noble) from the list
   # TODO: remove Debian 13 (Trixie) from the list
   when: >
-    ansible_facts.distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora', 'Archlinux')
+    ansible_facts.distribution in ('Alpine', 'openSUSE Leap', 'Fedora', 'Archlinux')
     or (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_release in ['noble'])
     or (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '13')
 
