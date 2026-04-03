@@ -170,10 +170,7 @@ cmd_echo_tests:
   # this will not be in the regular set of paths get_bin_path() searches
   - name: use cmd {{ remote_tmp_dir }}/echo
     condition: >
-      {{
-        ansible_facts.distribution != "MacOSX" and
-        not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_major_version is version('7.0', '<'))
-      }}
+      {{ ansible_facts.distribution != "MacOSX" }}
     copy_to: "{{ remote_tmp_dir }}"
     cmd: "{{ remote_tmp_dir }}/echo"
     arg_formats:
@@ -195,10 +192,7 @@ cmd_echo_tests:
   - name: use cmd echo with path_prefix {{ remote_tmp_dir }}
     cmd: echo
     condition: >
-      {{
-        ansible_facts.distribution != "MacOSX" and
-        not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_major_version is version('7.0', '<'))
-      }}
+      {{ ansible_facts.distribution != "MacOSX" }}
     copy_to: "{{ remote_tmp_dir }}"
     path_prefix: "{{ remote_tmp_dir }}"
     arg_formats:

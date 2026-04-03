@@ -8,12 +8,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# java >= 17 is not available in RHEL and CentOS7 repos, which is required for sdkmanager to run
-- name: Bail out if not supported
-  when:
-    - "ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_version is version('8.0', '<')"
-  ansible.builtin.meta: end_play
-
 - name: Run android_sdk tests
   environment:
     PATH: '{{ ansible_facts.env.PATH }}:{{ android_sdk_location }}/cmdline-tools/latest/bin'

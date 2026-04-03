@@ -39,20 +39,7 @@
 - assert:
     that:
       - result is changed
-      # selectattr not available on Jinja 2.2 provided by CentOS 6
-      # hence the two following tasks (set_fact/assert) are used
-      # - (result['sessions'] | selectattr('ID', 'match', '^' ~ session_id ~ '$') | first)['Name'] == 'testsession'
-
-- name: search created session
-  set_fact:
-    test_session_found: true
-  loop: "{{ result['sessions'] }}"
-  when: "item.get('ID') == session_id and item.get('Name') == 'testsession'"
-
-- name: ensure session was created
-  assert:
-    that:
-      - test_session_found|default(false)
+      - (result['sessions'] | selectattr('ID', 'match', '^' ~ session_id ~ '$') | first)['Name'] == 'testsession'
 
 - name: fetch info about a session
   consul_session:
@@ -93,21 +80,7 @@
 - assert:
     that:
       - result is changed
-      # selectattr and equalto not available on Jinja 2.2 provided by CentOS 6
-      # hence the two following tasks (command/assert) are used
-      # - (result['sessions'] | selectattr('ID', 'equalto', session_id) | list | length) == 0
-
-- name: search deleted session
-  command: echo 'session found'
-  loop: "{{ result['sessions'] }}"
-  when: "item.get('ID') == session_id and item.get('Name') == 'testsession'"
-  register: search_deleted
-
-- name: ensure session was deleted
-  assert:
-    that:
-      - search_deleted is skipped  # each iteration is skipped
-      - search_deleted is not changed  # and then unchanged
+      - (result['sessions'] | selectattr('ID', 'equalto', session_id) | list | length) == 0
 
 - name: ensure session can be created with a ttl
   consul_session:

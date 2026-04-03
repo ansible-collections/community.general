@@ -6,9 +6,8 @@
 - name: Skip unsupported platforms
   meta: end_play
   # TODO: figure out why Alpine does not work!
-  when: |
-    ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version is not version('7', '>=')
-    or ansible_facts.distribution == 'Alpine'
+  when:
+    - ansible_facts.distribution == 'Alpine'
 
 - name: Install Nomad and test
   vars:
@@ -16,15 +15,6 @@
     nomad_uri: https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_{{ ansible_facts.system | lower }}_{{ nomad_arch }}.zip
     nomad_cmd: '{{ remote_tmp_dir }}/nomad'
   block:
-
-    - name: Install requests<2.20 (CentOS/RHEL 6)
-      pip:
-        name: requests<2.20
-        extra_args: "-c {{ remote_constraints }}"
-      register: result
-      until: result is success
-      when: ansible_facts.distribution_file_variety|default() == 'RedHat' and ansible_facts.distribution_major_version is version('6', '<=')
-
     - name: Install python-nomad
       pip:
         name: python-nomad
