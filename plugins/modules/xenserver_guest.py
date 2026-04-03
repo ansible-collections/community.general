@@ -938,9 +938,7 @@ class XenServerVM(XenServerObject):
                                 )[0]
                                 self.xapi_session.xenapi.VBD.insert(cdrom_vbd_ref, cdrom_vdi_ref)
                     elif change.get("networks_changed"):
-                        position = 0
-
-                        for network_change_list in change["networks_changed"]:
+                        for position, network_change_list in enumerate(change["networks_changed"]):
                             if network_change_list:
                                 vm_vif_params = self.vm_params["VIFs"][position]
                                 network_params = self.module.params["networks"][position]
@@ -1113,7 +1111,6 @@ class XenServerVM(XenServerObject):
                                             network_params[network_change],
                                         )
 
-                            position += 1
                     elif change.get("networks_new"):
                         for position, vif_device in change["networks_new"]:
                             network_params = self.module.params["networks"][position]
