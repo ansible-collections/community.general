@@ -52,6 +52,7 @@ class TestLogrotateConfig(unittest.TestCase):
         self.mock_module.warn = Mock()
         self.mock_module.run_command = Mock(return_value=(0, "", ""))
         self.mock_module.backup_local = Mock(return_value=None)
+        self.mock_module.tmpdir = self.test_dir
         self.mock_ansible_basic.AnsibleModule.return_value = self.mock_module
         self.config_dir = os.path.join(self.test_dir, "logrotate.d")
         os.makedirs(self.config_dir, exist_ok=True)

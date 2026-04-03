@@ -788,7 +788,10 @@ class LogrotateConfig:
                 config_path = os.path.join(self.config_dir, self.config_name + suffix)
                 if os.path.exists(config_path):
                     if not self.module.check_mode:
-                        os.remove(config_path)
+                        try:
+                            os.remove(config_path)
+                        except Exception as e:
+                            self.module.fail_json(msg=f"Failed to remove config file '{config_path}': {to_native(e)}")
                     self.result["changed"] = True
                     self.result["config_file"] = config_path
                     break
@@ -812,7 +815,12 @@ class LogrotateConfig:
             if os.path.exists(old_path) and not os.path.exists(new_path):
                 self.result["changed"] = True
                 if not self.module.check_mode:
-                    self.module.atomic_move(old_path, new_path, unsafe_writes=False)
+                    try:
+                        self.module.atomic_move(old_path, new_path, unsafe_writes=False)
+                    except Exception as e:
+                        self.module.fail_json(
+                            msg=f"Failed to rename config file from '{old_path}' to '{new_path}': {to_native(e)}"
+                        )
 
                 self.result["config_file"] = new_path
                 self.result["enabled_state"] = target_enabled
@@ -833,31 +841,44 @@ class LogrotateConfig:
 
         if needs_update:
             if not self.module.check_mode:
+                tmp_path = os.path.join(self.module.tmpdir, self.config_name + ".tmp")
+                try:
+                    with open(tmp_path, "w") as f:
+                        f.write(new_content)
+                except Exception as e:
+                    self.module.fail_json(msg=f"Failed to write temp config file: {to_native(e)}")
+
+                test_cmd = [self.logrotate_bin, "-d", tmp_path]
+                rc, stdout, stderr = self.module.run_command(test_cmd)
+                if rc != 0:
+                    try:
+                        os.remove(tmp_path)
+                    except Exception:
+                        pass
+                    self.module.fail_json(
+                        msg="logrotate configuration test failed",
+                        stderr=stderr,
+                        stdout=stdout,
+                        config_file=str(self.result["config_file"]),
+                    )
+
+                config_file_path = str(self.result["config_file"])
                 for suffix in ["", self.disabled_suffix]:
                     old_path = os.path.join(self.config_dir, self.config_name + suffix)
                     if os.path.exists(old_path):
                         backup_path = self.module.backup_local(old_path)
                         if backup_path:
                             self.result["backup_file"] = backup_path
-                        os.remove(old_path)
+                        try:
+                            os.remove(old_path)
+                        except Exception as e:
+                            self.module.fail_json(msg=f"Failed to remove old config file '{old_path}': {to_native(e)}")
 
-                config_file_path = str(self.result["config_file"])
                 try:
-                    with open(config_file_path, "w") as f:
-                        f.write(new_content)
+                    self.module.atomic_move(tmp_path, config_file_path, unsafe_writes=False)
                     os.chmod(config_file_path, 0o644)
                 except Exception as e:
-                    self.module.fail_json(msg=f"Failed to write config file {config_file_path}: {to_native(e)}")
-
-                test_cmd = [self.logrotate_bin, "-d", config_file_path]
-                rc, stdout, stderr = self.module.run_command(test_cmd)
-                if rc != 0:
-                    self.module.fail_json(
-                        msg="logrotate configuration test failed",
-                        stderr=stderr,
-                        stdout=stdout,
-                        config_file=config_file_path,
-                    )
+                    self.module.fail_json(msg=f"Failed to move config file to '{config_file_path}': {to_native(e)}")
 
         self.result["changed"] = needs_update
         self.result["enabled_state"] = target_enabled
