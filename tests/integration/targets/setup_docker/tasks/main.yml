@@ -12,13 +12,6 @@
   debug:
     msg: "Distribution '{{ ansible_facts.distribution }}', version '{{ ansible_facts.distribution_version }}', OS family '{{ ansible_facts.os_family }}'"
 
-- name: Install EPEL repository (RHEL only)
-  include_role:
-    name: setup_epel
-  when:
-    - ansible_facts.distribution in ['RedHat', 'CentOS']
-    - ansible_facts.distribution_major_version is version('9', '<')
-
 - name: Distribution specific
   block:
     - name: Include distribution specific vars

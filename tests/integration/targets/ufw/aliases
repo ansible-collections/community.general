@@ -6,11 +6,7 @@ azp/posix/2
 azp/posix/vm
 skip/macos
 skip/freebsd
-skip/rhel9.3  # FIXME
-skip/rhel9.7  # FIXME
-skip/rhel10.0  # FIXME
-skip/rhel10.1  # FIXME
+skip/rhel
 skip/docker
 needs/root
-needs/target/setup_epel
 destructive
