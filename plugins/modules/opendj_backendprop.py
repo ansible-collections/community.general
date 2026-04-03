@@ -91,52 +91,45 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
 
 class BackendProp:
     def __init__(self, module):
         self._module = module
+        self.runner = CmdRunner(
+            module,
+            command=f"{module.params['opendj_bindir']}/dsconfig",
+            arg_formats=dict(
+                get_cmd=cmd_runner_fmt.as_fixed(["get-backend-prop", "-n", "-X", "-s"]),
+                set_cmd=cmd_runner_fmt.as_fixed(["set-backend-prop", "-n", "-X"]),
+                hostname=cmd_runner_fmt.as_opt_val("-h"),
+                port=cmd_runner_fmt.as_opt_val("--port"),
+                username=cmd_runner_fmt.as_opt_val("--bindDN"),
+                password=cmd_runner_fmt.as_opt_val("-w"),
+                passwordfile=cmd_runner_fmt.as_opt_val("-j"),
+                backend=cmd_runner_fmt.as_opt_val("--backend-name"),
+                set_prop=cmd_runner_fmt.as_func(cmd_runner_fmt.unpack_args(lambda n, v: ["--set", f"{n}:{v}"])),
+            ),
+        )
 
-    def get_property(self, opendj_bindir, hostname, port, username, password_method, backend_name):
-        my_command = [
-            f"{opendj_bindir}/dsconfig",
-            "get-backend-prop",
-            "-h",
-            hostname,
-            "--port",
-            str(port),
-            "--bindDN",
-            username,
-            "--backend-name",
-            backend_name,
-            "-n",
-            "-X",
-            "-s",
-        ] + password_method
-        rc, stdout, stderr = self._module.run_command(my_command, check_rc=True)
+    def get_property(self):
+        with self.runner(
+            "get_cmd hostname port username password passwordfile backend",
+            check_rc=True,
+        ) as ctx:
+            rc, stdout, stderr = ctx.run()
         return stdout
 
-    def set_property(self, opendj_bindir, hostname, port, username, password_method, backend_name, name, value):
-        my_command = [
-            f"{opendj_bindir}/dsconfig",
-            "set-backend-prop",
-            "-h",
-            hostname,
-            "--port",
-            str(port),
-            "--bindDN",
-            username,
-            "--backend-name",
-            backend_name,
-            "--set",
-            f"{name}:{value}",
-            "-n",
-            "-X",
-        ] + password_method
-        self._module.run_command(my_command, check_rc=True)
-        return True
+    def set_property(self, name, value):
+        with self.runner(
+            "set_cmd hostname port username password passwordfile backend set_prop",
+            check_rc=True,
+        ) as ctx:
+            ctx.run(set_prop=[name, value])
 
-    def validate_data(self, data=None, name=None, value=None):
-        for config_line in data.split("\n"):
+    def validate_data(self, data, name, value):
+        for config_line in data.splitlines():
             if config_line:
                 split_line = config_line.split()
                 if split_line[0] == name:
@@ -164,51 +157,14 @@ def main():
         required_one_of=[["password", "passwordfile"]],
     )
 
-    opendj_bindir = module.params["opendj_bindir"]
-    hostname = module.params["hostname"]
-    port = module.params["port"]
-    username = module.params["username"]
-    password = module.params["password"]
-    passwordfile = module.params["passwordfile"]
-    backend_name = module.params["backend"]
-    name = module.params["name"]
-    value = module.params["value"]
-    # state = module.params["state"]  TODO - ???
-
-    if module.params["password"] is not None:
-        password_method = ["-w", password]
-    elif module.params["passwordfile"] is not None:
-        password_method = ["-j", passwordfile]
-
     opendj = BackendProp(module)
-    validate = opendj.get_property(
-        opendj_bindir=opendj_bindir,
-        hostname=hostname,
-        port=port,
-        username=username,
-        password_method=password_method,
-        backend_name=backend_name,
-    )
+    stdout = opendj.get_property()
 
-    if validate:
-        if not opendj.validate_data(data=validate, name=name, value=value):
-            if module.check_mode:
-                module.exit_json(changed=True)
-            if opendj.set_property(
-                opendj_bindir=opendj_bindir,
-                hostname=hostname,
-                port=port,
-                username=username,
-                password_method=password_method,
-                backend_name=backend_name,
-                name=name,
-                value=value,
-            ):
-                module.exit_json(changed=True)
-            else:
-                module.exit_json(changed=False)
-        else:
-            module.exit_json(changed=False)
+    if stdout and not opendj.validate_data(data=stdout, name=module.params["name"], value=module.params["value"]):
+        if module.check_mode:
+            module.exit_json(changed=True)
+        opendj.set_property(module.params["name"], module.params["value"])
+        module.exit_json(changed=True)
     else:
         module.exit_json(changed=False)
 
