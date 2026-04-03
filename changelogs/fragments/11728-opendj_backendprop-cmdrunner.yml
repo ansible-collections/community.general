@@ -1,0 +1,2 @@
+minor_changes:
+  - opendj_backendprop - refactor to use ``CmdRunner`` (https://github.com/ansible-collections/community.general/pull/11728).
