@@ -1338,6 +1338,9 @@ files:
   $modules/snap_alias.py:
     labels: snap
     maintainers: russoz
+  $modules/snap_connect.py:
+    labels: snap
+    maintainers: russoz
   $modules/snmp_facts.py:
     maintainers: ogenstad ujwalkomarla lalten
   $modules/solaris_zone.py:
