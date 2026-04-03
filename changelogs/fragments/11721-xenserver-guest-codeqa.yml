@@ -1,0 +1,2 @@
+minor_changes:
+  - xenserver_guest - use ``enumerate()`` instead of manual index variable in ``for`` loop (https://github.com/ansible-collections/community.general/pull/11721).
