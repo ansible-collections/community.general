@@ -19,10 +19,6 @@
   when:
     - ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('43', '==')
 
-- name: Install EPEL repository (RHEL only)
-  include_role:
-    name: setup_epel
-
 - name: Install 7zip
   import_tasks: 7zip.yml
 

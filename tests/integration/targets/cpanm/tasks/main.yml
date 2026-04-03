@@ -5,7 +5,7 @@
 
 - name: bail out for non-supported platforms
   meta: end_play
-  when: ansible_facts.os_family not in ['RedHat', 'Debian']
+  when: ansible_facts.os_family != 'Debian'
 
 - name: install perl development package for Red Hat family
   package:

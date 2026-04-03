@@ -7,5 +7,5 @@
     - include_tasks: install.yml
     - include_tasks: lock_bash.yml
     - include_tasks: lock_updates.yml
-  when: ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_major_version is version('8', '>=')
+  when: ansible_facts.os_family == 'RedHat'
 ...

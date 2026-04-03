@@ -50,8 +50,8 @@
     # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
     - 'ansible_facts.distribution == "Alpine" and ansible_facts.distribution_version is version("3.18", ">") and item.0.key == "bcachefs"'
     - 'ansible_facts.distribution == "Archlinux" and item.0.key == "bcachefs"'
-    # f2fs-tools and reiserfs-utils packages not available with RHEL on CI
-    - 'not (ansible_facts.distribution == "RedHat" and item.0.key in ["f2fs", "reiserfs"])'
+    # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
+    - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs"])'
     - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
     # reiserfs-utils package not available with Fedora 35 on CI
     - 'not (ansible_facts.distribution == "Fedora" and (ansible_facts.distribution_major_version | int >= 35) and

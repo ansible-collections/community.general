@@ -24,3 +24,15 @@
         has_cargo: true
   when:
     - ansible_facts.system == 'FreeBSD' and ansible_facts.distribution_version is version('13.0', '>')
+
+- block:
+    - name: Download rustup
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /tmp/sh.rustup.rs
+        mode: "0750"
+        force: true
+    - name: Install rustup cargo
+      command: /tmp/sh.rustup.rs -y
+    - set_fact:
+        rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"
