@@ -111,9 +111,9 @@ cmd_echo_tests:
     check_mode: true
     expect_error: true  # because if result contains rc != 0, ansible assumes error
     assertions:
-      - test_result.rc == None
-      - test_result.out == None
-      - test_result.err == None
+      - test_result.rc | default(None) == None
+      - test_result.out | default(None) == None
+      - test_result.err | default(None) == None
 
   - name: set aa and tt value
     arg_formats:
