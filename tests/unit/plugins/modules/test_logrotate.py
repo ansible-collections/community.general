@@ -248,27 +248,6 @@ class TestLogrotateConfig(unittest.TestCase):
                 config.apply()
             self.assertIn("fail_json called", str(context.exception))
 
-    def test_validation_size_and_max_size_exclusive(self):
-        """Test validation when both size and max_size are specified."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
-        self._setup_module_params(size="100M", max_size="200M")
-        config_path = os.path.join(self.config_dir, "test")
-
-        def exists_side_effect(path):
-            if path == self.config_dir:
-                return True
-            elif path == config_path:
-                return False
-            return False
-
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            logrotate_bin = self.mock_module.get_bin_path.return_value
-            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-            with self.assertRaises(Exception) as context:
-                config.apply()
-            self.assertIn("fail_json called", str(context.exception))
-
     def test_check_mode(self):
         """Test that no changes are made in check mode."""
         from ansible_collections.community.general.plugins.modules import logrotate
@@ -679,48 +658,6 @@ class TestLogrotateConfig(unittest.TestCase):
                     self.assertIn("syslog", content)
                     self.assertTrue(result["changed"])
 
-    def test_validation_copy_and_copy_truncate_exclusive(self):
-        """Test validation when both copy and copy_truncate are specified."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
-        self._setup_module_params(copy=True, copy_truncate=True)
-        config_path = os.path.join(self.config_dir, "test")
-
-        def exists_side_effect(path):
-            if path == self.config_dir:
-                return True
-            elif path == config_path:
-                return False
-            return False
-
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            logrotate_bin = self.mock_module.get_bin_path.return_value
-            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-            with self.assertRaises(Exception) as context:
-                config.apply()
-            self.assertIn("fail_json called", str(context.exception))
-
-    def test_validation_copy_and_rename_copy_exclusive(self):
-        """Test validation when both copy and rename_copy are specified."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
-        self._setup_module_params(copy=True, rename_copy=True)
-        config_path = os.path.join(self.config_dir, "test")
-
-        def exists_side_effect(path):
-            if path == self.config_dir:
-                return True
-            elif path == config_path:
-                return False
-            return False
-
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            logrotate_bin = self.mock_module.get_bin_path.return_value
-            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-            with self.assertRaises(Exception) as context:
-                config.apply()
-            self.assertIn("fail_json called", str(context.exception))
-
     def test_validation_shred_cycles_positive(self):
         """Test validation when shred_cycles is not positive."""
         from ansible_collections.community.general.plugins.modules import logrotate
@@ -747,27 +684,6 @@ class TestLogrotateConfig(unittest.TestCase):
         from ansible_collections.community.general.plugins.modules import logrotate
 
         self._setup_module_params(start=-1)
-        config_path = os.path.join(self.config_dir, "test")
-
-        def exists_side_effect(path):
-            if path == self.config_dir:
-                return True
-            elif path == config_path:
-                return False
-            return False
-
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            logrotate_bin = self.mock_module.get_bin_path.return_value
-            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-            with self.assertRaises(Exception) as context:
-                config.apply()
-            self.assertIn("fail_json called", str(context.exception))
-
-    def test_validation_old_dir_and_no_old_dir_exclusive(self):
-        """Test validation when both old_dir and no_old_dir are specified."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
-        self._setup_module_params(old_dir="/var/log/archives", no_old_dir=True)
         config_path = os.path.join(self.config_dir, "test")
 
         def exists_side_effect(path):
@@ -839,51 +755,6 @@ class TestLogrotateConfig(unittest.TestCase):
                     self.assertNotIn("copytruncate", lines)
                     self.assertNotIn("renamecopy", lines)
                     self.assertNotIn("delaycompress", lines)
-
-    def test_parameter_interactions(self):
-        """Test interactions between related parameters."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
-        self._setup_module_params(old_dir="/var/log/archives", no_old_dir=True)
-        config_path = os.path.join(self.config_dir, "test")
-
-        def exists_side_effect(path):
-            if path == self.config_dir:
-                return True
-            elif path == config_path:
-                return False
-            return False
-
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            logrotate_bin = self.mock_module.get_bin_path.return_value
-            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-
-            with self.assertRaises(Exception) as context:
-                config.apply()
-
-            self.assertIn("fail_json called", str(context.exception))
-
-        self._setup_module_params(copy=True, rename_copy=True)
-
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            logrotate_bin = self.mock_module.get_bin_path.return_value
-            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-
-            with self.assertRaises(Exception) as context:
-                config.apply()
-
-            self.assertIn("fail_json called", str(context.exception))
-
-        self._setup_module_params(copy=True, copy_truncate=True)
-
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            logrotate_bin = self.mock_module.get_bin_path.return_value
-            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-
-            with self.assertRaises(Exception) as context:
-                config.apply()
-
-            self.assertIn("fail_json called", str(context.exception))
 
     def test_size_format_validation(self):
         """Test validation of size format parameters."""

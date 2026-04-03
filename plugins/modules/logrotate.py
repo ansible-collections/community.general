@@ -464,7 +464,7 @@ from ansible.module_utils.common.text.converters import to_native
 class LogrotateConfig:
     """Logrotate configuration manager."""
 
-    def __init__(self, module: AnsibleModule, logrotate_bin: str) -> None:
+    def __init__(self, module: AnsibleModule, logrotate_bin: object | None) -> None:
         self.module = module
         self.params = module.params
         self.logrotate_bin = logrotate_bin
@@ -481,10 +481,10 @@ class LogrotateConfig:
 
         self.config_file = self.get_config_path(self.params["enabled"])
 
-    def get_config_path(self, enabled: bool) -> str:
+    def get_config_path(self, enabled: bool | None) -> str:
         """Get config file path based on enabled state."""
         base_path = os.path.join(self.config_dir, self.config_name)
-        if not enabled:
+        if enabled is False:
             return base_path + self.disabled_suffix
         return base_path
 
@@ -493,9 +493,6 @@ class LogrotateConfig:
         if self.params.get("start") is not None:
             if self.params["start"] < 0 or self.params["start"] > 999:
                 self.module.fail_json(msg="'start' must be between 0 and 999")
-
-        if self.params.get("size") and self.params.get("max_size"):
-            self.module.fail_json(msg="'size' and 'max_size' parameters are mutually exclusive")
 
         su_val = self.params.get("su")
         if su_val is not None:
@@ -506,8 +503,24 @@ class LogrotateConfig:
                 if len(su_parts) != 2:
                     self.module.fail_json(msg="'su' parameter must be in format 'user group' or empty string to remove")
 
-        if self.params.get("shred_cycles", 1) < 1:
+        if self.params.get("create") is not None:
+            create_val = self.params["create"]
+            if not re.match(r"^\d{3,4}(\s+\S+\s+\S+)?$", create_val):
+                self.module.fail_json(
+                    msg="'create' must be in format 'mode' or 'mode user group' (for example '0640' or '0640 root adm')"
+                )
+
+        if self.params.get("shred_cycles") is not None and self.params["shred_cycles"] < 1:
             self.module.fail_json(msg="'shred_cycles' must be a positive integer")
+
+        if self.params.get("shred_cycles") is not None and not self.params.get("shred"):
+            self.module.fail_json(msg="'shred_cycles' requires 'shred=true'")
+
+        if self.params.get("compression_method") is not None and not self.params.get("compress"):
+            self.module.fail_json(msg="'compression_method' requires 'compress=true'")
+
+        if self.params.get("compress_options") is not None and not self.params.get("compress"):
+            self.module.fail_json(msg="'compress_options' requires 'compress=true'")
 
         for size_param in ["size", "min_size", "max_size"]:
             if self.params.get(size_param):
@@ -515,16 +528,6 @@ class LogrotateConfig:
                     self.module.fail_json(
                         msg=f"'{size_param}' must be in format 'number[k|M|G]' (for example '100M', '1G')"
                     )
-
-        if self.params.get("old_dir") and self.params.get("no_old_dir"):
-            self.module.fail_json(msg="'old_dir' and 'no_old_dir' parameters are mutually exclusive")
-
-        copy_params = [self.params.get("copy"), self.params.get("copy_truncate"), self.params.get("rename_copy")]
-        if sum(1 for v in copy_params if v) > 1:
-            self.module.fail_json(msg="'copy', 'copy_truncate', and 'rename_copy' parameters are mutually exclusive")
-
-        if self.params.get("delay_compress") and self.params.get("no_delay_compress"):
-            self.module.fail_json(msg="'delay_compress' and 'no_delay_compress' parameters are mutually exclusive")
 
         if self.params["state"] == "present":
             existing_content = self.read_existing_config(any_state=True)
@@ -803,8 +806,8 @@ class LogrotateConfig:
         )
 
         if only_changing_enabled:
-            old_path = self.get_config_path(not target_enabled)
-            new_path = self.get_config_path(target_enabled)
+            old_path = self.get_config_path(bool(not target_enabled))
+            new_path = self.get_config_path(bool(target_enabled))
 
             if os.path.exists(old_path) and not os.path.exists(new_path):
                 self.result["changed"] = True
@@ -824,7 +827,7 @@ class LogrotateConfig:
 
         new_content = self.generate_config_content()
         self.result["config_content"] = new_content
-        self.result["config_file"] = self.get_config_path(target_enabled)
+        self.result["config_file"] = self.get_config_path(bool(target_enabled))
 
         needs_update = existing_content is None or existing_content != new_content or target_enabled != current_enabled
 
