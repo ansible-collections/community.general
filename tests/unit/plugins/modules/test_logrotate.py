@@ -51,6 +51,7 @@ class TestLogrotateConfig(unittest.TestCase):
         self.mock_module.atomic_move = Mock()
         self.mock_module.warn = Mock()
         self.mock_module.run_command = Mock(return_value=(0, "", ""))
+        self.mock_module.backup_local = Mock(return_value=None)
         self.mock_ansible_basic.AnsibleModule.return_value = self.mock_module
         self.config_dir = os.path.join(self.test_dir, "logrotate.d")
         os.makedirs(self.config_dir, exist_ok=True)
@@ -101,16 +102,15 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()) as mock_file:
                 with patch("os.chmod") as mock_chmod:
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        self.assertTrue(result["changed"])
-                        self.assertIn("config_file", result)
-                        self.assertIn("config_content", result)
-                        self.assertEqual(result["enabled_state"], True)
-                        mock_file.assert_called_once()
-                        mock_chmod.assert_called_once()
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    self.assertTrue(result["changed"])
+                    self.assertIn("config_file", result)
+                    self.assertIn("config_content", result)
+                    self.assertEqual(result["enabled_state"], True)
+                    mock_file.assert_called_once()
+                    mock_chmod.assert_called_once()
 
     def test_update_existing_configuration(self):
         """Test updating an existing logrotate configuration."""
@@ -138,14 +138,13 @@ class TestLogrotateConfig(unittest.TestCase):
             with patch("builtins.open", mock_open(read_data=existing_content)):
                 with patch("os.remove") as mock_remove:
                     with patch("os.chmod") as mock_chmod:
-                        with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                            logrotate_bin = self.mock_module.get_bin_path.return_value
-                            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                            result = config.apply()
-                            self.assertTrue(result["changed"])
-                            self.assertIn("14", result["config_content"])
-                            mock_remove.assert_called()
-                            mock_chmod.assert_called_once()
+                        logrotate_bin = self.mock_module.get_bin_path.return_value
+                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                        result = config.apply()
+                        self.assertTrue(result["changed"])
+                        self.assertIn("14", result["config_content"])
+                        mock_remove.assert_called()
+                        mock_chmod.assert_called_once()
 
     def test_remove_configuration(self):
         """Test removing a logrotate configuration."""
@@ -191,10 +190,9 @@ class TestLogrotateConfig(unittest.TestCase):
                     with patch("os.chmod"):
                         mock_file_write = mock_open()
                         with patch("builtins.open", mock_file_write):
-                            with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                                logrotate_bin = self.mock_module.get_bin_path.return_value
-                                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                                result = config.apply()
+                            logrotate_bin = self.mock_module.get_bin_path.return_value
+                            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                            result = config.apply()
                         self.assertTrue(result["changed"])
                         self.assertEqual(result["enabled_state"], False)
                         self.assertTrue(result["config_file"].endswith(".disabled"))
@@ -222,13 +220,12 @@ class TestLogrotateConfig(unittest.TestCase):
                 with patch("os.remove"):
                     with patch("os.chmod"):
                         self.mock_module.atomic_move = Mock()
-                        with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                            logrotate_bin = self.mock_module.get_bin_path.return_value
-                            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                            result = config.apply()
-                            self.assertTrue(result["changed"])
-                            self.assertEqual(result["enabled_state"], True)
-                            self.assertFalse(result["config_file"].endswith(".disabled"))
+                        logrotate_bin = self.mock_module.get_bin_path.return_value
+                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                        result = config.apply()
+                        self.assertTrue(result["changed"])
+                        self.assertEqual(result["enabled_state"], True)
+                        self.assertFalse(result["config_file"].endswith(".disabled"))
 
     def test_validation_missing_paths(self):
         """Test validation when paths are missing for new configuration."""
@@ -289,11 +286,10 @@ class TestLogrotateConfig(unittest.TestCase):
 
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
-                with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                    logrotate_bin = self.mock_module.get_bin_path.return_value
-                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                    result = config.apply()
-                    self.assertTrue(result["changed"])
+                logrotate_bin = self.mock_module.get_bin_path.return_value
+                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                result = config.apply()
+                self.assertTrue(result["changed"])
 
     def test_generate_config_with_scripts(self):
         """Test generating configuration with pre/post scripts."""
@@ -317,17 +313,16 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("prerotate", content)
-                        self.assertIn("postrotate", content)
-                        self.assertIn("firstaction", content)
-                        self.assertIn("lastaction", content)
-                        self.assertIn("systemctl reload test", content)
-                        self.assertIn("echo 'Pre-rotation'", content)
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("prerotate", content)
+                    self.assertIn("postrotate", content)
+                    self.assertIn("firstaction", content)
+                    self.assertIn("lastaction", content)
+                    self.assertIn("systemctl reload test", content)
+                    self.assertIn("echo 'Pre-rotation'", content)
 
     def test_compression_methods(self):
         """Test different compression methods."""
@@ -349,18 +344,17 @@ class TestLogrotateConfig(unittest.TestCase):
                 with patch("os.path.exists", side_effect=exists_side_effect):
                     with patch("builtins.open", mock_open()):
                         with patch("os.chmod"):
-                            with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                                logrotate_bin = self.mock_module.get_bin_path.return_value
-                                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                                result = config.apply()
-                                content = result["config_content"]
-                                if method != "gzip":
-                                    self.assertIn(f"compresscmd /usr/bin/{method}", content)
-                                    if method == "zstd" or method == "lz4":
-                                        self.assertIn(f"uncompresscmd /usr/bin/{method} -d", content)
-                                    else:
-                                        uncompress_cmd = f"{method}un{method}"
-                                        self.assertIn(f"uncompresscmd /usr/bin/{uncompress_cmd}", content)
+                            logrotate_bin = self.mock_module.get_bin_path.return_value
+                            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                            result = config.apply()
+                            content = result["config_content"]
+                            if method != "gzip":
+                                self.assertIn(f"compresscmd /usr/bin/{method}", content)
+                                if method == "zstd" or method == "lz4":
+                                    self.assertIn(f"uncompresscmd /usr/bin/{method} -d", content)
+                                else:
+                                    uncompress_cmd = f"{method}un{method}"
+                                    self.assertIn(f"uncompresscmd /usr/bin/{uncompress_cmd}", content)
 
     def test_size_based_rotation(self):
         """Test size-based rotation configuration."""
@@ -379,13 +373,12 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("size 100M", content)
-                        self.assertNotIn("daily", content)
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("size 100M", content)
+                    self.assertNotIn("daily", content)
 
     def test_logrotate_not_installed(self):
         """Test error when logrotate is not installed."""
@@ -460,12 +453,11 @@ class TestLogrotateConfig(unittest.TestCase):
             with patch("builtins.open", mock_file_read):
                 with patch("os.remove"):
                     with patch("os.chmod"):
-                        with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                            logrotate_bin = self.mock_module.get_bin_path.return_value
-                            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                            result = config.apply()
-                            self.assertTrue(result["changed"])
-                            self.assertIn("/var/log/app1/*.log", result["config_content"])
+                        logrotate_bin = self.mock_module.get_bin_path.return_value
+                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                        result = config.apply()
+                        self.assertTrue(result["changed"])
+                        self.assertIn("/var/log/app1/*.log", result["config_content"])
 
     def test_no_delay_compress_parameter(self):
         """Test no_delay_compress parameter."""
@@ -484,13 +476,12 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("nodelaycompress", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("nodelaycompress", content)
+                    self.assertTrue(result["changed"])
 
     def test_shred_and_shred_cycles_parameters(self):
         """Test shred and shred_cycles parameters."""
@@ -509,14 +500,13 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("shred", content)
-                        self.assertIn("shredcycles 3", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("shred", content)
+                    self.assertIn("shredcycles 3", content)
+                    self.assertTrue(result["changed"])
 
     def test_copy_parameter(self):
         """Test copy parameter."""
@@ -535,14 +525,13 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("copy", content)
-                        self.assertNotIn("copytruncate", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("copy", content)
+                    self.assertNotIn("copytruncate", content)
+                    self.assertTrue(result["changed"])
 
     def test_rename_copy_parameter(self):
         """Test rename_copy parameter."""
@@ -561,13 +550,12 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("renamecopy", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("renamecopy", content)
+                    self.assertTrue(result["changed"])
 
     def test_min_size_parameter(self):
         """Test min_size parameter."""
@@ -586,13 +574,12 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("minsize 100k", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("minsize 100k", content)
+                    self.assertTrue(result["changed"])
 
     def test_date_yesterday_parameter(self):
         """Test date_yesterday parameter."""
@@ -611,14 +598,13 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("dateext", content)
-                        self.assertIn("dateyesterday", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("dateext", content)
+                    self.assertIn("dateyesterday", content)
+                    self.assertTrue(result["changed"])
 
     def test_create_old_dir_parameter(self):
         """Test create_old_dir parameter."""
@@ -637,14 +623,13 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("olddir /var/log/archives", content)
-                        self.assertIn("createolddir", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("olddir /var/log/archives", content)
+                    self.assertIn("createolddir", content)
+                    self.assertTrue(result["changed"])
 
     def test_start_parameter(self):
         """Test start parameter."""
@@ -663,13 +648,12 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("start 1", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("start 1", content)
+                    self.assertTrue(result["changed"])
 
     def test_syslog_parameter(self):
         """Test syslog parameter."""
@@ -688,13 +672,12 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertIn("syslog", content)
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertIn("syslog", content)
+                    self.assertTrue(result["changed"])
 
     def test_validation_copy_and_copy_truncate_exclusive(self):
         """Test validation when both copy and copy_truncate are specified."""
@@ -834,29 +817,28 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        logrotate_bin = self.mock_module.get_bin_path.return_value
-                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                        result = config.apply()
-                        content = result["config_content"]
-                        self.assertTrue(result["changed"])
+                    logrotate_bin = self.mock_module.get_bin_path.return_value
+                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    result = config.apply()
+                    content = result["config_content"]
+                    self.assertTrue(result["changed"])
 
-                        self.assertIn("nodelaycompress", content)
-                        self.assertIn("shred", content)
-                        self.assertIn("shredcycles 3", content)
-                        self.assertIn("copy", content)
-                        self.assertIn("minsize 100k", content)
-                        self.assertIn("dateext", content)
-                        self.assertIn("dateyesterday", content)
-                        self.assertIn("olddir /var/log/archives", content)
-                        self.assertIn("createolddir", content)
-                        self.assertIn("start 1", content)
-                        self.assertIn("syslog", content)
+                    self.assertIn("nodelaycompress", content)
+                    self.assertIn("shred", content)
+                    self.assertIn("shredcycles 3", content)
+                    self.assertIn("copy", content)
+                    self.assertIn("minsize 100k", content)
+                    self.assertIn("dateext", content)
+                    self.assertIn("dateyesterday", content)
+                    self.assertIn("olddir /var/log/archives", content)
+                    self.assertIn("createolddir", content)
+                    self.assertIn("start 1", content)
+                    self.assertIn("syslog", content)
 
-                        lines = [line.strip() for line in content.split("\n")]
-                        self.assertNotIn("copytruncate", lines)
-                        self.assertNotIn("renamecopy", lines)
-                        self.assertNotIn("delaycompress", lines)
+                    lines = [line.strip() for line in content.split("\n")]
+                    self.assertNotIn("copytruncate", lines)
+                    self.assertNotIn("renamecopy", lines)
+                    self.assertNotIn("delaycompress", lines)
 
     def test_parameter_interactions(self):
         """Test interactions between related parameters."""
@@ -924,12 +906,11 @@ class TestLogrotateConfig(unittest.TestCase):
                 with patch("os.path.exists", side_effect=exists_side_effect):
                     with patch("builtins.open", mock_open()):
                         with patch("os.chmod"):
-                            with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                                logrotate_bin = self.mock_module.get_bin_path.return_value
-                                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                            logrotate_bin = self.mock_module.get_bin_path.return_value
+                            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
 
-                                result = config.apply()
-                                self.assertIn(f"size {size}", result["config_content"])
+                            result = config.apply()
+                            self.assertIn(f"size {size}", result["config_content"])
 
         invalid_sizes = ["100kb", "M100", "1.5G", "abc", "100 MB"]
 
@@ -975,12 +956,11 @@ class TestLogrotateConfig(unittest.TestCase):
                 with patch("os.path.exists", side_effect=exists_side_effect):
                     with patch("builtins.open", mock_open()):
                         with patch("os.chmod"):
-                            with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                                logrotate_bin = self.mock_module.get_bin_path.return_value
-                                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                            logrotate_bin = self.mock_module.get_bin_path.return_value
+                            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
 
-                                result = config.apply()
-                                self.assertIn(f"maxsize {size}", result["config_content"])
+                            result = config.apply()
+                            self.assertIn(f"maxsize {size}", result["config_content"])
 
         invalid_sizes = ["100kb", "M100", "1.5G", "abc", "100 MB"]
 
@@ -1026,13 +1006,12 @@ class TestLogrotateConfig(unittest.TestCase):
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open()):
                 with patch("os.chmod"):
-                    with patch.object(logrotate.LogrotateConfig, "_backup_config", create=True):
-                        config = logrotate.LogrotateConfig(self.mock_module, test_logrotate_path)
-                        config.apply()
+                    config = logrotate.LogrotateConfig(self.mock_module, test_logrotate_path)
+                    config.apply()
 
-                        self.mock_module.run_command.assert_called_once()
-                        call_args = self.mock_module.run_command.call_args[0][0]
-                        self.assertEqual(call_args[0], test_logrotate_path)
+                    self.mock_module.run_command.assert_called_once()
+                    call_args = self.mock_module.run_command.call_args[0][0]
+                    self.assertEqual(call_args[0], test_logrotate_path)
 
 
 if __name__ == "__main__":

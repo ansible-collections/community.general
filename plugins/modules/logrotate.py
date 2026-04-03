@@ -866,8 +866,8 @@ def main() -> None:
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type="str", required=True, aliases=["config_name"]),
-            state=dict(type="str", choices=["present", "absent"]),
-            config_dir=dict(type="path"),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
+            config_dir=dict(type="path", default="/etc/logrotate.d"),
             paths=dict(type="list", elements="path"),
             rotation_period=dict(
                 type="str",
@@ -923,6 +923,11 @@ def main() -> None:
             ["size", "max_size"],
             ["copy", "copy_truncate", "rename_copy"],
         ],
+        required_by={
+            "shred_cycles": "shred",
+            "compression_method": "compress",
+            "compress_options": "compress",
+        },
         supports_check_mode=True,
     )
 
