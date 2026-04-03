@@ -10,7 +10,7 @@
 
 - name: Install Consul and test
   vars:
-    consul_version: 1.13.2
+    consul_version: 1.22.6
     consul_uri: https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_{{ ansible_facts.system | lower }}_{{ consul_arch }}.zip
     consul_cmd: '{{ remote_tmp_dir }}/consul'
   block:
@@ -53,13 +53,16 @@
       until: result is success
       when: ansible_facts.distribution != "MacOSX"
     - assert:
-        that: ansible_facts.architecture in ['i386', 'x86_64', 'amd64']
+        that: ansible_facts.architecture in ['i386', 'x86_64', 'amd64', 'arm64', 'aarch64']
     - set_fact:
         consul_arch: '386'
       when: ansible_facts.architecture == 'i386'
     - set_fact:
         consul_arch: amd64
       when: ansible_facts.architecture in ['x86_64', 'amd64']
+    - set_fact:
+        consul_arch: arm64
+      when: ansible_facts.architecture in ['arm64', 'aarch64']
     - name: Download consul binary
       unarchive:
         src: '{{ consul_uri }}'
@@ -67,6 +70,10 @@
         remote_src: true
       register: result
       until: result is success
+    - name: Remove macOS quarantine attribute from consul binary
+      command: xattr -d com.apple.quarantine {{ consul_cmd }}
+      when: ansible_facts.system == 'Darwin'
+      ignore_errors: true
     - vars:
         remote_dir: '{{ echo_remote_tmp_dir.stdout }}'
       block:
@@ -78,6 +85,12 @@
             dest: '{{ remote_tmp_dir }}/consul_config.hcl'
         - name: Start Consul (dev mode enabled)
           shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
+        - name: Wait for Consul HTTP API to be ready
+          wait_for:
+            host: localhost
+            port: 8500
+            delay: 3
+            timeout: 60
         - name: Bootstrap ACL
           consul_acl_bootstrap:
           register: consul_bootstrap_result

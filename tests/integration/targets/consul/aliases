@@ -4,4 +4,3 @@
 
 azp/posix/2
 destructive
-skip/macos  # cannot simply create binaries in system locations on newer macOS versions
