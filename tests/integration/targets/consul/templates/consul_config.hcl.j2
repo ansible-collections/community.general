@@ -7,11 +7,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
 server = true
 pid_file = "{{ remote_dir }}/consul.pid"
 ports {
-  http = 8500
+  http  = 8500
   https = 8501
+  grpc  = -1
 }
-key_file = "{{ remote_dir }}/privatekey.pem"
-cert_file = "{{ remote_dir }}/cert.pem"
+tls {
+  defaults {
+    key_file         = "{{ remote_dir }}/privatekey.pem"
+    cert_file        = "{{ remote_dir }}/cert.pem"
+    verify_incoming  = false
+    verify_outgoing  = false
+  }
+}
 acl {
   enabled        = true
   default_policy = "deny"
