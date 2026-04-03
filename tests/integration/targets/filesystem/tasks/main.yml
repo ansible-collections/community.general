@@ -52,8 +52,7 @@
     - 'ansible_facts.distribution == "Archlinux" and item.0.key == "bcachefs"'
     # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
     - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs"])'
-    - 'not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version is version("8", ">=") and
-            item.0.key == "btrfs")'
+    - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
     # reiserfs-utils package not available with Fedora 35 on CI
     - 'not (ansible_facts.distribution == "Fedora" and (ansible_facts.distribution_major_version | int >= 35) and
             item.0.key == "reiserfs")'
@@ -75,12 +74,6 @@
     # btrfs-progs cannot be installed on ArchLinux
     - 'not (item.0.key == "btrfs" and ansible_facts.distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
 
-    # On CentOS 6 shippable containers, wipefs seems unable to remove vfat signatures
-    - 'not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_version is version("7.0", "<") and
-            item.1 == "remove_fs" and item.0.key == "vfat")'
-    # On same systems, mkfs.minix (unhandled by the module) can't find the device/file
-    - 'not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_version is version("7.0", "<") and
-            item.1 == "overwrite_another_fs")'
 
     # TODO: something seems to be broken on Alpine
     - 'not (ansible_facts.distribution == "Alpine")'

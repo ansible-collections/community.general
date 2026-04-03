@@ -29,7 +29,7 @@
       assert:
         that: modules_before.stdout == modules_after.stdout
   when: ansible_facts.os_family in ['Debian', 'Suse']
-  # centos/RHEL does not have a2enmod/a2dismod
+  # CentOS/RHEL does not have a2enmod/a2dismod
 
 - name: include misleading warning test
   include_tasks: 635-apache2-misleading-warning.yml

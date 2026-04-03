@@ -13,8 +13,6 @@
   when:
     - ansible_facts.system != 'FreeBSD'
     - ansible_facts.distribution != 'MacOSX'
-    - ansible_facts.distribution != 'RedHat' or ansible_facts.distribution_version is version('8.0', '>=')
-    - ansible_facts.distribution != 'CentOS' or ansible_facts.distribution_version is version('7.0', '>=')
     - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_version is version('18', '>=')
 
 - block:
@@ -38,5 +36,3 @@
       command: /tmp/sh.rustup.rs -y
     - set_fact:
         rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"
-  when:
-    - ansible_facts.distribution != 'CentOS' or ansible_facts.distribution_version is version('7.0', '>=')
