@@ -33,6 +33,7 @@ options:
       - Whether the configuration should be present or absent.
     type: str
     choices: [present, absent]
+    default: present
   config_dir:
     description:
       - Directory where logrotate configurations are stored.
@@ -40,6 +41,7 @@ options:
       - Use V(~/.logrotate.d) for user-specific configurations.
       - This directory must exist before using the module.
     type: path
+    default: /etc/logrotate.d
   paths:
     description:
       - List of log file paths or patterns to rotate.
