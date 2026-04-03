@@ -23,7 +23,7 @@
         "ms-python.vscode-pylance",
         "redhat.ansible",
         "redhat.vscode-yaml",
-        "trond-snekvik.simple-rst",
+        "trond-snekvik.simple-rst"
       ]
     }
   },
