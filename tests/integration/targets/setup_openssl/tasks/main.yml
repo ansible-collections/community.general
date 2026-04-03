@@ -27,20 +27,18 @@
     name: '{{ openssl_package_name }}'
   when: not ansible_facts.os_family == 'Darwin'
 
-- when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
-  block:
-    - name: Install cryptography
-      become: true
-      package:
-        name: '{{ cryptography_package_name_python3 }}'
-      when: not cryptography_from_pip
+- name: Install cryptography
+  become: true
+  package:
+    name: '{{ cryptography_package_name_python3 }}'
+  when: not cryptography_from_pip
 
-    - name: Install cryptography (pip)
-      become: true
-      pip:
-        name: cryptography>=3.3
-        extra_args: "-c {{ remote_constraints }}"
-      when: cryptography_from_pip
+- name: Install cryptography (pip)
+  become: true
+  pip:
+    name: cryptography>=3.3
+    extra_args: "-c {{ remote_constraints }}"
+  when: cryptography_from_pip
 
 - name: Install pyOpenSSL
   become: true

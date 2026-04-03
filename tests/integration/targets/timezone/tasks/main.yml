@@ -8,14 +8,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Because hwclock usually isn't available inside Docker containers in Shippable
-# these tasks will detect if hwclock works and only run hwclock tests if it is
-# supported. That is why it is recommended to run these tests locally with
-# `--docker-privileged` on centos6, centos7 and ubuntu1404 images. Example
-# command to run on centos6:
-#
-#   ansible-test integration --docker centos6 --docker-privileged -v timezone
-
 ##
 ## set path to timezone config files
 ##

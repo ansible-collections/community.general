@@ -9,11 +9,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - set_fact:
-    has_java_keytool: >-
-      {{
-        ansible_facts.os_family not in ['Darwin', 'FreeBSD']
-        and not (ansible_facts.distribution == "CentOS" and ansible_facts.distribution_version is version("7.0", "<"))
-      }}
+    has_java_keytool: >
+      {{ ansible_facts.os_family not in ['Darwin', 'FreeBSD'] }}
 
 - name: Include OS-specific variables
   include_vars: '{{ lookup("first_found", params) }}'
