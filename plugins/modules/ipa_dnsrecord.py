@@ -210,7 +210,8 @@ class DNSRecordIPAClient(IPAClient):
         else:
             method = "dnsrecord_find"
         result = self._post_json(method=method, name=zone_name, item={"idnsname": record_name, "all": True})
-        result["dnsttl"] = [int(v) for v in result["dnsttl"]]
+        if "dnsttl" in result:
+            result["dnsttl"] = [int(v) for v in result["dnsttl"]]
         return result
 
     def dnsrecord_add(self, zone_name=None, record_name=None, details=None):
