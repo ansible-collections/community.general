@@ -134,7 +134,10 @@ options:
     type: str
     description:
       - Sets the assignee when O(operation) is V(create), V(transition), or V(edit).
-      - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use O(account_id) instead.
+      - Jira Cloud requires the assignee as an account ID (use O(account_id)). Alternatively, when O(cloud=true) and O(assignee) contains
+        C(@), the module resolves an email to an account ID via the Jira Cloud user search API (C(/rest/api/2/user/search)); resolution
+        succeeds only when exactly one user matches and the returned email address matches the value provided. Jira Server and Jira Data
+        Center may still accept O(assignee) as a username.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   account_id:
     type: str
@@ -195,6 +198,8 @@ options:
       - Enable when using Jira Cloud.
       - When set to V(true), O(operation=search) uses the C(/rest/api/2/search/jql) endpoint required by Jira Cloud,
         since the legacy C(/rest/api/2/search) endpoint has been removed.
+      - When set to V(true) and O(assignee) contains C(@), the module resolves the assignee as an email address
+        to an account ID using the C(/rest/api/2/user/search) endpoint.
       - When set to V(false) (the default), the legacy endpoint is used, which is still required for Jira Data Center / Server.
       - See U(https://developer.atlassian.com/changelog/#CHANGE-2046) for details about the endpoint deprecation.
       - In the future, if this option is set to V(true), other endpoints might also be replaced to address
@@ -351,6 +356,18 @@ EXAMPLES = r"""
     description: Created and assigned using Ansible
     issuetype: Task
     assignee: ssmith
+
+# Assign an issue on Jira Cloud using an email address
+# (the module resolves the email to an account ID automatically)
+- name: Assign an issue on Jira Cloud using email
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: edit
+    cloud: true
+    assignee: user@example.com
 
 # Edit an issue
 - name: Set the labels on an issue using free-form fields
@@ -612,14 +629,45 @@ class JIRA(StateModuleHelper):
     state_param = "operation"
 
     def __init_module__(self):
+        self.vars.uri = self.vars.uri.strip("/")
+        self.vars.set("restbase", f"{self.vars.uri}/rest/api/2")
         if self.vars.fields is None:
             self.vars.fields = {}
         if self.vars.assignee:
-            self.vars.fields["assignee"] = {"name": self.vars.assignee}
+            if self.vars.cloud and "@" in self.vars.assignee:
+                account_id = self._resolve_account_id(self.vars.assignee)
+                self.vars.fields["assignee"] = {"accountId": account_id}
+            else:
+                self.vars.fields["assignee"] = {"name": self.vars.assignee}
         if self.vars.account_id:
             self.vars.fields["assignee"] = {"accountId": self.vars.account_id}
-        self.vars.uri = self.vars.uri.strip("/")
-        self.vars.set("restbase", f"{self.vars.uri}/rest/api/2")
+
+    def _resolve_account_id(self, email):
+        url = f"{self.vars.restbase}/user/search?query={pathname2url(email)}"
+        result = self.get(url)
+        if not isinstance(result, list) or len(result) != 1:
+            count = len(result) if isinstance(result, list) else 0
+            self.module.fail_json(
+                msg=(
+                    f"Failed to resolve assignee '{email}' to "
+                    f"a unique Jira Cloud account ID: found "
+                    f"{count} result(s). Use the 'account_id' "
+                    f"parameter to specify the account ID "
+                    f"directly."
+                )
+            )
+        user = result[0]
+        if user.get("emailAddress", "").lower() != email.lower():
+            self.module.fail_json(
+                msg=(
+                    f"Failed to resolve assignee '{email}': "
+                    f"the returned user's email address "
+                    f"'{user.get('emailAddress')}' does not "
+                    f"match. Use the 'account_id' parameter "
+                    f"to specify the account ID directly."
+                )
+            )
+        return user["accountId"]
 
     @cause_changes(when="success")
     def operation_create(self):
