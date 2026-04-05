@@ -2915,7 +2915,7 @@ def create_module() -> AnsibleModule:
         ],
         supports_check_mode=True,
     )
-    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
     return module
 
 
