@@ -175,7 +175,7 @@ def check_package_version(module, name):
     # if newest version already installed return True
     # otherwise return False
 
-    rc, out, err = module.run_command([APT_CACHE, "policy", name], environ_update={"LANG": "C"})
+    rc, out, err = module.run_command([APT_CACHE, "policy", name], environ_update={"LANGUAGE": "C", "LC_ALL": "C"})
     installed = re.split("\n |: ", out)[2]
     candidate = re.split("\n |: ", out)[4]
     return installed >= candidate
@@ -204,7 +204,9 @@ def query_package_provides(module, name, allow_upgrade=False):
 
 
 def update_package_db(module):
-    rc, update_out, err = module.run_command([APT_PATH, "update"], check_rc=True, environ_update={"LANG": "C"})
+    rc, update_out, err = module.run_command(
+        [APT_PATH, "update"], check_rc=True, environ_update={"LANGUAGE": "C", "LC_ALL": "C"}
+    )
     return (False, update_out)
 
 
@@ -223,12 +225,16 @@ def clean(module):
 
 
 def dist_upgrade(module):
-    rc, out, err = module.run_command([APT_PATH, "-y", "dist-upgrade"], check_rc=True, environ_update={"LANG": "C"})
+    rc, out, err = module.run_command(
+        [APT_PATH, "-y", "dist-upgrade"], check_rc=True, environ_update={"LANGUAGE": "C", "LC_ALL": "C"}
+    )
     return (APT_GET_ZERO not in out, out)
 
 
 def update_kernel(module):
-    rc, out, err = module.run_command(["/usr/sbin/update-kernel", "-y"], check_rc=True, environ_update={"LANG": "C"})
+    rc, out, err = module.run_command(
+        ["/usr/sbin/update-kernel", "-y"], check_rc=True, environ_update={"LANGUAGE": "C", "LC_ALL": "C"}
+    )
     return (UPDATE_KERNEL_ZERO not in out, out)
 
 
@@ -243,7 +249,9 @@ def remove_packages(module, packages):
         if not query_package(module, package):
             continue
 
-        rc, out, err = module.run_command([APT_PATH, "-y", "remove", package], environ_update={"LANG": "C"})
+        rc, out, err = module.run_command(
+            [APT_PATH, "-y", "remove", package], environ_update={"LANGUAGE": "C", "LC_ALL": "C"}
+        )
 
         if rc != 0:
             module.fail_json(msg=f"failed to remove {package}: {err}")
@@ -267,7 +275,7 @@ def install_packages(module, pkgspec, allow_upgrade=False):
 
     if packages:
         command = [APT_PATH, "-y", "install"] + packages
-        rc, out, err = module.run_command(command, environ_update={"LANG": "C"})
+        rc, out, err = module.run_command(command, environ_update={"LANGUAGE": "C", "LC_ALL": "C"})
 
         installed = True
         for package in pkgspec:

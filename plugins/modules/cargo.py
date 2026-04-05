@@ -254,7 +254,7 @@ def main():
         module.fail_json(msg="Source directory does not exist")
 
     # Set LANG env since we parse stdout
-    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     cargo = Cargo(module, **module.params)
     changed, out, err = False, None, None
