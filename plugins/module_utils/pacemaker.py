@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import re
+import time
 import typing as t
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
@@ -57,6 +58,24 @@ def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
         maint_mode_re = re.compile(r"maintenance-mode.*true", re.IGNORECASE)
         maintenance_mode_output = [line for line in out.splitlines() if maint_mode_re.search(line)]
         return bool(maintenance_mode_output)
+
+
+def wait_for_resource(runner: CmdRunner, cli_noun: str, name: str, wait: int, sleep_interval: int = 5) -> None:
+    """Poll ``pcs <cli_noun> status <name>`` until the resource reports Started or the wait budget expires.
+
+    Raises an exception if the resource does not reach the Started state within *wait* seconds.
+    """
+    deadline = time.monotonic() + wait
+    while True:
+        with runner("cli_action state name") as ctx:
+            rc, out, err = ctx.run(cli_action=cli_noun, state="status")
+        if out and "Started" in out:
+            return
+        if time.monotonic() >= deadline:
+            raise Exception(
+                f"Timed out waiting {wait}s for {cli_noun} resource '{name}' to start"
+            )
+        time.sleep(sleep_interval)
 
 
 def pacemaker_runner(module: AnsibleModule, **kwargs) -> CmdRunner:

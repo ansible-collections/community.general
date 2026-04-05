@@ -33,10 +33,15 @@ test_cases:
           rc: 1
           out: ""
           err: ""
-        - command: ["/testbin/pcs", stonith, create, virtual-stonith, fence_virt, "pcmk_host_list=f1", "op", "monitor", "interval=30s", "--wait=300"]
+        - command: ["/testbin/pcs", stonith, create, virtual-stonith, fence_virt, "pcmk_host_list=f1", "op", "monitor", "interval=30s"]
           environ: *env-def
           rc: 0
           out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
           err: ""
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
           environ: *env-def
@@ -65,11 +70,16 @@ test_cases:
           rc: 0
           out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
           err: ""
-        - command: ["/testbin/pcs", stonith, create, virtual-stonith, fence_virt, "pcmk_host_list=f1", "op", "monitor", "interval=30s", "--wait=300"]
+        - command: ["/testbin/pcs", stonith, create, virtual-stonith, fence_virt, "pcmk_host_list=f1", "op", "monitor", "interval=30s"]
           environ: *env-def
           rc: 0
           out: ""
           err: "Error: 'virtual-stonith' already exists.\n"
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+          err: ""
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
           environ: *env-def
           rc: 0

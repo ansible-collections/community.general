@@ -125,7 +125,7 @@ value:
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pacemaker import pacemaker_runner
+from ansible_collections.community.general.plugins.module_utils.pacemaker import pacemaker_runner, wait_for_resource
 
 
 class PacemakerStonith(StateModuleHelper):
@@ -206,7 +206,7 @@ class PacemakerStonith(StateModuleHelper):
 
     def state_present(self):
         with self.runner(
-            "cli_action state name resource_type resource_option resource_operation resource_meta resource_argument agent_validation wait",
+            "cli_action state name resource_type resource_option resource_operation resource_meta resource_argument agent_validation",
             output_process=self._process_command_output(True, "already exists"),
             check_mode_skip=True,
         ) as ctx:
@@ -218,6 +218,8 @@ class PacemakerStonith(StateModuleHelper):
                 resource_meta=self.vars.stonith_metas,
                 resource_argument=self.vars.stonith_argument,
             )
+        if not self.module.check_mode and self.vars.wait:
+            wait_for_resource(self.runner, "stonith", self.vars.name, self.vars.wait)
 
     def state_enabled(self):
         with self.runner(
