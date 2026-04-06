@@ -1652,6 +1652,9 @@ def mocker_set(
     """
     Common mocker object
     """
+    mocker.patch(
+        "ansible_collections.community.general.plugins.modules.nmcli.get_best_parsable_locale", return_value="C"
+    )
     get_bin_path = mocker.patch("ansible.module_utils.basic.AnsibleModule.get_bin_path")
     get_bin_path.return_value = "/usr/bin/nmcli"
     connection = mocker.patch.object(nmcli.Nmcli, "connection_exists")
