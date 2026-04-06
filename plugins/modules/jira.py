@@ -138,6 +138,7 @@ options:
         C(@), the module resolves an email to an account ID via the Jira Cloud user search API (C(/rest/api/2/user/search)); resolution
         succeeds only when exactly one user matches and the returned email address matches the value provided. Jira Server and Jira Data
         Center may still accept O(assignee) as a username.
+      - Email-based assignee auto-resolution was added in community.general 12.6.0.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   account_id:
     type: str
@@ -512,6 +513,7 @@ import os
 import random
 import string
 import traceback
+from urllib.parse import quote
 from urllib.request import pathname2url
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
@@ -643,7 +645,7 @@ class JIRA(StateModuleHelper):
             self.vars.fields["assignee"] = {"accountId": self.vars.account_id}
 
     def _resolve_account_id(self, email):
-        url = f"{self.vars.restbase}/user/search?query={pathname2url(email)}"
+        url = f"{self.vars.restbase}/user/search?query={quote(email, safe='')}"
         result = self.get(url)
         if not isinstance(result, list) or len(result) != 1:
             count = len(result) if isinstance(result, list) else 0
