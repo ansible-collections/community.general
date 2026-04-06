@@ -1,0 +1,19 @@
+plugins/module_utils/_lxc.py pylint:ansible-bad-function  # needs to use Popen() to stream logs
+plugins/modules/ansible_galaxy_install.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
+plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/gandi_livedns.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
+plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/homectl.py import-3.12  # Uses deprecated stdlib library 'crypt'
+plugins/modules/interfaces_file.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
+plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
+plugins/modules/keycloak_realm_info.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
+plugins/modules/keycloak_realm_keys_metadata_info.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
+plugins/modules/nosh.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
+plugins/modules/omapi_host.py validate-modules:bad-return-value-key  # TODO: rename offending return values if possible, or adjust this comment in case the name is OK
+plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
+plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
+plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
+plugins/modules/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/udm_user.py import-3.12  # Uses deprecated stdlib library 'crypt'
+plugins/modules/xfconf.py validate-modules:return-syntax-error
+tests/unit/plugins/modules/test_gio_mime.yaml no-smart-quotes
