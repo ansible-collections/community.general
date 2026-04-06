@@ -1,4 +1,4 @@
-minor_changes:
+bugfixes:
   - alternatives - normalise locale environment for ``run_command()`` calls to ``LANGUAGE=C, LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
   - apk - normalise locale environment for ``run_command()`` calls to ``LANGUAGE=C, LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
   - apt_rpm - normalise locale environment for ``run_command()`` calls to ``LANGUAGE=C, LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
