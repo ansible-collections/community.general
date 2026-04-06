@@ -213,7 +213,7 @@ class Filesystem:
     CHANGE_UUID_OPTION: str | None = None
     CHANGE_UUID_OPTION_HAS_ARG = True
 
-    LANG_ENV = {"LANG": "C", "LC_ALL": "C", "LC_MESSAGES": "C"}
+    LANG_ENV = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     def __init__(self, module):
         self.module = module
