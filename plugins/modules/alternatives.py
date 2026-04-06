@@ -163,7 +163,7 @@ class AlternativesModule:
     def __init__(self, module):
         self.module = module
         self.result = dict(changed=False, diff=dict(before=dict(), after=dict()))
-        self.module.run_command_environ_update = {"LC_ALL": "C"}
+        self.module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
         self.messages = []
         self.run()
 
