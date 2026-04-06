@@ -381,6 +381,9 @@ files:
     maintainers: russoz
   $module_utils/_lxc.py:
     maintainers: russoz
+  $module_utils/lvm.py:
+    labels: lvm
+    maintainers: russoz
   $module_utils/manageiq.py:
     labels: manageiq
     maintainers: $team_manageiq

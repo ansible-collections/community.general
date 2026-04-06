@@ -74,7 +74,7 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils.lvm import pvmove_runner, pvs_runner
 
 
 def main():
@@ -89,18 +89,8 @@ def main():
         supports_check_mode=True,
     )
 
-    pvs_runner = CmdRunner(
-        module,
-        command="pvs",
-        arg_formats=dict(
-            noheadings=cmd_runner_fmt.as_fixed("--noheadings"),
-            readonly=cmd_runner_fmt.as_fixed("--readonly"),
-            vg_name=cmd_runner_fmt.as_fixed("-o", "vg_name"),
-            pv_pe_alloc_count=cmd_runner_fmt.as_fixed("-o", "pv_pe_alloc_count"),
-            pv_pe_count=cmd_runner_fmt.as_fixed("-o", "pv_pe_count"),
-            device=cmd_runner_fmt.as_list(),
-        ),
-    )
+    pvs = pvs_runner(module)
+    pvmove = pvmove_runner(module)
 
     source = module.params["source"]
     destination = module.params["destination"]
@@ -116,24 +106,16 @@ def main():
     if source == destination:
         module.fail_json(msg="Source and destination devices must be different")
 
-    def run_pvs_command(arguments, device):
-        with pvs_runner(arguments) as ctx:
-            rc, out, err = ctx.run(device=device)
+    def run_pvs_field(field, device):
+        with pvs("noheadings fields devices") as ctx:
+            rc, out, err = ctx.run(fields=field, devices=[device])
             if rc != 0:
-                module.fail_json(
-                    msg=f"Command failed: {err}",
-                    stdout=out,
-                    stderr=err,
-                    rc=rc,
-                    cmd=ctx.cmd,
-                    arguments=arguments,
-                    device=device,
-                )
+                module.fail_json(msg=f"Command failed: {err}", stdout=out, stderr=err, rc=rc, cmd=ctx.cmd)
             return out.strip()
 
     def is_pv(device):
-        with pvs_runner("noheadings readonly device", check_rc=False) as ctx:
-            rc, out, err = ctx.run(device=device)
+        with pvs("noheadings readonly devices", check_rc=False) as ctx:
+            rc, dummy, dummy = ctx.run(devices=[device])
         return rc == 0
 
     if not is_pv(source):
@@ -141,8 +123,8 @@ def main():
     if not is_pv(destination):
         module.fail_json(msg=f"Destination device {destination} is not a PV")
 
-    vg_src = run_pvs_command("noheadings vg_name device", source)
-    vg_dest = run_pvs_command("noheadings vg_name device", destination)
+    vg_src = run_pvs_field("vg_name", source)
+    vg_dest = run_pvs_field("vg_name", destination)
     if vg_src != vg_dest:
         module.fail_json(
             msg=f"Source and destination must be in the same VG. Source VG: '{vg_src}', Destination VG: '{vg_dest}'."
@@ -150,7 +132,7 @@ def main():
 
     def get_allocated_pe(device):
         try:
-            return int(run_pvs_command("noheadings pv_pe_alloc_count device", device))
+            return int(run_pvs_field("pv_pe_alloc_count", device))
         except ValueError:
             module.fail_json(msg=f"Invalid allocated PE count for device {device}")
 
@@ -161,7 +143,7 @@ def main():
         # Check destination has enough free space
         def get_total_pe(device):
             try:
-                return int(run_pvs_command("noheadings pv_pe_count device", device))
+                return int(run_pvs_field("pv_pe_count", device))
             except ValueError:
                 module.fail_json(msg=f"Invalid total PE count for device {device}")
 
@@ -181,22 +163,8 @@ def main():
             changed = True
             actions.append(f"would move data from {source} to {destination}")
         else:
-            pvmove_runner = CmdRunner(
-                module,
-                command="pvmove",
-                arg_formats=dict(
-                    auto_answer=cmd_runner_fmt.as_bool("-y"),
-                    atomic=cmd_runner_fmt.as_bool("--atomic"),
-                    autobackup=cmd_runner_fmt.as_fixed("--autobackup", "y" if module.params["autobackup"] else "n"),
-                    verbosity=cmd_runner_fmt.as_func(lambda v: [f"-{'v' * v}"] if v > 0 else []),
-                    source=cmd_runner_fmt.as_list(),
-                    destination=cmd_runner_fmt.as_list(),
-                ),
-            )
-
-            verbosity = module._verbosity
-            with pvmove_runner("auto_answer atomic autobackup verbosity source destination") as ctx:
-                rc, out, err = ctx.run(verbosity=verbosity, source=source, destination=destination)
+            with pvmove("auto_answer atomic autobackup verbosity source destination") as ctx:
+                dummy, out, err = ctx.run(verbosity=module._verbosity)
                 result["stdout"] = out
                 result["stderr"] = err
 

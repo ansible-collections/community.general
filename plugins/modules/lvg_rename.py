@@ -54,6 +54,8 @@ EXAMPLES = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.community.general.plugins.module_utils.lvm import vgrename_runner, vgs_runner
+
 argument_spec = dict(
     vg=dict(type="str", required=True),
     vg_new=dict(type="str", required=True),
@@ -70,6 +72,8 @@ class LvgRename:
         self.module = module
         self.result = {"changed": False}
         self.vg_list = []
+        self._vgs = vgs_runner(module)
+        self._vgrename = vgrename_runner(module)
         self._load_params()
 
     def run(self):
@@ -103,9 +107,8 @@ class LvgRename:
     def _load_vg_list(self):
         """Load the VGs from the system."""
 
-        vgs_cmd = self.module.get_bin_path("vgs", required=True)
-        vgs_cmd_with_opts = [vgs_cmd, "--noheadings", "--separator", ";", "-o", "vg_name,vg_uuid"]
-        dummy, vg_raw_list, dummy = self.module.run_command(vgs_cmd_with_opts, check_rc=True)
+        with self._vgs("noheadings separator fields") as ctx:
+            dummy, vg_raw_list, dummy = ctx.run(separator=";", fields="vg_name,vg_uuid")
 
         for vg_info in vg_raw_list.splitlines():
             vg_name, vg_uuid = vg_info.strip().split(";")
@@ -135,8 +138,6 @@ class LvgRename:
     def _rename_vg(self):
         """Renames the volume group."""
 
-        vgrename_cmd = self.module.get_bin_path("vgrename", required=True)
-
         if self.module._diff:
             self.result["diff"] = {"before": {"vg": self.vg}, "after": {"vg": self.vg_new}}
 
@@ -144,8 +145,8 @@ class LvgRename:
             self.result["msg"] = f"Running in check mode. The module would rename VG {self.vg} to {self.vg_new}."
             self.result["changed"] = True
         else:
-            vgrename_cmd_with_opts = [vgrename_cmd, self.vg, self.vg_new]
-            dummy, vg_rename_out, dummy = self.module.run_command(vgrename_cmd_with_opts, check_rc=True)
+            with self._vgrename("vg vg_new") as ctx:
+                dummy, vg_rename_out, dummy = ctx.run()
 
             self.result["msg"] = vg_rename_out
             self.result["changed"] = True
