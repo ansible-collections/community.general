@@ -35,9 +35,10 @@ options:
     type: bool
   email_verified:
     description:
-      - Check the validity of user email.
-    default: false
-    type: bool
+      - Set or reset the emailVerified flag of the user.
+    choices: ["ignore", "verified", "unverified"]
+    default: ignore
+    type: str
     aliases:
       - emailVerified
   first_name:
@@ -380,7 +381,7 @@ def main():
         last_name=dict(type="str", aliases=["lastName"]),
         email=dict(type="str"),
         enabled=dict(type="bool"),
-        email_verified=dict(type="bool", default=False, aliases=["emailVerified"]),
+        email_verified=dict(type="str", choices=["ignore", "verified", "unverified"], default="ignore", aliases=["emailVerified"]),
         federation_link=dict(type="str", aliases=["federationLink"]),
         service_account_client_id=dict(type="str", aliases=["serviceAccountClientId"]),
         attributes=dict(type="list", elements="dict", options=attributes_spec),
@@ -420,12 +421,21 @@ def main():
         module.fail_json(msg=str(e))
 
     kc = KeycloakAPI(module, connection_header)
+    
 
     realm = module.params.get("realm")
     state = module.params.get("state")
     force = module.params.get("force")
     username = module.params.get("username")
     groups = module.params.get("groups")
+    email_verified = module.params.get("email_verified")
+    
+    if email_verified == "verified":
+        module.params["email_verified"] = True
+    elif email_verified == "unverified":
+        module.params["email_verified"] = False
+
+        
 
     # Filter and map the parameters names that apply to the user
     user_params = [
@@ -508,14 +518,16 @@ def main():
                 # create_user could have failed, but we don't know for sure until we try to create the user.'
                 result["user_created"] = True
                 module.exit_json(**result)
-
-            # Create the user
-            after_user = kc.create_user(userrep=desired_user, realm=realm)
-            result["msg"] = f"User {desired_user['username']} created"
-            # Add user ID to new representation
-            desired_user["id"] = after_user["id"]
-            # Set user_created flag
-            result["user_created"] = True
+            else:
+              # Create the user
+              if desired_user.get("emailVerified") == "ignore":
+                  desired_user["emailVerified"] = False
+              after_user = kc.create_user(userrep=desired_user, realm=realm)
+              result["msg"] = f"User {desired_user['username']} created"
+              # Add user ID to new representation
+              desired_user["id"] = after_user["id"]
+              # Set user_created flag
+              result["user_created"] = True
         else:
             excludes = [
                 "access",
@@ -529,6 +541,8 @@ def main():
                 "federatedIdentities",
                 "requiredActions",
             ]
+            if desired_user.get("emailVerified") == "ignore":
+                excludes.append("emailVerified")
             # Add user ID to new representation
             desired_user["id"] = before_user["id"]
 
@@ -537,12 +551,14 @@ def main():
                 is_struct_included(desired_user, before_user, excludes)
             ):  # If the new user does not introduce a change to the existing user
                 # Update the user
-                after_user = kc.update_user(userrep=desired_user, realm=realm)
+                if not module.check_mode:
+                  after_user = kc.update_user(userrep=desired_user, realm=realm)
                 changed = True
 
-        # set user groups
-        if kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
-            changed = True
+        if not module.check_mode:
+          # set user groups
+          if kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
+              changed = True
         # Get the user groups
         after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
         result["end_state"] = after_user
