@@ -45,18 +45,28 @@ options:
   name:
     description:
       - The name of the flatpak to manage. To operate on several packages this can accept a list of packages.
-      - When used with O(state=present), O(name) can be specified as a URL to a C(flatpakref) file or the unique reverse DNS
-        name that identifies a flatpak.
-      - Both C(https://) and C(http://) URLs are supported.
+      - Should be specified as the unique reverse DNS name that identifies a flatpak (for example V(org.gnome.gedit)).
       - When supplying a reverse DNS name, you can use the O(remote) option to specify on what remote to look for the flatpak.
-        An example for a reverse DNS name is C(org.gnome.gedit).
-      - When used with O(state=absent) or O(state=latest), it is recommended to specify the name in the reverse DNS format.
-      - When supplying a URL with O(state=absent) or O(state=latest), the module tries to match the installed flatpak based
-        on the name of the flatpakref to remove or update it. However, there is no guarantee that the names of the flatpakref
-        file and the reverse DNS name of the installed flatpak do match.
+      - When used with O(state=present), O(name) can also be specified as a URL to a C(flatpakref) file, but that is
+        deprecated. Use the O(from_url) option instead to install from a URL.
+      - Both C(https://) and C(http://) URLs are supported in O(name), but support for URLs in O(name) is deprecated and
+        will be removed in community.general 14.0.0. Use O(from_url) instead.
+      - When used with O(state=absent) or O(state=latest), always specify the name in the reverse DNS format.
+      - B(Deprecated:) When supplying a URL with O(state=absent) or O(state=latest), the module tries to match the installed
+        flatpak based on the name of the flatpakref to remove or update it. However, there is no guarantee that the names of
+        the flatpakref file and the reverse DNS name of the installed flatpak do match.
     type: list
     elements: str
     required: true
+  from_url:
+    description:
+      - A C(http://) or C(https://) URL pointing to a C(.flatpakref) file to install from.
+      - When this option is set, O(name) must contain exactly one entry specifying the reverse DNS application ID of the
+        flatpak (for example V(com.onepassword.OnePassword)). This is used to check whether the flatpak is already installed.
+      - O(name) and O(from_url) cannot both contain URLs.
+      - Use this option instead of passing a URL in O(name); passing URLs in O(name) is deprecated.
+    type: str
+    version_added: "12.6.0"
   no_dependencies:
     description:
       - If installing runtime dependencies should be omitted or not.
@@ -84,12 +94,14 @@ options:
 EXAMPLES = r"""
 - name: Install the spotify flatpak
   community.general.flatpak:
-    name: https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
+    name: com.spotify.Client
+    from_url: https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
     state: present
 
 - name: Install the gedit flatpak package without dependencies (not recommended)
   community.general.flatpak:
-    name: https://git.gnome.org/browse/gnome-apps-nightly/plain/gedit.flatpakref
+    name: org.gnome.gedit
+    from_url: https://git.gnome.org/browse/gnome-apps-nightly/plain/gedit.flatpakref
     state: present
     no_dependencies: true
 
@@ -120,12 +132,14 @@ EXAMPLES = r"""
 
 - name: Update the spotify flatpak
   community.general.flatpak:
-    name: https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
+    name: com.spotify.Client
+    from_url: https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
     state: latest
 
 - name: Update the gedit flatpak package without dependencies (not recommended)
   community.general.flatpak:
-    name: https://git.gnome.org/browse/gnome-apps-nightly/plain/gedit.flatpakref
+    name: org.gnome.gedit
+    from_url: https://git.gnome.org/browse/gnome-apps-nightly/plain/gedit.flatpakref
     state: latest
     no_dependencies: true
 
@@ -180,7 +194,7 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE = "Unknown option --columns=application"
 
 
-def install_flat(module, binary, remote, names, method, no_dependencies):
+def install_flat(module, binary, remote, names, method, no_dependencies, from_url=None):
     """Add new flatpaks."""
     global result  # pylint: disable=global-variable-not-assigned
     uri_names = []
@@ -198,12 +212,16 @@ def install_flat(module, binary, remote, names, method, no_dependencies):
         base_command += ["--noninteractive"]
     if no_dependencies:
         base_command += ["--no-deps"]
-    if uri_names:
-        command = base_command + uri_names
+    if from_url:
+        command = base_command + ["--from", from_url]
         _flatpak_command(module, module.check_mode, command)
-    if id_names:
-        command = base_command + [remote] + id_names
-        _flatpak_command(module, module.check_mode, command)
+    else:
+        if uri_names:
+            command = base_command + uri_names
+            _flatpak_command(module, module.check_mode, command)
+        if id_names:
+            command = base_command + [remote] + id_names
+            _flatpak_command(module, module.check_mode, command)
     result["changed"] = True
 
 
@@ -356,6 +374,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type="list", elements="str", required=True),
+            from_url=dict(type="str"),
             remote=dict(type="str", default="flathub"),
             method=dict(type="str", default="system", choices=["user", "system"]),
             state=dict(type="str", default="present", choices=["absent", "present", "latest"]),
@@ -366,6 +385,7 @@ def main():
     )
 
     name = module.params["name"]
+    from_url = module.params["from_url"]
     state = module.params["state"]
     remote = module.params["remote"]
     no_dependencies = module.params["no_dependencies"]
@@ -380,6 +400,23 @@ def main():
     if not binary:
         module.fail_json(msg=f"Executable '{executable}' was not found on the system.", **result)
 
+    url_names = [n for n in name if n.startswith("http://") or n.startswith("https://")]
+    if from_url is not None:
+        if not (from_url.startswith("http://") or from_url.startswith("https://")):
+            module.fail_json(msg="The 'from_url' parameter must be an http:// or https:// URL.", **result)
+        if url_names:
+            module.fail_json(msg="The 'name' and 'from_url' parameters cannot both contain URLs.", **result)
+        if len(name) != 1:
+            module.fail_json(msg="When 'from_url' is used, 'name' must contain exactly one entry.", **result)
+    elif url_names:
+        module.deprecate(
+            "Passing URLs in the 'name' parameter is deprecated. Use the 'from_url' parameter for "
+            "installing from a URL and pass the flatpak application ID in 'name'. "
+            "URL support in 'name' will be removed in community.general 14.0.0.",
+            version="14.0.0",
+            collection_name="community.general",
+        )
+
     module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     installed, not_installed = flatpak_exists(module, binary, name, method)
@@ -389,7 +426,7 @@ def main():
         if state == "latest" and installed:
             update_flat(module, binary, installed, method, no_dependencies)
         if state in ("present", "latest") and not_installed:
-            install_flat(module, binary, remote, not_installed, method, no_dependencies)
+            install_flat(module, binary, remote, not_installed, method, no_dependencies, from_url)
 
     module.exit_json(**result)
 
