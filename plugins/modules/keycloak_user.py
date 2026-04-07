@@ -4,17 +4,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import annotations
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    KeycloakAPI,
-    KeycloakError,
-    camel,
-    get_token,
-    is_struct_included,
-    keycloak_argument_spec,
-)
-from ansible.module_utils.basic import AnsibleModule
-import copy
 
 DOCUMENTATION = r"""
 module: keycloak_user
@@ -350,11 +339,8 @@ user_created:
   version_added: 12.0.0
 """
 
-import copy
-
-from ansible.module_utils.basic import AnsibleModule
-
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
+from __future__ import annotations
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI,
     KeycloakError,
     camel,
@@ -362,7 +348,8 @@ from ansible_collections.community.general.plugins.module_utils._identity.keyclo
     is_struct_included,
     keycloak_argument_spec,
 )
-
+from ansible.module_utils.basic import AnsibleModule
+import copy
 
 def main():
     argument_spec = keycloak_argument_spec()
