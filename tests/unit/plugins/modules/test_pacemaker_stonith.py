@@ -45,7 +45,6 @@ def test_present_race_condition_stopped_then_started(mocker, capfd):
     # 3. wait_for_resource poll 1: status → Stopped (not yet running)
     # 4. wait_for_resource poll 2: status → Started
     # 5. __quit_module__ _get(): status → Started
-    env = {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False}
     run_command_calls = [
         (1, "", ""),
         (0, "", ""),
