@@ -370,7 +370,10 @@ def run_module():
     for query in queries:
         # Catch and exit on any bad query errors
         try:
-            cursor.execute(query, sql_params)
+            if sql_params:
+                cursor.execute(query, sql_params)
+            else:
+                cursor.execute(query)
             qry_result = []
             rows = cursor.fetchall()
             while rows:
