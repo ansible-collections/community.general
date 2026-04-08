@@ -449,7 +449,7 @@ TEST_CASES = [
                 (
                     [
                         "subscription-manager list --available",
-                        {"check_rc": True, "environ_update": {"LANG": "C", "LC_ALL": "C", "LC_MESSAGES": "C"}},
+                        {"check_rc": True, "environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}},
                         (
                             0,
                             """
@@ -559,7 +559,7 @@ Entitlement Type:    Physical
                 (
                     [
                         "subscription-manager list --available",
-                        {"check_rc": True, "environ_update": {"LANG": "C", "LC_ALL": "C", "LC_MESSAGES": "C"}},
+                        {"check_rc": True, "environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}},
                         (
                             0,
                             """
@@ -655,7 +655,7 @@ Entitlement Type:    Physical
                 (
                     [
                         "subscription-manager list --available",
-                        {"check_rc": True, "environ_update": {"LANG": "C", "LC_ALL": "C", "LC_MESSAGES": "C"}},
+                        {"check_rc": True, "environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}},
                         (
                             0,
                             """
@@ -733,7 +733,7 @@ Entitlement Type:    Physical
                 ),
                 (
                     "subscription-manager list --consumed",
-                    {"check_rc": True, "environ_update": {"LANG": "C", "LC_ALL": "C", "LC_MESSAGES": "C"}},
+                    {"check_rc": True, "environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}},
                     (
                         0,
                         """
@@ -776,7 +776,7 @@ Entitlement Type:    Physical
                 (
                     [
                         "subscription-manager list --available",
-                        {"check_rc": True, "environ_update": {"LANG": "C", "LC_ALL": "C", "LC_MESSAGES": "C"}},
+                        {"check_rc": True, "environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}},
                         (
                             0,
                             """
