@@ -15,10 +15,10 @@ from ansible_collections.community.general.plugins.module_utils.kopia import (
     kopia_runner,
 )
 
-
 # ---------------------------------------------------------------------------
 # KOPIA_COMMON_ARGUMENT_SPEC
 # ---------------------------------------------------------------------------
+
 
 def test_common_argument_spec_has_password():
     assert "password" in KOPIA_COMMON_ARGUMENT_SPEC
@@ -39,6 +39,7 @@ def test_common_argument_spec_only_two_keys():
 # ---------------------------------------------------------------------------
 # REPOSITORY_STATE_MAP
 # ---------------------------------------------------------------------------
+
 
 def test_repository_state_map_entries():
     assert REPOSITORY_STATE_MAP["created"] == "create"
@@ -182,6 +183,7 @@ def test_fmt_backend(backend, expected):
 # kopia_runner
 # ---------------------------------------------------------------------------
 
+
 def _make_mock_module(**params):
     module = MagicMock()
     module.params = params
@@ -192,6 +194,7 @@ def _make_mock_module(**params):
 
 def test_kopia_runner_returns_cmd_runner():
     from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
+
     module = _make_mock_module(config=None, password=None)
     with patch(
         "ansible_collections.community.general.plugins.module_utils.cmd_runner.CmdRunner.__init__",
@@ -242,6 +245,7 @@ def test_kopia_runner_extra_formats_merged():
         original_init(self, module, command, arg_formats=arg_formats, **kwargs)
 
     from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
+
     extra = {"my_custom_flag": cmd_runner_fmt.as_opt_eq_val("--custom")}
 
     module = _make_mock_module(config=None, password=None)
@@ -261,6 +265,6 @@ def test_kopia_runner_no_extra_formats():
     module = _make_mock_module(config=None, password=None)
     # Should not raise; CmdRunner will call get_bin_path internally
     try:
-        runner = kopia_runner(module, extra_formats=None)
+        kopia_runner(module, extra_formats=None)
     except Exception:
         pass  # CmdRunner may need the binary; we just ensure no TypeError from extra_formats
