@@ -1,0 +1,247 @@
+# Copyright (c) 2026, Dexter Le <dextersydney2001@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  status_ok: &status-ok
+    command: [/testbin/kopia, repository, status, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: "Connected to repository."
+    err: ''
+  status_empty: &status-empty
+    command: [/testbin/kopia, repository, status, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 1
+    out: ''
+    err: 'repository not connected'
+
+test_cases:
+  - id: create_s3
+    input:
+      state: created
+      password: secret
+      config: /etc/kopia/root.config
+      backend:
+        provider: s3
+        bucket: my-bucket
+        access_key: myaccesskey
+        secret_access_key: mysecretkey
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *status-empty
+        - command:
+            - /testbin/kopia
+            - repository
+            - create
+            - s3
+            - --bucket=my-bucket
+            - --access-key=myaccesskey
+            - --secret-access-key=mysecretkey
+            - --password=secret
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *status-ok
+
+  - id: create_s3_already_exists
+    input:
+      state: created
+      password: secret
+      config: /etc/kopia/root.config
+      backend:
+        provider: s3
+        bucket: my-bucket
+        access_key: myaccesskey
+        secret_access_key: mysecretkey
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *status-ok
+        - command:
+            - /testbin/kopia
+            - repository
+            - create
+            - s3
+            - --bucket=my-bucket
+            - --access-key=myaccesskey
+            - --secret-access-key=mysecretkey
+            - --password=secret
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'already exists'
+        - *status-ok
+
+  - id: create_filesystem
+    input:
+      state: created
+      password: secret
+      backend:
+        provider: filesystem
+        path: /mnt/backup/kopia
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/kopia, repository, status]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'repository not connected'
+        - command:
+            - /testbin/kopia
+            - repository
+            - create
+            - filesystem
+            - --path=/mnt/backup/kopia
+            - --password=secret
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/kopia, repository, status]
+          environ: *env-def
+          rc: 0
+          out: "Connected to repository."
+          err: ''
+
+  - id: connect_server
+    input:
+      state: connected
+      password: secret
+      config: /etc/kopia/root.config
+      url: https://kopia.example.com:51515
+      fingerprint_ssl: "AA:BB:CC:DD"
+      backend:
+        provider: server
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *status-empty
+        - command:
+            - /testbin/kopia
+            - repository
+            - connect
+            - --password=secret
+            - --server-cert-fingerprint=AA:BB:CC:DD
+            - --url=https://kopia.example.com:51515
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *status-ok
+
+  - id: connect_azure
+    input:
+      state: connected
+      password: secret
+      config: /etc/kopia/root.config
+      backend:
+        provider: azure
+        container: my-container
+        storage_account: myaccount
+        storage_key: mykey
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *status-empty
+        - command:
+            - /testbin/kopia
+            - repository
+            - connect
+            - azure
+            - --container=my-container
+            - --storage-account=myaccount
+            - --storage-key=mykey
+            - --password=secret
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *status-ok
+
+  - id: disconnect
+    input:
+      state: disconnected
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *status-ok
+        - command:
+            - /testbin/kopia
+            - repository
+            - disconnect
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *status-empty
+
+  - id: sync_s3
+    input:
+      state: synced
+      password: secret
+      config: /etc/kopia/root.config
+      backend:
+        provider: s3
+        bucket: my-sync-bucket
+        access_key: myaccesskey
+        secret_access_key: mysecretkey
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *status-ok
+        - command:
+            - /testbin/kopia
+            - repository
+            - sync-to
+            - s3
+            - --bucket=my-sync-bucket
+            - --access-key=myaccesskey
+            - --secret-access-key=mysecretkey
+            - --password=secret
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *status-ok
+
+  - id: throttle_get
+    input:
+      state: throttled
+      throttle_operation: get
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *status-ok
+        - command:
+            - /testbin/kopia
+            - repository
+            - throttle
+            - get
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "upload-speed-limit: 0"
+          err: ''
+        - *status-ok
