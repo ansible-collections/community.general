@@ -25,19 +25,19 @@ UTHelper.from_module(pacemaker_stonith, __name__, mocks=[RunCommandMock])
 # Race condition tests: resource starts after one or more Stopped polls
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def patch_bin(mocker):
     def mockie(self_, path, *args, **kwargs):
         return f"/testbin/{path}"
+
     mocker.patch("ansible.module_utils.basic.AnsibleModule.get_bin_path", mockie)
 
 
 @pytest.mark.usefixtures("patch_bin")
 def test_present_race_condition_stopped_then_started(mocker, capfd):
     """Resource reports Stopped on the first poll then Started on the second — must succeed."""
-    mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.pacemaker.time.sleep"
-    )
+    mocker.patch("ansible_collections.community.general.plugins.module_utils.pacemaker.time.sleep")
 
     # Sequence of run_command calls:
     # 1. initial _get(): stonith status → not found (rc=1)
@@ -63,14 +63,19 @@ def test_present_race_condition_stopped_then_started(mocker, capfd):
         with pytest.MonkeyPatch().context() as mp:
             mp.setattr(
                 "ansible.module_utils.basic._ANSIBLE_ARGS",
-                json.dumps({"ANSIBLE_MODULE_ARGS": {
-                    "state": "present",
-                    "name": "virtual-stonith",
-                    "stonith_type": "fence_virt",
-                    "stonith_options": ["pcmk_host_list=f1"],
-                    "wait": 30,
-                }}).encode(),
+                json.dumps(
+                    {
+                        "ANSIBLE_MODULE_ARGS": {
+                            "state": "present",
+                            "name": "virtual-stonith",
+                            "stonith_type": "fence_virt",
+                            "stonith_options": ["pcmk_host_list=f1"],
+                            "wait": 30,
+                        }
+                    }
+                ).encode(),
             )
+            mp.setattr("ansible.module_utils.basic._ANSIBLE_PROFILE", "legacy", raising=False)
             pacemaker_stonith.main()
 
     out, _err = capfd.readouterr()
@@ -83,12 +88,10 @@ def test_present_race_condition_stopped_then_started(mocker, capfd):
 @pytest.mark.usefixtures("patch_bin")
 def test_present_wait_timeout_raises(mocker, capfd):
     """Resource never starts within the wait window — must fail with a timeout message."""
-    mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.pacemaker.time.sleep"
-    )
+    mocker.patch("ansible_collections.community.general.plugins.module_utils.pacemaker.time.sleep")
 
     # Simulate time advancing past the deadline immediately on the first poll
-    monotonic_values = iter([0.0, 0.0, 999.0])
+    monotonic_values = iter([0.0, 999.0])
     mocker.patch(
         "ansible_collections.community.general.plugins.module_utils.pacemaker.time.monotonic",
         side_effect=lambda: next(monotonic_values),
@@ -110,14 +113,19 @@ def test_present_wait_timeout_raises(mocker, capfd):
         with pytest.MonkeyPatch().context() as mp:
             mp.setattr(
                 "ansible.module_utils.basic._ANSIBLE_ARGS",
-                json.dumps({"ANSIBLE_MODULE_ARGS": {
-                    "state": "present",
-                    "name": "virtual-stonith",
-                    "stonith_type": "fence_virt",
-                    "stonith_options": ["pcmk_host_list=f1"],
-                    "wait": 10,
-                }}).encode(),
+                json.dumps(
+                    {
+                        "ANSIBLE_MODULE_ARGS": {
+                            "state": "present",
+                            "name": "virtual-stonith",
+                            "stonith_type": "fence_virt",
+                            "stonith_options": ["pcmk_host_list=f1"],
+                            "wait": 10,
+                        }
+                    }
+                ).encode(),
             )
+            mp.setattr("ansible.module_utils.basic._ANSIBLE_PROFILE", "legacy", raising=False)
             pacemaker_stonith.main()
 
     out, _err = capfd.readouterr()

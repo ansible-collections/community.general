@@ -72,9 +72,7 @@ def wait_for_resource(runner: CmdRunner, cli_noun: str, name: str, wait: int, sl
         if out and "Started" in out:
             return
         if time.monotonic() >= deadline:
-            raise Exception(
-                f"Timed out waiting {wait}s for {cli_noun} resource '{name}' to start"
-            )
+            raise Exception(f"Timed out waiting {wait}s for {cli_noun} resource '{name}' to start")
         time.sleep(sleep_interval)
 
 
