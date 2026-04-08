@@ -651,20 +651,21 @@ class JIRA(StateModuleHelper):
             count = len(result) if isinstance(result, list) else 0
             self.module.fail_json(
                 msg=(
-                    f"Failed to resolve assignee '{email}' to "
+                    f"Failed to resolve assignee {email!r} to "
                     f"a unique Jira Cloud account ID: found "
-                    f"{count} result(s). Use the 'account_id' "
+                    f"{count} results. Use the 'account_id' "
                     f"parameter to specify the account ID "
                     f"directly."
                 )
             )
         user = result[0]
-        if user.get("emailAddress", "").lower() != email.lower():
+        user_email = user.get("emailAddress")
+        if (user_email or "").lower() != email.lower():
             self.module.fail_json(
                 msg=(
-                    f"Failed to resolve assignee '{email}': "
+                    f"Failed to resolve assignee {email!r}: "
                     f"the returned user's email address "
-                    f"'{user.get('emailAddress')}' does not "
+                    f"{user_email!r} does not "
                     f"match. Use the 'account_id' parameter "
                     f"to specify the account ID directly."
                 )
