@@ -93,7 +93,7 @@ class Rhsm:
         self.module = module
         self.rhsm_bin = self.module.get_bin_path("subscription-manager", required=True)
         self.rhsm_kwargs = {
-            "environ_update": dict(LANG="C", LC_ALL="C", LC_MESSAGES="C"),
+            "environ_update": dict(LANGUAGE="C", LC_ALL="C"),
             "expand_user_and_vars": False,
             "use_unsafe_shell": False,
         }
