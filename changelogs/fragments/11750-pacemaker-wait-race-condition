@@ -1,0 +1,2 @@
+bugfixes:
+  - pacemaker - fix resource and stonith creation race condition by polling pcs status. (https://github.com/ansible-collections/community.general/issues/11574, https://github.com/ansible-collections/community.general/pull/11750)
