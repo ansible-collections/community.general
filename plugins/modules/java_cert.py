@@ -205,7 +205,7 @@ cmd:
 import os
 import re
 import tempfile
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 from urllib.request import getproxies
 
 # import module snippets
@@ -297,27 +297,40 @@ def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, passwo
 
 
 def get_proxy_settings(scheme="https"):
-    """Returns a tuple containing (proxy_host, proxy_port). (False, False) if no proxy is found"""
+    """Returns a tuple containing (proxy_host, proxy_port, proxy_user, proxy_pass).
+    (False, False, False, False) if no proxy is found."""
     proxy_url = getproxies().get(scheme, "")
     if not proxy_url:
-        return (False, False)
+        return (False, False, False, False)
+    parsed_url = urlparse(proxy_url)
+    if parsed_url.scheme:
+        proxy_host = parsed_url.hostname
+        proxy_port = parsed_url.port
     else:
-        parsed_url = urlparse(proxy_url)
-        if parsed_url.scheme:
-            (proxy_host, proxy_port) = parsed_url.netloc.split(":")
-        else:
-            (proxy_host, proxy_port) = parsed_url.path.split(":")
-        return (proxy_host, proxy_port)
+        (proxy_host, proxy_port) = parsed_url.path.split(":")
+    proxy_user = unquote(parsed_url.username) if parsed_url.username else False
+    proxy_pass = unquote(parsed_url.password) if parsed_url.password else False
+    return (proxy_host, proxy_port, proxy_user, proxy_pass)
 
 
 def build_proxy_options():
     """Returns list of valid proxy options for keytool"""
-    (proxy_host, proxy_port) = get_proxy_settings()
+    (proxy_host, proxy_port, proxy_user, proxy_pass) = get_proxy_settings()
     no_proxy = os.getenv("no_proxy")
 
     proxy_opts = []
     if proxy_host:
         proxy_opts.extend([f"-J-Dhttps.proxyHost={proxy_host}", f"-J-Dhttps.proxyPort={proxy_port}"])
+
+        if proxy_user and proxy_pass:
+            proxy_opts.extend(
+                [
+                    f"-J-Dhttps.proxyUser={proxy_user}",
+                    f"-J-Dhttps.proxyPassword={proxy_pass}",
+                    # JDK 8u111+ disables Basic auth for HTTPS tunneling by default; clear that restriction.
+                    "-J-Djdk.http.auth.tunneling.disabledSchemes=",
+                ]
+            )
 
         if no_proxy is not None:
             # For Java's nonProxyHosts property, items are separated by '|',
