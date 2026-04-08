@@ -375,7 +375,7 @@ def main() -> None:
     )
 
     # We'll parse iptables-restore stderr
-    module.run_command_environ_update = dict(LANG="C", LC_MESSAGES="C")
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     path = module.params["path"]
     state = module.params["state"]
