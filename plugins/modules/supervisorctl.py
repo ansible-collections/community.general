@@ -153,7 +153,7 @@ def main():
     signal = module.params.get("signal")
 
     # we check error message for a pattern, so we need to make sure that's in C locale
-    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     if supervisorctl_path:
         if os.path.exists(supervisorctl_path) and is_executable(supervisorctl_path):
