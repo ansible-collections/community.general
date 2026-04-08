@@ -239,10 +239,8 @@ from ansible.module_utils.basic import AnsibleModule
 
 LVOL_ENV_VARS = dict(
     # make sure we use the C locale when running lvol-related commands
-    LANG="C",
+    LANGUAGE="C",
     LC_ALL="C",
-    LC_MESSAGES="C",
-    LC_CTYPE="C",
 )
 
 

@@ -303,7 +303,7 @@ class Pacman:
     def __init__(self, module):
         self.m = module
 
-        self.m.run_command_environ_update = dict(LC_ALL="C")
+        self.m.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
         p = self.m.params
 
         self._msgs = []
