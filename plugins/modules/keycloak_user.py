@@ -482,13 +482,17 @@ def main():
             module.exit_json(**result)
         else:
             # Delete user
-            kc.delete_user(user_id=before_user["id"], realm=realm)
-            result["msg"] = f"User {before_user['username']} deleted"
+            if module._diff:
+                result["diff"] = dict(before=before_user, after="")
+            
+            if not module.check_mode:
+              kc.delete_user(user_id=before_user["id"], realm=realm)
+              result["msg"] = f"User {before_user['username']} deleted"
             changed = True
 
     else:
         after_user = {}
-        if force and before_user:  # If the force option is set to true
+        if force and before_user and not module.check_mode:  # If the force option is set to true
             # Delete the existing user
             kc.delete_user(user_id=before_user["id"], realm=realm)
 
@@ -538,6 +542,10 @@ def main():
                 # Update the user
                 if not module.check_mode:
                     after_user = kc.update_user(userrep=desired_user, realm=realm)
+          
+                if module._diff:
+                  result["diff"] = dict(before=before_user, after=desired_user)
+          
                 changed = True
 
         if not module.check_mode:
