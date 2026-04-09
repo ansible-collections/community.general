@@ -507,7 +507,7 @@ def main():
                 # create_user could have failed, but we don't know for sure until we try to create the user.'
                 result["user_created"] = True
                 module.exit_json(**result)
-            
+
             # Create the user
             if desired_user.get("emailVerified") == "ignore":
                 desired_user["emailVerified"] = False
