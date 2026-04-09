@@ -383,8 +383,7 @@ def main():
         last_name=dict(type="str", aliases=["lastName"]),
         email=dict(type="str"),
         enabled=dict(type="bool"),
-        email_verified=dict(type="str", choices=[
-                            "ignore", "verified", "unverified"], default="ignore", aliases=["emailVerified"]),
+        email_verified=dict(type="bool", aliases=["emailVerified"]),
         federation_link=dict(type="str", aliases=["federationLink"]),
         service_account_client_id=dict(
             type="str", aliases=["serviceAccountClientId"]),
@@ -437,12 +436,6 @@ def main():
     force = module.params.get("force")
     username = module.params.get("username")
     groups = module.params.get("groups")
-    email_verified = module.params.get("email_verified")
-
-    if email_verified == "verified":
-        module.params["email_verified"] = True
-    elif email_verified == "unverified":
-        module.params["email_verified"] = False
 
     # Filter and map the parameters names that apply to the user
     user_params = [
@@ -550,8 +543,8 @@ def main():
                 "federatedIdentities",
                 "requiredActions",
             ]
-            if desired_user.get("emailVerified") == "ignore":
-                excludes.append("emailVerified")
+            # if desired_user.get("emailVerified") == "ignore":
+            #     excludes.append("emailVerified")
             # Add user ID to new representation
             desired_user["id"] = before_user["id"]
 
@@ -561,8 +554,7 @@ def main():
             ):  # If the new user does not introduce a change to the existing user
                 # Update the user
                 if not module.check_mode:
-                    after_user = kc.update_user(
-                        userrep=desired_user, realm=realm)
+                    after_user = kc.update_user(userrep=desired_user, realm=realm)
                 changed = True
 
         if not module.check_mode:
