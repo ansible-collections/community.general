@@ -4,6 +4,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: keycloak_user
@@ -506,16 +507,16 @@ def main():
                 # create_user could have failed, but we don't know for sure until we try to create the user.'
                 result["user_created"] = True
                 module.exit_json(**result)
-            else:
-                # Create the user
-                if desired_user.get("emailVerified") == "ignore":
-                    desired_user["emailVerified"] = False
-                after_user = kc.create_user(userrep=desired_user, realm=realm)
-                result["msg"] = f"User {desired_user['username']} created"
-                # Add user ID to new representation
-                desired_user["id"] = after_user["id"]
-                # Set user_created flag
-                result["user_created"] = True
+            
+            # Create the user
+            if desired_user.get("emailVerified") == "ignore":
+                desired_user["emailVerified"] = False
+            after_user = kc.create_user(userrep=desired_user, realm=realm)
+            result["msg"] = f"User {desired_user['username']} created"
+            # Add user ID to new representation
+            desired_user["id"] = after_user["id"]
+            # Set user_created flag
+            result["user_created"] = True
         else:
             excludes = [
                 "access",
