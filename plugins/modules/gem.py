@@ -133,9 +133,14 @@ RE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)")
 RE_INSTALLED = re.compile(r"\S+\s+\((?:default: )?(.+)\)")
 
 
+def get_rubygems_path(module):
+    if module.params["executable"]:
+        return module.params["executable"].split()
+    return [module.get_bin_path("gem", True)]
+
+
 def get_rubygems_version(module):
-    executable = module.params["executable"]
-    cmd = [executable or module.get_bin_path("gem", required=True), "--version"]
+    cmd = get_rubygems_path(module) + ["--version"]
     rc, out, err = module.run_command(cmd, check_rc=True)
     match = RE_VERSION.match(out)
     if not match:
@@ -144,7 +149,7 @@ def get_rubygems_version(module):
 
 
 def make_runner(module, ver):
-    command = module.params["executable"] or "gem"
+    command = get_rubygems_path(module)
 
     environ_update = {}
     if module.params["install_dir"]:
