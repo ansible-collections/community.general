@@ -484,10 +484,10 @@ def main():
             # Delete user
             if module._diff:
                 result["diff"] = dict(before=before_user, after="")
-            
+
             if not module.check_mode:
-              kc.delete_user(user_id=before_user["id"], realm=realm)
-              result["msg"] = f"User {before_user['username']} deleted"
+                kc.delete_user(user_id=before_user["id"], realm=realm)
+                result["msg"] = f"User {before_user['username']} deleted"
             changed = True
 
     else:
@@ -542,10 +542,10 @@ def main():
                 # Update the user
                 if not module.check_mode:
                     after_user = kc.update_user(userrep=desired_user, realm=realm)
-          
+
                 if module._diff:
-                  result["diff"] = dict(before=before_user, after=desired_user)
-          
+                    result["diff"] = dict(before=before_user, after=desired_user)
+
                 changed = True
 
         if not module.check_mode:
