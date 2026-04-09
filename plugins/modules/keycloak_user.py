@@ -509,8 +509,6 @@ def main():
                 module.exit_json(**result)
 
             # Create the user
-            if desired_user.get("emailVerified") == "ignore":
-                desired_user["emailVerified"] = False
             after_user = kc.create_user(userrep=desired_user, realm=realm)
             result["msg"] = f"User {desired_user['username']} created"
             # Add user ID to new representation
@@ -530,8 +528,6 @@ def main():
                 "federatedIdentities",
                 "requiredActions",
             ]
-            # if desired_user.get("emailVerified") == "ignore":
-            #     excludes.append("emailVerified")
             # Add user ID to new representation
             desired_user["id"] = before_user["id"]
 
