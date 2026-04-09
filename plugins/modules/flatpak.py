@@ -47,14 +47,13 @@ options:
       - The name of the flatpak to manage. To operate on several packages this can accept a list of packages.
       - Should be specified as the unique reverse DNS name that identifies a flatpak (for example V(org.gnome.gedit)).
       - When supplying a reverse DNS name, you can use the O(remote) option to specify on what remote to look for the flatpak.
-      - When used with O(state=present), O(name) can also be specified as a URL to a C(flatpakref) file, but that is
-        deprecated. Use the O(from_url) option instead to install from a URL.
-      - Both C(https://) and C(http://) URLs are supported in O(name), but support for URLs in O(name) is deprecated and
-        will be removed in community.general 14.0.0. Use O(from_url) instead.
+      - When used with O(state=present), O(name) can also be specified as a C(https://) or C(http://) URL to a C(flatpakref) file.
+        However, it is recommended you use O(from_url) instead to get reliable idempotency.
+        Passing URLs in O(name) will be deprecated in the future.
       - When used with O(state=absent) or O(state=latest), always specify the name in the reverse DNS format.
-      - B(Deprecated:) When supplying a URL with O(state=absent) or O(state=latest), the module tries to match the installed
-        flatpak based on the name of the flatpakref to remove or update it. However, there is no guarantee that the names of
-        the flatpakref file and the reverse DNS name of the installed flatpak do match.
+      - When supplying a URL with O(state=absent) or O(state=latest), the module tries to match the installed flatpak based
+        on the name of the flatpakref to remove or update it. However, there is no guarantee that the names of the flatpakref
+        file and the reverse DNS name of the installed flatpak do match.
     type: list
     elements: str
     required: true
@@ -64,7 +63,7 @@ options:
       - When this option is set, O(name) must contain exactly one entry specifying the reverse DNS application ID of the
         flatpak (for example V(com.onepassword.OnePassword)). This is used to check whether the flatpak is already installed.
       - O(name) and O(from_url) cannot both contain URLs.
-      - Use this option instead of passing a URL in O(name); passing URLs in O(name) is deprecated.
+      - This option is recommended instead of passing a URL in O(name); passing URLs in O(name) will be deprecated in the future.
     type: str
     version_added: "12.6.0"
   no_dependencies:
@@ -408,15 +407,6 @@ def main():
             module.fail_json(msg="The 'name' and 'from_url' parameters cannot both contain URLs.", **result)
         if len(name) != 1:
             module.fail_json(msg="When 'from_url' is used, 'name' must contain exactly one entry.", **result)
-    elif url_names:
-        module.deprecate(
-            "Passing URLs in the 'name' parameter is deprecated. Use the 'from_url' parameter for "
-            "installing from a URL and pass the flatpak application ID in 'name'. "
-            "URL support in 'name' will be removed in community.general 14.0.0.",
-            version="14.0.0",
-            collection_name="community.general",
-        )
-
     module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     installed, not_installed = flatpak_exists(module, binary, name, method)

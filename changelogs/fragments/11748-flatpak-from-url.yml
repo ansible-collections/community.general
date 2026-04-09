@@ -2,8 +2,3 @@ minor_changes:
   - flatpak - add new parameter ``from_url`` to install a flatpak from a ``.flatpakref`` URL
     (https://github.com/ansible-collections/community.general/issues/4000,
     https://github.com/ansible-collections/community.general/pull/11748).
-deprecated_features:
-  - flatpak - passing URLs in the ``name`` parameter is deprecated; use ``from_url`` instead.
-    URL support in ``name`` will be removed in community.general 14.0.0
-    (https://github.com/ansible-collections/community.general/issues/4000,
-    https://github.com/ansible-collections/community.general/pull/11748).
