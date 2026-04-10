@@ -84,7 +84,7 @@ options:
   skip_host_discovery:
     description: Prevent host discovery probes
     type: boolean
-    version_added:
+    version_added: 12.6.0
   dns_resolve:
     description: Whether to always (V(true)) or never (V(false)) do DNS resolution.
     type: boolean
