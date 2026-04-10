@@ -75,11 +75,11 @@ private_nics:
     "creation_date":
       description: Private NIC creation date.
       sample: "2026-04-09T00:00:00.000000+00:00"
-      type: string
+      type: str
     "id":
       description: Private NIC unique ID.
       sample: "abc123ab-12ab-12ab-12ab-123abc123abc"
-      type: string
+      type: str
     "ipam_ip_ids":
       description: UUID of IPAM ips.
       sample:
@@ -88,27 +88,27 @@ private_nics:
           "5678abcd-12ab-34cd-ab56-123abc123abc"
         ]
       type: list
-      elements: string
+      elements: str
     "mac_address":
       description: Private NIC MAC address.
       sample: "12:34:ab:cd:1a:2b"
-      type: string
+      type: str
     "modification_date":
       description: Private NIC last modified date.
       sample: "2026-04-09T00:00:01.000000+00:00"
-      type: string
+      type: str
     "private_network_id":
       description: ID of the private Network the private NIC is attached to.
       sample: "1234abcd-12ab-12ab-12ab-123abc123abc"
-      type: string
+      type: str
     "server_id":
       description: ID of the server which is used for request.
       sample: "1234ab-ab12-12ab-12a3-12345678ab9c"
-      type: string
+      type: str
     "state":
       description: Private NIC state.
       sample: "available"
-      type: string
+      type: str
     "tags":
       description: Tags associated with Private NIC.
       sample:
@@ -117,11 +117,11 @@ private_nics:
           "test"
         ]
       type: list
-      elements: string
+      elements: str
     "zone":
       description: The zone in which the Private NIC is located.
       sample: "fr-par-1"
-      type: string
+      type: str
 """
 
 from ansible.module_utils.basic import AnsibleModule
