@@ -107,6 +107,7 @@ def main():
         ),
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     if os.getuid() != 0:
         module.fail_json(msg="Interacting with subscription-manager requires root permissions ('become: true')")

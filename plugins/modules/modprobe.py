@@ -298,6 +298,7 @@ def build_module():
 
 def main():
     module = build_module()
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     modprobe = Modprobe(module)
 
