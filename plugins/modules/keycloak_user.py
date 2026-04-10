@@ -35,7 +35,7 @@ options:
     type: bool
   email_verified:
     description:
-      - Set or reset the emailVerified flag of the user.
+      - Set or reset the C(emailVerified) flag of the user.
     type: bool
     aliases:
       - emailVerified
