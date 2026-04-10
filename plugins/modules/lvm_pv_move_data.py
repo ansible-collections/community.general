@@ -74,7 +74,7 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.lvm import pvmove_runner, pvs_runner
+from ansible_collections.community.general.plugins.module_utils._lvm import pvmove_runner, pvs_runner
 
 
 def main():
