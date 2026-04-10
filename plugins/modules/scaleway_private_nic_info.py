@@ -7,10 +7,10 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: scaleway_ip_info
-short_description: Lists private NICs of the instance
+module: scaleway_private_nic_info
+short_description: List all private NICs
 description:
-  - Lists all private networks that are associated with the provided instance.
+  - List all private NICs of a specified Instance.
 author:
   - "Yanis Guenane (@Spredzy)"
   - "Remy Leone (@remyleone)"
@@ -52,13 +52,13 @@ options:
 """
 
 EXAMPLES = r"""
-- name: Get private network information and register it in a variable
+- name: Get information about all private NICs of specified instance and register it in a variable
   community.general.scaleway_private_nic_info:
     region: par1
     instance_id: "1234ab-ab12-12ab-12a3-12345678ab9c"
   register: nics
 
-- name: Display nics variable
+- name: Display nics
   debug:
     var: nics
 """
@@ -133,10 +133,12 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
     scaleway_argument_spec,
 )
 
+
 def list_strategy(api):
     private_nics = api.get(path=api.api_path)
 
     return private_nics.json
+
 
 def core(module):
     region = module.params["region"]
@@ -152,6 +154,7 @@ def core(module):
     except ScalewayException as exc:
         module.fail_json(msg=exc.message)
 
+
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(
@@ -163,6 +166,7 @@ def main():
     )
 
     core(module)
+
 
 if __name__ == "__main__":
     main()
