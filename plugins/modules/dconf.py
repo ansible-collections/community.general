@@ -311,7 +311,7 @@ class DconfPreference:
         """
         command = [self.dconf_bin, "read", key]
 
-        rc, out, err = self.module.run_command(command)
+        rc, out, err = self.module.run_command(command, environ_update={"LANGUAGE": "C", "LC_ALL": "C"})
 
         if rc != 0:
             self.module.fail_json(msg=f"dconf failed while reading the value with error: {err}", out=out, err=err)

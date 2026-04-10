@@ -156,7 +156,7 @@ def query_update(module, run_pkgng, name):
 
 
 def pkgng_older_than(module, pkgng_path, compare_version):
-    rc, out, err = module.run_command([pkgng_path, "-v"])
+    rc, out, err = module.run_command([pkgng_path, "-v"], environ_update={"LANGUAGE": "C", "LC_ALL": "C"})
     version = [int(x) for x in re.split(r"[\._]", out)]
 
     i = 0
@@ -455,7 +455,7 @@ def main():
         ):
             args = ("-g",) + args
 
-        pkgng_env = {"BATCH": "yes"}
+        pkgng_env = {"BATCH": "yes", "LANGUAGE": "C", "LC_ALL": "C"}
 
         if p["ignore_osver"]:
             pkgng_env["IGNORE_OSVERSION"] = "yes"
