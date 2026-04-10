@@ -857,6 +857,68 @@ class TestLogrotateConfig(unittest.TestCase):
 
                     self.assertIn("fail_json called", str(context.exception))
 
+    def test_backup_disabled_by_default(self):
+        """Test that backup is not created when backup parameter is False (default)."""
+        from ansible_collections.community.general.plugins.modules import logrotate
+
+        self._setup_module_params(rotate_count=14)
+        config_path = os.path.join(self.config_dir, "test")
+        existing_content = """/var/log/test/*.log {
+    daily
+    rotate 7
+    compress
+}"""
+
+        def exists_side_effect(path):
+            if path == self.config_dir:
+                return True
+            elif path == config_path:
+                return True
+            return False
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            with patch("builtins.open", mock_open(read_data=existing_content)):
+                with patch("os.remove"):
+                    with patch("os.chmod"):
+                        logrotate_bin = self.mock_module.get_bin_path.return_value
+                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                        result = config.apply()
+                        self.assertTrue(result["changed"])
+                        self.mock_module.backup_local.assert_not_called()
+                        self.assertNotIn("backup_file", result)
+
+    def test_backup_enabled_creates_backup(self):
+        """Test that backup is created when backup parameter is True."""
+        from ansible_collections.community.general.plugins.modules import logrotate
+
+        self._setup_module_params(rotate_count=14, backup=True)
+        config_path = os.path.join(self.config_dir, "test")
+        expected_backup_path = config_path + ".20260101_120000"
+        self.mock_module.backup_local = Mock(return_value=expected_backup_path)
+        existing_content = """/var/log/test/*.log {
+    daily
+    rotate 7
+    compress
+}"""
+
+        def exists_side_effect(path):
+            if path == self.config_dir:
+                return True
+            elif path == config_path:
+                return True
+            return False
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            with patch("builtins.open", mock_open(read_data=existing_content)):
+                with patch("os.remove"):
+                    with patch("os.chmod"):
+                        logrotate_bin = self.mock_module.get_bin_path.return_value
+                        config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                        result = config.apply()
+                        self.assertTrue(result["changed"])
+                        self.mock_module.backup_local.assert_called_once_with(config_path)
+                        self.assertEqual(result["backup_file"], expected_backup_path)
+
     def test_logrotate_bin_used_in_apply(self):
         """Test that logrotate binary path is used in apply method."""
         from ansible_collections.community.general.plugins.modules import logrotate

@@ -254,6 +254,12 @@ options:
       - Base number for rotated files. Allowed values are from V(0) to V(999).
       - For example, V(1) gives files C(.1), C(.2), and so on instead of C(.0), C(.1).
     type: int
+  backup:
+    description:
+      - Create a backup of the existing configuration file before overwriting.
+      - The backup file is created in the same directory with a timestamp suffix.
+    type: bool
+    default: false
   syslog:
     description:
       - Send logrotate messages to syslog.
@@ -452,7 +458,7 @@ enabled_state:
 backup_file:
   description: Path to the backup of the original configuration file, if it was backed up.
   type: str
-  returned: success when backup was made
+  returned: success when O(backup=true) and an existing configuration was overwritten
   sample: /etc/logrotate.d/nginx.20250101_120000
 """
 
@@ -868,9 +874,10 @@ class LogrotateConfig:
                 for suffix in ["", self.disabled_suffix]:
                     old_path = os.path.join(self.config_dir, self.config_name + suffix)
                     if os.path.exists(old_path):
-                        backup_path = self.module.backup_local(old_path)
-                        if backup_path:
-                            self.result["backup_file"] = backup_path
+                        if self.params.get("backup"):
+                            backup_path = self.module.backup_local(old_path)
+                            if backup_path:
+                                self.result["backup_file"] = backup_path
                         try:
                             os.remove(old_path)
                         except Exception as e:
@@ -942,6 +949,7 @@ def main() -> None:
             enabled=dict(type="bool"),
             start=dict(type="int"),
             syslog=dict(type="bool"),
+            backup=dict(type="bool", default=False),
         ),
         mutually_exclusive=[
             ["delay_compress", "no_delay_compress"],
