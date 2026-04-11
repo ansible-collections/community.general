@@ -1,0 +1,16 @@
+bugfixes:
+  - logstash_plugin - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11775).
+  - lvg - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11775).
+  - mas - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11775).
+  - osx_defaults - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11775).
+  - pkgutil - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11775).
