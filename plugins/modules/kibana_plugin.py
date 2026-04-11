@@ -232,6 +232,7 @@ def main():
         ),
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     name = module.params["name"]
     state = module.params["state"]
