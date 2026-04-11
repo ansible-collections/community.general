@@ -158,7 +158,6 @@ def setup_module_object():
 
 def main():
     module = setup_module_object()
-    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
     lvg_rename = LvgRename(module=module)
     lvg_rename.run()
 
