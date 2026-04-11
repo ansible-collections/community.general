@@ -122,6 +122,7 @@ def main():
         },
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     network_namespace = Namespace(module)
     if module.check_mode:
