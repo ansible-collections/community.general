@@ -259,6 +259,7 @@ def main():
         supports_check_mode=False,
         required_if=[("state", "present", ["permissions"])],
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
     zfs_delegate_admin = ZfsDelegateAdmin(module)
     zfs_delegate_admin.run()
 
