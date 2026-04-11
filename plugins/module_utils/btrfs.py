@@ -35,6 +35,7 @@ class BtrfsCommands:
 
     def __init__(self, module: AnsibleModule) -> None:
         self.__module = module
+        self.__module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
         self.__btrfs: str = self.__module.get_bin_path("btrfs", required=True)
 
     def filesystem_show(self) -> list[dict[str, t.Any]]:
