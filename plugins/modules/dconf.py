@@ -15,13 +15,15 @@ description:
   - This module allows modifications and reading of C(dconf) database. The module is implemented as a wrapper around C(dconf)
     tool. Please see the dconf(1) man page for more details.
   - Since C(dconf) requires a running D-Bus session to change values, the module tries to detect an existing session and reuse
-    it, or run the tool using C(dbus-run-session).
+    it, or run the tool using C(dbus-run-session). Both C(dbus-daemon) and C(dbus-broker) are supported.
 requirements:
   - Optionally the C(gi.repository) Python library (usually included in the OS on hosts which have C(dconf)); this is to become
     a non-optional requirement in a future major release of community.general.
 notes:
-  - This module depends on C(psutil) Python library (version 4.0.0 and upwards), C(dconf), C(dbus-send), and C(dbus-run-session)
-    binaries. Depending on distribution you are using, you may need to install additional packages to have these available.
+  - This module depends on C(psutil) Python library (version 4.0.0 and upwards), C(dconf), and either C(dbus-send) or C(busctl)
+    for D-Bus session validation, and C(dbus-run-session) as a fallback when no existing session is found.
+    Depending on distribution you are using, you may need to install additional packages to have these available.
+    Both the reference C(dbus-daemon) implementation and C(dbus-broker) are supported.
   - This module uses the C(gi.repository) Python library when available for accurate comparison of values in C(dconf) to values
     specified in Ansible code. C(gi.repository) is likely to be present on most systems which have C(dconf) but may not be
     present everywhere. When it is missing, a simple string comparison between values is used, and there may be false positives,
@@ -156,30 +158,41 @@ class DBusWrapper:
     If possible, command will be run against an existing D-Bus session,
     otherwise the session will be spawned via dbus-run-session.
 
-    Example usage:
+    Discovery order:
+    1. DBUS_SESSION_BUS_ADDRESS in the current process environment
+    2. /run/user/<uid>/bus  -- canonical socket for systemd and dbus-broker
+    3. Process scan for DBUS_SESSION_BUS_ADDRESS  -- legacy fallback
 
-    dbus_wrapper = DBusWrapper(ansible_module)
-    dbus_wrapper.run_command(["printenv", "DBUS_SESSION_BUS_ADDRESS"])
+    Validation uses C(dbus-send) if available, C(busctl) otherwise.
     """
 
     def __init__(self, module):
-        """
-        Initialises an instance of the class.
-
-        :param module: Ansible module instance used to signal failures and run commands.
-        :type module: AnsibleModule
-        """
-
-        # Store passed-in arguments and set-up some defaults.
         self.module = module
-
-        # Try to extract existing D-Bus session address.
         self.dbus_session_bus_address = self._get_existing_dbus_session()
 
-        # If no existing D-Bus session was detected, check if dbus-run-session
-        # is available.
         if self.dbus_session_bus_address is None:
             self.dbus_run_session_cmd = self.module.get_bin_path("dbus-run-session", required=True)
+
+    def _validate_address(self, address):
+        dbus_send = self.module.get_bin_path("dbus-send")
+        if dbus_send:
+            rc, dummy, dummy = self.module.run_command(
+                [dbus_send, f"--address={address}", "--type=signal", "/", "com.example.test"]
+            )
+            if rc == 0:
+                return True
+
+        busctl = self.module.get_bin_path("busctl")
+        if busctl:
+            rc, dummy, dummy = self.module.run_command([busctl, f"--address={address}", "list"])
+            if rc == 0:
+                return True
+
+        if not dbus_send and not busctl:
+            self.module.debug("No D-Bus validator available (dbus-send or busctl), accepting address")
+            return True
+
+        return False
 
     def _get_existing_dbus_session(self):
         """
@@ -191,11 +204,25 @@ class DBusWrapper:
         # We'll be checking the processes of current user only.
         uid = os.getuid()
 
-        # Go through all the pids for this user, try to extract the D-Bus
-        # session bus address from environment, and ensure it is possible to
-        # connect to it.
-        self.module.debug(f"Trying to detect existing D-Bus user session for user: {int(uid)}")
+        # Step 1: current process environment
+        address = os.environ.get("DBUS_SESSION_BUS_ADDRESS")
+        if address:
+            self.module.debug(f"Trying D-Bus address from environment: {address}")
+            if self._validate_address(address):
+                self.module.debug(f"Using D-Bus session from environment: {address}")
+                return address
 
+        # Step 2: canonical systemd/dbus-broker socket path
+        canonical_path = f"/run/user/{uid}/bus"
+        if os.path.exists(canonical_path):
+            address = f"unix:path={canonical_path}"
+            self.module.debug(f"Trying canonical D-Bus socket: {canonical_path}")
+            if self._validate_address(address):
+                self.module.debug(f"Using canonical D-Bus socket: {canonical_path}")
+                return address
+
+        # Step 3: process scan (legacy fallback)
+        self.module.debug(f"Scanning processes for D-Bus session (uid={uid})")
         for pid in psutil.pids():
             try:
                 process = psutil.Process(pid)
@@ -205,21 +232,10 @@ class DBusWrapper:
                     self.module.debug(
                         f"Found D-Bus user session candidate at address: {dbus_session_bus_address_candidate}"
                     )
-                    dbus_send_cmd = self.module.get_bin_path("dbus-send", required=True)
-                    command = [
-                        dbus_send_cmd,
-                        f"--address={dbus_session_bus_address_candidate}",
-                        "--type=signal",
-                        "/",
-                        "com.example.test",
-                    ]
-                    rc, dummy, dummy = self.module.run_command(command)
-
-                    if rc == 0:
+                    if self._validate_address(dbus_session_bus_address_candidate):
                         self.module.debug(
                             f"Verified D-Bus user session candidate as usable at address: {dbus_session_bus_address_candidate}"
                         )
-
                         return dbus_session_bus_address_candidate
 
             # This can happen with things like SSH sessions etc.
@@ -230,7 +246,6 @@ class DBusWrapper:
                 pass
 
         self.module.debug("Failed to find running D-Bus user session, will use dbus-run-session")
-
         return None
 
     def run_command(self, command):
@@ -249,8 +264,7 @@ class DBusWrapper:
             self.module.debug("Using dbus-run-session wrapper for running commands.")
             command = [self.dbus_run_session_cmd] + command
             rc, out, err = self.module.run_command(command)
-
-            if self.dbus_session_bus_address is None and rc == 127:
+            if rc == 127:
                 self.module.fail_json(
                     msg=f"Failed to run passed-in command, dbus-run-session faced an internal error: {err}"
                 )
