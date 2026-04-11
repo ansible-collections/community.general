@@ -124,7 +124,10 @@ class BecomeModule(BecomeBase):
 
         flags = self.get_option("become_flags")
         user = self.get_option("become_user")
-        return f"{become} -q shell {flags} {user}@ {self._build_success_command(cmd, shell)}"
+        # SYSTEMD_COLORS=0 stops machinectl from appending ANSI reset
+        # sequences (ESC[0m, ESC[J) after the child exits, which would
+        # otherwise land after the module JSON and break result parsing.
+        return f"SYSTEMD_COLORS=0 {become} -q shell {flags} {user}@ {self._build_success_command(cmd, shell)}"
 
     def check_success(self, b_output):
         b_output = self.remove_ansi_codes(b_output)

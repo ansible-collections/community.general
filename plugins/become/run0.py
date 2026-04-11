@@ -60,6 +60,8 @@ options:
     type: string
 notes:
   - This plugin only works when a C(polkit) rule is in place.
+  - This become plugin does not work when connection pipelining is enabled. With ansible-core 2.19+, using it automatically
+    disables pipelining. On ansible-core 2.18 and before, pipelining must explicitly be disabled by the user.
 """
 
 EXAMPLES = r"""
@@ -91,6 +93,10 @@ class BecomeModule(BecomeBase):
     success = ("==== AUTHENTICATION COMPLETE ====",)
     require_tty = True  # see https://github.com/ansible-collections/community.general/issues/6932
 
+    # See https://github.com/ansible/ansible/issues/81254,
+    # https://github.com/ansible/ansible/pull/78111
+    pipelining = False
+
     @staticmethod
     def remove_ansi_codes(line):
         return ansi_color_codes.sub(b"", line)
@@ -105,7 +111,11 @@ class BecomeModule(BecomeBase):
         flags = self.get_option("become_flags")
         user = self.get_option("become_user")
 
-        return f"{become} --user={user} {flags} {self._build_success_command(cmd, shell)}"
+        # SYSTEMD_COLORS=0 stops run0 from emitting terminal control
+        # sequences (window title OSC, ANSI reset) around the child
+        # command, which would otherwise corrupt the module JSON and
+        # break result parsing.
+        return f"SYSTEMD_COLORS=0 {become} --user={user} {flags} {self._build_success_command(cmd, shell)}"
 
     def check_success(self, b_output):
         b_output = self.remove_ansi_codes(b_output)
