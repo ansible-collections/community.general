@@ -1,6 +1,5 @@
 minor_changes:
   - jira - when ``cloud=true`` and ``assignee`` is an
     email address, the module now automatically resolves
-    the email to a Jira Cloud account ID using the
-    ``/rest/api/2/user/search`` endpoint
+    the email to a Jira Cloud account ID
     (https://github.com/ansible-collections/community.general/issues/11734, https://github.com/ansible-collections/community.general/pull/11735).

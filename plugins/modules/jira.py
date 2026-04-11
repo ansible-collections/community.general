@@ -134,10 +134,9 @@ options:
     type: str
     description:
       - Sets the assignee when O(operation) is V(create), V(transition), or V(edit).
-      - Jira Cloud requires the assignee as an account ID (use O(account_id)). Alternatively, when O(cloud=true) and O(assignee) contains
-        C(@), the module resolves an email to an account ID via the Jira Cloud user search API (C(/rest/api/2/user/search)); resolution
-        succeeds only when exactly one user matches and the returned email address matches the value provided. Jira Server and Jira Data
-        Center may still accept O(assignee) as a username.
+      - Jira Cloud generally requires account IDs for user fields (including assignee), so use O(account_id) where possible.
+      - When O(cloud=true) and O(assignee) contains C(@), the module can automatically resolve the email to an account ID.
+      - Jira Server and Jira Data Center may still accept O(assignee) as a username.
       - Email-based assignee auto-resolution was added in community.general 12.6.0.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   account_id:
@@ -197,14 +196,9 @@ options:
   cloud:
     description:
       - Enable when using Jira Cloud.
-      - When set to V(true), O(operation=search) uses the C(/rest/api/2/search/jql) endpoint required by Jira Cloud,
-        since the legacy C(/rest/api/2/search) endpoint has been removed.
-      - When set to V(true) and O(assignee) contains C(@), the module resolves the assignee as an email address
-        to an account ID using the C(/rest/api/2/user/search) endpoint.
-      - When set to V(false) (the default), the legacy endpoint is used, which is still required for Jira Data Center / Server.
-      - See U(https://developer.atlassian.com/changelog/#CHANGE-2046) for details about the endpoint deprecation.
-      - In the future, if this option is set to V(true), other endpoints might also be replaced to address
-        Jira Cloud deprecations.
+      - When set to V(true), the module uses Jira Cloud compatible behavior.
+      - When set to V(false) (the default), the module uses Jira Server / Data Center compatible behavior.
+      - In the future, this option might affect additional operations for Jira Cloud compatibility.
     type: bool
     default: false
     version_added: '12.6.0'
