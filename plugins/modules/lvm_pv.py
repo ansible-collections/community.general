@@ -73,18 +73,12 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 
-
-def get_pv_status(module, device):
-    """Check if the device is already a PV."""
-    cmd = ["pvs", "--noheadings", "--readonly", device]
-    return module.run_command(cmd)[0] == 0
-
-
-def get_pv_size(module, device):
-    """Get current PV size in bytes."""
-    cmd = ["pvs", "--noheadings", "--nosuffix", "--units", "b", "-o", "pv_size", device]
-    rc, out, err = module.run_command(cmd, check_rc=True)
-    return int(out.strip())
+from ansible_collections.community.general.plugins.module_utils._lvm import (
+    pvcreate_runner,
+    pvremove_runner,
+    pvresize_runner,
+    pvs_runner,
+)
 
 
 def rescan_device(module, device):
@@ -129,16 +123,30 @@ def main():
 
     device = module.params["device"]
     state = module.params["state"]
-    force = module.params["force"]
     resize = module.params["resize"]
     changed = False
     actions = []
+
+    pvs = pvs_runner(module)
+    pvcreate = pvcreate_runner(module)
+    pvresize = pvresize_runner(module)
+    pvremove = pvremove_runner(module)
+
+    def get_pv_status():
+        with pvs("noheadings readonly devices", check_rc=False) as ctx:
+            rc, dummy, dummy = ctx.run(devices=[device])
+        return rc == 0
+
+    def get_pv_size():
+        with pvs("noheadings nosuffix readonly units fields devices") as ctx:
+            dummy, out, dummy = ctx.run(units="b", fields="pv_size", devices=[device])
+        return int(out.strip())
 
     # Validate device existence for present state
     if state == "present" and not os.path.exists(device):
         module.fail_json(msg=f"Device {device} not found")
 
-    is_pv = get_pv_status(module, device)
+    is_pv = get_pv_status()
 
     if state == "present":
         # Create PV if needed
@@ -147,11 +155,7 @@ def main():
                 changed = True
                 actions.append("would be created")
             else:
-                cmd = ["pvcreate"]
-                if force:
-                    cmd.append("-f")
-                cmd.append(device)
-                rc, out, err = module.run_command(cmd, check_rc=True)
+                pvcreate("force device", check_rc=True).run()
                 changed = True
                 actions.append("created")
             is_pv = True
@@ -163,12 +167,12 @@ def main():
                 changed = True
                 actions.append("would be resized")
             else:
-                # Perform device rescan if each time
+                # Perform device rescan each time
                 if rescan_device(module, device):
                     actions.append("rescanned")
-                original_size = get_pv_size(module, device)
-                rc, out, err = module.run_command(["pvresize", device], check_rc=True)
-                new_size = get_pv_size(module, device)
+                original_size = get_pv_size()
+                pvresize("device", check_rc=True).run()
+                new_size = get_pv_size()
                 if new_size != original_size:
                     changed = True
                     actions.append("resized")
@@ -179,12 +183,8 @@ def main():
                 changed = True
                 actions.append("would be removed")
             else:
-                cmd = ["pvremove", "-y"]
-                if force:
-                    cmd.append("-ff")
+                pvremove("force device", check_rc=True).run()
                 changed = True
-                cmd.append(device)
-                rc, out, err = module.run_command(cmd, check_rc=True)
                 actions.append("removed")
 
     # Generate final message
