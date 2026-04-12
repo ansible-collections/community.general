@@ -809,8 +809,8 @@ class LogrotateConfig:
         )
 
         if only_changing_enabled:
-            old_path = self.get_config_path(bool(not target_enabled))
-            new_path = self.get_config_path(bool(target_enabled))
+            old_path = self.get_config_path(not target_enabled)
+            new_path = self.get_config_path(target_enabled)
 
             if os.path.exists(old_path) and not os.path.exists(new_path):
                 self.result["changed"] = True
@@ -835,7 +835,7 @@ class LogrotateConfig:
 
         new_content = self.generate_config_content()
         self.result["config_content"] = new_content
-        self.result["config_file"] = self.get_config_path(bool(target_enabled))
+        self.result["config_file"] = self.get_config_path(target_enabled)
 
         needs_update = existing_content is None or existing_content != new_content or target_enabled != current_enabled
 
