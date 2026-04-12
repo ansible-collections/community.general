@@ -126,53 +126,86 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt as fmt
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
+
+RE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)")
+RE_INSTALLED = re.compile(r"\S+\s+\((?:default: )?(.+)\)")
+
 
 def get_rubygems_path(module):
     if module.params["executable"]:
-        result = module.params["executable"].split(" ")
-    else:
-        result = [module.get_bin_path("gem", True)]
-    return result
+        return module.params["executable"].split()
+    return [module.get_bin_path("gem", True)]
 
 
 def get_rubygems_version(module):
-    if hasattr(get_rubygems_version, "ver"):
-        return get_rubygems_version.ver
-
     cmd = get_rubygems_path(module) + ["--version"]
-    (rc, out, err) = module.run_command(cmd, check_rc=True)
-
-    match = re.match(r"^(\d+)\.(\d+)\.(\d+)", out)
+    rc, out, err = module.run_command(cmd, check_rc=True)
+    match = RE_VERSION.match(out)
     if not match:
         return None
-
-    ver = tuple(int(x) for x in match.groups())
-    get_rubygems_version.ver = ver
-
-    return ver
+    return tuple(int(x) for x in match.groups())
 
 
-def get_rubygems_environ(module):
+def make_runner(module, ver):
+    command = get_rubygems_path(module)
+
+    environ_update = {}
     if module.params["install_dir"]:
-        return {"GEM_HOME": module.params["install_dir"]}
-    return None
+        environ_update["GEM_HOME"] = module.params["install_dir"]
+
+    if ver and ver < (2, 0, 0):
+        include_dependencies_fmt = fmt.as_bool("--include-dependencies", "--ignore-dependencies")
+        include_doc_fmt = fmt.as_bool_not(["--no-rdoc", "--no-ri"])
+    else:
+        include_dependencies_fmt = fmt.as_bool_not("--ignore-dependencies")
+        include_doc_fmt = fmt.as_bool_not("--no-document")
+
+    norc_fmt = fmt.as_bool("--norc") if (ver and ver >= (2, 5, 2)) else fmt.as_bool([])
+
+    return CmdRunner(
+        module,
+        command=command,
+        environ_update=environ_update,
+        check_rc=True,
+        arg_formats=dict(
+            _list_subcmd=fmt.as_fixed("list"),
+            _install_subcmd=fmt.as_fixed("install"),
+            _uninstall_subcmd=fmt.as_fixed("uninstall"),
+            norc=norc_fmt,
+            _remote_flag=fmt.as_fixed("--remote"),
+            repository=fmt.as_opt_val("--source"),
+            _name_pattern=fmt.as_func(lambda v: [f"^{v}$"]),
+            version=fmt.as_opt_val("--version"),
+            include_dependencies=include_dependencies_fmt,
+            user_install=fmt.as_bool("--user-install", "--no-user-install"),
+            install_dir=fmt.as_opt_val("--install-dir"),
+            bindir=fmt.as_opt_val("--bindir"),
+            pre_release=fmt.as_bool("--pre"),
+            include_doc=include_doc_fmt,
+            env_shebang=fmt.as_bool("--env-shebang"),
+            gem_source=fmt.as_list(),
+            build_flags=fmt.as_opt_val("--"),
+            force=fmt.as_bool("--force"),
+            _uninstall_version=fmt.as_func(lambda v: ["--version", v] if v else ["--all"], ignore_none=False),
+            _executable_flag=fmt.as_fixed("--executable"),
+            name=fmt.as_list(),
+        ),
+    )
 
 
-def get_installed_versions(module, remote=False):
-    cmd = get_rubygems_path(module)
-    cmd.append("list")
-    cmd.extend(common_opts(module))
+def get_installed_versions(runner, remote=False):
+    name = runner.module.params["name"]
     if remote:
-        cmd.append("--remote")
-        if module.params["repository"]:
-            cmd.extend(["--source", module.params["repository"]])
-    cmd.append(f"^{module.params['name']}$")
-
-    environ = get_rubygems_environ(module)
-    (rc, out, err) = module.run_command(cmd, environ_update=environ, check_rc=True)
+        args_order = ["_list_subcmd", "norc", "_remote_flag", "repository", "_name_pattern"]
+    else:
+        args_order = ["_list_subcmd", "norc", "_name_pattern"]
+    with runner(args_order) as ctx:
+        rc, out, err = ctx.run(_name_pattern=name)
     installed_versions = []
     for line in out.splitlines():
-        match = re.match(r"\S+\s+\((?:default: )?(.+)\)", line)
+        match = RE_INSTALLED.match(line)
         if match:
             versions = match.group(1)
             for version in versions.split(", "):
@@ -180,95 +213,52 @@ def get_installed_versions(module, remote=False):
     return installed_versions
 
 
-def exists(module):
+def exists(runner):
+    module = runner.module
     if module.params["state"] == "latest":
-        remoteversions = get_installed_versions(module, remote=True)
+        remoteversions = get_installed_versions(runner, remote=True)
         if remoteversions:
             module.params["version"] = remoteversions[0]
-    installed_versions = get_installed_versions(module)
+    installed_versions = get_installed_versions(runner)
     if module.params["version"]:
-        if module.params["version"] in installed_versions:
-            return True
-    else:
-        if installed_versions:
-            return True
-    return False
+        return module.params["version"] in installed_versions
+    return bool(installed_versions)
 
 
-def common_opts(module):
-    opts = []
-    ver = get_rubygems_version(module)
-    if module.params["norc"] and ver and ver >= (2, 5, 2):
-        opts.append("--norc")
-    return opts
+def install(runner):
+    args_order = [
+        "_install_subcmd",
+        "norc",
+        "version",
+        "repository",
+        "include_dependencies",
+        "user_install",
+        "install_dir",
+        "bindir",
+        "pre_release",
+        "include_doc",
+        "env_shebang",
+        "gem_source",
+        "build_flags",
+        "force",
+    ]
+    with runner(args_order, check_mode_skip=True) as ctx:
+        ctx.run()
 
 
-def uninstall(module):
-    if module.check_mode:
-        return
-    cmd = get_rubygems_path(module)
-    environ = get_rubygems_environ(module)
-    cmd.append("uninstall")
-    cmd.extend(common_opts(module))
-    if module.params["install_dir"]:
-        cmd.extend(["--install-dir", module.params["install_dir"]])
-
-    if module.params["bindir"]:
-        cmd.extend(["--bindir", module.params["bindir"]])
-
-    if module.params["version"]:
-        cmd.extend(["--version", module.params["version"]])
-    else:
-        cmd.append("--all")
-    cmd.append("--executable")
-    if module.params["force"]:
-        cmd.append("--force")
-    cmd.append(module.params["name"])
-    return module.run_command(cmd, environ_update=environ, check_rc=True)
-
-
-def install(module):
-    if module.check_mode:
-        return
-
-    ver = get_rubygems_version(module)
-
-    cmd = get_rubygems_path(module)
-    cmd.append("install")
-    cmd.extend(common_opts(module))
-    if module.params["version"]:
-        cmd.extend(["--version", module.params["version"]])
-    if module.params["repository"]:
-        cmd.extend(["--source", module.params["repository"]])
-    if not module.params["include_dependencies"]:
-        cmd.append("--ignore-dependencies")
-    else:
-        if ver and ver < (2, 0, 0):
-            cmd.append("--include-dependencies")
-    if module.params["user_install"]:
-        cmd.append("--user-install")
-    else:
-        cmd.append("--no-user-install")
-    if module.params["install_dir"]:
-        cmd.extend(["--install-dir", module.params["install_dir"]])
-    if module.params["bindir"]:
-        cmd.extend(["--bindir", module.params["bindir"]])
-    if module.params["pre_release"]:
-        cmd.append("--pre")
-    if not module.params["include_doc"]:
-        if ver and ver < (2, 0, 0):
-            cmd.append("--no-rdoc")
-            cmd.append("--no-ri")
-        else:
-            cmd.append("--no-document")
-    if module.params["env_shebang"]:
-        cmd.append("--env-shebang")
-    cmd.append(module.params["gem_source"])
-    if module.params["build_flags"]:
-        cmd.extend(["--", module.params["build_flags"]])
-    if module.params["force"]:
-        cmd.append("--force")
-    module.run_command(cmd, check_rc=True)
+def uninstall(runner):
+    args_order = [
+        "_uninstall_subcmd",
+        "norc",
+        "install_dir",
+        "bindir",
+        "_uninstall_version",
+        "_executable_flag",
+        "force",
+        "name",
+    ]
+    with runner(args_order, check_mode_skip=True) as ctx:
+        return ctx.run(_uninstall_version=runner.module.params["version"])
 
 
 def main():
@@ -305,16 +295,19 @@ def main():
     if not module.params["gem_source"]:
         module.params["gem_source"] = module.params["name"]
 
+    ver = get_rubygems_version(module)
+    runner = make_runner(module, ver)
+
     changed = False
 
     if module.params["state"] in ["present", "latest"]:
-        if not exists(module):
-            install(module)
+        if not exists(runner):
+            install(runner)
             changed = True
     elif module.params["state"] == "absent":
-        if exists(module):
-            command_output = uninstall(module)
-            if command_output is not None and exists(module):
+        if exists(runner):
+            command_output = uninstall(runner)
+            if command_output is not None and exists(runner):
                 rc, out, err = command_output
                 module.fail_json(
                     msg=(
