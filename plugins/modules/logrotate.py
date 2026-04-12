@@ -513,7 +513,7 @@ class LogrotateConfig:
 
         if self.params.get("create") is not None:
             create_val = self.params["create"]
-            if not re.match(r"^\d{3,4}(\s+\S+\s+\S+)?$", create_val):
+            if not re.match(r"^\d{3,4}(\s+\S+\s+\S+)?\s*$", create_val):
                 self.module.fail_json(
                     msg="'create' must be in format 'mode' or 'mode user group' (for example '0640' or '0640 root adm')"
                 )
