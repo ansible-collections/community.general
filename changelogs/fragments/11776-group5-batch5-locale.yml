@@ -1,0 +1,16 @@
+bugfixes:
+  - pnpm - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11776).
+  - sysrc - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11776).
+  - timezone - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11776).
+  - xattr - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11776).
+  - yarn - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11776).
