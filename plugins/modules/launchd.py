@@ -466,6 +466,7 @@ def main():
             ["state", "enabled"],
         ],
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     service = module.params["name"]
     plist_filename = module.params["plist"]

@@ -1,0 +1,16 @@
+bugfixes:
+  - homectl - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11774).
+  - java_cert - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11774).
+  - keyring - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11774).
+  - launchd - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11774).
+  - listen_ports_facts - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing
+    (https://github.com/ansible-collections/community.general/issues/11737,
+    https://github.com/ansible-collections/community.general/pull/11774).

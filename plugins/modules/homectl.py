@@ -614,6 +614,7 @@ def main():
             ("resize", True, ["disksize"]),
         ],
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     if not HAS_CRYPT and not HAS_LEGACYCRYPT:
         module.fail_json(

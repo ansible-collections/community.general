@@ -343,6 +343,7 @@ def main():
         ),
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     if module.params["include_non_listening"]:
         command_args = ["-p", "-u", "-n", "-t", "-a"]
