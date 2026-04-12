@@ -147,6 +147,7 @@ def main():
             executable=dict(type="str"),
         )
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     dest = module.params["dest"]
     parent = module.params["name"]
