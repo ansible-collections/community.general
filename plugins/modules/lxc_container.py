@@ -1432,6 +1432,7 @@ def main():
         supports_check_mode=False,
         required_if=([("archive", True, ["archive_path"])]),
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     if not HAS_LXC:
         module.fail_json(msg="The `lxc` module is not importable. Check the requirements.")
