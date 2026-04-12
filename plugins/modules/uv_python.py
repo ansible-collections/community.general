@@ -200,7 +200,6 @@ class UV:
         """
         Runs command 'uv python install X.Y.Z' with latest patch version available.
         Returns:
-          tuple [bool, str, str, int, list, list]
           - boolean to indicate if method changed state
           - command's stdout
           - command's stderr
@@ -232,9 +231,6 @@ class UV:
           command (str): uv python subcommand (e.g. "install", "uninstall", "find").
           *args: Additional positional arguments passed to the command.
           check_rc (bool): Whether to fail if the command exits with non-zero return code.
-        Returns:
-          tuple[int, str, str]:
-            A tuple containing (rc, stdout, stderr).
         """
         cmd = [self.bin_path, "python", command, python_version, "--color", "never", *args]
         rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
@@ -248,9 +244,6 @@ class UV:
         Args:
           *args: Additional positional arguments passed to _exec.
           check_rc (bool): Whether to fail if the command exits with non-zero return code.
-        Returns:
-          tuple[int, str, str]:
-            A tuple containing (rc, stdout, stderr).
         """
         rc, out, err = self._exec(self.python_version_str, "find", *args, check_rc=check_rc)
         if rc == 0:
@@ -264,9 +257,6 @@ class UV:
         Args:
           *args: Additional positional arguments passed to _exec.
           check_rc (bool): Whether to fail if the command exits with non-zero return code.
-        Returns:
-          tuple[int, list, str]
-            A tuple containing (rc, stdout, stderr).
         """
         rc, out, err = self._exec(self.python_version_str, "list", "--output-format", "json", *args, check_rc=check_rc)
         pythons_installed = []
@@ -283,7 +273,6 @@ class UV:
         Args:
           *args: Additional positional arguments passed to _list_python.
         Returns:
-          tuple[str, str]:
             - latest found patch version in format X.Y.Z
             - installation path of latest patch version if version exists
         """
@@ -303,7 +292,6 @@ class UV:
         Args:
           *args: Additional positional arguments passed to _list_python.
         Returns:
-          tuple[list, list]:
             - list of latest found patch versions
             - list of installation paths of installed versions
         """
