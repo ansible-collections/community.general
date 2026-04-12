@@ -142,15 +142,14 @@ class UV:
     def _ensure_min_uv_version(self) -> None:
         cmd = [self.bin_path, "--version", "--color", "never"]
         dummy_rc, out, dummy_err = self.module.run_command(cmd, check_rc=True)
-        detected = str(out.strip().split()[-1])
         try:
-          detected = re.search(r"\b\d+(?:\.\d+)+\b", out).group()
-          if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
-              self.module.fail_json(
-                  msg=f"uv_python module requires uv >= {MINIMUM_UV_VERSION}",
-                  detected_version=detected,
-                  required_version=MINIMUM_UV_VERSION,
-              )
+            detected = re.search(r"\b\d+(?:\.\d+)+\b", out).group()
+            if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
+                self.module.fail_json(
+                    msg=f"uv_python module requires uv >= {MINIMUM_UV_VERSION}",
+                    detected_version=detected,
+                    required_version=MINIMUM_UV_VERSION,
+                )
         except AttributeError:
             self.module.warn("Could not get installed uv version, skipping uv version check")
 
