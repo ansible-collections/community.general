@@ -122,6 +122,7 @@ def main():
             update=dict(type="bool", default=False),
         ),
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     if not os.path.exists(APT_REPO_PATH):
         module.fail_json(msg="cannot find /usr/bin/apt-repo")

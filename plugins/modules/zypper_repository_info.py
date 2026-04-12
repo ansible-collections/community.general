@@ -115,6 +115,7 @@ def _parse_repos(module):
 
 def main():
     module = AnsibleModule(argument_spec=dict(), supports_check_mode=True)
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     deps.validate(parseXML)
 
