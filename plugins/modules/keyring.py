@@ -190,6 +190,7 @@ def run_module():
     )
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     if not HAS_KEYRING:
         module.fail_json(msg=missing_required_lib("keyring"), exception=KEYRING_IMP_ERR)
