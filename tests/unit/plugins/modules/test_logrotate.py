@@ -101,17 +101,15 @@ class TestLogrotateConfig(unittest.TestCase):
             return False
 
         with patch("os.path.exists", side_effect=exists_side_effect):
-            with patch("builtins.open", mock_open()) as mock_file:
-                with patch("os.chmod") as mock_chmod:
-                    logrotate_bin = self.mock_module.get_bin_path.return_value
-                    config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
-                    result = config.apply()
-                    self.assertTrue(result["changed"])
-                    self.assertIn("config_file", result)
-                    self.assertIn("config_content", result)
-                    self.assertEqual(result["enabled_state"], True)
-                    mock_file.assert_called_once()
-                    mock_chmod.assert_called_once()
+            with patch("os.chmod") as mock_chmod:
+                logrotate_bin = self.mock_module.get_bin_path.return_value
+                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                result = config.apply()
+                self.assertTrue(result["changed"])
+                self.assertIn("config_file", result)
+                self.assertIn("config_content", result)
+                self.assertEqual(result["enabled_state"], True)
+                mock_chmod.assert_called_once()
 
     def test_update_existing_configuration(self):
         """Test updating an existing logrotate configuration."""
