@@ -521,15 +521,6 @@ class LogrotateConfig:
         if self.params.get("shred_cycles") is not None and self.params["shred_cycles"] < 1:
             self.module.fail_json(msg="'shred_cycles' must be a positive integer")
 
-        if self.params.get("shred_cycles") is not None and not self.params.get("shred"):
-            self.module.fail_json(msg="'shred_cycles' requires 'shred=true'")
-
-        if self.params.get("compression_method") is not None and not self.params.get("compress"):
-            self.module.fail_json(msg="'compression_method' requires 'compress=true'")
-
-        if self.params.get("compress_options") is not None and not self.params.get("compress"):
-            self.module.fail_json(msg="'compress_options' requires 'compress=true'")
-
         for size_param in ["size", "min_size", "max_size"]:
             if self.params.get(size_param):
                 if not re.match(r"^\d+[kMG]?$", self.params[size_param], re.I):
