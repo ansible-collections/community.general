@@ -95,6 +95,7 @@ def gather_lldp(module):
 def main():
     module_args = dict(multivalues=dict(type="bool", default=False))
     module = AnsibleModule(module_args)
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     lldp_output = gather_lldp(module)
     try:
