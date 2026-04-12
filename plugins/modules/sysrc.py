@@ -119,6 +119,7 @@ class Sysrc(StateModuleHelper):
         if not re.match(r"^\w+$", self.vars.name, re.ASCII):
             self.module.fail_json(msg="Name may only contain alpha-numeric and underscore characters")
 
+        self.module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
         self.sysrc = self.module.get_bin_path("sysrc", True)
 
     def _contains(self):

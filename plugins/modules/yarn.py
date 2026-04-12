@@ -280,6 +280,7 @@ def main():
     )
     arg_spec["global"] = dict(default=False, type="bool")
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     name = module.params["name"]
     path = module.params["path"]
