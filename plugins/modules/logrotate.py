@@ -488,10 +488,10 @@ class LogrotateConfig:
         self.config_name = self.params["name"]
         self.disabled_suffix = ".disabled"
 
-    def get_config_path(self, enabled: bool | None) -> str:
+    def get_config_path(self, enabled: bool) -> str:
         """Get config file path based on enabled state."""
         base_path = os.path.join(self.config_dir, self.config_name)
-        if enabled is False:
+        if not enabled:
             return base_path + self.disabled_suffix
         return base_path
 
