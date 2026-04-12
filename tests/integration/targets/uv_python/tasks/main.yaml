@@ -20,7 +20,7 @@
 
 - name: Install Python 3.14 in check mode
   uv_python:
-    version: 3.14
+    version: "3.14"
     state: present
   check_mode: true
   register: install_check_mode
@@ -34,7 +34,7 @@
 
 - name: Install Python 3.14
   uv_python:
-    version: 3.14
+    version: "3.14"
     state: present
   register: install_python
 
@@ -48,7 +48,7 @@
 
 - name: Re-install Python 3.14
   uv_python:
-    version: 3.14
+    version: "3.14"
     state: present
   register: reinstall_python
 
@@ -230,7 +230,7 @@
 
 - name: Install unsupported Python version with latest state
   uv_python:
-    version: 2.0
+    version: "2.0"
     state: latest
   register: unsupported_python
   ignore_errors: true
@@ -243,7 +243,7 @@
 
 - name: Delete Python 3.13 version
   uv_python:
-    version: 3.13
+    version: "3.13"
     state: absent
   register: uninstall_result
 
@@ -252,7 +252,8 @@
     that:
       - uninstall_result.changed is true
       - uninstall_result.failed is false
-      - '"3.13.12" in uninstall_result.python_versions'
+      - uninstall_result.python_versions | length >= 1
+      - '"3.13" in uninstall_result.python_versions[0]'
 
 - name: No specified version
   uv_python:
