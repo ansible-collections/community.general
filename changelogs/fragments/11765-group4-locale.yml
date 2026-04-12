@@ -1,0 +1,4 @@
+bugfixes:
+  - dconf - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11765).
+  - pkgng - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11765).
+  - terraform - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11765).
