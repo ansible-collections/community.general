@@ -135,6 +135,7 @@ def main():
         required_one_of=[["name", "activate"]],
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     global AWALL_PATH
     AWALL_PATH = module.get_bin_path("awall", required=True)
