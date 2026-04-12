@@ -217,6 +217,7 @@ def main():
         ),
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     if "all" in module.params["type"] and len(module.params["type"]) > 1:
         module.fail_json(msg="Value 'all' for parameter 'type' is mutually exclusive with other values")
