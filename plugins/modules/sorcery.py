@@ -703,7 +703,7 @@ def main():
         SORCERY[c] = module.get_bin_path(c, True)
 
     # prepare environment: run sorcery commands without asking questions
-    module.run_command_environ_update = dict(PROMPT_DELAY="0", VOYEUR="0")
+    module.run_command_environ_update = dict(PROMPT_DELAY="0", VOYEUR="0", LANGUAGE="C", LC_ALL="C")
 
     params = module.params
 
