@@ -1,6 +1,6 @@
 bugfixes:
-  - logrotate - fixed ``TypeError`` when ``shred_cycles`` is ``None`` and corrected ``enabled=None`` handling in ``get_config_path()`` (https://github.com/ansible-collections/community.general/pull/11764).
-  - logrotate - added missing default values for ``state`` and ``config_dir`` parameters, and added ``required_by`` declarations for shred and compression parameters (https://github.com/ansible-collections/community.general/pull/11764).
-  - logrotate - configuration files are now written to a temporary file first and validated before being atomically moved to the destination, and all ``os.remove()`` and ``atomic_move()`` calls are now properly wrapped in error handling (https://github.com/ansible-collections/community.general/pull/11764).
+  - logrotate - fixes ``TypeError`` when ``shred_cycles`` is ``None`` and corrects ``enabled=None`` handling in ``get_config_path()`` (https://github.com/ansible-collections/community.general/pull/11764).
+  - logrotate - adds missing default values for ``state`` and ``config_dir`` parameters, and adds ``required_by`` declarations for shred and compression parameters (https://github.com/ansible-collections/community.general/pull/11764).
+  - logrotate - writes configuration files to a temporary file first and validates before atomically moving to the destination, and properly wraps all ``os.remove()`` and ``atomic_move()`` calls in error handling (https://github.com/ansible-collections/community.general/pull/11764).
 minor_changes:
-  - logrotate - add optional ``backup`` parameter to create a backup of the existing configuration file before writing changes (https://github.com/ansible-collections/community.general/pull/11764).
+  - logrotate - adds optional ``backup`` parameter to create a backup of the existing configuration file before writing changes (https://github.com/ansible-collections/community.general/pull/11764).
