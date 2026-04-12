@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: MIT
 from __future__ import annotations
 
-import copy
-
 import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
@@ -26,10 +24,9 @@ def get_command(run_command):
 class TestGem(ModuleTestCase):
     def setUp(self):
         super().setUp()
-        self.rubygems_path = ["/usr/bin/gem"]
         self.mocker.patch(
-            "ansible_collections.community.general.plugins.modules.gem.get_rubygems_path",
-            lambda module: copy.deepcopy(self.rubygems_path),
+            "ansible.module_utils.basic.AnsibleModule.get_bin_path",
+            return_value="/usr/bin/gem",
         )
 
     @pytest.fixture(autouse=True)
@@ -41,7 +38,7 @@ class TestGem(ModuleTestCase):
 
         target = "ansible_collections.community.general.plugins.modules.gem.get_installed_versions"
 
-        def new(module, remote=False):
+        def new(runner, remote=False):
             return versions
 
         return self.mocker.patch(target, new)
