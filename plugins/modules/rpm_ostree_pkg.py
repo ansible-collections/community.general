@@ -190,6 +190,7 @@ def main():
             ),
         ),
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     rpm_ostree_pkg = RpmOstreePkg(module)
     rpm_ostree_pkg.ensure()

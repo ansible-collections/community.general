@@ -361,6 +361,7 @@ def main():
         mutually_exclusive=(("data", "file", "url", "keyserver"),),
         required_if=[("state", "present", ("data", "file", "url", "keyserver"), True)],
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
     PacmanKey(module)
 
 

@@ -117,4 +117,4 @@ def test_add_host_key(mocker, fqdn, port, add_host_key_cmd):
     mocker.patch("os.path.exists", return_value=True)
 
     known_hosts.add_host_key(am, fqdn, port=port)
-    run_command.assert_called_with(keyscan_cmd + add_host_key_cmd)
+    run_command.assert_called_with(keyscan_cmd + add_host_key_cmd, environ_update={"LANGUAGE": "C", "LC_ALL": "C"})
