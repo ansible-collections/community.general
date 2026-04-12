@@ -106,6 +106,7 @@ def main():
             validate_certs=dict(default=True, type="bool"),
         )
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     command = module.params.get("command")
     http_conn = module.params.get("http_conn")
