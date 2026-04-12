@@ -103,6 +103,7 @@ def main():
         supports_check_mode=True,
         required_one_of=[("state", "enabled")],
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     # initialize
     service = module.params["name"]
