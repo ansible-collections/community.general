@@ -202,6 +202,7 @@ def main():
         version=dict(),
     )
     module = AnsibleModule(argument_spec=arg_spec)
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     name = module.params["name"]
     offline = module.params["offline"]
