@@ -84,6 +84,7 @@ def main():
             mirror=dict(type="list", elements="str"),
         )
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     for option in ["origin", "mirror"]:
         if module.params[option] == [""]:
