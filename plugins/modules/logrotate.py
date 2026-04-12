@@ -796,26 +796,34 @@ class LogrotateConfig:
             old_path = self.get_config_path(not target_enabled)
             new_path = self.get_config_path(target_enabled)
 
-            if os.path.exists(old_path) and not os.path.exists(new_path):
-                self.result["changed"] = True
-                if not self.module.check_mode:
-                    try:
-                        self.module.atomic_move(old_path, new_path, unsafe_writes=False)
-                    except Exception as e:
-                        self.module.fail_json(
-                            msg=f"Failed to rename config file from '{old_path}' to '{new_path}': {to_native(e)}"
-                        )
+            if not os.path.exists(old_path):
+                self.module.fail_json(
+                    msg=f"Cannot change enabled state: config file '{old_path}' not found"
+                )
+            elif os.path.exists(new_path):
+                self.module.fail_json(
+                    msg=f"Cannot change enabled state: target path '{new_path}' already exists"
+                )
 
-                self.result["config_file"] = new_path
-                self.result["enabled_state"] = target_enabled
-
+            self.result["changed"] = True
+            if not self.module.check_mode:
                 try:
-                    with open(new_path, "r") as f:
-                        self.result["config_content"] = f.read()
-                except Exception:
-                    self.result["config_content"] = existing_content
+                    self.module.atomic_move(old_path, new_path, unsafe_writes=False)
+                except Exception as e:
+                    self.module.fail_json(
+                        msg=f"Failed to rename config file from '{old_path}' to '{new_path}': {to_native(e)}"
+                    )
 
-                return self.result
+            self.result["config_file"] = new_path
+            self.result["enabled_state"] = target_enabled
+
+            try:
+                with open(new_path, "r") as f:
+                    self.result["config_content"] = f.read()
+            except Exception:
+                self.result["config_content"] = existing_content
+
+            return self.result
 
         new_content = self.generate_config_content()
         self.result["config_content"] = new_content
