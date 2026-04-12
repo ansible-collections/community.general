@@ -464,6 +464,7 @@ backup_file:
 
 import os
 import re
+import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
@@ -840,10 +841,13 @@ class LogrotateConfig:
 
         if needs_update:
             if not self.module.check_mode:
-                tmp_path = os.path.join(self.module.tmpdir, self.config_name + ".tmp")
                 try:
-                    with open(tmp_path, "w") as f:
-                        f.write(new_content)
+                    with tempfile.NamedTemporaryFile(
+                        mode="w", suffix=".tmp", prefix=self.config_name + "_",
+                        dir=self.module.tmpdir, delete=False
+                    ) as tmp_file:
+                        tmp_file.write(new_content)
+                        tmp_path = tmp_file.name
                 except Exception as e:
                     self.module.fail_json(msg=f"Failed to write temp config file: {to_native(e)}")
 
