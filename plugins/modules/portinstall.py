@@ -191,6 +191,7 @@ def main():
             use_packages=dict(type="bool", default=True),
         )
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     p = module.params
 
