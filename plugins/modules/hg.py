@@ -219,6 +219,7 @@ def main():
             executable=dict(type="str"),
         ),
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
     repo = module.params["repo"]
     dest = module.params["dest"]
     revision = module.params["revision"]
