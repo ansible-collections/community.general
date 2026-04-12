@@ -276,6 +276,7 @@ def main():
         # provide a "noop" (or equivalent) mode to do a dry-run.
         supports_check_mode=False,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     imgadm = Imgadm(module)
 
