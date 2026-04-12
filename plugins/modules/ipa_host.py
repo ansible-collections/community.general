@@ -289,11 +289,15 @@ def ensure(module, client):
                 # so, return directly from here.
                 return changed, client.host_add(name=name, host=module_host)
         else:
-            if state in ["disabled", "enabled"]:
-                module.fail_json(msg=f"No host with name {ipa_host} found")
+            if not ipa_host and state in ["disabled", "enabled"]:
+                module.fail_json(msg=f"No host with name {name} found")
 
             diff = get_host_diff(client, ipa_host, module_host)
-            if len(diff) > 0:
+            ipa_host_show = client.host_show(name=name)
+            host_needs_to_be_disabled = ipa_host_show.get("has_keytab", True) and (
+                module.params["random_password"] or state == "disabled"
+            )
+            if diff or host_needs_to_be_disabled:
                 changed = True
                 if not module.check_mode:
                     data = {}
@@ -301,12 +305,12 @@ def ensure(module, client):
                         data[key] = module_host.get(key)
                     if "usercertificate" not in data:
                         data["usercertificate"] = [cert["__base64__"] for cert in ipa_host.get("usercertificate", [])]
-                    ipa_host_show = client.host_show(name=name)
-                    if ipa_host_show.get("has_keytab", True) and (
-                        state == "disabled" or module.params.get("random_password")
-                    ):
+                    if host_needs_to_be_disabled:
                         client.host_disable(name=name)
-                    return changed, client.host_mod(name=name, host=data)
+                    if diff:
+                        return changed, client.host_mod(name=name, host=data)
+                    else:
+                        return changed, client.host_find(name=name)
     elif state == "absent":
         if ipa_host:
             changed = True
