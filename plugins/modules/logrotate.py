@@ -528,30 +528,16 @@ class LogrotateConfig:
                     )
 
         if self.params["state"] == "present":
-            existing_content = self.read_existing_config(any_state=True)
+            existing_content = self.read_existing_config()
             if not existing_content and not self.params.get("paths"):
                 self.module.fail_json(msg="'paths' parameter is required when creating a new configuration")
 
-    def read_existing_config(self, any_state: bool = False) -> str | None:
-        """Read existing configuration file.
-
-        Args:
-            any_state: If True, check both enabled and disabled versions.
-                      If False, only check based on current enabled param.
-        """
-        if any_state:
-            for suffix in ["", self.disabled_suffix]:
-                config_path = os.path.join(self.config_dir, self.config_name + suffix)
-                if os.path.exists(config_path):
-                    self.result["enabled_state"] = suffix == ""
-                    try:
-                        with open(config_path, "r") as f:
-                            return f.read()
-                    except Exception as e:
-                        self.module.fail_json(msg=f"Failed to read config file {config_path}: {to_native(e)}")
-        else:
-            config_path = self.get_config_path(self.params["enabled"])
+    def read_existing_config(self) -> str | None:
+        """Read existing configuration file, checking both enabled and disabled versions."""
+        for suffix in ["", self.disabled_suffix]:
+            config_path = os.path.join(self.config_dir, self.config_name + suffix)
             if os.path.exists(config_path):
+                self.result["enabled_state"] = suffix == ""
                 try:
                     with open(config_path, "r") as f:
                         return f.read()
@@ -563,7 +549,7 @@ class LogrotateConfig:
     def generate_config_content(self) -> str:
         """Generate logrotate configuration content."""
         if not self.params.get("paths"):
-            existing_content = self.read_existing_config(any_state=True)
+            existing_content = self.read_existing_config()
             if existing_content:
                 lines = existing_content.strip().split("\n")
                 paths = []
@@ -795,7 +781,7 @@ class LogrotateConfig:
                     break
             return self.result
 
-        existing_content = self.read_existing_config(any_state=True)
+        existing_content = self.read_existing_config()
         current_enabled = self.result.get("enabled_state", True)
 
         target_enabled = self.params.get("enabled")
