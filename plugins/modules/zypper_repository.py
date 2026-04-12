@@ -338,6 +338,7 @@ def main():
         supports_check_mode=False,
         required_one_of=[["state", "runrefresh"]],
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     repo = module.params["repo"]
     alias = module.params["name"]
