@@ -500,6 +500,7 @@ def main():
         supports_check_mode=True,
         add_file_common_args=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     url = module.params.get("cert_url")
     path = module.params.get("cert_path")
