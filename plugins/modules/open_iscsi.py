@@ -390,6 +390,7 @@ def main():
         ],
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     global iscsiadm_cmd
     iscsiadm_cmd = module.get_bin_path("iscsiadm", required=True)

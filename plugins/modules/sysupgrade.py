@@ -133,6 +133,7 @@ def main():
         ),
         supports_check_mode=False,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
     return_dict = sysupgrade_run(module)
     module.exit_json(**return_dict)
 

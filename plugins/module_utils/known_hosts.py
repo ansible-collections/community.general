@@ -152,7 +152,7 @@ def add_host_key(module, fqdn, port=22, key_type="rsa", create_dir=False):
     else:
         this_cmd = f"{keyscan_cmd} -t {key_type} {fqdn}"
 
-    rc, out, err = module.run_command(this_cmd)
+    rc, out, err = module.run_command(this_cmd, environ_update={"LANGUAGE": "C", "LC_ALL": "C"})
     # ssh-keyscan gives a 0 exit code and prints nothing on timeout
     if rc != 0 or not out:
         msg = "failed to retrieve hostkey"
