@@ -50,6 +50,8 @@ options:
       - Selects the current default unit that Parted uses to display locations and capacities on the disk and to interpret
         those given by the user if they are not suffixed by an unit.
       - When fetching information about a disk, it is recommended to always specify a unit.
+      - O(unit_preserve_case) controls the case of the units in the return values. It used to be all lower case, but using that option you
+        can make it return the units textually equal to the choices used in O(unit).
     type: str
     choices: [s, B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, '%', cyl, chs, compact]
     default: KiB
@@ -114,12 +116,12 @@ options:
     version_added: '1.3.0'
   unit_preserve_case:
     description:
-      - Controls the case of the V(unit) field in the module output (RV(disk.unit), RV(partitions[].unit)).
-      - When V(true), the unit is returned in its original mixed case, for example V(KiB) or V(MiB).
-        This matches the values accepted by O(unit), making it safe to feed the output back as input.
+      - Controls the case of the V(unit) field in the module output (RV(ignore:partition_info.disk.unit), RV(ignore:partition_info.partitions[].unit)).
+      - When V(true), the unit is returned in its original mixed case, for example V(KiB) or V(MiB). This matches the values
+        accepted by O(unit), making it safe to feed the output back as input.
       - When V(false), the unit is returned in lowercase (legacy behavior), for example V(kib) or V(mib).
-      - When not set, the module uses the legacy lowercase behavior and emits a deprecation warning.
-        The default will change to V(true) in community.general 14.0.0.
+      - When not set, the module uses the legacy lowercase behavior and emits a deprecation warning. The default will change
+        to V(true) in community.general 15.0.0.
     type: bool
     version_added: '12.6.0'
 
@@ -664,15 +666,17 @@ def main():
     resize = module.params["resize"]
     unit_preserve_case = module.params["unit_preserve_case"]
     if unit_preserve_case is None:
-        module.deprecate(
-            "The unit field in the return value of community.general.parted is currently lowercased "
-            "(for example ``kib``) when its original has mixed case (for example ``KiB``). "
-            "To suppress this warning message, set the parameter ``unit_preserve_case`` either to ``false``, "
-            "for preserving the current behavior, or to ``true``, for using the new behavior immediately. "
-            "In community.general 14.0.0, the default value of this option will be set to ``true``.",
-            version="14.0.0",
-            collection_name="community.general",
-        )
+        # UNCOMMENT when 13.0.0 is released
+        #
+        # module.deprecate(
+        #     "The unit field in the return value of community.general.parted is currently lowercased "
+        #     "(for example ``kib``) when its original has mixed case (for example ``KiB``). "
+        #     "To suppress this warning message, set the parameter ``unit_preserve_case`` either to ``false``, "
+        #     "for preserving the current behavior, or to ``true``, for using the new behavior immediately. "
+        #     "In community.general 15.0.0, the default value of this option will be set to ``true``.",
+        #     version="15.0.0",
+        #     collection_name="community.general",
+        # )
         unit_preserve_case = False
 
     # Parted executable
