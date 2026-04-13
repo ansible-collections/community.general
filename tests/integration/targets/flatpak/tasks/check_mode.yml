@@ -84,6 +84,40 @@
         state=latest an absent flatpak a second time shall still mark module execution
         as changed in check mode
 
+# state=present with from_url on absent flatpak
+
+- name: Test addition of absent flatpak with from_url (check mode)
+  flatpak:
+    name: com.dummy.App1
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    no_dependencies: true
+  register: from_url_addition_result
+  check_mode: true
+
+- name: Verify addition of absent flatpak with from_url test result (check mode)
+  assert:
+    that:
+      - from_url_addition_result is changed
+    msg: "Adding an absent flatpak with from_url shall mark module execution as changed"
+
+- name: Test non-existent idempotency of addition of absent flatpak with from_url (check mode)
+  flatpak:
+    name: com.dummy.App1
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    no_dependencies: true
+  register: double_from_url_addition_result
+  check_mode: true
+
+- name: Verify non-existent idempotency of addition of absent flatpak with from_url test result (check mode)
+  assert:
+    that:
+      - double_from_url_addition_result is changed
+    msg: |
+        Adding an absent flatpak with from_url a second time shall still mark module execution
+        as changed in check mode
+
 # state=present with url on absent flatpak
 
 - name: Test addition of absent flatpak with url (check mode)
@@ -230,6 +264,23 @@
     that:
       - latest_present_result is changed
     msg: "state=latest an present flatpak shall mark module execution as changed"
+
+# state=present with from_url on present flatpak
+
+- name: Test addition with from_url of present flatpak (check mode)
+  flatpak:
+    name: com.dummy.App2
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    state: present
+    no_dependencies: true
+  register: from_url_addition_present_result
+  check_mode: true
+
+- name: Verify addition with from_url of present flatpak test result (check mode)
+  assert:
+    that:
+      - from_url_addition_present_result is not changed
+    msg: "Adding a present flatpak with from_url shall mark module execution as not changed"
 
 # state=present with url on present flatpak
 

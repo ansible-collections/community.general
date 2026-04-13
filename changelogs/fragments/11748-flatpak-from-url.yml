@@ -1,0 +1,4 @@
+minor_changes:
+  - flatpak - add new parameter ``from_url`` to install a flatpak from a ``.flatpakref`` URL
+    (https://github.com/ansible-collections/community.general/issues/4000,
+    https://github.com/ansible-collections/community.general/pull/11748).
