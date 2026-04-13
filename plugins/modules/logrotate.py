@@ -797,13 +797,9 @@ class LogrotateConfig:
             new_path = self.get_config_path(target_enabled)
 
             if not os.path.exists(old_path):
-                self.module.fail_json(
-                    msg=f"Cannot change enabled state: config file '{old_path}' not found"
-                )
+                self.module.fail_json(msg=f"Cannot change enabled state: config file '{old_path}' not found")
             elif os.path.exists(new_path):
-                self.module.fail_json(
-                    msg=f"Cannot change enabled state: target path '{new_path}' already exists"
-                )
+                self.module.fail_json(msg=f"Cannot change enabled state: target path '{new_path}' already exists")
 
             self.result["changed"] = True
             if not self.module.check_mode:
@@ -835,8 +831,7 @@ class LogrotateConfig:
             if not self.module.check_mode:
                 try:
                     with tempfile.NamedTemporaryFile(
-                        mode="w", suffix=".tmp", prefix=self.config_name + "_",
-                        dir=self.module.tmpdir, delete=False
+                        mode="w", suffix=".tmp", prefix=self.config_name + "_", dir=self.module.tmpdir, delete=False
                     ) as tmp_file:
                         tmp_file.write(new_content)
                         tmp_path = tmp_file.name
