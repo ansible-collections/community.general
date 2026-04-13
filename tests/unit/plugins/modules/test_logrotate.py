@@ -143,7 +143,7 @@ class TestLogrotateConfig(unittest.TestCase):
                         result = config.apply()
                         self.assertTrue(result["changed"])
                         self.assertIn("14", result["config_content"])
-                        mock_remove.assert_called()
+                        mock_remove.assert_not_called()
                         mock_chmod.assert_called_once()
 
     def test_remove_configuration(self):
