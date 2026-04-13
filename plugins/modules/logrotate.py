@@ -874,7 +874,7 @@ class LogrotateConfig:
                     self.module.atomic_move(tmp_path, config_file_path, unsafe_writes=False)
                     os.chmod(config_file_path, 0o644)
                 except Exception as e:
-                    self.module.fail_json(msg=f"Failed to move config file to '{config_file_path}': {to_native(e)}")
+                    self.module.fail_json(msg=f"Failed to move config file to {config_file_path!r}: {e}")
 
         self.result["changed"] = needs_update
         self.result["enabled_state"] = target_enabled
