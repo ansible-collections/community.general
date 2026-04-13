@@ -836,6 +836,7 @@ class LogrotateConfig:
                     ) as tmp_file:
                         tmp_file.write(new_content)
                         tmp_path = tmp_file.name
+                        self.module.add_cleanup_file(tmp_path)
                 except Exception as e:
                     self.module.fail_json(msg=f"Failed to write temp config file: {to_native(e)}")
 
