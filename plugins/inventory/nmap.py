@@ -256,10 +256,17 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if self.get_option('skip_host_discovery'):
                 cmd.append('-Pn')
 
+<<<<<<< HEAD
             if not self.get_option('use_arp_ping'):
                 cmd.append('--disable-arp-ping')
 
             cmd.append(self.get_option('address'))
+=======
+            if self.get_option('skip_host_discovery'):
+                cmd.append('-Pn')
+
+            cmd.append(self.get_option("address"))
+>>>>>>> d927399e2 (Fix: Prevent nmap inventory plugin from adding unwanted host discovery probes)
             try:
                 # execute
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)
