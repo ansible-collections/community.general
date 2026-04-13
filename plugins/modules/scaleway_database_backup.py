@@ -53,7 +53,6 @@ options:
       - fr-par
       - nl-ams
       - pl-waw
-      - it-mil
 
   id:
     description:

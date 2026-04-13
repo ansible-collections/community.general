@@ -41,7 +41,6 @@ options:
       - fr-par
       - nl-ams
       - pl-waw
-      - it-mil
 
   name:
     type: str
