@@ -82,6 +82,7 @@ class TestLogrotateConfig(unittest.TestCase):
             "date_format": "-%Y%m%d",
             "shared_scripts": False,
             "enabled": True,
+            "backup": False,
         }
         default_params.update(params)
         self.mock_module.params = default_params
