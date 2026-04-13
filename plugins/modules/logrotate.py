@@ -773,6 +773,10 @@ class LogrotateConfig:
                 config_path = os.path.join(self.config_dir, self.config_name + suffix)
                 if os.path.exists(config_path):
                     if not self.module.check_mode:
+                        if self.params["backup"]:
+                            backup_path = self.module.backup_local(config_path)
+                            if backup_path:
+                                self.result["backup_file"] = backup_path
                         try:
                             os.remove(config_path)
                         except Exception as e:
