@@ -36,6 +36,9 @@ options:
   email_verified:
     description:
       - Set or reset the C(emailVerified) flag of the user.
+      - >
+        The default value for this param is C(false) but that is being deprecated
+        and it will be removed in community.general 15.0.0.
     type: bool
     aliases:
       - emailVerified
@@ -425,6 +428,14 @@ def main():
     force = module.params.get("force")
     username = module.params.get("username")
     groups = module.params.get("groups")
+
+    if module.params.get("emailVerified") is None:
+        module.params["emailVerified"] = False
+        module.deprecate(
+            "The default value False for parameter emailVerified is being deprecated and it will be removed",
+            version="15.0.0",
+            collection_name="community.general"
+        )
 
     # Filter and map the parameters names that apply to the user
     user_params = [
