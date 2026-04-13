@@ -259,6 +259,7 @@ options:
       - Create a backup of the existing configuration file before overwriting.
       - The backup file is created in the same directory with a timestamp suffix.
     type: bool
+    version_added: 12.6.0
     default: false
   syslog:
     description:
