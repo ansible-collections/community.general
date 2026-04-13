@@ -866,7 +866,9 @@ class LogrotateConfig:
                             try:
                                 os.remove(old_path)
                             except Exception as e:
-                                self.module.fail_json(msg=f"Failed to remove old config file '{old_path}': {to_native(e)}")
+                                self.module.fail_json(
+                                    msg=f"Failed to remove old config file '{old_path}': {to_native(e)}"
+                                )
 
                 try:
                     self.module.atomic_move(tmp_path, config_file_path, unsafe_writes=False)
