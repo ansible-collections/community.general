@@ -854,7 +854,7 @@ class LogrotateConfig:
                 for suffix in ["", self.disabled_suffix]:
                     old_path = os.path.join(self.config_dir, self.config_name + suffix)
                     if os.path.exists(old_path):
-                        if self.params.get("backup"):
+                        if self.params["backup"]:
                             backup_path = self.module.backup_local(old_path)
                             if backup_path:
                                 self.result["backup_file"] = backup_path
