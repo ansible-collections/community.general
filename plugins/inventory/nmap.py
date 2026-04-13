@@ -322,4 +322,3 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._cache[cache_key] = results
 
         self._populate(results)
-
