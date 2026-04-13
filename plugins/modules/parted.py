@@ -120,8 +120,8 @@ options:
       - When V(true), the unit is returned in its original mixed case, for example V(KiB) or V(MiB). This matches the values
         accepted by O(unit), making it safe to feed the output back as input.
       - When V(false), the unit is returned in lowercase (legacy behavior), for example V(kib) or V(mib).
-      - When not set, the module uses the legacy lowercase behavior and emits a deprecation warning. The default will change
-        to V(true) in community.general 15.0.0.
+      #- When not set, the module uses the legacy lowercase behavior and emits a deprecation warning. The default will change
+      #  to V(true) in community.general 15.0.0.
     type: bool
     version_added: '12.6.0'
 
