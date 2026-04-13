@@ -2,4 +2,5 @@ bugfixes:
   - sefcontext - flush the in-process ``matchpathcon`` cache after applying changes, so
     subsequent tasks running in the same process (for example via the Mitogen connection
     plugin) see the updated SELinux file context rules instead of stale cached data
-    (https://github.com/ansible-collections/community.general/issues/888).
+    (https://github.com/ansible-collections/community.general/issues/888,
+    https://github.com/ansible-collections/community.general/pull/11812).
