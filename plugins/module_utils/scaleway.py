@@ -255,7 +255,6 @@ class Scaleway:
 
     def send(self, method, path, data=None, headers=None, params=None):
         url = self._url_builder(path=path, params=params)
-        self.module.debug(f"Scaleway URL used: {url}")
 
         if headers is not None:
             self.headers.update(headers)
