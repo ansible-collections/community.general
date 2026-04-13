@@ -59,7 +59,6 @@ options:
       - pl-waw-1
       - pl-waw-2
       - pl-waw-3
-      - it-mil-1
 """
 
 EXAMPLES = r"""
