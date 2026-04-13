@@ -858,10 +858,11 @@ class LogrotateConfig:
                             backup_path = self.module.backup_local(old_path)
                             if backup_path:
                                 self.result["backup_file"] = backup_path
-                        try:
-                            os.remove(old_path)
-                        except Exception as e:
-                            self.module.fail_json(msg=f"Failed to remove old config file '{old_path}': {to_native(e)}")
+                        if old_path != config_file_path:
+                            try:
+                                os.remove(old_path)
+                            except Exception as e:
+                                self.module.fail_json(msg=f"Failed to remove old config file '{old_path}': {to_native(e)}")
 
                 try:
                     self.module.atomic_move(tmp_path, config_file_path, unsafe_writes=False)
