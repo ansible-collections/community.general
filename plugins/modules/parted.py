@@ -112,6 +112,16 @@ options:
     type: bool
     default: false
     version_added: '1.3.0'
+  unit_preserve_case:
+    description:
+      - Controls the case of the V(unit) field in the module output (RV(disk.unit), RV(partitions[].unit)).
+      - When V(true), the unit is returned in its original mixed case, for example V(KiB) or V(MiB).
+        This matches the values accepted by O(unit), making it safe to feed the output back as input.
+      - When V(false), the unit is returned in lowercase (legacy behavior), for example V(kib) or V(mib).
+      - When not set, the module uses the legacy lowercase behavior and emits a deprecation warning.
+        The default will change to V(true) in community.general 14.0.0.
+    type: bool
+    version_added: '12.6.0'
 
 notes:
   - When fetching information about a new disk and when the version of parted installed on the system is before version 3.1,
@@ -144,7 +154,7 @@ partition_info:
       "physical_block": 512
       "size": 5.0
       "table": "msdos"
-      "unit": "gib"
+      "unit": "GiB"
     "partitions":
       - "begin": 0.0
         "end": 1.0
@@ -258,7 +268,7 @@ def parse_unit(size_str, unit=""):
     return size, unit
 
 
-def parse_partition_info(parted_output, unit):
+def parse_partition_info(parted_output, unit, unit_preserve_case):
     """
     Parses the output of parted and transforms the data into
     a dictionary.
@@ -289,10 +299,11 @@ def parse_partition_info(parted_output, unit):
     # The unit is read once, because parted always returns the same unit
     size, unit = parse_unit(generic_params[1], unit)
 
+    unit_output = unit if unit_preserve_case else unit.lower()
     generic = {
         "dev": generic_params[0],
         "size": size,
-        "unit": unit.lower(),
+        "unit": unit_output,
         "table": generic_params[5],
         "model": generic_params[6],
         "logical_block": int(generic_params[3]),
@@ -308,7 +319,7 @@ def parse_partition_info(parted_output, unit):
             "heads": int(chs_info[1]),
             "sectors": int(chs_info[2]),
             "cyl_size": cyl_size,
-            "cyl_size_unit": cyl_unit.lower(),
+            "cyl_size_unit": cyl_unit if unit_preserve_case else cyl_unit.lower(),
         }
         lines = lines[1:]
 
@@ -341,7 +352,7 @@ def parse_partition_info(parted_output, unit):
                 "fstype": fstype,
                 "name": name,
                 "flags": [f.strip() for f in flags.split(", ") if f != ""],
-                "unit": unit.lower(),
+                "unit": unit_output,
             }
         )
 
@@ -413,7 +424,7 @@ def convert_to_bytes(size_str, unit):
     return int(output)
 
 
-def get_unlabeled_device_info(device, unit):
+def get_unlabeled_device_info(device, unit, unit_preserve_case):
     """
     Fetches device information directly from the kernel and it is used when
     parted cannot work because of a missing label. It always returns a 'unknown'
@@ -428,7 +439,12 @@ def get_unlabeled_device_info(device, unit):
     phys_block = int(read_record(f"{base}/queue/physical_block_size", 0))
     size_bytes = int(read_record(f"{base}/size", 0)) * logic_block
 
+    original_unit = unit
     size, unit = format_disk_size(size_bytes, unit)
+    # format_disk_size lowercases the unit; restore original case if requested,
+    # but only for specific named units (not compact/cyl/chs which get replaced)
+    if unit_preserve_case and original_unit.lower() not in ["", "compact", "cyl", "chs"]:
+        unit = original_unit
 
     return {
         "generic": {
@@ -444,7 +460,7 @@ def get_unlabeled_device_info(device, unit):
     }
 
 
-def get_device_info(device, unit):
+def get_device_info(device, unit, unit_preserve_case):
     """
     Fetches information about a disk and its partitions and it returns a
     dictionary.
@@ -456,7 +472,7 @@ def get_device_info(device, unit):
     # parted formats for the unit.
     label_needed = check_parted_label(device)
     if label_needed:
-        return get_unlabeled_device_info(device, unit)
+        return get_unlabeled_device_info(device, unit, unit_preserve_case)
 
     command = [parted_exec, "-s", "-m", device, "--", "unit", unit, "print"]
     rc, out, err = module.run_command(command)
@@ -468,7 +484,7 @@ def get_device_info(device, unit):
             err=err,
         )
 
-    return parse_partition_info(out, unit)
+    return parse_partition_info(out, unit, unit_preserve_case)
 
 
 def check_parted_label(device):
@@ -622,6 +638,7 @@ def main():
             state=dict(type="str", default="info", choices=["absent", "info", "present"]),
             # resize part
             resize=dict(type="bool", default=False),
+            unit_preserve_case=dict(type="bool"),
         ),
         required_if=[
             ["state", "present", ["number"]],
@@ -645,6 +662,18 @@ def main():
     flags = module.params["flags"]
     fs_type = module.params["fs_type"]
     resize = module.params["resize"]
+    unit_preserve_case = module.params["unit_preserve_case"]
+    if unit_preserve_case is None:
+        module.deprecate(
+            "The unit field in the return value of community.general.parted is currently lowercased "
+            "(for example ``kib``) when its original has mixed case (for example ``KiB``). "
+            "To suppress this warning message, set the parameter ``unit_preserve_case`` either to ``false``, "
+            "for preserving the current behavior, or to ``true``, for using the new behavior immediately. "
+            "In community.general 14.0.0, the default value of this option will be set to ``true``.",
+            version="14.0.0",
+            collection_name="community.general",
+        )
+        unit_preserve_case = False
 
     # Parted executable
     parted_exec = module.get_bin_path("parted", True)
@@ -664,7 +693,7 @@ def main():
         )
 
     # Read the current disk information
-    current_device = get_device_info(device, unit)
+    current_device = get_device_info(device, unit, unit_preserve_case)
     current_parts = current_device["partitions"]
 
     if state == "present":
@@ -710,7 +739,7 @@ def main():
             script = []
 
             if not module.check_mode:
-                current_parts = get_device_info(device, unit)["partitions"]
+                current_parts = get_device_info(device, unit, unit_preserve_case)["partitions"]
 
         if part_exists(current_parts, "num", number) or module.check_mode:
             if changed and module.check_mode:
@@ -761,7 +790,7 @@ def main():
     elif state == "info":
         output_script = ["unit", unit, "print"]
     # Final status of the device
-    final_device_status = get_device_info(device, unit)
+    final_device_status = get_device_info(device, unit, unit_preserve_case)
     module.exit_json(
         changed=changed,
         disk=final_device_status["generic"],
