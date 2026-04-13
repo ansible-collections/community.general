@@ -457,7 +457,11 @@ SCALEWAY_LOCATION = {
 
 SCALEWAY_ENDPOINT = "https://api.scaleway.com"
 
-SCALEWAY_REGIONS = ["fr-par", "nl-ams", "pl-waw", "it-mil"]
+SCALEWAY_REGIONS = [
+    "fr-par",
+    "nl-ams",
+    "pl-waw",
+]
 
 SCALEWAY_ZONES = [
     "fr-par-1",
@@ -468,6 +472,5 @@ SCALEWAY_ZONES = [
     "nl-ams-3",
     "pl-waw-1",
     "pl-waw-2",
-    "pl-waw-3",
-    "it-mil-1",
+    "pl-waw-3"
 ]
