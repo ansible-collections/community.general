@@ -250,8 +250,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             if not self.get_option("use_arp_ping"):
                 cmd.append("--disable-arp-ping")
-            if self.get_option('skip_host_discovery'):
-                cmd.append('-Pn')
+
+            if self.get_option("skip_host_discovery"):
+                cmd.append("-Pn")
 
             cmd.append(self.get_option("address"))
             try:
