@@ -82,7 +82,7 @@ class TestLogrotateConfig(unittest.TestCase):
             "date_format": "-%Y%m%d",
             "shared_scripts": False,
             "enabled": True,
-            "backup": False,
+            "backup": True,
         }
         default_params.update(params)
         self.mock_module.params = default_params
@@ -856,11 +856,11 @@ class TestLogrotateConfig(unittest.TestCase):
 
                     self.assertIn("fail_json called", str(context.exception))
 
-    def test_backup_disabled_by_default(self):
-        """Test that backup is not created when backup parameter is False (default)."""
+    def test_backup_disabled_skips_backup(self):
+        """Test that backup is not created when backup parameter is False."""
         from ansible_collections.community.general.plugins.modules import logrotate
 
-        self._setup_module_params(rotate_count=14)
+        self._setup_module_params(rotate_count=14, backup=False)
         config_path = os.path.join(self.config_dir, "test")
         existing_content = """/var/log/test/*.log {
     daily
@@ -886,11 +886,11 @@ class TestLogrotateConfig(unittest.TestCase):
                         self.mock_module.backup_local.assert_not_called()
                         self.assertNotIn("backup_file", result)
 
-    def test_backup_enabled_creates_backup(self):
-        """Test that backup is created when backup parameter is True."""
+    def test_backup_enabled_by_default(self):
+        """Test that backup is created by default."""
         from ansible_collections.community.general.plugins.modules import logrotate
 
-        self._setup_module_params(rotate_count=14, backup=True)
+        self._setup_module_params(rotate_count=14)
         config_path = os.path.join(self.config_dir, "test")
         expected_backup_path = config_path + ".20260101_120000"
         self.mock_module.backup_local = Mock(return_value=expected_backup_path)

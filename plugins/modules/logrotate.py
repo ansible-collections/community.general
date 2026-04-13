@@ -260,7 +260,7 @@ options:
       - The backup file is created in the same directory with a timestamp suffix.
     type: bool
     version_added: 12.6.0
-    default: false
+    default: true
   syslog:
     description:
       - Send logrotate messages to syslog.
@@ -936,7 +936,7 @@ def main() -> None:
             enabled=dict(type="bool"),
             start=dict(type="int"),
             syslog=dict(type="bool"),
-            backup=dict(type="bool", default=False),
+            backup=dict(type="bool", default=True),
         ),
         mutually_exclusive=[
             ["delay_compress", "no_delay_compress"],
