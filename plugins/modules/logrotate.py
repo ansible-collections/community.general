@@ -843,10 +843,6 @@ class LogrotateConfig:
                 test_cmd = [self.logrotate_bin, "-d", tmp_path]
                 rc, stdout, stderr = self.module.run_command(test_cmd)
                 if rc != 0:
-                    try:
-                        os.remove(tmp_path)
-                    except Exception:
-                        pass
                     self.module.fail_json(
                         msg="logrotate configuration test failed",
                         stderr=stderr,
