@@ -230,6 +230,97 @@
     method: "{{ method }}"
     no_dependencies: true
 
+# state=present with from_url
+
+- name: Test addition with from_url - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: from_url_addition_result
+
+- name: Verify addition with from_url test result - {{ method }}
+  assert:
+    that:
+      - from_url_addition_result is changed
+    msg: "state=present with from_url shall add flatpak when absent"
+
+- name: Test idempotency of addition with from_url - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_from_url_addition_result
+
+- name: Verify idempotency of addition with from_url test result - {{ method }}
+  assert:
+    that:
+      - double_from_url_addition_result is not changed
+    msg: "state=present with from_url shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present with from_url test - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# from_url validation failures
+
+- name: Test from_url with URL in name fails - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_url_url_name_result
+  ignore_errors: true
+
+- name: Verify from_url with URL in name fails - {{ method }}
+  assert:
+    that:
+      - from_url_url_name_result is failed
+      - from_url_url_name_result is not changed
+    msg: "from_url and URL in name shall fail"
+
+- name: Test from_url with multiple names fails - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_url_multi_name_result
+  ignore_errors: true
+
+- name: Verify from_url with multiple names fails - {{ method }}
+  assert:
+    that:
+      - from_url_multi_name_result is failed
+      - from_url_multi_name_result is not changed
+    msg: "from_url with multiple names shall fail"
+
+- name: Test from_url with non-http URL fails - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    from_url: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_url_non_http_result
+  ignore_errors: true
+
+- name: Verify from_url with non-http URL fails - {{ method }}
+  assert:
+    that:
+      - from_url_non_http_result is failed
+      - from_url_non_http_result is not changed
+    msg: "from_url with non-http URL shall fail"
+
 # state=present with list of packages
 
 - name: Test addition with list - {{ method }}
