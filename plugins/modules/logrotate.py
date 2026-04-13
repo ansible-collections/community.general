@@ -474,7 +474,7 @@ from ansible.module_utils.common.text.converters import to_native
 class LogrotateConfig:
     """Logrotate configuration manager."""
 
-    def __init__(self, module: AnsibleModule, logrotate_bin: object | None) -> None:
+    def __init__(self, module: AnsibleModule, logrotate_bin: str) -> None:
         self.module = module
         self.params = module.params
         self.logrotate_bin = logrotate_bin
