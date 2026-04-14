@@ -35,10 +35,9 @@ options:
     type: bool
   email_verified:
     description:
-      - Set or reset the C(emailVerified) flag of the user.
-      - >
-        The default value for this param is C(false) but that is being deprecated
-        and it will be removed in community.general 15.0.0.
+      - Set or reset the I(emailVerified) flag of the user.
+      - If I(keycloak_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(false).
     type: bool
     aliases:
       - emailVerified
@@ -202,6 +201,20 @@ options:
       - If V(true), allows to remove user and recreate it.
     type: bool
     default: false
+  keycloak_default_behavior:
+    description:
+      - Various module options used to have default values. This caused problems when the
+        user expects different behavior from keycloak by default or fill options which cause
+        problems when they have been set.
+      - The default value is C(compatibility), which will ensure that the default values
+        are used when the values are not explicitly specified by the user.
+      - This affects the I(emailVerified) option.
+    type: str
+    choices:
+      - compatibility
+      - no_defaults
+    default: compatibility
+    version_added: "13.0.0"
 extends_documentation_fragment:
   - community.general._keycloak
   - community.general._keycloak.actiongroup_keycloak
@@ -400,6 +413,7 @@ def main():
         origin=dict(type="str"),
         state=dict(choices=["absent", "present"], default="present"),
         force=dict(type="bool", default=False),
+        keycloak_default_behavior=dict(type="str", choices=["compatibility", "no_defaults"], default="compatibility"),
     )
     argument_spec.update(meta_args)
 
@@ -429,13 +443,13 @@ def main():
     username = module.params.get("username")
     groups = module.params.get("groups")
 
-    if module.params.get("emailVerified") is None:
-        module.params["emailVerified"] = False
-        module.deprecate(
-            "The default value False for parameter emailVerified is being deprecated and it will be removed",
-            version="15.0.0",
-            collection_name="community.general"
+    if module.params["keycloak_default_behavior"] == "compatibility":
+        old_default_values = dict(
+            emailVerified=False,
         )
+        for param, value in old_default_values.items():
+            if module.params[param] is None:
+                module.params[param] = value
 
     # Filter and map the parameters names that apply to the user
     user_params = [
