@@ -138,6 +138,16 @@ options:
             protocol mapper configuration through check-mode in the RV(existing) return value.
         type: dict
 
+      consentRequired:
+        description:
+          - Specifies whether a user needs to provide consent to a client for this mapper to be active.
+        type: bool
+
+      consentText:
+        description:
+          - The human-readable name of the consent the user is presented to accept.
+        type: str
+
   attributes:
     type: dict
     description:
@@ -231,6 +241,7 @@ EXAMPLES = r"""
         name: family name
         protocol: openid-connect
         protocolMapper: oidc-usermodel-property-mapper
+        consentRequired: true
       - config:
           attribute.name: Role
           attribute.nameformat: Basic
@@ -238,6 +249,7 @@ EXAMPLES = r"""
         name: role list
         protocol: saml
         protocolMapper: saml-role-list-mapper
+        consentRequired: false
     attributes:
       attrib1: value1
       attrib2: value2
@@ -355,6 +367,8 @@ def main():
         protocol=dict(type="str", choices=["openid-connect", "saml", "wsfed", "docker-v2"]),
         protocolMapper=dict(type="str"),
         config=dict(type="dict"),
+        consentRequired=dict(type="bool"),
+        consentText=dict(type="str"),
     )
 
     meta_args = dict(
