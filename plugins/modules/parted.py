@@ -120,8 +120,8 @@ options:
       - When V(true), the unit is returned in its original mixed case, for example V(KiB) or V(MiB). This matches the values
         accepted by O(unit), making it safe to feed the output back as input.
       - When V(false), the unit is returned in lowercase (legacy behavior), for example V(kib) or V(mib).
-      #- When not set, the module uses the legacy lowercase behavior and emits a deprecation warning. The default will change
-      #  to V(true) in community.general 15.0.0.
+      # - When not set, the module uses the legacy lowercase behavior and emits a deprecation warning. The default will change
+      #   to V(true) in community.general 15.0.0.
     type: bool
     version_added: '12.6.0'
 
@@ -244,6 +244,12 @@ from ansible.module_utils.basic import AnsibleModule
 units_si = ["B", "KB", "MB", "GB", "TB"]
 units_iec = ["KiB", "MiB", "GiB", "TiB"]
 parted_units = units_si + units_iec + ["s", "%", "cyl", "chs", "compact"]
+_parted_units_lower = {u.lower(): u for u in parted_units}
+
+
+def canonical_unit(unit):
+    """Return the canonical mixed-case form of a parted unit string."""
+    return _parted_units_lower.get(unit.lower(), unit)
 
 
 def parse_unit(size_str, unit=""):
@@ -301,7 +307,7 @@ def parse_partition_info(parted_output, unit, unit_preserve_case):
     # The unit is read once, because parted always returns the same unit
     size, unit = parse_unit(generic_params[1], unit)
 
-    unit_output = unit if unit_preserve_case else unit.lower()
+    unit_output = canonical_unit(unit) if unit_preserve_case else unit.lower()
     generic = {
         "dev": generic_params[0],
         "size": size,
@@ -321,7 +327,7 @@ def parse_partition_info(parted_output, unit, unit_preserve_case):
             "heads": int(chs_info[1]),
             "sectors": int(chs_info[2]),
             "cyl_size": cyl_size,
-            "cyl_size_unit": cyl_unit if unit_preserve_case else cyl_unit.lower(),
+            "cyl_size_unit": canonical_unit(cyl_unit) if unit_preserve_case else cyl_unit.lower(),
         }
         lines = lines[1:]
 
@@ -441,12 +447,9 @@ def get_unlabeled_device_info(device, unit, unit_preserve_case):
     phys_block = int(read_record(f"{base}/queue/physical_block_size", 0))
     size_bytes = int(read_record(f"{base}/size", 0)) * logic_block
 
-    original_unit = unit
     size, unit = format_disk_size(size_bytes, unit)
-    # format_disk_size lowercases the unit; restore original case if requested,
-    # but only for specific named units (not compact/cyl/chs which get replaced)
-    if unit_preserve_case and original_unit.lower() not in ["", "compact", "cyl", "chs"]:
-        unit = original_unit
+    if unit_preserve_case:
+        unit = canonical_unit(unit)
 
     return {
         "generic": {
