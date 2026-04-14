@@ -134,10 +134,11 @@ options:
     type: str
     description:
       - Sets the assignee when O(operation) is V(create), V(transition), or V(edit).
-      - Jira Cloud generally requires account IDs for user fields (including assignee), so use O(account_id) where possible.
-      - When O(cloud=true) and O(assignee) contains C(@), the module can automatically resolve the email to an account ID.
+      - Jira Cloud requires account IDs for all user-type fields. When O(cloud=true), a string value containing C(@) is
+        resolved as an email to an account ID automatically. A string without C(@) is assumed to be an account ID.
+        See also O(account_id) for a dedicated assignee account ID parameter.
+        Added in community.general 12.6.0.
       - Jira Server and Jira Data Center may still accept O(assignee) as a username.
-      - Email-based assignee auto-resolution was added in community.general 12.6.0.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   account_id:
     type: str
@@ -164,6 +165,9 @@ options:
       - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API (possibly
         after merging with other required data, as when passed to create). See examples for more information, and the JIRA
         REST API for the structure required for various fields.
+      - When O(cloud=true), user-type fields (V(assignee), V(reporter), and any fields listed in O(custom_user_fields)) that
+        contain a string value with C(@) are automatically resolved from email to account ID. String values without C(@) are
+        assumed to be account IDs. Added in community.general 12.6.0.
       - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add
         JIRA properties for example.
       - Note that JIRA may not allow changing field values on specific transitions or states.
@@ -201,6 +205,18 @@ options:
       - In the future, this option might affect additional operations for Jira Cloud compatibility.
     type: bool
     default: false
+    version_added: '12.6.0'
+
+  custom_user_fields:
+    description:
+      - A list of field names (including custom fields such as V(customfield_10050)) that hold user values.
+      - When O(cloud=true) and a listed field is present in O(fields) as a string containing C(@), the module resolves the
+        email to a Jira Cloud account ID automatically.
+      - The built-in user fields V(assignee) and V(reporter) are always resolved; this option is only needed for additional
+        custom fields.
+    type: list
+    elements: str
+    default: []
     version_added: '12.6.0'
 
   attachment:
@@ -364,6 +380,27 @@ EXAMPLES = r"""
     cloud: true
     assignee: user@example.com
 
+# Create an issue on Jira Cloud with reporter and a custom user field
+# resolved from email addresses to account IDs
+- name: Create an issue on Jira Cloud with user field resolution
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: create
+    summary: Example Issue
+    description: Created using Ansible
+    issuetype: Task
+    cloud: true
+    assignee: assignee@example.com
+    custom_user_fields:
+      - customfield_10050
+  args:
+    fields:
+      reporter: reporter@example.com
+      customfield_10050: approver@example.com
+
 # Edit an issue
 - name: Set the labels on an issue using free-form fields
   community.general.jira:
@@ -517,6 +554,8 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 
 class JIRA(StateModuleHelper):
+    _USER_FIELDS = ["assignee", "reporter"]
+
     module = dict(
         argument_spec=dict(
             attachment=dict(
@@ -594,6 +633,7 @@ class JIRA(StateModuleHelper):
                 type="str",
             ),
             cloud=dict(type="bool", default=False),
+            custom_user_fields=dict(type="list", elements="str", default=[]),
             maxresults=dict(type="int"),
             timeout=dict(type="float", default=10),
             validate_certs=dict(default=True, type="bool"),
@@ -631,25 +671,40 @@ class JIRA(StateModuleHelper):
             self.vars.fields = {}
         if self.vars.assignee:
             if self.vars.cloud and "@" in self.vars.assignee:
-                account_id = self._resolve_account_id(self.vars.assignee)
+                account_id = self._resolve_account_id(self.vars.assignee, "assignee")
                 self.vars.fields["assignee"] = {"accountId": account_id}
+            elif self.vars.cloud:
+                self.vars.fields["assignee"] = {"accountId": self.vars.assignee}
             else:
                 self.vars.fields["assignee"] = {"name": self.vars.assignee}
         if self.vars.account_id:
             self.vars.fields["assignee"] = {"accountId": self.vars.account_id}
+        self._resolve_user_fields()
 
-    def _resolve_account_id(self, email):
+    def _resolve_user_fields(self):
+        if not self.vars.cloud or not self.vars.fields:
+            return
+        user_fields = self._USER_FIELDS + (self.vars.custom_user_fields or [])
+        for field_name in user_fields:
+            value = self.vars.fields.get(field_name)
+            if not isinstance(value, str):
+                continue
+            if "@" in value:
+                account_id = self._resolve_account_id(value, field_name)
+                self.vars.fields[field_name] = {"accountId": account_id}
+            else:
+                self.vars.fields[field_name] = {"accountId": value}
+
+    def _resolve_account_id(self, email, field_name="assignee"):
         url = f"{self.vars.restbase}/user/search?query={quote(email, safe='')}"
         result = self.get(url)
         if not isinstance(result, list) or len(result) != 1:
             count = len(result) if isinstance(result, list) else 0
             self.module.fail_json(
                 msg=(
-                    f"Failed to resolve assignee {email!r} to "
-                    f"a unique Jira Cloud account ID: found "
-                    f"{count} results. Use the 'account_id' "
-                    f"parameter to specify the account ID "
-                    f"directly."
+                    f"Failed to resolve field {field_name!r} email {email!r} to a unique "
+                    f"Jira Cloud account ID: found {count} result(s). "
+                    f"Specify the account ID directly."
                 )
             )
         user = result[0]
@@ -657,11 +712,9 @@ class JIRA(StateModuleHelper):
         if (user_email or "").lower() != email.lower():
             self.module.fail_json(
                 msg=(
-                    f"Failed to resolve assignee {email!r}: "
-                    f"the returned user's email address "
-                    f"{user_email!r} does not "
-                    f"match. Use the 'account_id' parameter "
-                    f"to specify the account ID directly."
+                    f"Failed to resolve field {field_name!r} email {email!r}: "
+                    f"the returned user's email address {user_email!r} does not match. "
+                    f"Specify the account ID directly."
                 )
             )
         return user["accountId"]
