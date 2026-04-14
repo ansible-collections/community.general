@@ -97,6 +97,7 @@ options:
   shred_cycles:
     description:
       - Number of times to overwrite files when using O(shred=true).
+      - When omitted, logrotate uses C(shred)'s default.
     type: int
   missing_ok:
     description:
