@@ -164,6 +164,11 @@ class DBusWrapper:
     3. Process scan for DBUS_SESSION_BUS_ADDRESS  -- legacy fallback
 
     Validation uses C(dbus-send) if available, C(busctl) otherwise.
+
+    Example usage:
+
+    dbus_wrapper = DBusWrapper(ansible_module)
+    dbus_wrapper.run_command(["printenv", "DBUS_SESSION_BUS_ADDRESS"])
     """
 
     def __init__(self, module):
@@ -189,8 +194,7 @@ class DBusWrapper:
                 return True
 
         if not dbus_send and not busctl:
-            self.module.debug("No D-Bus validator available (dbus-send or busctl), accepting address")
-            return True
+            self.module.fail_json(msg="Neither dbus-send nor busctl is available. Please install one of them.")
 
         return False
 
