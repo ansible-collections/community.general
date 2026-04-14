@@ -34,7 +34,9 @@ options:
       - List of comma-separated devices to use as physical devices in this volume group.
       - Required when creating or resizing volume group.
       - The module runs C(pvcreate) if needed.
-      - O(remove_extra_pvs) controls whether or not unspecified physical devices are removed from the volume group.
+      - This parameter defines the B(desired state) of the physical volumes in the volume group.
+        When the volume group already exists, physical volumes not listed here are removed from it by default.
+        To add physical volumes without removing existing unlisted ones, set O(remove_extra_pvs=false).
     type: list
     elements: str
   pesize:
