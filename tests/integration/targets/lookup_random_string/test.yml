@@ -11,7 +11,7 @@
         result1: "{{ query('community.general.random_string') }}"
         result2: "{{ query('community.general.random_string', length=0) }}"
         result3: "{{ query('community.general.random_string', length=10) }}"
-        result4: "{{ query('community.general.random_string', length=-1) }}"
+        result4: "{{ query('community.general.random_string', length=6) }}"
         result5: "{{ query('community.general.random_string', override_special='_', min_special=1) }}"
         result6: "{{ query('community.general.random_string', upper=false, special=false) }}" # lower case only
         result7: "{{ query('community.general.random_string', lower=false, special=false) }}" # upper case only
@@ -23,6 +23,8 @@
         result13: "{{ query('community.general.random_string', override_all='0', length=2) }}"
         result14: "{{ query('community.general.random_string', seed='1234') }}"
         result15: "{{ query('community.general.random_string', seed='1234') }}"
+        result16: "{{ query('community.general.random_string', avoid_special_first=true) }}"
+        result17: "{{ query('community.general.random_string', avoid_special_last=true) }}"
 
     - name: Raise error when impossible constraints are provided
       set_fact:
@@ -30,13 +32,25 @@
       ignore_errors: true
       register: impossible_result
 
+    - name: Raise error when override_all is provided with special characters and avoid_special_first is provided
+      set_fact:
+        error: "{{ query('community.general.random_string', override_all='!@#$%^&*()', avoid_special_first=true) }}"
+      ignore_errors: true
+      register: override_all_special_characters_avoid_special_first_error
+
+    - name: Raise error when override_all is provided with special characters and avoid_special_last is provided
+      set_fact:
+        error: "{{ query('community.general.random_string', override_all='!@#$%^&*()', avoid_special_last=true) }}"
+      ignore_errors: true
+      register: override_all_special_characters_avoid_special_last_error
+
     - name: Check results
       assert:
         that:
           - result1[0] | length == 8
           - result2[0] | length == 0
           - result3[0] | length == 10
-          - result4[0] | length == 0
+          - result4[0] | length == 6
           - result5[0] | length == 8
           - "'_' in result5[0]"
           - result6[0] is lower
@@ -54,3 +68,7 @@
           - impossible_result is failed
           - "'Available characters cannot' in impossible_result.msg"
           - result15[0] == result14[0]
+          - override_all_special_characters_avoid_special_first_error is failed
+          - "'No character satisfies the constraints for avoid_special_first' in override_all_special_characters_avoid_special_first_error.msg"
+          - override_all_special_characters_avoid_special_last_error is failed
+          - "'No character satisfies the constraints for avoid_special_last' in override_all_special_characters_avoid_special_last_error.msg"
