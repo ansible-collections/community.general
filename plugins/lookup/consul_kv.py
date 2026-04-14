@@ -64,6 +64,15 @@ options:
     ini:
       - section: lookup_consul
         key: validate_certs
+  ca_path:
+    description: The CA bundle to use for HTTPS connections.
+    type: str
+    version_added: "12.6.0"
+    env:
+      - name: ANSIBLE_CONSUL_CA_PATH
+    ini:
+      - section: lookup_consul
+        key: ca_path
   client_cert:
     description: The client cert to verify the TLS connection.
     type: str
@@ -146,13 +155,16 @@ class LookupModule(LookupBase):
                 port = u.port
 
         validate_certs = self.get_option("validate_certs")
+        ca_path = self.get_option("ca_path")
         client_cert = self.get_option("client_cert")
+
+        verify = ca_path if ca_path else validate_certs
 
         values = []
         try:
             for term in terms:
                 params = self.parse_params(term)
-                consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=validate_certs, cert=client_cert)
+                consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=verify, cert=client_cert)
 
                 results = consul_api.kv.get(
                     params["key"],

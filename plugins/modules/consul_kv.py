@@ -97,6 +97,11 @@ options:
       - Whether to verify the tls certificate of the Consul agent.
     type: bool
     default: true
+  ca_path:
+    description:
+      - The CA bundle to use for HTTPS connections.
+    type: str
+    version_added: "12.6.0"
   datacenter:
     description:
       - The name of the datacenter to query. If unspecified, the query defaults to the datacenter of the Consul agent on O(host).
@@ -263,11 +268,13 @@ def remove_value(module):
 
 
 def get_consul_api(module):
+    ca_path = module.params.get("ca_path")
+    verify = ca_path if ca_path else module.params.get("validate_certs")
     return consul.Consul(
         host=module.params.get("host"),
         port=module.params.get("port"),
         scheme=module.params.get("scheme"),
-        verify=module.params.get("validate_certs"),
+        verify=verify,
         token=module.params.get("token"),
         dc=module.params.get("datacenter"),
     )
@@ -291,6 +298,7 @@ def main():
             host=dict(type="str", default="localhost"),
             scheme=dict(type="str", default="http"),
             validate_certs=dict(type="bool", default=True),
+            ca_path=dict(type="str"),
             port=dict(type="int", default=8500),
             recurse=dict(type="bool"),
             retrieve=dict(type="bool", default=True),
