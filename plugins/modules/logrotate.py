@@ -518,8 +518,11 @@ class LogrotateConfig:
                     msg="'create' must be in format 'mode' or 'mode user group' (for example '0640' or '0640 root adm')"
                 )
 
-        if self.params.get("shred_cycles") is not None and self.params["shred_cycles"] < 1:
-            self.module.fail_json(msg="'shred_cycles' must be a positive integer")
+        if self.params.get("shred_cycles") is not None:
+            if self.params["shred_cycles"] < 1:
+                self.module.fail_json(msg="'shred_cycles' must be a positive integer")
+            if self.params.get("shred") is False:
+                self.module.fail_json(msg="'shred_cycles' requires 'shred=true'")
 
         for size_param in ["size", "min_size", "max_size"]:
             if self.params.get(size_param):
