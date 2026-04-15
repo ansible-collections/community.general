@@ -87,6 +87,7 @@ ETC_LOCALE_GEN = "/etc/locale.gen"
 VAR_LIB_LOCALES = "/var/lib/locales/supported.d"
 VAR_LIB_LOCALES_LOCAL = os.path.join(VAR_LIB_LOCALES, "local")
 SUPPORTED_LOCALES = ["/usr/share/i18n/SUPPORTED", "/usr/local/share/i18n/SUPPORTED"]
+RE_LOCALE_ENTRY = re.compile(r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$")
 LOCALE_NORMALIZATION = {
     ".utf8": ".UTF-8",
     ".eucjp": ".EUC-JP",
@@ -165,8 +166,7 @@ class LocaleGen(StateModuleHelper):
                 with open(locale_path) as fd:
                     self.vars.available_lines.extend(fd.readlines())
 
-        re_locale_entry = re.compile(r"^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$")
-        available_locale_entry_re_matches.extend([re_locale_entry.match(line) for line in self.vars.available_lines])
+        available_locale_entry_re_matches.extend([RE_LOCALE_ENTRY.match(line) for line in self.vars.available_lines])
 
         locales_not_found = []
         for locale in self.vars.name:
@@ -206,12 +206,24 @@ class LocaleGen(StateModuleHelper):
             name = name.replace(s, r)
         return name
 
+    def _get_charset_from_supported(self, locale):
+        """Look up the charset for a locale from the SUPPORTED files."""
+        for locale_path in SUPPORTED_LOCALES:
+            if os.path.exists(locale_path):
+                with open(locale_path) as fd:
+                    for line in fd:
+                        match = RE_LOCALE_ENTRY.match(line)
+                        if match and match.group("locale") == locale:
+                            return match.group("charset")
+        return None
+
     def set_locale_glibc(self, names, enabled=True):
         """Sets the state of the locale. Defaults to enabled."""
         with open(ETC_LOCALE_GEN) as fr:
             lines = fr.readlines()
 
-        locale_regexes = []
+        locale_regexes = {}
+        matched = set()
 
         for name in names:
             search_string = rf"^#?\s*{re.escape(name)} (?P<charset>.+)"
@@ -219,15 +231,25 @@ class LocaleGen(StateModuleHelper):
                 new_string = rf"{name} \g<charset>"
             else:
                 new_string = rf"# {name} \g<charset>"
-            re_search = re.compile(search_string)
-            locale_regexes.append([re_search, new_string])
+            locale_regexes[name] = (re.compile(search_string), new_string)
 
         def search_replace(line):
-            for [search, replace] in locale_regexes:
-                line = search.sub(replace, line)
+            for name, (search, replace) in locale_regexes.items():
+                new_line = search.sub(replace, line)
+                if new_line != line:
+                    matched.add(name)
+                line = new_line
             return line
 
         lines = [search_replace(line) for line in lines]
+
+        # For locales not found in /etc/locale.gen (e.g. on Gentoo), add them
+        if enabled:
+            for name in names:
+                if name not in matched:
+                    charset = self._get_charset_from_supported(name)
+                    if charset:
+                        lines.append(f"{name} {charset}\n")
 
         # Write the modified content back to the file
         with open(ETC_LOCALE_GEN, "w") as fw:
