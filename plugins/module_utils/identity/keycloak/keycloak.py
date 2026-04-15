@@ -3019,10 +3019,6 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(e, msg=f"Could not get groups for user {user_id} in realm {realm}: {e}")
 
-    def add_user_in_group(self, user_id, group_id, realm: str = "master"):
-        """DEPRECATED: Call add_user_to_group(...) instead. This method is scheduled for removal in community.general 13.0.0."""
-        return self.add_user_to_group(user_id, group_id, realm)
-
     def add_user_to_group(self, user_id, group_id, realm: str = "master"):
         """
         Add a user to a group.
