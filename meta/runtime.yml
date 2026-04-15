@@ -127,11 +127,9 @@ plugin_routing:
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
     hiera:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
-        warning_text: >-
-          Hiera has been deprecated a long time ago.
-          If you disagree with this deprecation, please create an issue in the community.general repository.
+        warning_text: Hiera has been deprecated a long time ago.
     manifold:
       tombstone:
         removal_version: 11.0.0
@@ -148,15 +146,15 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.ali_instance_info instead.
     atomic_container:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Project Atomic was sunset by the end of 2019.
     atomic_host:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Project Atomic was sunset by the end of 2019.
     atomic_image:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Project Atomic was sunset by the end of 2019.
     bearychat:
@@ -164,7 +162,7 @@ plugin_routing:
         removal_version: 12.0.0
         warning_text: Chat service is no longer available.
     catapult:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module since Oct 2024. See https://github.com/ansible-collections/community.general/issues/10318 for details.
     cisco_spark:
@@ -210,11 +208,11 @@ plugin_routing:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
     dimensiondata_network:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Service and its endpoints are no longer available.
     dimensiondata_vlan:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Service and its endpoints are no longer available.
     docker_compose:
@@ -527,7 +525,7 @@ plugin_routing:
     nios_zone:
       redirect: infoblox.nios_modules.nios_zone
     oci_vcn:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Use oracle.oci.oci_network_vcn instead.
     ome_device_info:
@@ -537,27 +535,27 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.one_image_info instead.
     oneandone_firewall_policy:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_load_balancer:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_monitoring_policy:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_private_network:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_public_ip:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_server:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     onepassword_facts:
@@ -868,7 +866,7 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use purestorage.flashblade.purefb_info instead.
     pushbullet:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Module relies on Python package pushbullet.py which is not maintained and supports only up to Python 3.2.
     python_requirements_facts:
@@ -1024,23 +1022,23 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_volume_info instead.
     sensu_check:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_client:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_handler:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_silence:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_subscription:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sf_account_manager:
@@ -1068,7 +1066,7 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.smartos_image_info instead.
     spotinst_aws_elastigroup:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Module relies on unsupported Python package. Use the module spot.cloud_modules.aws_elastigroup instead.
     stackdriver:
@@ -1082,7 +1080,7 @@ plugin_routing:
         removal_version: 15.0.0
         warning_text: ClearLinux was made EOL in July 2025. If you think the module is still useful for another distribution, please create an issue in the community.general repository.
     typetalk:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: The typetalk service will be discontinued on Dec 2025.
     vertica_facts:
@@ -1122,11 +1120,11 @@ plugin_routing:
     _gcp:
       redirect: community.google._gcp
     dimensiondata:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Service and its endpoints are no longer available.
     dimensiondata_wait:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Service and its endpoints are no longer available.
     docker:
@@ -1140,27 +1138,27 @@ plugin_routing:
     nios:
       redirect: infoblox.nios_modules.nios
     oracle:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     oracle_creatable_resource:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     oracle_display_name_option:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     oracle_name_option:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     oracle_tags:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     oracle_wait_options:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     postgresql:
@@ -1181,15 +1179,15 @@ plugin_routing:
           package pyrax.
   module_utils:
     cloud:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
     database:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
     dimensiondata:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Service and its endpoints are no longer available.
     docker.common:
@@ -1205,19 +1203,19 @@ plugin_routing:
     hetzner:
       redirect: community.hrobot.robot
     known_hosts:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
     kubevirt:
       redirect: community.kubevirt.kubevirt
     net_tools.nios.api:
       redirect: infoblox.nios_modules.api
-    oci_utils:
-      deprecation:
+    oracle.oci_utils:
+      tombstone:
         removal_version: 13.0.0
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     oneandone:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: DNS fails to resolve the API endpoint used by the module.
     postgresql:
@@ -1240,7 +1238,7 @@ plugin_routing:
     remote_management.dellemc.ome:
       redirect: dellemc.openmanage.ome
     saslprep:
-      deprecation:
+      tombstone:
         removal_version: 13.0.0
         warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
   inventory:
