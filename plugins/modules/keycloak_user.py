@@ -36,8 +36,8 @@ options:
   email_verified:
     description:
       - Set or reset the I(emailVerified) flag of the user.
-      - If I(keycloak_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(false).
+      - If O(keycloak_default_behavior) is set to V(compatiblity) (the default value), this
+        option has a default of V(false).
     type: bool
     aliases:
       - emailVerified
@@ -208,7 +208,7 @@ options:
         problems when they have been set.
       - The default value is C(compatibility), which will ensure that the default values
         are used when the values are not explicitly specified by the user.
-      - This affects the I(emailVerified) option.
+      - This affects the O(email_verified) option.
     type: str
     choices:
       - compatibility
