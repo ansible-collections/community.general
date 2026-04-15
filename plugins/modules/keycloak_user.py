@@ -445,7 +445,7 @@ def main():
 
     if module.params["keycloak_default_behavior"] == "compatibility":
         old_default_values = dict(
-            emailVerified=False,
+            email_verified=False,
         )
         for param, value in old_default_values.items():
             if module.params[param] is None:
