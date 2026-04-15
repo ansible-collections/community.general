@@ -1,0 +1,2 @@
+bugfixes:
+  - lvol - fix LVM version parsing (https://github.com/ansible-collections/community.general/issues/5445, https://github.com/ansible-collections/community.general/pull/11823).
