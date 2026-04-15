@@ -7,19 +7,18 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: keycloak_client_rolescope
+module: keycloak_clientscope_rolemappings
 
-short_description: Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other
-  specific client applications
+short_description: Allows administration of Keycloak clientscope roles scope to restrict the usage of certain roles to
+  specific clientscopes
 
-version_added: 8.6.0
+version_added: TODO
 
 description:
-  - This module allows you to add or remove Keycloak roles from clients scope using the Keycloak REST API. It requires access
+  - This module allows you to add or remove Keycloak roles from clientscopes using the Keycloak REST API. It requires access
     to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
     In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
     the scope tailored to your needs and a user having the expected roles.
-  - Client O(client_id) must have O(community.general.keycloak_client#module:full_scope_allowed) set to V(false).
   - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and are returned that way
     by this module. You may pass single values for attributes when calling the module, and this is translated into a list
     suitable for the API.
@@ -28,8 +27,6 @@ attributes:
     support: full
   diff_mode:
     support: full
-  action_group:
-    version_added: 10.2.0
 
 options:
   state:
@@ -49,68 +46,74 @@ options:
       - The Keycloak realm under which clients resides.
     default: 'master'
 
-  client_id:
-    type: str
+  clientscope_id:
     required: true
+    type: str
     description:
-      - Roles provided in O(role_names) while be added to this client scope.
-  client_scope_id:
+      - Roles provided in O(role_names) will be added to this clientscope.
+
+  client_id:
     type: str
     description:
       - If the O(role_names) are client role, the client ID under which it resides.
       - If this parameter is absent, the roles are considered a realm role.
+      
   role_names:
     required: true
     type: list
     elements: str
     description:
-      - Names of roles to manipulate.
-      - If O(client_scope_id) is present, all roles must be under this client.
-      - If O(client_scope_id) is absent, all roles must be under the realm.
+      - Names of roles to add.
+      - If O(client_id) is present, all roles must be under this client.
+      - If O(client_id) is absent, all roles must be under the realm.
+
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
   - community.general.attributes
 
 author:
-  - Andre Desrosiers (@desand01)
+  - Felix Grzelka
+  # TODO
+  # adapted from keycloak_client_rolescope
+  # - Andre Desrosiers (@desand01)
 """
 
 EXAMPLES = r"""
-- name: Add roles to public client scope
-  community.general.keycloak_client_rolescope:
+- name: Add roles to clientscope
+  community.general.keycloak_clientscope_rolemappings:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
     realm: MyCustomRealm
     client_id: frontend-client-public
-    client_scope_id: backend-client-private
+    clientscope_id: frontend-clientscope
     role_names:
       - backend-role-admin
       - backend-role-user
 
-- name: Remove roles from public client scope
-  community.general.keycloak_client_rolescope:
+- name: Remove roles from clientscope
+  community.general.keycloak_clientscope_rolemappings:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
     realm: MyCustomRealm
     client_id: frontend-client-public
-    client_scope_id: backend-client-private
+    clientscope_id: frontend-clientscope
     role_names:
       - backend-role-admin
     state: absent
 
-- name: Add realm roles to public client scope
-  community.general.keycloak_client_rolescope:
+- name: Add realm roles to clientscope
+  community.general.keycloak_clientscope_rolemappings:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
     realm: MyCustomRealm
-    client_id: frontend-client-public
+    clientscope_id: frontend-clientscope
     role_names:
       - realm-role-admin
       - realm-role-user
@@ -193,8 +196,8 @@ def main():
     role_names = module.params.get("role_names")
     state = module.params.get("state")
 
-    objRealm = kc.get_realm_by_id(realm)
-    if not objRealm:
+    realm_object = kc.get_realm_by_id(realm)
+    if not realm_object:
         module.fail_json(msg=f"Failed to retrive realm '{realm}'")
 
     objClient = kc.get_client_by_clientid(clientid, realm)
