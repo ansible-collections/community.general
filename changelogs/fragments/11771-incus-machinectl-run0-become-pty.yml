@@ -1,0 +1,5 @@
+bugfixes:
+  - incus connection plugin - work when the active become plugin sets ``require_tty`` instead of failing silently (https://github.com/ansible-collections/community.general/pull/11771).
+  - machinectl become plugin - prevent printing ANSI terminal color sequences (https://github.com/ansible-collections/community.general/pull/11771).
+  - run0 become plugin - prevent printing ANSI terminal color sequences (https://github.com/ansible-collections/community.general/pull/11771).
+  - run0 become plugin - mark the plugin as incompatible with connection pipelining (see https://github.com/ansible/ansible/issues/81254, https://github.com/ansible-collections/community.general/pull/11771).
