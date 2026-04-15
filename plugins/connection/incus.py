@@ -131,12 +131,18 @@ class Connection(ConnectionBase):
     def _build_command(self, cmd) -> list[str]:
         """build the command to execute on the incus host"""
 
+        # Force pseudo-terminal allocation if the active become plugin
+        # requires one (e.g. community.general.machinectl), otherwise the
+        # become helper runs without a controlling tty and silently fails.
+        require_tty = self.become is not None and getattr(self.become, "require_tty", False)
+
         exec_cmd: list[str] = [
             self._incus_cmd,
             "--project",
             self.get_option("project"),
             "exec",
             *(["-T"] if getattr(self._shell, "_IS_WINDOWS", False) else []),
+            *(["-t"] if require_tty and not getattr(self._shell, "_IS_WINDOWS", False) else []),
             f"{self.get_option('remote')}:{self._instance()}",
             "--",
         ]
