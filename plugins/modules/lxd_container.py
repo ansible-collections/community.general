@@ -41,6 +41,9 @@ options:
   config:
     description:
       - 'The config for the instance (for example V({"limits.cpu": "2"})).'
+      - All values in O(config) must be strings, as required by the LXD/Incus API.
+        Using non-string values (such as integers or booleans) will cause an API error.
+        Make sure to quote numeric and boolean values in YAML (for example, use V("2") instead of V(2)).
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
       - If the instance already exists and its "config" values in metadata obtained from the LXD API
         U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get)
