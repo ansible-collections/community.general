@@ -38,3 +38,19 @@
     that:
       - iso_extract_test0_again is changed
   when: in_check_mode
+
+- name: Extract the iso using files with leading slash
+  iso_extract:
+    image: '{{ output_test_dir }}/test.iso'
+    dest: '{{ output_test_dir }}'
+    files:
+      - /1.txt
+      - /2.txt
+    force: true
+  register: iso_extract_leading_slash
+
+- name: Test iso_extract with leading slash succeeds (normal mode)
+  assert:
+    that:
+      - iso_extract_leading_slash is not failed
+  when: not in_check_mode

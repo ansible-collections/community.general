@@ -48,6 +48,7 @@ options:
     description:
       - A list of files to extract from the image.
       - Extracting directories does not work.
+      - File paths should not include a leading V(/); any leading path separator is automatically stripped.
     type: list
     elements: str
     required: true
@@ -138,11 +139,11 @@ def main():
         module.fail_json(msg=f"ISO image '{image}' does not exist")
 
     result["files"] = []
-    extract_files = list(files)
+    extract_files = [f.lstrip(os.sep) for f in files]
 
     if not force:
         # Check if we have to process any files based on existence
-        for f in files:
+        for f in extract_files[:]:
             dest_file = os.path.join(dest, os.path.basename(f))
             if os.path.exists(dest_file):
                 result["files"].append(
