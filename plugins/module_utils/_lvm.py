@@ -54,7 +54,7 @@ def pvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     Runner for C(pvcreate). Used by: community.general.lvg, community.general.lvm_pv,
     community.general.filesystem.
 
-    Suggested arg_formats keys: force yes devices
+    Suggested arg_formats keys: force yes device
     """
     return CmdRunner(
         module,
@@ -62,7 +62,7 @@ def pvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
         arg_formats=dict(
             force=cmd_runner_fmt.as_bool("-f"),
             yes=cmd_runner_fmt.as_bool("--yes"),
-            devices=cmd_runner_fmt.as_list(),
+            device=cmd_runner_fmt.as_list(),
         ),
         **kwargs,
     )
@@ -108,15 +108,15 @@ def pvremove_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     """
     Runner for C(pvremove). Used by: community.general.lvm_pv.
 
-    Suggested arg_formats keys: yes force device
+    Suggested arg_formats keys: force device
 
-    Note: C(force=True) passes C(-ff), which removes PVs even when part of a VG.
+    Note: C(-y) is always passed (non-interactive). C(force=True) passes C(-ff),
+    which removes PVs even when part of a VG.
     """
     return CmdRunner(
         module,
-        command="pvremove",
+        command=["pvremove", "-y"],
         arg_formats=dict(
-            yes=cmd_runner_fmt.as_bool("-y"),
             force=cmd_runner_fmt.as_bool("-ff"),
             device=cmd_runner_fmt.as_list(),
         ),
