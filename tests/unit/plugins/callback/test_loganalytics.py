@@ -9,9 +9,15 @@ import unittest
 from datetime import datetime
 from unittest.mock import Mock, patch
 
+import pytest
 from ansible.executor.task_result import TaskResult
+from ansible.release import __version__ as ansible_release
 
 from ansible_collections.community.general.plugins.callback.loganalytics import AzureLogAnalyticsSource
+
+if tuple(int(x) for x in ansible_release.split(".")[:2]) >= (2, 21):
+    # https://github.com/ansible/ansible/issues/86761
+    pytest.skip("Temporarily skipping callback tests for ansible-core >= 2.21", allow_module_level=True)
 
 
 class TestAzureLogAnalytics(unittest.TestCase):
