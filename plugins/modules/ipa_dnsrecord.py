@@ -77,11 +77,14 @@ options:
   exclusive:
     description:
       - Whether the provided record value(s) should be the only ones for that record type and record name.
-      - Only relevant when O(state=present).
-      - When V(true), the specified O(record_value) or O(record_values) will replace all existing
-        records of the same type and name.
-      - When V(false), the specified values will be added to any existing records of the same type
-        and name, preserving values not listed.
+      - When O(state=present) and V(true), the specified O(record_value) or O(record_values) will
+        replace all existing records of the same type and name.
+      - When O(state=present) and V(false), the specified values will be added to any existing records
+        of the same type and name, preserving values not listed.
+      - When O(state=absent) and V(true), all existing records of the same type and name will be removed,
+        regardless of the specified O(record_value) or O(record_values).
+      - When O(state=absent) and V(false), only the specified values will be removed from the record,
+        preserving other existing values.
     type: bool
     default: true
     version_added: 12.6.0
@@ -377,10 +380,21 @@ def ensure(module, client):
                     add_details = dict(module_dnsrecord, record_values=missing_values)
                     client.dnsrecord_add(zone_name=zone_name, record_name=record_name, details=add_details)
     else:
-        if ipa_dnsrecord:
-            changed = True
-            if not module.check_mode:
-                client.dnsrecord_del(zone_name=zone_name, record_name=record_name, details=module_dnsrecord)
+        record_key = RECORD_TYPE_KEY.get(module_dnsrecord["record_type"])
+        current_values = ipa_dnsrecord.get(record_key, []) if (ipa_dnsrecord and record_key) else []
+        if exclusive:
+            if current_values:
+                changed = True
+                if not module.check_mode:
+                    del_details = dict(module_dnsrecord, record_values=current_values)
+                    client.dnsrecord_del(zone_name=zone_name, record_name=record_name, details=del_details)
+        else:
+            values_to_remove = [v for v in record_values if v in current_values]
+            if values_to_remove:
+                changed = True
+                if not module.check_mode:
+                    del_details = dict(module_dnsrecord, record_values=values_to_remove)
+                    client.dnsrecord_del(zone_name=zone_name, record_name=record_name, details=del_details)
 
     return changed, client.dnsrecord_find(zone_name, record_name)
 
