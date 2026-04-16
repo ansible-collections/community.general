@@ -86,23 +86,16 @@ def a_valid_tap(tap):
     return regex.match(tap)
 
 
-def already_tapped(module, brew_path, tap):
+def already_tapped(module, brew_path, tap, taps=None):
     """Returns True if already tapped."""
-
-    rc, out, err = module.run_command(
-        [
-            brew_path,
-            "tap",
-        ]
-    )
-
-    taps = [tap_.strip().lower() for tap_ in out.split("\n") if tap_]
+    if taps is None:
+        rc, out, err = module.run_command([brew_path, "tap"])
+        taps = [tap_.strip().lower() for tap_ in out.split("\n") if tap_]
     tap_name = re.sub("homebrew-", "", tap.lower())
-
     return tap_name in taps
 
 
-def add_tap(module, brew_path, tap, url=None):
+def add_tap(module, brew_path, tap, url=None, taps=None):
     """Adds a single tap."""
     failed, changed, msg = False, False, ""
 
@@ -110,18 +103,12 @@ def add_tap(module, brew_path, tap, url=None):
         failed = True
         msg = f"not a valid tap: {tap}"
 
-    elif not already_tapped(module, brew_path, tap):
+    elif not already_tapped(module, brew_path, tap, taps):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        rc, out, err = module.run_command(
-            [
-                brew_path,
-                "tap",
-                tap,
-                url,
-            ]
-        )
+        cmd = [opt for opt in [brew_path, "tap", tap, url] if opt]
+        rc, out, err = module.run_command(cmd)
         if rc == 0:
             changed = True
             msg = f"successfully tapped: {tap}"
@@ -139,8 +126,11 @@ def add_taps(module, brew_path, taps):
     """Adds one or more taps."""
     failed, changed, unchanged, added, msg = False, False, 0, 0, ""
 
+    rc, out, err = module.run_command([brew_path, "tap"])
+    tapped = [t.strip().lower() for t in out.split("\n") if t]
+
     for tap in taps:
-        (failed, changed, msg) = add_tap(module, brew_path, tap)
+        (failed, changed, msg) = add_tap(module, brew_path, tap, taps=tapped)
         if failed:
             break
         if changed:
@@ -149,8 +139,7 @@ def add_taps(module, brew_path, taps):
             unchanged += 1
 
     if failed:
-        msg = f"added: %d, unchanged: %d, error: {msg}"
-        msg = msg % (added, unchanged)
+        msg = f"added: {added}, unchanged: {unchanged}, error: {msg}"
     elif added:
         changed = True
         msg = f"added: {added}, unchanged: {unchanged}"
@@ -160,7 +149,7 @@ def add_taps(module, brew_path, taps):
     return (failed, changed, msg)
 
 
-def remove_tap(module, brew_path, tap):
+def remove_tap(module, brew_path, tap, taps=None):
     """Removes a single tap."""
     failed, changed, msg = False, False, ""
 
@@ -168,17 +157,11 @@ def remove_tap(module, brew_path, tap):
         failed = True
         msg = f"not a valid tap: {tap}"
 
-    elif already_tapped(module, brew_path, tap):
+    elif already_tapped(module, brew_path, tap, taps):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        rc, out, err = module.run_command(
-            [
-                brew_path,
-                "untap",
-                tap,
-            ]
-        )
+        rc, out, err = module.run_command([brew_path, "untap", tap])
         if not already_tapped(module, brew_path, tap):
             changed = True
             msg = f"successfully untapped: {tap}"
@@ -196,8 +179,11 @@ def remove_taps(module, brew_path, taps):
     """Removes one or more taps."""
     failed, changed, unchanged, removed, msg = False, False, 0, 0, ""
 
+    rc, out, err = module.run_command([brew_path, "tap"])
+    tapped = [t.strip().lower() for t in out.split("\n") if t]
+
     for tap in taps:
-        (failed, changed, msg) = remove_tap(module, brew_path, tap)
+        (failed, changed, msg) = remove_tap(module, brew_path, tap, taps=tapped)
         if failed:
             break
         if changed:
@@ -206,8 +192,7 @@ def remove_taps(module, brew_path, taps):
             unchanged += 1
 
     if failed:
-        msg = f"removed: %d, unchanged: %d, error: {msg}"
-        msg = msg % (removed, unchanged)
+        msg = f"removed: {removed}, unchanged: {unchanged}, error: {msg}"
     elif removed:
         changed = True
         msg = f"removed: {removed}, unchanged: {unchanged}"
