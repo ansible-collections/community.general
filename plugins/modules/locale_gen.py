@@ -38,16 +38,11 @@ options:
 notes:
   - Currently the module is B(only supported for Debian, Ubuntu, and Arch Linux) systems.
   - This module requires the package C(locales) installed in Debian and Ubuntu systems.
-  - If C(/etc/locale.gen) exists, the module assumes to be using the B(glibc) mechanism, else if C(/var/lib/locales/supported.d/)
-    exists it assumes to be using the B(ubuntu_legacy) mechanism, else it raises an error.
+  - If C(/etc/locale.gen) exists, the module assumes to be using the B(glibc) mechanism, else it raises an error.
+    Support for C(/var/lib/locales/supported.d/) (the V(ubuntu_legacy) mechanism) has been removed in community.general 13.0.0.
   - When using V(glibc) mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
-  - When using V(ubuntu_legacy) mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running
-    C(locale-gen).
   - Please note that the module asserts the availability of the locale by checking the files C(/usr/share/i18n/SUPPORTED) and
     C(/usr/local/share/i18n/SUPPORTED), but the C(/usr/local) one is not supported by Archlinux.
-  - Please note that the code path that uses V(ubuntu_legacy) mechanism has not been tested for a while, because recent versions of
-    Ubuntu is already using the V(glibc) mechanism. There is no support for V(ubuntu_legacy), given our inability to test it.
-    Therefore, that mechanism is B(deprecated) and will be removed in community.general 13.0.0.
 """
 
 EXAMPLES = r"""
@@ -70,7 +65,6 @@ mechanism:
   type: str
   choices:
     - glibc
-    - ubuntu_legacy
   returned: success
   sample: glibc
   version_added: 10.2.0
@@ -114,10 +108,6 @@ class LocaleGen(StateModuleHelper):
 
     def __init_module__(self):
         self.mechanisms = dict(
-            ubuntu_legacy=dict(
-                available=SUPPORTED_LOCALES,
-                apply_change=self.apply_change_ubuntu_legacy,
-            ),
             glibc=dict(
                 available=SUPPORTED_LOCALES,
                 apply_change=self.apply_change_glibc,
@@ -127,18 +117,8 @@ class LocaleGen(StateModuleHelper):
         if os.path.exists(ETC_LOCALE_GEN):
             self.vars.ubuntu_mode = False
             self.vars.mechanism = "glibc"
-        elif os.path.exists(VAR_LIB_LOCALES):
-            self.vars.ubuntu_mode = True
-            self.vars.mechanism = "ubuntu_legacy"
-            self.module.deprecate(
-                "On this machine mechanism=ubuntu_legacy is used. This mechanism is deprecated and will be removed from"
-                " in community.general 13.0.0. If you see this message on a modern Debian or Ubuntu version,"
-                " please create an issue in the community.general repository",
-                version="13.0.0",
-                collection_name="community.general",
-            )
         else:
-            self.do_raise(f'{VAR_LIB_LOCALES} and {ETC_LOCALE_GEN} are missing. Is the package "locales" installed?')
+            self.do_raise(f'{ETC_LOCALE_GEN} is missing. Is the package "locales" installed?')
 
         self.runner = locale_runner(self.module)
 
@@ -268,34 +248,6 @@ class LocaleGen(StateModuleHelper):
         runner = locale_gen_runner(self.module)
         with runner() as ctx:
             ctx.run()
-
-    def apply_change_ubuntu_legacy(self, target_state, names):
-        """Create or remove locale.
-
-        Keyword arguments:
-        target_state -- Desired state, either present or absent.
-        names -- Name list including encoding such as de_CH.UTF-8.
-        """
-        runner = locale_gen_runner(self.module)
-
-        if target_state == "present":
-            # Create locale.
-            # Ubuntu's patched locale-gen automatically adds the new locale to /var/lib/locales/supported.d/local
-            with runner() as ctx:
-                ctx.run()
-        else:
-            # Delete locale involves discarding the locale from /var/lib/locales/supported.d/local and regenerating all locales.
-            with open(VAR_LIB_LOCALES_LOCAL) as fr:
-                content = fr.readlines()
-            with open(VAR_LIB_LOCALES_LOCAL, "w") as fw:
-                for line in content:
-                    locale, charset = line.split(" ")
-                    if locale not in names:
-                        fw.write(line)
-            # Purge locales and regenerate.
-            # Please provide a patch if you know how to avoid regenerating the locales to keep!
-            with runner("purge") as ctx:
-                ctx.run()
 
     @check_mode_skip
     def __state_fallback__(self):
