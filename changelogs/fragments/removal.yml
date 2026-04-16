@@ -40,3 +40,5 @@ removed_features:
   - "django module utils - the deprecated ``database``, ``noinput``, ``dry_run``, and ``check`` parameters for the Django runner have been removed (https://github.com/ansible-collections/community.general/pull/11834)."
   - "pipx module utils - the deprecated ``make_process_list()`` function has been removed (https://github.com/ansible-collections/community.general/pull/11834)."
   - "cpanm - the ``mode=compatibility`` is no longer available. Migrate to ``mode=new`` (https://github.com/ansible-collections/community.general/pull/11834)."
+breaking_changes:
+  - "rocketchat - the default for the ``is_pre740`` changed from ``true`` to ``false`` (https://github.com/ansible-collections/community.general/pull/11834)."
