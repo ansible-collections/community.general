@@ -201,7 +201,7 @@ def main():
     realm_object = kc.get_realm_by_id(realm)
     if not realm_object:
         module.fail_json(msg=f"Failed to retrive realm '{realm}'")
-    
+
     clientscope_object = kc.get_clientscope_by_name(clientscope_id, realm)
     if not clientscope_object:
         module.fail_json(msg=f"Failed to retrive client-scope '{clientscope_id}'")
@@ -213,7 +213,7 @@ def main():
             module.fail_json(msg=f"Failed to retrive client '{realm}.{client_id}'")
         if client_object["fullScopeAllowed"] and state == "present":
             module.fail_json(msg=f"FullScopeAllowed is active for Client '{realm}.{client_id}'")
-        
+
         before_roles = kc.get_clientscope_scope_mappings_client(clientscope_object["id"], client_object["id"], realm)
         available_roles_by_name = kc.get_client_roles_by_id(client_object["id"], realm)
     else:
@@ -251,7 +251,7 @@ def main():
     result["changed"] = len(changed_roles) > 0
 
     if module._diff:
-        result["diff"] = dict(before={"roles": before_roles}, after={"roles":desired_role_mapping})
+        result["diff"] = dict(before={"roles": before_roles}, after={"roles": desired_role_mapping})
 
     if not result["changed"]:
         # no changes
