@@ -7,13 +7,19 @@ __metaclass__ = type
 
 from ansible.playbook.task import Task
 from ansible.executor.task_result import TaskResult
+from ansible.release import __version__ as ansible_release
 from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, MagicMock, Mock
 from ansible_collections.community.general.plugins.callback.elastic import ElasticSource, TaskData
 from collections import OrderedDict
 import sys
+import pytest
 
 ELASTIC_MINIMUM_PYTHON_VERSION = (3, 6)
+
+if tuple(int(x) for x in ansible_release.split(".")[:2]) >= (2, 21):
+    # https://github.com/ansible/ansible/issues/86761
+    pytest.skip("Temporarily skipping callback tests for ansible-core >= 2.21", allow_module_level=True)
 
 
 class TestOpentelemetry(unittest.TestCase):

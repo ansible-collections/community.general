@@ -5,13 +5,19 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import pytest
 from ansible.executor.task_result import TaskResult
+from ansible.release import __version__ as ansible_release
 from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, Mock
 from ansible_collections.community.general.plugins.callback.splunk import SplunkHTTPCollectorSource
 from datetime import datetime
 
 import json
+
+if tuple(int(x) for x in ansible_release.split(".")[:2]) >= (2, 21):
+    # https://github.com/ansible/ansible/issues/86761
+    pytest.skip("Temporarily skipping callback tests for ansible-core >= 2.21", allow_module_level=True)
 
 
 class TestSplunkClient(unittest.TestCase):
