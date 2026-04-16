@@ -238,7 +238,9 @@ def update_flat(module, binary, names, method, no_dependencies):
         command += ["--no-deps"]
     command += installed_flat_names
     stdout = _flatpak_command(module, module.check_mode, command)
-    result["changed"] = True if module.check_mode else stdout.find("Nothing to do.") == -1
+    result["changed"] = (
+        True if module.check_mode else (stdout.find("Nothing to do.") == -1 and stdout.find("Nothing to update.") == -1)
+    )
 
 
 def uninstall_flat(module, binary, names, method):

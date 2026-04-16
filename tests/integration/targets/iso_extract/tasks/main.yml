@@ -14,10 +14,10 @@
     output_test_dir: '{{ remote_tmp_dir }}/test_iso_extract'
 
 # TODO: figure out and fix!
-- name: Doesn't work with Fedora 43 for some reason
+- name: Doesn't work with Fedora 43+ for some reason
   meta: end_play
   when:
-    - ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('43', '==')
+    - ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('43', '>=')
 
 - name: Install 7zip
   import_tasks: 7zip.yml

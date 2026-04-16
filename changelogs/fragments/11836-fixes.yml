@@ -1,0 +1,2 @@
+bugfixes:
+  - "flatpak - support new output message when an update resulted in no action that appears on Fedora 44 (https://github.com/ansible-collections/community.general/pull/11836)."
