@@ -7,52 +7,6 @@ anchors:
   environ_true: &env-def-true {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
   environ_false: &env-def-false {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
 test_cases:
-  - id: install_dancer_compatibility
-    input:
-      name: Dancer
-      mode: compatibility
-    output:
-      changed: true
-      cpanm_version: '1.7047'
-    mocks:
-      run_command:
-        - command: [/testbin/cpanm, --version]
-          environ: *env-def-true
-          rc: 0
-          out: |
-            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-            perl version 5.041005 (/usr/local/bin/perl)
-          err: ''
-        - command: [/testbin/perl, -le, use Dancer;]
-          environ: *env-def-false
-          rc: 2
-          out: ''
-          err: error, not installed
-        - command: [/testbin/cpanm, Dancer]
-          environ: *env-def-true
-          rc: 0
-          out: ''
-          err: ''
-  - id: install_dancer_already_installed_compatibility
-    input:
-      name: Dancer
-      mode: compatibility
-    output:
-      changed: false
-    mocks:
-      run_command:
-        - command: [/testbin/cpanm, --version]
-          environ: *env-def-true
-          rc: 0
-          out: |
-            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-            perl version 5.041005 (/usr/local/bin/perl)
-          err: ''
-        - command: [/testbin/perl, -le, use Dancer;]
-          environ: *env-def-false
-          rc: 0
-          out: ''
-          err: ''
   - id: install_dancer
     input:
       name: Dancer
@@ -68,26 +22,6 @@ test_cases:
             perl version 5.041005 (/usr/local/bin/perl)
           err: ''
         - command: [/testbin/cpanm, Dancer]
-          environ: *env-def-true
-          rc: 0
-          out: ''
-          err: ''
-  - id: install_distribution_file_compatibility
-    input:
-      name: MIYAGAWA/Plack-0.99_05.tar.gz
-      mode: compatibility
-    output:
-      changed: true
-    mocks:
-      run_command:
-        - command: [/testbin/cpanm, --version]
-          environ: *env-def-true
-          rc: 0
-          out: |
-            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-            perl version 5.041005 (/usr/local/bin/perl)
-          err: ''
-        - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
           environ: *env-def-true
           rc: 0
           out: ''
