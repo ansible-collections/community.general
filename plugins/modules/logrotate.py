@@ -469,7 +469,6 @@ import re
 import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class LogrotateConfig:
@@ -547,7 +546,7 @@ class LogrotateConfig:
                     with open(config_path, "r") as f:
                         return f.read()
                 except Exception as e:
-                    self.module.fail_json(msg=f"Failed to read config file {config_path}: {to_native(e)}")
+                    self.module.fail_json(msg=f"Failed to read config file {config_path}: {e}")
 
         return None
 
@@ -784,7 +783,7 @@ class LogrotateConfig:
                         try:
                             os.remove(config_path)
                         except Exception as e:
-                            self.module.fail_json(msg=f"Failed to remove config file '{config_path}': {to_native(e)}")
+                            self.module.fail_json(msg=f"Failed to remove config file '{config_path}': {e}")
                     self.result["changed"] = True
                     self.result["config_file"] = config_path
                     break
@@ -816,7 +815,7 @@ class LogrotateConfig:
                     self.module.atomic_move(old_path, new_path, unsafe_writes=False)
                 except Exception as e:
                     self.module.fail_json(
-                        msg=f"Failed to rename config file from '{old_path}' to '{new_path}': {to_native(e)}"
+                        msg=f"Failed to rename config file from '{old_path}' to '{new_path}': {e}"
                     )
 
             self.result["config_file"] = new_path
@@ -871,7 +870,7 @@ class LogrotateConfig:
                                 os.remove(old_path)
                             except Exception as e:
                                 self.module.fail_json(
-                                    msg=f"Failed to remove old config file '{old_path}': {to_native(e)}"
+                                    msg=f"Failed to remove old config file '{old_path}': {e}"
                                 )
 
                 try:
