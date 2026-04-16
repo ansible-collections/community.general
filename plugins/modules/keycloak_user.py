@@ -455,7 +455,7 @@ def main():
     user_params = [
         x
         for x in module.params
-        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups"]
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups", "keycloak_default_behavior"]
         and module.params.get(x) is not None
     ]
 
@@ -522,7 +522,7 @@ def main():
             kc.delete_user(user_id=before_user["id"], realm=realm)
 
         if not before_user or force:
-            # Process a creation
+            # Create a new user
             changed = True
 
             if username is None:
@@ -545,6 +545,7 @@ def main():
             # Set user_created flag
             result["user_created"] = True
         else:
+            # Update an existing user
             excludes = [
                 "access",
                 "notBefore",
@@ -562,7 +563,7 @@ def main():
 
             # Compare users
             if not (
-                is_struct_included(desired_user, before_user, excludes)
+                is_struct_included(desired_user, before_user, excludes, empty_list_result=False)
             ):  # If the new user does not introduce a change to the existing user
                 # Update the user
                 if not module.check_mode:
