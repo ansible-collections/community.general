@@ -1,5 +1,4 @@
 bugfixes:
-  - iso_extract - retry ``umount`` up to 5 times with 1-second pauses when the
-    filesystem is busy, preventing spurious ``OSError`` on cleanup
+  - iso_extract - retry ``umount`` up to 5 times preventing ``OSError`` on cleanup
     (https://github.com/ansible-collections/community.general/issues/5333,
     https://github.com/ansible-collections/community.general/pull/11837).
