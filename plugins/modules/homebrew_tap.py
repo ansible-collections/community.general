@@ -107,7 +107,9 @@ def add_tap(module, brew_path, tap, url=None, taps=None):
         if module.check_mode:
             module.exit_json(changed=True)
 
-        cmd = [opt for opt in [brew_path, "tap", tap, url] if opt]
+        cmd = [brew_path, "tap", tap]
+        if url:
+            cmd.append(url)
         rc, out, err = module.run_command(cmd)
         if rc == 0:
             changed = True
