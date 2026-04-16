@@ -94,7 +94,8 @@ options:
     default: http
   validate_certs:
     description:
-      - Whether to verify the tls certificate of the Consul agent.
+      - Whether to verify the TLS certificate of the Consul agent.
+      - Instead of setting this to V(false), please consider using O(ca_path) instead.
     type: bool
     default: true
   ca_path:
@@ -269,7 +270,8 @@ def remove_value(module):
 
 def get_consul_api(module):
     ca_path = module.params.get("ca_path")
-    verify = ca_path if ca_path else module.params.get("validate_certs")
+    validate_certs = module.params.get("validate_certs")
+    verify = (ca_path or validate_certs) if validate_certs else False
     return consul.Consul(
         host=module.params.get("host"),
         port=module.params.get("port"),

@@ -57,7 +57,9 @@ options:
       - If you use E(ANSIBLE_CONSUL_URL) this value is used from there.
   validate_certs:
     default: true
-    description: Whether to verify the TLS connection or not.
+    description:
+      - Whether to verify the TLS connection or not.
+      - Instead of setting this to V(false), please consider using O(ca_path) instead.
     type: bool
     env:
       - name: ANSIBLE_CONSUL_VALIDATE_CERTS
@@ -158,7 +160,7 @@ class LookupModule(LookupBase):
         ca_path = self.get_option("ca_path")
         client_cert = self.get_option("client_cert")
 
-        verify = ca_path if ca_path else validate_certs
+        verify = (ca_path or validate_certs) if validate_certs else False
 
         values = []
         try:
