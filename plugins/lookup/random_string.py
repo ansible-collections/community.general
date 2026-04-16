@@ -171,12 +171,12 @@ EXAMPLES = r"""
 - name: Generate random string with avoid_special_first
   debug:
     var: query('community.general.random_string', avoid_special_first=true)
-  # Example result: ['Uan0hUiX5kVG']
+  # Example result: ['U@n0hUiX5kVG']
 
 - name: Generate random string with avoid_special_last
   debug:
     var: query('community.general.random_string', avoid_special_last=true)
-  # Example result: ['Uan0hUiX5kVG']
+  # Example result: ['U@n0hUiX5kVG']
 """
 
 RETURN = r"""
@@ -267,7 +267,13 @@ class LookupModule(LookupBase):
         min_lower = self.get_option("min_lower")
         min_upper = self.get_option("min_upper")
         min_special = self.get_option("min_special")
-        if length < min_numeric + min_lower + min_upper + min_special:
+        min_non_special = min_numeric + min_lower + min_upper
+        if avoid_special_first and avoid_special_last:
+            min_non_special += 2
+        elif avoid_special_first or avoid_special_last:
+            min_non_special += 1
+
+        if length < min_special + min_non_special:
             raise AnsibleLookupError("Minimum requirements exceed total length, please increase the length")
 
         # Ensure minimum requirements
@@ -281,6 +287,10 @@ class LookupModule(LookupBase):
 
         # Fill remaining length
         remaining_length = length - len(result)
+        if min_non_special <= remaining_length:
+            # atleast one non-special character
+            available_chars_set = available_chars_set.replace(special_chars, '')
+
         result += [random_generator.choice(available_chars_set) for dummy in range(remaining_length)]
 
         # Shuffle to avoid predictable pattern

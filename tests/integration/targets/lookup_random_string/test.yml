@@ -25,6 +25,7 @@
         result15: "{{ query('community.general.random_string', seed='1234') }}"
         result16: "{{ query('community.general.random_string', avoid_special_first=true) }}"
         result17: "{{ query('community.general.random_string', avoid_special_last=true) }}"
+        result18: "{{ query('community.general.random_string', length=10, avoid_special_first=true, avoid_special_last=true, min_special=8) }}"
 
     - name: Raise error when impossible constraints are provided
       set_fact:
@@ -44,6 +45,14 @@
       ignore_errors: true
       register: override_all_special_characters_avoid_special_last_error
 
+    - name: Raise error when impossible constraints are provided
+      set_fact:
+        error: "{{ query('community.general.random_string', length=10, avoid_special_first=true, avoid_special_last=true, min_special=9) }}"
+      ignore_errors: true
+      register: len_10_avoid_special_first_avoid_special_last_min_special_9
+
+    - debug:
+        var: len_10_avoid_special_first_avoid_special_last_min_special_9
     - name: Check results
       assert:
         that:
@@ -68,7 +77,14 @@
           - impossible_result is failed
           - "'Available characters cannot' in impossible_result.msg"
           - result15[0] == result14[0]
+          - result16[0][0] not in '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+          - result17[0][-1] not in '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+          - result18[0] | length == 10
+          - result18[0][0] not in '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+          - result18[0][-1] not in '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
           - override_all_special_characters_avoid_special_first_error is failed
           - "'No character satisfies the constraints for avoid_special_first' in override_all_special_characters_avoid_special_first_error.msg"
           - override_all_special_characters_avoid_special_last_error is failed
           - "'No character satisfies the constraints for avoid_special_last' in override_all_special_characters_avoid_special_last_error.msg"
+          - len_10_avoid_special_first_avoid_special_last_min_special_9 is failed
+          - "'Minimum requirements exceed total length, please increase the length' in len_10_avoid_special_first_avoid_special_last_min_special_9.msg"
