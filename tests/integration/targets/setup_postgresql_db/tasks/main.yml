@@ -20,6 +20,10 @@
 - meta: end_play
   when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '34'
 
+# Temporary disable Fedora 44
+- meta: end_play
+  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '44'
+
 - name: Include distribution and Python version specific variables
   include_vars: '{{ lookup(''first_found'', params) }}'
   vars:
