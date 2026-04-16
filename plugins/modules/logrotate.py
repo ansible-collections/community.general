@@ -37,8 +37,7 @@ options:
   config_dir:
     description:
       - Directory where logrotate configurations are stored.
-      - Default is V(/etc/logrotate.d) for system-wide configurations.
-      - Use V(~/.logrotate.d) for user-specific configurations.
+      - For user-specific configurations, V(~/.logrotate.d) is typical.
       - This directory must exist before using the module.
     type: path
     default: /etc/logrotate.d
