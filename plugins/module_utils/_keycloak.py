@@ -322,7 +322,7 @@ def get_token(module_params: dict[str, t.Any]) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
 
-def is_struct_included(struct1: object, struct2: object, exclude: Sequence[str] | None = None) -> bool:
+def is_struct_included(struct1: object, struct2: object, exclude: Sequence[str] | None = None, empty_list_result: bool = True) -> bool:
     """
     This function compare if the first parameter structure is included in the second.
     The function use every elements of struct1 and validates they are present in the struct2 structure.
@@ -344,6 +344,12 @@ def is_struct_included(struct1: object, struct2: object, exclude: Sequence[str] 
         description:
             Key to exclude from the comparison.
         default: None
+    :param empty_list_result:
+        type:
+            bool
+        description:
+            Return this value, when struct1 is an empty list.
+        default: True
     :return:
         type:
             bool
@@ -353,10 +359,14 @@ def is_struct_included(struct1: object, struct2: object, exclude: Sequence[str] 
     if isinstance(struct1, list) and isinstance(struct2, list):
         if not struct1 and not struct2:
             return True
+        
+        if not struct1:
+            return empty_list_result
+
         for item1 in struct1:
             if isinstance(item1, (list, dict)):
                 for item2 in struct2:
-                    if is_struct_included(item1, item2, exclude):
+                    if is_struct_included(item1, item2, exclude, empty_list_result):
                         break
                 else:
                     return False
@@ -370,7 +380,7 @@ def is_struct_included(struct1: object, struct2: object, exclude: Sequence[str] 
         try:
             for key in struct1:
                 if not (exclude and key in exclude):
-                    if not is_struct_included(struct1[key], struct2[key], exclude):
+                    if not is_struct_included(struct1[key], struct2[key], exclude, empty_list_result):
                         return False
         except KeyError:
             return False
