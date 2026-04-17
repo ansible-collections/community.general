@@ -1,0 +1,6 @@
+bugfixes:
+  - >-
+    etcd3 lookup plugin - improve HTTPS endpoint handling by stripping URL schemes from the ``host`` option
+    and warning when ``ca_cert`` is not provided for HTTPS endpoints
+    (https://github.com/ansible-collections/community.general/issues/1664,
+    https://github.com/ansible-collections/community.general/pull/11861).
