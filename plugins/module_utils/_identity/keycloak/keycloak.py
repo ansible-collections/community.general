@@ -3260,7 +3260,9 @@ class KeycloakAPI:
         try:
             return self._request_and_deserialize(client_role_scope_url, method="GET")
         except Exception as e:
-            self.fail_request(e, msg=f"Could not fetch realm roles for client-scope {clientscope_id} in realm {realm}: {e}")
+            self.fail_request(
+                e, msg=f"Could not fetch realm roles for client-scope {clientscope_id} in realm {realm}: {e}"
+            )
 
     def get_clientscope_scope_mappings_client(self, clientscope_id, client_id, realm: str = "master"):
         """Fetch the client roles (scope-mappings) associated with the clientscope for a specific clientscope and client on the Keycloak server.
@@ -3276,7 +3278,8 @@ class KeycloakAPI:
             return self._request_and_deserialize(client_role_scope_url, method="GET")
         except Exception as e:
             self.fail_request(
-                e, msg=f"Could not fetch client roles from client {client_id} for client-scope {clientscope_id} in realm {realm}: {e}"
+                e,
+                msg=f"Could not fetch client roles from client {client_id} for client-scope {clientscope_id} in realm {realm}: {e}",
             )
 
     def get_client_role_scope_from_client(self, clientid, clientscopeid, realm: str = "master"):
@@ -3294,7 +3297,9 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(e, msg=f"Could not fetch roles scope for client {clientid} in realm {realm}: {e}")
 
-    def update_clientscope_scope_mappings_client(self, payload: list[dict], clientscope_id: str, client_id: str, realm: str = "master"):
+    def update_clientscope_scope_mappings_client(
+        self, payload: list[dict], clientscope_id: str, client_id: str, realm: str = "master"
+    ):
         """Update and fetch the client roles (scope-mappings) associated with the clientscope on the Keycloak server.
         :param payload: List of client roles to be added to the scope.
         :param clientscope_id: ID of the clientscope to update scope-mappings.
@@ -3374,7 +3379,9 @@ class KeycloakAPI:
 
         return self.get_client_role_scope_from_client(clientid, clientscopeid, realm)
 
-    def delete_clientscope_scope_mappings_client(self, payload: list[dict], clientscope_id: str, client_id: str, realm: str = "master"):
+    def delete_clientscope_scope_mappings_client(
+        self, payload: list[dict], clientscope_id: str, client_id: str, realm: str = "master"
+    ):
         """Delete the client roles (scope_mappings) contained in the payload from the clientscope on the Keycloak server.
         :param payload: List of roles to be deleted.
         :param clientscope_id: ID of the clientscope to delete roles from scope-mappings.
