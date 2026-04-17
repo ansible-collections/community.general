@@ -54,12 +54,15 @@ def pvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     Runner for C(pvcreate). Used by: community.general.lvg, community.general.lvm_pv,
     community.general.filesystem.
 
-    Suggested arg_formats keys: force yes device
+    Suggested arg_formats keys: pv_options force yes device
+
+    Note: C(pv_options) accepts a pre-split list (e.g. from C(shlex.split())).
     """
     return CmdRunner(
         module,
         command="pvcreate",
         arg_formats=dict(
+            pv_options=cmd_runner_fmt.as_list(),
             force=cmd_runner_fmt.as_bool("-f"),
             yes=cmd_runner_fmt.as_bool("--yes"),
             device=cmd_runner_fmt.as_list(),
@@ -195,22 +198,25 @@ def vgcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     """
     Runner for C(vgcreate). Used by: community.general.lvg.
 
-    Suggested args order: pesize yes setautoactivation vg pvs
+    Suggested args order: vg_options pesize setautoactivation vg pvs
 
     Note: C(vg) and C(pvs) are positional — C(vg) must appear before C(pvs)
     in the args_order string. C(pvs) matches the O(pvs) module parameter in
-    community.general.lvg.
+    community.general.lvg. C(vg_options) accepts a pre-split list (e.g. from
+    C(shlex.split())). C(setautoactivation) accepts C(True)/C(False)/C(None);
+    C(None) omits the flag entirely (C(ignore_none=True)).
     """
     return CmdRunner(
         module,
         command="vgcreate",
         arg_formats=dict(
+            vg_options=cmd_runner_fmt.as_list(),
             pesize=cmd_runner_fmt.as_opt_val("-s"),
             yes=cmd_runner_fmt.as_bool("--yes"),
             setautoactivation=cmd_runner_fmt.as_bool(
                 ["--setautoactivation", "y"],
                 ["--setautoactivation", "n"],
-                ignore_none=False,
+                ignore_none=True,
             ),
             vg=cmd_runner_fmt.as_list(),
             pvs=cmd_runner_fmt.as_list(),
