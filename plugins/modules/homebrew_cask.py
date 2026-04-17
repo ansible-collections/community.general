@@ -141,14 +141,16 @@ EXAMPLES = r"""
     greedy: true
 
 - name: Using sudo password for installing cask
+  # ansible_become_password must be set in inventory or group_vars; it is not populated by -K
   community.general.homebrew_cask:
     name: wireshark
     state: present
-    sudo_password: "{{ ansible_become_pass }}"
+    sudo_password: "{{ ansible_become_password }}"
 """
 
 import os
 import re
+import shlex
 import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
@@ -480,13 +482,11 @@ class HomebrewCask:
         rc, out, err = "", "", ""
 
         with tempfile.NamedTemporaryFile() as sudo_askpass_file:
-            sudo_askpass_file.write(b"#!/bin/sh\n\necho '%s'\n" % to_bytes(self.sudo_password))
+            sudo_askpass_file.write(to_bytes(f"#!/bin/sh\necho {shlex.quote(self.sudo_password)}\n"))
+            sudo_askpass_file.flush()
             os.chmod(sudo_askpass_file.name, 0o700)
-            sudo_askpass_file.file.close()
 
             rc, out, err = self.module.run_command(cmd, environ_update={"SUDO_ASKPASS": sudo_askpass_file.name})
-
-            self.module.add_cleanup_file(sudo_askpass_file.name)
 
         return (rc, out, err)
 
