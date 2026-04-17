@@ -123,6 +123,7 @@ options:
       # - When not set, the module uses the legacy lowercase behavior and emits a deprecation warning. The default will change
       #   to V(true) in community.general 15.0.0.
     type: bool
+    default: false
     version_added: '12.6.0'
 
 notes:
