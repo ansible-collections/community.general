@@ -700,8 +700,8 @@ class JIRA(StateModuleHelper):
             self.module.fail_json(
                 msg=(
                     f'Failed to resolve field "{field_name}" email "{email}" to a unique '
-                    f"Jira Cloud account ID: found {count} result(s). "
-                    f"Specify the account ID directly."
+                    f'Jira Cloud account ID: found "{count}" result(s). '
+                    "Specify the account ID directly."
                 )
             )
         user = result[0]
@@ -711,7 +711,7 @@ class JIRA(StateModuleHelper):
                 msg=(
                     f'Failed to resolve field "{field_name}" email "{email}": '
                     f'the email address on the matched account "{user_email}" does not match. '
-                    f"Specify the account ID directly."
+                    "Specify the account ID directly."
                 )
             )
         return user["accountId"]
