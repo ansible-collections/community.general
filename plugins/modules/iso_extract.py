@@ -93,6 +93,7 @@ RETURN = r"""
 import os.path
 import shutil
 import tempfile
+import time
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -219,7 +220,14 @@ def main():
                 result["changed"] = True
     finally:
         if not binary:
-            module.run_command([module.get_bin_path("umount"), tmp_dir])
+            umount_cmd = [module.get_bin_path("umount"), tmp_dir]
+            for dummy in range(5):
+                rc, dummy, dummy = module.run_command(umount_cmd)
+                if rc == 0:
+                    break
+                time.sleep(1)
+            else:
+                module.warn(f"Failed to unmount ISO image from '{tmp_dir}' after 5 attempts.")
 
         shutil.rmtree(tmp_dir)
 
