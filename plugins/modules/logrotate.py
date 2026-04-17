@@ -811,9 +811,7 @@ class LogrotateConfig:
                 try:
                     self.module.atomic_move(old_path, new_path, unsafe_writes=False)
                 except Exception as e:
-                    self.module.fail_json(
-                        msg=f"Failed to rename config file from '{old_path}' to '{new_path}': {e}"
-                    )
+                    self.module.fail_json(msg=f"Failed to rename config file from '{old_path}' to '{new_path}': {e}")
 
             self.result["config_file"] = new_path
             self.result["enabled_state"] = target_enabled
@@ -864,9 +862,7 @@ class LogrotateConfig:
                             try:
                                 os.remove(old_path)
                             except Exception as e:
-                                self.module.fail_json(
-                                    msg=f"Failed to remove old config file '{old_path}': {e}"
-                                )
+                                self.module.fail_json(msg=f"Failed to remove old config file '{old_path}': {e}")
 
                 try:
                     self.module.atomic_move(tmp_path, config_file_path, unsafe_writes=False)
