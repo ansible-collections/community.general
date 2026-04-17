@@ -1,0 +1,5 @@
+bugfixes:
+  - udm_user - replace removed stdlib ``crypt`` module with ``passlib`` for password
+    verification, fixing compatibility with Python 3.13+
+    (https://github.com/ansible-collections/community.general/issues/4690,
+    https://github.com/ansible-collections/community.general/pull/11860).
