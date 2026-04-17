@@ -209,11 +209,11 @@ options:
 
   custom_user_fields:
     description:
-      - A list of field names (including custom fields such as V(customfield_10050)) that hold user values.
+      - A list of field names (for example V(customfield_10050)) that hold user values.
       - When O(cloud=true) and a listed field is present in O(fields) as a string containing C(@), the module resolves the
         email to a Jira Cloud account ID automatically.
-      - The built-in user fields V(assignee) and V(reporter) are always resolved; this option is only needed for additional
-        custom fields.
+      - The built-in user fields V(assignee) and V(reporter) are always resolved when present; list here any further
+        user-typed fields (from other Jira products or extensions) that should receive the same resolution.
     type: list
     elements: str
     default: []
@@ -554,7 +554,7 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 
 class JIRA(StateModuleHelper):
-    _USER_FIELDS = ["assignee", "reporter"]
+    USER_FIELDS = ["assignee", "reporter"]
 
     module = dict(
         argument_spec=dict(
@@ -670,39 +670,36 @@ class JIRA(StateModuleHelper):
         if self.vars.fields is None:
             self.vars.fields = {}
         if self.vars.assignee:
-            if self.vars.cloud and "@" in self.vars.assignee:
-                account_id = self._resolve_account_id(self.vars.assignee, "assignee")
-                self.vars.fields["assignee"] = {"accountId": account_id}
-            elif self.vars.cloud:
-                self.vars.fields["assignee"] = {"accountId": self.vars.assignee}
+            if self.vars.cloud:
+                self.vars.fields["assignee"] = self.vars.assignee
             else:
                 self.vars.fields["assignee"] = {"name": self.vars.assignee}
         if self.vars.account_id:
             self.vars.fields["assignee"] = {"accountId": self.vars.account_id}
-        self._resolve_user_fields()
+        self.resolve_user_fields()
 
-    def _resolve_user_fields(self):
+    def resolve_user_fields(self):
         if not self.vars.cloud or not self.vars.fields:
             return
-        user_fields = self._USER_FIELDS + (self.vars.custom_user_fields or [])
+        user_fields = self.USER_FIELDS + self.vars.custom_user_fields
         for field_name in user_fields:
             value = self.vars.fields.get(field_name)
             if not isinstance(value, str):
                 continue
             if "@" in value:
-                account_id = self._resolve_account_id(value, field_name)
+                account_id = self.resolve_account_id(value, field_name)
                 self.vars.fields[field_name] = {"accountId": account_id}
             else:
                 self.vars.fields[field_name] = {"accountId": value}
 
-    def _resolve_account_id(self, email, field_name="assignee"):
+    def resolve_account_id(self, email, field_name="assignee"):
         url = f"{self.vars.restbase}/user/search?query={quote(email, safe='')}"
         result = self.get(url)
         if not isinstance(result, list) or len(result) != 1:
             count = len(result) if isinstance(result, list) else 0
             self.module.fail_json(
                 msg=(
-                    f"Failed to resolve field {field_name!r} email {email!r} to a unique "
+                    f'Failed to resolve field "{field_name}" email "{email}" to a unique '
                     f"Jira Cloud account ID: found {count} result(s). "
                     f"Specify the account ID directly."
                 )
@@ -712,8 +709,8 @@ class JIRA(StateModuleHelper):
         if (user_email or "").lower() != email.lower():
             self.module.fail_json(
                 msg=(
-                    f"Failed to resolve field {field_name!r} email {email!r}: "
-                    f"the returned user's email address {user_email!r} does not match. "
+                    f"Failed to resolve field \"{field_name}\" email \"{email}\": "
+                    f"the returned user's email address \"{user_email}\" does not match. "
                     f"Specify the account ID directly."
                 )
             )
