@@ -1,0 +1,4 @@
+bugfixes:
+  - gitlab_project_members - fail with a clear error when multiple projects match the given name, instead of silently operating on the first result
+    (https://github.com/ansible-collections/community.general/issues/2767,
+    https://github.com/ansible-collections/community.general/pull/11851).
