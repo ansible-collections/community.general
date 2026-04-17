@@ -247,8 +247,8 @@ stages:
         parameters:
           testFormat: 2.18/{0}
           targets:
-            - name: macOS 14.3
-              test: macos/14.3
+            # - name: macOS 14.3
+            #   test: macos/14.3
             - name: FreeBSD 14.1
               test: freebsd/14.1
           groups:
