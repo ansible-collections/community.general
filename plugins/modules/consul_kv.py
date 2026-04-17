@@ -94,9 +94,15 @@ options:
     default: http
   validate_certs:
     description:
-      - Whether to verify the tls certificate of the Consul agent.
+      - Whether to verify the TLS certificate of the Consul agent.
+      - Instead of setting this to V(false), please consider using O(ca_path) instead.
     type: bool
     default: true
+  ca_path:
+    description:
+      - The CA bundle to use for HTTPS connections.
+    type: str
+    version_added: "12.6.0"
   datacenter:
     description:
       - The name of the datacenter to query. If unspecified, the query defaults to the datacenter of the Consul agent on O(host).
@@ -263,11 +269,14 @@ def remove_value(module):
 
 
 def get_consul_api(module):
+    ca_path = module.params.get("ca_path")
+    validate_certs = module.params.get("validate_certs")
+    verify = (ca_path or validate_certs) if validate_certs else False
     return consul.Consul(
         host=module.params.get("host"),
         port=module.params.get("port"),
         scheme=module.params.get("scheme"),
-        verify=module.params.get("validate_certs"),
+        verify=verify,
         token=module.params.get("token"),
         dc=module.params.get("datacenter"),
     )
@@ -291,6 +300,7 @@ def main():
             host=dict(type="str", default="localhost"),
             scheme=dict(type="str", default="http"),
             validate_certs=dict(type="bool", default=True),
+            ca_path=dict(type="str"),
             port=dict(type="int", default=8500),
             recurse=dict(type="bool"),
             retrieve=dict(type="bool", default=True),
