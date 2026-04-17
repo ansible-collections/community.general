@@ -283,7 +283,7 @@ class LookupModule(LookupBase):
         remaining_length = length - len(result)
         if min_non_special <= remaining_length:
             # atleast one non-special character
-            available_chars_set = available_chars_set.replace(special_chars, '')
+            available_chars_set = available_chars_set.replace(special_chars, "")
 
         result += [random_generator.choice(available_chars_set) for dummy in range(remaining_length)]
 
