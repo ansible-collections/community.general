@@ -799,6 +799,62 @@ class XenServerVM(XenServerObject):
                                 self.xapi_session.xenapi.VM.set_memory_limits(
                                     self.vm_ref, vm_memory_static_min_b, memory_b, memory_b, memory_b
                                 )
+
+                    elif change.get("cdrom"):
+                        vm_cdrom_params_list = [
+                            cdrom_params for cdrom_params in self.vm_params["VBDs"] if cdrom_params["type"] == "CD"
+                        ]
+
+                        # If there is no CD present, we have to create one.
+                        if not vm_cdrom_params_list:
+                            # We will try to place cdrom at userdevice position
+                            # 3 (which is default) if it is not already occupied
+                            # else we will place it at first allowed position.
+                            cdrom_userdevices_allowed = self.xapi_session.xenapi.VM.get_allowed_VBD_devices(self.vm_ref)
+
+                            if "3" in cdrom_userdevices_allowed:
+                                cdrom_userdevice = "3"
+                            else:
+                                cdrom_userdevice = cdrom_userdevices_allowed[0]
+
+                            cdrom_vbd = {
+                                "VM": self.vm_ref,
+                                "VDI": "OpaqueRef:NULL",
+                                "userdevice": cdrom_userdevice,
+                                "bootable": False,
+                                "mode": "RO",
+                                "type": "CD",
+                                "empty": True,
+                                "other_config": {},
+                                "qos_algorithm_type": "",
+                                "qos_algorithm_params": {},
+                            }
+
+                            cdrom_vbd_ref = self.xapi_session.xenapi.VBD.create(cdrom_vbd)
+                        else:
+                            cdrom_vbd_ref = self.xapi_session.xenapi.VBD.get_by_uuid(vm_cdrom_params_list[0]["uuid"])
+
+                        cdrom_is_empty = self.xapi_session.xenapi.VBD.get_empty(cdrom_vbd_ref)
+
+                        for cdrom_change in change["cdrom"]:
+                            if cdrom_change == "type":
+                                cdrom_type = self.module.params["cdrom"]["type"]
+
+                                if cdrom_type == "none" and not cdrom_is_empty:
+                                    self.xapi_session.xenapi.VBD.eject(cdrom_vbd_ref)
+                                elif cdrom_type == "host":
+                                    # Unimplemented!
+                                    pass
+
+                            elif cdrom_change == "iso_name":
+                                if not cdrom_is_empty:
+                                    self.xapi_session.xenapi.VBD.eject(cdrom_vbd_ref)
+
+                                cdrom_vdi_ref = self.xapi_session.xenapi.VDI.get_by_name_label(
+                                    self.module.params["cdrom"]["iso_name"]
+                                )[0]
+                                self.xapi_session.xenapi.VBD.insert(cdrom_vbd_ref, cdrom_vdi_ref)
+
                     elif change.get("disks_changed"):
                         vm_disk_params_list = [
                             disk_params for disk_params in self.vm_params["VBDs"] if disk_params["type"] == "Disk"
@@ -883,60 +939,6 @@ class XenServerVM(XenServerObject):
                             if self.vm_params["power_state"].lower() == "running":
                                 self.xapi_session.xenapi.VBD.plug(vbd_ref_new)
 
-                    elif change.get("cdrom"):
-                        vm_cdrom_params_list = [
-                            cdrom_params for cdrom_params in self.vm_params["VBDs"] if cdrom_params["type"] == "CD"
-                        ]
-
-                        # If there is no CD present, we have to create one.
-                        if not vm_cdrom_params_list:
-                            # We will try to place cdrom at userdevice position
-                            # 3 (which is default) if it is not already occupied
-                            # else we will place it at first allowed position.
-                            cdrom_userdevices_allowed = self.xapi_session.xenapi.VM.get_allowed_VBD_devices(self.vm_ref)
-
-                            if "3" in cdrom_userdevices_allowed:
-                                cdrom_userdevice = "3"
-                            else:
-                                cdrom_userdevice = cdrom_userdevices_allowed[0]
-
-                            cdrom_vbd = {
-                                "VM": self.vm_ref,
-                                "VDI": "OpaqueRef:NULL",
-                                "userdevice": cdrom_userdevice,
-                                "bootable": False,
-                                "mode": "RO",
-                                "type": "CD",
-                                "empty": True,
-                                "other_config": {},
-                                "qos_algorithm_type": "",
-                                "qos_algorithm_params": {},
-                            }
-
-                            cdrom_vbd_ref = self.xapi_session.xenapi.VBD.create(cdrom_vbd)
-                        else:
-                            cdrom_vbd_ref = self.xapi_session.xenapi.VBD.get_by_uuid(vm_cdrom_params_list[0]["uuid"])
-
-                        cdrom_is_empty = self.xapi_session.xenapi.VBD.get_empty(cdrom_vbd_ref)
-
-                        for cdrom_change in change["cdrom"]:
-                            if cdrom_change == "type":
-                                cdrom_type = self.module.params["cdrom"]["type"]
-
-                                if cdrom_type == "none" and not cdrom_is_empty:
-                                    self.xapi_session.xenapi.VBD.eject(cdrom_vbd_ref)
-                                elif cdrom_type == "host":
-                                    # Unimplemented!
-                                    pass
-
-                            elif cdrom_change == "iso_name":
-                                if not cdrom_is_empty:
-                                    self.xapi_session.xenapi.VBD.eject(cdrom_vbd_ref)
-
-                                cdrom_vdi_ref = self.xapi_session.xenapi.VDI.get_by_name_label(
-                                    self.module.params["cdrom"]["iso_name"]
-                                )[0]
-                                self.xapi_session.xenapi.VBD.insert(cdrom_vbd_ref, cdrom_vdi_ref)
                     elif change.get("networks_changed"):
                         for position, network_change_list in enumerate(change["networks_changed"]):
                             if network_change_list:
@@ -1455,11 +1457,79 @@ class XenServerVM(XenServerObject):
             if config_changes_hardware:
                 config_changes.append({"hardware": config_changes_hardware})
 
-            config_changes_disks = []
-            config_new_disks = []
-
             # Find allowed userdevices.
             vbd_userdevices_allowed = self.xapi_session.xenapi.VM.get_allowed_VBD_devices(self.vm_ref)
+
+            config_changes_cdrom = []
+
+            if self.module.params["cdrom"]:
+                # Get the list of all CD-ROMs. Filter out any regular disks
+                # found. If we found no existing CD-ROM, we will create it
+                # later else take the first one found.
+                vm_cdrom_params_list = [
+                    cdrom_params for cdrom_params in self.vm_params["VBDs"] if cdrom_params["type"] == "CD"
+                ]
+
+                # If no existing CD-ROM is found, we will need to add one.
+                if not vm_cdrom_params_list:
+                    # We need to check if there is any userdevice allowed.
+                    if not vbd_userdevices_allowed:
+                        self.module.fail_json(msg="VM check cdrom: maximum number of devices reached!")
+
+                    # If userdevice position 3 is available, we reserve it for
+                    # CD-ROM to prevent any disk taking the same position. If the
+                    # position 3 is not available, we reserve the first available
+                    # one to prevent any disk from taking it.
+                    if "3" in vbd_userdevices_allowed:
+                        vbd_userdevices_allowed.remove("3")
+                    else:
+                        vbd_userdevices_allowed.pop(0)
+
+                cdrom_type = self.module.params["cdrom"].get("type")
+                cdrom_iso_name = self.module.params["cdrom"].get("iso_name")
+
+                # If cdrom.iso_name is specified but cdrom.type is not,
+                # then set cdrom.type to 'iso', unless cdrom.iso_name is
+                # an empty string, in that case set cdrom.type to 'none'.
+                if not cdrom_type:
+                    if cdrom_iso_name:
+                        cdrom_type = "iso"
+                    elif cdrom_iso_name is not None:
+                        cdrom_type = "none"
+
+                    self.module.params["cdrom"]["type"] = cdrom_type
+
+                # If type changed.
+                if cdrom_type and (
+                    not vm_cdrom_params_list or cdrom_type != self.get_cdrom_type(vm_cdrom_params_list[0])
+                ):
+                    config_changes_cdrom.append("type")
+
+                if cdrom_type == "iso":
+                    # Check if ISO exists.
+                    # Check existence only. Ignore return value.
+                    get_object_ref(
+                        self.module,
+                        cdrom_iso_name,
+                        uuid=None,
+                        obj_type="ISO image",
+                        fail=True,
+                        msg_prefix="VM check cdrom.iso_name: ",
+                    )
+
+                    # Is ISO image changed?
+                    if cdrom_iso_name and (
+                        not vm_cdrom_params_list
+                        or not vm_cdrom_params_list[0]["VDI"]
+                        or cdrom_iso_name != vm_cdrom_params_list[0]["VDI"]["name_label"]
+                    ):
+                        config_changes_cdrom.append("iso_name")
+
+            if config_changes_cdrom:
+                config_changes.append({"cdrom": config_changes_cdrom})
+
+            config_changes_disks = []
+            config_new_disks = []
 
             if self.module.params["disks"]:
                 # Get the list of all disk. Filter out any CDs found.
@@ -1556,9 +1626,13 @@ class XenServerVM(XenServerObject):
                         # placed existing disk to maintain relative disk
                         # positions pairable with disk specifications in
                         # module params. That place must not be occupied by
-                        # some other device like CD-ROM.
+                        # some other device like CD-ROM. We also skip the
+                        # position number 3 to keep it reserved for the
+                        # CD-ROM drive. If CD-ROM drive ends up in the
+                        # position above 3 because we used it for a disk,
+                        # booting from ISO will not work (#11624).
                         for userdevice in vbd_userdevices_allowed:
-                            if int(userdevice) > int(vm_disk_userdevice_highest):
+                            if userdevice != "3" and int(userdevice) > int(vm_disk_userdevice_highest):
                                 disk_userdevice = userdevice
                                 vbd_userdevices_allowed.remove(userdevice)
                                 vm_disk_userdevice_highest = userdevice
@@ -1586,64 +1660,6 @@ class XenServerVM(XenServerObject):
 
             if config_new_disks:
                 config_changes.append({"disks_new": config_new_disks})
-
-            config_changes_cdrom = []
-
-            if self.module.params["cdrom"]:
-                # Get the list of all CD-ROMs. Filter out any regular disks
-                # found. If we found no existing CD-ROM, we will create it
-                # later else take the first one found.
-                vm_cdrom_params_list = [
-                    cdrom_params for cdrom_params in self.vm_params["VBDs"] if cdrom_params["type"] == "CD"
-                ]
-
-                # If no existing CD-ROM is found, we will need to add one.
-                # We need to check if there is any userdevice allowed.
-                if not vm_cdrom_params_list and not vbd_userdevices_allowed:
-                    self.module.fail_json(msg="VM check cdrom: maximum number of devices reached!")
-
-                cdrom_type = self.module.params["cdrom"].get("type")
-                cdrom_iso_name = self.module.params["cdrom"].get("iso_name")
-
-                # If cdrom.iso_name is specified but cdrom.type is not,
-                # then set cdrom.type to 'iso', unless cdrom.iso_name is
-                # an empty string, in that case set cdrom.type to 'none'.
-                if not cdrom_type:
-                    if cdrom_iso_name:
-                        cdrom_type = "iso"
-                    elif cdrom_iso_name is not None:
-                        cdrom_type = "none"
-
-                    self.module.params["cdrom"]["type"] = cdrom_type
-
-                # If type changed.
-                if cdrom_type and (
-                    not vm_cdrom_params_list or cdrom_type != self.get_cdrom_type(vm_cdrom_params_list[0])
-                ):
-                    config_changes_cdrom.append("type")
-
-                if cdrom_type == "iso":
-                    # Check if ISO exists.
-                    # Check existence only. Ignore return value.
-                    get_object_ref(
-                        self.module,
-                        cdrom_iso_name,
-                        uuid=None,
-                        obj_type="ISO image",
-                        fail=True,
-                        msg_prefix="VM check cdrom.iso_name: ",
-                    )
-
-                    # Is ISO image changed?
-                    if cdrom_iso_name and (
-                        not vm_cdrom_params_list
-                        or not vm_cdrom_params_list[0]["VDI"]
-                        or cdrom_iso_name != vm_cdrom_params_list[0]["VDI"]["name_label"]
-                    ):
-                        config_changes_cdrom.append("iso_name")
-
-            if config_changes_cdrom:
-                config_changes.append({"cdrom": config_changes_cdrom})
 
             config_changes_networks = []
             config_new_networks = []
