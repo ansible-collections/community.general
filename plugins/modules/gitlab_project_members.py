@@ -179,8 +179,15 @@ class GitLabProjectMembers:
             return project_exists.id
         except gitlab.exceptions.GitlabGetError:
             project_exists = self._gitlab.projects.list(search=project_name, all=False)
-            if project_exists:
+            if len(project_exists) == 1:
                 return project_exists[0].id
+            if len(project_exists) > 1:
+                self._module.fail_json(
+                    msg=(
+                        f"More than one project matches '{project_name}'. "
+                        "Use the full path ('group/project') to disambiguate."
+                    )
+                )
 
     def get_user_id(self, gitlab_user):
         user_exists = self._gitlab.users.list(username=gitlab_user, all=False)
