@@ -476,13 +476,11 @@ class HomebrewCask:
         rc, out, err = "", "", ""
 
         with tempfile.NamedTemporaryFile() as sudo_askpass_file:
-            sudo_askpass_file.write(b"#!/bin/sh\n\necho '%s'\n" % to_bytes(self.sudo_password))
+            sudo_askpass_file.write(to_bytes(f"#!/bin/sh\ncat <<'SUDO_PASS'\n{self.sudo_password}\nSUDO_PASS\n"))
+            sudo_askpass_file.flush()
             os.chmod(sudo_askpass_file.name, 0o700)
-            sudo_askpass_file.file.close()
 
             rc, out, err = self.module.run_command(cmd, environ_update={"SUDO_ASKPASS": sudo_askpass_file.name})
-
-            self.module.add_cleanup_file(sudo_askpass_file.name)
 
         return (rc, out, err)
 
