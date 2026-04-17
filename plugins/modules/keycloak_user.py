@@ -591,6 +591,7 @@ def main():
             if module.check_mode:
                 # after_user will not have changed, so use the desired user
                 result["diff"] = dict(before=before_user, after=desired_user)
+                changed = not is_struct_included(desired_user["groups"], before_user["groups"], excludes, empty_list_result=False)
             else:
                 result["diff"] = dict(before=before_user, after=after_user)
 
