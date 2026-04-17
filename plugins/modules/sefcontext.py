@@ -279,6 +279,10 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, substitute, 
     if module._diff and prepared_diff:
         result['diff'] = dict(prepared=prepared_diff)
 
+    if changed and not module.check_mode:
+        # Flush the in-process matchpathcon cache
+        selinux.matchpathcon_fini()
+
     module.exit_json(changed=changed, seuser=seuser, serange=serange, **result)
 
 
@@ -321,6 +325,10 @@ def semanage_fcontext_delete(module, result, target, ftype, setype, substitute, 
 
     if module._diff and prepared_diff:
         result['diff'] = dict(prepared=prepared_diff)
+
+    if changed and not module.check_mode:
+        # Flush the in-process matchpathcon cache
+        selinux.matchpathcon_fini()
 
     module.exit_json(changed=changed, **result)
 
