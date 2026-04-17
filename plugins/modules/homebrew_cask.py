@@ -150,6 +150,7 @@ EXAMPLES = r"""
 
 import os
 import re
+import shlex
 import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
@@ -477,7 +478,7 @@ class HomebrewCask:
         rc, out, err = "", "", ""
 
         with tempfile.NamedTemporaryFile() as sudo_askpass_file:
-            sudo_askpass_file.write(to_bytes(f"#!/bin/sh\ncat <<'SUDO_PASS'\n{self.sudo_password}\nSUDO_PASS\n"))
+            sudo_askpass_file.write(to_bytes(f"#!/bin/sh\necho {shlex.quote(self.sudo_password)}\n"))
             sudo_askpass_file.flush()
             os.chmod(sudo_askpass_file.name, 0o700)
 
