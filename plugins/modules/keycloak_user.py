@@ -455,7 +455,9 @@ def main():
     user_params = [
         x
         for x in module.params
-        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups", "keycloak_default_behavior"]
+        if x
+        not in list(keycloak_argument_spec().keys())
+        + ["state", "realm", "force", "groups", "keycloak_default_behavior"]
         and module.params.get(x) is not None
     ]
 
@@ -578,20 +580,22 @@ def main():
             # set user groups
             if kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
                 changed = True
-        
+
         after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
-        
+
         if module._diff:
             try:
                 # try to get the user groups
-                before_user["groups"] = kc.get_user_groups(user_id=before_user["id"], realm=realm)    
+                before_user["groups"] = kc.get_user_groups(user_id=before_user["id"], realm=realm)
             except:
                 before_user["groups"] = []
-            
+
             if module.check_mode:
                 # after_user will not have changed, so use the desired user
                 result["diff"] = dict(before=before_user, after=desired_user)
-                changed = not is_struct_included(desired_user["groups"], before_user["groups"], excludes, empty_list_result=False)
+                changed = not is_struct_included(
+                    desired_user["groups"], before_user["groups"], excludes, empty_list_result=False
+                )
             else:
                 result["diff"] = dict(before=before_user, after=after_user)
 

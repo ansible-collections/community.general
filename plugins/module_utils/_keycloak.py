@@ -322,7 +322,9 @@ def get_token(module_params: dict[str, t.Any]) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
 
-def is_struct_included(struct1: object, struct2: object, exclude: Sequence[str] | None = None, empty_list_result: bool = True) -> bool:
+def is_struct_included(
+    struct1: object, struct2: object, exclude: Sequence[str] | None = None, empty_list_result: bool = True
+) -> bool:
     """
     This function compare if the first parameter structure is included in the second.
     The function use every elements of struct1 and validates they are present in the struct2 structure.
@@ -359,7 +361,7 @@ def is_struct_included(struct1: object, struct2: object, exclude: Sequence[str] 
     if isinstance(struct1, list) and isinstance(struct2, list):
         if not struct1 and not struct2:
             return True
-        
+
         if not struct1:
             return empty_list_result
 
