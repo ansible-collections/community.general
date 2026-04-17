@@ -9,13 +9,13 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: keycloak_clientscope_rolemappings
 
-short_description: Allows administration of Keycloak clientscope roles scope to restrict the usage of certain roles to
-  specific clientscopes
+short_description: Allows administration of Keycloak client scope scope mappings to restrict the usage of certain roles to
+  specific client scopes
 
 version_added: TODO
 
 description:
-  - This module allows you to add or remove Keycloak roles from clientscopes using the Keycloak REST API. It requires access
+  - This module allows you to add or remove Keycloak roles from client scopes using the Keycloak REST API. It requires access
     to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
     In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
     the scope tailored to your needs and a user having the expected roles.
@@ -50,7 +50,7 @@ options:
     required: true
     type: str
     description:
-      - Roles provided in O(role_names) will be added to this clientscope.
+      - Roles provided in O(role_names) will be added to this client scope.
 
   client_id:
     type: str
@@ -80,7 +80,7 @@ author:
 """
 
 EXAMPLES = r"""
-- name: Add roles to clientscope
+- name: Add roles to client scope
   community.general.keycloak_clientscope_rolemappings:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -93,7 +93,7 @@ EXAMPLES = r"""
       - backend-role-admin
       - backend-role-user
 
-- name: Remove roles from clientscope
+- name: Remove roles from client scope
   community.general.keycloak_clientscope_rolemappings:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -106,7 +106,7 @@ EXAMPLES = r"""
       - backend-role-admin
     state: absent
 
-- name: Add realm roles to clientscope
+- name: Add realm roles to client scope
   community.general.keycloak_clientscope_rolemappings:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -124,28 +124,30 @@ msg:
   description: Message as to what action was taken.
   returned: always
   type: str
-  sample: "Client role scope for frontend-client-public has been updated"
+  sample: "Client scope scope mappings for frontend-client-public have been updated"
 
 end_state:
-  description: Representation of role role scope after module execution.
+  description: Representation of client scope scope mappings after module execution.
   returned: on success
   type: list
   elements: dict
   sample:
     [
       {
-        "clientRole": false,
-        "composite": false,
-        "containerId": "MyCustomRealm",
-        "id": "47293104-59a6-46f0-b460-2e9e3c9c424c",
-        "name": "backend-role-admin"
+            "clientRole": false,
+            "composite": false,
+            "containerId": "77f9bd4e-13a6-451e-9c72-ee6997299c1f",
+            "description": "User role",
+            "id": "9e155ef7-86f5-4def-b507-581ce7b87013",
+            "name": "realm-role-user"
       },
       {
-        "clientRole": false,
-        "composite": false,
-        "containerId": "MyCustomRealm",
-        "id": "39c62a6d-542c-4715-92d2-41021eb33967",
-        "name": "backend-role-user"
+            "clientRole": false,
+            "composite": false,
+            "containerId": "77f9bd4e-13a6-451e-9c72-ee6997299c1f",
+            "description": "Admin role",
+            "id": "9e155ef7-86f5-4def-b507-581ce7b87013",
+            "name": "realm-role-admin"
       }
     ]
 """
@@ -256,7 +258,7 @@ def main():
     if not result["changed"]:
         # no changes
         result["end_state"] = before_roles
-        result["msg"] = f"No changes required for client role scope {client_id}."
+        result["msg"] = f"No changes required for client scope {clientscope_id}."
     elif state == "present":
         # doing update
         if module.check_mode:
@@ -269,7 +271,7 @@ def main():
             result["end_state"] = kc.update_clientscope_scope_mappings_realm(
                 changed_roles, clientscope_object["id"], realm
             )
-        result["msg"] = f"Client role scope for {client_id} has been updated"
+        result["msg"] = f"Client scope scope mappings for {clientscope_id} have been updated"
     else:
         # doing delete
         if module.check_mode:
@@ -282,7 +284,7 @@ def main():
             result["end_state"] = kc.delete_clientscope_scope_mappings_realm(
                 changed_roles, clientscope_object["id"], realm
             )
-        result["msg"] = f"Client role scope for {client_id} has been deleted"
+        result["msg"] = f"Client scope scope mappings for {clientscope_id} have been deleted"
     module.exit_json(**result)
 
 
