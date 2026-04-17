@@ -198,12 +198,6 @@ from ansible.plugins.lookup import LookupBase
 
 class LookupModule(LookupBase):
     @staticmethod
-    def get_random(random_generator, chars, length):
-        if not chars:
-            raise AnsibleLookupError("Available characters cannot be None, please change constraints")
-        return "".join(random_generator.choice(chars) for dummy in range(length))
-
-    @staticmethod
     def b64encode(string_value, encoding="utf-8"):
         return to_text(base64.b64encode(to_bytes(string_value, encoding=encoding, errors="surrogate_or_strict")))
 
@@ -269,9 +263,9 @@ class LookupModule(LookupBase):
         min_special = self.get_option("min_special")
         min_non_special = min_numeric + min_lower + min_upper
         if avoid_special_first and avoid_special_last:
-            min_non_special += 2
+            min_non_special = max(min_non_special, 2)
         elif avoid_special_first or avoid_special_last:
-            min_non_special += 1
+            min_non_special = max(min_non_special, 1)
 
         if length < min_special + min_non_special:
             raise AnsibleLookupError("Minimum requirements exceed total length, please increase the length")
@@ -303,7 +297,7 @@ class LookupModule(LookupBase):
                     result[0], result[i] = result[i], result[0]
                     break
             else:
-                raise AnsibleLookupError("No character satisfies the constraints for avoid_special_first")
+                raise AssertionError("No character satisfies the constraints for avoid_special_first")
 
         if avoid_special_last and result[-1] in special_chars:
             for i in range(len(result) - 2, -1, -1):
@@ -311,7 +305,7 @@ class LookupModule(LookupBase):
                     result[-1], result[i] = result[i], result[-1]
                     break
             else:
-                raise AnsibleLookupError("No character satisfies the constraints for avoid_special_last")
+                raise AssertionError("No character satisfies the constraints for avoid_special_last")
 
         if base64_flag:
             return [self.b64encode("".join(result))]
