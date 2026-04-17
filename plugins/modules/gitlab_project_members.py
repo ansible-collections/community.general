@@ -183,8 +183,10 @@ class GitLabProjectMembers:
                 return project_exists[0].id
             if len(project_exists) > 1:
                 self._module.fail_json(
-                    msg=f"More than one project matches '{project_name}'. "
-                    "Use the full path ('group/project') to disambiguate."
+                    msg=(
+                        f"More than one project matches '{project_name}'. "
+                        "Use the full path ('group/project') to disambiguate."
+                    )
                 )
 
     def get_user_id(self, gitlab_user):
