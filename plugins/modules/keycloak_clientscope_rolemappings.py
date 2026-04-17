@@ -12,7 +12,7 @@ module: keycloak_clientscope_rolemappings
 short_description: Allows administration of Keycloak clientscope scope mappings to restrict the usage of certain roles to
   specific clientscopes
 
-version_added: TODO
+version_added: 12.6.0
 
 description:
   - This module allows you to add or remove Keycloak roles from clientscopes using the Keycloak REST API. It requires access
