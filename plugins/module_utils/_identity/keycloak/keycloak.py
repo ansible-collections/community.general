@@ -3279,7 +3279,7 @@ class KeycloakAPI:
                 e, msg=f"Could not fetch client roles from client {client_id} for client-scope {clientscope_id} in realm {realm}: {e}"
             )
 
-    def get_client_scope_from_client(self, clientid, clientscopeid, realm: str = "master"):
+    def get_client_role_scope_from_client(self, clientid, clientscopeid, realm: str = "master"):
         """Fetch the roles associated with the client's scope for a specific client on the Keycloak server.
         :param clientid: ID of the client from which to obtain the associated roles.
         :param clientscopeid: ID of the client who owns the roles.
