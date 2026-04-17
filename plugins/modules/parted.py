@@ -644,7 +644,7 @@ def main():
             state=dict(type="str", default="info", choices=["absent", "info", "present"]),
             # resize part
             resize=dict(type="bool", default=False),
-            unit_preserve_case=dict(type="bool"),
+            unit_preserve_case=dict(type="bool", default=False),
         ),
         required_if=[
             ["state", "present", ["number"]],
