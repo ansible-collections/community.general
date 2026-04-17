@@ -1,0 +1,4 @@
+bugfixes:
+  - homebrew_cask - fix failure when ``brew --version`` returns a placeholder version string
+    (https://github.com/ansible-collections/community.general/issues/4708,
+    https://github.com/ansible-collections/community.general/pull/11849).
