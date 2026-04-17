@@ -141,10 +141,11 @@ EXAMPLES = r"""
     greedy: true
 
 - name: Using sudo password for installing cask
+  # ansible_become_password must be set in inventory or group_vars; it is not populated by -K
   community.general.homebrew_cask:
     name: wireshark
     state: present
-    sudo_password: "{{ ansible_become_pass }}"
+    sudo_password: "{{ ansible_become_password }}"
 """
 
 import os
