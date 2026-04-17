@@ -174,7 +174,7 @@ def main():
 
     meta_args = dict(
         client_id=dict(type="str"),
-        client_scope_id=dict(type="str", required=True),
+        clientscope_id=dict(type="str", required=True),
         realm=dict(type="str", default="master"),
         role_names=dict(type="list", elements="str", required=True),
         state=dict(type="str", default="present", choices=["present", "absent"]),
@@ -196,7 +196,7 @@ def main():
 
     realm = module.params.get("realm")
     client_id = module.params.get("client_id")
-    clientscope_id = module.params.get("client_scope_id")
+    clientscope_id = module.params.get("clientscope_id")
     role_names = module.params.get("role_names")
     state = module.params.get("state")
 
