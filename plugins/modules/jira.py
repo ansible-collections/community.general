@@ -709,8 +709,8 @@ class JIRA(StateModuleHelper):
         if (user_email or "").lower() != email.lower():
             self.module.fail_json(
                 msg=(
-                    f"Failed to resolve field \"{field_name}\" email \"{email}\": "
-                    f"the returned user's email address \"{user_email}\" does not match. "
+                    f'Failed to resolve field "{field_name}" email "{email}": '
+                    f'the email address on the matched account "{user_email}" does not match. '
                     f"Specify the account ID directly."
                 )
             )
