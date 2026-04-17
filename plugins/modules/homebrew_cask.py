@@ -471,7 +471,7 @@ class HomebrewCask(object):
         rc, out, err = '', '', ''
 
         with tempfile.NamedTemporaryFile() as sudo_askpass_file:
-            sudo_askpass_file.write(to_bytes(f"#!/bin/sh\necho {shlex.quote(self.sudo_password)}\n"))
+            sudo_askpass_file.write(b"#!/bin/sh\necho %s\n" % to_bytes(shlex.quote(self.sudo_password)))
             sudo_askpass_file.flush()
             os.chmod(sudo_askpass_file.name, 0o700)
 
