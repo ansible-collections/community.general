@@ -845,6 +845,8 @@ files:
     maintainers: Gaetan2907
   $modules/keycloak_client_rolescope.py:
     maintainers: desand01
+  $modules/keycloak_clientscope_rolemappings.py:
+    maintainers: felix-grzelka
   $modules/keycloak_clientscope.py:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope_type.py:

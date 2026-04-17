@@ -73,7 +73,7 @@ extends_documentation_fragment:
   - community.general.attributes
 
 author:
-  - Felix Grzelka
+  - Felix Grzelka (@felix-grzelka)
   # TODO
   # adapted from keycloak_client_rolescope
   # - Andre Desrosiers (@desand01)
