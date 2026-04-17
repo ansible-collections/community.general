@@ -444,19 +444,27 @@ def main():
             else:
                 obj = umc_module_for_edit("users/user", user_dn)
 
-            if module.params["displayName"] is None:
-                module.params["displayName"] = f"{module.params['firstname']} {module.params['lastname']}"
+            if module.params["display_name"] is None:
+                module.params["display_name"] = f"{module.params['firstname']} {module.params['lastname']}"
             if module.params["unixhome"] is None:
                 module.params["unixhome"] = f"/home/{module.params['username']}"
+            # Build a mapping from alias names to canonical param names,
+            # so that UDM object keys (camelCase) can be resolved to the
+            # corresponding module.params keys (snake_case).
+            alias_to_param = {}
+            for param_name, param_spec in module.argument_spec.items():
+                for alias in param_spec.get("aliases", []):
+                    alias_to_param[alias] = param_name
             for k in obj.keys():
+                param_name = alias_to_param.get(k, k)
                 if (
                     k != "password"
                     and k != "groups"
                     and k != "overridePWHistory"
-                    and k in module.params
-                    and module.params[k] is not None
+                    and param_name in module.params
+                    and module.params[param_name] is not None
                 ):
-                    obj[k] = module.params[k]
+                    obj[k] = module.params[param_name]
             # handle some special values
             obj["e-mail"] = module.params["email"]
             if "userexpiry" in obj and obj.get("userexpiry") is None:
