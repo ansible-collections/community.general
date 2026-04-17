@@ -438,14 +438,18 @@ class HomebrewCask:
             return self.brew_version
 
         cmd = [self.brew_path, "--version"]
-
         dummy, out, dummy = self.module.run_command(cmd, check_rc=True)
 
         pattern = r"Homebrew (.*)(\d+\.\d+\.\d+)(-dirty)?"
         rematch = re.search(pattern, out)
         if not rematch:
             self.module.fail_json(msg="Failed to match regex to get brew version", stdout=out)
-        self.brew_version = rematch.groups()[1]
+
+        prefix, version, dummy = rematch.groups()
+        if ">=" in prefix:
+            version = "99.0.0"
+
+        self.brew_version = version
         return self.brew_version
 
     def _brew_cask_command_is_deprecated(self):
