@@ -261,11 +261,10 @@ def install(runner, user_dir=None):
             ctx.run()
 
 
-def uninstall(runner):
+def uninstall(runner, user_dir=None):
     args_order = [
         "_uninstall_subcmd",
         "norc",
-        "user_install",
         "install_dir",
         "bindir",
         "_uninstall_version",
@@ -274,7 +273,10 @@ def uninstall(runner):
         "name",
     ]
     with runner(args_order, check_mode_skip=True) as ctx:
-        return ctx.run(_uninstall_version=runner.module.params["version"])
+        kwargs = {"_uninstall_version": runner.module.params["version"]}
+        if user_dir:
+            kwargs["install_dir"] = user_dir
+        return ctx.run(**kwargs)
 
 
 def main():
@@ -332,7 +334,7 @@ def main():
             changed = True
     elif module.params["state"] == "absent":
         if exists(runner):
-            command_output = uninstall(runner)
+            command_output = uninstall(runner, user_dir)
             if command_output is not None and exists(runner):
                 rc, out, err = command_output
                 module.fail_json(
