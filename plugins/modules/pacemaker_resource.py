@@ -149,6 +149,7 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 from ansible_collections.community.general.plugins.module_utils.pacemaker import (
     get_pacemaker_maintenance_mode,
     pacemaker_runner,
+    wait_for_resource,
 )
 
 
@@ -237,7 +238,7 @@ class PacemakerResource(StateModuleHelper):
     def state_present(self):
         with self.runner(
             "cli_action state name resource_type resource_option resource_operation resource_meta resource_argument "
-            "resource_clone_ids resource_clone_meta wait",
+            "resource_clone_ids resource_clone_meta",
             output_process=self._process_command_output(
                 not get_pacemaker_maintenance_mode(self.runner), "already exists"
             ),
@@ -247,10 +248,12 @@ class PacemakerResource(StateModuleHelper):
                 cli_action="resource",
                 resource_clone_ids=self.fmt_as_stack_argument(self.module.params["resource_clone_ids"], "clone"),
             )
+        if not self.module.check_mode and self.vars.wait and not get_pacemaker_maintenance_mode(self.runner):
+            wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait)
 
     def state_cloned(self):
         with self.runner(
-            "cli_action state name resource_clone_ids resource_clone_meta wait",
+            "cli_action state name resource_clone_ids resource_clone_meta",
             output_process=self._process_command_output(
                 not get_pacemaker_maintenance_mode(self.runner), "already a clone resource"
             ),
@@ -260,6 +263,8 @@ class PacemakerResource(StateModuleHelper):
                 cli_action="resource",
                 resource_clone_meta=self.fmt_as_stack_argument(self.module.params["resource_clone_meta"], "meta"),
             )
+        if not self.module.check_mode and self.vars.wait and not get_pacemaker_maintenance_mode(self.runner):
+            wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait)
 
     def state_enabled(self):
         with self.runner(
