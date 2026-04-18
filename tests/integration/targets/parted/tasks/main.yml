@@ -84,3 +84,40 @@
       - fs2_succ is changed
       - partition_rem1 is changed
       - partition_rem1.partitions | length == 1
+
+- name: Get partition info with unit_preserve_case=true
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    state: info
+    unit: KiB
+    unit_preserve_case: true
+  register: info_preserve_true
+
+- name: Get partition info with unit_preserve_case=false
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    state: info
+    unit: KiB
+    unit_preserve_case: false
+  register: info_preserve_false
+
+- name: Assert unit_preserve_case results
+  assert:
+    that:
+      - info_preserve_true.disk.unit == "KiB"
+      - info_preserve_true.partitions[0].unit == "KiB"
+      - info_preserve_false.disk.unit == "kib"
+      - info_preserve_false.partitions[0].unit == "kib"
+
+- name: Use returned unit as input (round-trip) - regression test for issue 1860
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    state: info
+    unit: "{{ info_preserve_true.disk.unit }}"
+    unit_preserve_case: true
+  register: info_roundtrip
+
+- name: Assert round-trip succeeds and unit is consistent
+  assert:
+    that:
+      - info_roundtrip.disk.unit == info_preserve_true.disk.unit
