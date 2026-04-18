@@ -40,10 +40,25 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
           environ: *env-def
           rc: 0
           out: "Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPAddr2')"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
@@ -103,10 +118,25 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, clone, test_clone, test_clone_meta1=789, --wait=200]
+        - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, clone, test_clone, test_clone_meta1=789]
           environ: *env-def
           rc: 0
           out: "Assumed agent name 'ocf:heartbeat:IPaddr2'"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
@@ -142,11 +172,26 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
           environ: *env-def
           rc: 1
           out: ""
           err: "Error: 'virtual-ip' already exists\n"
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
           rc: 0
@@ -182,11 +227,22 @@ test_cases:
             have-watchdog=false
             maintenance-mode=true
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
           environ: *env-def
-          rc: 1
+          rc: 0
           out: ""
-          err: "Error: resource 'virtual-ip' is not running on any node"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+            maintenance-mode=true
+          err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
           rc: 0
@@ -222,11 +278,22 @@ test_cases:
             have-watchdog: false
             maintenance-mode: true
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
           environ: *env-def
-          rc: 1
+          rc: 0
           out: ""
-          err: "Error: resource 'virtual-ip' is not running on any node"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure: corosync
+            cluster-name: hacluster
+            dc-version: 2.1.9-1.fc41-7188dbf
+            have-watchdog: false
+            maintenance-mode: true
+          err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
           rc: 0
@@ -523,7 +590,7 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, clone, virtual-ip, --wait=300]
+        - command: [/testbin/pcs, resource, clone, virtual-ip]
           environ: *env-def
           rc: 1
           out: ""
@@ -558,10 +625,25 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, clone, virtual-ip, test_clone, meta, test_clone_meta1=789, --wait=200]
+        - command: [/testbin/pcs, resource, clone, virtual-ip, test_clone, meta, test_clone_meta1=789]
           environ: *env-def
           rc: 0
           out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
