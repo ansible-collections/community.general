@@ -140,13 +140,8 @@ def get_rubygems_path(module):
     return [module.get_bin_path("gem", True)]
 
 
-def get_user_install_dir(module, ver):
+def get_user_install_dir(module):
     cmd = get_rubygems_path(module)
-    if ver and ver >= (3, 1, 0):
-        rc, out, err = module.run_command(cmd + ["environment", "user_gemhome"], check_rc=True)
-        user_dir = out.strip()
-        if user_dir:
-            return user_dir
     rc, out, err = module.run_command(cmd + ["environment"], check_rc=True)
     for line in out.splitlines():
         match = re.search(r"USER INSTALLATION DIRECTORY:\s*(.+)", line)
@@ -270,6 +265,7 @@ def uninstall(runner):
     args_order = [
         "_uninstall_subcmd",
         "norc",
+        "user_install",
         "install_dir",
         "bindir",
         "_uninstall_version",
@@ -324,7 +320,7 @@ def main():
     # gems regardless of where they were installed.
     user_dir = None
     if module.params["user_install"] and not module.params["install_dir"]:
-        user_dir = get_user_install_dir(module, ver)
+        user_dir = get_user_install_dir(module)
 
     runner = make_runner(module, ver)
 
