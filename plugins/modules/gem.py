@@ -122,6 +122,7 @@ EXAMPLES = r"""
     state: present
 """
 
+import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
@@ -137,6 +138,21 @@ def get_rubygems_path(module):
     if module.params["executable"]:
         return module.params["executable"].split()
     return [module.get_bin_path("gem", True)]
+
+
+def get_user_install_dir(module, ver):
+    cmd = get_rubygems_path(module)
+    if ver and ver >= (3, 1, 0):
+        rc, out, err = module.run_command(cmd + ["environment", "user_gemhome"], check_rc=True)
+        user_dir = out.strip()
+        if user_dir:
+            return user_dir
+    rc, out, err = module.run_command(cmd + ["environment"], check_rc=True)
+    for line in out.splitlines():
+        match = re.search(r"USER INSTALLATION DIRECTORY:\s*(.+)", line)
+        if match:
+            return match.group(1).strip()
+    return None
 
 
 def get_rubygems_version(module):
@@ -225,7 +241,7 @@ def exists(runner):
     return bool(installed_versions)
 
 
-def install(runner):
+def install(runner, user_dir=None):
     args_order = [
         "_install_subcmd",
         "norc",
@@ -243,7 +259,11 @@ def install(runner):
         "force",
     ]
     with runner(args_order, check_mode_skip=True) as ctx:
-        ctx.run()
+        if user_dir:
+            bindir = runner.module.params["bindir"] or os.path.join(user_dir, "bin")
+            ctx.run(user_install=False, install_dir=user_dir, bindir=bindir)
+        else:
+            ctx.run()
 
 
 def uninstall(runner):
@@ -296,13 +316,23 @@ def main():
         module.params["gem_source"] = module.params["name"]
 
     ver = get_rubygems_version(module)
+
+    # Some OS distributions (e.g. Fedora via operating_system.rb) inject --install-dir as a
+    # platform default, which conflicts with --user-install at the gem CLI parser level.
+    # Resolve the user install dir explicitly and pass --install-dir to gem install instead.
+    # We do this only for the install command; uninstall must remain unscoped so gem can find
+    # gems regardless of where they were installed.
+    user_dir = None
+    if module.params["user_install"] and not module.params["install_dir"]:
+        user_dir = get_user_install_dir(module, ver)
+
     runner = make_runner(module, ver)
 
     changed = False
 
     if module.params["state"] in ["present", "latest"]:
         if not exists(runner):
-            install(runner)
+            install(runner, user_dir)
             changed = True
     elif module.params["state"] == "absent":
         if exists(runner):

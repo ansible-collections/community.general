@@ -30,49 +30,37 @@
       loop: "{{ test_packages }}"
       when: ansible_facts.distribution != "MacOSX"
 
-    - name: Install a gem
+    - name: Install a gem (default user_install)
       gem:
         name: gist
         state: present
       register: install_gem_result
-      ignore_errors: true
 
-    # when running as root on Fedora, '--install-dir' is set in the os defaults which is
-    # incompatible with '--user-install', we ignore this error for this case only
-    - name: fail if failed to install gem
-      fail:
-        msg: "failed to install gem: {{ install_gem_result.msg }}"
-      when:
-        - install_gem_result is failed
-        - not (ansible_facts.user_uid == 0 and "User --install-dir or --user-install but not both" not in install_gem_result.msg)
+    - name: List gems
+      command: gem list
+      register: current_gems
 
-    - block:
-        - name: List gems
-          command: gem list
-          register: current_gems
+    - name: Ensure gem was installed
+      assert:
+        that:
+          - install_gem_result is changed
+          - current_gems.stdout is search('gist\s+\([0-9.]+\)')
 
-        - name: Ensure gem was installed
-          assert:
-            that:
-              - install_gem_result is changed
-              - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+    - name: Remove a gem
+      gem:
+        name: gist
+        state: absent
+      register: remove_gem_results
 
-        - name: Remove a gem
-          gem:
-            name: gist
-            state: absent
-          register: remove_gem_results
+    - name: List gems
+      command: gem list
+      register: current_gems
 
-        - name: List gems
-          command: gem list
-          register: current_gems
-
-        - name: Verify gem is not installed
-          assert:
-            that:
-              - remove_gem_results is changed
-              - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
-      when: not install_gem_result is failed
+    - name: Verify gem is not installed
+      assert:
+        that:
+          - remove_gem_results is changed
+          - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
 
     # install gem in --no-user-install
     - block:
@@ -179,7 +167,7 @@
         state: present
         bindir: "{{ remote_tmp_dir }}/custom_bindir"
         norc: true
-        user_install: false  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
+        user_install: false
       register: install_gem_result
 
     - name: Get stats of gem executable
@@ -199,7 +187,7 @@
         state: absent
         bindir: "{{ remote_tmp_dir }}/custom_bindir"
         norc: true
-        user_install: false  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
+        user_install: false
       register: install_gem_result
 
     - name: Get stats of gem executable
