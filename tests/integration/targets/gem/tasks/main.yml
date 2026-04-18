@@ -85,6 +85,7 @@
           gem:
             name: gist
             state: absent
+            user_install: false
           register: remove_gem_results
 
         - name: List gems
