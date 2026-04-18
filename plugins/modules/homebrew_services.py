@@ -139,9 +139,6 @@ def validate_and_load_arguments(module: AnsibleModule) -> HomebrewServiceArgs:
         module.fail_json(msg=f"Invalid package name: {package}")
 
     state: t.Literal["present", "absent", "restarted"] = module.params["state"]
-    if state not in ["present", "absent", "restarted"]:
-        module.fail_json(msg=f"Invalid state: {state}")
-
     brew_path = parse_brew_path(module)
 
     return HomebrewServiceArgs(name=package, state=state, brew_path=brew_path)
@@ -158,7 +155,7 @@ def start_service(args: HomebrewServiceArgs, module: AnsibleModule) -> None:
         _exit_with_state(args, module, changed=True, message="Service would be started")
 
     start_cmd = [args.brew_path, "services", "start", args.name]
-    rc, stdout, stderr = module.run_command(start_cmd, check_rc=True)
+    module.run_command(start_cmd, check_rc=True)
 
     _exit_with_state(args, module, changed=True)
 
@@ -174,7 +171,7 @@ def stop_service(args: HomebrewServiceArgs, module: AnsibleModule) -> None:
         _exit_with_state(args, module, changed=True, message="Service would be stopped")
 
     stop_cmd = [args.brew_path, "services", "stop", args.name]
-    rc, stdout, stderr = module.run_command(stop_cmd, check_rc=True)
+    module.run_command(stop_cmd, check_rc=True)
 
     _exit_with_state(args, module, changed=True)
 
@@ -185,7 +182,7 @@ def restart_service(args: HomebrewServiceArgs, module: AnsibleModule) -> None:
         _exit_with_state(args, module, changed=True, message="Service would be restarted")
 
     restart_cmd = [args.brew_path, "services", "restart", args.name]
-    rc, stdout, stderr = module.run_command(restart_cmd, check_rc=True)
+    module.run_command(restart_cmd, check_rc=True)
 
     _exit_with_state(args, module, changed=True)
 
@@ -209,8 +206,6 @@ def main() -> None:
         ),
         supports_check_mode=True,
     )
-
-    module.run_command_environ_update = dict(LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C")
 
     # Pre-validate arguments.
     service_args = validate_and_load_arguments(module)
