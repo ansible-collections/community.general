@@ -200,8 +200,8 @@ class TestParted(ModuleTestCase):
 
     def test_parse_partition_info(self):
         """Test that the parse_partition_info returns the expected dictionary"""
-        self.assertEqual(parse_partition_info(parted_output1, "MB"), parted_dict1)
-        self.assertEqual(parse_partition_info(parted_output2, "MB"), parted_dict2)
+        self.assertEqual(parse_partition_info(parted_output1, "MB", False), parted_dict1)
+        self.assertEqual(parse_partition_info(parted_output2, "MB", False), parted_dict2)
 
     def test_partition_already_exists(self):
         with set_module_args(
