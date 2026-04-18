@@ -1,0 +1,5 @@
+bugfixes:
+  - gem - resolve the user gem installation directory and pass ``--install-dir`` to ``gem install``
+    instead of ``--user-install``, avoiding a conflict with OS-injected ``--install-dir`` defaults
+    on distributions such as Fedora (https://github.com/ansible-collections/community.general/issues/3259,
+    https://github.com/ansible-collections/community.general/pull/11873).
