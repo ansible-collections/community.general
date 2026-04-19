@@ -19,7 +19,8 @@ notes:
   - This module uses L(passlib, https://pypi.org/project/passlib/) for password hashing when available,
     falling back to the Python C(crypt) module or L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
-  - passlib (Python library, recommended) or crypt/legacycrypt
+  - passlib (Python library, recommended), or legacycrypt on Python 3.13 or newer
+  - It requires no dependency on Python 3.12 and earlier, but then it relies on the deprecated stdlib library C(crypt).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
