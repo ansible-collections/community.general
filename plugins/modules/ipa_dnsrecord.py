@@ -74,6 +74,20 @@ options:
       - Set the TTL for the record.
       - Applies only when adding a new or changing the value of O(record_value) or O(record_values).
     type: int
+  exclusive:
+    description:
+      - Whether the provided record value(s) should be the only ones for that record type and record name.
+      - When O(state=present) and V(true), the specified O(record_value) or O(record_values) will
+        replace all existing records of the same type and name.
+      - When O(state=present) and V(false), the specified values will be added to any existing records
+        of the same type and name, preserving values not listed.
+      - When O(state=absent) and V(true), all existing records of the same type and name will be removed,
+        regardless of the specified O(record_value) or O(record_values).
+      - When O(state=absent) and V(false), only the specified values will be removed from the record,
+        preserving other existing values.
+    type: bool
+    default: true
+    version_added: 12.6.0
   state:
     description: State to ensure.
     default: present
@@ -148,6 +162,17 @@ EXAMPLES = r"""
     record_values:
       - '1 mailserver-01.example.com'
       - '2 mailserver-02.example.com'
+
+- name: Ensure an SRV record is added without replacing existing ones
+  community.general.ipa_dnsrecord:
+    ipa_host: spider.example.com
+    ipa_pass: Passw0rd!
+    state: present
+    zone_name: example.com
+    record_name: _etcd-server-ssl._tcp.cloud.example.com.
+    record_type: 'SRV'
+    record_value: '0 10 2380 etcd-0.cloud.example.com.'
+    exclusive: false
 
 - name: Ensure that dns record is removed
   community.general.ipa_dnsrecord:
@@ -259,6 +284,21 @@ class DNSRecordIPAClient(IPAClient):
         return self._post_json(method="dnsrecord_del", name=zone_name, item=item)
 
 
+RECORD_TYPE_KEY = {
+    "A": "arecord",
+    "AAAA": "aaaarecord",
+    "A6": "a6record",
+    "CNAME": "cnamerecord",
+    "DNAME": "dnamerecord",
+    "NS": "nsrecord",
+    "PTR": "ptrrecord",
+    "TXT": "txtrecord",
+    "SRV": "srvrecord",
+    "MX": "mxrecord",
+    "SSHFP": "sshfprecord",
+}
+
+
 def get_dnsrecord_dict(details=None):
     module_dnsrecord = dict()
     if details["record_type"] == "A" and details["record_values"]:
@@ -300,6 +340,7 @@ def ensure(module, client):
     record_name = module.params["record_name"]
     record_ttl = module.params.get("record_ttl")
     state = module.params["state"]
+    exclusive = module.params["exclusive"]
 
     ipa_dnsrecord = client.dnsrecord_find(zone_name, record_name)
 
@@ -323,17 +364,37 @@ def ensure(module, client):
             changed = True
             if not module.check_mode:
                 client.dnsrecord_add(zone_name=zone_name, record_name=record_name, details=module_dnsrecord)
-        else:
+        elif exclusive:
             diff = get_dnsrecord_diff(client, ipa_dnsrecord, module_dnsrecord)
             if len(diff) > 0:
                 changed = True
                 if not module.check_mode:
                     client.dnsrecord_mod(zone_name=zone_name, record_name=record_name, details=module_dnsrecord)
+        else:
+            record_key = RECORD_TYPE_KEY.get(module_dnsrecord["record_type"])
+            current_values = ipa_dnsrecord.get(record_key, []) if record_key else []
+            missing_values = [v for v in record_values if v not in current_values]
+            if missing_values:
+                changed = True
+                if not module.check_mode:
+                    add_details = dict(module_dnsrecord, record_values=missing_values)
+                    client.dnsrecord_add(zone_name=zone_name, record_name=record_name, details=add_details)
     else:
-        if ipa_dnsrecord:
-            changed = True
-            if not module.check_mode:
-                client.dnsrecord_del(zone_name=zone_name, record_name=record_name, details=module_dnsrecord)
+        record_key = RECORD_TYPE_KEY.get(module_dnsrecord["record_type"])
+        current_values = ipa_dnsrecord.get(record_key, []) if (ipa_dnsrecord and record_key) else []
+        if exclusive:
+            if current_values:
+                changed = True
+                if not module.check_mode:
+                    del_details = dict(module_dnsrecord, record_values=current_values)
+                    client.dnsrecord_del(zone_name=zone_name, record_name=record_name, details=del_details)
+        else:
+            values_to_remove = [v for v in record_values if v in current_values]
+            if values_to_remove:
+                changed = True
+                if not module.check_mode:
+                    del_details = dict(module_dnsrecord, record_values=values_to_remove)
+                    client.dnsrecord_del(zone_name=zone_name, record_name=record_name, details=del_details)
 
     return changed, client.dnsrecord_find(zone_name, record_name)
 
@@ -349,6 +410,7 @@ def main():
         record_values=dict(type="list", elements="str"),
         state=dict(type="str", default="present", choices=["present", "absent"]),
         record_ttl=dict(type="int"),
+        exclusive=dict(type="bool", default=True),
     )
 
     module = AnsibleModule(
