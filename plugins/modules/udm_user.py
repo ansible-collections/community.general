@@ -324,9 +324,9 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("crypt_context"):
-    from ansible_collections.community.general.plugins.module_utils._crypt import CryptContext
+    from ansible_collections.community.general.plugins.module_utils._crypt import CryptContext, has_crypt_context
 
-    if CryptContext is None:
+    if not has_crypt_context:
         raise ImportError("Failed to import any of: passlib, crypt, legacycrypt")
 
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (

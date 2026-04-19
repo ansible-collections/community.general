@@ -4,8 +4,9 @@
 
 from __future__ import annotations
 
-__all__ = ["CryptContext"]
+__all__ = ["CryptContext", "has_crypt_context"]
 
+has_crypt_context = True
 try:
     from passlib.context import CryptContext
 
@@ -35,5 +36,10 @@ except ImportError:
                     raise ValueError(f"Unsupported scheme: {scheme}")
                 salt = _crypt_mod.mksalt(method, rounds=rounds)
                 return _crypt_mod.crypt(password, salt)
+
     except ImportError:
-        CryptContext = None
+
+        class CryptContext:  # type: ignore[no-redef]
+            pass
+
+        has_crypt_context = False
