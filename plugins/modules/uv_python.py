@@ -143,7 +143,7 @@ class UV:
         cmd = [self.bin_path, "--version", "--color", "never"]
         dummy_rc, out, dummy_err = self.module.run_command(cmd, check_rc=True)
         try:
-            detected = re.search(r"\b\d+(?:\.\d+)+\b", out).group()
+            detected = re.search(r"\b\d+(?:\.\d+)+\b", out).group()  # type: ignore[union-attr]
             if LooseVersion(detected) < LooseVersion(MINIMUM_UV_VERSION):
                 self.module.fail_json(
                     msg=f"uv_python module requires uv >= {MINIMUM_UV_VERSION}",
