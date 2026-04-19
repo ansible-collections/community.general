@@ -10,12 +10,11 @@ module: uv_python
 short_description: Manage Python versions and installations using the C(uv) Python package manager
 description:
   - Install, uninstall or upgrade Python versions managed by C(uv).
-version_added: "12.5.0"
+version_added: "13.0.0"
 requirements:
   - C(uv) must be installed and available in E(PATH) and must be at least 0.8.0.
-  - Python version must be at least 3.9.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -312,7 +311,7 @@ class UV:
                 result["parsed_version"] = StrictVersion(version)
                 valid_results.append(result)
             except ValueError:
-                self.module.debug(f"Found {version} available, but it's not yet supported by uv_python module.")
+                self.module.debug(f"Found {version!r} available, but it's not yet supported by uv_python module.")
         return valid_results
 
     @staticmethod

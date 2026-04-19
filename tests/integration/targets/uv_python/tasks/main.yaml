@@ -12,6 +12,15 @@
   ansible.builtin.pip:
     name: uv
 
+- name: Install uv in RHEL
+  when: ansible_facts['os_family'] == "RedHat"
+  shell: |
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  environment:
+    UV_INSTALL_DIR: "{{ ansible_env.HOME }}/ansible/bin"
+  args:
+    creates: "{{ ansible_env.HOME }}/ansible/bin/uv"
+
 - name: Check if Python 3.14 exists already
   command: uv python find 3.14
   ignore_errors: true
@@ -28,8 +37,8 @@
 - name: Verify Python 3.14 installation in check mode
   assert:
     that:
-      - install_check_mode.changed == check_python_314_exists.failed
-      - install_check_mode.failed is false
+      - (install_check_mode is changed) == (check_python_314_exists is failed)
+      - install_check_mode is not failed
       - install_check_mode.python_versions | length >= 1
 
 - name: Install Python 3.14
