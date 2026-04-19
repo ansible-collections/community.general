@@ -656,7 +656,7 @@ class HomebrewCask:
         else:
             rc, out, err = self.module.run_command(cmd)
 
-        if self._current_cask_is_installed() and not self._current_cask_is_outdated():
+        if rc == 0:
             self.changed_count += 1
             self.changed = True
             self.message = f"Cask upgraded: {self.current_cask}"
