@@ -605,7 +605,8 @@ def main():
         if vars is None:
             return "null"
         elif isinstance(vars, str):
-            return '"{string}"'.format(string=vars.replace("\\", "\\\\").replace('"', '\\"')).replace("\n", "\\n")
+            escaped = vars.replace("\\", "\\\\").replace('"', '\\"')
+            return f'"{escaped}"'.replace("\n", "\\n")
         elif isinstance(vars, bool):
             if vars:
                 return "true"

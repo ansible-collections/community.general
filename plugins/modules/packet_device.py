@@ -286,7 +286,7 @@ except ImportError:
     HAS_PACKET_SDK = False
 
 
-NAME_RE = r"({0}|{0}{1}*{0})".format(r"[a-zA-Z0-9]", r"[a-zA-Z0-9\-]")
+NAME_RE = r"([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])"
 HOSTNAME_RE = rf"({NAME_RE}\.)*{NAME_RE}$"
 MAX_DEVICES = 100
 

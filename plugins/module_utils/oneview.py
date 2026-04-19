@@ -186,7 +186,6 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
     MSG_DELETED = "Resource deleted successfully."
     MSG_ALREADY_PRESENT = "Resource is already present."
     MSG_ALREADY_ABSENT = "Resource is already absent."
-    MSG_DIFF_AT_KEY = "Difference found at key '{0}'. "
 
     ONEVIEW_COMMON_ARGS = dict(
         config=dict(type="path"),
@@ -407,7 +406,7 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
             if key not in resource2:
                 if resource1[key] is not None:
                     # Inexistent key is equivalent to exist with value None
-                    self.module.log(self.MSG_DIFF_AT_KEY.format(key) + debug_resources)
+                    self.module.log(f"Difference found at key '{key}'. {debug_resources}")
                     return False
             # If both values are null, empty or False it will be considered equal.
             elif not resource1[key] and not resource2[key]:
@@ -415,15 +414,15 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
             elif isinstance(resource1[key], Mapping):
                 # recursive call
                 if not self.compare(resource1[key], resource2[key]):
-                    self.module.log(self.MSG_DIFF_AT_KEY.format(key) + debug_resources)
+                    self.module.log(f"Difference found at key '{key}'. {debug_resources}")
                     return False
             elif isinstance(resource1[key], list):
                 # change comparison function to compare_list
                 if not self.compare_list(resource1[key], resource2[key]):
-                    self.module.log(self.MSG_DIFF_AT_KEY.format(key) + debug_resources)
+                    self.module.log(f"Difference found at key '{key}'. {debug_resources}")
                     return False
             elif _standardize_value(resource1[key]) != _standardize_value(resource2[key]):
-                self.module.log(self.MSG_DIFF_AT_KEY.format(key) + debug_resources)
+                self.module.log(f"Difference found at key '{key}'. {debug_resources}")
                 return False
 
         # Checks all keys in the second dict, looking for missing elements
@@ -431,7 +430,7 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
             if key not in resource1:
                 if resource2[key] is not None:
                     # Inexistent key is equivalent to exist with value None
-                    self.module.log(self.MSG_DIFF_AT_KEY.format(key) + debug_resources)
+                    self.module.log(f"Difference found at key '{key}'. {debug_resources}")
                     return False
 
         return True

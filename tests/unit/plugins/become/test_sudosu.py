@@ -50,17 +50,11 @@ def test_sudosu(mocker, parser, reset_cli_args):
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
+    password_pattern = r"\[sudo via ansible, key=.+?\] password:"
     assert (
         re.match(
-            """{} {} -p "{}" su -l {} {} -c 'echo {}; {}'""".format(
-                sudo_exe,
-                sudo_flags.replace("-n", ""),
-                r"\[sudo via ansible, key=.+?\] password:",
-                task["become_user"],
-                default_exe,
-                success,
-                default_cmd,
-            ),
+            f"""{sudo_exe} {sudo_flags.replace("-n", "")} -p "{password_pattern}" """
+            f"""su -l {task["become_user"]} {default_exe} -c 'echo {success}; {default_cmd}'""",
             cmd,
         )
         is not None

@@ -16,7 +16,7 @@ username = sys.argv[3]
 password = sys.argv[4]
 
 if username:
-    url = "http://{}:{}@127.0.0.1:9001/RPC2".format(quote(username, safe=""), quote(password, safe=""))
+    url = f"http://{quote(username, safe='')}:{quote(password, safe='')}@127.0.0.1:9001/RPC2"
 else:
     url = "http://127.0.0.1:9001/RPC2"
 
