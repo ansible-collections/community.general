@@ -19,7 +19,7 @@
     curl -LsSf https://astral.sh/uv/install.sh | sh
 
 - name: Install uv on FreeBSD
-  community.general.pkgng:
+  ansible.builtin.package:
     name: uv
     state: latest
   when: ansible_facts['os_family'] == "FreeBSD"
