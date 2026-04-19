@@ -1,0 +1,5 @@
+bugfixes:
+  - gitlab_project_variable - use ``find_project()`` from module utils for project lookup, consistent
+    with all other GitLab modules in the collection
+    (https://github.com/ansible-collections/community.general/issues/3157,
+    https://github.com/ansible-collections/community.general/pull/11878).
