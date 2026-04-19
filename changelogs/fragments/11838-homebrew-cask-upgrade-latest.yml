@@ -1,0 +1,6 @@
+bugfixes:
+  - homebrew_cask - fix false task failure when upgrading casks with ``version=latest``;
+    the post-upgrade check incorrectly re-ran ``brew outdated`` (which always lists ``latest``
+    casks as outdated under ``--greedy``), now uses the command exit code instead
+    (https://github.com/ansible-collections/community.general/issues/1647,
+    https://github.com/ansible-collections/community.general/pull/11838).
