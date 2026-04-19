@@ -53,7 +53,6 @@ def check_client(module: AnsibleModule) -> None:
 
 def validate_connection_params(module: AnsibleModule) -> dict[str, t.Any]:
     params: dict[str, t.Any] = module.params["manageiq_connection"]
-    error_str = "missing required argument: manageiq_connection[{}]"
     url: str | None = params["url"]
     token: str | None = params["token"]
     username: str | None = params["username"]
@@ -63,7 +62,7 @@ def validate_connection_params(module: AnsibleModule) -> dict[str, t.Any]:
         return params
     for arg in ["url", "username", "password"]:
         if params[arg] in (None, ""):
-            module.fail_json(msg=error_str.format(arg))
+            module.fail_json(msg=f"missing required argument: manageiq_connection[{arg}]")
     raise AssertionError("should be unreachable")
 
 
@@ -218,9 +217,9 @@ class ManageIQPolicies:
 
     def query_resource_profiles(self):
         """Returns a set of the profile objects objects assigned to the resource"""
-        url = "{resource_url}/policy_profiles?expand=resources"
+        url = f"{self.resource_url}/policy_profiles?expand=resources"
         try:
-            response = self.client.get(url.format(resource_url=self.resource_url))
+            response = self.client.get(url)
         except Exception as e:
             msg = f"Failed to query {self.resource_type} policies: {e}"
             self.module.fail_json(msg=msg)
@@ -235,9 +234,9 @@ class ManageIQPolicies:
 
     def query_profile_policies(self, profile_id):
         """Returns a set of the policy objects assigned to the resource"""
-        url = "{api_url}/policy_profiles/{profile_id}?expand=policies"
+        url = f"{self.api_url}/policy_profiles/{profile_id}?expand=policies"
         try:
-            response = self.client.get(url.format(api_url=self.api_url, profile_id=profile_id))
+            response = self.client.get(url)
         except Exception as e:
             msg = f"Failed to query {self.resource_type} policies: {e}"
             self.module.fail_json(msg=msg)
@@ -370,9 +369,9 @@ class ManageIQTags:
 
     def query_resource_tags(self):
         """Returns a set of the tag objects assigned to the resource"""
-        url = "{resource_url}/tags?expand=resources&attributes=categorization"
+        url = f"{self.resource_url}/tags?expand=resources&attributes=categorization"
         try:
-            response = self.client.get(url.format(resource_url=self.resource_url))
+            response = self.client.get(url)
         except Exception as e:
             msg = f"Failed to query {self.resource_type} tags: {e}"
             self.module.fail_json(msg=msg)

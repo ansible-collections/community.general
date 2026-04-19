@@ -135,8 +135,7 @@ class ManageIQAlertProfiles:
         # now that it has been created, we can assign the alerts
         self.assign_or_unassign(result["results"][0], alerts, "assign")
 
-        msg = "Profile {name} created successfully"
-        msg = msg.format(name=profile["name"])
+        msg = f"Profile {profile['name']} created successfully"
         return dict(changed=True, msg=msg)
 
     def delete_profile(self, profile):
@@ -161,12 +160,14 @@ class ManageIQAlertProfiles:
         try:
             result = self.client.post(subcollection_url, resources=alerts, action=action)
             if len(result["results"]) != len(alerts):
-                msg = "Failed to {action} alerts to profile '{name}',expected {expected} alerts to be {action}ed,but only {changed} were {action}ed"
-                msg = msg.format(action=action, name=profile["name"], expected=len(alerts), changed=result["results"])
+                msg = (
+                    f"Failed to {action} alerts to profile '{profile['name']}', "
+                    f"expected {len(alerts)} alerts to be {action}ed, "
+                    f"but only {result['results']} were {action}ed"
+                )
                 self.module.fail_json(msg=msg)
         except Exception as e:
-            msg = "Failed to {action} alerts to profile '{name}': {error}"
-            msg = msg.format(action=action, name=profile["name"], error=e)
+            msg = f"Failed to {action} alerts to profile '{profile['name']}': {e}"
             self.module.fail_json(msg=msg)
 
         return result["results"]
@@ -220,8 +221,7 @@ class ManageIQAlertProfiles:
             try:
                 self.client.post(old_profile["href"], resource=profile_dict, action="edit")
             except Exception as e:
-                msg = "Updating profile '{name}' failed: {error}"
-                msg = msg.format(name=old_profile["name"], error=e)
+                msg = f"Updating profile '{old_profile['name']}' failed: {e}"
                 self.module.fail_json(msg=msg)
 
         if changed:
@@ -280,8 +280,7 @@ def main():
             res_args = manageiq_alert_profiles.delete_profile(existing_profile)
         else:
             # This alert profile does not exist in ManageIQ, and that's okay
-            msg = "Alert profile '{name}' does not exist in ManageIQ"
-            msg = msg.format(name=name)
+            msg = f"Alert profile '{name}' does not exist in ManageIQ"
             res_args = dict(changed=False, msg=msg)
 
     module.exit_json(**res_args)
