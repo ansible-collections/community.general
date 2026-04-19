@@ -8,13 +8,18 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Install rust on FreeBSD
+  ansible.builtin.package:
+    name: rust
+    state: latest
+  when: ansible_facts['os_family'] == "FreeBSD"
+
 - name: Install uv python package
   ansible.builtin.pip:
     name: uv
-  when: ansible_facts['os_family'] != "FreeBSD"
 
 - name: Install uv in RHEL
-  when: ansible_facts['os_family'] in ["RedHat", "FreeBSD"]
+  when: ansible_facts['os_family'] == "RedHat"
   shell: |
     curl -LsSf https://astral.sh/uv/install.sh | sh
 
