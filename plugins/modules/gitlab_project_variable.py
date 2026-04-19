@@ -256,7 +256,7 @@ class GitlabProjectVariables:
     def get_project(self, project_name):
         project = find_project(self.repo, project_name)
         if project is None:
-            self._module.fail_json(msg=f"Project {project_name!r} not found or insufficient permissions.")
+            self._module.fail_json(msg=f"Project {project_name} not found or insufficient permissions.")
         return project
 
     def list_all_project_variables(self):
