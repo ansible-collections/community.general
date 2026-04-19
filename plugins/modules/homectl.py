@@ -15,10 +15,11 @@ version_added: 4.4.0
 description:
   - Manages a user's home directory managed by systemd-homed.
 notes:
-  - This module requires the deprecated L(crypt Python module, https://docs.python.org/3.12/library/crypt.html) library which
-    was removed from Python 3.13. For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
+  - This module uses L(passlib, https://pypi.org/project/passlib/) for password hashing when available,
+    falling back to the Python C(crypt) module or L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
-  - legacycrypt (on Python 3.13 or newer)
+  - passlib (Python library, recommended), or legacycrypt on Python 3.13 or newer
+  - It requires no dependency on Python 3.12 and earlier, but then it relies on the deprecated standard library C(crypt).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -268,38 +269,23 @@ data:
 """
 
 import json
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, jsonify, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule, jsonify
 from ansible.module_utils.common.text.formatters import human_to_bytes
 
-CRYPT_IMPORT_ERROR: str | None
-try:
-    import crypt
-except ImportError:
-    HAS_CRYPT = False
-    CRYPT_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_CRYPT = True
-    CRYPT_IMPORT_ERROR = None
+from ansible_collections.community.general.plugins.module_utils import deps
 
-LEGACYCRYPT_IMPORT_ERROR: str | None
-try:
-    import legacycrypt
+with deps.declare("crypt_context"):
+    from ansible_collections.community.general.plugins.module_utils._crypt import CryptContext, has_crypt_context
 
-    if not HAS_CRYPT:
-        crypt = legacycrypt
-except ImportError:
-    HAS_LEGACYCRYPT = False
-    LEGACYCRYPT_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_LEGACYCRYPT = True
-    LEGACYCRYPT_IMPORT_ERROR = None
+    if not has_crypt_context:
+        raise ImportError("Failed to import any of: passlib, crypt, legacycrypt")
 
 
 class Homectl:
-    def __init__(self, module):
+    def __init__(self, module, crypt_context):
         self.module = module
+        self.crypt_context = crypt_context
         self.state = module.params["state"]
         self.name = module.params["name"]
         self.password = module.params["password"]
@@ -364,14 +350,10 @@ class Homectl:
         return self.module.run_command(cmd, data=record)
 
     def _hash_password(self, password):
-        method = crypt.METHOD_SHA512
-        salt = crypt.mksalt(method, rounds=10000)
-        pw_hash = crypt.crypt(password, salt)
-        return pw_hash
+        return self.crypt_context.hash(password, scheme="sha512_crypt", rounds=10000)
 
     def _check_password(self, pwhash):
-        hash = crypt.crypt(self.password, pwhash)
-        return pwhash == hash
+        return self.crypt_context.verify(self.password, pwhash)
 
     def remove_user(self):
         cmd = [self.module.get_bin_path("homectl", True)]
@@ -616,13 +598,10 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    if not HAS_CRYPT and not HAS_LEGACYCRYPT:
-        module.fail_json(
-            msg=missing_required_lib("crypt (part of standard library up to Python 3.12) or legacycrypt (PyPI)"),
-            exception=CRYPT_IMPORT_ERROR,
-        )
+    deps.validate(module)
 
-    homectl = Homectl(module)
+    crypt_context = CryptContext(schemes=["sha512_crypt", "sha256_crypt", "md5_crypt", "des_crypt"])
+    homectl = Homectl(module, crypt_context)
     homectl.result["state"] = homectl.state
 
     # First we need to make sure homed service is active

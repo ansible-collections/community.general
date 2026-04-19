@@ -379,6 +379,8 @@ files:
   $module_utils/jenkins.py:
     labels: jenkins
     maintainers: russoz
+  $module_utils/_crypt.py:
+    maintainers: russoz
   $module_utils/_lxc.py:
     maintainers: russoz
   $module_utils/_lvm.py:

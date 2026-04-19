@@ -1,0 +1,6 @@
+bugfixes:
+  - homectl - allow to use passlib instead of legacycrypt for Python 3.13+
+    (https://github.com/ansible-collections/community.general/pull/11860).
+  - udm_user - allow to use passlib instead of legacycrypt for Python 3.13+
+    (https://github.com/ansible-collections/community.general/issues/4690,
+    https://github.com/ansible-collections/community.general/pull/11860).
