@@ -5,6 +5,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
+import hashlib
+import re
+
+from ansible.module_utils.basic import AnsibleModule
+
+
 DOCUMENTATION = r"""
 ---
 module: nfs_exports_info
@@ -60,35 +66,26 @@ file_digest:
     - At least one hash value is guaranteed to be present if the file exists and is readable.
   type: dict
   returned: always
-  sample:
-    sha256: "a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
-    sha1: "f7e8d9c0b1a23c4d5e6f7a8b9c0d1e2f3a4b5c6d"
-    md5: "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d"
 """
-
-from ansible.module_utils.basic import AnsibleModule
-import re
-import hashlib
 
 
 def get_exports(module, output_format, file_path="/etc/exports"):
-    IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
-    MAIN_LINE_PATTERN = re.compile(r'(/\S+)\s+(.+)')
+    ip_entry_pattern = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
+    main_line_pattern = re.compile(r'(/\S+)\s+(.+)')
 
     file_digests = {}
-    hash_algorithms = ['sha256', 'sha1', 'md5']
+    hash_algorithms = ["sha256", "sha1", "md5"]
 
     try:
-
         if not module.file_exists(file_path):
-            module.fail_json(msg="{} file not found".format(file_path))
+            module.fail_json(msg=f"{file_path} file not found")
 
         file_content_bytes = None
         try:
-            with open(file_path, 'rb') as f:
+            with open(file_path, "rb") as f:
                 file_content_bytes = f.read()
-        except IOError:
-            module.fail_json(msg="Could not read {}".format(file_path))
+        except OSError:
+            module.fail_json(msg=f"Could not read {file_path}")
 
         if file_content_bytes:
             for algo in hash_algorithms:
@@ -97,28 +94,34 @@ def get_exports(module, output_format, file_path="/etc/exports"):
                     hasher.update(file_content_bytes)
                     file_digests[algo] = hasher.hexdigest()
                 except ValueError:
-                    module.warn("Hash algorithm '{}' not available on this system. Skipping.".format(algo))
+                    module.warn(
+                        f"Hash algorithm '{algo}' not available on this system. Skipping."
+                    )
                 except Exception as ex:
-                    module.warn("Error calculating '{}' hash: {}".format(algo, ex))
+                    module.warn(f"Error calculating '{algo}' hash: {ex}")
+
         exports = {}
 
         output_lines = []
         if file_content_bytes:
-            output_lines = file_content_bytes.decode('utf-8', errors='ignore').splitlines()
+            output_lines = file_content_bytes.decode("utf-8", errors="ignore").splitlines()
+
         for line in output_lines:
             line = line.strip()
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
-            match = MAIN_LINE_PATTERN.match(line)
+
+            match = main_line_pattern.match(line)
             if not match:
                 continue
 
             folder = match.group(1)
             rest = match.group(2)
 
-            entries = IP_ENTRY_PATTERN.findall(rest)
+            entries = ip_entry_pattern.findall(rest)
+
             for ip, options_str in entries:
-                options = options_str.split(',')
+                options = options_str.split(",")
 
                 if output_format == "ips_per_share":
                     entry = {"ip": ip, "options": options}
@@ -133,33 +136,38 @@ def get_exports(module, output_format, file_path="/etc/exports"):
                     exports[ip].append(entry)
 
         return {
-            'exports_info': exports,
-            'file_digest': file_digests
+            "exports_info": exports,
+            "file_digest": file_digests,
         }
 
     except Exception as e:
-        module.fail_json(msg="Error while processing exports: {}".format(e))
+        module.fail_json(msg=f"Error while processing exports: {e}")
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            output_format=dict(type='str', required=True, choices=['ips_per_share', 'shares_per_ip'])
+            output_format=dict(
+                type="str",
+                required=True,
+                choices=["ips_per_share", "shares_per_ip"],
+            )
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
-    output_format = module.params['output_format']
+    output_format = module.params["output_format"]
     result = get_exports(module, output_format)
 
     module.exit_json(
         changed=False,
-        exports_info=result['exports_info'],
-        file_digest=result['file_digest']
+        exports_info=result["exports_info"],
+        file_digest=result["file_digest"],
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
-__all__ = ['get_exports']
+
+__all__ = ["get_exports"]
