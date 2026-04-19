@@ -16,10 +16,11 @@ description:
   - This module allows to manage posix users on a univention corporate server (UCS). It uses the Python API of the UCS to
     create a new object or edit it.
 notes:
-  - This module requires the deprecated L(crypt Python module, https://docs.python.org/3.12/library/crypt.html) library which
-    was removed from Python 3.13. For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
+  - This module uses L(passlib, https://pypi.org/project/passlib/) for password hashing when available,
+    falling back to the Python C(crypt) module or L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
-  - legacycrypt (on Python 3.13 or newer)
+  - passlib (Python library, recommended), or legacycrypt on Python 3.13 or newer
+  - It requires no dependency on Python 3.12 and earlier, but then it relies on the deprecated standard library C(crypt).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -316,10 +317,18 @@ EXAMPLES = r"""
 
 RETURN = """#"""
 
-import traceback
+
 from datetime import date, timedelta
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils import deps
+
+with deps.declare("crypt_context"):
+    from ansible_collections.community.general.plugins.module_utils._crypt import CryptContext, has_crypt_context
+
+    if not has_crypt_context:
+        raise ImportError("Failed to import any of: passlib, crypt, legacycrypt")
 
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
     base_dn,
@@ -327,29 +336,6 @@ from ansible_collections.community.general.plugins.module_utils.univention_umc i
     umc_module_for_add,
     umc_module_for_edit,
 )
-
-CRYPT_IMPORT_ERROR: str | None
-try:
-    import crypt
-except ImportError:
-    HAS_CRYPT = False
-    CRYPT_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_CRYPT = True
-    CRYPT_IMPORT_ERROR = None
-
-LEGACYCRYPT_IMPORT_ERROR: str | None
-try:
-    import legacycrypt
-
-    if not HAS_CRYPT:
-        crypt = legacycrypt
-except ImportError:
-    HAS_LEGACYCRYPT = False
-    LEGACYCRYPT_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_LEGACYCRYPT = True
-    LEGACYCRYPT_IMPORT_ERROR = None
 
 
 def main():
@@ -410,11 +396,9 @@ def main():
         required_if=([("state", "present", ["firstname", "lastname", "password"])]),
     )
 
-    if not HAS_CRYPT and not HAS_LEGACYCRYPT:
-        module.fail_json(
-            msg=missing_required_lib("crypt (part of standard library up to Python 3.12) or legacycrypt (PyPI)"),
-            exception=LEGACYCRYPT_IMPORT_ERROR,
-        )
+    deps.validate(module)
+
+    crypt_context = CryptContext(schemes=["sha512_crypt", "sha256_crypt", "md5_crypt", "des_crypt"])
 
     username = module.params["username"]
     position = module.params["position"]
@@ -474,7 +458,7 @@ def main():
                 obj["password"] = password
             if module.params["update_password"] == "always":
                 old_password = obj["password"].split("}", 2)[1]
-                if crypt.crypt(password, old_password) != old_password:
+                if not crypt_context.verify(password, old_password):
                     obj["overridePWHistory"] = module.params["overridePWHistory"]
                     obj["overridePWLength"] = module.params["overridePWLength"]
                     obj["password"] = password
