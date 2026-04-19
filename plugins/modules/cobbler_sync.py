@@ -99,9 +99,9 @@ def main():
     use_ssl = module.params["use_ssl"]
     validate_certs = module.params["validate_certs"]
 
-    module.params["proto"] = "https" if use_ssl else "http"
+    proto = "https" if use_ssl else "http"
     if not port:
-        module.params["port"] = "443" if use_ssl else "80"
+        port = "443" if use_ssl else "80"
 
     result = dict(
         changed=True,
@@ -111,17 +111,13 @@ def main():
 
     ssl_context = None if validate_certs or not use_ssl else ssl._create_unverified_context()
 
-    url = "{proto}://{host}:{port}/cobbler_api".format(**module.params)
+    url = f"{proto}://{module.params['host']}:{port}/cobbler_api"
     conn = xmlrpc_client.ServerProxy(url, context=ssl_context)
 
     try:
         token = conn.login(username, password)
     except xmlrpc_client.Fault as e:
-        module.fail_json(
-            msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(
-                url=url, error=f"{e}", **module.params
-            )
-        )
+        module.fail_json(msg=f"Failed to log in to Cobbler '{url}' as '{username}'. {e}")
     except Exception as e:
         module.fail_json(msg=f"Connection to '{url}' failed. {e}")
 

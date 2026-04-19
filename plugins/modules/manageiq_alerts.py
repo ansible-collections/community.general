@@ -213,30 +213,25 @@ class ManageIQAlerts:
         try:
             result = self.client.post(self.alerts_url, action="create", resource=alert)
 
-            msg = "Alert {description} created successfully: {details}"
-            msg = msg.format(description=alert["description"], details=result)
+            msg = f"Alert {alert['description']} created successfully: {result}"
             return dict(changed=True, msg=msg)
         except Exception as e:
-            msg = "Creating alert {description} failed: {error}"
+            description = alert["description"]
             if "Resource expression needs be specified" in str(e):
                 # Running on an older version of ManageIQ and trying to create a hash expression
-                msg = msg.format(
-                    description=alert["description"], error="Your version of ManageIQ does not support hash_expression"
-                )
+                msg = f"Creating alert {description} failed: Your version of ManageIQ does not support hash_expression"
             else:
-                msg = msg.format(description=alert["description"], error=e)
+                msg = f"Creating alert {description} failed: {e}"
             self.module.fail_json(msg=msg)
 
     def delete_alert(self, alert):
         """Delete an alert"""
         try:
             result = self.client.post(f"{self.alerts_url}/{alert['id']}", action="delete")
-            msg = "Alert {description} deleted: {details}"
-            msg = msg.format(description=alert["description"], details=result)
+            msg = f"Alert {alert['description']} deleted: {result}"
             return dict(changed=True, msg=msg)
         except Exception as e:
-            msg = "Deleting alert {description} failed: {error}"
-            msg = msg.format(description=alert["description"], error=e)
+            msg = f"Deleting alert {alert['description']} failed: {e}"
             self.module.fail_json(msg=msg)
 
     def update_alert(self, existing_alert, new_alert):
@@ -254,27 +249,22 @@ class ManageIQAlerts:
                 # the result to the expected result.
                 if new_alert_obj == ManageIQAlert(result):
                     # success!
-                    msg = "Alert {description} updated successfully: {details}"
-                    msg = msg.format(description=existing_alert["description"], details=result)
+                    msg = f"Alert {existing_alert['description']} updated successfully: {result}"
 
                     return dict(changed=True, msg=msg)
                 else:
                     # unexpected result
-                    msg = "Updating alert {description} failed, unexpected result {details}"
-                    msg = msg.format(description=existing_alert["description"], details=result)
+                    msg = f"Updating alert {existing_alert['description']} failed, unexpected result {result}"
 
                     self.module.fail_json(msg=msg)
 
             except Exception as e:
-                msg = "Updating alert {description} failed: {error}"
+                description = existing_alert["description"]
                 if "Resource expression needs be specified" in str(e):
                     # Running on an older version of ManageIQ and trying to update a hash expression
-                    msg = msg.format(
-                        description=existing_alert["description"],
-                        error="Your version of ManageIQ does not support hash_expression",
-                    )
+                    msg = f"Updating alert {description} failed: Your version of ManageIQ does not support hash_expression"
                 else:
-                    msg = msg.format(description=existing_alert["description"], error=e)
+                    msg = f"Updating alert {description} failed: {e}"
                 self.module.fail_json(msg=msg)
 
 
@@ -337,8 +327,7 @@ def main():
             res_args = manageiq_alerts.delete_alert(existing_alert)
         else:
             # it doesn't exist, and that's okay
-            msg = "Alert '{description}' does not exist in ManageIQ"
-            msg = msg.format(description=description)
+            msg = f"Alert '{description}' does not exist in ManageIQ"
             res_args = dict(changed=False, msg=msg)
 
     module.exit_json(**res_args)
