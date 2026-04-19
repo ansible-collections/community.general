@@ -15,8 +15,11 @@ short_description: Manage posix users on a univention corporate server
 description:
   - This module allows to manage posix users on a univention corporate server (UCS). It uses the Python API of the UCS to
     create a new object or edit it.
+notes:
+  - This module uses L(passlib, https://pypi.org/project/passlib/) for password hashing when available,
+    falling back to the Python C(crypt) module or L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
-  - passlib (Python library)
+  - passlib (Python library, recommended) or crypt/legacycrypt
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -313,20 +316,25 @@ EXAMPLES = r"""
 
 RETURN = """#"""
 
+
 from datetime import date, timedelta
 
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils import deps
+
+with deps.declare("crypt_context"):
+    from ansible_collections.community.general.plugins.module_utils._crypt import CryptContext
+
+    if CryptContext is None:
+        raise ImportError("Failed to import any of: passlib, crypt, legacycrypt")
+
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
     base_dn,
     ldap_search,
     umc_module_for_add,
     umc_module_for_edit,
 )
-
-with deps.declare("passlib", url="https://pypi.org/project/passlib/"):
-    from passlib.context import CryptContext
 
 
 def main():
