@@ -55,8 +55,8 @@
 - name: Verify Python 3.14 re-installation
   assert:
     that:
-      - reinstall_python.changed is false
-      - reinstall_python.failed is false
+      - reinstall_python is not changed
+      - reinstall_python is not failed
       - reinstall_python.python_versions | length >= 1
       - reinstall_python.python_paths | length >= 1
 
