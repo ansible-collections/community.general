@@ -275,12 +275,14 @@ def pubnub_account(module, user):
         account_name = params.get("account")
         account = user.account(name=params.get("account"))
         if account is None:
-            err_frmt = (
-                "It looks like there is no '{0}' account for "
-                "authorized user. Please make sure what correct "
-                "name has been passed during module configuration."
+            module.fail_json(
+                msg="Missing account.",
+                description=(
+                    f"It looks like there is no '{account_name}' account for authorized user. "
+                    "Please make sure what correct name has been passed during module configuration."
+                ),
+                changed=False,
             )
-            module.fail_json(msg="Missing account.", description=err_frmt.format(account_name), changed=False)
     else:
         account = user.accounts()[0]
 
@@ -312,14 +314,15 @@ def pubnub_application(module, account):
         module.fail_json(msg=exc_msg, description=exc_descr, changed=account.changed, module_cache=dict(account))
 
     if application is None:
-        err_fmt = (
-            "There is no '{0}' application for {1}. Make sure what "
-            "correct application name has been passed. If application "
-            "doesn't exist you can create it on admin.pubnub.com."
-        )
         email = account.owner.email
         module.fail_json(
-            msg=err_fmt.format(params["application"], email), changed=account.changed, module_cache=dict(account)
+            msg=(
+                f"There is no '{params['application']}' application for {email}. "
+                "Make sure what correct application name has been passed. "
+                "If application doesn't exist you can create it on admin.pubnub.com."
+            ),
+            changed=account.changed,
+            module_cache=dict(account),
         )
 
     return application
@@ -346,13 +349,14 @@ def pubnub_keyset(module, account, application):
     params = module.params
     keyset = application.keyset(params["keyset"])
     if keyset is None:
-        err_fmt = (
-            "There is no '{0}' keyset for '{1}' application. Make "
-            "sure what correct keyset name has been passed. If keyset "
-            "doesn't exist you can create it on admin.pubnub.com."
-        )
         module.fail_json(
-            msg=err_fmt.format(params["keyset"], application.name), changed=account.changed, module_cache=dict(account)
+            msg=(
+                f"There is no '{params['keyset']}' keyset for '{application.name}' application. "
+                "Make sure what correct keyset name has been passed. "
+                "If keyset doesn't exist you can create it on admin.pubnub.com."
+            ),
+            changed=account.changed,
+            module_cache=dict(account),
         )
 
     return keyset

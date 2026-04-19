@@ -63,17 +63,10 @@ def test_dzdo(mocker, parser, reset_cli_args):
     task["become_pass"] = "testpass"
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
+    password_pattern = r"\"\[dzdo via ansible, key=.+?\] password:\""
     assert (
         re.match(
-            """{} {} -p {} -u {} {} -c 'echo {}; {}'""".format(
-                dzdo_exe,
-                dzdo_flags,
-                r"\"\[dzdo via ansible, key=.+?\] password:\"",
-                task["become_user"],
-                default_exe,
-                success,
-                default_cmd,
-            ),
+            f"""{dzdo_exe} {dzdo_flags} -p {password_pattern} -u {task["become_user"]} {default_exe} -c 'echo {success}; {default_cmd}'""",
             cmd,
         )
         is not None
@@ -112,17 +105,10 @@ def test_dzdo_varoptions(mocker, parser, reset_cli_args):
     var_options["ansible_become_pass"] = "testpass"
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
+    password_pattern = r"\"\[dzdo via ansible, key=.+?\] password:\""
     assert (
         re.match(
-            """{} {} -p {} -u {} {} -c 'echo {}; {}'""".format(
-                dzdo_exe,
-                dzdo_flags,
-                r"\"\[dzdo via ansible, key=.+?\] password:\"",
-                var_options["ansible_become_user"],
-                default_exe,
-                success,
-                default_cmd,
-            ),
+            f"""{dzdo_exe} {dzdo_flags} -p {password_pattern} -u {var_options["ansible_become_user"]} {default_exe} -c 'echo {success}; {default_cmd}'""",
             cmd,
         )
         is not None
