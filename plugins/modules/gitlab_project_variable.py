@@ -240,6 +240,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec,
     filter_returned_variables,
+    find_project,
     gitlab_authentication,
     list_all_kwargs,
     vars_to_variables,
@@ -249,11 +250,14 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 class GitlabProjectVariables:
     def __init__(self, module, gitlab_instance):
         self.repo = gitlab_instance
-        self.project = self.get_project(module.params["project"])
         self._module = module
+        self.project = self.get_project(module.params["project"])
 
     def get_project(self, project_name):
-        return self.repo.projects.get(project_name)
+        project = find_project(self.repo, project_name)
+        if project is None:
+            self._module.fail_json(msg=f"Project {project_name} not found or insufficient permissions.")
+        return project
 
     def list_all_project_variables(self):
         return list(self.project.variables.list(**list_all_kwargs))
