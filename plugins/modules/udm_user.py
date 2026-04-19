@@ -20,7 +20,7 @@ notes:
     falling back to the Python C(crypt) module or L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
   - passlib (Python library, recommended), or legacycrypt on Python 3.13 or newer
-  - It requires no dependency on Python 3.12 and earlier, but then it relies on the deprecated stdlib library C(crypt).
+  - It requires no dependency on Python 3.12 and earlier, but then it relies on the deprecated standard library C(crypt).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
