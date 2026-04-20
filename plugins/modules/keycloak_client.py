@@ -582,6 +582,7 @@ extends_documentation_fragment:
 
 author:
   - Eike Frost (@eikef)
+  - Ivan Kokalović (@koke1997)
 """
 
 EXAMPLES = r"""

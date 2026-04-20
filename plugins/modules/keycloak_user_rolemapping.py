@@ -105,6 +105,7 @@ extends_documentation_fragment:
 
 author:
   - Dušan Marković (@bratwurzt)
+  - Ivan Kokalović (@koke1997)
 """
 
 EXAMPLES = r"""
