@@ -98,7 +98,7 @@ exclusions = [
     "consul_acl_bootstrap",
     "consul_kv",
 ]
-doc_fragment = "community.general.consul._actiongroup_consul"
+doc_fragment = "community.general._consul.actiongroup_consul"
 
 [[sessions.extra_checks.action_groups_config]]
 name = "keycloak"
@@ -106,12 +106,12 @@ pattern = "^keycloak_.*$"
 exclusions = [
     "keycloak_realm_info",
 ]
-doc_fragment = "community.general.keycloak._actiongroup_keycloak"
+doc_fragment = "community.general._keycloak.actiongroup_keycloak"
 
 [[sessions.extra_checks.action_groups_config]]
 name = "scaleway"
 pattern = "^scaleway_.*$"
-doc_fragment = "community.general.scaleway._actiongroup_scaleway"
+doc_fragment = "community.general._scaleway.actiongroup_scaleway"
 
 [sessions.build_import_check]
 run_galaxy_importer = true
