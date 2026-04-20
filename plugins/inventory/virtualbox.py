@@ -16,8 +16,8 @@ description:
   - A separate parameter, O(enable_advanced_group_parsing) is exposed to change grouping behaviour. See the parameter documentation
     for details.
 extends_documentation_fragment:
-  - constructed
-  - inventory_cache
+  - ansible.builtin.constructed
+  - ansible.builtin.inventory_cache
 options:
   plugin:
     description: Token that ensures this is a source file for the P(community.general.virtualbox#inventory) plugin.

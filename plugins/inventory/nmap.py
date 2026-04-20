@@ -11,8 +11,8 @@ short_description: Uses nmap to find hosts to target
 description:
   - Uses a YAML configuration file with a valid YAML extension.
 extends_documentation_fragment:
-  - constructed
-  - inventory_cache
+  - ansible.builtin.constructed
+  - ansible.builtin.inventory_cache
 requirements:
   - nmap CLI installed
 options:

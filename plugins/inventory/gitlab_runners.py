@@ -13,7 +13,7 @@ short_description: Ansible dynamic inventory plugin for GitLab runners
 requirements:
   - python-gitlab > 1.8.0
 extends_documentation_fragment:
-  - constructed
+  - ansible.builtin.constructed
 description:
   - Reads inventories from the GitLab API.
   - Uses a YAML configuration file gitlab_runners.[yml|yaml].
