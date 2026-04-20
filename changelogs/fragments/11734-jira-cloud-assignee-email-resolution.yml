@@ -1,0 +1,7 @@
+minor_changes:
+  - jira - when ``cloud=true``, user-type fields
+    (``assignee``, ``reporter``, and any listed in the new
+    ``custom_user_fields`` parameter) containing an email
+    address are automatically resolved to Jira Cloud
+    account IDs
+    (https://github.com/ansible-collections/community.general/issues/11734, https://github.com/ansible-collections/community.general/pull/11735).
