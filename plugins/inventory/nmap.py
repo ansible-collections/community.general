@@ -154,6 +154,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             hostname = host["name"]
             self.inventory.add_host(hostname)
             for var, value in host.items():
+                if var == "name":
+                    continue
                 self.inventory.set_variable(hostname, var, value)
 
             # Composed variables
