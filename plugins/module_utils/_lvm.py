@@ -363,13 +363,14 @@ def lvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     """
     Runner for C(lvcreate). Used by: community.general.lvol, community.general.lxc_container.
 
-    Suggested args order (normal LV): test yes lv size_L vg pvs
-    Suggested args order (snapshot):  test yes size_L is_snapshot lv vg
-    Suggested args order (thin pool): test yes lv size_L thin vg pvs
-    Suggested args order (thin vol):  test yes lv size_V thin vg
+    Suggested args order (normal LV): test yes lv size_L opts vg pvs
+    Suggested args order (snapshot):  test yes size_L is_snapshot lv opts vg
+    Suggested args order (thin pool): test yes size_L opts thin vg pvs
+    Suggested args order (thin vol):  test yes lv size_V opts thin vg
 
     Note: C(vg) must appear after all option args and before C(pvs).
     For snapshots and thin volumes, pass the origin as C(vg="{vg}/{lv}").
+    C(opts) accepts a pre-split list (e.g. from C(shlex.split())).
 
     Intentional mismatches with module parameters:
     - C(lv) matches O(lv) in community.general.lvol (the LV name, passed as C(-n lv)).
@@ -382,6 +383,8 @@ def lvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
       must always pass the appropriate size key explicitly.
     - C(pvs) matches O(pvs) in community.general.lvol; callers must pass the value
       explicitly since it is the list of PV paths, not the full module param value.
+    - C(opts) matches O(opts) in community.general.lvol; callers must pass the
+      pre-split list explicitly.
     """
     return CmdRunner(
         module,
@@ -395,6 +398,7 @@ def lvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             size_V=cmd_runner_fmt.as_opt_val("-V"),
             is_snapshot=cmd_runner_fmt.as_bool("-s"),
             thin=cmd_runner_fmt.as_fixed("-T"),
+            opts=cmd_runner_fmt.as_list(),
             vg=cmd_runner_fmt.as_list(),
             pvs=cmd_runner_fmt.as_list(),
         ),
