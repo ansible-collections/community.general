@@ -17,7 +17,7 @@ requirements:
   - pdpyras python module = 4.1.1
   - PagerDuty API Access
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

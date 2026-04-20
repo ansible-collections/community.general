@@ -20,7 +20,7 @@ author:
   - Maxime de Roucy (@tchernomax)
   - Jean Raby (@jraby)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

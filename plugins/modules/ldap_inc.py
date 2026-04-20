@@ -60,8 +60,8 @@ options:
       - If V(auto), the module determines automatically the method to use.
       - If V(rfc4525) or V(legacy) force to use the corresponding method.
 extends_documentation_fragment:
-  - community.general.ldap.documentation
-  - community.general.attributes
+  - community.general._ldap.documentation
+  - community.general._attributes
 """
 
 

@@ -82,9 +82,9 @@ seealso:
     description: You can specify list of supported locales using O(community.general.keycloak_realm#module:supported_locales).
 
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author: Jakub Danek (@danekja)
 """

@@ -15,7 +15,7 @@ short_description: Manage Gandi LiveDNS records
 description:
   - 'Manages DNS records by the Gandi LiveDNS API, see the docs: U(https://doc.livedns.gandi.net/).'
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

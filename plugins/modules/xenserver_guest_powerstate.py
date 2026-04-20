@@ -68,8 +68,8 @@ options:
     type: int
     default: 0
 extends_documentation_fragment:
-  - community.general.xenserver.documentation
-  - community.general.attributes
+  - community.general._xenserver.documentation
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

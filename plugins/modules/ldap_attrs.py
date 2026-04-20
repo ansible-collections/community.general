@@ -79,8 +79,8 @@ options:
       - If V(true), prepend list values with X-ORDERED index numbers in all attributes specified in the current task. This
         is useful mostly with C(olcAccess) attribute to easily manage LDAP Access Control Lists.
 extends_documentation_fragment:
-  - community.general.ldap.documentation
-  - community.general.attributes
+  - community.general._ldap.documentation
+  - community.general._attributes
 """
 
 

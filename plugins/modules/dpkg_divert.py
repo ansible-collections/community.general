@@ -21,7 +21,7 @@ description:
     or remove a diversion for a given file, but also update an existing diversion to modify its O(holder) and/or its O(divert)
     location.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

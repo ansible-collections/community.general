@@ -34,8 +34,8 @@ options:
   service_account_token:
     version_added: 7.1.0
 extends_documentation_fragment:
-  - community.general.onepassword
-  - community.general.onepassword.lookup
+  - community.general._onepassword
+  - community.general._onepassword.lookup
 """
 
 EXAMPLES = r"""

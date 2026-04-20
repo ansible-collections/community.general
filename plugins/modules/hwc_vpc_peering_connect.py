@@ -73,8 +73,8 @@ options:
       - The description of vpc peering connection.
     type: str
 extends_documentation_fragment:
-  - community.general.hwc
-  - community.general.attributes
+  - community.general._hwc
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

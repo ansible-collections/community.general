@@ -20,7 +20,7 @@ requirements:
   - If the version of C(parted) is below 3.1, it requires a Linux version running the C(sysfs) file system C(/sys/).
   - Requires the C(resizepart) command when using the O(resize) parameter.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

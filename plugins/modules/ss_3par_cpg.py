@@ -85,8 +85,8 @@ options:
     type: bool
     default: false
 extends_documentation_fragment:
-  - community.general.hpe3par
-  - community.general.attributes
+  - community.general._hpe3par
+  - community.general._attributes
 """
 
 

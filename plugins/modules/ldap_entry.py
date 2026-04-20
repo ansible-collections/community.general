@@ -74,8 +74,8 @@ options:
     default: false
     version_added: 4.6.0
 extends_documentation_fragment:
-  - community.general.ldap.documentation
-  - community.general.attributes
+  - community.general._ldap.documentation
+  - community.general._attributes
 """
 
 

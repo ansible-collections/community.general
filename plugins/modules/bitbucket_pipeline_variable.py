@@ -14,8 +14,8 @@ description:
 author:
   - Evgeniy Krysanov (@catcombo)
 extends_documentation_fragment:
-  - community.general.bitbucket
-  - community.general.attributes
+  - community.general._bitbucket
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

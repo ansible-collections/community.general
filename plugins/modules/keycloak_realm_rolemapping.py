@@ -103,9 +103,9 @@ options:
           - This parameter is not required for updating or deleting a role_representation but providing it reduces the number
             of API calls required.
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Gaëtan Daubresse (@Gaetan2907)

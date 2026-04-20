@@ -104,7 +104,7 @@ notes:
     your own release name with O(release). Due to the nature of deploying software, this should not be much of a problem.
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

@@ -19,7 +19,7 @@ seealso:
     description: Complete documentation for Pacemaker STONITH.
     link: https://clusterlabs.org/projects/pacemaker/doc/3.0/Pacemaker_Explained/html/resources.html#stonith
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

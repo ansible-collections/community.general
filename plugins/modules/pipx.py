@@ -13,8 +13,8 @@ version_added: 3.8.0
 description:
   - Manage Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.pipx
+  - community.general._attributes
+  - community.general._pipx
 attributes:
   check_mode:
     support: full

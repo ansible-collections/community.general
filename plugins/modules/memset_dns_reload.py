@@ -18,7 +18,7 @@ notes:
 description:
   - Request a reload of Memset's DNS infrastructure, and optionally poll until it finishes.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

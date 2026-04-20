@@ -64,9 +64,9 @@ options:
       - Optional lifespan (in seconds) for the action token (supported on newer Keycloak versions). Forwarded as query parameter if provided.
     type: int
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 author:
   - Marius Bertram (@mariusbertram)
 """

@@ -14,7 +14,7 @@ author: "Nate Kingsley (@nate-kingsley)"
 requirements:
   - Valid Uptime Robot API Key
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

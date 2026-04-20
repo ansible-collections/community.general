@@ -12,7 +12,7 @@ short_description: Publish a message on an MQTT topic for the IoT
 description:
   - Publish a message on an MQTT topic.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

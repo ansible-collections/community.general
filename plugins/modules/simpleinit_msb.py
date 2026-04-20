@@ -15,7 +15,7 @@ description:
   - Controls services on remote hosts using C(simpleinit-msb).
 author: "Vlad Glagolev (@vaygr)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -20,7 +20,7 @@ version_added: 10.7.0
 description:
   - This module allows configuring the default handler for specific MIME types when you use applications that rely on XDG.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

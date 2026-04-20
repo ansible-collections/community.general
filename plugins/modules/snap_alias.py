@@ -14,7 +14,7 @@ version_added: 4.0.0
 description:
   - Manages snaps aliases.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

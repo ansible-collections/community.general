@@ -15,7 +15,7 @@ requirements:
   - "python-jenkins >= 0.4.12"
 author: "Sergio Millan Rodriguez (@sermilrod)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

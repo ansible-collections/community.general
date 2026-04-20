@@ -19,7 +19,7 @@ requirements:
   - Univention
   - ipaddress (for O(type=ptr_record))
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

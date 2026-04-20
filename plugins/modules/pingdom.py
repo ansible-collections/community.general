@@ -16,7 +16,7 @@ author:
 requirements:
   - "This pingdom python library: U(https://github.com/mbabineau/pingdom-python)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

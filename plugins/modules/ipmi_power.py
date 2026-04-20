@@ -12,7 +12,7 @@ short_description: Power management for machine
 description:
   - Use this module for power management.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

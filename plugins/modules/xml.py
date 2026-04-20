@@ -15,7 +15,7 @@ short_description: Manage bits and pieces of XML files or strings
 description:
   - A CRUD-like interface to managing bits of XML files.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

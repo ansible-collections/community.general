@@ -15,9 +15,9 @@ description:
   - Runs the C(facter) discovery program (U(https://github.com/puppetlabs/facter)) on the remote system, returning Ansible
     facts from the JSON data that can be useful for inventory purposes.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.facts
-  - community.general.attributes.facts_module
+  - community.general._attributes
+  - community.general._attributes.facts
+  - community.general._attributes.facts_module
 options:
   arguments:
     description:

@@ -14,8 +14,8 @@ description:
   - This module returns details about all storage pools or a specific storage pool.
 author: "Sean McAvoy (@smcavoy)"
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 attributes:
   check_mode:
     support: full

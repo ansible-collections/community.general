@@ -14,8 +14,8 @@ version_added: 9.0.0
 description:
   - This module allows the execution of arbitrary Django admin commands.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.django
+  - community.general._attributes
+  - community.general._django
 attributes:
   check_mode:
     support: none

@@ -18,7 +18,7 @@ requirements:
   - C(ipmctl) and C(ndctl) command line tools
   - xmltodict
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

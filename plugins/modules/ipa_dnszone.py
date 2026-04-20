@@ -38,9 +38,9 @@ options:
     type: bool
     version_added: 4.3.0
 extends_documentation_fragment:
-  - community.general.ipa.documentation
-  - community.general.ipa.connection_notes
-  - community.general.attributes
+  - community.general._ipa.documentation
+  - community.general._ipa.connection_notes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

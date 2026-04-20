@@ -17,7 +17,7 @@ description:
 requirements:
   - C(open_iscsi) library and tools C(iscsiadm)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -11,8 +11,8 @@ module: manageiq_tags
 
 short_description: Management of resource tags in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Daniel Korn (@dkorn)
 description:

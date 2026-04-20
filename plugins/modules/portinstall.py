@@ -15,7 +15,7 @@ short_description: Installing packages from FreeBSD's ports system
 description:
   - Manage packages for FreeBSD using C(portinstall).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -12,7 +12,7 @@ short_description: Send a message to jabber user or chat room
 description:
   - Send a message to jabber.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -12,7 +12,7 @@ short_description: Interact with GitHub Releases
 description:
   - Fetch metadata about GitHub Releases.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

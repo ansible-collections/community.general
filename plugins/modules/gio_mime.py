@@ -15,7 +15,7 @@ description:
   - This module allows configuring the default handler for a specific MIME type, to be used by applications built with the
     Gnome GIO API.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -13,7 +13,7 @@ short_description: Get details reported by LLDP
 description:
   - Reads data out of C(lldpctl).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

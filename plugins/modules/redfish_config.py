@@ -14,8 +14,8 @@ description:
   - Manages BIOS configuration settings.
   - Manages OOB controller configuration settings.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: none

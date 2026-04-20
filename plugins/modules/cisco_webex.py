@@ -16,7 +16,7 @@ notes:
   - The O(recipient_type) must be valid for the supplied O(recipient_id).
   - Full API documentation can be found at U(https://developer.webex.com/docs/api/basics).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

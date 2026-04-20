@@ -67,9 +67,9 @@ options:
     type: dict
 
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Björn Bösel (@fivetide)

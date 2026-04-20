@@ -14,7 +14,7 @@ description:
 notes:
   - You need a pushover.net account to use this module. But no account is required to receive messages.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

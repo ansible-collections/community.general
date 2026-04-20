@@ -22,7 +22,7 @@ requirements:
   - passlib (Python library, recommended), or legacycrypt on Python 3.13 or newer
   - It requires no dependency on Python 3.12 and earlier, but then it relies on the deprecated standard library C(crypt).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

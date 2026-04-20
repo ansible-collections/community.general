@@ -13,7 +13,7 @@ module: archive
 short_description: Creates a compressed archive of one or more files or trees
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 description:
   - Creates or extends an archive.
   - The source and archive are on the target host, and the archive I(is not) copied to the controller host.

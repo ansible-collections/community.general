@@ -11,8 +11,8 @@ short_description: Show python path and assert dependency versions
 description:
   - Get info about available Python requirements on the target host, including listing required libraries and gathering versions.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   dependencies:
     type: list

@@ -17,8 +17,8 @@ requirements:
 author:
   - Juan Casanova (@juanmcasanova)
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   name:
     description:

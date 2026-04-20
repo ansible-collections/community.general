@@ -103,8 +103,8 @@ options:
       - Specifies the ID of shared bandwidth.
     type: str
 extends_documentation_fragment:
-  - community.general.hwc
-  - community.general.attributes
+  - community.general._hwc
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

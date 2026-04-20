@@ -42,8 +42,8 @@ options:
 
 
 extends_documentation_fragment:
-  - community.general.redis.documentation
-  - community.general.attributes
+  - community.general._redis.documentation
+  - community.general._attributes
 
 seealso:
   - module: community.general.redis_data

@@ -27,7 +27,7 @@ description:
     or a I(icinga.cfg) in I(/etc/icinga) and I(/usr/local/icinga/etc).
     (The Nagios configuration file should be readable by the Ansible user.)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

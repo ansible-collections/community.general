@@ -35,10 +35,10 @@ options:
       - The start point to return the results.
     default: 0
 extends_documentation_fragment:
-  - community.general.rundeck
+  - community.general._rundeck
   - ansible.builtin.url
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""

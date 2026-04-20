@@ -13,7 +13,7 @@ description:
   - Notify BigPanda when deployments start and end (successfully or not). Returns a deployment object containing all the parameters
     for future module calls.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

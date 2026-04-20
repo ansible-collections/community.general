@@ -15,7 +15,7 @@ short_description: Add and remove Zypper repositories
 description:
   - Add or remove Zypper repositories on SUSE and openSUSE.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -15,7 +15,7 @@ description:
   - IPS packages are the native packages in Solaris 11 and higher.
   - This module configures which publishers a client downloads IPS packages from.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

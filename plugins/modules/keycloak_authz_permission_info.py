@@ -46,10 +46,10 @@ options:
     required: true
 
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 author:
   - Samuli Seppänen (@mattock)

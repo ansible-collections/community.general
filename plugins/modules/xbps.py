@@ -16,7 +16,7 @@ author:
   - "Dino Occhialini (@dinoocch)"
   - "Michael Aldridge (@the-maldridge)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

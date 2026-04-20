@@ -15,7 +15,7 @@ description:
     or V(usb).'
   - This module requires the hpilo python module.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

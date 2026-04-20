@@ -12,7 +12,7 @@ short_description: Adds or removes Vertica database roles and assigns roles to t
 description:
   - Adds or removes Vertica database role and, optionally, assign other roles.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

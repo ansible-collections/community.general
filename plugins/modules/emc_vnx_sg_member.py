@@ -17,8 +17,8 @@ short_description: Manage storage group member on EMC VNX
 description:
   - This module manages the members of an existing storage group.
 extends_documentation_fragment:
-  - community.general.emc.emc_vnx
-  - community.general.attributes
+  - community.general._emc.emc_vnx
+  - community.general._attributes
 
 attributes:
   check_mode:

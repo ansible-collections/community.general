@@ -16,9 +16,9 @@ author:
   - Tim Rupp (@caphrim007)
   - Robin Lee (@cheese)
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.facts
-  - community.general.attributes.facts_module
+  - community.general._attributes
+  - community.general._attributes.facts
+  - community.general._attributes.facts_module
 attributes:
   check_mode:
     version_added: 3.3.0

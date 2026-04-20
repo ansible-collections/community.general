@@ -14,7 +14,7 @@ description:
   - Builds OCAPI URIs locally and sends them to remote OOB controllers to perform an action.
   - Manages OOB controller such as Indicator LED, Reboot, Power Mode, Firmware Update.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

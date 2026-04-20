@@ -68,9 +68,9 @@ options:
       - Send a job abort request if exceeded the O(wait_execution_timeout) specified.
     default: false
 extends_documentation_fragment:
-  - community.general.rundeck
+  - community.general._rundeck
   - ansible.builtin.url
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

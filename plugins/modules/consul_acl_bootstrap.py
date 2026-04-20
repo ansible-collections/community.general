@@ -16,8 +16,8 @@ description:
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
-  - community.general.consul
-  - community.general.attributes
+  - community.general._consul
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

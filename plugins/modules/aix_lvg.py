@@ -20,7 +20,7 @@ deprecated:
     Use C(ibm.power_aix.lvg) instead.
     See U(https://ibm.github.io/ansible-power-aix/modules/lvg.html) for details.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

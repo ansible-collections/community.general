@@ -115,7 +115,7 @@ author:
   - quidame (@quidame)
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 seealso:
   - module: community.crypto.openssl_pkcs12
   - module: community.general.java_cert

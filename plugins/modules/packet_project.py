@@ -22,7 +22,7 @@ author:
   - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
 
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:

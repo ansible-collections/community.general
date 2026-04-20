@@ -51,8 +51,8 @@ options:
     type: list
     elements: dict
 extends_documentation_fragment:
-  - community.general.influxdb
-  - community.general.attributes
+  - community.general._influxdb
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

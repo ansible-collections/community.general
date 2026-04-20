@@ -16,8 +16,8 @@ short_description: List Zypper repositories
 description:
   - List Zypper repositories on SUSE and openSUSE.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 requirements:
   - "zypper >= 1.0 (included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0)"

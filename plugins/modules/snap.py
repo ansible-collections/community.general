@@ -17,7 +17,7 @@ short_description: Manages snaps
 description:
   - Manages snaps packages.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

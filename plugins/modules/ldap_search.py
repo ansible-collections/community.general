@@ -70,8 +70,8 @@ options:
     elements: str
     version_added: 7.0.0
 extends_documentation_fragment:
-  - community.general.ldap.documentation
-  - community.general.attributes
+  - community.general._ldap.documentation
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

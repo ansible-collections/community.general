@@ -58,8 +58,8 @@ options:
     version_added: '0.2.0'
 extends_documentation_fragment:
   - ansible.builtin.url
-  - community.general.attributes
-  - community.general.rundeck
+  - community.general._attributes
+  - community.general._rundeck
 """
 
 EXAMPLES = r"""

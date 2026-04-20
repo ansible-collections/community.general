@@ -13,7 +13,7 @@ version_added: 1.1.0
 description:
   - Manage OpenBSD system upgrades using C(sysupgrade).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -13,8 +13,8 @@ short_description: Manages Pritunl Organizations using the Pritunl API
 description:
   - A module to manage Pritunl organizations using the Pritunl API.
 extends_documentation_fragment:
-  - community.general.pritunl
-  - community.general.attributes
+  - community.general._pritunl
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -14,8 +14,8 @@ version_added: 9.1.0
 description:
   - This module is a wrapper for the execution of C(django-admin check).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.django
+  - community.general._attributes
+  - community.general._django
 options:
   databases:
     description:

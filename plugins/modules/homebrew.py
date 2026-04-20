@@ -23,7 +23,7 @@ short_description: Package manager for Homebrew
 description:
   - Manages Homebrew packages.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

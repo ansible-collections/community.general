@@ -23,9 +23,9 @@ author:
 requirements:
   - python-gitlab python module
 extends_documentation_fragment:
-  - community.general.auth_basic
-  - community.general.gitlab
-  - community.general.attributes
+  - community.general._auth_basic
+  - community.general._gitlab
+  - community.general._attributes
 
 attributes:
   check_mode:

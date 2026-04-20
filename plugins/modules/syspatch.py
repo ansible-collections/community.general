@@ -15,7 +15,7 @@ short_description: Manage OpenBSD system patches
 description:
   - Manage OpenBSD system patches using syspatch.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:

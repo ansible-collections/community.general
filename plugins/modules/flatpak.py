@@ -20,7 +20,7 @@ author:
 requirements:
   - flatpak
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: partial

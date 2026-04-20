@@ -14,7 +14,7 @@ description:
   - Mount and unmount ZFS boot environments.
 author: Adam Števko (@xen0l)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

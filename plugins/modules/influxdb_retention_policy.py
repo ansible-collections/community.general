@@ -62,8 +62,8 @@ options:
     type: str
     version_added: '2.0.0'
 extends_documentation_fragment:
-  - community.general.influxdb
-  - community.general.attributes
+  - community.general._influxdb
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

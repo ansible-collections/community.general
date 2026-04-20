@@ -34,9 +34,9 @@ requirements:
   - python-gitlab >= 4.0.0 for new runner registration workflow (runner authentication token -
     U(https://docs.gitlab.com/runner/register/#register-with-a-runner-authentication-token))
 extends_documentation_fragment:
-  - community.general.auth_basic
-  - community.general.gitlab
-  - community.general.attributes
+  - community.general._auth_basic
+  - community.general._gitlab
+  - community.general._attributes
 
 attributes:
   check_mode:

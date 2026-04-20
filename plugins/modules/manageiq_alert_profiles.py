@@ -10,8 +10,8 @@ module: manageiq_alert_profiles
 
 short_description: Configuration of alert profiles for ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
 description:

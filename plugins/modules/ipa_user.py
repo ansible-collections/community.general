@@ -107,9 +107,9 @@ options:
     elements: str
     version_added: '1.2.0'
 extends_documentation_fragment:
-  - community.general.ipa.documentation
-  - community.general.ipa.connection_notes
-  - community.general.attributes
+  - community.general._ipa.documentation
+  - community.general._ipa.connection_notes
+  - community.general._attributes
 
 requirements:
   - base64

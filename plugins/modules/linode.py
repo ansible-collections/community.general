@@ -12,7 +12,7 @@ short_description: Manage instances on the Linode Public Cloud
 description:
   - Manage Linode Public Cloud instances and optionally wait for it to be 'running'.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -13,9 +13,9 @@ version_added: 5.4.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to get information back.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._attributes.info_module
+  - community.general._redfish
 options:
   category:
     required: true

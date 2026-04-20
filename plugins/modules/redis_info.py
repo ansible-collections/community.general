@@ -13,9 +13,9 @@ version_added: '0.2.0'
 description:
   - Gathers information and statistics about Redis servers.
 extends_documentation_fragment:
-  - community.general.redis
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._redis
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   login_user:
     version_added: 7.5.0

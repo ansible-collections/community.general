@@ -12,7 +12,7 @@ short_description: Manages linux user to SELinux user mapping
 description:
   - Manages linux user to SELinux user mapping.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -13,7 +13,7 @@ version_added: 11.0.0
 description:
   - Create, destroy, and modify ZFS zpools and their vdev layouts, pool properties, and filesystem properties.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: partial

@@ -13,7 +13,7 @@ description:
   - A user is not removed until all the dependencies have been dropped.
   - In such a situation, if the module tries to remove the user it fails and only remove roles granted to the user.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

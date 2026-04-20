@@ -16,10 +16,10 @@ author: Guillaume MARTINEZ (@Lunik)
 description:
   - This module manages container registries on Scaleway account.
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.scaleway_waitable_resource
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
+  - community.general._scaleway
+  - community.general._scaleway_waitable_resource
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
 
 attributes:
   check_mode:

@@ -53,8 +53,8 @@ options:
       - Specifies the resource ID of the VPC to which the security group belongs.
     type: str
 extends_documentation_fragment:
-  - community.general.hwc
-  - community.general.attributes
+  - community.general._hwc
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

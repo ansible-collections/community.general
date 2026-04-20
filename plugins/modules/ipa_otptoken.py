@@ -102,9 +102,9 @@ options:
       - B(Note:) Cannot be modified after OTP is created.
     type: int
 extends_documentation_fragment:
-  - community.general.ipa.documentation
-  - community.general.ipa.connection_notes
-  - community.general.attributes
+  - community.general._ipa.documentation
+  - community.general._ipa.connection_notes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

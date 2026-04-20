@@ -13,7 +13,7 @@ short_description: Interface with dnsimple.com (a DNS hosting service)
 description:
   - 'Manages domains and records using the DNSimple API, see the docs: U(http://developer.dnsimple.com/).'
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

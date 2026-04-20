@@ -21,7 +21,7 @@ seealso:
     link: https://help.gnome.org/admin//system-admin-guide/2.32/gconf-6.html.en
 
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

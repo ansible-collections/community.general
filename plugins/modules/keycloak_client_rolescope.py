@@ -68,9 +68,9 @@ options:
       - If O(client_scope_id) is present, all roles must be under this client.
       - If O(client_scope_id) is absent, all roles must be under the realm.
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Andre Desrosiers (@desand01)

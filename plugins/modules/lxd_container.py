@@ -13,7 +13,7 @@ description:
   - Management of LXD containers and virtual machines.
 author: "Hiroaki Nakamura (@hnakamur)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -15,7 +15,7 @@ description:
   - Allows installation of packages to a non-default SDK root directory.
 author: Stanislav Shamilov (@shamilovstas)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

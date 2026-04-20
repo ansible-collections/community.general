@@ -137,8 +137,8 @@ options:
     default: false
 
 extends_documentation_fragment:
-  - community.general.utm
-  - community.general.attributes
+  - community.general._utm
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

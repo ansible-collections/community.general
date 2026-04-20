@@ -20,7 +20,7 @@ notes:
   - Depends on netcat (C(nc)) being available; you need to install the appropriate package for your operating system before
     this module can be used.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -15,7 +15,7 @@ description:
   - This module can be used to manage Kibana plugins.
 author: Thierno IB. BARRY (@barryib)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

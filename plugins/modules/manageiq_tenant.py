@@ -10,8 +10,8 @@ module: manageiq_tenant
 
 short_description: Management of tenants in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Evert Mulder (@evertmulder)
 description:

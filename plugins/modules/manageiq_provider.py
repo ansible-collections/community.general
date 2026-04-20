@@ -10,8 +10,8 @@ DOCUMENTATION = r"""
 module: manageiq_provider
 short_description: Management of provider in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Daniel Korn (@dkorn)
 description:

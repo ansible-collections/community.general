@@ -15,7 +15,7 @@ short_description: Urpmi manager
 description:
   - Manages packages with C(urpmi) (such as for Mageia or Mandriva).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

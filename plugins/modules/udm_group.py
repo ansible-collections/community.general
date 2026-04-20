@@ -16,7 +16,7 @@ description:
   - This module allows to manage user groups on a univention corporate server (UCS). It uses the Python API of the UCS to
     create a new object or edit it.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

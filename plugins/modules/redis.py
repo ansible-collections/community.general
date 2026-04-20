@@ -12,8 +12,8 @@ short_description: Various redis commands, replica and flush
 description:
   - Unified utility to interact with redis instances.
 extends_documentation_fragment:
-  - community.general.redis
-  - community.general.attributes
+  - community.general._redis
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

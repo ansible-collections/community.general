@@ -43,8 +43,8 @@ options:
 author:
   - Marco Noce (@NomakCooper)
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""

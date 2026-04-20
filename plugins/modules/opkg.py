@@ -15,7 +15,7 @@ short_description: Package manager for OpenWrt and Openembedded/Yocto based Linu
 description:
   - Manages ipk packages for OpenWrt and Openembedded/Yocto based Linux distributions.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -30,8 +30,8 @@ options:
     type: bool
 
 extends_documentation_fragment:
-  - community.general.onepassword
-  - community.general.onepassword.lookup
+  - community.general._onepassword
+  - community.general._onepassword.lookup
 """
 
 EXAMPLES = r"""

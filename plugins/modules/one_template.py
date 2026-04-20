@@ -61,8 +61,8 @@ options:
     version_added: 10.3.0
 
 extends_documentation_fragment:
-  - community.general.opennebula
-  - community.general.attributes
+  - community.general._opennebula
+  - community.general._attributes
 
 author:
   - "Jyrki Gadinger (@nilsding)"

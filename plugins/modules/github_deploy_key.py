@@ -15,7 +15,7 @@ description:
     password and 2-factor authentication code (OTP), OAuth2 token, or personal access token. Admin rights on the repository
     are required.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

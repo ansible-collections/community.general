@@ -21,7 +21,7 @@ version_added: 9.3.0
 description:
   - Manages daemons and services using Homebrew.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -13,7 +13,7 @@ short_description: Configure HP iLO interface using C(hponcfg)
 description:
   - This modules configures the HP iLO interface using C(hponcfg).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

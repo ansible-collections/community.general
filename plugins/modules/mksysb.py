@@ -19,7 +19,7 @@ seealso:
     link: https://www.ibm.com/docs/en/aix/7.3?topic=m-mksysb-command
 
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

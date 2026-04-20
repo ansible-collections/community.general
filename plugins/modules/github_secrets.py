@@ -17,7 +17,7 @@ version_added: '12.5.0'
 requirements:
   - pynacl
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

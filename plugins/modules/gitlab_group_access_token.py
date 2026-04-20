@@ -21,9 +21,9 @@ author:
 requirements:
   - python-gitlab >= 3.1.0
 extends_documentation_fragment:
-  - community.general.auth_basic
-  - community.general.gitlab
-  - community.general.attributes
+  - community.general._auth_basic
+  - community.general._gitlab
+  - community.general._attributes
 notes:
   - Access tokens can not be changed. If a parameter needs to be changed, an acceess token has to be recreated. Whether tokens
     are recreated or not is controlled by the O(recreate) option, which defaults to V(never).

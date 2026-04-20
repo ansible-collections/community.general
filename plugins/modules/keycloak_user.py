@@ -201,9 +201,9 @@ options:
     type: bool
     default: false
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

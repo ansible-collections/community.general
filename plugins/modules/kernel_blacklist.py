@@ -15,7 +15,7 @@ short_description: Blacklist kernel modules
 description:
   - Add or remove kernel modules from blacklist.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -16,7 +16,7 @@ description:
   - Source file can be deleted after decompression.
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

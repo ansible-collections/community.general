@@ -16,9 +16,9 @@ author: Guillaume MARTINEZ (@Lunik)
 requirements:
   - C(owner) or C(maintainer) rights to project on the GitLab server
 extends_documentation_fragment:
-  - community.general.auth_basic
-  - community.general.gitlab
-  - community.general.attributes
+  - community.general._auth_basic
+  - community.general._gitlab
+  - community.general._attributes
 
 attributes:
   check_mode:

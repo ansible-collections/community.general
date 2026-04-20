@@ -20,7 +20,7 @@ description:
     be maintained when the applications are not running (such as default font for new documents, or the position of an Info
     panel).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

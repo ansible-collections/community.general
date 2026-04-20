@@ -23,8 +23,8 @@ requirements:
   - gnome-keyring (application - required for headless Linux keyring access)
   - dbus-run-session (application - required for headless Linux keyring access)
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   service:
     description: The name of the service.

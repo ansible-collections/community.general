@@ -12,7 +12,7 @@ short_description: Manage the state of a program or group of programs managed by
 description:
   - Manage the state of a program or group of programs managed by C(supervisord).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

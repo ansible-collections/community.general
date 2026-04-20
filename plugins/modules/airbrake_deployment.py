@@ -15,7 +15,7 @@ short_description: Notify airbrake about app deployments
 description:
   - Notify airbrake about app deployments (see U(https://airbrake.io/docs/api/#deploys-v4)).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

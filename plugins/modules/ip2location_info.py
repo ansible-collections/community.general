@@ -14,8 +14,8 @@ description:
   - Gather IP geolocation information of a host's IP address using the keyless U(api.ip2location.io) API.
 author: "IP2Location (@ip2location)"
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   ip:
     description:

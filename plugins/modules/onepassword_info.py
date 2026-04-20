@@ -24,8 +24,8 @@ description:
   - A fatal error occurs if any of the items being searched for can not be found.
   - Recommend using with the C(no_log) option to avoid logging the values of the secrets being retrieved.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   search_terms:
     type: list

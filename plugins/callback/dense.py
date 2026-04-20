@@ -10,7 +10,7 @@ name: dense
 type: stdout
 short_description: Minimal stdout output
 extends_documentation_fragment:
-  - default_callback
+  - ansible.builtin.default_callback
 description:
   - When in verbose mode it acts the same as the default callback.
 author:

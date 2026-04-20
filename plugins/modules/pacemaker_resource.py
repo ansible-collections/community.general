@@ -15,7 +15,7 @@ version_added: 10.5.0
 description:
   - This module can manage resources in a Pacemaker cluster using the pacemaker CLI.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -266,7 +266,7 @@ options:
       - Send logrotate messages to syslog.
     type: bool
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

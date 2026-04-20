@@ -14,9 +14,9 @@ description:
 requirements:
   - pyone
 extends_documentation_fragment:
-  - community.general.opennebula
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._opennebula
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   ids:
     description:

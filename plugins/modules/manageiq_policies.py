@@ -11,8 +11,8 @@ module: manageiq_policies
 
 short_description: Management of resource policy_profiles in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Daniel Korn (@dkorn)
 description:

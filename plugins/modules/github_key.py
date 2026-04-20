@@ -13,7 +13,7 @@ description:
   - Creates, removes, or updates GitHub access keys.
   - Works with both GitHub.com and GitHub Enterprise Server installations.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

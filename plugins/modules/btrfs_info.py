@@ -16,8 +16,8 @@ author:
   - Gregory Furlong (@gnfzdz)
 
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""

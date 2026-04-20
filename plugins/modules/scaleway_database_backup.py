@@ -17,9 +17,9 @@ author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
   - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
 attributes:
   check_mode:
     support: full

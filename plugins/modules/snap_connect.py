@@ -15,7 +15,7 @@ description:
   - Snaps run in a sandbox and need explicit interface connections to access system resources
     or communicate with other snaps.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

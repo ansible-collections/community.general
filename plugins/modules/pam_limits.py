@@ -16,7 +16,7 @@ description:
   - The default file is V(/etc/security/limits.conf).
   - For the full documentation, see C(man 5 limits.conf).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

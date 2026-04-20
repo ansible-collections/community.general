@@ -19,7 +19,7 @@ notes:
 requirements:
   - Red Hat Enterprise Linux 6+ with subscription-manager installed
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

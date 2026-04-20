@@ -21,9 +21,9 @@ options:
     required: true
 
 extends_documentation_fragment:
-  - community.general.redis
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._redis
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 seealso:
   - module: community.general.redis_data

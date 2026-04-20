@@ -12,7 +12,7 @@ short_description: Runs puppet
 description:
   - Runs C(puppet) agent or apply in a reliable manner.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

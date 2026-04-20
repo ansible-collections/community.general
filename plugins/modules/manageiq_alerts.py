@@ -10,8 +10,8 @@ module: manageiq_alerts
 
 short_description: Configuration of alerts in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
 description:

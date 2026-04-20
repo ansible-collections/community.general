@@ -14,10 +14,10 @@ version_added: 11.3.0
 description:
   - This module is a wrapper for the execution of C(django-admin dumpdata).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.django
-  - community.general.django.database
-  - community.general.django.data
+  - community.general._attributes
+  - community.general._django
+  - community.general._django.database
+  - community.general._django.data
 attributes:
   check_mode:
     support: none

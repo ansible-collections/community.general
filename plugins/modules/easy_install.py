@@ -12,7 +12,7 @@ short_description: Installs Python libraries
 description:
   - Installs Python libraries, optionally in a C(virtualenv).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

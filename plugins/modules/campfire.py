@@ -13,7 +13,7 @@ description:
   - Send a message to Campfire.
   - Messages with newlines result in a "Paste" message being sent.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

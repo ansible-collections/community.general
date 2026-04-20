@@ -14,7 +14,7 @@ description:
   - Tested on CA Spectrum 9.4.2, 10.1.1 and 10.2.1.
 author: "Renato Orgito (@orgito)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

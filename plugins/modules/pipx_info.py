@@ -13,9 +13,9 @@ version_added: 5.6.0
 description:
   - Retrieve details about Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
-  - community.general.pipx
+  - community.general._attributes
+  - community.general._attributes.info_module
+  - community.general._pipx
 options:
   name:
     description:

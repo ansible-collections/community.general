@@ -147,7 +147,7 @@ notes:
 extends_documentation_fragment:
   - ansible.builtin.url
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

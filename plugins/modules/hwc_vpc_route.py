@@ -57,8 +57,8 @@ options:
     type: str
     default: 'peering'
 extends_documentation_fragment:
-  - community.general.hwc
-  - community.general.attributes
+  - community.general._hwc
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

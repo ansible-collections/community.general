@@ -16,7 +16,7 @@ version_added: '2.0.0'
 description:
   - Manages C(/etc/rc.conf) for FreeBSD.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

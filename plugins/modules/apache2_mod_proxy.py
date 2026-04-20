@@ -14,7 +14,7 @@ description:
   - Set and/or get members' attributes of an Apache httpd 2.4 mod_proxy balancer pool, using HTTP POST and GET requests. The
     httpd mod_proxy balancer-member status page has to be enabled and accessible, as this module relies on parsing this page.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 requirements:
   - Python package C(beautifulsoup4)
 attributes:

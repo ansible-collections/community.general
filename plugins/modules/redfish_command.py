@@ -15,8 +15,8 @@ description:
   - Manages OOB controller users ex. add, remove, update.
   - Manages system power ex. on, off, graceful and forced reboot.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: none

@@ -18,9 +18,9 @@ description:
   - This module manages user_data on compute instances on Scaleway.
   - It can be used to configure cloud-init for instance.
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
 
 attributes:
   check_mode:

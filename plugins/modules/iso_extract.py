@@ -26,7 +26,7 @@ requirements:
   - Either 7z (from C(7zip) or C(p7zip) package)
   - Or mount capabilities (root-access, or CAP_SYS_ADMIN capability on Linux)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

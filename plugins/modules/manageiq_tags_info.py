@@ -11,9 +11,9 @@ module: manageiq_tags_info
 version_added: 5.8.0
 short_description: Retrieve resource tags in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._manageiq
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 author: Alexei Znamensky (@russoz)
 description:

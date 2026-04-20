@@ -20,7 +20,7 @@ description:
     when not using a minimal installation like Alpine Linux).
   - Windows and HPUX are not supported, please let us know if you find any other OS/distro in which this fails.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

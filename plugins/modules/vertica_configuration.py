@@ -11,7 +11,7 @@ short_description: Updates Vertica configuration parameters
 description:
   - Updates Vertica configuration parameters.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

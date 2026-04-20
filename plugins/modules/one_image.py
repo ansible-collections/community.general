@@ -14,8 +14,8 @@ description:
 requirements:
   - pyone
 extends_documentation_fragment:
-  - community.general.opennebula
-  - community.general.attributes
+  - community.general._opennebula
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

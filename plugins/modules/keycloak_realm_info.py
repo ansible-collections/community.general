@@ -21,8 +21,8 @@ description:
     by this module. You may pass single values for attributes when calling the module, and this is translated into a list
     suitable for the API.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 options:
   auth_keycloak_url:

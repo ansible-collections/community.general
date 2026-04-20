@@ -246,8 +246,8 @@ requirements:
   - "Python >= 3.6"
   - "footmark >= 1.19.0"
 extends_documentation_fragment:
-  - community.general.alicloud
-  - community.general.attributes
+  - community.general._alicloud
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

@@ -13,7 +13,7 @@ description:
   - Similar to the M(community.general.facter_facts) module, this runs the I(Ohai) discovery program (U(https://docs.chef.io/ohai.html))
     on the remote host and returns JSON inventory data. I(Ohai) data is a bit more verbose and nested than I(facter).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -12,9 +12,9 @@ description:
   - Builds Redfish URIs locally and sends them to iLO to get information back.
   - For use with HPE iLO operations that require Redfish OEM extensions.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._attributes.info_module
+  - community.general._redfish
 options:
   category:
     required: true

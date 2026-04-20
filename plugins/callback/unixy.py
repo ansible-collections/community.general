@@ -14,7 +14,7 @@ short_description: Condensed Ansible output
 description:
   - Consolidated Ansible output in the style of LINUX/UNIX startup logs.
 extends_documentation_fragment:
-  - default_callback
+  - ansible.builtin.default_callback
 requirements:
   - set as stdout in configuration
 """

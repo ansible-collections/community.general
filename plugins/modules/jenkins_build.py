@@ -19,7 +19,7 @@ author:
   - Tong He (@unnecessary-username)
   - Juan Casanova (@juanmcasanova)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

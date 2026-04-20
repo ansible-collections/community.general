@@ -19,7 +19,7 @@ requirements:
   - lxml
   - xmljson >= 0.1.8
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

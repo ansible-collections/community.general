@@ -17,7 +17,7 @@ short_description: Configure LVM logical volumes
 description:
   - This module creates, removes or resizes logical volumes.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

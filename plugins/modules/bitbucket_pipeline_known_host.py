@@ -15,8 +15,8 @@ description:
 author:
   - Evgeniy Krysanov (@catcombo)
 extends_documentation_fragment:
-  - community.general.bitbucket
-  - community.general.attributes
+  - community.general._bitbucket
+  - community.general._attributes
 requirements:
   - paramiko
 attributes:

@@ -124,8 +124,8 @@ options:
       - Specifies the snapshot ID. If this parameter is specified, the disk is created from a snapshot.
     type: str
 extends_documentation_fragment:
-  - community.general.hwc
-  - community.general.attributes
+  - community.general._hwc
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

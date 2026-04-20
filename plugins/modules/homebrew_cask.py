@@ -18,7 +18,7 @@ short_description: Install and uninstall homebrew casks
 description:
   - Manages Homebrew casks.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -82,7 +82,7 @@ notes:
     only a single btrfs filesystem is mounted, that filesystem is used; otherwise, the module takes no action and returns an
     error.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:

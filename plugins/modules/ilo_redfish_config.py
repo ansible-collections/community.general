@@ -12,8 +12,8 @@ description:
   - Builds Redfish URIs locally and sends them to iLO to set or update a configuration attribute.
   - For use with HPE iLO operations that require Redfish OEM extensions.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: none

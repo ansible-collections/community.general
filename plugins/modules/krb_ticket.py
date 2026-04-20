@@ -126,7 +126,7 @@ options:
 requirements:
   - krb5-user and krb5-config packages
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

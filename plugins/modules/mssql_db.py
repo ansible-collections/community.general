@@ -13,7 +13,7 @@ short_description: Add or remove MSSQL databases from a remote host
 description:
   - Add or remove MSSQL databases from a remote host.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

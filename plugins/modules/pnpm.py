@@ -17,7 +17,7 @@ author:
   - "Aritra Sen (@aretrosen)"
   - "Chris Hoffman (@chrishoffman), creator of NPM Ansible module"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

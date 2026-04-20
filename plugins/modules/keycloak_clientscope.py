@@ -144,9 +144,9 @@ options:
       - A dict of key/value pairs to set as custom attributes for the client_scope.
       - Values may be single values (for example a string) or a list of strings.
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Gaëtan Daubresse (@Gaetan2907)

@@ -12,7 +12,7 @@ short_description: Deploy and manage OpenNebula services
 description:
   - Manage OpenNebula services.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

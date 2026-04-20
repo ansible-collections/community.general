@@ -31,8 +31,8 @@ options:
     required: true
     type: str
 extends_documentation_fragment:
-  - community.general.influxdb
-  - community.general.attributes
+  - community.general._influxdb
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

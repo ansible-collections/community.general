@@ -12,7 +12,7 @@ description:
   - Manage node.js packages with Node Package Manager (npm).
 author: "Chris Hoffman (@chrishoffman)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

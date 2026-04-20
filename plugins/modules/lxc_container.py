@@ -13,7 +13,7 @@ description:
   - Management of LXC containers.
 author: "Kevin Carter (@cloudnull)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

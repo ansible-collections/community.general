@@ -15,7 +15,7 @@ short_description: Manage packages on OpenBSD
 description:
   - Manage packages on OpenBSD using the pkg tools.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

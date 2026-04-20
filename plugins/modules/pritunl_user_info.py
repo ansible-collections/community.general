@@ -13,9 +13,9 @@ short_description: List Pritunl Users using the Pritunl API
 description:
   - A module to list Pritunl users using the Pritunl API.
 extends_documentation_fragment:
-  - community.general.pritunl
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._pritunl
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   organization:
     type: str

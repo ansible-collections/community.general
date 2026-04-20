@@ -16,7 +16,7 @@ version_added: "4.0.0"
 description:
   - Execute SQL scripts on a MSSQL database.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:

@@ -45,8 +45,8 @@ options:
       - Port group name.
     type: str
 extends_documentation_fragment:
-  - community.general.vexata.vx100
-  - community.general.attributes
+  - community.general._vexata.vx100
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

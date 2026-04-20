@@ -15,7 +15,7 @@ author: "Nick Harring (@NickatEpic)"
 requirements:
   - requests >= 2.0.0
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

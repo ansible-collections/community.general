@@ -40,8 +40,8 @@ options:
     type: str
 
 extends_documentation_fragment:
-  - community.general.lxca_common
-  - community.general.attributes
+  - community.general._lxca_common
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

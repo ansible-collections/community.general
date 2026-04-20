@@ -17,7 +17,7 @@ requirements: [gunicorn]
 author:
   - "Alejandro Gomez (@agmezr)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

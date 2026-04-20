@@ -91,7 +91,7 @@ requirements:
   - freeipa-client
   - Managed host is FreeIPA client
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

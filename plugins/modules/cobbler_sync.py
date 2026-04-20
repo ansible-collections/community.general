@@ -12,7 +12,7 @@ short_description: Sync Cobbler
 description:
   - Sync Cobbler to commit changes.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

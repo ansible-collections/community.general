@@ -13,7 +13,7 @@ description:
   - Manage SmartOS virtual machines through vmadm(1M).
 author: Jasper Lievisse Adriaanse (@jasperla)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

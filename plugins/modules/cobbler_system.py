@@ -12,7 +12,7 @@ short_description: Manage system objects in Cobbler
 description:
   - Add, modify or remove systems in Cobbler.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -13,7 +13,7 @@ short_description: Module for tracking logs using U(logentries.com)
 description:
   - Sends logs to LogEntries in realtime.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

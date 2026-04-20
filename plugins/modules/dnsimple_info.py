@@ -16,8 +16,8 @@ version_added: "4.2.0"
 description: Retrieve existing records and domains from DNSimple API.
 
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 options:
   name:

@@ -17,7 +17,7 @@ requirements:
 author:
   - Connor Newton (@phyrwork)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: partial

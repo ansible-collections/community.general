@@ -15,8 +15,8 @@ notes:
 description:
   - Retrieve server information.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 attributes:
   check_mode:
     version_added: 3.3.0

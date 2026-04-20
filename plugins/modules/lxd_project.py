@@ -13,7 +13,7 @@ description:
   - Management of LXD projects.
 author: "Raymond Chang (@we10710aa)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

@@ -94,7 +94,7 @@ options:
     type: str
 extends_documentation_fragment:
   - community.general._icinga2_api
-  - community.general.attributes
+  - community.general._attributes
   - ansible.builtin.url
 """
 

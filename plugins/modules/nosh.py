@@ -15,7 +15,7 @@ description:
   - Control running and enabled state for system-wide or user services.
   - BSD and Linux systems are supported.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

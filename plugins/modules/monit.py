@@ -12,7 +12,7 @@ short_description: Manage the state of a program monitored using Monit
 description:
   - Manage the state of a program monitored using Monit.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

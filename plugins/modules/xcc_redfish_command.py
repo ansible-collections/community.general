@@ -18,8 +18,8 @@ description:
   - Supports updating a configuration attribute using PATCH method.
   - Supports performing an action using POST method.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: none

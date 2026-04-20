@@ -51,8 +51,8 @@ options:
     type: str
 
 extends_documentation_fragment:
-  - community.general.ibm_storage
-  - community.general.attributes
+  - community.general._ibm_storage
+  - community.general._attributes
 
 author:
   - Tzur Eliyahu (@tzure)

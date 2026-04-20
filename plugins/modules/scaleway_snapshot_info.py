@@ -15,10 +15,10 @@ author:
   - "Yanis Guenane (@Spredzy)"
   - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
-  - community.general.attributes.info_module
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
+  - community.general._attributes.info_module
 
 attributes:
   action_group:

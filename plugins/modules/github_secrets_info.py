@@ -15,8 +15,8 @@ author:
   - Thomas Sjögren (@konstruktoid)
 version_added: '12.5.0'
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   organization:
     description:

@@ -13,7 +13,7 @@ short_description: Notify Rollbar about app deployments
 description:
   - Notify Rollbar about app deployments (see U(https://rollbar.com/docs/deploys_other/)).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

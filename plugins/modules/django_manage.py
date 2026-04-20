@@ -14,7 +14,7 @@ description:
   - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the O(virtualenv) parameter,
     all management commands are executed by the given C(virtualenv) installation.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

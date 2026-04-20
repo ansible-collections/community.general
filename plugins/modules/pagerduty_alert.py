@@ -16,7 +16,7 @@ author:
 requirements:
   - PagerDuty API access
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

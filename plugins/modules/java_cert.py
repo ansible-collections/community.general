@@ -14,7 +14,7 @@ description:
   - This is a wrapper module around keytool, which can be used to import certificates and optionally private keys to a given
     java keystore, or remove them from it.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
   - ansible.builtin.files
 attributes:
   check_mode:

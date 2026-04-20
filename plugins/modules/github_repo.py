@@ -14,7 +14,7 @@ description:
   - Manages Github repositories using PyGithub library.
   - Authentication can be done with O(access_token) or with O(username) and O(password).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

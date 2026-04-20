@@ -82,8 +82,8 @@ options:
         The value can be in the CIDR format or IP addresses. The parameter is exclusive with parameter remote_group_id.
     type: str
 extends_documentation_fragment:
-  - community.general.hwc
-  - community.general.attributes
+  - community.general._hwc
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

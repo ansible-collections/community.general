@@ -46,7 +46,7 @@ notes:
     application affected by the key, and then having a look at value set using commands C(dconf dump /path/to/dir/) or C(dconf
     read /path/to/key).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

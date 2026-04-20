@@ -20,7 +20,7 @@ description:
   - VDO, or Virtual Data Optimizer, is a device-mapper target that provides inline block-level deduplication, compression,
     and thin provisioning capabilities to primary storage.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:

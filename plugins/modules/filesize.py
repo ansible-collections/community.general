@@ -85,7 +85,7 @@ requirements:
 
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 
 seealso:
   - name: dd(1) manpage for Linux

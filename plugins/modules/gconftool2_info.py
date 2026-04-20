@@ -14,8 +14,8 @@ version_added: 5.1.0
 description:
   - This module allows retrieving application preferences from the GConf database, with the help of C(gconftool-2).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   key:
     description:

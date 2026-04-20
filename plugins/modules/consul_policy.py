@@ -16,10 +16,10 @@ description:
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
-  - community.general.consul
-  - community.general.consul.actiongroup_consul
-  - community.general.consul.token
-  - community.general.attributes
+  - community.general._consul
+  - community.general._consul.actiongroup_consul
+  - community.general._consul.token
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

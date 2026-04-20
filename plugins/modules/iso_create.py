@@ -19,7 +19,7 @@ requirements:
 version_added: '0.2.0'
 
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:

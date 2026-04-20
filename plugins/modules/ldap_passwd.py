@@ -27,8 +27,8 @@ options:
       - The (plaintext) password to be set for O(dn).
     type: str
 extends_documentation_fragment:
-  - community.general.ldap.documentation
-  - community.general.attributes
+  - community.general._ldap.documentation
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

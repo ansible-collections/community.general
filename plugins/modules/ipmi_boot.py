@@ -12,7 +12,7 @@ short_description: Management of order of boot devices
 description:
   - Use this module to manage order of boot devices.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -15,7 +15,7 @@ version_added: 1.0.0
 description:
   - Manage launchd services on target macOS hosts.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

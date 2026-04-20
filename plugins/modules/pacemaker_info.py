@@ -15,8 +15,8 @@ version_added: 11.2.0
 description:
   - Gather information about a Pacemaker cluster.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""
