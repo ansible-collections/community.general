@@ -565,7 +565,7 @@ def main():
             # Compare users
             if not (
                 is_struct_included(desired_user, before_user, excludes, empty_list_result=False)
-            ):  # If the new user does not introduce a change to the existing user
+            ):  # If the new user introduces a change to the existing user
                 # Update the user
                 if not module.check_mode:
                     after_user = kc.update_user(userrep=desired_user, realm=realm)
