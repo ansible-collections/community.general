@@ -104,22 +104,3 @@ def make_process_dict(include_injected, include_deps=False):
         return results, raw_data
 
     return process_dict
-
-
-def make_process_list(mod_helper, **kwargs):
-    #
-    # ATTENTION!
-    #
-    # The function `make_process_list()` is deprecated and will be removed in community.general 13.0.0
-    #
-    process_dict = make_process_dict(mod_helper, **kwargs)
-
-    def process_list(rc, out, err):
-        res_dict, raw_data = process_dict(rc, out, err)
-
-        if kwargs.get("include_raw"):
-            mod_helper.vars.raw_output = raw_data
-
-        return [entry for name, entry in res_dict.items() if name == kwargs.get("name")]
-
-    return process_list

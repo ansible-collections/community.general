@@ -305,8 +305,6 @@ files:
   $lookups/flattened.py: {}
   $lookups/github_app_access_token.py:
     maintainers: weisheng-p blavoie
-  $lookups/hiera.py:
-    maintainers: jparrill
   $lookups/keyring.py: {}
   $lookups/lastpass.py: {}
   $lookups/lmdb_kv.py:
@@ -399,9 +397,6 @@ files:
     maintainers: russoz
   $module_utils/net_tools/pritunl/:
     maintainers: Lowess
-  $module_utils/oracle/oci_utils.py:
-    labels: cloud
-    maintainers: $team_oracle
   $module_utils/pacemaker.py:
     maintainers: munchtoast
   $module_utils/pipx.py:
@@ -487,10 +482,6 @@ files:
     maintainers: evgkrsk
   $modules/archive.py:
     maintainers: bendoh
-  $modules/atomic_:
-    maintainers: krsacme
-  $modules/atomic_container.py:
-    maintainers: giuseppe krsacme
   $modules/awall.py:
     maintainers: tdtrask
   $modules/beadm.py:
@@ -517,8 +508,6 @@ files:
     maintainers: natefoo
   $modules/cargo.py:
     maintainers: radek-sprta
-  $modules/catapult.py:
-    maintainers: Jmainguy
   $modules/circonus_annotation.py:
     maintainers: NickatEpic
   $modules/cisco_webex.py:
@@ -558,11 +547,6 @@ files:
     maintainers: shamilovstas
   $modules/deploy_helper.py:
     maintainers: ramondelafuente
-  $modules/dimensiondata_network.py:
-    labels: dimensiondata_network
-    maintainers: aimonb tintoy
-  $modules/dimensiondata_vlan.py:
-    maintainers: tintoy
   $modules/discord.py:
     maintainers: cwollinger
   $modules/django_check.py:
@@ -1054,8 +1038,6 @@ files:
     maintainers: $team_wdc
   $modules/ocapi_info.py:
     maintainers: $team_wdc
-  $modules/oci_vcn.py:
-    maintainers: $team_oracle rohitChaware
   $modules/odbc.py:
     maintainers: john-westcott-iv
   $modules/office_365_connector_card.py:
@@ -1072,8 +1054,6 @@ files:
     maintainers: rvalle
   $modules/one_vnet.py:
     maintainers: abakanovskii
-  $modules/oneandone_:
-    maintainers: aajdinov edevenport
   $modules/onepassword_info.py:
     maintainers: Rylon
   $modules/oneview_:
@@ -1198,8 +1178,6 @@ files:
   $modules/puppet.py:
     labels: puppet
     maintainers: emonty
-  $modules/pushbullet.py:
-    maintainers: willybarro
   $modules/pushover.py:
     maintainers: weaselkeeper wopfel
   $modules/python_requirements_info.py:
@@ -1313,14 +1291,6 @@ files:
     maintainers: bachradsusi dankeder jamescassell
   $modules/sendgrid.py:
     maintainers: makaimc
-  $modules/sensu_:
-    maintainers: dmsimard
-  $modules/sensu_check.py:
-    maintainers: andsens
-  $modules/sensu_silence.py:
-    maintainers: smbambling
-  $modules/sensu_subscription.py:
-    maintainers: andsens
   $modules/seport.py:
     maintainers: dankeder
   $modules/serverless.py:
@@ -1360,8 +1330,6 @@ files:
     maintainers: orgito
   $modules/spectrum_model_attrs.py:
     maintainers: tgates81
-  $modules/spotinst_aws_elastigroup.py:
-    maintainers: talzur
   $modules/ss_3par_cpg.py:
     maintainers: farhan7500 gautamphegde
   $modules/ssh_config.py:
@@ -1416,8 +1384,6 @@ files:
     maintainers: indrajitr jasperla tmshn
   $modules/twilio.py:
     maintainers: makaimc
-  $modules/typetalk.py:
-    maintainers: tksmd
   $modules/udm_:
     maintainers: keachi
   $modules/ufw.py:
@@ -1656,7 +1622,6 @@ macros:
   team_manageiq: abellotti cben gtanzillo yaacov zgalor dkorn evertmulder
   team_networking: NilashishC Qalthos danielmellado ganeshrn justjais trishnaguha sganesh-infoblox privateip
   team_opennebula: ilicmilan meerkampdvv rsmontero xorel nilsding
-  team_oracle: manojmeda mross22 nalsaber
   team_redfish: mraineri tomasg2012 xmadsen renxulei rajeevkallur bhavya06 jyundt
   team_rhsm: cnsnyder ptoscano
   team_scaleway: remyleone abarbare

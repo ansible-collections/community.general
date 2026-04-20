@@ -83,16 +83,12 @@ options:
     description:
       - Controls the module behavior. See notes below for more details.
       - The default changed from V(compatibility) to V(new) in community.general 9.0.0.
+        V(compatibility) was removed from community.general 13.0.0.
       - 'O(mode=new): The O(name) parameter may refer to a module name, a distribution file, a HTTP URL or a git repository
         URL as described in C(cpanminus) documentation. C(cpanm) version specifiers are recognized. This is the default mode
         from community.general 9.0.0 onwards.'
-      - 'O(mode=compatibility): This was the default mode before community.general 9.0.0. O(name) must be either a module
-        name or a distribution file. If the perl module given by O(name) is installed (at the exact O(version) when specified),
-        then nothing happens. Otherwise, it is installed using the C(cpanm) executable. O(name) cannot be an URL, or a git
-        URL. C(cpanm) version specifiers do not work in this mode.'
-      - 'B(ATTENTION): V(compatibility) mode is deprecated and will be removed in community.general 13.0.0.'
     type: str
-    choices: [compatibility, new]
+    choices: [new]
     default: new
     version_added: 3.0.0
   name_check:
@@ -184,7 +180,7 @@ class CPANMinus(ModuleHelper):
             install_recommendations=dict(type="bool"),
             install_suggestions=dict(type="bool"),
             executable=dict(type="path"),
-            mode=dict(type="str", default="new", choices=["compatibility", "new"]),
+            mode=dict(type="str", default="new", choices=["new"]),
             name_check=dict(type="str"),
         ),
         required_one_of=[("name", "from_path")],
@@ -204,17 +200,8 @@ class CPANMinus(ModuleHelper):
 
     def __init_module__(self):
         v = self.vars
-        if v.mode == "compatibility":
-            if v.name_check:
-                self.do_raise("Parameter name_check can only be used with mode=new")
-            self.deprecate(
-                "'mode=compatibility' is deprecated, use 'mode=new' instead",
-                version="13.0.0",
-                collection_name="community.general",
-            )
-        else:
-            if v.name and v.from_path:
-                self.do_raise("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
+        if v.name and v.from_path:
+            self.do_raise("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
 
         self.command = v.executable if v.executable else self.command
         self.runner = CmdRunner(self.module, self.command, self.command_args_formats, check_rc=True)
@@ -260,22 +247,15 @@ class CPANMinus(ModuleHelper):
 
     def __run__(self):
         def process(rc, out, err):
-            if self.vars.mode == "compatibility" and rc != 0:
-                self.do_raise(msg=err, cmd=self.vars.cmd_args)
             return "is up to date" not in err and "is up to date" not in out
 
         v = self.vars
         pkg_param = "from_path" if v.from_path else "name"
 
-        if v.mode == "compatibility":
-            if self._is_package_installed(v.name, v.locallib, v.version):
-                return
-            pkg_spec = v[pkg_param]
-        else:
-            installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
-            if installed:
-                return
-            pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param], v.version)
+        installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
+        if installed:
+            return
+        pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param], v.version)
 
         with self.runner(
             [

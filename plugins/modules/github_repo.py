@@ -75,8 +75,9 @@ options:
   force_defaults:
     description:
       - If V(true), overwrite current O(description) and O(private) attributes with defaults.
-      - V(true) is deprecated for this option and will not be allowed starting in community.general 13.0.0. V(false) will be the default value then.
+      - The default value changed from V(true) to V(false) in community.general 13.0.0.
     type: bool
+    default: false
     version_added: 4.1.0
 requirements:
   - PyGithub>=1.54
@@ -239,7 +240,7 @@ def main():
         private=dict(type="bool"),
         description=dict(type="str"),
         api_url=dict(type="str", default="https://api.github.com"),
-        force_defaults=dict(type="bool"),
+        force_defaults=dict(type="bool", default=False),
     )
     module = AnsibleModule(
         argument_spec=module_args,
@@ -248,14 +249,6 @@ def main():
         required_one_of=[("username", "access_token")],
         mutually_exclusive=[("username", "access_token")],
     )
-
-    if module.params["force_defaults"] is None:
-        module.deprecate(
-            "'force_defaults=true' is deprecated and will not be allowed in community.general 13.0.0, use 'force_defaults=false' instead",
-            version="13.0.0",
-            collection_name="community.general",
-        )
-        module.params["force_defaults"] = True
 
     if not HAS_GITHUB_PACKAGE:
         module.fail_json(msg=missing_required_lib("PyGithub"), exception=GITHUB_IMP_ERR)

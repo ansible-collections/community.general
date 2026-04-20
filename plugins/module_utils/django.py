@@ -74,10 +74,6 @@ _django_std_arg_fmts: dict[str, ArgFormatter] = dict(
 # keys can be used in _django_args
 _args_menu = dict(
     std=(django_std_args, _django_std_arg_fmts),
-    database=(_database_dash, {"database": _django_std_arg_fmts["database_dash"]}),  # deprecate, remove in 13.0.0
-    noinput=({}, {"noinput": cmd_runner_fmt.as_fixed("--noinput")}),  # deprecate, remove in 13.0.0
-    dry_run=({}, {"dry_run": cmd_runner_fmt.as_bool("--dry-run")}),  # deprecate, remove in 13.0.0
-    check=({}, {"check": cmd_runner_fmt.as_bool("--check")}),  # deprecate, remove in 13.0.0
     database_dash=(_database_dash, {}),
     data=(_data, {}),
 )
