@@ -13,7 +13,7 @@ description:
   - Callback plugin that allows you to supply your own custom callback templates to be output.
 author: Trevor Highfill (@theque5t)
 extends_documentation_fragment:
-  - default_callback
+  - ansible.builtin.default_callback
 notes:
   - Uses the P(ansible.builtin.default#callback) callback plugin output when a custom callback V(message(msg\)) is not provided.
   - Makes the callback event data available using the C(ansible_callback_diy) dictionary, which can be used in the templating

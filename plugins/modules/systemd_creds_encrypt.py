@@ -15,7 +15,7 @@ author:
   - Thomas Sjögren (@konstruktoid)
 version_added: '10.2.0'
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

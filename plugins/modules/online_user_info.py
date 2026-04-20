@@ -13,9 +13,9 @@ description:
 author:
   - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
-  - community.general.online
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._online
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""
@@ -47,7 +47,7 @@ online_user_info:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.online import (
+from ansible_collections.community.general.plugins.module_utils._online import (
     Online,
     OnlineException,
     online_argument_spec,

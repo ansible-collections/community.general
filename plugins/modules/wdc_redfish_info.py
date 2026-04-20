@@ -13,9 +13,9 @@ version_added: 5.4.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to get information back.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._attributes.info_module
+  - community.general._redfish
 options:
   category:
     required: true
@@ -123,8 +123,8 @@ StatusCode:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
-from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils import WdcRedfishUtils
 
 CATEGORY_COMMANDS_ALL = {"Update": ["SimpleUpdateStatus"]}
 

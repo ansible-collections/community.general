@@ -41,9 +41,9 @@ options:
       - It is required if name is not unique.
     type: str
 extends_documentation_fragment:
-  - community.general.xenserver.documentation
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._xenserver.documentation
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""
@@ -150,7 +150,7 @@ instance:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.xenserver import (
+from ansible_collections.community.general.plugins.module_utils._xenserver import (
     XenServerObject,
     gather_vm_facts,
     gather_vm_params,

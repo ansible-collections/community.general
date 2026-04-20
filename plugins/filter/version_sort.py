@@ -33,7 +33,7 @@ _value:
   elements: string
 """
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 def version_sort(value, reverse=False):

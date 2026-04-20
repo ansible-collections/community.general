@@ -16,7 +16,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 from linode_api4 import LinodeClient
 from linode_api4.errors import ApiError as LinodeApiError
 
-from ansible_collections.community.general.plugins.module_utils.linode import get_user_agent
+from ansible_collections.community.general.plugins.module_utils._linode import get_user_agent
 from ansible_collections.community.general.plugins.modules import linode_v4
 
 from .linode_conftest import (  # noqa: F401, pylint: disable=unused-import

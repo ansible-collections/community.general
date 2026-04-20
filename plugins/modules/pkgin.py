@@ -26,7 +26,7 @@ notes:
   - 'Known bug with pkgin < 0.8.0: if a package is removed and another package depends on it, the other package is silently
     removed as well.'
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

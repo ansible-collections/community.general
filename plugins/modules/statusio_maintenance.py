@@ -16,7 +16,7 @@ notes:
   - Use start_date and start_time with minutes to set future maintenance window.
 author: Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -179,7 +179,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 
-from ansible_collections.community.general.plugins.module_utils.datetime import (
+from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
 

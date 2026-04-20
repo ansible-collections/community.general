@@ -17,8 +17,8 @@ description:
   - Shut downs a machine.
 version_added: "1.1.0"
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.flow
+  - community.general._attributes
+  - community.general._attributes.flow
 attributes:
   check_mode:
     support: full

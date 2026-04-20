@@ -17,7 +17,7 @@ notes:
   - A list of available voices, with language, can be found by running C(say -v ?) on a OSX host and C(espeak --voices) on
     a Linux host.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

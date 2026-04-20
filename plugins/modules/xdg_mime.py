@@ -20,7 +20,7 @@ version_added: 10.7.0
 description:
   - This module allows configuring the default handler for specific MIME types when you use applications that rely on XDG.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -86,8 +86,8 @@ version:
   sample: "1.2.1"
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xdg_mime import xdg_mime_get, xdg_mime_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._xdg_mime import xdg_mime_get, xdg_mime_runner
 
 
 class XdgMime(ModuleHelper):

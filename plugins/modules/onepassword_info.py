@@ -24,8 +24,8 @@ description:
   - A fatal error occurs if any of the items being searched for can not be found.
   - Recommend using with the C(no_log) option to avoid logging the values of the secrets being retrieved.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   search_terms:
     type: list
@@ -161,7 +161,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
-from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
+from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
 
 
 class AnsibleModuleError(Exception):

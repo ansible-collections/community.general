@@ -19,7 +19,7 @@ description:
   - Sends notifications to U(http://your.mattermost.url) using the Incoming WebHook integration.
 author: "Benjamin Jolivot (@bjolivot)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -17,8 +17,8 @@ short_description: Manage storage group member on EMC VNX
 description:
   - This module manages the members of an existing storage group.
 extends_documentation_fragment:
-  - community.general.emc.emc_vnx
-  - community.general.attributes
+  - community.general._emc.emc_vnx
+  - community.general._attributes
 
 attributes:
   check_mode:
@@ -82,7 +82,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.storage.emc.emc_vnx import emc_vnx_argument_spec
+from ansible_collections.community.general.plugins.module_utils._storage.emc.emc_vnx import emc_vnx_argument_spec
 
 LIB_IMP_ERR = None
 try:

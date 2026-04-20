@@ -21,7 +21,7 @@ notes:
 requirements:
   - subscription-manager
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

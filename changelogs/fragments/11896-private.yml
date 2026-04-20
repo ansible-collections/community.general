@@ -1,0 +1,5 @@
+breaking_changes:
+  - "Since community.general 13.0.0, all module utils, plugin utils, and doc fragments contained in this collection are private to the collection.
+     This means that if another collection wants to use these, there is no longer any guarantee that there are no breaking changes, even in bugfix releases.
+     This has no practical impact on any other use of the collection, that is, everyone using modules or plugins from the collections will not notice any
+     difference (https://github.com/ansible-collections/community.general/issues/11312, https://github.com/ansible-collections/community.general/pull/11896)."

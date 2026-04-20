@@ -138,7 +138,7 @@ class TestOcapiInfo(unittest.TestCase):
 
     def test_job_status_in_progress(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
             delete_request=mock_delete_request,
@@ -182,7 +182,7 @@ class TestOcapiInfo(unittest.TestCase):
 
     def test_job_status_complete(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
             delete_request=mock_delete_request,
@@ -224,7 +224,7 @@ class TestOcapiInfo(unittest.TestCase):
 
     def test_job_status_not_found(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
             delete_request=mock_delete_request,

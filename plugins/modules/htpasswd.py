@@ -70,7 +70,7 @@ requirements: [passlib>=1.6]
 author: "Ansible Core Team"
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -103,7 +103,7 @@ import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("passlib"):
     # Apparently the type infos don't know htpasswd_context, which *does* exist

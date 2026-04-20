@@ -19,7 +19,7 @@ author:
 requirements:
   - heroku3
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -82,7 +82,7 @@ RETURN = """ # """
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.heroku import HerokuHelper
+from ansible_collections.community.general.plugins.module_utils._heroku import HerokuHelper
 
 
 def add_or_delete_heroku_collaborator(module, client):

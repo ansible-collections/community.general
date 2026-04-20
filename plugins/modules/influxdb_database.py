@@ -33,8 +33,8 @@ options:
     default: present
     type: str
 extends_documentation_fragment:
-  - community.general.influxdb
-  - community.general.attributes
+  - community.general._influxdb
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -72,7 +72,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
+from ansible_collections.community.general.plugins.module_utils._influxdb import InfluxDb
 
 
 def find_database(module, client, database_name):

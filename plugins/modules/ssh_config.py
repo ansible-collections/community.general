@@ -18,7 +18,7 @@ author:
   - Björn Andersson (@gaqzi)
   - Abhijeet Kasurde (@Akasurde)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -223,12 +223,12 @@ from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
+from ansible_collections.community.general.plugins.module_utils._ssh import determine_config_file
 from ansible_collections.community.general.plugins.module_utils._stormssh import (
     HAS_PARAMIKO,
     PARAMIKO_IMPORT_ERROR,
     ConfigParser,
 )
-from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
 def convert_bool(value):

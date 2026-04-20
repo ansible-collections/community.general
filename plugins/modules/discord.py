@@ -18,7 +18,7 @@ seealso:
     description: Documentation for Discord API.
     link: https://discord.com/developers/docs/resources/webhook#execute-webhook
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

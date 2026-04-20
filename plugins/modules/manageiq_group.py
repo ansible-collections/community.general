@@ -10,8 +10,8 @@ module: manageiq_group
 
 short_description: Management of groups in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Evert Mulder (@evertmulder)
 description:
@@ -200,7 +200,7 @@ group:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
+from ansible_collections.community.general.plugins.module_utils._manageiq import ManageIQ, manageiq_argument_spec
 
 
 class ManageIQgroup:

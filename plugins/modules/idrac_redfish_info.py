@@ -13,9 +13,9 @@ description:
   - Builds Redfish URIs locally and sends them to remote iDRAC controllers to get information back.
   - For use with Dell EMC iDRAC operations that require Redfish OEM extensions.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._attributes.info_module
+  - community.general._redfish
 attributes:
   check_mode:
     version_added: 3.3.0
@@ -130,7 +130,7 @@ msg:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import (
     REDFISH_COMMON_ARGUMENT_SPEC,
     RedfishUtils,
 )

@@ -13,8 +13,8 @@ short_description: Manages Out-Of-Band controllers using Open Composable API (OC
 description:
   - Builds OCAPI URIs locally and sends them to remote OOB controllers to get information back.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   category:
     required: true
@@ -142,7 +142,7 @@ from urllib.parse import urljoin
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
+from ansible_collections.community.general.plugins.module_utils._ocapi_utils import OcapiUtils
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {"Jobs": ["JobStatus"]}

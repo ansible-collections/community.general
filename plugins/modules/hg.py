@@ -14,7 +14,7 @@ description:
   - Manages Mercurial (hg) repositories. Supports SSH, HTTP/S and local address.
 author: "Yeukhon Wong (@yeukhon)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

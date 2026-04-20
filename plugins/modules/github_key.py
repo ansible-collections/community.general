@@ -13,7 +13,7 @@ description:
   - Creates, removes, or updates GitHub access keys.
   - Works with both GitHub.com and GitHub Enterprise Server installations.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -134,7 +134,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-from ansible_collections.community.general.plugins.module_utils.datetime import (
+from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
 

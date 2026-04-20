@@ -79,7 +79,7 @@ _value:
 
 from ansible.errors import AnsibleFilterError
 
-from ansible_collections.community.general.plugins.module_utils.csv import (
+from ansible_collections.community.general.plugins.module_utils._csv import (
     CSVError,
     CustomDialectFailureError,
     DialectNotAvailableError,

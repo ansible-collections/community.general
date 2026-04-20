@@ -16,10 +16,10 @@ description:
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
-  - community.general.consul
-  - community.general.consul.actiongroup_consul
-  - community.general.consul.token
-  - community.general.attributes
+  - community.general._consul
+  - community.general._consul.actiongroup_consul
+  - community.general._consul.token
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -132,7 +132,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.consul import (
+from ansible_collections.community.general.plugins.module_utils._consul import (
     AUTH_ARGUMENTS_SPEC,
     _ConsulModule,
     camel_case_key,

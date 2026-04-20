@@ -14,7 +14,7 @@ version_added: 4.0.0
 description:
   - Manages snaps aliases.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -88,8 +88,8 @@ version:
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.snap import get_version, snap_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._snap import get_version, snap_runner
 
 
 class SnapAlias(StateModuleHelper):

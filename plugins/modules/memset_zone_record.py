@@ -18,7 +18,7 @@ notes:
 description:
   - Manage DNS records in a Memset account.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -165,7 +165,7 @@ memset_api:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.memset import get_zone_id, memset_api_call
+from ansible_collections.community.general.plugins.module_utils._memset import get_zone_id, memset_api_call
 
 
 def api_validation(args=None):

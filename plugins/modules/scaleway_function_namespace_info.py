@@ -16,10 +16,10 @@ author: Guillaume MARTINEZ (@Lunik)
 description:
   - This module return information about a function namespace on Scaleway account.
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
-  - community.general.attributes.info_module
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
+  - community.general._attributes.info_module
 
 attributes:
   action_group:
@@ -83,7 +83,7 @@ function_namespace:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import (
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
     SCALEWAY_REGIONS,
     Scaleway,
     scaleway_argument_spec,

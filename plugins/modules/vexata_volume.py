@@ -35,8 +35,8 @@ options:
       - Volume size in M, G, T units. M=2^20, G=2^30, T=2^40 bytes.
     type: str
 extends_documentation_fragment:
-  - community.general.vexata.vx100
-  - community.general.attributes
+  - community.general._vexata.vx100
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -72,7 +72,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.vexata import (
+from ansible_collections.community.general.plugins.module_utils._vexata import (
     argument_spec,
     get_array,
     required_together,

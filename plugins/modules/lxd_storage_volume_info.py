@@ -14,8 +14,8 @@ description:
   - This module returns details about all volumes or a specific volume in a pool.
 author: "Sean McAvoy (@smcavoy)"
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 attributes:
   check_mode:
     support: full
@@ -193,7 +193,7 @@ from urllib.parse import quote, urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.lxd import (
+from ansible_collections.community.general.plugins.module_utils._lxd import (
     LXDClient,
     LXDClientException,
     default_cert_file,

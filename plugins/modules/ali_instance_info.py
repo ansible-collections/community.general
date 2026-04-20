@@ -57,9 +57,9 @@ requirements:
   - "Python >= 3.6"
   - "footmark >= 1.13.0"
 extends_documentation_fragment:
-  - community.general.alicloud
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._alicloud
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""
@@ -343,7 +343,7 @@ ids:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
+from ansible_collections.community.general.plugins.module_utils._alicloud_ecs import (
     FOOTMARK_IMP_ERR,
     HAS_FOOTMARK,
     ecs_argument_spec,

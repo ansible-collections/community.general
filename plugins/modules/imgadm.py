@@ -13,7 +13,7 @@ description:
   - Manage SmartOS virtual machine images through imgadm(8).
 author: Jasper Lievisse Adriaanse (@jasperla)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

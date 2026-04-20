@@ -79,8 +79,8 @@ options:
     type: dict
 
 extends_documentation_fragment:
-  - community.general.opennebula
-  - community.general.attributes
+  - community.general._opennebula
+  - community.general._attributes
 
 author:
   - Rafael del Valle (@rvalle)
@@ -111,7 +111,7 @@ RETURN = r"""
 # TODO: Documentation on valid state transitions is required to properly implement all valid cases
 # TODO: To be coherent with CLI this module should also provide "flush" functionality
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
+from ansible_collections.community.general.plugins.module_utils._opennebula import OpenNebulaModule
 
 try:
     from pyone import HOST_STATES, HOST_STATUS

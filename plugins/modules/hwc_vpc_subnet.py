@@ -86,8 +86,8 @@ options:
     type: list
     elements: str
 extends_documentation_fragment:
-  - community.general.hwc
-  - community.general.attributes
+  - community.general._hwc
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -148,7 +148,7 @@ dns_address:
   returned: success
 """
 
-from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
+from ansible_collections.community.general.plugins.module_utils._hwc_utils import (
     Config,
     HwcClientException,
     HwcClientException404,

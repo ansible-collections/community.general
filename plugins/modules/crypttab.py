@@ -12,7 +12,7 @@ short_description: Encrypted Linux block devices
 description:
   - Control Linux encrypted block devices that are set up during system boot in C(/etc/crypttab).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

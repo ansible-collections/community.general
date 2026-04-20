@@ -96,9 +96,9 @@ notes:
   - Presently, the RV(end_state.realmRoles), RV(end_state.clientRoles), and RV(end_state.access) attributes returned by the
     Keycloak API are read-only for groups. This limitation will be removed in a later version of this module.
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Adam Goossens (@adamgoossens)
@@ -299,7 +299,7 @@ end_state:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
     KeycloakAPI,
     KeycloakError,
     camel,

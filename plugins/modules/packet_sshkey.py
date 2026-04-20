@@ -13,7 +13,7 @@ description:
   - API is documented at U(https://www.packet.net/help/api/#page:ssh-keys,header:ssh-keys-ssh-keys-post).
 author: "Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

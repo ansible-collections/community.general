@@ -13,7 +13,7 @@ short_description: Interface with dnsimple.com (a DNS hosting service)
 description:
   - 'Manages domains and records using the DNSimple API, see the docs: U(http://developer.dnsimple.com/).'
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -168,7 +168,7 @@ RETURN = r"""#"""
 import re
 import traceback
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class DNSimpleV2:

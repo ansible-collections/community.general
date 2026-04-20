@@ -13,8 +13,8 @@ if "hpOneView" not in sys.modules:
     sys.modules["hpOneView"] = Mock()
     sys.modules["hpOneView.oneview_client"] = Mock()
 
-ONEVIEW_MODULE_UTILS_PATH = "ansible_collections.community.general.plugins.module_utils.oneview"
-from ansible_collections.community.general.plugins.module_utils.oneview import (  # noqa: F401, pylint: disable=unused-import
+ONEVIEW_MODULE_UTILS_PATH = "ansible_collections.community.general.plugins.module_utils._oneview"
+from ansible_collections.community.general.plugins.module_utils._oneview import (  # noqa: F401, pylint: disable=unused-import
     OneViewModuleBase,
     OneViewModuleException,
     OneViewModuleResourceNotFound,

@@ -14,8 +14,8 @@ version_added: 9.0.0
 description:
   - This module allows the execution of arbitrary Django admin commands.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.django
+  - community.general._attributes
+  - community.general._django
 attributes:
   check_mode:
     support: none
@@ -63,8 +63,8 @@ version:
 
 import shlex
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._django import DjangoModuleHelper
 
 
 class DjangoCommand(DjangoModuleHelper):

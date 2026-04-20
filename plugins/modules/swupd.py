@@ -20,7 +20,7 @@ description:
   - Manages updates and bundles with the swupd bundle manager, which is used by the Clear Linux Project for Intel Architecture.
 author: Alberto Murillo (@albertomurillo)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

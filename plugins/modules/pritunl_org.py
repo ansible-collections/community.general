@@ -13,8 +13,8 @@ short_description: Manages Pritunl Organizations using the Pritunl API
 description:
   - A module to manage Pritunl organizations using the Pritunl API.
 extends_documentation_fragment:
-  - community.general.pritunl
-  - community.general.attributes
+  - community.general._pritunl
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -78,7 +78,7 @@ response:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api import (
+from ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api import (
     PritunlException,
     delete_pritunl_organization,
     get_pritunl_settings,

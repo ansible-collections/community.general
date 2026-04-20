@@ -21,7 +21,7 @@ description:
     or remove a diversion for a given file, but also update an existing diversion to modify its O(holder) and/or its O(divert)
     location.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -145,7 +145,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 def diversion_state(module, command, path):

@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.general.plugins.module_utils.homebrew import (
+from ansible_collections.community.general.plugins.module_utils._homebrew import (
     HomebrewValidate,
 )
 from ansible_collections.community.general.plugins.modules.homebrew_cask import (

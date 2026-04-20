@@ -13,7 +13,7 @@ Command Runner guide
 Introduction
 ^^^^^^^^^^^^
 
-The ``ansible_collections.community.general.plugins.module_utils.cmd_runner`` module util provides the
+The ``ansible_collections.community.general.plugins.module_utils._cmd_runner`` module util provides the
 ``CmdRunner`` class to help execute external commands. The class is a wrapper around
 the standard ``AnsibleModule.run_command()`` method, handling command arguments, localization setting,
 output processing output, check mode, and other features.
@@ -38,7 +38,7 @@ version of the actual code in :ansplugin:`community.general.ansible_galaxy_insta
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+    from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
 
     runner = CmdRunner(
         module,
@@ -151,7 +151,7 @@ that class:
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+    from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
 
 The same example shows how to make use of some of them in the instantiation of the ``CmdRunner`` object.
 A description of each one of the convenience methods available and examples of how to use them is found below.
@@ -354,7 +354,7 @@ Some additional features are available as decorators:
 - ``cmd_runner_fmt.unpack args()``
     This decorator unpacks the incoming ``value`` as a list of elements.
 
-    For example, in ``ansible_collections.community.general.plugins.module_utils.puppet``, it is used as:
+    For example, in ``ansible_collections.community.general.plugins.module_utils._puppet``, it is used as:
 
     .. code-block:: python
 
@@ -492,8 +492,8 @@ Python scripts. It features two extra and  mutually exclusive parameters ``pytho
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
-    from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
+    from ansible_collections.community.general.plugins.module_utils._python_runner import PythonRunner
+    from ansible_collections.community.general.plugins.module_utils._cmd_runner import cmd_runner_fmt
 
     runner = PythonRunner(
         module,

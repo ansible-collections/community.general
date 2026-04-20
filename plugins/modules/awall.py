@@ -15,7 +15,7 @@ description:
   - Alpine Wall (C(awall)) generates a firewall configuration from the enabled policy files and activates the configuration
     on the system.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

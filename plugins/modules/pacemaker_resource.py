@@ -15,7 +15,7 @@ version_added: 10.5.0
 description:
   - This module can manage resources in a Pacemaker cluster using the pacemaker CLI.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -145,8 +145,8 @@ cluster_resources:
   returned: always
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pacemaker import (
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     get_pacemaker_maintenance_mode,
     pacemaker_runner,
     wait_for_resource,

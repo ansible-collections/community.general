@@ -17,7 +17,7 @@ description:
   - You can see how many tasks has the playbook to run, and which one is actually running.
   - You can see how many hosts may run a task, and which of them is actually running.
 extends_documentation_fragment:
-  - default_callback
+  - ansible.builtin.default_callback
 requirements:
   - set as stdout callback in C(ansible.cfg) (C(stdout_callback = counter_enabled))
 """

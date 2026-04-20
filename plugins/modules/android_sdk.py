@@ -15,7 +15,7 @@ description:
   - Allows installation of packages to a non-default SDK root directory.
 author: Stanislav Shamilov (@shamilovstas)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -132,8 +132,8 @@ removed:
   sample: ["build-tools;34.0.0", "platform-tools"]
 """
 
-from ansible_collections.community.general.plugins.module_utils.android_sdkmanager import AndroidSdkManager, Package
-from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._android_sdkmanager import AndroidSdkManager, Package
+from ansible_collections.community.general.plugins.module_utils._mh.module_helper import StateModuleHelper
 
 
 class AndroidSdk(StateModuleHelper):

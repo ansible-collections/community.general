@@ -13,7 +13,7 @@ description:
   - 'Manages DNS records using the v2 REST API of the DNS Made Easy service. It handles records only; there is no manipulation
     of domains or monitor/account support yet. See: U(https://www.dnsmadeeasy.com/integration/restapi/).'
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

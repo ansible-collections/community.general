@@ -14,8 +14,8 @@ description:
   - Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API.
 author: "Dominik Kukacka (@dominikkukacka)"
 extends_documentation_fragment:
-  - "community.general.attributes"
-  - "community.general.attributes.info_module"
+  - "community.general._attributes"
+  - "community.general._attributes.info_module"
 options:
   ip:
     description:

@@ -14,8 +14,8 @@ version_added: 3.5.0
 description:
   - This module allows retrieving Xfce 4 configurations with the help of C(xfconf-query).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 attributes:
   check_mode:
     version_added: 3.3.0
@@ -125,8 +125,8 @@ version:
   version_added: 10.2.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import get_xfconf_version, xfconf_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._xfconf import get_xfconf_version, xfconf_runner
 
 
 class XFConfInfo(ModuleHelper):

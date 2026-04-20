@@ -16,7 +16,7 @@ description:
   - This module allows to manage user groups on a univention corporate server (UCS). It uses the Python API of the UCS to
     create a new object or edit it.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -81,7 +81,7 @@ RETURN = """#"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.univention_umc import (
+from ansible_collections.community.general.plugins.module_utils._univention_umc import (
     base_dn,
     ldap_search,
     umc_module_for_add,

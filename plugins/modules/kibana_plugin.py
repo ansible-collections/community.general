@@ -15,7 +15,7 @@ description:
   - This module can be used to manage Kibana plugins.
 author: Thierno IB. BARRY (@barryib)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -116,7 +116,7 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 PACKAGE_STATE_MAP = dict(present="--install", absent="--remove")
 

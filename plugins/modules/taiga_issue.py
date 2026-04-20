@@ -14,7 +14,7 @@ description:
   - An issue is identified by the combination of project, issue subject and issue type.
   - This module implements the creation or deletion of issues (not the update).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

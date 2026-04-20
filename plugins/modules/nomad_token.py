@@ -16,8 +16,8 @@ description:
 requirements:
   - python-nomad
 extends_documentation_fragment:
-  - community.general.nomad
-  - community.general.attributes
+  - community.general._nomad
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

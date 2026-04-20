@@ -15,7 +15,7 @@ short_description: Manage Gandi LiveDNS records
 description:
   - 'Manages DNS records by the Gandi LiveDNS API, see the docs: U(https://doc.livedns.gandi.net/).'
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -160,7 +160,7 @@ record:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gandi_livedns_api import GandiLiveDNSAPI
+from ansible_collections.community.general.plugins.module_utils._gandi_livedns_api import GandiLiveDNSAPI
 
 
 def main():

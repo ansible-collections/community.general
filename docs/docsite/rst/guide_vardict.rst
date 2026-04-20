@@ -11,7 +11,7 @@ VarDict Guide
 Introduction
 ^^^^^^^^^^^^
 
-The ``ansible_collections.community.general.plugins.module_utils.vardict`` module util provides the
+The ``ansible_collections.community.general.plugins.module_utils._vardict`` module util provides the
 ``VarDict`` class to help manage the module variables. That class is a container for module variables,
 especially the ones for which the module must keep track of state changes, and the ones that should
 be published as return values.
@@ -26,7 +26,7 @@ The simplest way of using ``VarDict`` is:
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.vardict import VarDict
+    from ansible_collections.community.general.plugins.module_utils._vardict import VarDict
 
 Then in ``main()``, or any other function called from there:
 

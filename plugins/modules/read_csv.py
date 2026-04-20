@@ -14,7 +14,7 @@ description:
 author:
   - Dag Wieers (@dagwieers)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -145,7 +145,7 @@ list:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.csv import (
+from ansible_collections.community.general.plugins.module_utils._csv import (
     CSVError,
     CustomDialectFailureError,
     DialectNotAvailableError,

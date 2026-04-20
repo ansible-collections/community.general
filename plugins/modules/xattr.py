@@ -14,7 +14,7 @@ description:
   - Requires that extended attributes are enabled on the target filesystem and that the C(setfattr)/C(getfattr) utilities
     are present.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

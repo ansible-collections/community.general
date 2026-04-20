@@ -18,9 +18,9 @@ description:
 requirements:
   - pysnmp (either pysnmp < 6.2.4 or pysnmp >= 7.1)
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.facts
-  - community.general.attributes.facts_module
+  - community.general._attributes
+  - community.general._attributes.facts
+  - community.general._attributes.facts_module
 attributes:
   check_mode:
     version_added: 3.3.0
@@ -199,7 +199,7 @@ from collections import defaultdict
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("pysnmp", url="https://pypi.org/project/pysnmp/"):
     from pysnmp.hlapi.v3arch.asyncio import (

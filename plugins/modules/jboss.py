@@ -18,7 +18,7 @@ deprecated:
     Use the C(middleware_automation.wildfly.wildfly_app_deploy) role to deploy applications in JBoss or WildFly.
     See U(https://galaxy.ansible.com/ui/repo/published/middleware_automation/wildfly/content/role/wildfly_app_deploy/) for details.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

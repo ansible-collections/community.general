@@ -17,7 +17,7 @@ author:
 requirements:
   - Solaris 10 or 11
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

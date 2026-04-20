@@ -10,8 +10,8 @@ module: manageiq_alerts
 
 short_description: Configuration of alerts in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
 description:
@@ -127,7 +127,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
+from ansible_collections.community.general.plugins.module_utils._manageiq import ManageIQ, manageiq_argument_spec
 
 
 class ManageIQAlert:

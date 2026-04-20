@@ -13,7 +13,7 @@ version_added: 11.0.0
 description:
   - Create, destroy, and modify ZFS zpools and their vdev layouts, pool properties, and filesystem properties.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: partial
@@ -139,7 +139,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
 
 
 class Zpool:

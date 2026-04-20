@@ -16,7 +16,7 @@ short_description: Makes a filesystem
 description:
   - This module creates a filesystem.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -155,7 +155,7 @@ import stat
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils._lvm import pvs_runner
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class Device:

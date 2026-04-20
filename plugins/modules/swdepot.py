@@ -17,7 +17,7 @@ description:
 notes: []
 author: "Raul Melo (@melodous)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

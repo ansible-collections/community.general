@@ -51,8 +51,8 @@ options:
     type: str
 
 extends_documentation_fragment:
-  - community.general.ibm_storage
-  - community.general.attributes
+  - community.general._ibm_storage
+  - community.general._attributes
 
 author:
   - Tzur Eliyahu (@tzure)
@@ -92,7 +92,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (
+from ansible_collections.community.general.plugins.module_utils._ibm_sa_utils import (
     connect_ssl,
     execute_pyxcli_command,
     is_pyxcli_installed,

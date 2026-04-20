@@ -150,7 +150,7 @@ notes:
     types are welcome.
 extends_documentation_fragment:
   - ansible.builtin.url
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

@@ -17,10 +17,10 @@ author:
   - Steve Gargan (@sgargan)
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
-  - community.general.consul
-  - community.general.consul.actiongroup_consul
-  - community.general.consul.token
-  - community.general.attributes
+  - community.general._consul
+  - community.general._consul.actiongroup_consul
+  - community.general._consul.token
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -116,7 +116,7 @@ EXAMPLES = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.consul import AUTH_ARGUMENTS_SPEC, _ConsulModule
+from ansible_collections.community.general.plugins.module_utils._consul import AUTH_ARGUMENTS_SPEC, _ConsulModule
 
 
 def execute(module, consul_module):

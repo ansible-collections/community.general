@@ -13,8 +13,8 @@ version_added: 3.8.0
 description:
   - Manage Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.pipx
+  - community.general._attributes
+  - community.general._pipx
 attributes:
   check_mode:
     support: full
@@ -211,14 +211,14 @@ version:
 """
 
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import (
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._pipx import (
     make_process_dict,
     pipx_common_argspec,
     pipx_runner,
 )
-from ansible_collections.community.general.plugins.module_utils.pkg_req import PackageRequirement
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._pkg_req import PackageRequirement
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 def make_installed_name(name, suffix):

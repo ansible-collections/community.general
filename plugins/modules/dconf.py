@@ -46,7 +46,7 @@ notes:
     application affected by the key, and then having a look at value set using commands C(dconf dump /path/to/dir/) or C(dconf
     read /path/to/key).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -136,7 +136,7 @@ from ansible.module_utils.common.respawn import (
     respawn_module,
 )
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 glib_module_name = "gi.repository.GLib"
 

@@ -99,7 +99,7 @@ _value:
   elements: dictionary
 """
 
-from ansible_collections.community.general.plugins.plugin_utils.keys_filter import (
+from ansible_collections.community.general.plugins.plugin_utils._keys_filter import (
     _keys_filter_params,
     _keys_filter_target_str,
 )

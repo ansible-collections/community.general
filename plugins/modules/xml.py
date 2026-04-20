@@ -15,7 +15,7 @@ short_description: Manage bits and pieces of XML files or strings
 description:
   - A CRUD-like interface to managing bits of XML files.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -363,7 +363,7 @@ import traceback
 from collections.abc import MutableMapping
 from io import BytesIO
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 LXML_IMP_ERR = None
 try:

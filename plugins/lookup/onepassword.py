@@ -34,8 +34,8 @@ options:
   service_account_token:
     version_added: 7.1.0
 extends_documentation_fragment:
-  - community.general.onepassword
-  - community.general.onepassword.lookup
+  - community.general._onepassword
+  - community.general._onepassword.lookup
 """
 
 EXAMPLES = r"""
@@ -84,7 +84,7 @@ from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.lookup import LookupBase
 
-from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
+from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
 
 
 def _lower_if_possible(value):

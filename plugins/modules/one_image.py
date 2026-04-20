@@ -14,8 +14,8 @@ description:
 requirements:
   - pyone
 extends_documentation_fragment:
-  - community.general.opennebula
-  - community.general.attributes
+  - community.general._opennebula
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -370,7 +370,7 @@ snapshots:
 
 import time
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
+from ansible_collections.community.general.plugins.module_utils._opennebula import OpenNebulaModule
 
 IMAGE_STATES = [
     "INIT",

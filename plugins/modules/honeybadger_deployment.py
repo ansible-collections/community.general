@@ -13,7 +13,7 @@ short_description: Notify Honeybadger.io about app deployments
 description:
   - Notify Honeybadger.io about app deployments (see U(http://docs.honeybadger.io/article/188-deployment-tracking)).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

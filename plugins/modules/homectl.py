@@ -21,7 +21,7 @@ requirements:
   - passlib (Python library, recommended), or legacycrypt on Python 3.13 or newer
   - It requires no dependency on Python 3.12 and earlier, but then it relies on the deprecated standard library C(crypt).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -273,7 +273,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule, jsonify
 from ansible.module_utils.common.text.formatters import human_to_bytes
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("crypt_context"):
     from ansible_collections.community.general.plugins.module_utils._crypt import CryptContext, has_crypt_context

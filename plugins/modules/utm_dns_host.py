@@ -69,8 +69,8 @@ options:
     default: 0
 
 extends_documentation_fragment:
-  - community.general.utm
-  - community.general.attributes
+  - community.general._utm
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -131,7 +131,7 @@ result:
       type: int
 """
 
-from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM, UTMModule
+from ansible_collections.community.general.plugins.module_utils._utm_utils import UTM, UTMModule
 
 
 def main():

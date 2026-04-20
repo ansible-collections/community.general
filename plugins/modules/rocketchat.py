@@ -16,7 +16,7 @@ description:
   - This module sends notifications to Rocket Chat through the Incoming WebHook integration.
 author: "Ramon de la Fuente (@ramondelafuente)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

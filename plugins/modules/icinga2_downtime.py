@@ -94,7 +94,7 @@ options:
     type: str
 extends_documentation_fragment:
   - community.general._icinga2_api
-  - community.general.attributes
+  - community.general._attributes
   - ansible.builtin.url
 """
 
@@ -190,7 +190,7 @@ from ansible_collections.community.general.plugins.module_utils._icinga2 import 
     Icinga2Client,
     icinga2_argument_spec,
 )
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 
 class Icinga2Downtime(StateModuleHelper):

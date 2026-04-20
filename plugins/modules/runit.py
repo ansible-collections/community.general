@@ -14,7 +14,7 @@ short_description: Manage runit services
 description:
   - Controls runit services on remote hosts using the sv utility.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

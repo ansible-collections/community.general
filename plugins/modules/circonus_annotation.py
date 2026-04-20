@@ -15,7 +15,7 @@ author: "Nick Harring (@NickatEpic)"
 requirements:
   - requests >= 2.0.0
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -147,7 +147,7 @@ import json
 import time
 import traceback
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 REQUESTS_IMP_ERR = None
 try:

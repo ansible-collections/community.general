@@ -29,8 +29,7 @@ description:
   - Also supports transactional updates, by running zypper inside C(/sbin/transactional-update --continue --drop-if-no-change
     --quiet run).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

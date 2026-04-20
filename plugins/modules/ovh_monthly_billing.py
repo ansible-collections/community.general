@@ -15,7 +15,7 @@ description:
   - Enable monthly billing on OVH cloud instances (be aware OVH does not allow to disable it).
 requirements: ["ovh"]
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

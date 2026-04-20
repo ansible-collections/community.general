@@ -15,7 +15,7 @@ short_description: Manage Networking
 requirements:
   - nmcli
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 description:
   - Manage the network devices. Create, modify and manage various connection and device type, for example V(ethernet), V(team),
     V(bond), V(vlan) and so on.

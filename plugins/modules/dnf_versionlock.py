@@ -14,7 +14,7 @@ description:
     for packages and excludes all other versions of those packages. This allows you to for example protect packages from being
     updated by newer versions. The state of the plugin that reflects locking of packages is the C(locklist).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: partial

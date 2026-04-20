@@ -14,7 +14,7 @@ description:
 requirements:
   - "PyGithub >= 1.3.5"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

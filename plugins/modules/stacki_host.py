@@ -13,7 +13,7 @@ description:
   - Use this module to add or remove hosts to a stacki front-end using API.
   - Information on stacki can be found at U(https://github.com/StackIQ/stacki).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

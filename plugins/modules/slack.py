@@ -19,7 +19,7 @@ description:
   - The M(community.general.slack) module sends notifications to U(http://slack.com) using the Incoming WebHook integration.
 author: "Ramon de la Fuente (@ramondelafuente)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

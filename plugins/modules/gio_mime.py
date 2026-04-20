@@ -15,7 +15,7 @@ description:
   - This module allows configuring the default handler for a specific MIME type, to be used by applications built with the
     Gnome GIO API.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -67,8 +67,8 @@ version:
   version_added: 10.0.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.gio_mime import gio_mime_get, gio_mime_runner
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._gio_mime import gio_mime_get, gio_mime_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 
 class GioMime(ModuleHelper):

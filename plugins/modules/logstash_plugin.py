@@ -12,7 +12,7 @@ description:
   - Manages Logstash plugins.
 author: Loic Blot (@nerzhul)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

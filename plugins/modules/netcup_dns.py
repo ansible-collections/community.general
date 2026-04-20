@@ -13,7 +13,7 @@ short_description: Manage Netcup DNS records
 description:
   - Manages DNS records using the Netcup API, see the docs U(https://ccp.netcup.net/run/webservice/servers/endpoint.php).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

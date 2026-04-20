@@ -13,9 +13,9 @@ version_added: 5.8.0
 
 short_description: Listing of resource policy_profiles in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._manageiq
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 author: Alexei Znamensky (@russoz)
 description:
@@ -89,7 +89,7 @@ profiles:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.manageiq import (
+from ansible_collections.community.general.plugins.module_utils._manageiq import (
     ManageIQ,
     manageiq_argument_spec,
     manageiq_entities,

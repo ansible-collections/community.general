@@ -13,7 +13,7 @@ short_description: Send notifications to matrix
 description:
   - This module sends HTML formatted notifications to matrix rooms.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

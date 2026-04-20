@@ -14,7 +14,7 @@ short_description: Manage C(daemontools) services
 description:
   - Controls C(daemontools) services on remote hosts using the C(svc) utility.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

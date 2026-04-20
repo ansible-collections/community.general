@@ -16,8 +16,8 @@ description:
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
-  - community.general.consul
-  - community.general.attributes
+  - community.general._consul
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -68,7 +68,7 @@ result:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.consul import (
+from ansible_collections.community.general.plugins.module_utils._consul import (
     AUTH_ARGUMENTS_SPEC,
     RequestError,
     _ConsulModule,

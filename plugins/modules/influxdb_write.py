@@ -31,8 +31,8 @@ options:
     required: true
     type: str
 extends_documentation_fragment:
-  - community.general.influxdb
-  - community.general.attributes
+  - community.general._influxdb
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -63,7 +63,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
+from ansible_collections.community.general.plugins.module_utils._influxdb import InfluxDb
 
 
 class AnsibleInfluxDBWrite(InfluxDb):

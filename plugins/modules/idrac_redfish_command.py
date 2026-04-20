@@ -13,8 +13,8 @@ description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
   - For use with Dell iDRAC operations that require Redfish OEM extensions.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: none
@@ -99,7 +99,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import (
     REDFISH_COMMON_ARGUMENT_SPEC,
     RedfishUtils,
 )

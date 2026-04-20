@@ -318,9 +318,9 @@ notes:
   - Currently, only a single V(declarative-user-profile) entry is supported for O(provider_id) (design of the Keyckoak API).
     However, there can be multiple O(config.kc_user_profile_config[].attributes[]) entries.
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Eike Waldt (@yeoldegrove)
@@ -480,7 +480,7 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
     KeycloakAPI,
     KeycloakError,
     camel,

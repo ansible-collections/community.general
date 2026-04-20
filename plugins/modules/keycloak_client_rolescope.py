@@ -68,9 +68,9 @@ options:
       - If O(client_scope_id) is present, all roles must be under this client.
       - If O(client_scope_id) is absent, all roles must be under the realm.
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Andre Desrosiers (@desand01)
@@ -149,7 +149,7 @@ end_state:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
     KeycloakAPI,
     KeycloakError,
     get_token,

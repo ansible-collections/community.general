@@ -51,8 +51,8 @@ options:
     description:
       - Whether or not the object is resolved.
 extends_documentation_fragment:
-  - community.general.utm
-  - community.general.attributes
+  - community.general._utm
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -108,7 +108,7 @@ result:
       type: bool
 """
 
-from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM, UTMModule
+from ansible_collections.community.general.plugins.module_utils._utm_utils import UTM, UTMModule
 
 
 def main():

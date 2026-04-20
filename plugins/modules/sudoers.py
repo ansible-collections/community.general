@@ -16,7 +16,7 @@ description:
 author:
   - "Jon Ellis (@JonEllis) <ellis.jp@gmail.com>"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

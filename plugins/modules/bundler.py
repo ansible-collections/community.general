@@ -12,7 +12,7 @@ short_description: Manage Ruby Gem dependencies with Bundler
 description:
   - Manage installation and Gem version dependencies for Ruby using the Bundler gem.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

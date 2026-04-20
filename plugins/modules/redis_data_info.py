@@ -21,9 +21,9 @@ options:
     required: true
 
 extends_documentation_fragment:
-  - community.general.redis
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._redis
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 seealso:
   - module: community.general.redis_data
@@ -68,7 +68,7 @@ msg:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.redis import (
+from ansible_collections.community.general.plugins.module_utils._redis import (
     RedisAnsible,
     fail_imports,
     redis_auth_argument_spec,

@@ -35,9 +35,9 @@ options:
       - 'V(sort): The sort order of the returned data set.'
     type: dict
 extends_documentation_fragment:
-  - community.general.oneview
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._oneview
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""
@@ -85,7 +85,7 @@ san_managers:
   type: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
+from ansible_collections.community.general.plugins.module_utils._oneview import OneViewModuleBase
 
 
 class SanManagerInfoModule(OneViewModuleBase):

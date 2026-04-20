@@ -13,7 +13,7 @@ requirements: [ip]
 description:
   - Create or delete network namespaces using the C(ip) command.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

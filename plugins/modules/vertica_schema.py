@@ -15,7 +15,7 @@ description:
   - In such a situation, if the module tries to remove the schema it fails and only remove roles created for the schema if
     they have no dependencies.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -74,8 +74,8 @@ options:
     default: false
     version_added: 4.6.0
 extends_documentation_fragment:
-  - community.general.ldap.documentation
-  - community.general.attributes
+  - community.general._ldap.documentation
+  - community.general._attributes
 """
 
 
@@ -176,7 +176,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes
 
-from ansible_collections.community.general.plugins.module_utils.ldap import (
+from ansible_collections.community.general.plugins.module_utils._ldap import (
     LdapGeneric,
     gen_specs,
     ldap_required_together,

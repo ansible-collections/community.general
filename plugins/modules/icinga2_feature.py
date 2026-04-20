@@ -18,7 +18,7 @@ description:
   - This module can be used to enable or disable an Icinga2 feature.
 author: "Loic Blot (@nerzhul)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

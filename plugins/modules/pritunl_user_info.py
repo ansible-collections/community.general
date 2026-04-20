@@ -13,9 +13,9 @@ short_description: List Pritunl Users using the Pritunl API
 description:
   - A module to list Pritunl users using the Pritunl API.
 extends_documentation_fragment:
-  - community.general.pritunl
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._pritunl
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   organization:
     type: str
@@ -91,7 +91,7 @@ users:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api import (
+from ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api import (
     PritunlException,
     get_pritunl_settings,
     list_pritunl_organizations,

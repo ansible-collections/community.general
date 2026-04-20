@@ -20,7 +20,7 @@ requirements:
 version_added: '5.8.0'
 
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:
@@ -102,7 +102,7 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("pycdlib"):
     import pycdlib

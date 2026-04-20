@@ -28,7 +28,7 @@ seealso:
     link: https://docs.xfce.org/xfce/xfce4-settings/editor#change_properties
 
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:
@@ -176,8 +176,8 @@ version:
 
 from ansible.module_utils.parsing.convert_bool import boolean
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import get_xfconf_version, xfconf_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._xfconf import get_xfconf_version, xfconf_runner
 
 
 class XFConfProperty(StateModuleHelper):

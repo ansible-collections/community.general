@@ -14,7 +14,7 @@ description:
   - The C(jenkins_script) module takes a script plus a dict of values to use within the script and returns the result of the
     script being run.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 
 attributes:
   check_mode:

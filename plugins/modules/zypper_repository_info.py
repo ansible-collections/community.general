@@ -16,8 +16,8 @@ short_description: List Zypper repositories
 description:
   - List Zypper repositories on SUSE and openSUSE.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 
 requirements:
   - "zypper >= 1.0 (included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0)"
@@ -71,7 +71,7 @@ repodatalist:
 """
 
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("parseXML"):
     from xml.dom.minidom import parseString as parseXML

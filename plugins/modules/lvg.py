@@ -15,7 +15,7 @@ short_description: Configure LVM volume groups
 description:
   - This module creates, removes or resizes volume groups.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

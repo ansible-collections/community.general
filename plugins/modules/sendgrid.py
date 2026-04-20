@@ -21,7 +21,7 @@ notes:
 requirements:
   - sendgrid Python library 1.6.22 or lower (Sendgrid API V2 supported)
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -126,7 +126,7 @@ import os
 import traceback
 from urllib.parse import urlencode
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 SENDGRID_IMP_ERR = None
 try:

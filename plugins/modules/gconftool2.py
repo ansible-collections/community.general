@@ -21,7 +21,7 @@ seealso:
     link: https://help.gnome.org/admin//system-admin-guide/2.32/gconf-6.html.en
 
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -102,8 +102,8 @@ version:
   version_added: 10.0.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.gconftool2 import gconftool2_runner
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._gconftool2 import gconftool2_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 
 class GConftool(StateModuleHelper):

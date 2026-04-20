@@ -22,7 +22,7 @@ description:
   - Use this module to manage crontab variables.
   - This module allows you to create, update, or delete cron variable definitions.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

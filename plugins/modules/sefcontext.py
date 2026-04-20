@@ -13,8 +13,8 @@ description:
   - Manages SELinux file context mapping definitions.
   - Similar to the C(semanage fcontext) command.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.platform
+  - community.general._attributes
+  - community.general._attributes.platform
 attributes:
   check_mode:
     support: full

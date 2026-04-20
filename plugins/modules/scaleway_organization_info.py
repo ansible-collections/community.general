@@ -26,10 +26,10 @@ options:
     default: 'https://account.scaleway.com'
     aliases: ['base_url']
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
-  - community.general.attributes.info_module
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""
@@ -75,7 +75,7 @@ scaleway_organization_info:
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import (
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
     Scaleway,
     ScalewayException,
     scaleway_argument_spec,

@@ -15,7 +15,7 @@ short_description: Add and remove Zypper repositories
 description:
   - Add or remove Zypper repositories on SUSE and openSUSE.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -143,7 +143,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 REPO_OPTS = ["alias", "name", "priority", "enabled", "autorefresh", "gpgcheck"]
 

@@ -23,7 +23,7 @@ short_description: Package manager for Homebrew
 description:
   - Manages Homebrew packages.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -179,7 +179,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
+from ansible_collections.community.general.plugins.module_utils._homebrew import HomebrewValidate
 
 
 # exceptions -------------------------------------------------------------- {{{

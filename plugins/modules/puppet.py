@@ -12,7 +12,7 @@ short_description: Runs puppet
 description:
   - Runs C(puppet) agent or apply in a reliable manner.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -193,7 +193,7 @@ import stat
 
 from ansible.module_utils.basic import AnsibleModule
 
-import ansible_collections.community.general.plugins.module_utils.puppet as puppet_utils
+import ansible_collections.community.general.plugins.module_utils._puppet as puppet_utils
 
 
 def _write_structured_data(basedir, basename, data):

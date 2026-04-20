@@ -12,7 +12,7 @@ short_description: Manages a Serverless Framework project
 description:
   - Provides support for managing Serverless Framework (U(https://serverless.com/)) project deployments and stacks.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

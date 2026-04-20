@@ -17,7 +17,7 @@ notes:
   - This module works on ALT based distros.
   - Does NOT support checkmode, due to a limitation in C(apt-repo) tool.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none

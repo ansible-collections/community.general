@@ -68,8 +68,8 @@ options:
     type: int
     default: 0
 extends_documentation_fragment:
-  - community.general.xenserver.documentation
-  - community.general.attributes
+  - community.general._xenserver.documentation
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -177,7 +177,7 @@ instance:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.xenserver import (
+from ansible_collections.community.general.plugins.module_utils._xenserver import (
     XenServerObject,
     gather_vm_facts,
     gather_vm_params,

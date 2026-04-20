@@ -21,9 +21,9 @@ author:
 requirements:
   - python-gitlab >= 3.1.0
 extends_documentation_fragment:
-  - community.general.auth_basic
-  - community.general.gitlab
-  - community.general.attributes
+  - community.general._auth_basic
+  - community.general._gitlab
+  - community.general._attributes
 notes:
   - Access tokens can not be changed. If a parameter needs to be changed, an acceess token has to be recreated. Whether tokens
     are recreated or not is controlled by the O(recreate) option, which defaults to V(never).
@@ -157,7 +157,7 @@ from datetime import datetime
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import (
+from ansible_collections.community.general.plugins.module_utils._gitlab import (
     auth_argument_spec,
     find_project,
     gitlab,

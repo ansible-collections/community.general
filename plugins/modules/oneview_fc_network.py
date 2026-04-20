@@ -34,9 +34,9 @@ options:
     required: true
 
 extends_documentation_fragment:
-  - community.general.oneview
-  - community.general.oneview.validateetag
-  - community.general.attributes
+  - community.general._oneview
+  - community.general._oneview.validateetag
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -80,7 +80,7 @@ fc_network:
   type: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
+from ansible_collections.community.general.plugins.module_utils._oneview import OneViewModuleBase
 
 
 class FcNetworkModule(OneViewModuleBase):

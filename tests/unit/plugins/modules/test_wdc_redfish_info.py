@@ -205,7 +205,7 @@ class TestWdcRedfishInfo(unittest.TestCase):
                     raise RuntimeError(f"Illegal call to get_request in test: {uri}")
 
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils.get_request"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils.get_request"
             ) as mock_get_request:
                 mock_get_request.side_effect = mock_get_request_function
                 with self.assertRaises(AnsibleFailJson) as ansible_exit_json:

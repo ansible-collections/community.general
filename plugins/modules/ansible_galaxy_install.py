@@ -26,7 +26,7 @@ seealso:
 requirements:
   - ansible-core 2.11 or newer
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -194,8 +194,11 @@ version:
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper, ModuleHelperException
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._module_helper import (
+    ModuleHelper,
+    ModuleHelperException,
+)
 
 
 class AnsibleGalaxyInstall(ModuleHelper):

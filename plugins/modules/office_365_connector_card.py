@@ -17,7 +17,7 @@ author: "Marc Sensenich (@marc-sensenich)"
 notes:
   - This module is not idempotent, therefore if you run the same task twice then you create two Connector Cards.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

@@ -294,8 +294,8 @@ options:
     type: bool
     default: false
 extends_documentation_fragment:
-  - community.general.xenserver.documentation
-  - community.general.attributes
+  - community.general._xenserver.documentation
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -544,7 +544,7 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.network import is_mac
 
-from ansible_collections.community.general.plugins.module_utils.xenserver import (
+from ansible_collections.community.general.plugins.module_utils._xenserver import (
     XenServerObject,
     gather_vm_facts,
     gather_vm_params,

@@ -17,7 +17,7 @@ version_added: '12.5.0'
 requirements:
   - pynacl
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -106,7 +106,7 @@ from http import HTTPStatus
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare(
     "pynacl",

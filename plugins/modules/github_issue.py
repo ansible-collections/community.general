@@ -13,7 +13,7 @@ short_description: View GitHub issue
 description:
   - View GitHub issue for a given repository and organization.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

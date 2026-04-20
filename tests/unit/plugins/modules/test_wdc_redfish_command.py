@@ -262,7 +262,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         }
         with set_module_args(module_args):
             with patch.multiple(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
                 post_request=mock_post_request,
             ):
@@ -283,7 +283,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         }
         with set_module_args(module_args):
             with patch.multiple(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
             ):
                 with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
@@ -303,7 +303,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         }
         with set_module_args(module_args):
             with patch.multiple(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
             ):
                 with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
@@ -323,7 +323,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         }
         with set_module_args(module_args):
             with patch.multiple(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
                 post_request=mock_post_request,
             ):
@@ -344,7 +344,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         }
         with set_module_args(module_args):
             with patch.multiple(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
                 post_request=mock_post_request,
             ):
@@ -365,7 +365,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         }
         with set_module_args(module_args):
             with patch.multiple(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                 get_request=mock_get_request,
             ):
                 with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
@@ -420,7 +420,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
             module_args.update(uri_specifier)
             with set_module_args(module_args):
                 with patch.multiple(
-                    "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                    "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                     _firmware_activate_uri=mock_fw_activate_url,
                     _update_uri=mock_update_url,
                     _find_updateservice_resource=empty_return,
@@ -538,7 +538,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
             }
         ):
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = mock_filename
                 with patch.multiple(
@@ -571,7 +571,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
             empty_tarfile = tarfile.open(os.path.join(self.tempdir, tar_name), "w")
             empty_tarfile.close()
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
                 with patch.multiple(
@@ -603,7 +603,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         ):
             tar_name = self.generate_temp_bundlefile(mock_firmware_version=mock_firmware_version, is_multi_tenant=False)
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
                 with patch.multiple(
@@ -638,7 +638,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         ):
             tar_name = self.generate_temp_bundlefile(mock_firmware_version=mock_firmware_version, is_multi_tenant=True)
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
                 with patch.multiple(
@@ -673,11 +673,11 @@ class TestWdcRedfishCommand(unittest.TestCase):
             tar_name = self.generate_temp_bundlefile(mock_firmware_version=mock_firmware_version, is_multi_tenant=False)
 
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
                 with patch.multiple(
-                    "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                    "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils",
                     get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
                     simple_update=mock_simple_update,
                     _simple_update_status_uri=mocked_url_response,
@@ -687,7 +687,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
                     post_request=mock_post_request,
                 ):
                     with patch(
-                        "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils.get_simple_update_status"
+                        "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils.get_simple_update_status"
                     ) as mock_get_simple_update_status:
                         mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
                         with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
@@ -712,7 +712,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
             tar_name = self.generate_temp_bundlefile(mock_firmware_version=mock_firmware_version, is_multi_tenant=True)
 
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
                 with patch.multiple(
@@ -726,7 +726,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
                     post_request=mock_post_request,
                 ):
                     with patch(
-                        "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils.get_simple_update_status"
+                        "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.WdcRedfishUtils.get_simple_update_status"
                     ) as mock_get_simple_update_status:
                         mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
                         with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
@@ -751,7 +751,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         ):
             tar_name = self.generate_temp_bundlefile(mock_firmware_version=mock_firmware_version, is_multi_tenant=True)
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
                 with patch.multiple(
@@ -785,7 +785,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         ):
             tar_name = self.generate_temp_bundlefile(mock_firmware_version=mock_firmware_version, is_multi_tenant=False)
             with patch(
-                "ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file"
+                "ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils.fetch_file"
             ) as mock_fetch_file:
                 mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
                 with patch.multiple(

@@ -35,10 +35,10 @@ options:
       - The start point to return the results.
     default: 0
 extends_documentation_fragment:
-  - community.general.rundeck
+  - community.general._rundeck
   - ansible.builtin.url
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 """
 
 EXAMPLES = r"""
@@ -131,7 +131,7 @@ from urllib.parse import quote
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.rundeck import api_argument_spec, api_request
+from ansible_collections.community.general.plugins.module_utils._rundeck import api_argument_spec, api_request
 
 
 class RundeckJobExecutionsInfo:

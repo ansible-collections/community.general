@@ -15,8 +15,8 @@ author:
   - Thomas Sjögren (@konstruktoid)
 version_added: '12.5.0'
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   organization:
     description:
@@ -82,7 +82,7 @@ from http import HTTPStatus
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 
 def list_secrets(

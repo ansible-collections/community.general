@@ -19,7 +19,7 @@ seealso:
     description: Complete documentation for Pacemaker STONITH.
     link: https://clusterlabs.org/projects/pacemaker/doc/3.0/Pacemaker_Explained/html/resources.html#stonith
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -124,8 +124,8 @@ value:
   returned: on success
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pacemaker import pacemaker_runner, wait_for_resource
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._pacemaker import pacemaker_runner, wait_for_resource
 
 
 class PacemakerStonith(StateModuleHelper):

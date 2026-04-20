@@ -13,7 +13,7 @@ short_description: Notify New Relic about app deployments
 description:
   - Notify New Relic about app deployments (see U(https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)).
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

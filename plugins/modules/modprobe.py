@@ -16,7 +16,7 @@ author:
 description:
   - Load or unload kernel modules.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

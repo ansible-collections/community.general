@@ -15,7 +15,7 @@ description:
   - Sets or deletes values in etcd3 cluster using its v3 API.
   - Needs python etcd3 lib to work.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

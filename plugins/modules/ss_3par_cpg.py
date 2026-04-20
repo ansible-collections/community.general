@@ -85,8 +85,8 @@ options:
     type: bool
     default: false
 extends_documentation_fragment:
-  - community.general.hpe3par
-  - community.general.attributes
+  - community.general._hpe3par
+  - community.general._attributes
 """
 
 
@@ -123,7 +123,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.storage.hpe3par import hpe3par
+from ansible_collections.community.general.plugins.module_utils._storage.hpe3par import hpe3par
 
 try:
     from hpe3par_sdk import client

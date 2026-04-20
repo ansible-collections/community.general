@@ -14,7 +14,8 @@ from ansible_collections.community.general.plugins.modules import lxca_nodes
 
 @pytest.fixture(scope="module")
 @mock.patch(
-    "ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common.close_conn", autospec=True
+    "ansible_collections.community.general.plugins.module_utils._remote_management.lxca.common.close_conn",
+    autospec=True,
 )
 def setup_module(close_conn):
     close_conn.return_value = True
@@ -42,7 +43,7 @@ class TestMyModule:
     )
     @pytest.mark.usefixtures("patch_ansible_module")
     @mock.patch(
-        "ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common.setup_conn",
+        "ansible_collections.community.general.plugins.module_utils._remote_management.lxca.common.setup_conn",
         autospec=True,
     )
     @mock.patch("ansible_collections.community.general.plugins.modules.lxca_nodes.execute_module", autospec=True)
@@ -58,7 +59,7 @@ class TestMyModule:
         assert "missing required arguments" in results["msg"]
 
     @mock.patch(
-        "ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common.setup_conn",
+        "ansible_collections.community.general.plugins.module_utils._remote_management.lxca.common.setup_conn",
         autospec=True,
     )
     @mock.patch("ansible_collections.community.general.plugins.modules.lxca_nodes.execute_module", autospec=True)
@@ -95,7 +96,7 @@ class TestMyModule:
         assert mock.call(argument_spec=expected_arguments_spec, supports_check_mode=False) == ansible_mod_cls.call_args
 
     @mock.patch(
-        "ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common.setup_conn",
+        "ansible_collections.community.general.plugins.module_utils._remote_management.lxca.common.setup_conn",
         autospec=True,
     )
     @mock.patch("ansible_collections.community.general.plugins.modules.lxca_nodes._nodes_by_uuid", autospec=True)

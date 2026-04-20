@@ -342,7 +342,7 @@ from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
 
 from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 PARAMIKO_IMPORT_ERR: str | None
 try:

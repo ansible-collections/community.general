@@ -18,7 +18,7 @@ seealso:
     description: Documentation for Alerta API.
     link: https://docs.alerta.io/api/reference.html#customers
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

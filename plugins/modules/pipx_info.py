@@ -13,9 +13,9 @@ version_added: 5.6.0
 description:
   - Retrieve details about Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
-  - community.general.pipx
+  - community.general._attributes
+  - community.general._attributes.info_module
+  - community.general._pipx
 options:
   name:
     description:
@@ -130,13 +130,13 @@ version:
   version_added: 10.1.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import (
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._pipx import (
     make_process_dict,
     pipx_common_argspec,
     pipx_runner,
 )
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class PipXInfo(ModuleHelper):

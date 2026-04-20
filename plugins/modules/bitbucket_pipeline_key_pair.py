@@ -14,8 +14,8 @@ description:
 author:
   - Evgeniy Krysanov (@catcombo)
 extends_documentation_fragment:
-  - community.general.bitbucket
-  - community.general.attributes
+  - community.general._bitbucket
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -71,7 +71,7 @@ RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
+from ansible_collections.community.general.plugins.module_utils._source_control.bitbucket import BitbucketHelper
 
 error_messages = {
     "invalid_params": "Account, repository or SSH key pair was not found",

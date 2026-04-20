@@ -15,7 +15,7 @@ author: Linus Unnebäck (@LinusU) <linus@folkdatorn.se>
 description:
   - Run targets in a Makefile.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

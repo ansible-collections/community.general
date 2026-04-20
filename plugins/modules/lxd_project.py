@@ -13,7 +13,7 @@ description:
   - Management of LXD projects.
 author: "Raymond Chang (@we10710aa)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -172,7 +172,7 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.lxd import (
+from ansible_collections.community.general.plugins.module_utils._lxd import (
     LXDClient,
     LXDClientException,
     default_cert_file,

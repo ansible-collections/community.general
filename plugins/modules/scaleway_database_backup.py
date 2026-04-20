@@ -17,9 +17,9 @@ author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
   - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
 attributes:
   check_mode:
     support: full
@@ -166,10 +166,10 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.datetime import (
+from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
-from ansible_collections.community.general.plugins.module_utils.scaleway import (
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
     SCALEWAY_REGIONS,
     Scaleway,
     scaleway_argument_spec,

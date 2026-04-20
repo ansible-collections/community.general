@@ -12,7 +12,7 @@ short_description: Sync Cobbler
 description:
   - Sync Cobbler to commit changes.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -75,7 +75,7 @@ import xmlrpc.client as xmlrpc_client
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.datetime import (
+from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
 

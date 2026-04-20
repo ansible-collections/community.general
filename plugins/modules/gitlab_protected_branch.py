@@ -16,9 +16,9 @@ author:
 requirements:
   - python-gitlab >= 2.3.0
 extends_documentation_fragment:
-  - community.general.auth_basic
-  - community.general.gitlab
-  - community.general.attributes
+  - community.general._auth_basic
+  - community.general._gitlab
+  - community.general._attributes
 
 attributes:
   check_mode:
@@ -86,12 +86,12 @@ RETURN = r"""
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import (
+from ansible_collections.community.general.plugins.module_utils._gitlab import (
     auth_argument_spec,
     gitlab,
     gitlab_authentication,
 )
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class GitlabProtectedBranch:

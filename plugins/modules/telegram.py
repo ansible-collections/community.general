@@ -20,7 +20,7 @@ description:
 notes:
   - You need a telegram account and create telegram bot to use this module.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

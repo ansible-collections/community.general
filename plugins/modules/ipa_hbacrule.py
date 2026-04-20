@@ -105,9 +105,9 @@ options:
     type: list
     elements: str
 extends_documentation_fragment:
-  - community.general.ipa.documentation
-  - community.general.ipa.connection_notes
-  - community.general.attributes
+  - community.general._ipa.documentation
+  - community.general._ipa.connection_notes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -156,8 +156,8 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._ipa import IPAClient, ipa_argument_spec
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class HBACRuleIPAClient(IPAClient):

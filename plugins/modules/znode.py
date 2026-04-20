@@ -16,7 +16,7 @@ attributes:
   diff_mode:
     support: none
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 options:
   hosts:
     description:

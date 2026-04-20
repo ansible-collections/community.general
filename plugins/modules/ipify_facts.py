@@ -14,9 +14,9 @@ description:
 author:
   - René Moser (@resmo)
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.facts
-  - community.general.attributes.facts_module
+  - community.general._attributes
+  - community.general._attributes.facts
+  - community.general._attributes.facts_module
 options:
   api_url:
     description:

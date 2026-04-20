@@ -22,7 +22,7 @@ requirements:
   - gssapi (when using GSS-TSIG authentication)
 author: "Loic Blot (@nerzhul)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -209,7 +209,7 @@ from contextlib import suppress
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("dnspython", url="https://github.com/rthalley/dnspython"):
     import dns.message

@@ -15,8 +15,8 @@ description:
 requirements:
   - "python-jenkins >= 0.4.12"
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   name:
     type: str

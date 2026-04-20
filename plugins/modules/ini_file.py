@@ -14,7 +14,7 @@ module: ini_file
 short_description: Tweak settings in INI files
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 description:
   - Manage (add, remove, change) individual settings in an INI-style file without having to manage the file as a whole with,
     say, M(ansible.builtin.template) or M(ansible.builtin.assemble).

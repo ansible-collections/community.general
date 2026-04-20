@@ -13,8 +13,8 @@ description:
   - For use with Dell iDRAC operations that require Redfish OEM extensions.
   - Builds Redfish URIs locally and sends them to remote iDRAC controllers to set or update a configuration attribute.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: none
@@ -155,7 +155,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.validation import check_mutually_exclusive, check_required_arguments
 
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import (
     REDFISH_COMMON_ARGUMENT_SPEC,
     RedfishUtils,
 )

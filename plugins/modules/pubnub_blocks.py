@@ -23,7 +23,7 @@ author:
 requirements:
   - "pubnub_blocks_client >= 1.0"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full

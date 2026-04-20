@@ -48,8 +48,8 @@ options:
     type: str
 
 extends_documentation_fragment:
-  - community.general.opennebula
-  - community.general.attributes
+  - community.general._opennebula
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -254,7 +254,7 @@ ar_pool:
 """
 
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
+from ansible_collections.community.general.plugins.module_utils._opennebula import OpenNebulaModule
 
 
 class NetworksModule(OpenNebulaModule):

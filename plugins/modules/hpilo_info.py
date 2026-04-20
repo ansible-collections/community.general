@@ -15,8 +15,8 @@ description:
     network related information useful for provisioning (for example macaddress, uuid).
   - This module requires the C(hpilo) python module.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   host:
     description:

@@ -158,7 +158,7 @@ def test_xenserver_guest_powerstate_set_power_state(
     mocked_xenapi.configure_mock(**mocked_returns)
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        "ansible_collections.community.general.plugins.module_utils._xenserver.get_xenserver_version",
         return_value=[7, 2, 0],
     )
 
@@ -222,7 +222,7 @@ def test_xenserver_guest_powerstate_present(mocker, patch_ansible_module, capfd,
     mocked_xenapi.configure_mock(**mocked_returns)
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        "ansible_collections.community.general.plugins.module_utils._xenserver.get_xenserver_version",
         return_value=[7, 2, 0],
     )
 
@@ -283,7 +283,7 @@ def test_xenserver_guest_powerstate_other(mocker, patch_ansible_module, capfd, X
     mocked_xenapi.configure_mock(**mocked_returns)
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        "ansible_collections.community.general.plugins.module_utils._xenserver.get_xenserver_version",
         return_value=[7, 2, 0],
     )
 
@@ -343,7 +343,7 @@ def test_xenserver_guest_powerstate_wait(mocker, patch_ansible_module, capfd, Xe
     mocked_xenapi.configure_mock(**mocked_returns)
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        "ansible_collections.community.general.plugins.module_utils._xenserver.get_xenserver_version",
         return_value=[7, 2, 0],
     )
 

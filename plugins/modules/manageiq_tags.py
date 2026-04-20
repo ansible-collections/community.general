@@ -11,8 +11,8 @@ module: manageiq_tags
 
 short_description: Management of resource tags in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Daniel Korn (@dkorn)
 description:
@@ -123,7 +123,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.manageiq import (
+from ansible_collections.community.general.plugins.module_utils._manageiq import (
     ManageIQ,
     ManageIQTags,
     manageiq_argument_spec,

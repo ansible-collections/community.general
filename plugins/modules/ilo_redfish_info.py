@@ -12,9 +12,9 @@ description:
   - Builds Redfish URIs locally and sends them to iLO to get information back.
   - For use with HPE iLO operations that require Redfish OEM extensions.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._attributes.info_module
+  - community.general._redfish
 options:
   category:
     required: true
@@ -109,8 +109,8 @@ CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils._ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 
 
 def main():

@@ -21,7 +21,7 @@ version_added: 9.3.0
 description:
   - Manages daemons and services using Homebrew.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -91,7 +91,7 @@ import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.homebrew import (
+from ansible_collections.community.general.plugins.module_utils._homebrew import (
     HomebrewValidate,
     parse_brew_path,
 )

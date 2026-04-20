@@ -171,7 +171,7 @@ class TestOcapiCommand(unittest.TestCase):
     def test_set_power_mode(self):
         """Test that we can set chassis power mode"""
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
         ):
@@ -192,7 +192,7 @@ class TestOcapiCommand(unittest.TestCase):
     def test_set_chassis_led_indicator(self):
         """Test that we can set chassis LED indicator."""
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
         ):
@@ -213,7 +213,7 @@ class TestOcapiCommand(unittest.TestCase):
     def test_set_power_mode_already_set(self):
         """Test that if we set Power Mode to normal when it's already normal, we get changed=False."""
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
         ):
@@ -234,7 +234,7 @@ class TestOcapiCommand(unittest.TestCase):
     def test_set_power_mode_check_mode(self):
         """Test check mode when setting chassis Power Mode."""
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
         ):
@@ -256,7 +256,7 @@ class TestOcapiCommand(unittest.TestCase):
     def test_set_chassis_led_indicator_check_mode(self):
         """Test check mode when setting chassis LED indicator"""
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
         ):
@@ -278,7 +278,7 @@ class TestOcapiCommand(unittest.TestCase):
     def test_set_chassis_led_indicator_already_set(self):
         """Test that if we set LED Indicator to off when it's already off, we get changed=False."""
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
         ):
@@ -299,7 +299,7 @@ class TestOcapiCommand(unittest.TestCase):
     def test_set_chassis_led_indicator_already_set_check_mode(self):
         """Test that if we set LED Indicator to off when it's already off, we get changed=False even in check mode."""
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
         ):
@@ -320,7 +320,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_set_chassis_invalid_indicator_command(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
         ):
@@ -339,7 +339,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_reset_enclosure(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
         ):
@@ -359,7 +359,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_reset_enclosure_check_mode(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
         ):
@@ -380,7 +380,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_firmware_upload_missing_update_image_path(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
         ):
@@ -399,7 +399,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_firmware_upload_file_not_found(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
         ):
@@ -425,7 +425,7 @@ class TestOcapiCommand(unittest.TestCase):
             f.write(file_contents)
 
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
             post_request=mock_post_request,
@@ -453,7 +453,7 @@ class TestOcapiCommand(unittest.TestCase):
             f.write(file_contents)
 
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
             post_request=mock_invalid_http_request,
@@ -476,7 +476,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_firmware_update(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
             post_request=mock_invalid_http_request,
@@ -497,7 +497,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_firmware_update_check_mode(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
             post_request=mock_invalid_http_request,
@@ -519,7 +519,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_firmware_activate(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_put_request,
             post_request=mock_invalid_http_request,
@@ -540,7 +540,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_firmware_activate_check_mode(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request,
             put_request=mock_invalid_http_request,
             post_request=mock_invalid_http_request,
@@ -562,7 +562,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_delete_job(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request_job_complete,
             delete_request=mock_delete_request,
             put_request=mock_invalid_http_request,
@@ -585,7 +585,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_delete_job_in_progress(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request_job_in_progress,
             delete_request=mock_invalid_http_request,
             put_request=mock_invalid_http_request,
@@ -607,7 +607,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_delete_job_in_progress_only_on_delete(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request_job_complete,
             delete_request=mock_http_request_conflict,
             put_request=mock_invalid_http_request,
@@ -629,7 +629,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_delete_job_check_mode(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request_job_complete,
             delete_request=mock_delete_request,
             put_request=mock_invalid_http_request,
@@ -653,7 +653,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_delete_job_check_mode_job_not_found(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request_job_does_not_exist,
             delete_request=mock_delete_request,
             put_request=mock_invalid_http_request,
@@ -677,7 +677,7 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_delete_job_check_mode_job_in_progress(self):
         with patch.multiple(
-            "ansible_collections.community.general.plugins.module_utils.ocapi_utils.OcapiUtils",
+            "ansible_collections.community.general.plugins.module_utils._ocapi_utils.OcapiUtils",
             get_request=mock_get_request_job_in_progress,
             delete_request=mock_delete_request,
             put_request=mock_invalid_http_request,

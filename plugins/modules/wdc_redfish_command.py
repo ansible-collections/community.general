@@ -14,8 +14,8 @@ description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
   - Manages OOB controller firmware. For example, Firmware Activate, Update and Activate.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: full
@@ -197,8 +197,8 @@ msg:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
-from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils._wdc_redfish_utils import WdcRedfishUtils
 
 CATEGORY_COMMANDS_ALL = {
     "Update": ["FWActivate", "UpdateAndActivate"],

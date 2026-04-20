@@ -16,10 +16,10 @@ description:
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
-  - community.general.consul
-  - community.general.consul.token
-  - community.general.consul.actiongroup_consul
-  - community.general.attributes
+  - community.general._consul
+  - community.general._consul.token
+  - community.general._consul.actiongroup_consul
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -202,7 +202,7 @@ operation:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.consul import (
+from ansible_collections.community.general.plugins.module_utils._consul import (
     AUTH_ARGUMENTS_SPEC,
     OPERATION_READ,
     _ConsulModule,

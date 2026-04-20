@@ -16,9 +16,9 @@ author: Antoine Barbare (@abarbare)
 description:
   - This module manages Security Group on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
-  - community.general.scaleway
-  - community.general.attributes
-  - community.general.scaleway.actiongroup_scaleway
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
 
 attributes:
   check_mode:
@@ -158,7 +158,7 @@ from uuid import uuid4
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import (
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
     SCALEWAY_LOCATION,
     Scaleway,
     scaleway_argument_spec,

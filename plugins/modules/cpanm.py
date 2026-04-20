@@ -13,7 +13,7 @@ short_description: Manages Perl library dependencies
 description:
   - Manage Perl library dependencies using cpanminus.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -161,8 +161,8 @@ cpanm_version:
 import os
 import re
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 
 class CPANMinus(ModuleHelper):

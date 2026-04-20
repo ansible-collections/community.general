@@ -37,9 +37,9 @@ options:
     type: dict
     required: true
 extends_documentation_fragment:
-  - community.general.oneview
-  - community.general.oneview.validateetag
-  - community.general.attributes
+  - community.general._oneview
+  - community.general._oneview.validateetag
+  - community.general._attributes
 """
 
 EXAMPLES = r"""
@@ -122,7 +122,7 @@ ethernet_network_connection_template:
   type: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.oneview import (
+from ansible_collections.community.general.plugins.module_utils._oneview import (
     OneViewModuleBase,
     OneViewModuleResourceNotFound,
 )

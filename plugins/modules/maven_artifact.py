@@ -166,7 +166,7 @@ options:
       - Filesystem permission mode applied recursively to O(dest) when it is a directory.
 extends_documentation_fragment:
   - ansible.builtin.files
-  - community.general.attributes
+  - community.general._attributes
 """
 
 EXAMPLES = r"""

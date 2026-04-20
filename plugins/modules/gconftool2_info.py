@@ -14,8 +14,8 @@ version_added: 5.1.0
 description:
   - This module allows retrieving application preferences from the GConf database, with the help of C(gconftool-2).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - community.general._attributes
+  - community.general._attributes.info_module
 options:
   key:
     description:
@@ -53,8 +53,8 @@ version:
   version_added: 10.0.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.gconftool2 import gconftool2_runner
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._gconftool2 import gconftool2_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 
 class GConftoolInfo(ModuleHelper):

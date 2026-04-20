@@ -11,8 +11,8 @@ module: manageiq_policies
 
 short_description: Management of resource policy_profiles in ManageIQ
 extends_documentation_fragment:
-  - community.general.manageiq
-  - community.general.attributes
+  - community.general._manageiq
+  - community.general._attributes
 
 author: Daniel Korn (@dkorn)
 description:
@@ -134,7 +134,7 @@ manageiq_policies:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.manageiq import (
+from ansible_collections.community.general.plugins.module_utils._manageiq import (
     ManageIQ,
     manageiq_argument_spec,
     manageiq_entities,

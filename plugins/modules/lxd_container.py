@@ -13,7 +13,7 @@ description:
   - Management of LXD containers and virtual machines.
 author: "Hiroaki Nakamura (@hnakamur)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -406,7 +406,7 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
+from ansible_collections.community.general.plugins.module_utils._lxd import LXDClient, LXDClientException
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used
 # when a particular state is evoked.

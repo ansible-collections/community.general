@@ -14,8 +14,8 @@ description:
   - Manages BIOS configuration settings.
   - Manages OOB controller configuration settings.
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.redfish
+  - community.general._attributes
+  - community.general._redfish
 attributes:
   check_mode:
     support: none
@@ -376,7 +376,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import (
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import (
     REDFISH_COMMON_ARGUMENT_SPEC,
     RedfishUtils,
 )

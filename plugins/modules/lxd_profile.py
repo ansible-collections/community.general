@@ -14,7 +14,7 @@ description:
   - Management of LXD profiles.
 author: "Hiroaki Nakamura (@hnakamur)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: none
@@ -214,7 +214,7 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
+from ansible_collections.community.general.plugins.module_utils._lxd import LXDClient, LXDClientException
 
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = "unix:/var/lib/lxd/unix.socket"
