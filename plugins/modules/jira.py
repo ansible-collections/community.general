@@ -134,7 +134,11 @@ options:
     type: str
     description:
       - Sets the assignee when O(operation) is V(create), V(transition), or V(edit).
-      - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use O(account_id) instead.
+      - Jira Cloud requires account IDs for all user-type fields. When O(cloud=true), a string value containing C(@) is
+        resolved as an email to an account ID automatically. A string without C(@) is assumed to be an account ID.
+        See also O(account_id) for a dedicated assignee account ID parameter.
+        Added in community.general 12.6.0.
+      - Jira Server and Jira Data Center may still accept O(assignee) as a username.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   account_id:
     type: str
@@ -161,6 +165,9 @@ options:
       - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API (possibly
         after merging with other required data, as when passed to create). See examples for more information, and the JIRA
         REST API for the structure required for various fields.
+      - When O(cloud=true), user-type fields (V(assignee), V(reporter), and any fields listed in O(custom_user_fields)) that
+        contain a string value with C(@) are automatically resolved from email to account ID. String values without C(@) are
+        assumed to be account IDs. Added in community.general 12.6.0.
       - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add
         JIRA properties for example.
       - Note that JIRA may not allow changing field values on specific transitions or states.
@@ -193,14 +200,23 @@ options:
   cloud:
     description:
       - Enable when using Jira Cloud.
-      - When set to V(true), O(operation=search) uses the C(/rest/api/2/search/jql) endpoint required by Jira Cloud,
-        since the legacy C(/rest/api/2/search) endpoint has been removed.
-      - When set to V(false) (the default), the legacy endpoint is used, which is still required for Jira Data Center / Server.
-      - See U(https://developer.atlassian.com/changelog/#CHANGE-2046) for details about the endpoint deprecation.
-      - In the future, if this option is set to V(true), other endpoints might also be replaced to address
-        Jira Cloud deprecations.
+      - When set to V(true), the module uses Jira Cloud compatible behavior.
+      - When set to V(false) (the default), the module uses Jira Server / Data Center compatible behavior.
+      - In the future, this option might affect additional operations for Jira Cloud compatibility.
     type: bool
     default: false
+    version_added: '12.6.0'
+
+  custom_user_fields:
+    description:
+      - A list of field names (for example V(customfield_10050)) that hold user values.
+      - When O(cloud=true) and a listed field is present in O(fields) as a string containing C(@), the module resolves the
+        email to a Jira Cloud account ID automatically.
+      - The built-in user fields O(assignee) and V(reporter) are always resolved when present; list here any further
+        user-typed fields (from other Jira products or extensions) that should receive the same resolution.
+    type: list
+    elements: str
+    default: []
     version_added: '12.6.0'
 
   attachment:
@@ -352,6 +368,39 @@ EXAMPLES = r"""
     issuetype: Task
     assignee: ssmith
 
+# Assign an issue on Jira Cloud using an email address
+# (the module resolves the email to an account ID automatically)
+- name: Assign an issue on Jira Cloud using email
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: edit
+    cloud: true
+    assignee: user@example.com
+
+# Create an issue on Jira Cloud with reporter and a custom user field
+# resolved from email addresses to account IDs
+- name: Create an issue on Jira Cloud with user field resolution
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: create
+    summary: Example Issue
+    description: Created using Ansible
+    issuetype: Task
+    cloud: true
+    assignee: assignee@example.com
+    custom_user_fields:
+      - customfield_10050
+  args:
+    fields:
+      reporter: reporter@example.com
+      customfield_10050: approver@example.com
+
 # Edit an issue
 - name: Set the labels on an issue using free-form fields
   community.general.jira:
@@ -495,6 +544,7 @@ import os
 import random
 import string
 import traceback
+from urllib.parse import quote
 from urllib.request import pathname2url
 
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
@@ -504,6 +554,8 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 
 class JIRA(StateModuleHelper):
+    USER_FIELDS = ["assignee", "reporter"]
+
     module = dict(
         argument_spec=dict(
             attachment=dict(
@@ -581,6 +633,7 @@ class JIRA(StateModuleHelper):
                 type="str",
             ),
             cloud=dict(type="bool", default=False),
+            custom_user_fields=dict(type="list", elements="str", default=[]),
             maxresults=dict(type="int"),
             timeout=dict(type="float", default=10),
             validate_certs=dict(default=True, type="bool"),
@@ -612,14 +665,56 @@ class JIRA(StateModuleHelper):
     state_param = "operation"
 
     def __init_module__(self):
+        self.vars.uri = self.vars.uri.strip("/")
+        self.vars.set("restbase", f"{self.vars.uri}/rest/api/2")
         if self.vars.fields is None:
             self.vars.fields = {}
         if self.vars.assignee:
-            self.vars.fields["assignee"] = {"name": self.vars.assignee}
+            if self.vars.cloud:
+                self.vars.fields["assignee"] = self.vars.assignee
+            else:
+                self.vars.fields["assignee"] = {"name": self.vars.assignee}
         if self.vars.account_id:
             self.vars.fields["assignee"] = {"accountId": self.vars.account_id}
-        self.vars.uri = self.vars.uri.strip("/")
-        self.vars.set("restbase", f"{self.vars.uri}/rest/api/2")
+        self.resolve_user_fields()
+
+    def resolve_user_fields(self):
+        if not self.vars.cloud or not self.vars.fields:
+            return
+        user_fields = self.USER_FIELDS + self.vars.custom_user_fields
+        for field_name in user_fields:
+            value = self.vars.fields.get(field_name)
+            if not isinstance(value, str):
+                continue
+            if "@" in value:
+                account_id = self.resolve_account_id(value, field_name)
+                self.vars.fields[field_name] = {"accountId": account_id}
+            else:
+                self.vars.fields[field_name] = {"accountId": value}
+
+    def resolve_account_id(self, email, field_name="assignee"):
+        url = f"{self.vars.restbase}/user/search?query={quote(email, safe='')}"
+        result = self.get(url)
+        if not isinstance(result, list) or len(result) != 1:
+            count = len(result) if isinstance(result, list) else 0
+            self.module.fail_json(
+                msg=(
+                    f'Failed to resolve field "{field_name}" email "{email}" to a unique '
+                    f'Jira Cloud account ID: found "{count}" result(s). '
+                    "Specify the account ID directly."
+                )
+            )
+        user = result[0]
+        user_email = user.get("emailAddress")
+        if (user_email or "").lower() != email.lower():
+            self.module.fail_json(
+                msg=(
+                    f'Failed to resolve field "{field_name}" email "{email}": '
+                    f'the email address on the matched account "{user_email}" does not match. '
+                    "Specify the account ID directly."
+                )
+            )
+        return user["accountId"]
 
     @cause_changes(when="success")
     def operation_create(self):
