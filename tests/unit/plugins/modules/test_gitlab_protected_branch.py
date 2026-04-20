@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 from ansible_collections.community.general.plugins.modules.gitlab_protected_branch import GitlabProtectedBranch
 
 

@@ -129,7 +129,7 @@ online_server_info:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.online import (
+from ansible_collections.community.general.plugins.module_utils._online import (
     Online,
     OnlineException,
     online_argument_spec,

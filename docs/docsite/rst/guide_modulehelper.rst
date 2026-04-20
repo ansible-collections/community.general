@@ -27,7 +27,7 @@ But bear in mind that it does not showcase all of MH's features:
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+    from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 
     class MyTest(ModuleHelper):
@@ -72,7 +72,7 @@ section above, but there are more elements that will take part in it.
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+    from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 
     class MyTest(ModuleHelper):
@@ -354,7 +354,7 @@ However, you can set output variables specifically for that exception, if you so
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelperException
+    from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelperException
 
     def __init_module__(self):
         if not complex_validation():
@@ -385,7 +385,7 @@ By using ``StateModuleHelper`` you can make your code like the excerpt from the 
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+    from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
     class GConftool(StateModuleHelper):
         ...
@@ -501,7 +501,7 @@ The value of ``changed`` in the module output will be set to ``True``:
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.module_helper import cause_changes
+    from ansible_collections.community.general.plugins.module_utils._module_helper import cause_changes
 
     # adapted excerpt from the community.general.jira module
     class JIRA(StateModuleHelper):
@@ -528,7 +528,7 @@ The return value in that case is ``None``.
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.module_helper import check_mode_skip
+    from ansible_collections.community.general.plugins.module_utils._module_helper import check_mode_skip
 
     # adapted excerpt from the community.general.locale_gen module
     class LocaleGen(StateModuleHelper):

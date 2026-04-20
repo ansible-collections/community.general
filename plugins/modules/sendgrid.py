@@ -126,7 +126,7 @@ import os
 import traceback
 from urllib.parse import urlencode
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 SENDGRID_IMP_ERR = None
 try:

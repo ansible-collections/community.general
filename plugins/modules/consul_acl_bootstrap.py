@@ -68,7 +68,7 @@ result:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.consul import (
+from ansible_collections.community.general.plugins.module_utils._consul import (
     AUTH_ARGUMENTS_SPEC,
     RequestError,
     _ConsulModule,

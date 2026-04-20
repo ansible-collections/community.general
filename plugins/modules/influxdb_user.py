@@ -104,7 +104,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import ConnectionError
 
-import ansible_collections.community.general.plugins.module_utils.influxdb as influx
+import ansible_collections.community.general.plugins.module_utils._influxdb as influx
 
 
 def find_user(module, client, user_name):

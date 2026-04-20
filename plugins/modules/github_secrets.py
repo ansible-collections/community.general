@@ -106,7 +106,7 @@ from http import HTTPStatus
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare(
     "pynacl",

@@ -8,7 +8,7 @@ import typing as t
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils import csv
+from ansible_collections.community.general.plugins.module_utils import _csv as csv
 
 VALID_CSV = [
     (

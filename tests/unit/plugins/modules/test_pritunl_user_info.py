@@ -32,14 +32,14 @@ class TestPritunlUserInfo(ModuleTestCase):
 
     def patch_get_pritunl_users(self, **kwds):
         return patch(
-            "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_users",
+            "ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api._get_pritunl_users",
             autospec=True,
             **kwds,
         )
 
     def patch_get_pritunl_organizations(self, **kwds):
         return patch(
-            "ansible_collections.community.general.plugins.module_utils.net_tools.pritunl.api._get_pritunl_organizations",
+            "ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api._get_pritunl_organizations",
             autospec=True,
             **kwds,
         )

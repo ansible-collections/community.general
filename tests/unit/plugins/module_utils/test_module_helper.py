@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import cause_changes
+from ansible_collections.community.general.plugins.module_utils._module_helper import cause_changes
 
 #
 # DEPRECATION NOTICE

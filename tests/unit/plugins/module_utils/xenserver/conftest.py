@@ -61,7 +61,7 @@ def xenserver(XenAPI):
     # that depend on it have to be imported inside a test function. To make
     # this easier to handle and remove some code repetition, we wrap the import
     # of xenserver module util with a fixture.
-    from ansible_collections.community.general.plugins.module_utils import xenserver
+    from ansible_collections.community.general.plugins.module_utils import _xenserver as xenserver
 
     return xenserver
 

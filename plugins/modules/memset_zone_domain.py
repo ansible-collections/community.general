@@ -80,7 +80,7 @@ memset_api:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.memset import (
+from ansible_collections.community.general.plugins.module_utils._memset import (
     check_zone_domain,
     get_zone_id,
     memset_api_call,

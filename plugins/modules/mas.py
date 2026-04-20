@@ -105,7 +105,7 @@ import platform
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 NOT_WORKING_MAC_VERSION_MAS_ACCOUNT = "12.0"
 

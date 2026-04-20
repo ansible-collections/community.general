@@ -34,7 +34,7 @@ EXAMPLES = ""
 
 RETURN = ""
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 
 class MState(StateModuleHelper):

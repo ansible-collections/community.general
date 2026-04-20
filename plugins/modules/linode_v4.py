@@ -172,7 +172,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.linode import get_user_agent
+from ansible_collections.community.general.plugins.module_utils._linode import get_user_agent
 
 LINODE_IMP_ERR = None
 try:

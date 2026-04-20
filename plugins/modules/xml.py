@@ -363,7 +363,7 @@ import traceback
 from collections.abc import MutableMapping
 from io import BytesIO
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 LXML_IMP_ERR = None
 try:

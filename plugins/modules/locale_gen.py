@@ -73,9 +73,9 @@ mechanism:
 import os
 import re
 
-from ansible_collections.community.general.plugins.module_utils.locale_gen import locale_gen_runner, locale_runner
-from ansible_collections.community.general.plugins.module_utils.mh.deco import check_mode_skip
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._locale_gen import locale_gen_runner, locale_runner
+from ansible_collections.community.general.plugins.module_utils._mh.deco import check_mode_skip
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 ETC_LOCALE_GEN = "/etc/locale.gen"
 VAR_LIB_LOCALES = "/var/lib/locales/supported.d"

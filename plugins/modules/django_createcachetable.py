@@ -50,7 +50,7 @@ version:
   version_added: 10.0.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
+from ansible_collections.community.general.plugins.module_utils._django import DjangoModuleHelper
 
 
 class DjangoCreateCacheTable(DjangoModuleHelper):

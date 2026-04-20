@@ -193,7 +193,7 @@ from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import (
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
     SCALEWAY_REGIONS,
     Scaleway,
     SecretVariables,

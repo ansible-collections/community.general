@@ -12,7 +12,7 @@
 Using ``deps``
 ^^^^^^^^^^^^^^
 
-The ``ansible_collections.community.general.plugins.module_utils.deps`` module util simplifies
+The ``ansible_collections.community.general.plugins.module_utils._deps`` module util simplifies
 the importing of code as described in :ref:`Importing and using shared code <shared_code>`.
 Please notice that ``deps`` is meant to be used specifically with Ansible modules, and not other types of plugins.
 
@@ -20,7 +20,7 @@ The same example from the Developer Guide would become:
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils import deps
+    from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 
     with deps.declare("foo"):

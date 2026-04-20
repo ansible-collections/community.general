@@ -134,7 +134,7 @@ manageiq_policies:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.manageiq import (
+from ansible_collections.community.general.plugins.module_utils._manageiq import (
     ManageIQ,
     manageiq_argument_spec,
     manageiq_entities,

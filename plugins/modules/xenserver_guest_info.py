@@ -150,7 +150,7 @@ instance:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.xenserver import (
+from ansible_collections.community.general.plugins.module_utils._xenserver import (
     XenServerObject,
     gather_vm_facts,
     gather_vm_params,

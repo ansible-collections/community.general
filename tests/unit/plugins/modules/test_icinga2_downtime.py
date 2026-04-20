@@ -15,7 +15,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
-from ansible_collections.community.general.plugins.module_utils.mh.deco import no_handle_exceptions
+from ansible_collections.community.general.plugins.module_utils._mh.deco import no_handle_exceptions
 from ansible_collections.community.general.plugins.modules import icinga2_downtime
 
 

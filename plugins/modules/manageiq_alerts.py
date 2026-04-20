@@ -127,7 +127,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
+from ansible_collections.community.general.plugins.module_utils._manageiq import ManageIQ, manageiq_argument_spec
 
 
 class ManageIQAlert:

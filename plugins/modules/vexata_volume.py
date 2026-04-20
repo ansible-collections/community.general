@@ -72,7 +72,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.vexata import (
+from ansible_collections.community.general.plugins.module_utils._vexata import (
     argument_spec,
     get_array,
     required_together,

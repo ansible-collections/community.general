@@ -103,7 +103,7 @@ import tempfile
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("passlib"):
     # Apparently the type infos don't know htpasswd_context, which *does* exist

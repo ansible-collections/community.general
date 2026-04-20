@@ -161,7 +161,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
-from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
+from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
 
 
 class AnsibleModuleError(Exception):

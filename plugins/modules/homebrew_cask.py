@@ -156,8 +156,8 @@ import tempfile
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes
 
-from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._homebrew import HomebrewValidate
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 # exceptions -------------------------------------------------------------- {{{

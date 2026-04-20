@@ -131,7 +131,7 @@ enable_shared_snat:
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
+from ansible_collections.community.general.plugins.module_utils._hwc_utils import (
     Config,
     HwcClientException,
     HwcClientException404,

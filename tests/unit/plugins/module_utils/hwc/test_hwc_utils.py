@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import unittest
 
-from ansible_collections.community.general.plugins.module_utils.hwc_utils import HwcModuleException, navigate_value
+from ansible_collections.community.general.plugins.module_utils._hwc_utils import HwcModuleException, navigate_value
 
 
 class HwcUtilsTestCase(unittest.TestCase):

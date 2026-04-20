@@ -179,7 +179,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 
-from ansible_collections.community.general.plugins.module_utils.datetime import (
+from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
 

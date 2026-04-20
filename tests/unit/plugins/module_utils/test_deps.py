@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 
 @pytest.fixture

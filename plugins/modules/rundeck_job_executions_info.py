@@ -131,7 +131,7 @@ from urllib.parse import quote
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.rundeck import api_argument_spec, api_request
+from ansible_collections.community.general.plugins.module_utils._rundeck import api_argument_spec, api_request
 
 
 class RundeckJobExecutionsInfo:

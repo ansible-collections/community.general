@@ -126,8 +126,8 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt as fmt
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
+from ansible_collections.community.general.plugins.module_utils import _cmd_runner_fmt as fmt
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner
 
 RE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)")
 RE_INSTALLED = re.compile(r"\S+\s+\((?:default: )?(.+)\)")

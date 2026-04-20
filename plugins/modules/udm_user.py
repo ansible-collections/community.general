@@ -322,7 +322,7 @@ from datetime import date, timedelta
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("crypt_context"):
     from ansible_collections.community.general.plugins.module_utils._crypt import CryptContext, has_crypt_context
@@ -330,7 +330,7 @@ with deps.declare("crypt_context"):
     if not has_crypt_context:
         raise ImportError("Failed to import any of: passlib, crypt, legacycrypt")
 
-from ansible_collections.community.general.plugins.module_utils.univention_umc import (
+from ansible_collections.community.general.plugins.module_utils._univention_umc import (
     base_dn,
     ldap_search,
     umc_module_for_add,

@@ -74,7 +74,7 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class BitwardenSecretsManagerException(AnsibleLookupError):

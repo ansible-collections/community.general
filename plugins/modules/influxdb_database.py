@@ -72,7 +72,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
+from ansible_collections.community.general.plugins.module_utils._influxdb import InfluxDb
 
 
 def find_database(module, client, database_name):

@@ -85,7 +85,7 @@ zone:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
+from ansible_collections.community.general.plugins.module_utils._ipa import IPAClient, ipa_argument_spec
 
 
 class DNSZoneIPAClient(IPAClient):

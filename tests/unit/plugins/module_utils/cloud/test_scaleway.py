@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import unittest
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import SecretVariables, argon2
+from ansible_collections.community.general.plugins.module_utils._scaleway import SecretVariables, argon2
 
 
 class SecretVariablesTestCase(unittest.TestCase):

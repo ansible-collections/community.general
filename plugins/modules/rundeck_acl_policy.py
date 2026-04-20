@@ -118,7 +118,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.rundeck import (
+from ansible_collections.community.general.plugins.module_utils._rundeck import (
     api_argument_spec,
     api_request,
 )

@@ -69,7 +69,7 @@ def test_gather_vm_params_and_facts(mocker, fake_ansible_module, XenAPI, xenserv
     mocked_xenapi.configure_mock(**mocked_returns)
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.xenserver.get_xenserver_version",
+        "ansible_collections.community.general.plugins.module_utils._xenserver.get_xenserver_version",
         return_value=[7, 2, 0],
     )
 

@@ -343,7 +343,7 @@ ids:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
+from ansible_collections.community.general.plugins.module_utils._alicloud_ecs import (
     FOOTMARK_IMP_ERR,
     HAS_FOOTMARK,
     ecs_argument_spec,

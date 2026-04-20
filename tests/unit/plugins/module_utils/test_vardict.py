@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.general.plugins.module_utils.vardict import VarDict
+from ansible_collections.community.general.plugins.module_utils._vardict import VarDict
 
 
 def test_var_simple():

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import unittest
 
-from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
+from ansible_collections.community.general.plugins.module_utils._homebrew import HomebrewValidate
 
 
 class TestHomebrewModule(unittest.TestCase):

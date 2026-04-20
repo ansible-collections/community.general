@@ -168,7 +168,7 @@ RETURN = r"""#"""
 import re
 import traceback
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class DNSimpleV2:

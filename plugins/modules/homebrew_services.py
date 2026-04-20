@@ -91,7 +91,7 @@ import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.homebrew import (
+from ansible_collections.community.general.plugins.module_utils._homebrew import (
     HomebrewValidate,
     parse_brew_path,
 )

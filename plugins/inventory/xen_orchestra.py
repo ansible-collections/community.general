@@ -101,7 +101,7 @@ from time import sleep
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
 
 # 3rd party imports

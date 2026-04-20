@@ -220,7 +220,7 @@ import fnmatch
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.systemd import systemd_runner
+from ansible_collections.community.general.plugins.module_utils._systemd import systemd_runner
 
 
 def get_version(runner):

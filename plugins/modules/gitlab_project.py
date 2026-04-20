@@ -408,14 +408,14 @@ project:
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import (
+from ansible_collections.community.general.plugins.module_utils._gitlab import (
     auth_argument_spec,
     find_group,
     find_project,
     gitlab,
     gitlab_authentication,
 )
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class GitLabProject:

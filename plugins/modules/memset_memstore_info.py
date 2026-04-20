@@ -107,7 +107,7 @@ memset_api:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.memset import memset_api_call
+from ansible_collections.community.general.plugins.module_utils._memset import memset_api_call
 
 
 def get_facts(args=None):

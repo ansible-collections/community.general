@@ -153,7 +153,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.formatters import human_to_bytes
 
-from ansible_collections.community.general.plugins.module_utils.redis import (
+from ansible_collections.community.general.plugins.module_utils._redis import (
     fail_imports,
     redis_auth_argument_spec,
     redis_auth_params,

@@ -8,7 +8,7 @@ import os
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
+from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
 
 
 @pytest.fixture

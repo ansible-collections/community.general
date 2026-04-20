@@ -130,13 +130,13 @@ version:
   version_added: 10.1.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import (
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._pipx import (
     make_process_dict,
     pipx_common_argspec,
     pipx_runner,
 )
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 
 class PipXInfo(ModuleHelper):

@@ -58,8 +58,8 @@ property_info:
 
 import json
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pacemaker import pacemaker_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._pacemaker import pacemaker_runner
 
 
 class PacemakerInfo(ModuleHelper):

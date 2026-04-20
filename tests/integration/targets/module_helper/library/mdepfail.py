@@ -28,8 +28,8 @@ EXAMPLES = ""
 
 RETURN = ""
 
-from ansible_collections.community.general.plugins.module_utils import deps
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 with deps.declare("nopackagewiththisname"):
     import nopackagewiththisname  # noqa: F401, pylint: disable=unused-import # type: ignore[import-not-found]

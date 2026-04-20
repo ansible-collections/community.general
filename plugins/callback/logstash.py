@@ -111,7 +111,7 @@ except ImportError:
 
 from ansible.plugins.callback import CallbackBase
 
-from ansible_collections.community.general.plugins.module_utils.datetime import (
+from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
 

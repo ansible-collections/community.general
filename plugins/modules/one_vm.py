@@ -691,7 +691,7 @@ from collections import namedtuple
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
+from ansible_collections.community.general.plugins.module_utils._opennebula import flatten, render
 
 # Updateconf attributes documentation: https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html#one-vm-updateconf
 UPDATECONF_ATTRIBUTES = {

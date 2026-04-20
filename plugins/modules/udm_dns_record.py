@@ -94,8 +94,8 @@ RETURN = """#"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import deps
-from ansible_collections.community.general.plugins.module_utils.univention_umc import (
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
+from ansible_collections.community.general.plugins.module_utils._univention_umc import (
     base_dn,
     config,
     ldap_search,

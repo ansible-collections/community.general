@@ -77,7 +77,7 @@ filesystems:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.btrfs import BtrfsFilesystemsProvider
+from ansible_collections.community.general.plugins.module_utils._btrfs import BtrfsFilesystemsProvider
 
 
 def run_module():

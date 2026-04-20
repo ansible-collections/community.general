@@ -13,7 +13,7 @@ from .FakeAnsibleModule import FailJsonException
 
 def test_xenserverobject_xenapi_lib_detection(mocker, fake_ansible_module, xenserver):
     """Tests XenAPI lib detection code."""
-    mocker.patch("ansible_collections.community.general.plugins.module_utils.xenserver.HAS_XENAPI", new=False)
+    mocker.patch("ansible_collections.community.general.plugins.module_utils._xenserver.HAS_XENAPI", new=False)
 
     with pytest.raises(FailJsonException) as exc_info:
         xenserver.XenServerObject(fake_ansible_module)

@@ -769,10 +769,10 @@ import copy
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak._keycloak_utils import (
+from ansible_collections.community.general.plugins.module_utils._identity.keycloak._keycloak_utils import (
     merge_settings_without_absent_nulls,
 )
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
     KeycloakAPI,
     KeycloakError,
     camel,

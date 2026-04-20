@@ -13,7 +13,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args as _set_module_args,
 )
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 
 def _fix_ansible_args(args):

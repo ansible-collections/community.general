@@ -324,7 +324,7 @@ from urllib.parse import urlencode
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import basic_auth_header, fetch_url
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("urllib3", reason="urllib3 is required to embed files into requests"):
     import urllib3

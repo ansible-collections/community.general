@@ -209,7 +209,7 @@ from contextlib import suppress
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("dnspython", url="https://github.com/rthalley/dnspython"):
     import dns.message

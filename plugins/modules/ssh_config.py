@@ -228,7 +228,7 @@ from ansible_collections.community.general.plugins.module_utils._stormssh import
     PARAMIKO_IMPORT_ERROR,
     ConfigParser,
 )
-from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
+from ansible_collections.community.general.plugins.module_utils._ssh import determine_config_file
 
 
 def convert_bool(value):

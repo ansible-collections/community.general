@@ -86,7 +86,7 @@ data:
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import Scaleway, scaleway_argument_spec
+from ansible_collections.community.general.plugins.module_utils._scaleway import Scaleway, scaleway_argument_spec
 
 
 def extract_present_sshkeys(raw_organization_dict):

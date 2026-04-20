@@ -264,7 +264,7 @@ def test_set_vm_power_state_task_timeout(mocker, fake_ansible_module, XenAPI, xe
     mocked_xenapi.configure_mock(**mocked_returns)
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.xenserver.wait_for_task", return_value="timeout"
+        "ansible_collections.community.general.plugins.module_utils._xenserver.wait_for_task", return_value="timeout"
     )
 
     with pytest.raises(FailJsonException) as exc_info:
@@ -373,7 +373,7 @@ def test_set_vm_power_state_transition_async(
 
     mocked_xenapi.configure_mock(**mocked_returns)
 
-    mocker.patch("ansible_collections.community.general.plugins.module_utils.xenserver.wait_for_task", return_value="")
+    mocker.patch("ansible_collections.community.general.plugins.module_utils._xenserver.wait_for_task", return_value="")
 
     result = xenserver.set_vm_power_state(fake_ansible_module, fake_xenapi_ref("VM"), power_state_desired, timeout=1)
 

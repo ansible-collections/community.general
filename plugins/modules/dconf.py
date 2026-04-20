@@ -136,7 +136,7 @@ from ansible.module_utils.common.respawn import (
     respawn_module,
 )
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 glib_module_name = "gi.repository.GLib"
 

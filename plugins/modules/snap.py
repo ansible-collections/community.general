@@ -174,8 +174,8 @@ import re
 
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.snap import get_version, snap_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._snap import get_version, snap_runner
 
 
 class Snap(StateModuleHelper):

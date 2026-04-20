@@ -10,7 +10,7 @@ from unittest.mock import patch
 import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import Response, Scaleway
+from ansible_collections.community.general.plugins.module_utils._scaleway import Response, Scaleway
 from ansible_collections.community.general.plugins.modules import scaleway_compute_private_network
 
 

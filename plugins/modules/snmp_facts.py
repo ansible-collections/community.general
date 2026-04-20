@@ -199,7 +199,7 @@ from collections import defaultdict
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("pysnmp", url="https://pypi.org/project/pysnmp/"):
     from pysnmp.hlapi.v3arch.asyncio import (

@@ -45,7 +45,7 @@ def patch_bin(mocker):
 @pytest.mark.usefixtures("patch_bin")
 def test_present_race_condition_stopped_then_started(mocker, capfd):
     """Resource reports Stopped on the first poll then Started on the second — must succeed."""
-    mocker.patch("ansible_collections.community.general.plugins.module_utils.pacemaker.time.sleep")
+    mocker.patch("ansible_collections.community.general.plugins.module_utils._pacemaker.time.sleep")
 
     # Sequence of run_command calls:
     # 1. initial _get(): resource status → not found (rc=1)
@@ -99,12 +99,12 @@ def test_present_race_condition_stopped_then_started(mocker, capfd):
 @pytest.mark.usefixtures("patch_bin")
 def test_present_wait_timeout_raises(mocker, capfd):
     """Resource never starts within the wait window — must fail with a timeout message."""
-    mocker.patch("ansible_collections.community.general.plugins.module_utils.pacemaker.time.sleep")
+    mocker.patch("ansible_collections.community.general.plugins.module_utils._pacemaker.time.sleep")
 
     # Simulate time advancing past the deadline immediately on the first poll
     monotonic_values = iter([0.0, 999.0])
     mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils.pacemaker.time.monotonic",
+        "ansible_collections.community.general.plugins.module_utils._pacemaker.time.monotonic",
         side_effect=lambda: next(monotonic_values),
     )
 

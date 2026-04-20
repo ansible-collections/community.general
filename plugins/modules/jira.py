@@ -550,7 +550,7 @@ from urllib.request import pathname2url
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.urls import fetch_url
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper, cause_changes
 
 
 class JIRA(StateModuleHelper):

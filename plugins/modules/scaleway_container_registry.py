@@ -119,7 +119,7 @@ container_registry:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.scaleway import (
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
     SCALEWAY_REGIONS,
     Scaleway,
     resource_attributes_should_be_changed,

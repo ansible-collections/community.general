@@ -193,7 +193,7 @@ from urllib.parse import quote, urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.lxd import (
+from ansible_collections.community.general.plugins.module_utils._lxd import (
     LXDClient,
     LXDClientException,
     default_cert_file,

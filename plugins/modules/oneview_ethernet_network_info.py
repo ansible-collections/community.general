@@ -111,7 +111,7 @@ enet_associated_uplink_groups:
   type: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
+from ansible_collections.community.general.plugins.module_utils._oneview import OneViewModuleBase
 
 
 class EthernetNetworkInfoModule(OneViewModuleBase):

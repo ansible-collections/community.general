@@ -71,7 +71,7 @@ repodatalist:
 """
 
 
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare("parseXML"):
     from xml.dom.minidom import parseString as parseXML

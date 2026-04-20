@@ -75,8 +75,8 @@ EXAMPLES = r"""
     executable: /opt/hp/tools/hponcfg
 """
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 
 class HPOnCfg(ModuleHelper):

@@ -342,7 +342,7 @@ from urllib.parse import urlencode
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.urls import basic_auth_header, fetch_url, url_argument_spec
 
-from ansible_collections.community.general.plugins.module_utils.jenkins import download_updates_file
+from ansible_collections.community.general.plugins.module_utils._jenkins import download_updates_file
 
 
 class FailedInstallingWithPluginManager(Exception):

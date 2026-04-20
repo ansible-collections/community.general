@@ -21,7 +21,7 @@ import dns.update
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 import ansible_collections.community.general.plugins.modules.nsupdate as nsupdate_module
-from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 # ---------------------------------------------------------------------------
 # Fixtures

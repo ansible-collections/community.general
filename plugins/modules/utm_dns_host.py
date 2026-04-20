@@ -131,7 +131,7 @@ result:
       type: int
 """
 
-from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM, UTMModule
+from ansible_collections.community.general.plugins.module_utils._utm_utils import UTM, UTMModule
 
 
 def main():

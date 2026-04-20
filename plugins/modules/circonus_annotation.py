@@ -147,7 +147,7 @@ import json
 import time
 import traceback
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 REQUESTS_IMP_ERR = None
 try:

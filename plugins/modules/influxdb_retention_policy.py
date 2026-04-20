@@ -143,7 +143,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.influxdb import InfluxDb
+from ansible_collections.community.general.plugins.module_utils._influxdb import InfluxDb
 
 VALID_DURATION_REGEX = re.compile(r"^(INF|(\d+(ns|u|µ|ms|s|m|h|d|w)))+$")
 

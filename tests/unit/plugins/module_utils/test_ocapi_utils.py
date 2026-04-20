@@ -10,7 +10,7 @@ import shutil
 import tempfile
 import unittest
 
-from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
+from ansible_collections.community.general.plugins.module_utils._ocapi_utils import OcapiUtils
 
 
 class TestOcapiUtils(unittest.TestCase):

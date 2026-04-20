@@ -65,8 +65,8 @@ out:
   returned: always
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pacemaker import (
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     get_pacemaker_maintenance_mode,
     pacemaker_runner,
 )

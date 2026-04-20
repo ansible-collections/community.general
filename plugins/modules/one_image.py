@@ -370,7 +370,7 @@ snapshots:
 
 import time
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
+from ansible_collections.community.general.plugins.module_utils._opennebula import OpenNebulaModule
 
 IMAGE_STATES = [
     "INIT",

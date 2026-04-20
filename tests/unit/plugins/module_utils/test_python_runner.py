@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, PropertyMock
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._python_runner import PythonRunner
 
 TC_RUNNER = dict(
     # SAMPLE: This shows all possible elements of a test case. It does not actually run.

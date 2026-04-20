@@ -100,7 +100,7 @@ logical_interconnect_group:
   type: dict
 """
 
-from ansible_collections.community.general.plugins.module_utils.oneview import (
+from ansible_collections.community.general.plugins.module_utils._oneview import (
     OneViewModuleBase,
     OneViewModuleResourceNotFound,
 )

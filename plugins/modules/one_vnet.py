@@ -254,7 +254,7 @@ ar_pool:
 """
 
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
+from ansible_collections.community.general.plugins.module_utils._opennebula import OpenNebulaModule
 
 
 class NetworksModule(OpenNebulaModule):

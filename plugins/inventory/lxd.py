@@ -177,7 +177,7 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.inventory import BaseInventoryPlugin
 
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
+from ansible_collections.community.general.plugins.module_utils._lxd import LXDClient, LXDClientException
 from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
 
 IPADDRESS_IMPORT_ERROR: ImportError | None

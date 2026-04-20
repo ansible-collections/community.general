@@ -60,7 +60,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.ldap import (
+from ansible_collections.community.general.plugins.module_utils._ldap import (
     LdapGeneric,
     gen_specs,
     ldap_required_together,

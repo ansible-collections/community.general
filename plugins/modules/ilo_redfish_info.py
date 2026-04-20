@@ -109,8 +109,8 @@ CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
+from ansible_collections.community.general.plugins.module_utils._ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils._redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 
 
 def main():

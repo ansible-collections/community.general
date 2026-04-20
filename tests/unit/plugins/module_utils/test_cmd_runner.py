@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, PropertyMock
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
 
 TC_FORMATS = dict(
     simple_boolean__true=(partial(cmd_runner_fmt.as_bool, "--superflag"), True, ["--superflag"], None),

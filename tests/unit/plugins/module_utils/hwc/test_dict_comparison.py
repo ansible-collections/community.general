@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import unittest
 
-from ansible_collections.community.general.plugins.module_utils.hwc_utils import are_different_dicts
+from ansible_collections.community.general.plugins.module_utils._hwc_utils import are_different_dicts
 
 
 class HwcDictComparisonTestCase(unittest.TestCase):

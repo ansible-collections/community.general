@@ -125,8 +125,8 @@ version:
   version_added: 10.2.0
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import get_xfconf_version, xfconf_runner
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils._xfconf import get_xfconf_version, xfconf_runner
 
 
 class XFConfInfo(ModuleHelper):
