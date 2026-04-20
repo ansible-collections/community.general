@@ -855,6 +855,8 @@ files:
     maintainers: mattock
   $modules/keycloak_authz_permission_info.py:
     maintainers: mattock
+  $modules/keycloak_client.py:
+    maintainers: koke1997
   $modules/keycloak_client_rolemapping.py:
     maintainers: Gaetan2907
   $modules/keycloak_client_rolescope.py:
@@ -880,7 +882,7 @@ files:
   $modules/keycloak_realm_info.py:
     maintainers: fynncfchen
   $modules/keycloak_realm_key.py:
-    maintainers: mattock
+    maintainers: mattock koke1997
   $modules/keycloak_realm_localization.py:
     maintainers: danekja
   $modules/keycloak_realm_rolemapping.py:
@@ -894,7 +896,7 @@ files:
   $modules/keycloak_user_federation.py:
     maintainers: laurpaum
   $modules/keycloak_user_rolemapping.py:
-    maintainers: bratwurzt
+    maintainers: bratwurzt koke1997
   $modules/keycloak_userprofile.py:
     maintainers: yeoldegrove
   $modules/keyring.py:
