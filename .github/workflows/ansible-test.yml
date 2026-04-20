@@ -29,7 +29,6 @@ jobs:
     strategy:
       matrix:
         ansible:
-          - '2.17'
           - '2.18'
     runs-on: ubuntu-latest
     steps:
@@ -58,12 +57,6 @@ jobs:
         exclude:
           - ansible: ''
         include:
-          - ansible: '2.17'
-            python: '3.7'
-          - ansible: '2.17'
-            python: '3.10'
-          - ansible: '2.17'
-            python: '3.12'
           - ansible: '2.18'
             python: '3.8'
           - ansible: '2.18'
@@ -105,52 +98,6 @@ jobs:
         exclude:
           - ansible: ''
         include:
-          # 2.17
-          - ansible: '2.17'
-            docker: fedora39
-            python: ''
-            target: azp/posix/1/
-          - ansible: '2.17'
-            docker: fedora39
-            python: ''
-            target: azp/posix/2/
-          - ansible: '2.17'
-            docker: fedora39
-            python: ''
-            target: azp/posix/3/
-          - ansible: '2.17'
-            docker: ubuntu2004
-            python: ''
-            target: azp/posix/1/
-          - ansible: '2.17'
-            docker: ubuntu2004
-            python: ''
-            target: azp/posix/2/
-          - ansible: '2.17'
-            docker: ubuntu2004
-            python: ''
-            target: azp/posix/3/
-          - ansible: '2.17'
-            docker: alpine319
-            python: ''
-            target: azp/posix/1/
-          - ansible: '2.17'
-            docker: alpine319
-            python: ''
-            target: azp/posix/2/
-          - ansible: '2.17'
-            docker: alpine319
-            python: ''
-            target: azp/posix/3/
-          # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
-          # - ansible: '2.17'
-          #   docker: default
-          #   python: '3.7'
-          #   target: azp/generic/1/
-          # - ansible: '2.17'
-          #   docker: default
-          #   python: '3.12'
-          #   target: azp/generic/1/
           # 2.18
           - ansible: '2.18'
             docker: fedora40
