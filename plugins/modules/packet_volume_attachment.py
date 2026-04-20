@@ -86,7 +86,7 @@ EXAMPLES = r"""
 
   tasks:
     - name: Create volume
-      packet_volume:
+      community.general.packet_volume:
         description: "{{ volname }}"
         project_id: "{{ project_id }}"
         facility: ewr1
@@ -98,7 +98,7 @@ EXAMPLES = r"""
           snapshot_frequency: 1day
 
     - name: Create a device
-      packet_device:
+      community.general.packet_device:
         project_id: "{{ project_id }}"
         hostnames: "{{ devname }}"
         operating_system: ubuntu_16_04
