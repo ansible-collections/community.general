@@ -30,6 +30,7 @@ jobs:
       matrix:
         ansible:
           - '2.17'
+          - '2.18'
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
@@ -63,6 +64,12 @@ jobs:
             python: '3.10'
           - ansible: '2.17'
             python: '3.12'
+          - ansible: '2.18'
+            python: '3.8'
+          - ansible: '2.18'
+            python: '3.11'
+          - ansible: '2.18'
+            python: '3.13'
 
     steps:
       - name: >-
@@ -143,6 +150,52 @@ jobs:
           # - ansible: '2.17'
           #   docker: default
           #   python: '3.12'
+          #   target: azp/generic/1/
+          # 2.18
+          - ansible: '2.18'
+            docker: fedora40
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.18'
+            docker: fedora40
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.18'
+            docker: fedora40
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.18'
+            docker: ubuntu2404
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.18'
+            docker: ubuntu2404
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.18'
+            docker: ubuntu2404
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.18'
+            docker: alpine320
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.18'
+            docker: alpine320
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.18'
+            docker: alpine320
+            python: ''
+            target: azp/posix/3/
+          # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
+          # - ansible: '2.18'
+          #   docker: default
+          #   python: '3.8'
+          #   target: azp/generic/1/
+          # - ansible: '2.18'
+          #   docker: default
+          #   python: '3.13'
           #   target: azp/generic/1/
 
     steps:
