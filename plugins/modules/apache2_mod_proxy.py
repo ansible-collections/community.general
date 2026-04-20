@@ -211,7 +211,10 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.community.general.plugins.module_utils import _deps as deps
-from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper, ModuleHelperException
+from ansible_collections.community.general.plugins.module_utils._module_helper import (
+    ModuleHelper,
+    ModuleHelperException,
+)
 
 with deps.declare("beautifulsoup4"):
     from bs4 import BeautifulSoup

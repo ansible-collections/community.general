@@ -195,7 +195,10 @@ version:
 import re
 
 from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper, ModuleHelperException
+from ansible_collections.community.general.plugins.module_utils._module_helper import (
+    ModuleHelper,
+    ModuleHelperException,
+)
 
 
 class AnsibleGalaxyInstall(ModuleHelper):

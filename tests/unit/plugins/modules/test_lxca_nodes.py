@@ -14,7 +14,8 @@ from ansible_collections.community.general.plugins.modules import lxca_nodes
 
 @pytest.fixture(scope="module")
 @mock.patch(
-    "ansible_collections.community.general.plugins.module_utils._remote_management.lxca.common.close_conn", autospec=True
+    "ansible_collections.community.general.plugins.module_utils._remote_management.lxca.common.close_conn",
+    autospec=True,
 )
 def setup_module(close_conn):
     close_conn.return_value = True

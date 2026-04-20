@@ -135,7 +135,10 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import open_url
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 
-from ansible_collections.community.general.plugins.module_utils._scaleway import SCALEWAY_LOCATION, parse_pagination_link
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
+    SCALEWAY_LOCATION,
+    parse_pagination_link,
+)
 from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
 
 

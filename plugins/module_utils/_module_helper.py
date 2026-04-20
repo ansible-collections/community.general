@@ -15,7 +15,9 @@ from ansible_collections.community.general.plugins.module_utils._mh.deco import 
     check_mode_skip_returns,
     module_fails_on_exception,
 )
-from ansible_collections.community.general.plugins.module_utils._mh.exceptions import ModuleHelperException  # noqa: F401
+from ansible_collections.community.general.plugins.module_utils._mh.exceptions import (
+    ModuleHelperException,  # noqa: F401
+)
 from ansible_collections.community.general.plugins.module_utils._mh.module_helper import (  # noqa: F401
     ModuleHelper,
     StateModuleHelper,
