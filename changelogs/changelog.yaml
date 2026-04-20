@@ -1947,3 +1947,30 @@ releases:
       - 11656-counter_enabled-display_ok_hosts.yml
       - keycloak-authentication-none-executions.yml
     release_date: '2026-03-23'
+  11.4.7:
+    changes:
+      bugfixes:
+        - flatpak - support new output message when an update resulted in no action
+          that appears on Fedora 44 (https://github.com/ansible-collections/community.general/pull/11836).
+        - homebrew_cask - fix ``sudo_password`` failing when the password contains
+          single quotes or other special shell characters (https://github.com/ansible-collections/community.general/issues/4957,
+          https://github.com/ansible-collections/community.general/pull/11850).
+        - lvol - fix LVM version parsing (https://github.com/ansible-collections/community.general/issues/5445,
+          https://github.com/ansible-collections/community.general/pull/11823).
+        - mssql_script - only passes ``params`` to ``cursor.execute()`` when the user
+          actually provides them (https://github.com/ansible-collections/community.general/issues/11699,
+          https://github.com/ansible-collections/community.general/pull/11754).
+        - sefcontext - flush the in-process ``matchpathcon`` cache after applying
+          changes, so subsequent tasks running in the same process (for example via
+          the Mitogen connection plugin) see the updated SELinux file context rules
+          instead of stale cached data (https://github.com/ansible-collections/community.general/issues/888,
+          https://github.com/ansible-collections/community.general/pull/11812).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 11.4.7.yml
+      - 11754-mssql-script-params-substitution.yml
+      - 11812-sefcontext-matchpathcon-cache-flush.yml
+      - 11823-lvol-lvm-version-regex.yml
+      - 11836-fixes.yml
+      - 11850-homebrew-cask-sudo-password.yml
+    release_date: '2026-04-20'

@@ -6,6 +6,23 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.7
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- flatpak - support new output message when an update resulted in no action that appears on Fedora 44 (https://github.com/ansible-collections/community.general/pull/11836).
+- homebrew_cask - fix ``sudo_password`` failing when the password contains single quotes or other special shell characters (https://github.com/ansible-collections/community.general/issues/4957, https://github.com/ansible-collections/community.general/pull/11850).
+- lvol - fix LVM version parsing (https://github.com/ansible-collections/community.general/issues/5445, https://github.com/ansible-collections/community.general/pull/11823).
+- mssql_script - only passes ``params`` to ``cursor.execute()`` when the user actually provides them (https://github.com/ansible-collections/community.general/issues/11699, https://github.com/ansible-collections/community.general/pull/11754).
+- sefcontext - flush the in-process ``matchpathcon`` cache after applying changes, so subsequent tasks running in the same process (for example via the Mitogen connection plugin) see the updated SELinux file context rules instead of stale cached data (https://github.com/ansible-collections/community.general/issues/888, https://github.com/ansible-collections/community.general/pull/11812).
+
 v11.4.6
 =======
 
