@@ -212,7 +212,7 @@ options:
       - A list of field names (for example V(customfield_10050)) that hold user values.
       - When O(cloud=true) and a listed field is present in O(fields) as a string containing C(@), the module resolves the
         email to a Jira Cloud account ID automatically.
-      - The built-in user fields V(assignee) and V(reporter) are always resolved when present; list here any further
+      - The built-in user fields O(assignee) and V(reporter) are always resolved when present; list here any further
         user-typed fields (from other Jira products or extensions) that should receive the same resolution.
     type: list
     elements: str
