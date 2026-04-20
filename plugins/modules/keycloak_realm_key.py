@@ -244,6 +244,7 @@ extends_documentation_fragment:
 
 author:
   - Samuli Seppänen (@mattock)
+  - Ivan Kokalović (@koke1997)
 """
 
 EXAMPLES = r"""
