@@ -472,5 +472,5 @@ SCALEWAY_ZONES = [
     "nl-ams-3",
     "pl-waw-1",
     "pl-waw-2",
-    "pl-waw-3",
+    "pl-waw-3"
 ]
