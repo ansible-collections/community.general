@@ -42,7 +42,7 @@ def XenAPI():
     # First we use importlib.import_module() to import the module and assign
     # it to a local symbol.
     fake_xenapi = importlib.import_module(
-        "ansible_collections.community.general.tests.unit.plugins.module_utils.xenserver.FakeXenAPI"
+        "ansible_collections.community.general.tests.unit.plugins.module_utils._xenserver.FakeXenAPI"
     )
 
     # Now we populate Python module cache with imported fake module using the
