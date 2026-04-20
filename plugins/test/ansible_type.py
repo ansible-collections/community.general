@@ -227,7 +227,7 @@ from collections.abc import Callable, Sequence
 
 from ansible.errors import AnsibleFilterError
 
-from ansible_collections.community.general.plugins.plugin_utils.ansible_type import _ansible_type
+from ansible_collections.community.general.plugins.plugin_utils._ansible_type import _ansible_type
 
 
 def ansible_type(data: t.Any, dtype: t.Any, alias: t.Any = None) -> bool:
