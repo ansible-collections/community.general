@@ -391,10 +391,7 @@ def do_ini(
     within_section = not section
     section_start = section_end = 0
     msg = "OK"
-    if no_extra_spaces:
-        assignment_format = "%s=%s\n"
-    else:
-        assignment_format = "%s = %s\n"
+    sep = "=" if no_extra_spaces else " = "
 
     option_no_value_present = False
 
@@ -453,7 +450,7 @@ def do_ini(
                         option_no_value_present = True
                     else:
                         # replace existing option=value line(s)
-                        newline = assignment_format % (option, matched_value)
+                        newline = f"{option}{sep}{matched_value}\n"
                     (changed, msg) = update_section_line(
                         option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg
                     )
@@ -472,7 +469,7 @@ def do_ini(
         if len(values) > 0:
             for index, line in enumerate(section_lines):
                 if not changed_lines[index] and match_function(option, line):
-                    newline = assignment_format % (option, values.pop(0))
+                    newline = f"{option}{sep}{values.pop(0)}\n"
                     (changed, msg) = update_section_line(
                         option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg
                     )
@@ -498,7 +495,7 @@ def do_ini(
                         # otherwise some of their options might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
                         if element is not None:
                             # insert option=value line
-                            section_lines.insert(index, assignment_format % (option, element))
+                            section_lines.insert(index, f"{option}{sep}{element}\n")
                             msg = "option added"
                             changed = True
                         elif element is None and allow_no_value:
@@ -555,7 +552,7 @@ def do_ini(
                 if condition["option"] != option:
                     if len(condition["values"]) > 0:
                         for value in condition["values"]:
-                            ini_lines.append(assignment_format % (condition["option"], value))
+                            ini_lines.append(f"{condition['option']}{sep}{value}\n")
                     elif allow_no_value:
                         ini_lines.append(f"{condition['option']}\n")
                 elif not exclusive:
@@ -564,7 +561,7 @@ def do_ini(
                             values.append(value)
         if option and values:
             for value in values:
-                ini_lines.append(assignment_format % (option, value))
+                ini_lines.append(f"{option}{sep}{value}\n")
         elif option and not values and allow_no_value:
             ini_lines.append(f"{option}\n")
         else:

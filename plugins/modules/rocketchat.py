@@ -160,8 +160,6 @@ EXAMPLES = r"""
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-ROCKETCHAT_INCOMING_WEBHOOK = "%s://%s/hooks/%s"
-
 
 def build_payload_for_rocketchat(
     module, text, channel, username, icon_url, icon_emoji, link_names, color, attachments, is_pre740
@@ -205,7 +203,7 @@ def do_notify_rocketchat(module, domain, token, protocol, payload, is_pre740):
     if token.count("/") < 1:
         module.fail_json(msg="Invalid Token specified, provide a valid token")
 
-    rocketchat_incoming_webhook = ROCKETCHAT_INCOMING_WEBHOOK % (protocol, domain, token)
+    rocketchat_incoming_webhook = f"{protocol}://{domain}/hooks/{token}"
 
     headers = None
     if not is_pre740:

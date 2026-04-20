@@ -46,12 +46,6 @@ class Repos:
     Available Repositories in /etc/yum.repos.d/redhat.repo
 +----------------------------------------------------------+
 """
-    _SUBMAN_OUT_ENTRY = """Repo ID:   %s
-Repo Name: %s
-Repo URL:  %s
-Enabled:   %s
-
-"""
 
     def __init__(self, repos):
         self.repos = repos
@@ -62,11 +56,12 @@ Enabled:   %s
         """
         out = self._SUBMAN_OUT_HEADER
         for repo in self.repos:
-            out += self._SUBMAN_OUT_ENTRY % (
-                repo["id"],
-                repo["name"],
-                repo["url"],
-                "1" if repo["enabled"] else "0",
+            out += (
+                f"Repo ID:   {repo['id']}\n"
+                f"Repo Name: {repo['name']}\n"
+                f"Repo URL:  {repo['url']}\n"
+                f"Enabled:   {'1' if repo['enabled'] else '0'}\n"
+                "\n"
             )
 
         return out

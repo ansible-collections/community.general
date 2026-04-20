@@ -137,10 +137,8 @@ def _keys_filter_target_dict(
             tr = map(re.compile, before)
             return list(zip(tr, after))
         except re.error as e:
-            msg = (
-                "The attributes before must be valid regex if matching_parameter=regex."
-                " Not all items are valid regex in: %s"
-            )
-            raise AnsibleFilterError(msg % before) from e
+            raise AnsibleFilterError(
+                f"The attributes before must be valid regex if matching_parameter=regex. Not all items are valid regex in: {before}"
+            ) from e
     else:
         return list(zip(before, after))
