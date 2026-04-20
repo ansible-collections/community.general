@@ -1,4 +1,0 @@
-bugfixes:
-  - mssql_script - only passes ``params`` to ``cursor.execute()`` when the user actually provides them
-    (https://github.com/ansible-collections/community.general/issues/11699,
-    https://github.com/ansible-collections/community.general/pull/11754).

@@ -1,8 +1,0 @@
-bugfixes:
-  - alternatives - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
-  - apk - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
-  - apt_rpm - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
-  - cargo - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
-  - filesystem - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
-  - git_config - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
-  - git_config_info - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).

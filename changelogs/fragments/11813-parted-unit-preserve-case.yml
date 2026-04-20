@@ -1,5 +1,0 @@
-minor_changes:
-  - parted - add ``unit_preserve_case`` option to control the case of the ``unit`` field in the
-    return value, fixing the round-trip use case where the returned unit is fed back as input
-    (https://github.com/ansible-collections/community.general/issues/1860,
-    https://github.com/ansible-collections/community.general/pull/11813).

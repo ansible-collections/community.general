@@ -1,6 +1,0 @@
-bugfixes:
-  - cronvar - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
-  - dnf_versionlock - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
-  - dpkg_divert - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
-  - flatpak_remote - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
-  - hg - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).

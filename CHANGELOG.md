@@ -2,66 +2,256 @@
 
 **Topics**
 
-- <a href="#v12-5-0">v12\.5\.0</a>
+- <a href="#v12-6-0">v12\.6\.0</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
-    - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes">Bugfixes</a>
     - <a href="#new-modules">New Modules</a>
-- <a href="#v12-4-0">v12\.4\.0</a>
+- <a href="#v12-5-0">v12\.5\.0</a>
     - <a href="#release-summary-1">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
+    - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes-1">Bugfixes</a>
-    - <a href="#new-plugins">New Plugins</a>
-        - <a href="#callback">Callback</a>
     - <a href="#new-modules-1">New Modules</a>
-- <a href="#v12-3-0">v12\.3\.0</a>
+- <a href="#v12-4-0">v12\.4\.0</a>
     - <a href="#release-summary-2">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#bugfixes-2">Bugfixes</a>
+    - <a href="#new-plugins">New Plugins</a>
+        - <a href="#callback">Callback</a>
+    - <a href="#new-modules-2">New Modules</a>
+- <a href="#v12-3-0">v12\.3\.0</a>
+    - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#minor-changes-3">Minor Changes</a>
+    - <a href="#bugfixes-3">Bugfixes</a>
     - <a href="#new-plugins-1">New Plugins</a>
         - <a href="#filter">Filter</a>
 - <a href="#v12-2-0">v12\.2\.0</a>
-    - <a href="#release-summary-3">Release Summary</a>
-    - <a href="#minor-changes-3">Minor Changes</a>
-    - <a href="#deprecated-features-1">Deprecated Features</a>
-    - <a href="#bugfixes-3">Bugfixes</a>
-    - <a href="#new-modules-2">New Modules</a>
-- <a href="#v12-1-0">v12\.1\.0</a>
     - <a href="#release-summary-4">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
-    - <a href="#deprecated-features-2">Deprecated Features</a>
+    - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-4">Bugfixes</a>
     - <a href="#new-modules-3">New Modules</a>
-- <a href="#v12-0-1">v12\.0\.1</a>
+- <a href="#v12-1-0">v12\.1\.0</a>
     - <a href="#release-summary-5">Release Summary</a>
     - <a href="#minor-changes-5">Minor Changes</a>
+    - <a href="#deprecated-features-2">Deprecated Features</a>
     - <a href="#bugfixes-5">Bugfixes</a>
-- <a href="#v12-0-0">v12\.0\.0</a>
+    - <a href="#new-modules-4">New Modules</a>
+- <a href="#v12-0-1">v12\.0\.1</a>
     - <a href="#release-summary-6">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
+    - <a href="#bugfixes-6">Bugfixes</a>
+- <a href="#v12-0-0">v12\.0\.0</a>
+    - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#minor-changes-7">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features-3">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes-6">Bugfixes</a>
+    - <a href="#bugfixes-7">Bugfixes</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#callback-1">Callback</a>
         - <a href="#filter-1">Filter</a>
         - <a href="#inventory">Inventory</a>
         - <a href="#lookup">Lookup</a>
-    - <a href="#new-modules-4">New Modules</a>
+    - <a href="#new-modules-5">New Modules</a>
 This changelog describes changes after version 11\.0\.0\.
 
-<a id="v12-5-0"></a>
-## v12\.5\.0
+<a id="v12-6-0"></a>
+## v12\.6\.0
 
 <a id="release-summary"></a>
 ### Release Summary
 
-Bugfix and feature release\.
+Regular bugfix and feature release\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* cobbler\_sync \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* cobbler\_system \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* composer \- add <code>force</code> parameter\; when <code>command\=create\-project</code>\, the module now checks whether a <code>composer\.json</code> already exists in <code>working\_dir</code> and skips the command if so\, making the task idempotent\. Set <code>force\=true</code> to always run the command regardless \([https\://github\.com/ansible\-collections/community\.general/issues/725](https\://github\.com/ansible\-collections/community\.general/issues/725)\, [https\://github\.com/ansible\-collections/community\.general/pull/11689](https\://github\.com/ansible\-collections/community\.general/pull/11689)\)\.
+* consul\_kv \- add <code>ca\_path</code> option to specify a CA bundle for HTTPS connections \([https\://github\.com/ansible\-collections/community\.general/pull/11817](https\://github\.com/ansible\-collections/community\.general/pull/11817)\)\.
+* consul\_kv lookup plugin \- add <code>ca\_path</code> option to specify a CA bundle for HTTPS connections \([https\://github\.com/ansible\-collections/community\.general/issues/2876](https\://github\.com/ansible\-collections/community\.general/issues/2876)\, [https\://github\.com/ansible\-collections/community\.general/pull/11817](https\://github\.com/ansible\-collections/community\.general/pull/11817)\)\.
+* dconf \- add support for C\(dbus\-broker\) \([https\://github\.com/ansible\-collections/community\.general/issues/495](https\://github\.com/ansible\-collections/community\.general/issues/495)\, [https\://github\.com/ansible\-collections/community\.general/pull/11772](https\://github\.com/ansible\-collections/community\.general/pull/11772)\)\.
+* filesystem \- migrate <code>LVM\.get\_fs\_size\(\)</code> to use <code>CmdRunner</code>\, ensuring locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/pull/11888](https\://github\.com/ansible\-collections/community\.general/pull/11888)\)\.
+* flatpak \- add new parameter <code>from\_url</code> to install a flatpak from a <code>\.flatpakref</code> URL \([https\://github\.com/ansible\-collections/community\.general/issues/4000](https\://github\.com/ansible\-collections/community\.general/issues/4000)\, [https\://github\.com/ansible\-collections/community\.general/pull/11748](https\://github\.com/ansible\-collections/community\.general/pull/11748)\)\.
+* gem \- refactor module to use <code>CmdRunner</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11733](https\://github\.com/ansible\-collections/community\.general/pull/11733)\)\.
+* homebrew\_services \- remove various redundancies including dead state validation\, unused return values\, and unnecessary locale environment variables \([https\://github\.com/ansible\-collections/community\.general/pull/11839](https\://github\.com/ansible\-collections/community\.general/pull/11839)\)\.
+* homebrew\_tap \- avoid redundant <code>brew tap</code> calls when processing multiple taps by fetching the tap list once upfront \([https\://github\.com/ansible\-collections/community\.general/pull/11848](https\://github\.com/ansible\-collections/community\.general/pull/11848)\)\.
+* ipa\_dnsrecord \- add <code>exclusive</code> parameter to allow appending values to existing records without replacing them \([https\://github\.com/ansible\-collections/community\.general/issues/682](https\://github\.com/ansible\-collections/community\.general/issues/682)\, [https\://github\.com/ansible\-collections/community\.general/pull/11694](https\://github\.com/ansible\-collections/community\.general/pull/11694)\)\.
+* java\_cert \- support proxy authentication when <code>https\_proxy</code> environment variable includes credentials \([https\://github\.com/ansible\-collections/community\.general/issues/4126](https\://github\.com/ansible\-collections/community\.general/issues/4126)\, [https\://github\.com/ansible\-collections/community\.general/pull/11753](https\://github\.com/ansible\-collections/community\.general/pull/11753)\)\.
+* jira \- add <code>cloud</code> option to support Jira Cloud\'s new search endpoint <code>/rest/api/2/search/jql</code>\, since the legacy <code>/rest/api/2/search</code> endpoint has been removed on Jira Cloud \([https\://github\.com/ansible\-collections/community\.general/issues/10786](https\://github\.com/ansible\-collections/community\.general/issues/10786)\, [https\://github\.com/ansible\-collections/community\.general/pull/11701](https\://github\.com/ansible\-collections/community\.general/pull/11701)\)\.
+* jira \- when <code>cloud\=true</code>\, user\-type fields \(<code>assignee</code>\, <code>reporter</code>\, and any listed in the new <code>custom\_user\_fields</code> parameter\) containing an email address are automatically resolved to Jira Cloud account IDs \([https\://github\.com/ansible\-collections/community\.general/issues/11734](https\://github\.com/ansible\-collections/community\.general/issues/11734)\, [https\://github\.com/ansible\-collections/community\.general/pull/11735](https\://github\.com/ansible\-collections/community\.general/pull/11735)\)\.
+* logrotate \- adds optional <code>backup</code> parameter to create a backup of the existing configuration file before writing changes \([https\://github\.com/ansible\-collections/community\.general/pull/11764](https\://github\.com/ansible\-collections/community\.general/pull/11764)\)\.
+* lvg \- migrate to <code>CmdRunner</code>\, removing direct <code>run\_command</code> calls and <code>run\_command\_environ\_update</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11835](https\://github\.com/ansible\-collections/community\.general/pull/11835)\)\.
+* lvm\_pv \- migrate to <code>CmdRunner</code> using shared runners from <code>module\_utils/\_lvm</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11811](https\://github\.com/ansible\-collections/community\.general/pull/11811)\)\.
+* lvol \- migrate to <code>CmdRunner</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11887](https\://github\.com/ansible\-collections/community\.general/pull/11887)\)\.
+* manageiq module utils \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* manageiq\_alert\_profiles \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* manageiq\_alerts \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* oneview module utils \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* oneview\_san\_manager \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* opendj\_backendprop \- refactor to use <code>CmdRunner</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11728](https\://github\.com/ansible\-collections/community\.general/pull/11728)\)\.
+* packet\_device \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* packet\_ip\_subnet \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* pacman \- add <code>root</code>\, <code>cachedir</code>\, and <code>config</code> options to support installing packages into an alternative root directory \([https\://github\.com/ansible\-collections/community\.general/issues/438](https\://github\.com/ansible\-collections/community\.general/issues/438)\, [https\://github\.com/ansible\-collections/community\.general/pull/11681](https\://github\.com/ansible\-collections/community\.general/pull/11681)\)\.
+* parted \- add <code>unit\_preserve\_case</code> option to control the case of the <code>unit</code> field in the return value\, fixing the round\-trip use case where the returned unit is fed back as input \([https\://github\.com/ansible\-collections/community\.general/issues/1860](https\://github\.com/ansible\-collections/community\.general/issues/1860)\, [https\://github\.com/ansible\-collections/community\.general/pull/11813](https\://github\.com/ansible\-collections/community\.general/pull/11813)\)\.
+* pubnub\_blocks \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* terraform \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
+* xenserver\_guest \- use <code>enumerate\(\)</code> instead of manual index variable in <code>for</code> loop \([https\://github\.com/ansible\-collections/community\.general/pull/11721](https\://github\.com/ansible\-collections/community\.general/pull/11721)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* alternatives \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
+* apache2\_module \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* apk \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
+* apt\_repo \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11782](https\://github\.com/ansible\-collections/community\.general/pull/11782)\)\.
+* apt\_rpm \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
+* awall \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11784](https\://github\.com/ansible\-collections/community\.general/pull/11784)\)\.
+* beadm \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11780](https\://github\.com/ansible\-collections/community\.general/pull/11780)\)\.
+* bower \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11783](https\://github\.com/ansible\-collections/community\.general/pull/11783)\)\.
+* btrfs module\_utils \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> environment variables to <code>C</code> in all <code>run\_command\(\)</code> calls \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11787](https\://github\.com/ansible\-collections/community\.general/pull/11787)\)\.
+* bundler \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11783](https\://github\.com/ansible\-collections/community\.general/pull/11783)\)\.
+* bzr \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11785](https\://github\.com/ansible\-collections/community\.general/pull/11785)\)\.
+* capabilities \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11779](https\://github\.com/ansible\-collections/community\.general/pull/11779)\)\.
+* cargo \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
+* composer \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* cronvar \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11773](https\://github\.com/ansible\-collections/community\.general/pull/11773)\)\.
+* dconf \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11765](https\://github\.com/ansible\-collections/community\.general/pull/11765)\)\.
+* dnf\_versionlock \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11773](https\://github\.com/ansible\-collections/community\.general/pull/11773)\)\.
+* dpkg\_divert \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11773](https\://github\.com/ansible\-collections/community\.general/pull/11773)\)\.
+* easy\_install \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11782](https\://github\.com/ansible\-collections/community\.general/pull/11782)\)\.
+* etcd3 lookup plugin \- improve HTTPS endpoint handling by stripping URL schemes from the <code>host</code> option and warning when <code>ca\_cert</code> is not provided for HTTPS endpoints \([https\://github\.com/ansible\-collections/community\.general/issues/1664](https\://github\.com/ansible\-collections/community\.general/issues/1664)\, [https\://github\.com/ansible\-collections/community\.general/pull/11861](https\://github\.com/ansible\-collections/community\.general/pull/11861)\)\.
+* facter\_facts \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* filesystem \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
+* flatpak \- fix removal of runtimes\, which was broken because the module was filtering the installed flatpak list to apps only\, so runtimes could never be matched for uninstallation \([https\://github\.com/ansible\-collections/community\.general/issues/553](https\://github\.com/ansible\-collections/community\.general/issues/553)\, [https\://github\.com/ansible\-collections/community\.general/pull/11688](https\://github\.com/ansible\-collections/community\.general/pull/11688)\)\.
+* flatpak \- support new output message when an update resulted in no action that appears on Fedora 44 \([https\://github\.com/ansible\-collections/community\.general/pull/11836](https\://github\.com/ansible\-collections/community\.general/pull/11836)\)\.
+* flatpak\_remote \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11773](https\://github\.com/ansible\-collections/community\.general/pull/11773)\)\.
+* git\_config \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
+* git\_config\_info \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
+* gitlab\_project\_members \- fail with a clear error when multiple projects match the given name\, instead of silently operating on the first result \([https\://github\.com/ansible\-collections/community\.general/issues/2767](https\://github\.com/ansible\-collections/community\.general/issues/2767)\, [https\://github\.com/ansible\-collections/community\.general/pull/11851](https\://github\.com/ansible\-collections/community\.general/pull/11851)\)\.
+* gitlab\_project\_variable \- use <code>find\_project\(\)</code> from module utils for project lookup\, consistent with all other GitLab modules in the collection \([https\://github\.com/ansible\-collections/community\.general/issues/3157](https\://github\.com/ansible\-collections/community\.general/issues/3157)\, [https\://github\.com/ansible\-collections/community\.general/pull/11878](https\://github\.com/ansible\-collections/community\.general/pull/11878)\)\.
+* hg \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11773](https\://github\.com/ansible\-collections/community\.general/pull/11773)\)\.
+* homebrew \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* homebrew\_cask \- fix <code>sudo\_password</code> failing when the password contains single quotes or other special shell characters \([https\://github\.com/ansible\-collections/community\.general/issues/4957](https\://github\.com/ansible\-collections/community\.general/issues/4957)\, [https\://github\.com/ansible\-collections/community\.general/pull/11850](https\://github\.com/ansible\-collections/community\.general/pull/11850)\)\.
+* homebrew\_cask \- fix failure when <code>brew \-\-version</code> returns a placeholder version string \([https\://github\.com/ansible\-collections/community\.general/issues/4708](https\://github\.com/ansible\-collections/community\.general/issues/4708)\, [https\://github\.com/ansible\-collections/community\.general/pull/11849](https\://github\.com/ansible\-collections/community\.general/pull/11849)\)\.
+* homebrew\_cask \- fix false task failure when upgrading casks with <code>version\=latest</code>\; the post\-upgrade check incorrectly re\-ran <code>brew outdated</code> \(which always lists <code>latest</code> casks as outdated under <code>\-\-greedy</code>\)\, now uses the command exit code instead \([https\://github\.com/ansible\-collections/community\.general/issues/1647](https\://github\.com/ansible\-collections/community\.general/issues/1647)\, [https\://github\.com/ansible\-collections/community\.general/pull/11838](https\://github\.com/ansible\-collections/community\.general/pull/11838)\)\.
+* homebrew\_cask \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* homebrew\_tap \- fix <code>None</code> being passed as a command argument when adding a tap without a URL \([https\://github\.com/ansible\-collections/community\.general/pull/11848](https\://github\.com/ansible\-collections/community\.general/pull/11848)\)\.
+* homectl \- allow to use passlib instead of legacycrypt for Python 3\.13\+ \([https\://github\.com/ansible\-collections/community\.general/pull/11860](https\://github\.com/ansible\-collections/community\.general/pull/11860)\)\.
+* homectl \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11774](https\://github\.com/ansible\-collections/community\.general/pull/11774)\)\.
+* icinga2\_feature \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* imgadm \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11781](https\://github\.com/ansible\-collections/community\.general/pull/11781)\)\.
+* incus connection plugin \- work when the active become plugin sets <code>require\_tty</code> instead of failing silently \([https\://github\.com/ansible\-collections/community\.general/pull/11771](https\://github\.com/ansible\-collections/community\.general/pull/11771)\)\.
+* ip\_netns \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11779](https\://github\.com/ansible\-collections/community\.general/pull/11779)\)\.
+* ipa module utils \- fix failure to detect errors reported in the <code>failed</code> field of the IPA API response\, which is returned with HTTP 200 on partial or full failures in member add/remove operations \([https\://github\.com/ansible\-collections/community\.general/issues/1239](https\://github\.com/ansible\-collections/community\.general/issues/1239)\, [https\://github\.com/ansible\-collections/community\.general/pull/11698](https\://github\.com/ansible\-collections/community\.general/pull/11698)\)\.
+* ipa\_dnsrecord \- fix errors when module is used with existing record with default TTL \([https\://github\.com/ansible\-collections/community\.general/pull/11717](https\://github\.com/ansible\-collections/community\.general/pull/11717)\)\.
+* ipa\_host \- fix logic to disable existing hosts \([https\://github\.com/ansible\-collections/community\.general/issues/11483](https\://github\.com/ansible\-collections/community\.general/issues/11483)\, [https\://github\.com/ansible\-collections/community\.general/pull/11487](https\://github\.com/ansible\-collections/community\.general/pull/11487)\)\.
+* iptables\_state \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* iso\_extract \- retry <code>umount</code> up to 5 times preventing <code>OSError</code> on cleanup \([https\://github\.com/ansible\-collections/community\.general/issues/5333](https\://github\.com/ansible\-collections/community\.general/issues/5333)\, [https\://github\.com/ansible\-collections/community\.general/pull/11837](https\://github\.com/ansible\-collections/community\.general/pull/11837)\)\.
+* iso\_extract \- strip leading path separator from file entries so files with a leading <code>/</code> are extracted correctly \([https\://github\.com/ansible\-collections/community\.general/issues/5283](https\://github\.com/ansible\-collections/community\.general/issues/5283)\, [https\://github\.com/ansible\-collections/community\.general/pull/11825](https\://github\.com/ansible\-collections/community\.general/pull/11825)\)\.
+* java\_cert \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11774](https\://github\.com/ansible\-collections/community\.general/pull/11774)\)\.
+* java\_keystore \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* keyring \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11774](https\://github\.com/ansible\-collections/community\.general/pull/11774)\)\.
+* keyring\_info \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11786](https\://github\.com/ansible\-collections/community\.general/pull/11786)\)\.
+* kibana\_plugin \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11783](https\://github\.com/ansible\-collections/community\.general/pull/11783)\)\.
+* known\_hosts module utils \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* launchd \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11774](https\://github\.com/ansible\-collections/community\.general/pull/11774)\)\.
+* lbu \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11781](https\://github\.com/ansible\-collections/community\.general/pull/11781)\)\.
+* listen\_ports\_facts \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11774](https\://github\.com/ansible\-collections/community\.general/pull/11774)\)\.
+* lldp \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11785](https\://github\.com/ansible\-collections/community\.general/pull/11785)\)\.
+* locale\_gen \- add missing locale entries to <code>/etc/locale\.gen</code> when not already present \([https\://github\.com/ansible\-collections/community\.general/issues/2399](https\://github\.com/ansible\-collections/community\.general/issues/2399)\, [https\://github\.com/ansible\-collections/community\.general/pull/11824](https\://github\.com/ansible\-collections/community\.general/pull/11824)\)\.
+* logrotate \- adds missing default values for <code>state</code> and <code>config\_dir</code> parameters\, and adds <code>required\_by</code> declarations for shred and compression parameters \([https\://github\.com/ansible\-collections/community\.general/pull/11764](https\://github\.com/ansible\-collections/community\.general/pull/11764)\)\.
+* logrotate \- fixes <code>TypeError</code> when <code>shred\_cycles</code> is <code>None</code> and corrects <code>enabled\=None</code> handling in <code>get\_config\_path\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11764](https\://github\.com/ansible\-collections/community\.general/pull/11764)\)\.
+* logrotate \- writes configuration files to a temporary file first and validates before atomically moving to the destination\, and properly wraps all <code>os\.remove\(\)</code> and <code>atomic\_move\(\)</code> calls in error handling \([https\://github\.com/ansible\-collections/community\.general/pull/11764](https\://github\.com/ansible\-collections/community\.general/pull/11764)\)\.
+* logstash\_plugin \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11775](https\://github\.com/ansible\-collections/community\.general/pull/11775)\)\.
+* lvg \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11775](https\://github\.com/ansible\-collections/community\.general/pull/11775)\)\.
+* lvol \- fix LVM version parsing \([https\://github\.com/ansible\-collections/community\.general/issues/5445](https\://github\.com/ansible\-collections/community\.general/issues/5445)\, [https\://github\.com/ansible\-collections/community\.general/pull/11823](https\://github\.com/ansible\-collections/community\.general/pull/11823)\)\.
+* lvol \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* lxc\_container \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11779](https\://github\.com/ansible\-collections/community\.general/pull/11779)\)\.
+* machinectl become plugin \- prevent printing ANSI terminal color sequences \([https\://github\.com/ansible\-collections/community\.general/pull/11771](https\://github\.com/ansible\-collections/community\.general/pull/11771)\)\.
+* macports \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* mas \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11775](https\://github\.com/ansible\-collections/community\.general/pull/11775)\)\.
+* modprobe \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* monit \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* mssql\_db \- fail with a clear error message when a named instance \(<code>server\\instance</code> format\) is used together with <code>login\_port</code>\, since these are mutually exclusive connection methods \([https\://github\.com/ansible\-collections/community\.general/issues/5693](https\://github\.com/ansible\-collections/community\.general/issues/5693)\, [https\://github\.com/ansible\-collections/community\.general/pull/11664](https\://github\.com/ansible\-collections/community\.general/pull/11664)\)\.
+* mssql\_script \- fail with a clear error message when a named instance \(<code>server\\instance</code> format\) is used together with <code>login\_port</code>\, since these are mutually exclusive connection methods \([https\://github\.com/ansible\-collections/community\.general/issues/5693](https\://github\.com/ansible\-collections/community\.general/issues/5693)\, [https\://github\.com/ansible\-collections/community\.general/pull/11664](https\://github\.com/ansible\-collections/community\.general/pull/11664)\)\.
+* mssql\_script \- only passes <code>params</code> to <code>cursor\.execute\(\)</code> when the user actually provides them \([https\://github\.com/ansible\-collections/community\.general/issues/11699](https\://github\.com/ansible\-collections/community\.general/issues/11699)\, [https\://github\.com/ansible\-collections/community\.general/pull/11754](https\://github\.com/ansible\-collections/community\.general/pull/11754)\)\.
+* nmcli \- use <code>get\_best\_parsable\_locale\(\)</code> to set locale environment for <code>run\_command\(\)</code> calls\, fixing UTF\-8 connection names being corrupted to <code>\?\?\?\?</code> under <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/10384](https\://github\.com/ansible\-collections/community\.general/issues/10384)\, [https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11742](https\://github\.com/ansible\-collections/community\.general/pull/11742)\)\.
+* nsupdate \- fix GSS\-TSIG support \(accidentally broken by [https\://github\.com/ansible\-collections/community\.general/pull/11461](https\://github\.com/ansible\-collections/community\.general/pull/11461)\, [https\://github\.com/ansible\-collections/community\.general/pull/11712](https\://github\.com/ansible\-collections/community\.general/pull/11712)\)
+* ohai \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11785](https\://github\.com/ansible\-collections/community\.general/pull/11785)\)\.
+* onepassword\_info \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11786](https\://github\.com/ansible\-collections/community\.general/pull/11786)\)\.
+* open\_iscsi \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* openbsd\_pkg \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11767](https\://github\.com/ansible\-collections/community\.general/pull/11767)\)\.
+* openwrt\_init \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11784](https\://github\.com/ansible\-collections/community\.general/pull/11784)\)\.
+* osx\_defaults \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11775](https\://github\.com/ansible\-collections/community\.general/pull/11775)\)\.
+* pacemaker\_resource\, pacemaker\_stonith \- fix resource and stonith creation race condition by polling PCS status \([https\://github\.com/ansible\-collections/community\.general/issues/11574](https\://github\.com/ansible\-collections/community\.general/issues/11574)\, [https\://github\.com/ansible\-collections/community\.general/pull/11750](https\://github\.com/ansible\-collections/community\.general/pull/11750)\)\.
+* pacman \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* pacman\_key \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* parted \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11740](https\://github\.com/ansible\-collections/community\.general/pull/11740)\)\.
+* pear \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11782](https\://github\.com/ansible\-collections/community\.general/pull/11782)\)\.
+* pip\_package\_info \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11784](https\://github\.com/ansible\-collections/community\.general/pull/11784)\)\.
+* pkg5 \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11780](https\://github\.com/ansible\-collections/community\.general/pull/11780)\)\.
+* pkg5\_publisher \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11780](https\://github\.com/ansible\-collections/community\.general/pull/11780)\)\.
+* pkgin \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* pkgng \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11765](https\://github\.com/ansible\-collections/community\.general/pull/11765)\)\.
+* pkgutil \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11775](https\://github\.com/ansible\-collections/community\.general/pull/11775)\)\.
+* pnpm \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11776](https\://github\.com/ansible\-collections/community\.general/pull/11776)\)\.
+* portage \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11781](https\://github\.com/ansible\-collections/community\.general/pull/11781)\)\.
+* portinstall \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11781](https\://github\.com/ansible\-collections/community\.general/pull/11781)\)\.
+* redhat\_subscription \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* rhsm\_release \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* rhsm\_repository \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* riak \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11786](https\://github\.com/ansible\-collections/community\.general/pull/11786)\)\.
+* rpm\_ostree\_pkg \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* run0 become plugin \- mark the plugin as incompatible with connection pipelining \(see [https\://github\.com/ansible/ansible/issues/81254](https\://github\.com/ansible/ansible/issues/81254)\, [https\://github\.com/ansible\-collections/community\.general/pull/11771](https\://github\.com/ansible\-collections/community\.general/pull/11771)\)\.
+* run0 become plugin \- prevent printing ANSI terminal color sequences \([https\://github\.com/ansible\-collections/community\.general/pull/11771](https\://github\.com/ansible\-collections/community\.general/pull/11771)\)\.
+* runit \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* sefcontext \- flush the in\-process <code>matchpathcon</code> cache after applying changes\, so subsequent tasks running in the same process \(for example via the Mitogen connection plugin\) see the updated SELinux file context rules instead of stale cached data \([https\://github\.com/ansible\-collections/community\.general/issues/888](https\://github\.com/ansible\-collections/community\.general/issues/888)\, [https\://github\.com/ansible\-collections/community\.general/pull/11812](https\://github\.com/ansible\-collections/community\.general/pull/11812)\)\.
+* smartos\_image\_info \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11781](https\://github\.com/ansible\-collections/community\.general/pull/11781)\)\.
+* snmp\_facts \- the module now also supports pysnmp \>\= 7\.1 \([https\://github\.com/ansible\-collections/community\.general/issues/8852](https\://github\.com/ansible\-collections/community\.general/issues/8852)\, [https\://github\.com/ansible\-collections/community\.general/pull/11683](https\://github\.com/ansible\-collections/community\.general/pull/11683)\)\.
+* sorcery \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11767](https\://github\.com/ansible\-collections/community\.general/pull/11767)\)\.
+* supervisorctl \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* svc \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* swdepot \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11780](https\://github\.com/ansible\-collections/community\.general/pull/11780)\)\.
+* syspatch \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11781](https\://github\.com/ansible\-collections/community\.general/pull/11781)\)\.
+* sysrc \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11776](https\://github\.com/ansible\-collections/community\.general/pull/11776)\)\.
+* sysupgrade \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11768](https\://github\.com/ansible\-collections/community\.general/pull/11768)\)\.
+* terraform \- ensure <code>LANGUAGE\=C</code> and <code>LC\_ALL\=C</code> are set when running commands that parse output \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11765](https\://github\.com/ansible\-collections/community\.general/pull/11765)\)\.
+* timezone \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11776](https\://github\.com/ansible\-collections/community\.general/pull/11776)\)\.
+* udm\_user \- allow to use passlib instead of legacycrypt for Python 3\.13\+ \([https\://github\.com/ansible\-collections/community\.general/issues/4690](https\://github\.com/ansible\-collections/community\.general/issues/4690)\, [https\://github\.com/ansible\-collections/community\.general/pull/11860](https\://github\.com/ansible\-collections/community\.general/pull/11860)\)\.
+* udm\_user \- fix alias\-to\-canonical parameter name mismatch that caused all camelCase\-aliased parameters such as <code>display\_name</code> and <code>primary\_group</code> to be silently ignored \([https\://github\.com/ansible\-collections/community\.general/issues/2950](https\://github\.com/ansible\-collections/community\.general/issues/2950)\, [https\://github\.com/ansible\-collections/community\.general/issues/3691](https\://github\.com/ansible\-collections/community\.general/issues/3691)\, [https\://github\.com/ansible\-collections/community\.general/pull/11859](https\://github\.com/ansible\-collections/community\.general/pull/11859)\)\.
+* ufw \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* xattr \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11776](https\://github\.com/ansible\-collections/community\.general/pull/11776)\)\.
+* xbps \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11781](https\://github\.com/ansible\-collections/community\.general/pull/11781)\)\.
+* xenserver\_guest \- fix an issue where booting from ISO is not possible because CD\-ROM device is placed in position above number 3\. Position number 3 is now reserved for CD\-ROM device and cannot be occupied by a disk \([https\://github\.com/ansible\-collections/community\.general/issues/11624](https\://github\.com/ansible\-collections/community\.general/issues/11624)\, [https\://github\.com/ansible\-collections/community\.general/pull/11702](https\://github\.com/ansible\-collections/community\.general/pull/11702)\)\.
+* yarn \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11776](https\://github\.com/ansible\-collections/community\.general/pull/11776)\)\.
+* yum\_versionlock \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11777](https\://github\.com/ansible\-collections/community\.general/pull/11777)\)\.
+* zfs \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11778](https\://github\.com/ansible\-collections/community\.general/pull/11778)\)\.
+* zfs\_delegate\_admin \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11778](https\://github\.com/ansible\-collections/community\.general/pull/11778)\)\.
+* zfs\_facts \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11778](https\://github\.com/ansible\-collections/community\.general/pull/11778)\)\.
+* zpool\_facts \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11778](https\://github\.com/ansible\-collections/community\.general/pull/11778)\)\.
+* zypper \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11741](https\://github\.com/ansible\-collections/community\.general/pull/11741)\)\.
+* zypper\_repository \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11777](https\://github\.com/ansible\-collections/community\.general/pull/11777)\)\.
+* zypper\_repository\_info \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11782](https\://github\.com/ansible\-collections/community\.general/pull/11782)\)\.
+
+<a id="new-modules"></a>
+### New Modules
+
+* community\.general\.snap\_connect \- Manages snap interface connections\.
+
+<a id="v12-5-0"></a>
+## v12\.5\.0
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Bugfix and feature release\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * ansible\_galaxy\_install \- add parameter <code>executable</code> \([https\://github\.com/ansible\-collections/community\.general/issues/7261](https\://github\.com/ansible\-collections/community\.general/issues/7261)\, [https\://github\.com/ansible\-collections/community\.general/pull/11646](https\://github\.com/ansible\-collections/community\.general/pull/11646)\)\.
@@ -106,7 +296,7 @@ Bugfix and feature release\.
 * monit \- support for Monit version 5\.18 or older is deprecated and will be removed in community\.general 14\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11254](https\://github\.com/ansible\-collections/community\.general/pull/11254)\)\.
 * puppet \- the <code>timeout</code> parameter is deprecated and will be removed in community\.general 14\.0\.0\. \([https\://github\.com/ansible\-collections/community\.general/pull/11658](https\://github\.com/ansible\-collections/community\.general/pull/11658)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * counter\_enabled callback plugin \- fix plugin not observing <code>display\_ok\_hosts</code> option \([https\://github\.com/ansible\-collections/community\.general/issues/3978](https\://github\.com/ansible\-collections/community\.general/issues/3978)\, [https\://github\.com/ansible\-collections/community\.general/pull/11656](https\://github\.com/ansible\-collections/community\.general/pull/11656)\)\.
@@ -117,7 +307,7 @@ Bugfix and feature release\.
 * open\_iscsi \- fix IPv6 portal address formatting\; iscsiadm requires bracket notation for IPv6 addresses but the module was producing an incorrect format \([https\://github\.com/ansible\-collections/community\.general/issues/4467](https\://github\.com/ansible\-collections/community\.general/issues/4467)\, [https\://github\.com/ansible\-collections/community\.general/pull/11657](https\://github\.com/ansible\-collections/community\.general/pull/11657)\)\.
 * xfconf \- representation of boolean properties was not consistent between Python and <code>xfconf\-query</code>\, leading to broken idempotency \([https\://github\.com/ansible\-collections/community\.general/pull/11645](https\://github\.com/ansible\-collections/community\.general/pull/11645)\)\.
 
-<a id="new-modules"></a>
+<a id="new-modules-1"></a>
 ### New Modules
 
 * community\.general\.github\_secrets \- Manage GitHub repository or organization secrets\.
@@ -128,12 +318,12 @@ Bugfix and feature release\.
 <a id="v12-4-0"></a>
 ## v12\.4\.0
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * ModuleHelper module utils \- allow to ignore specific exceptions in <code>module\_fails\_on\_exception</code> decorator \([https\://github\.com/ansible\-collections/community\.general/pull/11488](https\://github\.com/ansible\-collections/community\.general/pull/11488)\)\.
@@ -145,7 +335,7 @@ Regular bugfix and feature release\.
 * redfish\_info \- add Redfish Root data to results of successful <code>CheckAvailability</code> command \([https\://github\.com/ansible\-collections/community\.general/pull/11504](https\://github\.com/ansible\-collections/community\.general/pull/11504)\)\.
 * seport \- adds support for DCCP and SCTP protocols \([https\://github\.com/ansible\-collections/community\.general/pull/11486](https\://github\.com/ansible\-collections/community\.general/pull/11486)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * keycloak module utils \- fix <code>TypeError</code> crash when managing users whose username or email contains special characters such as <code>\+</code> \([https\://github\.com/ansible\-collections/community\.general/issues/10305](https\://github\.com/ansible\-collections/community\.general/issues/10305)\, [https\://github\.com/ansible\-collections/community\.general/pull/11472](https\://github\.com/ansible\-collections/community\.general/pull/11472)\)\.
@@ -168,7 +358,7 @@ Regular bugfix and feature release\.
 
 * community\.general\.loganalytics\_ingestion \- Posts task results to an Azure Log Analytics workspace using the new Logs Ingestion API\.
 
-<a id="new-modules-1"></a>
+<a id="new-modules-2"></a>
 ### New Modules
 
 * community\.general\.icinga2\_downtime \- Manages Icinga 2 downtimes\.
@@ -177,12 +367,12 @@ Regular bugfix and feature release\.
 <a id="v12-3-0"></a>
 ## v12\.3\.0
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Regular feature and bugfix release\.
 
-<a id="minor-changes-2"></a>
+<a id="minor-changes-3"></a>
 ### Minor Changes
 
 * alicloud\_ecs module utils \- update to Python 3\.7 idioms \([https\://github\.com/ansible\-collections/community\.general/pull/11341](https\://github\.com/ansible\-collections/community\.general/pull/11341)\)\.
@@ -282,7 +472,7 @@ Regular feature and bugfix release\.
 * zypper \- update to Python 3\.7 idioms \([https\://github\.com/ansible\-collections/community\.general/pull/11344](https\://github\.com/ansible\-collections/community\.general/pull/11344)\)\.
 * zypper\_repository \- update to Python 3\.7 idioms \([https\://github\.com/ansible\-collections/community\.general/pull/11344](https\://github\.com/ansible\-collections/community\.general/pull/11344)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * cloudflare\_dns \- also allow <code>flag\=128</code> for CAA records \([https\://github\.com/ansible\-collections/community\.general/issues/11355](https\://github\.com/ansible\-collections/community\.general/issues/11355)\, [https\://github\.com/ansible\-collections/community\.general/pull/11377](https\://github\.com/ansible\-collections/community\.general/pull/11377)\)\.
@@ -303,12 +493,12 @@ Regular feature and bugfix release\.
 <a id="v12-2-0"></a>
 ## v12\.2\.0
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Feature and bugfix release\.
 
-<a id="minor-changes-3"></a>
+<a id="minor-changes-4"></a>
 ### Minor Changes
 
 * btrfs module utils \- make execution of external commands safer by passing arguments as list \([https\://github\.com/ansible\-collections/community\.general/pull/11240](https\://github\.com/ansible\-collections/community\.general/pull/11240)\)\.
@@ -328,7 +518,7 @@ Feature and bugfix release\.
 
 * All module utils\, plugin utils\, and doc fragments will be made <strong>private</strong> in community\.general 13\.0\.0\. This means that they will no longer be part of the public API of the collection\, and can have breaking changes even in bugfix releases\. If you depend on importing code from the module or plugin utils\, or use one of the doc fragments\, please [comment in the issue to discuss this](https\://github\.com/ansible\-collections/community\.general/issues/11312)\. Note that this does not affect any use of community\.general in task files\, roles\, or playbooks \([https\://github\.com/ansible\-collections/community\.general/issues/11312](https\://github\.com/ansible\-collections/community\.general/issues/11312)\, [https\://github\.com/ansible\-collections/community\.general/pull/11320](https\://github\.com/ansible\-collections/community\.general/pull/11320)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * apk \- fix <code>packages</code> return value for apk\-tools \>\= 3 \(Alpine 3\.23\) \([https\://github\.com/ansible\-collections/community\.general/issues/11264](https\://github\.com/ansible\-collections/community\.general/issues/11264)\)\.
@@ -339,7 +529,7 @@ Feature and bugfix release\.
 * monit \- add delay of 0\.5 seconds after state change and check for status \([https\://github\.com/ansible\-collections/community\.general/pull/11255](https\://github\.com/ansible\-collections/community\.general/pull/11255)\)\.
 * monit \- internal state was not reflecting when operation is \"pending\" in <code>monit</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11245](https\://github\.com/ansible\-collections/community\.general/pull/11245)\)\.
 
-<a id="new-modules-2"></a>
+<a id="new-modules-3"></a>
 ### New Modules
 
 * community\.general\.ip2location\_info \- Retrieve IP geolocation information of a host\'s IP address\.
@@ -348,12 +538,12 @@ Feature and bugfix release\.
 <a id="v12-1-0"></a>
 ## v12\.1\.0
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-4"></a>
+<a id="minor-changes-5"></a>
 ### Minor Changes
 
 * The last code included in the collection that was licensed under the PSF 2\.0 license was removed form the collection\. This means that now all code is either GPLv3\+ licensed\, MIT licensed\, or BSD\-2\-clause licensed \([https\://github\.com/ansible\-collections/community\.general/pull/11232](https\://github\.com/ansible\-collections/community\.general/pull/11232)\)\.
@@ -704,7 +894,7 @@ Regular bugfix and feature release\.
 * saslprep module utils \- this module utils is not used by community\.general and will thus be removed from community\.general 13\.0\.0\. If you are using it from another collection\, please copy it over \([https\://github\.com/ansible\-collections/community\.general/pull/11205](https\://github\.com/ansible\-collections/community\.general/pull/11205)\)\.
 * spotinst\_aws\_elastigroup \- module relies on Python package supporting Python 2\.7 only\; the module will be removed from community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11069](https\://github\.com/ansible\-collections/community\.general/pull/11069)\)\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * \_filelock module utils \- add type hints\. Fix bug if <code>set\_lock\(\)</code> is called with <code>lock\_timeout\=None</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11222](https\://github\.com/ansible\-collections/community\.general/pull/11222)\)\.
@@ -722,7 +912,7 @@ Regular bugfix and feature release\.
 * xcc\_redfish\_command \- fix templating of dictionary keys as list \([https\://github\.com/ansible\-collections/community\.general/pull/11144](https\://github\.com/ansible\-collections/community\.general/pull/11144)\)\.
 * zfs \- mark change correctly when updating properties whose current value differs\, even if they already have a non\-default value \([https\://github\.com/ansible\-collections/community\.general/issues/11019](https\://github\.com/ansible\-collections/community\.general/issues/11019)\, [https\://github\.com/ansible\-collections/community\.general/pull/11172](https\://github\.com/ansible\-collections/community\.general/pull/11172)\)\.
 
-<a id="new-modules-3"></a>
+<a id="new-modules-4"></a>
 ### New Modules
 
 * community\.general\.file\_remove \- Remove files matching a pattern from a directory\.
@@ -732,12 +922,12 @@ Regular bugfix and feature release\.
 <a id="v12-0-1"></a>
 ## v12\.0\.1
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 
-<a id="minor-changes-5"></a>
+<a id="minor-changes-6"></a>
 ### Minor Changes
 
 * datetime module utils \- remove code for unsupported Python version \([https\://github\.com/ansible\-collections/community\.general/pull/11048](https\://github\.com/ansible\-collections/community\.general/pull/11048)\)\.
@@ -752,7 +942,7 @@ Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 * tss lookup plugin \- fixed <code>AccessTokenAuthorizer</code> initialization to include <code>base\_url</code> parameter for proper token authentication \([https\://github\.com/ansible\-collections/community\.general/pull/11031](https\://github\.com/ansible\-collections/community\.general/pull/11031)\)\.
 * zfs\_facts \- use Ansible construct to check result of external command \([https\://github\.com/ansible\-collections/community\.general/pull/11054](https\://github\.com/ansible\-collections/community\.general/pull/11054)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * \_filelock module utils \- improve Python code \([https\://github\.com/ansible\-collections/community\.general/pull/11043](https\://github\.com/ansible\-collections/community\.general/pull/11043)\)\.
@@ -885,12 +1075,12 @@ Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 <a id="v12-0-0"></a>
 ## v12\.0\.0
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-11\-03\.
 
-<a id="minor-changes-6"></a>
+<a id="minor-changes-7"></a>
 ### Minor Changes
 
 * Modernize code for Python 3\.7\+\. This includes code reformatting\, and adding new checks to CI\, including a type checker \(mypy\)\. Most of the code does not have type hints yet\, but now it is possible to add typing hints and have these validated \([https\://github\.com/ansible\-collections/community\.general/pull/10285](https\://github\.com/ansible\-collections/community\.general/pull/10285)\, [https\://github\.com/ansible\-collections/community\.general/pull/10886](https\://github\.com/ansible\-collections/community\.general/pull/10886)\, [https\://github\.com/ansible\-collections/community\.general/pull/10891](https\://github\.com/ansible\-collections/community\.general/pull/10891)\, [https\://github\.com/ansible\-collections/community\.general/pull/10892](https\://github\.com/ansible\-collections/community\.general/pull/10892)\, [https\://github\.com/ansible\-collections/community\.general/pull/10897](https\://github\.com/ansible\-collections/community\.general/pull/10897)\, [https\://github\.com/ansible\-collections/community\.general/pull/10899](https\://github\.com/ansible\-collections/community\.general/pull/10899)\, [https\://github\.com/ansible\-collections/community\.general/pull/10902](https\://github\.com/ansible\-collections/community\.general/pull/10902)\, [https\://github\.com/ansible\-collections/community\.general/pull/10903](https\://github\.com/ansible\-collections/community\.general/pull/10903)\, [https\://github\.com/ansible\-collections/community\.general/pull/10904](https\://github\.com/ansible\-collections/community\.general/pull/10904)\, [https\://github\.com/ansible\-collections/community\.general/pull/10907](https\://github\.com/ansible\-collections/community\.general/pull/10907)\, [https\://github\.com/ansible\-collections/community\.general/pull/10908](https\://github\.com/ansible\-collections/community\.general/pull/10908)\, [https\://github\.com/ansible\-collections/community\.general/pull/10909](https\://github\.com/ansible\-collections/community\.general/pull/10909)\, [https\://github\.com/ansible\-collections/community\.general/pull/10939](https\://github\.com/ansible\-collections/community\.general/pull/10939)\, [https\://github\.com/ansible\-collections/community\.general/pull/10940](https\://github\.com/ansible\-collections/community\.general/pull/10940)\, [https\://github\.com/ansible\-collections/community\.general/pull/10941](https\://github\.com/ansible\-collections/community\.general/pull/10941)\, [https\://github\.com/ansible\-collections/community\.general/pull/10942](https\://github\.com/ansible\-collections/community\.general/pull/10942)\, [https\://github\.com/ansible\-collections/community\.general/pull/10945](https\://github\.com/ansible\-collections/community\.general/pull/10945)\, [https\://github\.com/ansible\-collections/community\.general/pull/10947](https\://github\.com/ansible\-collections/community\.general/pull/10947)\, [https\://github\.com/ansible\-collections/community\.general/pull/10958](https\://github\.com/ansible\-collections/community\.general/pull/10958)\, [https\://github\.com/ansible\-collections/community\.general/pull/10959](https\://github\.com/ansible\-collections/community\.general/pull/10959)\, [https\://github\.com/ansible\-collections/community\.general/pull/10968](https\://github\.com/ansible\-collections/community\.general/pull/10968)\, [https\://github\.com/ansible\-collections/community\.general/pull/10969](https\://github\.com/ansible\-collections/community\.general/pull/10969)\, [https\://github\.com/ansible\-collections/community\.general/pull/10970](https\://github\.com/ansible\-collections/community\.general/pull/10970)\, [https\://github\.com/ansible\-collections/community\.general/pull/10971](https\://github\.com/ansible\-collections/community\.general/pull/10971)\, [https\://github\.com/ansible\-collections/community\.general/pull/10973](https\://github\.com/ansible\-collections/community\.general/pull/10973)\, [https\://github\.com/ansible\-collections/community\.general/pull/10974](https\://github\.com/ansible\-collections/community\.general/pull/10974)\, [https\://github\.com/ansible\-collections/community\.general/pull/10975](https\://github\.com/ansible\-collections/community\.general/pull/10975)\, [https\://github\.com/ansible\-collections/community\.general/pull/10976](https\://github\.com/ansible\-collections/community\.general/pull/10976)\, [https\://github\.com/ansible\-collections/community\.general/pull/10977](https\://github\.com/ansible\-collections/community\.general/pull/10977)\, [https\://github\.com/ansible\-collections/community\.general/pull/10978](https\://github\.com/ansible\-collections/community\.general/pull/10978)\, [https\://github\.com/ansible\-collections/community\.general/pull/10979](https\://github\.com/ansible\-collections/community\.general/pull/10979)\, [https\://github\.com/ansible\-collections/community\.general/pull/10980](https\://github\.com/ansible\-collections/community\.general/pull/10980)\, [https\://github\.com/ansible\-collections/community\.general/pull/10981](https\://github\.com/ansible\-collections/community\.general/pull/10981)\, [https\://github\.com/ansible\-collections/community\.general/pull/10992](https\://github\.com/ansible\-collections/community\.general/pull/10992)\, [https\://github\.com/ansible\-collections/community\.general/pull/10993](https\://github\.com/ansible\-collections/community\.general/pull/10993)\, [https\://github\.com/ansible\-collections/community\.general/pull/10997](https\://github\.com/ansible\-collections/community\.general/pull/10997)\, [https\://github\.com/ansible\-collections/community\.general/pull/10999](https\://github\.com/ansible\-collections/community\.general/pull/10999)\, [https\://github\.com/ansible\-collections/community\.general/pull/11015](https\://github\.com/ansible\-collections/community\.general/pull/11015)\, [https\://github\.com/ansible\-collections/community\.general/pull/11016](https\://github\.com/ansible\-collections/community\.general/pull/11016)\, [https\://github\.com/ansible\-collections/community\.general/pull/11017](https\://github\.com/ansible\-collections/community\.general/pull/11017)\)\.
@@ -1227,7 +1417,7 @@ This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-
 
 * keycloak\_user \- the parameter <code>credentials\[\]\.value</code> is now marked as <code>no\_log\=true</code>\. Before it was logged by Ansible\, unless the task was marked as <code>no\_log\: true</code>\. Since this parameter can be used for passwords\, this resulted in credential leaking \([https\://github\.com/ansible\-collections/community\.general/issues/11000](https\://github\.com/ansible\-collections/community\.general/issues/11000)\, [https\://github\.com/ansible\-collections/community\.general/pull/11005](https\://github\.com/ansible\-collections/community\.general/pull/11005)\)\.
 
-<a id="bugfixes-6"></a>
+<a id="bugfixes-7"></a>
 ### Bugfixes
 
 * Avoid deprecated functionality in ansible\-core 2\.20 \([https\://github\.com/ansible\-collections/community\.general/pull/10687](https\://github\.com/ansible\-collections/community\.general/pull/10687)\)\.
@@ -1313,7 +1503,7 @@ This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-
 
 * community\.general\.binary\_file \- Read binary file and return it Base64 encoded\.
 
-<a id="new-modules-4"></a>
+<a id="new-modules-5"></a>
 ### New Modules
 
 * community\.general\.django\_dumpdata \- Wrapper for <code>django\-admin dumpdata</code>\.

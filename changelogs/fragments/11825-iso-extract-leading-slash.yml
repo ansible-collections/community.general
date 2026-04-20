@@ -1,2 +1,0 @@
-bugfixes:
-  - iso_extract - strip leading path separator from file entries so files with a leading ``/`` are extracted correctly (https://github.com/ansible-collections/community.general/issues/5283, https://github.com/ansible-collections/community.general/pull/11825).

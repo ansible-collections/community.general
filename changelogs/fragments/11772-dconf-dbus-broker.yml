@@ -1,3 +1,0 @@
-minor_changes:
-  - dconf - add support for C(dbus-broker) (https://github.com/ansible-collections/community.general/issues/495,
-    https://github.com/ansible-collections/community.general/pull/11772).

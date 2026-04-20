@@ -1,3 +1,0 @@
-bugfixes:
-  - openbsd_pkg - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11767).
-  - sorcery - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11767).
