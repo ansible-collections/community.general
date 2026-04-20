@@ -5,7 +5,7 @@
 DOCUMENTATION:
   name: to_toml
   author:
-    - Matt Williaks (@milliams)
+    - Matt Williams (@milliams)
   version_added: 12.3.0
   short_description: Convert variable to TOML string
   description:
