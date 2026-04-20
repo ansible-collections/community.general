@@ -154,6 +154,7 @@ import stat
 
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.community.general.plugins.module_utils._lvm import pvs_runner
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
@@ -569,14 +570,15 @@ class LVM(Filesystem):
     CHANGE_UUID_OPTION = "-u"
     CHANGE_UUID_OPTION_HAS_ARG = False
 
+    def __init__(self, module):
+        super().__init__(module)
+        self._pvs = pvs_runner(module)
+
     def get_fs_size(self, dev):
         """Get and return PV size, in bytes."""
-        cmd = self.module.get_bin_path(self.INFO, required=True)
-        dummy, size, dummy = self.module.run_command(
-            [cmd, "--noheadings", "-o", "pv_size", "--units", "b", "--nosuffix", str(dev)], check_rc=True
-        )
-        pv_size = int(size)
-        return pv_size
+        with self._pvs("noheadings nosuffix units fields devices") as ctx:
+            dummy, size, dummy = ctx.run(units="b", fields="pv_size", devices=[str(dev)])
+        return int(size.strip())
 
 
 class Swap(Filesystem):
