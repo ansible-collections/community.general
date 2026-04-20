@@ -1,0 +1,2 @@
+minor_changes:
+  - filesystem - migrate ``LVM.get_fs_size()`` to use ``CmdRunner``, ensuring locale-independent output parsing (https://github.com/ansible-collections/community.general/pull/11888).
