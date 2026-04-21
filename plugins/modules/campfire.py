@@ -184,8 +184,6 @@ def main():
     notify = module.params["notify"]
 
     URI = f"https://{subscription}.campfirenow.com"
-    NSTR = "<message><type>SoundMessage</type><body>%s</body></message>"
-    MSTR = "<message><body>%s</body></message>"
     AGENT = "Ansible/1.2"
 
     # Hack to add basic auth username and password the way fetch_url expects
@@ -197,14 +195,21 @@ def main():
 
     # Send some audible notification if requested
     if notify:
-        response, info = fetch_url(module, target_url, data=NSTR % html_escape(notify), headers=headers)
+        response, info = fetch_url(
+            module,
+            target_url,
+            data=f"<message><type>SoundMessage</type><body>{html_escape(notify)}</body></message>",
+            headers=headers,
+        )
         if info["status"] not in [200, 201]:
             module.fail_json(
                 msg=f"unable to send msg: '{notify}', campfire api returned error code: '{info['status']}'"
             )
 
     # Send the message
-    response, info = fetch_url(module, target_url, data=MSTR % html_escape(msg), headers=headers)
+    response, info = fetch_url(
+        module, target_url, data=f"<message><body>{html_escape(msg)}</body></message>", headers=headers
+    )
     if info["status"] not in [200, 201]:
         module.fail_json(msg=f"unable to send msg: '{msg}', campfire api returned error code: '{info['status']}'")
 

@@ -212,8 +212,9 @@ def list_mergeby(x, y, index, recursive=False, list_merge="replace"):
     for lst in (x, y):
         for elem in lst:
             if not isinstance(elem, Mapping):
-                msg = "Elements of list arguments for lists_mergeby must be dictionaries. %s is %s"
-                raise AnsibleFilterError(msg % (elem, type(elem)))
+                raise AnsibleFilterError(
+                    f"Elements of list arguments for lists_mergeby must be dictionaries. {elem} is {type(elem)}"
+                )
             if index in elem.keys():
                 d[elem[index]].update(merge_hash(d[elem[index]], elem, recursive, list_merge))
     return sorted(d.values(), key=itemgetter(index))
@@ -236,8 +237,9 @@ def lists_mergeby(*terms, **kwargs):
     flat_list = []
     for sublist in terms[:-1]:
         if not isinstance(sublist, Sequence):
-            msg = "All arguments before the argument index for community.general.lists_mergeby must be lists. %s is %s"
-            raise AnsibleFilterError(msg % (sublist, type(sublist)))
+            raise AnsibleFilterError(
+                f"All arguments before the argument index for community.general.lists_mergeby must be lists. {sublist} is {type(sublist)}"
+            )
         if len(sublist) > 0:
             if all(isinstance(lst, Sequence) for lst in sublist):
                 for item in sublist:
@@ -255,8 +257,9 @@ def lists_mergeby(*terms, **kwargs):
     index = terms[-1]
 
     if not isinstance(index, str):
-        msg = "First argument after the lists for community.general.lists_mergeby must be string. %s is %s"
-        raise AnsibleFilterError(msg % (index, type(index)))
+        raise AnsibleFilterError(
+            f"First argument after the lists for community.general.lists_mergeby must be string. {index} is {type(index)}"
+        )
 
     high_to_low_prio_list_iterator = reversed(lists)
     result = next(high_to_low_prio_list_iterator)

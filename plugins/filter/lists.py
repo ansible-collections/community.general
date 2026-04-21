@@ -32,8 +32,7 @@ def flatten_list(lst):
     result = []
     for sublist in lst:
         if not is_sequence(sublist):
-            msg = "All arguments must be lists. %s is %s"
-            raise AnsibleFilterError(msg % (sublist, type(sublist)))
+            raise AnsibleFilterError(f"All arguments must be lists. {sublist} is {type(sublist)}")
         if len(sublist) > 0:
             if all(is_sequence(sub) for sub in sublist):
                 for item in sublist:

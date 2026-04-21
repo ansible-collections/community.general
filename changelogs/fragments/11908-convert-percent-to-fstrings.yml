@@ -1,0 +1,13 @@
+minor_changes:
+  - campfire - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - decompress - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - grove - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - ini_file - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - lxca_cmms - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - lxca_nodes - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - rocketchat - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - slack - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - keys_filter plugin utils - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - redfish_utils module utils - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - lists filter plugin - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+  - lists_mergeby filter plugin - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).

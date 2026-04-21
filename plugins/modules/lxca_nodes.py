@@ -126,7 +126,6 @@ except ImportError:
 
 UUID_REQUIRED = "UUID of device is required for nodes_by_uuid command."
 CHASSIS_UUID_REQUIRED = "UUID of chassis is required for nodes_by_chassis_uuid command."
-SUCCESS_MSG = "Success %s result"
 
 
 def _nodes(module, lxca_con):
@@ -192,7 +191,7 @@ def execute_module(module):
     try:
         with connection_object(module) as lxca_con:
             result = FUNC_DICT[module.params["command_options"]](module, lxca_con)
-            module.exit_json(changed=False, msg=SUCCESS_MSG % module.params["command_options"], result=result)
+            module.exit_json(changed=False, msg=f"Success {module.params['command_options']} result", result=result)
     except Exception as exception:
         error_msg = "; ".join(exception.args)
         module.fail_json(msg=error_msg, exception=traceback.format_exc())

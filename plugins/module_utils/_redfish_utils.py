@@ -4122,8 +4122,10 @@ class RedfishUtils:
 
         # Get Registries URI
         if "Bios" not in server_details:
-            msg = "Getting BIOS URI failed, Key 'Bios' not found in /redfish/v1/Systems/1/ response: %s"
-            return {"ret": False, "msg": msg % str(server_details)}
+            return {
+                "ret": False,
+                "msg": f"Getting BIOS URI failed, Key 'Bios' not found in /redfish/v1/Systems/1/ response: {server_details}",
+            }
 
         bios_uri = server_details["Bios"]["@odata.id"]
         bios_resp = self.get_request(self.root_uri + bios_uri)
@@ -4169,8 +4171,10 @@ class RedfishUtils:
                     if isinstance(loc["Uri"], dict) and "extref" in loc["Uri"].keys():
                         rsp_uri = loc["Uri"]["extref"]
         if not rsp_uri:
-            msg = "Language 'en' not found in BIOS Attribute Registries location, URI: %s, response: %s"
-            return {"ret": False, "msg": msg % (resp_uri, str(resp_data))}
+            return {
+                "ret": False,
+                "msg": f"Language 'en' not found in BIOS Attribute Registries location, URI: {resp_uri}, response: {resp_data}",
+            }
 
         res = self.get_request(self.root_uri + rsp_uri)
         if res["ret"] is False:

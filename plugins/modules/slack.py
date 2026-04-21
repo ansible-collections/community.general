@@ -269,12 +269,6 @@ from urllib.parse import urlencode
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-OLD_SLACK_INCOMING_WEBHOOK = "https://%s/services/hooks/incoming-webhook?token=%s"
-SLACK_INCOMING_WEBHOOK = "https://hooks.%s/services/%s"
-SLACK_POSTMESSAGE_WEBAPI = "https://%s/api/chat.postMessage"
-SLACK_UPDATEMESSAGE_WEBAPI = "https://%s/api/chat.update"
-SLACK_CONVERSATIONS_HISTORY_WEBAPI = "https://%s/api/conversations.history"
-
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
 escape_table = {
@@ -402,7 +396,7 @@ def get_slack_message(module, domain, token, channel, ts):
         }
     )
     domain = validate_slack_domain(domain)
-    url = f"{SLACK_CONVERSATIONS_HISTORY_WEBAPI % domain}?{qs}"
+    url = f"https://{domain}/api/conversations.history?{qs}"
     response, info = fetch_url(module=module, url=url, headers=headers, method="GET")
     if info["status"] != 200:
         module.fail_json(msg="failed to get slack message")
@@ -421,10 +415,10 @@ def do_notify_slack(module, domain, token, payload):
     if token.count("/") >= 2:
         # New style webhook token
         domain = validate_slack_domain(domain)
-        slack_uri = SLACK_INCOMING_WEBHOOK % (domain, token)
+        slack_uri = f"https://hooks.{domain}/services/{token}"
     elif re.match(r"^xox[abp]-\S+$", token):
         domain = validate_slack_domain(domain)
-        slack_uri = (SLACK_UPDATEMESSAGE_WEBAPI if "ts" in payload else SLACK_POSTMESSAGE_WEBAPI) % domain
+        slack_uri = f"https://{domain}/api/{'chat.update' if 'ts' in payload else 'chat.postMessage'}"
         use_webapi = True
     else:
         if not domain:
@@ -432,7 +426,7 @@ def do_notify_slack(module, domain, token, payload):
                 msg="Slack has updated its webhook API. You need to specify a token of the form "
                 "XXXX/YYYY/ZZZZ in your playbook"
             )
-        slack_uri = OLD_SLACK_INCOMING_WEBHOOK % (domain, token)
+        slack_uri = f"https://{domain}/services/hooks/incoming-webhook?token={token}"
 
     headers = {
         "Content-Type": "application/json; charset=UTF-8",
@@ -448,7 +442,7 @@ def do_notify_slack(module, domain, token, payload):
         if use_webapi:
             obscured_incoming_webhook = slack_uri
         else:
-            obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % (domain, "[obscured]")
+            obscured_incoming_webhook = f"https://hooks.{domain}/services/[obscured]"
         module.fail_json(msg=f" failed to send {data} to {obscured_incoming_webhook}: {info['msg']}")
 
     # each API requires different handling

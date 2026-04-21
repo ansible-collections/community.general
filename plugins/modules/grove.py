@@ -65,14 +65,12 @@ from urllib.parse import urlencode
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-BASE_URL = "https://grove.io/api/notice/%s/"
-
 # ==============================================================
 # do_notify_grove
 
 
 def do_notify_grove(module, channel_token, service, message, url=None, icon_url=None):
-    my_url = BASE_URL % (channel_token,)
+    my_url = f"https://grove.io/api/notice/{channel_token}/"
 
     my_data = dict(service=service, message=message)
     if url is not None:

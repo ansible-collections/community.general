@@ -120,7 +120,6 @@ def decompress(b_src, b_dest, handler):
 
 
 class Decompress(ModuleHelper):
-    destination_filename_template = "%s_decompressed"
     output_params = "dest"
 
     module = dict(
@@ -189,7 +188,7 @@ class Decompress(ModuleHelper):
         if src.endswith(fmt_extension) and len(src) > len(fmt_extension):
             filename = src[: -len(fmt_extension)]
         else:
-            filename = Decompress.destination_filename_template % src
+            filename = f"{src}_decompressed"
         return filename
 
 
