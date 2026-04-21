@@ -14,8 +14,8 @@ from ansible import context
 from .helper import call_become_plugin
 
 
-def test_pfexec_basic(mocker, parser, reset_cli_args):
-    """Test pfexec with default settings (no flags, wrap_exe enabled)."""
+def test_pfexec_wrap(mocker, parser, reset_cli_args):
+    """Test pfexec with wrap_exe explicitly enabled."""
     options = parser.parse_args([])
     context._init_global_context(options)
 
@@ -28,15 +28,16 @@ def test_pfexec_basic(mocker, parser, reset_cli_args):
     task = {
         "become_method": "community.general.pfexec",
     }
-    var_options = {}
+    var_options = {
+        "ansible_pfexec_wrap_execution": "true",
+    }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    # With wrap_exe=true (default), command is wrapped in shell -c
-    assert re.match(f"""{pfexec_exe}  {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
+    assert re.match(f"""{pfexec_exe} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_pfexec_no_wrap(mocker, parser, reset_cli_args):
-    """Test pfexec with wrap_exe disabled (legacy behaviour)."""
+    """Test pfexec with wrap_exe explicitly disabled."""
     options = parser.parse_args([])
     context._init_global_context(options)
 
@@ -55,11 +56,11 @@ def test_pfexec_no_wrap(mocker, parser, reset_cli_args):
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match(f"""{pfexec_exe}  'echo {success}; {default_cmd}'""", cmd) is not None
+    assert re.match(f"""{pfexec_exe} 'echo {success}; {default_cmd}'""", cmd) is not None
 
 
 def test_pfexec_custom_flags(mocker, parser, reset_cli_args):
-    """Test pfexec with custom flags."""
+    """Test pfexec with custom flags and wrap_exe enabled."""
     options = parser.parse_args([])
     context._init_global_context(options)
 
@@ -74,7 +75,9 @@ def test_pfexec_custom_flags(mocker, parser, reset_cli_args):
         "become_method": "community.general.pfexec",
         "become_flags": pfexec_flags,
     }
-    var_options = {}
+    var_options = {
+        "ansible_pfexec_wrap_execution": "true",
+    }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
     assert (
@@ -101,8 +104,9 @@ def test_pfexec_varoptions(mocker, parser, reset_cli_args):
     var_options = {
         "ansible_become_user": "bar",
         "ansible_become_flags": "",
+        "ansible_pfexec_wrap_execution": "true",
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
     # var_options override task flags, so flags should be empty
-    assert re.match(f"""{pfexec_exe}  {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
+    assert re.match(f"""{pfexec_exe} {default_exe} -c 'echo {success}; {default_cmd}'""", cmd) is not None
