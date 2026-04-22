@@ -1,5 +1,5 @@
 ---
-bugfixes:
+minor_changes:
   - nmap inventory plugin - added ``set_name_variable`` option to control whether the ``name`` variable is set for each host,
-    allowing users to avoid the "Found variable using reserved name" warning while maintaining backward compatibility.
-    See https://github.com/ansible-collections/community.general/issues/11766
+    allowing users to avoid the "Found variable using reserved name" warning while maintaining backward compatibility
+    (https://github.com/ansible-collections/community.general/pull/11893, https://github.com/ansible-collections/community.general/issues/11766).

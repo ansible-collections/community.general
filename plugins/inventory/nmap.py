@@ -102,7 +102,7 @@ options:
       - Set to V(false) to avoid the warning when C(name) is not needed as a variable.
     type: boolean
     default: true
-    version_added: 10.6.0
+    version_added: 13.0.0
 notes:
   - At least one of O(ipv4) or O(ipv6) is required to be V(true); both can be V(true), but they cannot both be V(false).
   - 'TODO: add OS fingerprinting.'
