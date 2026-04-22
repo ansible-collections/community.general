@@ -125,6 +125,7 @@ stages:
             - test: '3.12'
             - test: '3.13'
             - test: '3.14'
+            - test: '3.15'
   - stage: Units_2_21
     displayName: Units 2.21
     dependsOn: []
@@ -366,8 +367,8 @@ stages:
 #          testFormat: devel/generic/{0}/1
 #          targets:
 #            - test: '3.9'
-#            - test: '3.12'
-#            - test: '3.14'
+#            - test: '3.13'
+#            - test: '3.15'
 #  - stage: Generic_2_21
 #    displayName: Generic 2.21
 #    dependsOn: []
