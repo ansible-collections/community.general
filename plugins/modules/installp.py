@@ -13,6 +13,12 @@ author:
 short_description: Manage packages on AIX
 description:
   - Manage packages using 'installp' on AIX.
+deprecated:
+  removed_in: 15.0.0
+  why: The module is not actively maintained.
+  alternative: >-
+    Use C(ibm.power_aix.installp) instead.
+    See U(https://ibm.github.io/ansible-power-aix/modules/installp.html) for details.
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
