@@ -1,0 +1,2 @@
+deprecated_features:
+  - installp - Deprecated and scheduled for removal in community.general 15.0.0 (https://github.com/ansible-collections/community.general/pull/11910).
