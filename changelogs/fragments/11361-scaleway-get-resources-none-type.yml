@@ -1,0 +1,2 @@
+bugfixes:
+  - scaleway modules (using ``get_resources()``) - fix ``NoneType`` error when the Scaleway API returns an empty or non-JSON response body (https://github.com/ansible-collections/community.general/pull/11918).
