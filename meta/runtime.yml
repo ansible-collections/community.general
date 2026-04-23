@@ -402,6 +402,10 @@ plugin_routing:
         warning_text: Use community.general.idrac_redfish_info instead.
     idrac_server_config_profile:
       redirect: dellemc.openmanage.idrac_server_config_profile
+    installp:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.installp instead. The C(ibm.power_aix) collection is actively maintained by IBM.
     jboss:
       deprecation:
         removal_version: 14.0.0

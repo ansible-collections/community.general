@@ -1,0 +1,2 @@
+deprecated_features:
+  - installp - deprecated and scheduled for removal in community.general 15.0.0. Use ``ibm.power_aix.installp`` instead (https://github.com/ansible-collections/community.general/pull/11910).
