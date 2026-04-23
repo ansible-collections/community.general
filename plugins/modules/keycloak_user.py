@@ -570,9 +570,6 @@ def main():
                 if not module.check_mode:
                     after_user = kc.update_user(userrep=desired_user, realm=realm)
 
-                if module._diff:
-                    result["diff"] = dict(before=before_user, after=desired_user)
-
                 changed = True
 
         if before_user:
@@ -591,9 +588,6 @@ def main():
             absent_groups = [g["name"] for g in groups if g["state"] == "absent"]
 
             desired_user["groups"] = (set(before_groups) | set(present_groups)) - set(absent_groups)
-            after_groups = kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
-            if after_user:
-                after_user["groups"] = after_groups
 
             if module.check_mode:
                 # after_user will not have changed, so use the desired user
@@ -602,7 +596,11 @@ def main():
                     groups, before_user["groups"], excludes, empty_list_result=False
                 )
             else:
+                after_groups = (
+                    kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
+                )
                 if after_user:
+                    after_user["groups"] = after_groups
                     result["diff"] = dict(before=before_user, after=after_user)
                 else:
                     result["diff"] = dict(
