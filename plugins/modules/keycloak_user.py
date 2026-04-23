@@ -404,7 +404,7 @@ def main():
         disableable_credential_types=dict(
             type="list", default=[], aliases=["disableableCredentialTypes"], elements="str"
         ),
-        required_actions=dict(type="list", default=[], aliases=["requiredActions"], elements="str"),
+        required_actions=dict(type="list", aliases=["requiredActions"], elements="str"),
         credentials=dict(type="list", default=[], elements="dict", options=credential_spec),
         federated_identities=dict(type="list", default=[], aliases=["federatedIdentities"], elements="str"),
         client_consents=dict(
@@ -557,7 +557,7 @@ def main():
                 "groups",
                 "clientConsents",
                 "federatedIdentities",
-                "requiredActions",
+                
             ]
             # Add user ID to new representation
             desired_user["id"] = before_user["id"]
