@@ -240,9 +240,14 @@ class Scaleway:
         results = self.get(f"/{self.name}")
 
         if not results.ok:
+            api_response = results.json if results.json is not None else results.body
+            message = api_response.get("message") if isinstance(api_response, dict) else api_response
             raise ScalewayException(
-                f"Error fetching {self.name} ({self.module.params.get('api_url')}/{self.name}) [{results.status_code}: {results.json['message']}]"
+                f"Error fetching {self.name} ({self.module.params.get('api_url')}/{self.name}) [{results.status_code}: {message}]"
             )
+
+        if results.json is None:
+            raise ScalewayException(f"Scaleway API returned an empty or non-JSON response for {self.name}")
 
         return results.json.get(self.name)
 
