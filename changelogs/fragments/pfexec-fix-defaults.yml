@@ -1,4 +1,4 @@
 bugfixes:
   - "pfexec become plugin - fix default ``become_flags`` from ``-H -S -n`` (sudo flags) to empty string, as ``pfexec`` does not accept these options (https://github.com/ansible-collections/community.general/pull/11623)."
 deprecated_features:
-  - "pfexec become plugin - the default value of the ``wrap_exe`` option will change from ``false`` to ``true`` in community.general 15.0.0. The current default only works in very limited cases because ``pfexec`` does not interpret shell constructs internally. Set ``wrap_exe`` explicitly to silence the deprecation warning (https://github.com/ansible-collections/community.general/pull/11623)."
+  - "pfexec become plugin - the default value of the ``wrap_exe`` option will change from ``false`` to ``true`` in community.general 14.0.0. The current default only works in very limited cases because ``pfexec`` does not interpret shell constructs internally. Set ``wrap_exe`` explicitly to silence the deprecation warning (https://github.com/ansible-collections/community.general/pull/11623)."

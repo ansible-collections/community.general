@@ -78,8 +78,9 @@ options:
       - Unlike C(sudo), C(pfexec) does not interpret shell constructs internally,
         so commands containing shell operators must be wrapped in a shell invocation.
       - The current default of V(false) only works in very limited cases (for example
-        with M(ansible.builtin.raw)). The default will change to V(true) in a future
-        release.
+        with M(ansible.builtin.raw)).
+      - The current default is B(deprecated) and will change to V(true) in community.general 14.0.0.
+        To avoid the deprecation message, you can explicitly set this option to a value.
     type: bool
     ini:
       - section: pfexec_become_plugin
@@ -114,9 +115,9 @@ class BecomeModule(BecomeBase):
         if wrap_exe is None:
             display.deprecated(
                 "The default value of the wrap_exe option for the community.general.pfexec "
-                "become plugin will change from false to true in community.general 15.0.0. "
+                "become plugin will change from false to true in community.general 14.0.0. "
                 "Set wrap_exe explicitly to silence this warning.",
-                version="15.0.0",
+                version="14.0.0",
                 collection_name="community.general",
             )
             wrap_exe = False
