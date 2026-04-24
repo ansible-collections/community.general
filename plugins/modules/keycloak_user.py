@@ -135,8 +135,7 @@ options:
         default: false
   required_actions:
     description:
-      - RequiredActions user Auth.
-    default: []
+        - Set or reset a user's required actions.
     type: list
     elements: str
     aliases:
