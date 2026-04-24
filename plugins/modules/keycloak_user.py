@@ -495,7 +495,7 @@ def main():
         before_user["groups"] = before_groups
     else:
         before_groups = []
-    
+
     result["proposed"] = changeset
     result["existing"] = before_user
     # Default values for user_created
@@ -562,7 +562,6 @@ def main():
                 "groups",
                 "clientConsents",
                 "federatedIdentities",
-                
             ]
             # Add user ID to new representation
             desired_user["id"] = before_user["id"]
@@ -576,8 +575,6 @@ def main():
                     after_user = kc.update_user(userrep=desired_user, realm=realm)
 
                 changed = True
-
-
 
         if not module.check_mode:
             # set user groups
