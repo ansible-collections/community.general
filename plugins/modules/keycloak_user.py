@@ -490,6 +490,12 @@ def main():
     desired_user = copy.deepcopy(before_user)
     desired_user.update(changeset)
 
+    if before_user:
+        before_groups = kc.get_user_groups(user_id=before_user["id"], realm=realm)
+        before_user["groups"] = before_groups
+    else:
+        before_groups = []
+    
     result["proposed"] = changeset
     result["existing"] = before_user
     # Default values for user_created
@@ -571,11 +577,7 @@ def main():
 
                 changed = True
 
-        if before_user:
-            before_groups = kc.get_user_groups(user_id=before_user["id"], realm=realm)
-            before_user["groups"] = before_groups
-        else:
-            before_groups = []
+
 
         if not module.check_mode:
             # set user groups
