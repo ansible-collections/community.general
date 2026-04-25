@@ -46,7 +46,7 @@ options:
   become_flags:
     description: Options to pass to C(pfexec).
     type: string
-    default: -H -S -n
+    default: ""
     ini:
       - section: privilege_escalation
         key: become_flags
@@ -73,8 +73,14 @@ options:
       - section: pfexec_become_plugin
         key: password
   wrap_exe:
-    description: Toggle to wrap the command C(pfexec) calls in C(shell -c) or not.
-    default: false
+    description:
+      - Toggle to wrap the command C(pfexec) calls in C(shell -c) or not.
+      - Unlike C(sudo), C(pfexec) does not interpret shell constructs internally,
+        so commands containing shell operators must be wrapped in a shell invocation.
+      - The current default of V(false) only works in very limited cases (for example
+        with M(ansible.builtin.raw)).
+      - The current default is B(deprecated) and will change to V(true) in community.general 14.0.0.
+        To avoid the deprecation message, you can explicitly set this option to a value.
     type: bool
     ini:
       - section: pfexec_become_plugin
@@ -88,6 +94,9 @@ notes:
 """
 
 from ansible.plugins.become import BecomeBase
+from ansible.utils.display import Display
+
+display = Display()
 
 
 class BecomeModule(BecomeBase):
@@ -100,7 +109,18 @@ class BecomeModule(BecomeBase):
             return cmd
 
         exe = self.get_option("become_exe")
-
         flags = self.get_option("become_flags")
-        noexe = not self.get_option("wrap_exe")
-        return f"{exe} {flags} {self._build_success_command(cmd, shell, noexe=noexe)}"
+
+        wrap_exe = self.get_option("wrap_exe")
+        if wrap_exe is None:
+            display.deprecated(
+                "The default value of the wrap_exe option for the community.general.pfexec "
+                "become plugin will change from false to true in community.general 14.0.0. "
+                "Set wrap_exe explicitly to silence this warning.",
+                version="14.0.0",
+                collection_name="community.general",
+            )
+            wrap_exe = False
+
+        become_cmd = self._build_success_command(cmd, shell, noexe=not wrap_exe)
+        return " ".join(part for part in (exe, flags, become_cmd) if part)
