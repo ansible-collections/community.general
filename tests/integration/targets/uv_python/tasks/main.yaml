@@ -22,7 +22,11 @@
   when: ansible_facts['os_family'] == "RedHat"
   shell: |
     curl -LsSf https://astral.sh/uv/install.sh | sh
-
+  environment:
+    UV_INSTALL_DIR: "{{ ansible_env.HOME }}/ansible/bin"   
+  args:
+    creates: "{{ ansible_env.HOME }}/ansible/bin/uv"
+    
 - name: Check if Python 3.14 exists already
   command: uv python find 3.14
   ignore_errors: true
