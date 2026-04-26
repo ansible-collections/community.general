@@ -13,7 +13,6 @@ description:
 version_added: "13.0.0"
 requirements:
   - C(uv) must be installed and available in E(PATH) and must be at least 0.8.0.
-  - Python version must be at least 3.9.
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
