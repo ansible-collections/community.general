@@ -179,7 +179,7 @@ def pvmove_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
 def vgs_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     """
     Runner for C(vgs). Used by: community.general.lvol, community.general.lvg,
-    community.general.lvg_rename.
+    community.general.lvg_rename, community.general.lxc_container.
 
     Suggested arg_formats keys: noheadings nosuffix readonly units separator fields select vg
     """
@@ -341,7 +341,7 @@ def vgrename_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
 
 def lvs_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     """
-    Runner for C(lvs). Used by: community.general.lvol.
+    Runner for C(lvs). Used by: community.general.lvol, community.general.lxc_container.
 
     Suggested arg_formats keys: all noheadings nosuffix units separator fields select vg
 

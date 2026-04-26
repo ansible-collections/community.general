@@ -422,6 +422,12 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.parsing.convert_bool import BOOLEANS_FALSE
 
+from ansible_collections.community.general.plugins.module_utils._lvm import (
+    lvcreate_runner,
+    lvremove_runner,
+    lvs_runner,
+    vgs_runner,
+)
 from ansible_collections.community.general.plugins.module_utils._lxc import create_script
 
 # LXC_COMPRESSION_MAP is a map of available compression types when creating
@@ -1045,13 +1051,11 @@ class LxcContainerManagement:
         """Return a list of all lv in a current vg."""
 
         vg = self._get_lxc_vg()
-        build_command = [self.module.get_bin_path("lvs", True)]
-        rc, stdout, err = self.module.run_command(build_command)
+        with lvs_runner(self.module)("noheadings separator fields vg") as ctx:
+            rc, stdout, err = ctx.run(separator=";", fields="lv_name", vg=[vg])
         if rc != 0:
-            self.failure(err=err, rc=rc, msg="Failed to get list of LVs", command=" ".join(build_command))
-
-        all_lvms = [i.split() for i in stdout.splitlines()][1:]
-        return [lv_entry[0] for lv_entry in all_lvms if lv_entry[1] == vg]
+            self.failure(err=err, rc=rc, msg="Failed to get list of LVs")
+        return [line.strip() for line in stdout.splitlines() if line.strip()]
 
     def _get_vg_free_pe(self, vg_name):
         """Return the available size of a given VG.
@@ -1062,15 +1066,11 @@ class LxcContainerManagement:
         :type: ``tuple``
         """
 
-        build_command = ["vgdisplay", vg_name, "--units", "g"]
-        rc, stdout, err = self.module.run_command(build_command)
+        with vgs_runner(self.module)("noheadings nosuffix units separator fields vg") as ctx:
+            rc, stdout, err = ctx.run(units="g", separator=";", fields="vg_free", vg=[vg_name])
         if rc != 0:
-            self.failure(err=err, rc=rc, msg=f"failed to read vg {vg_name}", command=" ".join(build_command))
-
-        vg_info = [i.strip() for i in stdout.splitlines()][1:]
-        free_pe = [i for i in vg_info if i.startswith("Free")]
-        _free_pe = free_pe[0].split()
-        return float(_free_pe[-2]), _free_pe[-1]
+            self.failure(err=err, rc=rc, msg=f"failed to read vg {vg_name}")
+        return float(stdout.strip()), "g"
 
     def _get_lv_size(self, lv_name):
         """Return the available size of a given LV.
@@ -1083,15 +1083,11 @@ class LxcContainerManagement:
 
         vg = self._get_lxc_vg()
         lv = os.path.join(vg, lv_name)
-        build_command = ["lvdisplay", lv, "--units", "g"]
-        rc, stdout, err = self.module.run_command(build_command)
+        with lvs_runner(self.module)("noheadings nosuffix units separator fields vg") as ctx:
+            rc, stdout, err = ctx.run(units="g", separator=";", fields="lv_size", vg=[lv])
         if rc != 0:
-            self.failure(err=err, rc=rc, msg=f"failed to read lv {lv}", command=" ".join(build_command))
-
-        lv_info = [i.strip() for i in stdout.splitlines()][1:]
-        _free_pe = [i for i in lv_info if i.startswith("LV Size")]
-        free_pe = _free_pe[0].split()
-        return self._roundup(float(free_pe[-2])), free_pe[-1]
+            self.failure(err=err, rc=rc, msg=f"failed to read lv {lv}")
+        return self._roundup(float(stdout.strip())), "g"
 
     def _lvm_snapshot_create(self, source_lv, snapshot_name, snapshot_size_gb=5):
         """Create an LVM snapshot.
@@ -1113,16 +1109,13 @@ class LxcContainerManagement:
             )
             self.failure(error="Not enough space to create snapshot", rc=2, msg=message)
 
-        # Create LVM Snapshot
-        build_command = [
-            self.module.get_bin_path("lvcreate", True),
-            "-n",
-            snapshot_name,
-            "-s",
-            os.path.join(vg, source_lv),
-            f"-L{snapshot_size_gb}g",
-        ]
-        rc, stdout, err = self.module.run_command(build_command)
+        with lvcreate_runner(self.module)("size_L is_snapshot lv vg") as ctx:
+            rc, dummy, err = ctx.run(
+                size_L=f"{snapshot_size_gb}g",
+                is_snapshot=True,
+                lv=[snapshot_name],
+                vg=[os.path.join(vg, source_lv)],
+            )
         if rc != 0:
             self.failure(err=err, rc=rc, msg=f"Failed to Create LVM snapshot {vg}/{source_lv} --> {snapshot_name}")
 
@@ -1190,14 +1183,10 @@ class LxcContainerManagement:
         """
 
         vg = self._get_lxc_vg()
-        build_command = [
-            self.module.get_bin_path("lvremove", True),
-            "-f",
-            f"{vg}/{lv_name}",
-        ]
-        rc, stdout, err = self.module.run_command(build_command)
+        with lvremove_runner(self.module)("force lv") as ctx:
+            rc, dummy, err = ctx.run(force=True, lv=[f"{vg}/{lv_name}"])
         if rc != 0:
-            self.failure(err=err, rc=rc, msg=f"Failed to remove LVM LV {vg}/{lv_name}", command=" ".join(build_command))
+            self.failure(err=err, rc=rc, msg=f"Failed to remove LVM LV {vg}/{lv_name}")
 
     def _rsync_data(self, container_path, temp_dir):
         """Sync the container directory to the temp directory.
