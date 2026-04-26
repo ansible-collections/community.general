@@ -525,6 +525,7 @@ class LxcContainerManagement:
         self.container = self.get_container_bind()
         self.archive_info = None
         self.clone_info = None
+        self.run_info = []
 
     def get_container_bind(self):
         return lxc.Container(name=self.container_name)
@@ -1053,6 +1054,8 @@ class LxcContainerManagement:
         vg = self._get_lxc_vg()
         with lvs_runner(self.module)("noheadings separator fields vg") as ctx:
             rc, stdout, err = ctx.run(separator=";", fields="lv_name", vg=[vg])
+        if self.module._verbosity >= 4:
+            self.run_info.append(ctx.run_info)
         if rc != 0:
             self.failure(err=err, rc=rc, msg="Failed to get list of LVs")
         return [line.strip() for line in stdout.splitlines() if line.strip()]
@@ -1068,6 +1071,8 @@ class LxcContainerManagement:
 
         with vgs_runner(self.module)("noheadings nosuffix units separator fields vg") as ctx:
             rc, stdout, err = ctx.run(units="g", separator=";", fields="vg_free", vg=[vg_name])
+        if self.module._verbosity >= 4:
+            self.run_info.append(ctx.run_info)
         if rc != 0:
             self.failure(err=err, rc=rc, msg=f"failed to read vg {vg_name}")
         return float(stdout.strip()), "g"
@@ -1085,6 +1090,8 @@ class LxcContainerManagement:
         lv = os.path.join(vg, lv_name)
         with lvs_runner(self.module)("noheadings nosuffix units separator fields vg") as ctx:
             rc, stdout, err = ctx.run(units="g", separator=";", fields="lv_size", vg=[lv])
+        if self.module._verbosity >= 4:
+            self.run_info.append(ctx.run_info)
         if rc != 0:
             self.failure(err=err, rc=rc, msg=f"failed to read lv {lv}")
         return self._roundup(float(stdout.strip())), "g"
@@ -1116,6 +1123,8 @@ class LxcContainerManagement:
                 lv=[snapshot_name],
                 vg=[os.path.join(vg, source_lv)],
             )
+        if self.module._verbosity >= 4:
+            self.run_info.append(ctx.run_info)
         if rc != 0:
             self.failure(err=err, rc=rc, msg=f"Failed to Create LVM snapshot {vg}/{source_lv} --> {snapshot_name}")
 
@@ -1185,6 +1194,8 @@ class LxcContainerManagement:
         vg = self._get_lxc_vg()
         with lvremove_runner(self.module)("force lv") as ctx:
             rc, dummy, err = ctx.run(force=True, lv=[f"{vg}/{lv_name}"])
+        if self.module._verbosity >= 4:
+            self.run_info.append(ctx.run_info)
         if rc != 0:
             self.failure(err=err, rc=rc, msg=f"Failed to remove LVM LV {vg}/{lv_name}")
 
@@ -1364,6 +1375,8 @@ class LxcContainerManagement:
         :param rc: ``int``     Return code while executing an Ansible command.
         :param msg: ``str``    Message to report.
         """
+        if self.run_info:
+            kwargs["run_info"] = self.run_info
 
         self.module.fail_json(**kwargs)
 
