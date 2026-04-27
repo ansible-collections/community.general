@@ -48,7 +48,7 @@
   community.general.lvol:
     vg: testvg2
     thinpool: testthinpool3
-    size: 10m
+    size: 4m
   register: thinpool_abs_create
 
 - name: Assert thin pool with absolute size created
@@ -61,7 +61,7 @@
   community.general.lvol:
     vg: testvg2
     thinpool: testthinpool3
-    size: 10m
+    size: 4m
   register: thinpool_abs_idempotent
 
 - name: Assert thin pool with absolute size creation is idempotent
