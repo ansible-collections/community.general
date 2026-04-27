@@ -12,7 +12,7 @@ module: keycloak_clientscope_rolemappings
 short_description: Allows administration of Keycloak clientscope scope mappings to restrict the usage of certain roles to
   specific clientscopes
 
-version_added: 12.6.0
+version_added: 13.0.0
 
 description:
   - This module allows you to add or remove Keycloak roles from clientscopes using the Keycloak REST API. It requires access
@@ -68,9 +68,9 @@ options:
       - If O(client_id) is absent, all roles must be under the realm.
 
 extends_documentation_fragment:
-  - community.general.keycloak
-  - community.general.keycloak.actiongroup_keycloak
-  - community.general.attributes
+  - community.general._keycloak
+  - community.general._keycloak.actiongroup_keycloak
+  - community.general._attributes
 
 author:
   - Felix Grzelka (@felix-grzelka)
@@ -156,7 +156,7 @@ import copy
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
     KeycloakAPI,
     KeycloakError,
     get_token,
