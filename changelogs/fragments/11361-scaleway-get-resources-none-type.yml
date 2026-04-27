@@ -1,0 +1,2 @@
+bugfixes:
+  - scaleway_image_info, scaleway_ip_info, scaleway_organization_info, scaleway_security_group_info, scaleway_server_info, scaleway_snapshot_info, scaleway_volume_info - fix ``NoneType`` error when the Scaleway API returns an empty or non-JSON response body (https://github.com/ansible-collections/community.general/issues/11361, https://github.com/ansible-collections/community.general/pull/11918).
