@@ -91,6 +91,7 @@
     lv: testthinvol1
     thinpool: testthinpool1
     size: 5m
+    shrink: false
   register: thinvol_idempotent
 
 - name: Assert thin volume creation is idempotent
