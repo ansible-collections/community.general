@@ -101,10 +101,10 @@ class CallbackModule(CallbackBase):
             self.printed_last_task = True
             line_length = 120
             if self.last_skipped:
-                print()
+                self._display.display("")
             line = f"# {task_name} "
             msg = colorize(f"{line}{'*' * (line_length - len(line))}", "bold")
-            print(msg)
+            self._display.display(msg)
 
     def _indent_text(self, text, indent_level):
         lines = text.splitlines()
@@ -128,7 +128,7 @@ class CallbackModule(CallbackBase):
                 diff = dict_diff(diff["before"], diff["after"])
         if diff:
             diff = colorize(str(diff), "changed")
-            print(self._indent_text(diff, indent_level + 4))
+            self._display.display(self._indent_text(diff, indent_level + 4))
 
     def _print_host_or_item(self, host_or_item, changed, msg, diff, is_host, error, stdout, stderr):
         if is_host:
@@ -156,19 +156,19 @@ class CallbackModule(CallbackBase):
 
         if len(msg) < 50:
             line += f" -- {msg}"
-            print(f"{line} {'-' * (line_length - len(line))}---------")
+            self._display.display(f"{line} {'-' * (line_length - len(line))}---------")
         else:
-            print(f"{line} {'-' * (line_length - len(line))}")
-            print(self._indent_text(msg, indent_level + 4))
+            self._display.display(f"{line} {'-' * (line_length - len(line))}")
+            self._display.display(self._indent_text(msg, indent_level + 4))
 
         if diff:
             self._print_diff(diff, indent_level)
         if stdout:
             stdout = colorize(stdout, "failed")
-            print(self._indent_text(stdout, indent_level + 4))
+            self._display.display(self._indent_text(stdout, indent_level + 4))
         if stderr:
             stderr = colorize(stderr, "failed")
-            print(self._indent_text(stderr, indent_level + 4))
+            self._display.display(self._indent_text(stderr, indent_level + 4))
 
     def v2_playbook_on_play_start(self, play):
         """Run on start of the play."""
@@ -223,7 +223,7 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_stats(self, stats):
         """Display info about playbook statistics."""
-        print()
+        self._display.display("")
         self.printed_last_task = False
         self._print_task("STATS")
 
@@ -242,7 +242,7 @@ class CallbackModule(CallbackBase):
                 f"{host}    : ok={s['ok']}\tchanged={s['changed']}\tfailed={s['failures']}\tunreachable="
                 f"{s['unreachable']}\trescued={s['rescued']}\tignored={s['ignored']}"
             )
-            print(colorize(msg, color))
+            self._display.display(colorize(msg, color))
 
     def v2_runner_on_skipped(self, result, **kwargs):
         """Run when a task is skipped."""
@@ -258,11 +258,11 @@ class CallbackModule(CallbackBase):
             reason = result._result.get("skipped_reason", "") or result._result.get("skip_reason", "")
             if len(reason) < 50:
                 line += f" -- {reason}"
-                print(f"{line} {'-' * (line_length - len(line))}---------")
+                self._display.display(f"{line} {'-' * (line_length - len(line))}---------")
             else:
-                print(f"{line} {'-' * (line_length - len(line))}")
-                print(self._indent_text(reason, 8))
-                print(reason)
+                self._display.display(f"{line} {'-' * (line_length - len(line))}")
+                self._display.display(self._indent_text(reason, 8))
+                self._display.display(reason)
 
     def v2_runner_on_ok(self, result, **kwargs):
         self._print_task_result(result, error=False, **kwargs)
