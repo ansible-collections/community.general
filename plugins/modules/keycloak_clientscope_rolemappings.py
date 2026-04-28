@@ -74,10 +74,9 @@ extends_documentation_fragment:
 
 author:
   - Felix Grzelka (@felix-grzelka)
-  # TODO
-  # adapted from keycloak_client_rolescope
-  # - Andre Desrosiers (@desand01)
 """
+
+# This module was adapted from keycloak_client_rolescope, which was written by Andre Desrosiers (@desand01).
 
 EXAMPLES = r"""
 - name: Add roles to clientscope
