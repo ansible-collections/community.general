@@ -281,7 +281,7 @@ class Options(dict):
         self.itemlist = []
         if opts_string is not None:
             for opt in opts_string.split(","):
-                kv = opt.split("=")
+                kv = opt.split("=", 1)
                 if len(kv) > 1:
                     k, v = (kv[0], kv[1])
                 else:

@@ -1,0 +1,2 @@
+bugfixes:
+  - crypttab - fix parsing of options whose value contains an equal sign (https://github.com/ansible-collections/community.general/issues/4963, https://github.com/ansible-collections/community.general/pull/11926).
