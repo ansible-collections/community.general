@@ -203,9 +203,9 @@ EXAMPLES = r"""
       {{ token_result.id }},{{ token_result.name }},{{ token_result.token_uuid }},{{ token_result.token }}
 
 # Note:
-# The intended method is to store the Jenkins token in a secure place outside of the playbook, like an encrypted storage or a secrets vault, then retrieve it from there when needed.
-# Examples below show how to access the token from the variable "token_result", and are NOT the intended approach for using the token to add credentials.
-# Data inside "token_result" will not be consistent or available across different playbooks and multiple executions.
+# Jenkins token is intended to be securely stored in encrypted storage or secrets vault outside the playbook, retrieved when needed.
+# Examples below showcasing token retrieval from variable "token_result" are NOT how it should be used to add credentials.
+# Data in "token_result" is inconsistent and unavailable across different playbooks and multiple executions.
 
 - name: Add CUSTOM scope credential
   community.general.jenkins_credential:
