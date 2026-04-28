@@ -62,6 +62,7 @@
     vg: testvg2
     thinpool: testthinpool3
     size: 4m
+    shrink: false
   register: thinpool_abs_idempotent
 
 - name: Assert thin pool with absolute size creation is idempotent
