@@ -9,7 +9,7 @@
   community.general.lvol:
     vg: testvg1
     thinpool: testthinpool1
-    size: 40%VG
+    size: 20%VG
   register: thinpool_pct_vg_create
 
 - name: Assert thin pool with percentage of VG created
@@ -22,7 +22,7 @@
   community.general.lvol:
     vg: testvg1
     thinpool: testthinpool1
-    size: 40%VG
+    size: 20%VG
   register: thinpool_pct_vg_idempotent
 
 - name: Assert thin pool with percentage of VG creation is idempotent
@@ -35,7 +35,7 @@
   community.general.lvol:
     vg: testvg2
     thinpool: testthinpool2
-    size: 40%FREE
+    size: 20%FREE
   register: thinpool_pct_free_create
 
 - name: Assert thin pool with percentage of free space created
