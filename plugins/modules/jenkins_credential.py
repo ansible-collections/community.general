@@ -195,7 +195,7 @@ EXAMPLES = r"""
   register: token_result
 
 - name: Save Jenkins token to CSV (you must secure/encrypt separately)
-  copy:
+  ansible.builtin.copy:
     dest: /secure/path/jenkins_tokens.csv
     mode: '0600'
     content: |
