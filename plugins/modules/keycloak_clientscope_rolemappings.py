@@ -134,20 +134,20 @@ end_state:
   sample:
     [
       {
-            "clientRole": false,
-            "composite": false,
-            "containerId": "77f9bd4e-13a6-451e-9c72-ee6997299c1f",
-            "description": "User role",
-            "id": "9e155ef7-86f5-4def-b507-581ce7b87013",
-            "name": "realm-role-user"
+        "clientRole": false,
+        "composite": false,
+        "containerId": "77f9bd4e-13a6-451e-9c72-ee6997299c1f",
+        "description": "User role",
+        "id": "9e155ef7-86f5-4def-b507-581ce7b87013",
+        "name": "realm-role-user"
       },
       {
-            "clientRole": false,
-            "composite": false,
-            "containerId": "77f9bd4e-13a6-451e-9c72-ee6997299c1f",
-            "description": "Admin role",
-            "id": "9e155ef7-86f5-4def-b507-581ce7b87013",
-            "name": "realm-role-admin"
+        "clientRole": false,
+        "composite": false,
+        "containerId": "77f9bd4e-13a6-451e-9c72-ee6997299c1f",
+        "description": "Admin role",
+        "id": "9e155ef7-86f5-4def-b507-581ce7b87013",
+        "name": "realm-role-admin"
       }
     ]
 """
