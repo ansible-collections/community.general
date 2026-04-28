@@ -2999,7 +2999,7 @@ class KeycloakAPI:
             updated_user = self.get_user_by_id(user_id=userrep["id"], realm=realm, user_profile_metadata=True)
             return updated_user
         except Exception as e:
-            self.fail_request(e, msg="Could not update user %s in realm %s: %s" % (userrep["username"], realm, str(e)))
+            self.fail_request(e, msg=f"Could not update user {userrep['username']} in realm {realm}: {str(e)}")
 
     def delete_user(self, user_id, realm: str = "master"):
         """
