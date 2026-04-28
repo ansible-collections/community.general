@@ -31,6 +31,7 @@ action_groups:
     - keycloak_client_rolescope
     - keycloak_clientscope
     - keycloak_clientscope_type
+    - keycloak_clientscope_rolemappings
     - keycloak_clientsecret_info
     - keycloak_clientsecret_regenerate
     - keycloak_clienttemplate
