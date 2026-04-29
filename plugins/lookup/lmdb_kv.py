@@ -15,7 +15,7 @@ short_description: fetch data from LMDB
 description:
   - This lookup returns a list of results from an LMDB DB corresponding to a list of items given to it.
 requirements:
-  - lmdb (Python library U(https://lmdb.readthedocs.io/en/release/))
+  - lmdb (Python library U(https://lmdb.readthedocs.io/en/latest/))
 options:
   _terms:
     description: List of keys to query.
@@ -46,8 +46,8 @@ EXAMPLES = r"""
   ansible.builtin.assert:
     that:
       - item == 'Belgium'
-    vars:
-      - lmdb_kv_db: jp.mdb
+  vars:
+    - lmdb_kv_db: jp.mdb
   with_community.general.lmdb_kv:
     - be
 """
