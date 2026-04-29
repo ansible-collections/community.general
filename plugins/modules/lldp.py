@@ -8,10 +8,11 @@ from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: lldp
-requirements: [lldpctl]
+requirements:
+  - C(lldpctl), usually provided by the C(lldpd) package.
 short_description: Get details reported by LLDP
 description:
-  - Reads data out of C(lldpctl).
+  - Reads LLDP data from C(lldpd) using the CLI tool C(lldpctl).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -21,7 +22,7 @@ attributes:
     support: none
 options:
   multivalues:
-    description: If lldpctl outputs an attribute multiple time represent all values as a list.
+    description: If C(lldpctl) outputs an attribute multiple time represent all values as a list.
     type: bool
     default: false
 author: "Andy Hill (@andyhky)"
