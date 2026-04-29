@@ -17,7 +17,7 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    support: full
+    support: none
   diff_mode:
     support: none
 options:
