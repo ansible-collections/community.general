@@ -1,0 +1,2 @@
+minor_changes:
+  - xml - add ``huge_tree`` option to support processing of very large XML files (https://github.com/ansible-collections/community.general/issues/4897, https://github.com/ansible-collections/community.general/pull/11940).
