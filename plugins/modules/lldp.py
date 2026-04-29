@@ -12,7 +12,7 @@ requirements:
   - C(lldpctl), usually provided by the C(lldpd) package.
 short_description: Get details reported by LLDP
 description:
-  - Reads C(lldpd) using the CLI tool C(lldpctl).
+  - Reads LLDP data from C(lldpd) using the CLI tool C(lldpctl).
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
