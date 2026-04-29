@@ -20,7 +20,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
 options:
   personal_access_token:
     description:
@@ -189,24 +189,32 @@ def main():
 
     gandi_api = GandiLiveDNSAPI(module)
 
+    domain = module.params["domain"]
+
     if module.params["state"] == "present":
-        ret, changed = gandi_api.ensure_dns_record(
+        before, ret, changed = gandi_api.ensure_dns_record(
             module.params["record"],
             module.params["type"],
             module.params["ttl"],
             module.params["values"],
-            module.params["domain"],
+            domain,
         )
     else:
-        ret, changed = gandi_api.delete_dns_record(
-            module.params["record"], module.params["type"], module.params["values"], module.params["domain"]
+        before, ret, changed = gandi_api.delete_dns_record(
+            module.params["record"], module.params["type"], module.params["values"], domain
         )
 
     result = dict(
         changed=changed,
     )
     if ret:
-        result["record"] = gandi_api.build_result(ret, module.params["domain"])
+        result["record"] = gandi_api.build_result(ret, domain)
+
+    if module._diff:
+        result["diff"] = {
+            "before": gandi_api.build_result(before, domain) or {},
+            "after": result.get("record") or {},
+        }
 
     module.exit_json(**result)
 

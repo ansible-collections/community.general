@@ -168,6 +168,7 @@ class GandiLiveDNSAPI:
 
         if records:
             cur_record = records[0]
+            before = cur_record
 
             self.changed = True
 
@@ -177,14 +178,14 @@ class GandiLiveDNSAPI:
                     # Removing one or more values from a record, we update the record with the remaining values
                     self.update_record(record, type, list(new_values), cur_record["rrset_ttl"], domain)
                     records = self.get_records(record, type, domain)
-                    return records[0], self.changed
+                    return before, records[0], self.changed
 
             if not self.module.check_mode:
                 self.delete_record(record, type, domain)
         else:
-            cur_record = None
+            before = None
 
-        return None, self.changed
+        return before, None, self.changed
 
     def ensure_dns_record(self, record, type, ttl, values, domain):
         if record == "":
@@ -194,6 +195,7 @@ class GandiLiveDNSAPI:
 
         if records:
             cur_record = records[0]
+            before = cur_record
 
             do_update = False
             if ttl is not None and cur_record["rrset_ttl"] != ttl:
@@ -210,10 +212,11 @@ class GandiLiveDNSAPI:
                     records = self.get_records(record, type, domain)
                     result = records[0]
                 self.changed = True
-                return result, self.changed
+                return before, result, self.changed
             else:
-                return cur_record, self.changed
+                return before, cur_record, self.changed
 
+        before = None
         if self.module.check_mode:
             new_record = dict(rrset_type=type, rrset_name=record, rrset_values=values, rrset_ttl=ttl)
             result = new_record
@@ -221,4 +224,4 @@ class GandiLiveDNSAPI:
             result = self.create_record(record, type, values, ttl, domain)
 
         self.changed = True
-        return result, self.changed
+        return before, result, self.changed
