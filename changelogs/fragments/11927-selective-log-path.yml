@@ -1,0 +1,5 @@
+bugfixes:
+  - selective callback plugin - route all output through ``self._display.display()``
+    instead of bare ``print()`` calls, fixing missing output when ``ANSIBLE_LOG_PATH``
+    is set (https://github.com/ansible-collections/community.general/issues/4850,
+    https://github.com/ansible-collections/community.general/pull/11927).
