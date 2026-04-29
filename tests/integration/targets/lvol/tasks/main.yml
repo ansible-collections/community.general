@@ -18,6 +18,8 @@
   block:
     - import_tasks: setup.yml
 
+    - import_tasks: test_thinpool.yml
+
     - import_tasks: test_pvs.yml
 
   always:

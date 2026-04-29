@@ -1,0 +1,101 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Regression tests for thin-pool creation with percentage-based sizes (GH-11923)
+
+- name: Create thin pool with percentage of VG size
+  community.general.lvol:
+    vg: testvg1
+    thinpool: testthinpool1
+    size: 20%VG
+  register: thinpool_pct_vg_create
+
+- name: Assert thin pool with percentage of VG created
+  assert:
+    that:
+      - thinpool_pct_vg_create is success
+      - thinpool_pct_vg_create is changed
+
+- name: Create thin pool with percentage of VG size - idempotency
+  community.general.lvol:
+    vg: testvg1
+    thinpool: testthinpool1
+    size: 20%VG
+  register: thinpool_pct_vg_idempotent
+
+- name: Assert thin pool with percentage of VG creation is idempotent
+  assert:
+    that:
+      - thinpool_pct_vg_idempotent is success
+      - thinpool_pct_vg_idempotent is not changed
+
+- name: Create thin pool with percentage of free space
+  community.general.lvol:
+    vg: testvg2
+    thinpool: testthinpool2
+    size: 20%FREE
+  register: thinpool_pct_free_create
+
+- name: Assert thin pool with percentage of free space created
+  assert:
+    that:
+      - thinpool_pct_free_create is success
+      - thinpool_pct_free_create is changed
+
+- name: Create thin pool with absolute size
+  community.general.lvol:
+    vg: testvg2
+    thinpool: testthinpool3
+    size: 4m
+  register: thinpool_abs_create
+
+- name: Assert thin pool with absolute size created
+  assert:
+    that:
+      - thinpool_abs_create is success
+      - thinpool_abs_create is changed
+
+- name: Create thin pool with absolute size - idempotency
+  community.general.lvol:
+    vg: testvg2
+    thinpool: testthinpool3
+    size: 4m
+    shrink: false
+  register: thinpool_abs_idempotent
+
+- name: Assert thin pool with absolute size creation is idempotent
+  assert:
+    that:
+      - thinpool_abs_idempotent is success
+      - thinpool_abs_idempotent is not changed
+
+- name: Create thin volume inside thin pool
+  community.general.lvol:
+    vg: testvg1
+    lv: testthinvol1
+    thinpool: testthinpool1
+    size: 5m
+  register: thinvol_create
+
+- name: Assert thin volume created
+  assert:
+    that:
+      - thinvol_create is success
+      - thinvol_create is changed
+
+- name: Create thin volume inside thin pool - idempotency
+  community.general.lvol:
+    vg: testvg1
+    lv: testthinvol1
+    thinpool: testthinpool1
+    size: 5m
+    shrink: false
+  register: thinvol_idempotent
+
+- name: Assert thin volume creation is idempotent
+  assert:
+    that:
+      - thinvol_idempotent is success
+      - thinvol_idempotent is not changed

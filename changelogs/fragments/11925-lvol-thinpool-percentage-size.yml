@@ -1,0 +1,2 @@
+bugfixes:
+  - lvol - fix thin-pool creation when ``size`` is a percentage (https://github.com/ansible-collections/community.general/issues/11923, https://github.com/ansible-collections/community.general/pull/11925).
