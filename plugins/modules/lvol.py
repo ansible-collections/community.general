@@ -505,15 +505,26 @@ def main():
                             vg=[f"{vg}/{thinpool}"],
                         )
                 else:
-                    with lvcreate("test yes size_L opts thin vg pvs") as ctx:
-                        rc, dummy, err = ctx.run(
-                            test=module.check_mode,
-                            yes=use_yes,
-                            size_L=size_value,
-                            opts=opts,
-                            vg=[f"{vg}/{thinpool}"],
-                            pvs=pvs,
-                        )
+                    if size_opt == "l":
+                        with lvcreate("test yes size_l opts thin vg pvs") as ctx:
+                            rc, dummy, err = ctx.run(
+                                test=module.check_mode,
+                                yes=use_yes,
+                                size_l=size_value,
+                                opts=opts,
+                                vg=[f"{vg}/{thinpool}"],
+                                pvs=pvs,
+                            )
+                    else:
+                        with lvcreate("test yes size_L opts thin vg pvs") as ctx:
+                            rc, dummy, err = ctx.run(
+                                test=module.check_mode,
+                                yes=use_yes,
+                                size_L=size_value,
+                                opts=opts,
+                                vg=[f"{vg}/{thinpool}"],
+                                pvs=pvs,
+                            )
             else:
                 if size_opt == "l":
                     with lvcreate("test yes lv size_l opts vg pvs") as ctx:
