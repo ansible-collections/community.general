@@ -1,0 +1,2 @@
+minor_changes:
+  - lxc_container - use shared LVM runners from ``_lvm`` module utils instead of direct ``run_command`` calls for LVM2 commands (https://github.com/ansible-collections/community.general/pull/11920).
