@@ -77,6 +77,13 @@ options:
     type: bool
     default: false
     version_added: 7.2.0
+  devmode:
+    description:
+      - Install the snap in developer mode, granting the snap full system access and disabling security confinement.
+      - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
+    type: bool
+    default: false
+    version_added: 13.0.0
 notes:
   - Privileged operations, such as installing and configuring snaps, require root priviledges. This is only the case if the
     user has not logged in to the Snap Store.
@@ -194,6 +201,7 @@ class Snap(StateModuleHelper):
             "channel": dict(type="str"),
             "options": dict(type="list", elements="str"),
             "dangerous": dict(type="bool", default=False),
+            "devmode": dict(type="bool", default=False),
         },
         supports_check_mode=True,
     )
@@ -390,7 +398,7 @@ class Snap(StateModuleHelper):
         if self.check_mode:
             return
 
-        params = ["state", "classic", "channel", "dangerous"]  # get base cmd parts
+        params = ["state", "classic", "channel", "dangerous", "devmode"]  # get base cmd parts
         has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != "stable"
         has_multiple_snaps = len(actionable_snaps) > 1
 

@@ -47,6 +47,7 @@ def snap_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             options=cmd_runner_fmt.as_list(),
             info=cmd_runner_fmt.as_fixed("info"),
             dangerous=cmd_runner_fmt.as_bool("--dangerous"),
+            devmode=cmd_runner_fmt.as_bool("--devmode"),
             version=cmd_runner_fmt.as_fixed("version"),
             _connect=cmd_runner_fmt.as_func(lambda v: ["connect", v]),
             _disconnect=cmd_runner_fmt.as_func(lambda v: ["disconnect", v]),
