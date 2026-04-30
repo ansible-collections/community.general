@@ -567,7 +567,17 @@ class LogrotateConfig:
                     ):
                         if not any(
                             keyword in line
-                            for keyword in [" ", "\t", "hourly", "daily", "weekly", "monthly", "yearly", "rotate", "compress"]
+                            for keyword in [
+                                " ",
+                                "\t",
+                                "hourly",
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "yearly",
+                                "rotate",
+                                "compress",
+                            ]
                         ):
                             paths.append(line)
 
