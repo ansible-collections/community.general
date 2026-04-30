@@ -15,10 +15,18 @@
   ignore_errors: true
 
 - block:
-    - name: Install legacycrypt on Python 3.13+
+    - name: Install legacycrypt on Python 3.13+ (non-Archlinux)
       pip:
         name: legacycrypt
-      when: ansible_facts.python_version is version("3.13", ">=")
+      when:
+        - ansible_facts.python_version is version("3.13", ">=")
+        - ansible_facts.distribution != 'Archlinux'
+
+    - name: Install passlib on Archlinux
+      package:
+        name: python-passlib
+        state: present
+      when: ansible_facts.distribution == 'Archlinux'
 
     - name: Check and start systemd-homed service
       service:
