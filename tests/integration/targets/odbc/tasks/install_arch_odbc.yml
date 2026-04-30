@@ -1,0 +1,56 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# psqlodbc is only available in the AUR on Arch Linux, so we must build it.
+# makepkg cannot run as root, so we create a temporary build user with sudo.
+
+- name: Create AUR build user
+  ansible.builtin.user:
+    name: odbcbuilder
+    state: present
+  notify: Remove user odbcbuilder
+
+- name: Grant sudo powers to build user
+  community.general.sudoers:
+    name: odbcbuilder
+    user: odbcbuilder
+    commands: ALL
+    nopassword: true
+  notify: Remove odbcbuilder sudoers
+
+- name: Install AUR build dependencies
+  ansible.builtin.package:
+    name:
+      - base-devel
+      - git
+      - postgresql-libs
+    state: present
+
+- name: Allow build user to write to remote_tmp_dir
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}"
+    mode: "0777"
+
+- name: Create build directory for psqlodbc
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/odbcbuilder/psqlodbc"
+    owner: odbcbuilder
+    state: directory
+    mode: "0755"
+
+- name: Clone psqlodbc from AUR
+  become: true
+  become_user: odbcbuilder
+  ansible.builtin.git:
+    repo: https://aur.archlinux.org/psqlodbc.git
+    dest: "{{ remote_tmp_dir }}/odbcbuilder/psqlodbc"
+    depth: 1
+
+- name: Build and install psqlodbc
+  become: true
+  become_user: odbcbuilder
+  ansible.builtin.command:
+    chdir: "{{ remote_tmp_dir }}/odbcbuilder/psqlodbc"
+    cmd: makepkg -si --noconfirm
