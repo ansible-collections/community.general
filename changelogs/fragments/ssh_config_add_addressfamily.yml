@@ -1,0 +1,2 @@
+minor_changes:
+  - ssh_config: Added support for the `AddressFamily` option, allowing users to specify the address family (IPv4, IPv6, or any) for SSH connections.
