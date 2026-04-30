@@ -189,6 +189,9 @@ class Yarn:
         try:
             # We need to filter for errors, since Yarn warnings are included in stderr
             for line in err.splitlines():
+                # Skip Node.js runtime warnings (e.g. DeprecationWarning emitted by newer Node versions)
+                if line.startswith("(node:"):
+                    continue
                 if json.loads(line)["type"] == "error":
                     self.module.fail_json(msg=err)
         except Exception:
