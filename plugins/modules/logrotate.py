@@ -54,6 +54,7 @@ options:
       - How often to rotate the logs.
       - If not specified when modifying an existing configuration, the existing value is preserved.
       - When creating a new configuration, this option is only included if specified.
+      - Choice V(hourly) was added in community.general 13.0.0.
     type: str
     choices: [hourly, daily, weekly, monthly, yearly]
   rotate_count:
