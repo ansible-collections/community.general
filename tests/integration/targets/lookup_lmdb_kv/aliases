@@ -4,3 +4,4 @@
 
 azp/posix/2
 destructive
+skip/freebsd14.2
