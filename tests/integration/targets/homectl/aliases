@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 azp/posix/1
+azp/posix/vm
+destructive
+needs/privileged
 skip/freebsd
 skip/macos
 skip/rhel9.3  # See https://www.reddit.com/r/Fedora/comments/si7nzk/homectl/
