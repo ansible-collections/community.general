@@ -194,13 +194,16 @@ EXAMPLES = r"""
     type: "token"
   register: token_result
 
-- name: Save Jenkins token to CSV (you must secure/encrypt separately)
+- name: Save Jenkins token to INI file (you must secure/encrypt separately)
+  vars:
+    jenkins_token_ini: # Defining dict for to_ini filter
+      api_token:
+        uuid: "{{ token_result.token_uuid }}"
+        token: "{{ token_result.token }}"
   ansible.builtin.copy:
-    dest: /secure/path/jenkins_tokens.csv
+    dest: "/secure/path/jenkins_token.ini"
     mode: '0600'
-    content: |
-      id,name,uuid,token
-      {{ token_result.id }},{{ token_result.name }},{{ token_result.token_uuid }},{{ token_result.token }}
+    content: "{{ jenkins_token_ini | community.general.to_ini }}"
 
 # Note:
 # (1) Jenkins token is intended to be securely stored in encrypted storage
