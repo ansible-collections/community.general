@@ -36,7 +36,7 @@ EXAMPLES = r"""
   ansible.builtin.debug:
     msg: "Hello from {{ item.0 }} a.k.a. {{ item.1 }}"
   vars:
-    - lmdb_kv_db: jp.mdb
+    lmdb_kv_db: jp.mdb
   with_community.general.lmdb_kv:
     - "n*"
 
@@ -45,7 +45,7 @@ EXAMPLES = r"""
     that:
       - item == 'Belgium'
   vars:
-    - lmdb_kv_db: jp.mdb
+    lmdb_kv_db: jp.mdb
   with_community.general.lmdb_kv:
     - be
 """
@@ -81,7 +81,7 @@ class LookupModule(LookupBase):
         variable 'lmdb_kv_db' is not set:
 
               vars:
-                - lmdb_kv_db: "jp.mdb"
+                lmdb_kv_db: "jp.mdb"
         """
         if HAVE_LMDB is False:
             raise AnsibleError("Can't LOOKUP(lmdb_kv): this module requires lmdb to be installed")
