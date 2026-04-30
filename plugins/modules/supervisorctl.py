@@ -117,6 +117,22 @@ import os
 from ansible.module_utils.basic import AnsibleModule, is_executable
 
 
+def _is_active(status):
+    return status in ("RUNNING", "STARTING")
+
+
+def _is_not_active(status):
+    return not _is_active(status)
+
+
+def _is_strictly_running(status):
+    return status in ("RUNNING",)
+
+
+def _always(_status):
+    return True
+
+
 def main():
     arg_spec = dict(
         name=dict(type="str", required=True),
@@ -231,13 +247,31 @@ def main():
         if exit_module:
             module.exit_json(changed=True, name=name, state=state, affected=to_take_action_on)
 
+    if name == "all" and state in ("started", "stopped", "restarted"):
+        if state == "restarted":
+            run_supervisorctl("update", check_rc=True)
+        processes = get_matched_processes()
+        status_filters = {
+            "started": _is_not_active,
+            "stopped": _is_active,
+            "restarted": _always,
+        }
+        to_act_on = [p for p, s in processes if status_filters[state](s)]
+        if not to_act_on:
+            module.exit_json(changed=False, name=name, state=state)
+        if module.check_mode:
+            module.exit_json(changed=True)
+        actions = {"started": "start", "stopped": "stop", "restarted": "restart"}
+        run_supervisorctl(actions[state], "all", check_rc=True)
+        module.exit_json(changed=True, name=name, state=state, affected=to_act_on)
+
     if state == "restarted":
         rc, out, err = run_supervisorctl("update", check_rc=True)
         processes = get_matched_processes()
         if len(processes) == 0:
             module.fail_json(name=name, msg="ERROR (no such process)")
 
-        take_action_on_processes(processes, lambda s: True, "restart", "started")
+        take_action_on_processes(processes, _always, "restart", "started")
 
     processes = get_matched_processes()
 
@@ -246,9 +280,7 @@ def main():
             module.exit_json(changed=False, name=name, state=state)
 
         if stop_before_removing:
-            take_action_on_processes(
-                processes, lambda s: s in ("RUNNING", "STARTING"), "stop", "stopped", exit_module=False
-            )
+            take_action_on_processes(processes, _is_active, "stop", "stopped", exit_module=False)
 
         if module.check_mode:
             module.exit_json(changed=True)
@@ -277,13 +309,13 @@ def main():
         module.fail_json(name=name, msg="ERROR (no such process)")
 
     if state == "started":
-        take_action_on_processes(processes, lambda s: s not in ("RUNNING", "STARTING"), "start", "started")
+        take_action_on_processes(processes, _is_not_active, "start", "started")
 
     if state == "stopped":
-        take_action_on_processes(processes, lambda s: s in ("RUNNING", "STARTING"), "stop", "stopped")
+        take_action_on_processes(processes, _is_active, "stop", "stopped")
 
     if state == "signalled":
-        take_action_on_processes(processes, lambda s: s in ("RUNNING",), f"signal {signal}", "signalled")
+        take_action_on_processes(processes, _is_strictly_running, f"signal {signal}", "signalled")
 
 
 if __name__ == "__main__":
