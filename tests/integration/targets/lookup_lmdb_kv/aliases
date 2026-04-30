@@ -4,4 +4,3 @@
 
 azp/posix/2
 destructive
-disabled  # TODO: currently broken
