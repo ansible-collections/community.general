@@ -6,10 +6,11 @@
 - name: Install nodejs and yarn via apk
   community.general.apk:
     name:
+      - sqlite-libs
       - nodejs
       - yarn
-      - sqlite  # nodejs 22+ requires sqlite session extension symbols not in sqlite-libs
-    state: present
+    state: latest
+    update_cache: true
 
 # Clean up before running tests
 - name: Remove any previous Nodejs modules
