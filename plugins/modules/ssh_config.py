@@ -301,7 +301,7 @@ class SSHConfig:
             controlpath=self.params.get("controlpath"),
             controlpersist=fix_bool_str(self.params.get("controlpersist")),
             dynamicforward=self.params.get("dynamicforward"),
-            address_family=self.params.get('address_family'),
+            address_family=self.params.get("address_family"),
         )
         if self.params.get("other_options"):
             for key, value in self.params.get("other_options").items():
@@ -421,7 +421,7 @@ def main():
             dynamicforward=dict(type="str"),
             user=dict(type="str"),
             user_known_hosts_file=dict(type="str"),
-            address_family=dict(type='str', default=None),
+            address_family=dict(type="str", default=None),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
