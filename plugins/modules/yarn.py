@@ -187,10 +187,11 @@ class Yarn:
 
     def _process_yarn_error(self, err):
         try:
-            # We need to filter for errors, since Yarn warnings are included in stderr
+            # We need to filter for errors, since Yarn warnings are included in stderr.
+            # Only attempt JSON parsing on lines that look like Yarn's structured output;
+            # non-JSON lines (e.g. Node.js runtime DeprecationWarnings) are skipped.
             for line in err.splitlines():
-                # Skip Node.js runtime warnings (e.g. DeprecationWarning emitted by newer Node versions)
-                if line.startswith("(node:"):
+                if not line.startswith("{"):
                     continue
                 if json.loads(line)["type"] == "error":
                     self.module.fail_json(msg=err)
