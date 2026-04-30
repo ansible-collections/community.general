@@ -100,6 +100,8 @@
 
 - name: Initialize postgres (Archlinux)
   command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
+  args:
+    creates: /var/lib/postgres/data/PG_VERSION
   when: ansible_facts.os_family == "Archlinux"
 
 - name: Initialize postgres (Alpine)
