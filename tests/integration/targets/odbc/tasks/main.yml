@@ -12,7 +12,6 @@
     msg: "{{ ansible_facts.os_family }} / {{ ansible_facts.distribution }} / {{ ansible_facts.distribution_major_version }}"
 
 - when:
-    - ansible_facts.os_family != 'Archlinux'  # TODO install driver from AUR: https://aur.archlinux.org/packages/psqlodbc
     - ansible_facts.distribution != 'Debian' or ansible_facts.distribution_major_version != '13'  # TODO fix tests for Debian 13 (Trixie)!
   block:
 
@@ -22,6 +21,12 @@
     # Some of the docker images already have pyodbc installed on it
     - include_tasks: no_pyodbc.yml
       when: ansible_facts.os_family != 'FreeBSD' and ansible_facts.os_family != 'Suse' and ansible_facts.os_family != 'Debian'
+
+    #
+    # Install PostgreSQL ODBC driver from AUR on Arch Linux
+    #
+    - include_tasks: install_arch_odbc.yml
+      when: ansible_facts.os_family == 'Archlinux'
 
     #
     # Get pyodbc installed
@@ -50,6 +55,11 @@
       set_fact:
         dsn: "DRIVER={PostgreSQL Unicode};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
       when: ansible_facts.os_family == 'Debian'
+
+    - name: Changing DSN for Arch Linux
+      set_fact:
+        dsn: "DRIVER={/usr/lib/psqlodbcw.so};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
+      when: ansible_facts.os_family == 'Archlinux'
 
     #
     # Name setup database
