@@ -11,9 +11,9 @@ import typing as t
 
 from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
-nomad = None
+nomad: t.Any = None
 with deps.declare("python-nomad"):
-    import nomad  # type: ignore[assignment]
+    import nomad  # type: ignore[no-redef]
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
