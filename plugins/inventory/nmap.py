@@ -95,6 +95,16 @@ options:
     type: boolean
     default: true
     version_added: 7.4.0
+  skip_host_discovery:
+    description:
+      - Skip nmap host discovery phase and treat all hosts as online (C(-Pn)).
+      - Useful when scanning remote hosts over VPN or through firewalls where nmap's default discovery probes
+        (TCP SYN to ports 80/443) are blocked but the target port is open.
+      - When V(false) (default), nmap performs host discovery before port scanning, which may send packets
+        to ports 80 and 443 regardless of the O(port) setting.
+    type: boolean
+    default: false
+    version_added: 13.0.0
   set_name_variable:
     description:
       - Set the C(name) variable for each host.
@@ -263,6 +273,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             if not self.get_option("use_arp_ping"):
                 cmd.append("--disable-arp-ping")
+
+            if self.get_option("skip_host_discovery"):
+                cmd.append("-Pn")
 
             cmd.append(self.get_option("address"))
             try:
