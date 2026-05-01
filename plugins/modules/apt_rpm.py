@@ -239,7 +239,7 @@ def update_kernel(module):
     if rc != 0:
         if UPDATE_KERNEL_NO_NEW in err:
             return (False, out)
-        module.fail_json(msg=err or out, rc=rc, stdout=out, stderr=err)
+        module.fail_json(msg=f"Error while updating kernel: {err or out}", rc=rc, stdout=out, stderr=err)
     return (UPDATE_KERNEL_ZERO not in out, out)
 
 
