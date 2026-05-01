@@ -179,8 +179,8 @@ def run(module):
     msg = ""
     result = {}
     changed = False
-    if module.params.get("state") == "present":
-        if module.params.get("token_type") == "bootstrap":
+    if module.params["state"] == "present":
+        if module.params["token_type"] == "bootstrap":
             try:
                 current_token = get_token("Bootstrap Token", nomad_client)
                 if current_token:
@@ -203,10 +203,10 @@ def run(module):
         else:
             try:
                 token_info = {
-                    "Name": module.params.get("name"),
-                    "Type": module.params.get("token_type"),
-                    "Policies": module.params.get("policies"),
-                    "Global": module.params.get("global_replicated"),
+                    "Name": module.params["name"],
+                    "Type": module.params["token_type"],
+                    "Policies": module.params["policies"],
+                    "Global": module.params["global_replicated"],
                 }
 
                 current_token = get_token(token_info["Name"], nomad_client)
@@ -227,15 +227,15 @@ def run(module):
             except Exception as e:
                 module.fail_json(msg=f"{e}")
 
-    if module.params.get("state") == "absent":
-        if not module.params.get("name"):
+    if module.params["state"] == "absent":
+        if not module.params["name"]:
             module.fail_json(msg="name is needed to delete token.")
 
-        if module.params.get("token_type") == "bootstrap" or module.params.get("name") == "Bootstrap Token":
+        if module.params["token_type"] == "bootstrap" or module.params["name"] == "Bootstrap Token":
             module.fail_json(msg="Delete ACL bootstrap token is not allowed.")
 
         try:
-            token = get_token(module.params.get("name"), nomad_client)
+            token = get_token(module.params["name"], nomad_client)
             if token:
                 nomad_client.acl.delete_token(token.get("AccessorID"))
                 msg = "ACL token deleted."

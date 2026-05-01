@@ -117,20 +117,19 @@ def run():
 
     nomad_client = setup_nomad_client(module)
 
-    if module.params.get("state") == "present":
-        if module.params.get("name") and not module.params.get("force_start"):
+    if module.params["state"] == "present":
+        if module.params["name"] and not module.params["force_start"]:
             module.fail_json(msg="For start job with name, force_start is needed")
 
         changed = False
-        if module.params.get("content"):
-            if module.params.get("content_format") == "json":
-                job_json = module.params.get("content")
+        if module.params["content"]:
+            if module.params["content_format"] == "json":
+                job_json = module.params["content"]
                 try:
                     job_json = json.loads(job_json)
                 except ValueError as e:
                     module.fail_json(msg=f"{e}")
-                job = dict()
-                job["job"] = job_json
+                job = {"job": job_json}
                 try:
                     job_id = job_json.get("ID")
                     if job_id is None:
@@ -147,12 +146,11 @@ def run():
                 except Exception as e:
                     module.fail_json(msg=f"{e}")
 
-            if module.params.get("content_format") == "hcl":
+            if module.params["content_format"] == "hcl":
                 try:
-                    job_hcl = module.params.get("content")
+                    job_hcl = module.params["content"]
                     job_json = nomad_client.jobs.parse(job_hcl)
-                    job = dict()
-                    job["job"] = job_json
+                    job = {"job": job_json}
                 except nomad.api.exceptions.BadRequestNomadException as err:
                     module.fail_json(msg=f"{err.nomad_resp.reason} {err.nomad_resp.text}")
                 try:
@@ -169,11 +167,10 @@ def run():
                 except Exception as e:
                     module.fail_json(msg=f"{e}")
 
-        if module.params.get("force_start"):
+        if module.params["force_start"]:
             try:
-                job = dict()
-                if module.params.get("name"):
-                    job_name = module.params.get("name")
+                if module.params["name"]:
+                    job_name = module.params["name"]
                 else:
                     job_name = job_json["Name"]
                 job_json = nomad_client.job.get_job(job_name)
@@ -182,7 +179,7 @@ def run():
                 else:
                     job_json["Status"] = "running"
                     job_json["Stop"] = False
-                    job["job"] = job_json
+                    job = {"job": job_json}
                     if not module.check_mode:
                         result = nomad_client.jobs.register_job(job)
                     else:
@@ -194,16 +191,16 @@ def run():
             except Exception as e:
                 module.fail_json(msg=f"{e}")
 
-    if module.params.get("state") == "absent":
+    if module.params["state"] == "absent":
         try:
-            if module.params.get("name") is not None:
-                job_name = module.params.get("name")
+            if module.params["name"] is not None:
+                job_name = module.params["name"]
             else:
-                if module.params.get("content_format") == "hcl":
-                    job_json = nomad_client.jobs.parse(module.params.get("content"))
+                if module.params["content_format"] == "hcl":
+                    job_json = nomad_client.jobs.parse(module.params["content"])
                     job_name = job_json["Name"]
-                if module.params.get("content_format") == "json":
-                    job_json = module.params.get("content")
+                if module.params["content_format"] == "json":
+                    job_json = module.params["content"]
                     job_name = job_json["Name"]
             job = nomad_client.job.get_job(job_name)
             if job["Status"] == "dead":
