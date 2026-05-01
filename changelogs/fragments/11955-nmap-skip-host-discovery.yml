@@ -1,0 +1,4 @@
+minor_changes:
+  - nmap inventory plugin - add ``skip_host_discovery`` option to skip nmap host discovery phase (``-Pn``)
+    (https://github.com/ansible-collections/community.general/issues/7893,
+    https://github.com/ansible-collections/community.general/pull/11955).
