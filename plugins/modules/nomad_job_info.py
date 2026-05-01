@@ -288,11 +288,11 @@ def run():
     except Exception as e:
         module.fail_json(msg=f"{e}")
 
-    if module.params.get("name"):
+    if module.params["name"]:
         filter = list()
         try:
             for job in result:
-                if job.get("ID") == module.params.get("name"):
+                if job.get("ID") == module.params["name"]:
                     filter.append(job)
                     result = filter
             if not filter:
