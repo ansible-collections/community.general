@@ -1,0 +1,15 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+arch_map:
+  x86_64: amd64
+  amd64: amd64
+
+nomad_version: 2.0.0
+nomad_cmd: "{{ remote_tmp_dir }}/nomad"
+nomad_arch: "{{ arch_map[ansible_facts.architecture] }}"
+nomad_uri: >-
+  https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{
+  nomad_version }}_{{ ansible_facts.system | lower }}_{{ nomad_arch }}.zip
