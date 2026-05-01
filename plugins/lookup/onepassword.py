@@ -19,7 +19,8 @@ requirements:
   - C(op) 1Password command line utility
 options:
   _terms:
-    description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
+      - description: Identifier(s) (case-insensitive UUID or name or secret reference) of item(s) to retrieve.
+      - description: Secret references start with V(op://) and are supported since community.general 13.0.0.
     required: true
     type: list
     elements: string
@@ -28,7 +29,8 @@ options:
   domain:
     version_added: 3.2.0
   field:
-    description: Field to return from each matching item (case-insensitive).
+    - description: Field to return from each matching item (case-insensitive).
+    - description: Ignored when using a secret reference, as the field is included in the secret reference.
     default: 'password'
     type: str
   service_account_token:
@@ -716,8 +718,8 @@ class OnePass:
         # Split into parts, to check length in a second
         path_parts = [part for part in path.split("/") if part]
 
-        # Must be 3 parts (vault,item,field) or 4(vault,item,section,field)
-        if len(path_parts) not in [3, 4]:
+        # Must be 3 parts (vault,item,field) or 4 (vault,item,section,field)
+        if len(path_parts) not in (3, 4):
             raise AnsibleLookupError("Not a valid secret reference")
 
         rc, out, err = self._cli.get_secret_reference(reference, self.token)
