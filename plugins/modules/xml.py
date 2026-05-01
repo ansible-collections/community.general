@@ -121,6 +121,13 @@ options:
       - Note that this might break your XML file if text values contain characters that could be interpreted as XML.
     type: bool
     default: false
+  huge_tree:
+    description:
+      - Disable libxml2 security restrictions on XML node size or document depth, allowing processing of very large XML files.
+      - This option should only be activated when needed, as it disables internal safety limits.
+    type: bool
+    default: false
+    version_added: "13.0.0"
   insertbefore:
     description:
       - Add additional child-element(s) before the first selected element for a given O(xpath).
@@ -875,6 +882,7 @@ def main():
             input_type=dict(type="str", default="yaml", choices=["xml", "yaml"]),
             backup=dict(type="bool", default=False),
             strip_cdata_tags=dict(type="bool", default=False),
+            huge_tree=dict(type="bool", default=False),
             insertbefore=dict(type="bool", default=False),
             insertafter=dict(type="bool", default=False),
         ),
@@ -918,6 +926,7 @@ def main():
     print_match = module.params["print_match"]
     count = module.params["count"]
     strip_cdata_tags = module.params["strip_cdata_tags"]
+    huge_tree = module.params["huge_tree"]
     insertbefore = module.params["insertbefore"]
     insertafter = module.params["insertafter"]
 
@@ -950,7 +959,7 @@ def main():
 
         # Try to parse in the target XML file
         try:
-            parser = etree.XMLParser(remove_blank_text=pretty_print, strip_cdata=strip_cdata_tags)
+            parser = etree.XMLParser(remove_blank_text=pretty_print, strip_cdata=strip_cdata_tags, huge_tree=huge_tree)
             doc = etree.parse(infile, parser)
         except etree.XMLSyntaxError as e:
             module.fail_json(msg=f"Error while parsing document: {xml_file or 'xml_string'} ({e})")
