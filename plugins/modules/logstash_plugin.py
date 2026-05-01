@@ -39,6 +39,10 @@ options:
     type: str
     description:
       - Proxy host to use during plugin installation.
+      - Can be specified as a hostname (for example, V(myproxy.example.com)) or as a URL (for example, V(http://myproxy.example.com)).
+        When specified without a scheme, V(http://) is assumed.
+      - Sets the O(proxy_host):O(proxy_port) combination as the E(http_proxy) and E(https_proxy) environment variables
+        when running the C(logstash-plugin) command.
   proxy_port:
     type: str
     description:
@@ -99,21 +103,24 @@ def install_plugin(module, plugin_bin, plugin_name, version, proxy_host, proxy_p
     if version:
         cmd_args.extend(["--version", version])
 
-    if proxy_host and proxy_port:
-        cmd_args.extend([f"-DproxyHost={proxy_host}", f"-DproxyPort={proxy_port}"])
-
     cmd_args.append(plugin_name)
+
+    environ_update = {}
+    if proxy_host and proxy_port:
+        scheme = proxy_host if "://" in proxy_host else f"http://{proxy_host}"
+        proxy_url = f"{scheme}:{proxy_port}"
+        environ_update = {"http_proxy": proxy_url, "https_proxy": proxy_url}
 
     cmd = " ".join(cmd_args)
 
     if module.check_mode:
         rc, out, err = 0, "check mode", ""
     else:
-        rc, out, err = module.run_command(cmd_args)
+        rc, out, err = module.run_command(cmd_args, environ_update=environ_update)
 
     if rc != 0:
         reason = parse_error(out)
-        module.fail_json(msg=reason)
+        module.fail_json(msg=reason, stderr=err)
 
     return True, cmd, out, err
 
@@ -130,7 +137,7 @@ def remove_plugin(module, plugin_bin, plugin_name):
 
     if rc != 0:
         reason = parse_error(out)
-        module.fail_json(msg=reason)
+        module.fail_json(msg=reason, stderr=err)
 
     return True, cmd, out, err
 
