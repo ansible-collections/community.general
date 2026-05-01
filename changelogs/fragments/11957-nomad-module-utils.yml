@@ -1,0 +1,4 @@
+minor_changes:
+  - "nomad_job - use ``_nomad`` module utils for common Nomad connection logic (https://github.com/ansible-collections/community.general/issues/7688, https://github.com/ansible-collections/community.general/pull/11957)."
+  - "nomad_job_info - use ``_nomad`` module utils for common Nomad connection logic (https://github.com/ansible-collections/community.general/issues/7688, https://github.com/ansible-collections/community.general/pull/11957)."
+  - "nomad_token - use ``_nomad`` module utils for common Nomad connection logic (https://github.com/ansible-collections/community.general/issues/7688, https://github.com/ansible-collections/community.general/pull/11957)."
