@@ -21,6 +21,7 @@ attributes:
     support: full
   diff_mode:
     support: full
+    version_added: 13.0.0
 options:
   personal_access_token:
     description:
