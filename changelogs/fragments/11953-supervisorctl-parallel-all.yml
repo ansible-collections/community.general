@@ -1,0 +1,4 @@
+minor_changes:
+  - supervisorctl - when ``name=all``, dispatch a single ``supervisorctl start/stop/restart all``
+    command (https://github.com/ansible-collections/community.general/issues/8159,
+    https://github.com/ansible-collections/community.general/pull/11953).
