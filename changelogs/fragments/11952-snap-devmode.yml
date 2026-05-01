@@ -1,0 +1,2 @@
+minor_changes:
+  - snap - add ``devmode`` option to support installing snaps in developer mode (https://github.com/ansible-collections/community.general/pull/11952, https://github.com/ansible-collections/community.general/issues/8155).
