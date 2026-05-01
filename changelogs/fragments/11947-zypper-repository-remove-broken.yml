@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository - allow unreachable ``.repo`` URLs and missing local paths when using ``state=absent`` (https://github.com/ansible-collections/community.general/issues/5769, https://github.com/ansible-collections/community.general/pull/11947).
