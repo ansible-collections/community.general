@@ -4,4 +4,4 @@
 
 azp/posix/2
 destructive
-disabled  # TODO: currently broken
+skip/freebsd14.2
