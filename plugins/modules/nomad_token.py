@@ -118,16 +118,10 @@ result:
     }
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
-import_nomad = None
-
-try:
-    import nomad
-
-    import_nomad = True
-except ImportError:
-    import_nomad = False
+from ansible_collections.community.general.plugins.module_utils._nomad import argument_spec as nomad_argument_spec
+from ansible_collections.community.general.plugins.module_utils._nomad import nomad, setup_nomad_client
 
 
 def get_token(name, nomad_client):
@@ -156,22 +150,14 @@ def transform_response(nomad_response):
     return transformed_response
 
 
-argument_spec = dict(
-    host=dict(required=True, type="str"),
-    port=dict(type="int", default=4646),
-    state=dict(required=True, choices=["present", "absent"]),
-    use_ssl=dict(type="bool", default=True),
-    timeout=dict(type="int", default=5),
-    validate_certs=dict(type="bool", default=True),
-    client_cert=dict(type="path"),
-    client_key=dict(type="path"),
-    namespace=dict(type="str"),
-    token=dict(type="str", no_log=True),
-    name=dict(type="str"),
-    token_type=dict(choices=["client", "management", "bootstrap"], default="client"),
-    policies=dict(type="list", elements="str", default=[]),
-    global_replicated=dict(type="bool", default=False),
-)
+argument_spec = {
+    **nomad_argument_spec,
+    "state": dict(required=True, choices=["present", "absent"]),
+    "name": dict(type="str"),
+    "token_type": dict(choices=["client", "management", "bootstrap"], default="client"),
+    "policies": dict(type="list", elements="str", default=[]),
+    "global_replicated": dict(type="bool", default=False),
+}
 
 
 def setup_module_object():
@@ -185,26 +171,6 @@ def setup_module_object():
         ],
     )
     return module
-
-
-def setup_nomad_client(module):
-    if not import_nomad:
-        module.fail_json(msg=missing_required_lib("python-nomad"))
-
-    certificate_ssl = (module.params.get("client_cert"), module.params.get("client_key"))
-
-    nomad_client = nomad.Nomad(
-        host=module.params.get("host"),
-        port=module.params.get("port"),
-        secure=module.params.get("use_ssl"),
-        timeout=module.params.get("timeout"),
-        verify=module.params.get("validate_certs"),
-        cert=certificate_ssl,
-        namespace=module.params.get("namespace"),
-        token=module.params.get("token"),
-    )
-
-    return nomad_client
 
 
 def run(module):
