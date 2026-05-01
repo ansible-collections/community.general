@@ -688,6 +688,18 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value):
             msg=f"Xpath {xpath} does not reference a node! tree is {etree.tostring(tree, pretty_print=True)}"
         )
 
+    if isinstance(value, bool):
+        str_value = str(value).lower()
+        target = f"attribute '{attribute}' at xpath '{xpath}'" if attribute else f"element text at xpath '{xpath}'"
+        module.warn(
+            f"A value was parsed as boolean for {target} and converted to '{str_value}'. "
+            "YAML aliases (yes/no/on/off) are also booleans and may not yield the string you intended. "
+            "Quote the value to be explicit, like `value: 'yes'`."
+        )
+        value = str_value
+    elif not isinstance(value, str):
+        value = str(value)
+
     for element in tree.xpath(xpath, namespaces=namespaces):
         if not attribute:
             changed = changed or (element.text != value)
