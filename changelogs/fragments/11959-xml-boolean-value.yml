@@ -1,0 +1,4 @@
+bugfixes:
+  - "xml - coerce boolean ``value`` to string and emit a warning pointing to the offending xpath
+    (https://github.com/ansible-collections/community.general/issues/7171,
+    https://github.com/ansible-collections/community.general/pull/11959)."
