@@ -1,0 +1,84 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Regression test for https://github.com/ansible-collections/community.general/issues/7171
+# Passing an unquoted YAML boolean as `value` used to crash with:
+#   TypeError: Argument must be bytes or unicode, got 'bool'
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-beers.xml
+    dest: /tmp/ansible-xml-beers.xml
+
+
+- name: "Set '/business/rating/@subjective' to boolean false (unquoted YAML boolean)"
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating
+    attribute: subjective
+    value: false
+  register: set_attribute_boolean_false
+
+- name: Add trailing newline
+  shell: echo "" >> /tmp/ansible-xml-beers.xml
+
+- name: Compare to expected result
+  copy:
+    src: results/test-set-attribute-value-boolean.xml
+    dest: /tmp/ansible-xml-beers.xml
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Test expected result
+  assert:
+    that:
+      - set_attribute_boolean_false is changed
+      - comparison is not changed  # identical
+
+
+- name: "Set '/business/rating/@subjective' to boolean false (unquoted YAML) a second time - no change expected"
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating
+    attribute: subjective
+    value: false
+  register: set_attribute_boolean_false_again
+
+- name: Test idempotency
+  assert:
+    that:
+      - set_attribute_boolean_false_again is not changed
+
+
+- name: Setup test fixture (element text)
+  copy:
+    src: fixtures/ansible-xml-beers.xml
+    dest: /tmp/ansible-xml-beers.xml
+
+
+- name: "Set '/business/rating' text content to boolean true (unquoted YAML boolean)"
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating
+    value: true
+  register: set_element_boolean_true
+
+- name: Add trailing newline
+  shell: echo "" >> /tmp/ansible-xml-beers.xml
+
+- name: Compare to expected result (element text)
+  copy:
+    src: results/test-set-element-value-boolean.xml
+    dest: /tmp/ansible-xml-beers.xml
+  check_mode: true
+  diff: true
+  register: comparison_text
+
+- name: Test expected result (element text)
+  assert:
+    that:
+      - set_element_boolean_true is changed
+      - comparison_text is not changed  # identical
