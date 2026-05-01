@@ -403,6 +403,8 @@ files:
   $module_utils/_module_helper.py:
     labels: module_helper
     maintainers: russoz
+  $module_utils/_nomad.py:
+    maintainers: russoz
   $module_utils/_pritunl_api.py:
     maintainers: Lowess
   $module_utils/_pacemaker.py:

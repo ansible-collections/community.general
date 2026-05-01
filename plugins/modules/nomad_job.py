@@ -93,56 +93,29 @@ EXAMPLES = r"""
 
 import json
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-import_nomad = None
-try:
-    import nomad
-
-    import_nomad = True
-except ImportError:
-    import_nomad = False
+from ansible_collections.community.general.plugins.module_utils._nomad import argument_spec as nomad_argument_spec
+from ansible_collections.community.general.plugins.module_utils._nomad import nomad, setup_nomad_client
 
 
 def run():
     module = AnsibleModule(
-        argument_spec=dict(
-            host=dict(required=True, type="str"),
-            port=dict(type="int", default=4646),
-            state=dict(required=True, choices=["present", "absent"]),
-            use_ssl=dict(type="bool", default=True),
-            timeout=dict(type="int", default=5),
-            validate_certs=dict(type="bool", default=True),
-            client_cert=dict(type="path"),
-            client_key=dict(type="path"),
-            namespace=dict(type="str"),
-            name=dict(type="str"),
-            content_format=dict(choices=["hcl", "json"], default="hcl"),
-            content=dict(type="str"),
-            force_start=dict(type="bool", default=False),
-            token=dict(type="str", no_log=True),
-        ),
+        argument_spec={
+            **nomad_argument_spec,
+            "state": dict(required=True, choices=["present", "absent"]),
+            "name": dict(type="str"),
+            "content_format": dict(choices=["hcl", "json"], default="hcl"),
+            "content": dict(type="str"),
+            "force_start": dict(type="bool", default=False),
+        },
         supports_check_mode=True,
         mutually_exclusive=[["name", "content"]],
         required_one_of=[["name", "content"]],
     )
 
-    if not import_nomad:
-        module.fail_json(msg=missing_required_lib("python-nomad"))
-
-    certificate_ssl = (module.params.get("client_cert"), module.params.get("client_key"))
-
-    nomad_client = nomad.Nomad(
-        host=module.params.get("host"),
-        port=module.params.get("port"),
-        secure=module.params.get("use_ssl"),
-        timeout=module.params.get("timeout"),
-        verify=module.params.get("validate_certs"),
-        cert=certificate_ssl,
-        namespace=module.params.get("namespace"),
-        token=module.params.get("token"),
-    )
+    nomad_client = setup_nomad_client(module)
 
     if module.params.get("state") == "present":
         if module.params.get("name") and not module.params.get("force_start"):
