@@ -28,6 +28,8 @@ author:
 """
 
 EXAMPLES = r"""
+# fmt: console
+
 ansible webservers -m ohai --tree=/tmp/ohaidata
 ...
 """
