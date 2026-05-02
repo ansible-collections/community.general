@@ -147,7 +147,7 @@ options:
     description:
       - Sets the C(AddressFamily) option.
     type: str
-    version_added: 10.4.0
+    version_added: 13.0.0
 requirements:
   - paramiko
 """
@@ -421,7 +421,7 @@ def main():
             dynamicforward=dict(type="str"),
             user=dict(type="str"),
             user_known_hosts_file=dict(type="str"),
-            address_family=dict(type="str", default=None),
+            address_family=dict(type="str"),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
