@@ -351,6 +351,8 @@ files:
     maintainers: russoz
   $module_utils/_django.py:
     maintainers: russoz
+  $module_utils/_emc_vnx.py:
+    maintainers: russoz
   $module_utils/_gconftool2.py:
     labels: gconftool2
     maintainers: russoz
@@ -361,6 +363,8 @@ files:
     labels: gitlab
     maintainers: $team_gitlab
     notify: jlozadad
+  $module_utils/_hpe3par.py:
+    maintainers: farhan7500 gautamphegde
   $module_utils/_hwc_utils.py:
     keywords: cloud huawei hwc
     labels: huawei hwc_utils networking
@@ -424,8 +428,6 @@ files:
     maintainers: russoz
   $module_utils/_systemd.py:
     maintainers: NomakCooper
-  $module_utils/_storage/hpe3par/hpe3par.py:
-    maintainers: farhan7500 gautamphegde
   $module_utils/_utm_utils.py:
     labels: utm_utils
     maintainers: $team_e_spirit

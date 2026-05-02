@@ -83,7 +83,7 @@ RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule, _load_params
 
-from ansible_collections.community.general.plugins.module_utils._source_control.bitbucket import BitbucketHelper
+from ansible_collections.community.general.plugins.module_utils._bitbucket import BitbucketHelper
 
 error_messages = {
     "required_value": "`value` is required when the `state` is `present`",

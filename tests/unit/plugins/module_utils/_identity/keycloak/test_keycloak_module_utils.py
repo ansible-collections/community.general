@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import unittest
 
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import is_struct_included
+from ansible_collections.community.general.plugins.module_utils._keycloak import is_struct_included
 
 
 class KeycloakIsStructIncludedTestCase(unittest.TestCase):

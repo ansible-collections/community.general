@@ -123,7 +123,7 @@ RETURN = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils._storage.hpe3par import hpe3par
+from ansible_collections.community.general.plugins.module_utils import _hpe3par as hpe3par
 
 try:
     from hpe3par_sdk import client

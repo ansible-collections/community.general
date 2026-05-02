@@ -10,7 +10,7 @@ from urllib.error import HTTPError
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._keycloak import (
     KeycloakError,
     get_token,
 )
