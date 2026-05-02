@@ -17,7 +17,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 from ansible_collections.community.general.plugins.modules import (
     pritunl_org,
 )
-from ansible_collections.community.general.tests.unit.plugins.module_utils._net_tools.pritunl.test_api import (
+from ansible_collections.community.general.tests.unit.plugins.module_utils._pritunl_test_api import (
     PritunlDeleteOrganizationMock,
     PritunlListOrganizationAfterPostMock,
     PritunlListOrganizationMock,
@@ -35,21 +35,21 @@ class TestPritunlOrg(ModuleTestCase):
 
     def patch_add_pritunl_organization(self, **kwds):
         return patch(
-            "ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api._post_pritunl_organization",
+            "ansible_collections.community.general.plugins.module_utils._pritunl_api._post_pritunl_organization",
             autospec=True,
             **kwds,
         )
 
     def patch_delete_pritunl_organization(self, **kwds):
         return patch(
-            "ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api._delete_pritunl_organization",
+            "ansible_collections.community.general.plugins.module_utils._pritunl_api._delete_pritunl_organization",
             autospec=True,
             **kwds,
         )
 
     def patch_get_pritunl_organizations(self, **kwds):
         return patch(
-            "ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api._get_pritunl_organizations",
+            "ansible_collections.community.general.plugins.module_utils._pritunl_api._get_pritunl_organizations",
             autospec=True,
             **kwds,
         )
