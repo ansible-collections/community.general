@@ -19,7 +19,9 @@ requirements:
   - C(op) 1Password command line utility
 options:
   _terms:
-    description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
+    description:
+      - Identifier(s) (case-insensitive UUID or name or secret reference) of item(s) to retrieve.
+      - Secret references start with V(op://) and are supported since community.general 13.0.0.
     required: true
     type: list
     elements: string
@@ -28,7 +30,9 @@ options:
   domain:
     version_added: 3.2.0
   field:
-    description: Field to return from each matching item (case-insensitive).
+    description:
+      - Field to return from each matching item (case-insensitive).
+      - Ignored when using a secret reference, as the field is included in the secret reference.
     default: 'password'
     type: str
   service_account_token:
@@ -348,6 +352,11 @@ class OnePassCLIv1(OnePassCLIBase):
 
         return self._run(args, command_input=to_bytes(self.master_password))
 
+    def get_secret_reference(self, reference):
+        raise AnsibleLookupError(
+            "Secret references are not supported in op v1. Upgrade to op v2 or use item names/UUIDs"
+        )
+
 
 class OnePassCLIv2(OnePassCLIBase):
     """
@@ -580,6 +589,10 @@ class OnePassCLIv2(OnePassCLIBase):
         args = ["item", "get", item_id, "--format", "json"]
         return self._add_parameters_and_run(args, vault=vault, token=token)
 
+    def get_secret_reference(self, reference, token=None):
+        args = ["read", reference]
+        return self._add_parameters_and_run(args, token=token)
+
     def signin(self):
         self._check_required_params(["master_password"])
 
@@ -700,6 +713,20 @@ class OnePass:
 
         return ""
 
+    def get_secret_reference(self, reference):
+        path = reference[5:]
+        if not path:
+            raise AnsibleLookupError("Secret references must have a path")
+        # Split into parts, to check length in a second
+        path_parts = [part for part in path.split("/") if part]
+
+        # Must be 3 parts (vault,item,field) or 4 (vault,item,section,field)
+        if len(path_parts) not in (3, 4):
+            raise AnsibleLookupError("Not a valid secret reference")
+
+        rc, out, err = self._cli.get_secret_reference(reference, self.token)
+        return out.strip()
+
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
@@ -733,6 +760,9 @@ class LookupModule(LookupBase):
 
         values = []
         for term in terms:
-            values.append(op.get_field(term, field, section, vault))
+            if term.startswith("op://"):
+                values.append(op.get_secret_reference(term))
+            else:
+                values.append(op.get_field(term, field, section, vault))
 
         return values
