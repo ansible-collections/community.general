@@ -13,7 +13,7 @@ from ansible.executor.task_result import TaskResult
 from ansible.playbook.task import Task
 from ansible.release import __version__ as ansible_release
 
-from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData
+from ansible_collections.community.general.plugins.callback.opentelemetry import HostData, OpenTelemetrySource, TaskData
 
 if tuple(int(x) for x in ansible_release.split(".")[:2]) >= (2, 21):
     # https://github.com/ansible/ansible/issues/86761
@@ -42,11 +42,15 @@ class TestOpentelemetry(unittest.TestCase):
         self.my_task_result = TaskResult(
             host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields
         )
+        self.mock_span = Mock("MockSpan")
+        self.mock_span.set_status = MagicMock()
+        self.mock_span.set_attributes = MagicMock()
+        self.mock_span.end = MagicMock()
 
-    def test_start_task(self):
+    def test_run_task_with_host(self):
         tasks_data = OrderedDict()
 
-        self.opentelemetry.start_task(tasks_data, False, "myplay", self.mock_task)
+        self.opentelemetry.start_task(tasks_data, False, "myplay", self.mock_task, self.mock_host)
 
         task_data = tasks_data["myuuid"]
         self.assertEqual(task_data.uuid, "myuuid")
@@ -55,6 +59,14 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(task_data.play, "myplay")
         self.assertEqual(task_data.action, "myaction")
         self.assertEqual(task_data.args, {})
+
+        host_data = task_data.host_data["myhost_uuid"]
+        self.assertEqual(host_data.uuid, "myhost_uuid")
+        self.assertEqual(host_data.name, "myhost")
+        self.assertIsNotNone(host_data.start)
+
+        self.opentelemetry.finish_task(tasks_data, "ok", self.my_task_result, "")
+        self.assertEqual(host_data.status, "ok")
 
     def test_finish_task_with_a_host_match(self):
         tasks_data = OrderedDict()
@@ -80,6 +92,13 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, "include")
         self.assertEqual(host_data.name, "include")
         self.assertEqual(host_data.status, "ok")
+
+    @patch("ansible_collections.community.general.plugins.callback.opentelemetry.Status", create=True)
+    @patch("ansible_collections.community.general.plugins.callback.opentelemetry.StatusCode", create=True)
+    def test_update_span_data(self, mock_status_code, mock_status):
+        unfinished_host = HostData("myhost_uuid", "myhost", "unreachable")
+        self.opentelemetry.update_span_data(self.mock_task, unfinished_host, self.mock_span, True, True)
+        self.mock_span.end.assert_called()
 
     def test_get_error_message(self):
         test_cases = (
