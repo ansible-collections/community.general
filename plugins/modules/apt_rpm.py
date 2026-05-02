@@ -144,6 +144,7 @@ APT_PATH = "/usr/bin/apt-get"
 RPM_PATH = "/usr/bin/rpm"
 APT_GET_ZERO = "\n0 upgraded, 0 newly installed"
 UPDATE_KERNEL_ZERO = "\nTry to install new kernel "
+UPDATE_KERNEL_NO_NEW = "There are no available kernels"
 
 
 def local_rpm_package_name(path):
@@ -233,8 +234,12 @@ def dist_upgrade(module):
 
 def update_kernel(module):
     rc, out, err = module.run_command(
-        ["/usr/sbin/update-kernel", "-y"], check_rc=True, environ_update={"LANGUAGE": "C", "LC_ALL": "C"}
+        ["/usr/sbin/update-kernel", "-y"], environ_update={"LANGUAGE": "C", "LC_ALL": "C"}
     )
+    if rc != 0:
+        if UPDATE_KERNEL_NO_NEW in err:
+            return (False, out)
+        module.fail_json(msg=f"Error while updating kernel: {err or out}", rc=rc, stdout=out, stderr=err)
     return (UPDATE_KERNEL_ZERO not in out, out)
 
 

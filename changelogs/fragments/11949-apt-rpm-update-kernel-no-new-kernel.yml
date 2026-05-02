@@ -1,0 +1,2 @@
+bugfixes:
+  - "apt_rpm - do not fail when ``update_kernel`` finds no new kernel available (https://github.com/ansible-collections/community.general/issues/10055, https://github.com/ansible-collections/community.general/pull/11949)."
