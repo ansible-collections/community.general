@@ -112,6 +112,8 @@ doc_fragment = "community.general._scaleway.actiongroup_scaleway"
 [sessions.build_import_check]
 run_galaxy_importer = true
 
+[sessions.ansible_lint]
+
 [sessions.ansible_test_sanity]
 include_devel = true
 

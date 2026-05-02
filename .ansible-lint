@@ -1,0 +1,36 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+skip_list:
+  # Ignore rules that make no sense:
+  - galaxy[tags]
+  - galaxy[version-incorrect]
+  - meta-runtime[unsupported-version]
+  - no-changed-when
+  - sanity[cannot-ignore]  # some of the rules you cannot ignore actually MUST be ignored, like yamllint:unparsable-with-libyaml
+  - yaml  # we're using yamllint ourselves
+  - var-naming[no-role-prefix]
+
+  # To be checked and maybe fixed:
+  - args
+  - avoid-implicit
+  - command-instead-of-module
+  - command-instead-of-shell
+  - complexity
+  - fqcn
+  - galaxy
+  - ignore-errors
+  - jinja
+  - key-order
+  - latest
+  - literal-compare
+  - name
+  - no-free-form
+  - no-handler
+  - package-latest
+  - risky-file-permissions
+  - risky-shell-pipe
+  - schema
+  - var-naming
