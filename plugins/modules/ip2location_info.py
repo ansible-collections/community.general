@@ -48,59 +48,66 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-record:
-  description: Dictionary of IP geolocation information for the IP address.
-  returned: changed
-  type: complex
-  contains:
-    ip:
-      description: "Public IP address of a host."
-      type: str
-      sample: "8.8.8.8"
-    country_code:
-      description: ISO 3166-1 alpha-2 country code.
-      type: str
-      sample: "US"
-    country_name:
-      description: Country name based on ISO 3166.
-      type: str
-      sample: "United States of America"
-    region_name:
-      description: State or province name.
-      type: str
-      sample: "California"
-    city_name:
-      description: City name.
-      type: str
-      sample: "Mountain View"
-    latitude:
-      description: Latitude of the city.
-      type: float
-      sample: 37.3860
-    longitude:
-      description: Longitude of the city.
-      type: float
-      sample: -122.0838
-    zip_code:
-      description: ZIP/Postal code.
-      type: str
-      sample: "94035"
-    time_zone:
-      description: UTC time zone (with DST supported).
-      type: str
-      sample: "-08:00"
-    asn:
-      description: Autonomous system number (ASN).
-      type: str
-      sample: "15169"
-    as:
-      description: Autonomous system (AS) name.
-      type: str
-      sample: "Google LLC"
-    is_proxy:
-      description: Whether is a proxy or not.
-      type: bool
-      sample: false
+ip:
+  description: "Public IP address of a host."
+  type: str
+  returned: success
+  sample: "8.8.8.8"
+country_code:
+  description: ISO 3166-1 alpha-2 country code.
+  type: str
+  returned: success
+  sample: "US"
+country_name:
+  description: Country name based on ISO 3166.
+  type: str
+  returned: success
+  sample: "United States of America"
+region_name:
+  description: State or province name.
+  type: str
+  returned: success
+  sample: "California"
+city_name:
+  description: City name.
+  type: str
+  returned: success
+  sample: "Mountain View"
+latitude:
+  description: Latitude of the city.
+  type: float
+  returned: success
+  sample: 37.3860
+longitude:
+  description: Longitude of the city.
+  type: float
+  returned: success
+  sample: -122.0838
+zip_code:
+  description: ZIP/Postal code.
+  type: str
+  returned: success
+  sample: "94035"
+time_zone:
+  description: UTC time zone (with DST supported).
+  type: str
+  returned: success
+  sample: "-08:00"
+asn:
+  description: Autonomous system number (ASN).
+  type: str
+  returned: success
+  sample: "15169"
+as:
+  description: Autonomous system (AS) name.
+  type: str
+  returned: success
+  sample: "Google LLC"
+is_proxy:
+  description: Whether is a proxy or not.
+  type: bool
+  returned: success
+  sample: false
 """
 
 import typing as t

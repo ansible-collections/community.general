@@ -449,7 +449,8 @@ instances_ids:
   sample: [1234, 1235]
 instances:
   description: A list of instances info whose state is changed or which are fetched with O(instance_ids) option.
-  type: complex
+  type: list
+  elements: dict
   returned: success
   contains:
     vm_id:
@@ -563,7 +564,8 @@ tagged_instances:
   description:
     - A list of instances info based on a specific attributes and/or labels that are specified with O(count_attributes) and
       O(count_labels) options.
-  type: complex
+  type: list
+  elements: dict
   returned: success
   contains:
     vm_id:
