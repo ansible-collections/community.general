@@ -36,33 +36,33 @@ EXAMPLES = r"""
 RETURN = r"""
 ansible_facts:
   description: Dictionary containing details of connected USB devices.
-  returned: always
+  returned: success
   type: dict
   contains:
     usb_devices:
       description: A list of USB devices available.
-      returned: always
+      returned: success
       type: list
       elements: dict
       contains:
         bus:
           description: The bus the usb device is connected to.
-          returned: always
+          returned: success
           type: str
           sample: "001"
         device:
           description: The device number occupied on the bus.
-          returned: always
+          returned: success
           type: str
           sample: "002"
         id:
           description: ID of the USB device.
-          returned: always
+          returned: success
           type: str
           sample: "1d6b:0002"
         name:
           description: Human readable name of the device.
-          returned: always
+          returned: success
           type: str
           sample: Linux Foundation 2.0 root hub
 """

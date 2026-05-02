@@ -73,7 +73,7 @@ EXAMPLES = r"""
 RETURN = r"""
 name:
   description: ZFS dataset name.
-  returned: always
+  returned: success
   type: str
   sample: rpool/var/spool
 parsable:
@@ -86,67 +86,73 @@ recurse:
   returned: if O(recurse=True)
   type: bool
   sample: true
-zfs_datasets:
-  description: ZFS dataset facts.
-  returned: always
-  type: str
-  sample:
-    "aclinherit": "restricted"
-    "aclmode": "discard"
-    "atime": "on"
-    "available": "43.8G"
-    "canmount": "on"
-    "casesensitivity": "sensitive"
-    "checksum": "on"
-    "compression": "off"
-    "compressratio": "1.00x"
-    "copies": "1"
-    "creation": "Thu Jun 16 11:37 2016"
-    "dedup": "off"
-    "devices": "on"
-    "exec": "on"
-    "filesystem_count": "none"
-    "filesystem_limit": "none"
-    "logbias": "latency"
-    "logicalreferenced": "18.5K"
-    "logicalused": "3.45G"
-    "mlslabel": "none"
-    "mounted": "yes"
-    "mountpoint": "/rpool"
-    "name": "rpool"
-    "nbmand": "off"
-    "normalization": "none"
-    "org.openindiana.caiman:install": "ready"
-    "primarycache": "all"
-    "quota": "none"
-    "readonly": "off"
-    "recordsize": "128K"
-    "redundant_metadata": "all"
-    "refcompressratio": "1.00x"
-    "referenced": "29.5K"
-    "refquota": "none"
-    "refreservation": "none"
-    "reservation": "none"
-    "secondarycache": "all"
-    "setuid": "on"
-    "sharenfs": "off"
-    "sharesmb": "off"
-    "snapdir": "hidden"
-    "snapshot_count": "none"
-    "snapshot_limit": "none"
-    "sync": "standard"
-    "type": "filesystem"
-    "used": "4.41G"
-    "usedbychildren": "4.41G"
-    "usedbydataset": "29.5K"
-    "usedbyrefreservation": "0"
-    "usedbysnapshots": "0"
-    "utf8only": "off"
-    "version": "5"
-    "vscan": "off"
-    "written": "29.5K"
-    "xattr": "on"
-    "zoned": "off"
+ansible_facts:
+  description: Dictionary containing all the detailed information about the ZFS facts.
+  returned: success
+  type: dict
+  contains:
+    zfs_datasets:
+      description: ZFS dataset facts.
+      returned: always
+      type: list
+      elements: dict
+      sample:
+        - "aclinherit": "restricted"
+          "aclmode": "discard"
+          "atime": "on"
+          "available": "43.8G"
+          "canmount": "on"
+          "casesensitivity": "sensitive"
+          "checksum": "on"
+          "compression": "off"
+          "compressratio": "1.00x"
+          "copies": "1"
+          "creation": "Thu Jun 16 11:37 2016"
+          "dedup": "off"
+          "devices": "on"
+          "exec": "on"
+          "filesystem_count": "none"
+          "filesystem_limit": "none"
+          "logbias": "latency"
+          "logicalreferenced": "18.5K"
+          "logicalused": "3.45G"
+          "mlslabel": "none"
+          "mounted": "yes"
+          "mountpoint": "/rpool"
+          "name": "rpool"
+          "nbmand": "off"
+          "normalization": "none"
+          "org.openindiana.caiman:install": "ready"
+          "primarycache": "all"
+          "quota": "none"
+          "readonly": "off"
+          "recordsize": "128K"
+          "redundant_metadata": "all"
+          "refcompressratio": "1.00x"
+          "referenced": "29.5K"
+          "refquota": "none"
+          "refreservation": "none"
+          "reservation": "none"
+          "secondarycache": "all"
+          "setuid": "on"
+          "sharenfs": "off"
+          "sharesmb": "off"
+          "snapdir": "hidden"
+          "snapshot_count": "none"
+          "snapshot_limit": "none"
+          "sync": "standard"
+          "type": "filesystem"
+          "used": "4.41G"
+          "usedbychildren": "4.41G"
+          "usedbydataset": "29.5K"
+          "usedbyrefreservation": "0"
+          "usedbysnapshots": "0"
+          "utf8only": "off"
+          "version": "5"
+          "vscan": "off"
+          "written": "29.5K"
+          "xattr": "on"
+          "zoned": "off"
 """
 
 from collections import defaultdict

@@ -48,12 +48,12 @@ EXAMPLES = r"""
 RETURN = r"""
 ansible_facts:
   description: Dictionary with one key C(facter).
-  returned: always
+  returned: success
   type: dict
   contains:
     facter:
       description: Dictionary containing facts discovered in the remote system.
-      returned: always
+      returned: success
       type: dict
 """
 

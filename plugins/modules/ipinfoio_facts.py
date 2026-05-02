@@ -40,8 +40,8 @@ EXAMPLES = r"""
 RETURN = r"""
 ansible_facts:
   description: "Dictionary of IP geolocation facts for a host's IP address."
-  returned: changed
-  type: complex
+  returned: success
+  type: dict
   contains:
     ip:
       description: "Public IP address of a host."
