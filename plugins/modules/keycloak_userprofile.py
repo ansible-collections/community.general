@@ -480,7 +480,7 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._keycloak import (
     KeycloakAPI,
     KeycloakError,
     camel,

@@ -769,15 +769,15 @@ import copy
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak._keycloak_utils import (
-    merge_settings_without_absent_nulls,
-)
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._keycloak import (
     KeycloakAPI,
     KeycloakError,
     camel,
     get_token,
     keycloak_argument_spec,
+)
+from ansible_collections.community.general.plugins.module_utils._keycloak_utils import (
+    merge_settings_without_absent_nulls,
 )
 
 PROTOCOL_OPENID_CONNECT = "openid-connect"

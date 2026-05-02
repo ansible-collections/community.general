@@ -13,7 +13,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
-from ansible_collections.community.general.plugins.module_utils._source_control.bitbucket import BitbucketHelper
+from ansible_collections.community.general.plugins.module_utils._bitbucket import BitbucketHelper
 from ansible_collections.community.general.plugins.modules import bitbucket_pipeline_known_host
 from ansible_collections.community.general.plugins.modules.bitbucket_pipeline_known_host import HAS_PARAMIKO
 

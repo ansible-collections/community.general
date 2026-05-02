@@ -73,7 +73,7 @@ organizations:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api import (
+from ansible_collections.community.general.plugins.module_utils._pritunl_api import (
     PritunlException,
     get_pritunl_settings,
     list_pritunl_organizations,
