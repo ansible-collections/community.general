@@ -80,6 +80,10 @@ options:
     type: boolean
     default: false
     version_added: 6.5.0
+  skip_host_discovery:
+    description: Prevent host discovery probes
+    type: boolean
+    version_added: 12.6.0
   dns_resolve:
     description: Whether to always (V(true)) or never (V(false)) do DNS resolution.
     type: boolean
@@ -263,6 +267,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             if not self.get_option("use_arp_ping"):
                 cmd.append("--disable-arp-ping")
+
+            if self.get_option("skip_host_discovery"):
+                cmd.append("-Pn")
 
             cmd.append(self.get_option("address"))
             try:
