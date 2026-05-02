@@ -46,7 +46,7 @@ def _mock_good_connection():
         )
     }
     return patch(
-        "ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak.open_url",
+        "ansible_collections.community.general.plugins.module_utils._keycloak.open_url",
         side_effect=_build_mocked_request(count(), token_response),
         autospec=True,
     )
