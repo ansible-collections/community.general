@@ -1,0 +1,2 @@
+bugfixes:
+  - "logstash_plugin - use ``http_proxy``/``https_proxy`` environment variables for proxy support instead of broken JVM flags; expose ``stderr`` on failure (https://github.com/ansible-collections/community.general/issues/8650, https://github.com/ansible-collections/community.general/pull/11951)."
