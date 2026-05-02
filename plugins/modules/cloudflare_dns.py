@@ -327,7 +327,7 @@ RETURN = r"""
 record:
   description: A dictionary containing the record data.
   returned: success, except on record deletion
-  type: complex
+  type: dict
   contains:
     comment:
       description: Comments or notes about the DNS record.

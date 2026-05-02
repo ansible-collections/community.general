@@ -161,7 +161,7 @@ msg:
 end_state:
   description: Representation of the authorization permission after module execution.
   returned: on success
-  type: complex
+  type: dict
   contains:
     id:
       description: ID of the authorization permission.

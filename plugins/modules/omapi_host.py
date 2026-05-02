@@ -104,7 +104,7 @@ RETURN = r"""
 lease:
   description: Dictionary containing host information.
   returned: success
-  type: complex
+  type: dict
   contains:
     ip-address:
       description: IP address, if there is.

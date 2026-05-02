@@ -91,7 +91,8 @@ RETURN = r"""
 instances:
   description: List of ECS instances.
   returned: always
-  type: complex
+  type: list
+  elements: dict
   contains:
     availability_zone:
       description: The availability zone of the instance is in.
