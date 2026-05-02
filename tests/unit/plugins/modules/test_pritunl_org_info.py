@@ -16,7 +16,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 from ansible_collections.community.general.plugins.modules import (
     pritunl_org_info,
 )
-from ansible_collections.community.general.tests.unit.plugins.module_utils._net_tools.pritunl.test_api import (
+from ansible_collections.community.general.tests.unit.plugins.module_utils._pritunl_test_api import (
     PritunlEmptyOrganizationMock,
     PritunlListOrganizationMock,
 )
@@ -32,7 +32,7 @@ class TestPritunlOrgInfo(ModuleTestCase):
 
     def patch_get_pritunl_organizations(self, **kwds):
         return patch(
-            "ansible_collections.community.general.plugins.module_utils._net_tools.pritunl.api._get_pritunl_organizations",
+            "ansible_collections.community.general.plugins.module_utils._pritunl_api._get_pritunl_organizations",
             autospec=True,
             **kwds,
         )
