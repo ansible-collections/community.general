@@ -23,6 +23,9 @@ extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.facts
   - community.general._attributes.facts_module
+attributes:
+  check_mode:
+    version_added: 13.0.0
 options:
   command:
     description:

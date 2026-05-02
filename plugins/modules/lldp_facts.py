@@ -7,19 +7,19 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: lldp
+module: lldp_facts
 requirements:
   - C(lldpctl), usually provided by the C(lldpd) package.
+  - The module was renamed from C(lldp) to C(lldp_facts) in community.general 13.0.0.
+    The old name is available as an alias. Eventually a deprecation message will be shown
+    when the old name is used.
 short_description: Get details reported by LLDP
 description:
   - Reads LLDP data from C(lldpd) using the CLI tool C(lldpctl).
 extends_documentation_fragment:
   - community.general._attributes
-attributes:
-  check_mode:
-    support: none
-  diff_mode:
-    support: none
+  - community.general._attributes.facts
+  - community.general._attributes.facts_module
 options:
   multivalues:
     description: If C(lldpctl) outputs an attribute multiple time represent all values as a list.
@@ -44,6 +44,18 @@ EXAMPLES = r"""
 # ok: [10.13.0.22] => (item=eth2) => {"item": "eth2", "msg": "switch1.example.com / Gi0/24"}
 # ok: [10.13.0.22] => (item=eth1) => {"item": "eth1", "msg": "switch2.example.com / Gi0/3"}
 # ok: [10.13.0.22] => (item=eth0) => {"item": "eth0", "msg": "switch3.example.com / Gi0/3"}
+"""
+
+RESULTS = r"""
+ansible_facts:
+  description: The returned facts.
+  returned: success
+  type: dict
+  contains:
+    lldp:
+      descrition:
+        - The parsed output.
+      type: dict
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -95,7 +107,7 @@ def gather_lldp(module):
 
 def main():
     module_args = dict(multivalues=dict(type="bool", default=False))
-    module = AnsibleModule(module_args)
+    module = AnsibleModule(module_args, supports_check_mode=True)
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     lldp_output = gather_lldp(module)

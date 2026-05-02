@@ -1,0 +1,3 @@
+minor_changes:
+  - lldp - the module has been renamed to ``community.general.lldp_facts`` (https://github.com/ansible-collections/community.general/pull/11980).
+  - lldp - the module now supports check mode (https://github.com/ansible-collections/community.general/pull/11980).

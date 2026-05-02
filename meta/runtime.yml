@@ -430,6 +430,9 @@ plugin_routing:
       redirect: community.kubevirt.kubevirt_template
     kubevirt_vm:
       redirect: community.kubevirt.kubevirt_vm
+    lldp:
+      # TODO: introduce deprecation warning in 14.0.0
+      redirect: community.general.lldp_facts
     layman:
       deprecation:
         removal_version: 14.0.0
