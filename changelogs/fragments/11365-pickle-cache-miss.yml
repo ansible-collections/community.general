@@ -1,0 +1,2 @@
+bugfixes:
+  - nmap with pickle as cache plugin - Fixed the cache misses due to the absence of the Plugin Interposer (Issue https://github.com/ansible-collections/community.general/issues/11365) 
