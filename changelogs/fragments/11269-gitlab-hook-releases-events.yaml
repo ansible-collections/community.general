@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - gitlab_hook - now properly passes the ``releases_events`` parameter to the GitLab API on hook creation,
+    fixing a 500 Internal Server Error when the parameter was not specified
+    (https://github.com/ansible-collections/community.general/issues/11269, https://github.com/ansible-collections/community.general/pull/11917).
