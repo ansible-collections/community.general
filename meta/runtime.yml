@@ -438,6 +438,11 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ldap_attrs instead.
+    lldp:
+      redirect: community.general.lldp_facts
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use community.general.lldp_facts instead.
     logicmonitor:
       tombstone:
         removal_version: 1.0.0

@@ -915,7 +915,7 @@ files:
     maintainers: zbal
   $modules/listen_ports_facts.py:
     maintainers: ndavison
-  $modules/lldp.py:
+  $modules/lldp_facts.py:
     ignore: andyhky
     labels: lldp
   $modules/locale_gen.py:
