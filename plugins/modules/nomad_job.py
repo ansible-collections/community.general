@@ -93,71 +93,43 @@ EXAMPLES = r"""
 
 import json
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-import_nomad = None
-try:
-    import nomad
-
-    import_nomad = True
-except ImportError:
-    import_nomad = False
+from ansible_collections.community.general.plugins.module_utils._nomad import argument_spec as nomad_argument_spec
+from ansible_collections.community.general.plugins.module_utils._nomad import nomad, setup_nomad_client
 
 
 def run():
     module = AnsibleModule(
-        argument_spec=dict(
-            host=dict(required=True, type="str"),
-            port=dict(type="int", default=4646),
-            state=dict(required=True, choices=["present", "absent"]),
-            use_ssl=dict(type="bool", default=True),
-            timeout=dict(type="int", default=5),
-            validate_certs=dict(type="bool", default=True),
-            client_cert=dict(type="path"),
-            client_key=dict(type="path"),
-            namespace=dict(type="str"),
-            name=dict(type="str"),
-            content_format=dict(choices=["hcl", "json"], default="hcl"),
-            content=dict(type="str"),
-            force_start=dict(type="bool", default=False),
-            token=dict(type="str", no_log=True),
-        ),
+        argument_spec={
+            **nomad_argument_spec,
+            "state": dict(required=True, choices=["present", "absent"]),
+            "name": dict(type="str"),
+            "content_format": dict(choices=["hcl", "json"], default="hcl"),
+            "content": dict(type="str"),
+            "force_start": dict(type="bool", default=False),
+        },
         supports_check_mode=True,
         mutually_exclusive=[["name", "content"]],
         required_one_of=[["name", "content"]],
     )
 
-    if not import_nomad:
-        module.fail_json(msg=missing_required_lib("python-nomad"))
+    nomad_client = setup_nomad_client(module)
 
-    certificate_ssl = (module.params.get("client_cert"), module.params.get("client_key"))
-
-    nomad_client = nomad.Nomad(
-        host=module.params.get("host"),
-        port=module.params.get("port"),
-        secure=module.params.get("use_ssl"),
-        timeout=module.params.get("timeout"),
-        verify=module.params.get("validate_certs"),
-        cert=certificate_ssl,
-        namespace=module.params.get("namespace"),
-        token=module.params.get("token"),
-    )
-
-    if module.params.get("state") == "present":
-        if module.params.get("name") and not module.params.get("force_start"):
+    if module.params["state"] == "present":
+        if module.params["name"] and not module.params["force_start"]:
             module.fail_json(msg="For start job with name, force_start is needed")
 
         changed = False
-        if module.params.get("content"):
-            if module.params.get("content_format") == "json":
-                job_json = module.params.get("content")
+        if module.params["content"]:
+            if module.params["content_format"] == "json":
+                job_json = module.params["content"]
                 try:
                     job_json = json.loads(job_json)
                 except ValueError as e:
                     module.fail_json(msg=f"{e}")
-                job = dict()
-                job["job"] = job_json
+                job = {"job": job_json}
                 try:
                     job_id = job_json.get("ID")
                     if job_id is None:
@@ -174,12 +146,11 @@ def run():
                 except Exception as e:
                     module.fail_json(msg=f"{e}")
 
-            if module.params.get("content_format") == "hcl":
+            if module.params["content_format"] == "hcl":
                 try:
-                    job_hcl = module.params.get("content")
+                    job_hcl = module.params["content"]
                     job_json = nomad_client.jobs.parse(job_hcl)
-                    job = dict()
-                    job["job"] = job_json
+                    job = {"job": job_json}
                 except nomad.api.exceptions.BadRequestNomadException as err:
                     module.fail_json(msg=f"{err.nomad_resp.reason} {err.nomad_resp.text}")
                 try:
@@ -196,11 +167,10 @@ def run():
                 except Exception as e:
                     module.fail_json(msg=f"{e}")
 
-        if module.params.get("force_start"):
+        if module.params["force_start"]:
             try:
-                job = dict()
-                if module.params.get("name"):
-                    job_name = module.params.get("name")
+                if module.params["name"]:
+                    job_name = module.params["name"]
                 else:
                     job_name = job_json["Name"]
                 job_json = nomad_client.job.get_job(job_name)
@@ -209,7 +179,7 @@ def run():
                 else:
                     job_json["Status"] = "running"
                     job_json["Stop"] = False
-                    job["job"] = job_json
+                    job = {"job": job_json}
                     if not module.check_mode:
                         result = nomad_client.jobs.register_job(job)
                     else:
@@ -221,16 +191,16 @@ def run():
             except Exception as e:
                 module.fail_json(msg=f"{e}")
 
-    if module.params.get("state") == "absent":
+    if module.params["state"] == "absent":
         try:
-            if module.params.get("name") is not None:
-                job_name = module.params.get("name")
+            if module.params["name"] is not None:
+                job_name = module.params["name"]
             else:
-                if module.params.get("content_format") == "hcl":
-                    job_json = nomad_client.jobs.parse(module.params.get("content"))
+                if module.params["content_format"] == "hcl":
+                    job_json = nomad_client.jobs.parse(module.params["content"])
                     job_name = job_json["Name"]
-                if module.params.get("content_format") == "json":
-                    job_json = module.params.get("content")
+                if module.params["content_format"] == "json":
+                    job_json = module.params["content"]
                     job_name = job_json["Name"]
             job = nomad_client.job.get_job(job_name)
             if job["Status"] == "dead":

@@ -118,16 +118,10 @@ result:
     }
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
-import_nomad = None
-
-try:
-    import nomad
-
-    import_nomad = True
-except ImportError:
-    import_nomad = False
+from ansible_collections.community.general.plugins.module_utils._nomad import argument_spec as nomad_argument_spec
+from ansible_collections.community.general.plugins.module_utils._nomad import nomad, setup_nomad_client
 
 
 def get_token(name, nomad_client):
@@ -156,22 +150,14 @@ def transform_response(nomad_response):
     return transformed_response
 
 
-argument_spec = dict(
-    host=dict(required=True, type="str"),
-    port=dict(type="int", default=4646),
-    state=dict(required=True, choices=["present", "absent"]),
-    use_ssl=dict(type="bool", default=True),
-    timeout=dict(type="int", default=5),
-    validate_certs=dict(type="bool", default=True),
-    client_cert=dict(type="path"),
-    client_key=dict(type="path"),
-    namespace=dict(type="str"),
-    token=dict(type="str", no_log=True),
-    name=dict(type="str"),
-    token_type=dict(choices=["client", "management", "bootstrap"], default="client"),
-    policies=dict(type="list", elements="str", default=[]),
-    global_replicated=dict(type="bool", default=False),
-)
+argument_spec = {
+    **nomad_argument_spec,
+    "state": dict(required=True, choices=["present", "absent"]),
+    "name": dict(type="str"),
+    "token_type": dict(choices=["client", "management", "bootstrap"], default="client"),
+    "policies": dict(type="list", elements="str", default=[]),
+    "global_replicated": dict(type="bool", default=False),
+}
 
 
 def setup_module_object():
@@ -187,34 +173,14 @@ def setup_module_object():
     return module
 
 
-def setup_nomad_client(module):
-    if not import_nomad:
-        module.fail_json(msg=missing_required_lib("python-nomad"))
-
-    certificate_ssl = (module.params.get("client_cert"), module.params.get("client_key"))
-
-    nomad_client = nomad.Nomad(
-        host=module.params.get("host"),
-        port=module.params.get("port"),
-        secure=module.params.get("use_ssl"),
-        timeout=module.params.get("timeout"),
-        verify=module.params.get("validate_certs"),
-        cert=certificate_ssl,
-        namespace=module.params.get("namespace"),
-        token=module.params.get("token"),
-    )
-
-    return nomad_client
-
-
 def run(module):
     nomad_client = setup_nomad_client(module)
 
     msg = ""
     result = {}
     changed = False
-    if module.params.get("state") == "present":
-        if module.params.get("token_type") == "bootstrap":
+    if module.params["state"] == "present":
+        if module.params["token_type"] == "bootstrap":
             try:
                 current_token = get_token("Bootstrap Token", nomad_client)
                 if current_token:
@@ -237,10 +203,10 @@ def run(module):
         else:
             try:
                 token_info = {
-                    "Name": module.params.get("name"),
-                    "Type": module.params.get("token_type"),
-                    "Policies": module.params.get("policies"),
-                    "Global": module.params.get("global_replicated"),
+                    "Name": module.params["name"],
+                    "Type": module.params["token_type"],
+                    "Policies": module.params["policies"],
+                    "Global": module.params["global_replicated"],
                 }
 
                 current_token = get_token(token_info["Name"], nomad_client)
@@ -261,15 +227,15 @@ def run(module):
             except Exception as e:
                 module.fail_json(msg=f"{e}")
 
-    if module.params.get("state") == "absent":
-        if not module.params.get("name"):
+    if module.params["state"] == "absent":
+        if not module.params["name"]:
             module.fail_json(msg="name is needed to delete token.")
 
-        if module.params.get("token_type") == "bootstrap" or module.params.get("name") == "Bootstrap Token":
+        if module.params["token_type"] == "bootstrap" or module.params["name"] == "Bootstrap Token":
             module.fail_json(msg="Delete ACL bootstrap token is not allowed.")
 
         try:
-            token = get_token(module.params.get("name"), nomad_client)
+            token = get_token(module.params["name"], nomad_client)
             if token:
                 nomad_client.acl.delete_token(token.get("AccessorID"))
                 msg = "ACL token deleted."

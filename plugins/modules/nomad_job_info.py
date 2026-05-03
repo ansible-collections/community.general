@@ -262,49 +262,22 @@ result:
     ]
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
-import_nomad = None
-try:
-    import nomad
-
-    import_nomad = True
-except ImportError:
-    import_nomad = False
+from ansible_collections.community.general.plugins.module_utils._nomad import argument_spec as nomad_argument_spec
+from ansible_collections.community.general.plugins.module_utils._nomad import setup_nomad_client
 
 
 def run():
     module = AnsibleModule(
-        argument_spec=dict(
-            host=dict(required=True, type="str"),
-            port=dict(type="int", default=4646),
-            use_ssl=dict(type="bool", default=True),
-            timeout=dict(type="int", default=5),
-            validate_certs=dict(type="bool", default=True),
-            client_cert=dict(type="path"),
-            client_key=dict(type="path"),
-            namespace=dict(type="str"),
-            name=dict(type="str"),
-            token=dict(type="str", no_log=True),
-        ),
+        argument_spec={
+            **nomad_argument_spec,
+            "name": dict(type="str"),
+        },
         supports_check_mode=True,
     )
 
-    if not import_nomad:
-        module.fail_json(msg=missing_required_lib("python-nomad"))
-
-    certificate_ssl = (module.params.get("client_cert"), module.params.get("client_key"))
-
-    nomad_client = nomad.Nomad(
-        host=module.params.get("host"),
-        port=module.params.get("port"),
-        secure=module.params.get("use_ssl"),
-        timeout=module.params.get("timeout"),
-        verify=module.params.get("validate_certs"),
-        cert=certificate_ssl,
-        namespace=module.params.get("namespace"),
-        token=module.params.get("token"),
-    )
+    nomad_client = setup_nomad_client(module)
 
     changed = False
     result = list()
@@ -315,11 +288,11 @@ def run():
     except Exception as e:
         module.fail_json(msg=f"{e}")
 
-    if module.params.get("name"):
+    if module.params["name"]:
         filter = list()
         try:
             for job in result:
-                if job.get("ID") == module.params.get("name"):
+                if job.get("ID") == module.params["name"]:
                     filter.append(job)
                     result = filter
             if not filter:
