@@ -619,6 +619,8 @@ files:
     maintainers: guenhter
   $modules/github_:
     maintainers: stpierre
+  $modules/github_branch_protection.py:
+    maintainers: john-westcott-iv
   $modules/github_deploy_key.py:
     maintainers: bincyber
   $modules/github_issue.py:
