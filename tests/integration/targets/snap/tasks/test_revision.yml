@@ -1,0 +1,60 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure package is not installed (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: absent
+
+- name: Install package at specific revision (uhttpd rev 15)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    revision: 15
+  register: install_revision
+
+- name: Install same revision again - idempotency (uhttpd rev 15)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    revision: 15
+  register: install_revision_again
+
+- name: Assert revision install behavior
+  assert:
+    that:
+      - install_revision is changed
+      - install_revision_again is not changed
+
+- name: Install different revision (uhttpd rev 45)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    revision: 45
+  register: install_different_revision
+
+- name: Assert switching to a different revision triggers change
+  assert:
+    that:
+      - install_different_revision is changed
+
+- name: Remove package (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: absent
+
+- name: Verify channel and revision are mutually exclusive
+  community.general.snap:
+    name: uhttpd
+    state: present
+    channel: latest/stable
+    revision: 15
+  register: install_channel_and_revision
+  ignore_errors: true
+
+- name: Assert channel and revision are mutually exclusive
+  assert:
+    that:
+      - install_channel_and_revision is failed

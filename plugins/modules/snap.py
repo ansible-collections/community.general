@@ -84,6 +84,14 @@ options:
     type: bool
     default: false
     version_added: 13.0.0
+  revision:
+    description:
+      - Install a specific revision of the snap.
+      - This option can only be specified if there is a single snap in the task.
+      - Mutually exclusive with O(channel). Installing a specific revision pins the snap and disables automatic updates.
+      - See U(https://snapcraft.io/docs/revisions) for more details about snap revisions.
+    type: int
+    version_added: 13.0.0
 notes:
   - Privileged operations, such as installing and configuring snaps, require root priviledges. This is only the case if the
     user has not logged in to the Snap Store.
@@ -140,6 +148,13 @@ EXAMPLES = r"""
   community.general.snap:
     name: foo
     channel: latest/edge
+
+# Install a specific revision of a snap
+- name: Install revision 481 of "helm"
+  community.general.snap:
+    name: helm
+    classic: true
+    revision: 481
 """
 
 RETURN = r"""
@@ -168,6 +183,11 @@ options_changed:
   type: list
   returned: When any options have been changed/set
   version_added: 4.4.0
+revision:
+  description: The revision of the snap that was installed.
+  type: int
+  returned: When snaps are installed with a specific revision
+  version_added: 13.0.0
 version:
   description: Versions of snap components as reported by C(snap version).
   type: dict
@@ -189,10 +209,11 @@ class Snap(StateModuleHelper):
     NOT_INSTALLED = 0
     CHANNEL_MISMATCH = 1
     INSTALLED = 2
+    REVISION_MISMATCH = 3
 
     __disable_re = re.compile(r"(?:\S+\s+){5}(?P<notes>\S+)")
     __set_param_re = re.compile(r"(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)")
-    __list_re = re.compile(r"^(?P<name>\S+)\s+\S+\s+\S+\s+(?P<channel>\S+)")
+    __list_re = re.compile(r"^(?P<name>\S+)\s+\S+\s+(?P<rev>\S+)\s+(?P<channel>\S+)")
     module = dict(
         argument_spec={
             "name": dict(type="list", elements="str", required=True),
@@ -202,7 +223,9 @@ class Snap(StateModuleHelper):
             "options": dict(type="list", elements="str"),
             "dangerous": dict(type="bool", default=False),
             "devmode": dict(type="bool", default=False),
+            "revision": dict(type="int"),
         },
+        mutually_exclusive=[["channel", "revision"]],
         supports_check_mode=True,
     )
 
@@ -233,14 +256,14 @@ class Snap(StateModuleHelper):
         self.vars.set("status_var", status_var, output=False)
         self.vars.set(
             "snap_status",
-            self.snap_status(self.vars[self.vars.status_var], self.vars.channel),
+            self.snap_status(self.vars[self.vars.status_var], self.vars.channel, self.vars.revision),
             output=False,
             change=True,
         )
         self.vars.set("snap_status_map", dict(zip(self.vars.name, self.vars.snap_status)), output=False, change=True)
 
     def __quit_module__(self):
-        self.vars.snap_status = self.snap_status(self.vars[self.vars.status_var], self.vars.channel)
+        self.vars.snap_status = self.snap_status(self.vars[self.vars.status_var], self.vars.channel, self.vars.revision)
         if self.vars.channel is None:
             self.vars.channel = "stable"
 
@@ -359,25 +382,27 @@ class Snap(StateModuleHelper):
                     self.vars.snapinfo_run_info.append(ctx.run_info)
         return names
 
-    def snap_status(self, snap_name, channel):
-        def _status_check(name, channel, installed):
-            match = [c for n, c in installed if n == name]
+    def snap_status(self, snap_name, channel, revision=None):
+        def _status_check(name, channel, revision, installed):
+            match = [(r, c) for n, r, c in installed if n == name]
             if not match:
                 return Snap.NOT_INSTALLED
-            if channel and match[0] not in (channel, f"latest/{channel}"):
+            installed_rev, installed_channel = match[0]
+            if revision is not None and str(revision) != installed_rev:
+                return Snap.REVISION_MISMATCH
+            if channel and installed_channel not in (channel, f"latest/{channel}"):
                 return Snap.CHANNEL_MISMATCH
-            else:
-                return Snap.INSTALLED
+            return Snap.INSTALLED
 
         with self.runner("_list") as ctx:
             rc, out, err = ctx.run(check_rc=True)
         list_out = out.split("\n")[1:]
         list_out = [self.__list_re.match(x) for x in list_out]
-        list_out = [(m.group("name"), m.group("channel")) for m in list_out if m]
+        list_out = [(m.group("name"), m.group("rev"), m.group("channel")) for m in list_out if m]
         self.vars.status_out = list_out
         self.vars.status_run_info = ctx.run_info
 
-        return [_status_check(n, channel, list_out) for n in snap_name]
+        return [_status_check(n, channel, revision, list_out) for n in snap_name]
 
     def is_snap_enabled(self, snap_name):
         with self.runner("_list name") as ctx:
@@ -398,8 +423,8 @@ class Snap(StateModuleHelper):
         if self.check_mode:
             return
 
-        params = ["state", "classic", "channel", "dangerous", "devmode"]  # get base cmd parts
-        has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != "stable"
+        params = ["state", "classic", "channel", "revision", "dangerous", "devmode"]  # get base cmd parts
+        has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != "stable" or self.vars.revision is not None
         has_multiple_snaps = len(actionable_snaps) > 1
 
         if has_one_pkg_params and has_multiple_snaps:
@@ -430,9 +455,12 @@ class Snap(StateModuleHelper):
     def state_present(self):
         self.vars.set_meta("classic", output=True)
         self.vars.set_meta("channel", output=True)
+        self.vars.set_meta("revision", output=True)
 
         actionable_refresh = [
-            snap for snap in self.vars.name if self.vars.snap_status_map[snap] == Snap.CHANNEL_MISMATCH
+            snap
+            for snap in self.vars.name
+            if self.vars.snap_status_map[snap] in (Snap.CHANNEL_MISMATCH, Snap.REVISION_MISMATCH)
         ]
         if actionable_refresh:
             self._present(actionable_refresh, refresh=True)

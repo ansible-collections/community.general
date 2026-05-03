@@ -19,5 +19,7 @@
       ansible.builtin.include_tasks: test_dangerous.yml
     - name: Include test_3dash
       ansible.builtin.include_tasks: test_3dash.yml
+    - name: Include test_revision
+      ansible.builtin.include_tasks: test_revision.yml
     - name: Include test_empty_list
       ansible.builtin.include_tasks: test_empty_list.yml
