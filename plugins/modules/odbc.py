@@ -134,8 +134,6 @@ def main():
             cursor.execute(query, params)
         else:
             cursor.execute(query)
-        if commit:
-            cursor.commit()
         try:
             # Get the rows out into an 2d array
             for row in cursor.fetchall():
@@ -162,6 +160,8 @@ def main():
         except Exception as e:
             module.fail_json(msg="Exception while reading rows: {0}".format(to_native(e)))
 
+        if commit:
+            cursor.commit()
         cursor.close()
     except Exception as e:
         module.fail_json(msg="Failed to execute query: {0}".format(to_native(e)))
