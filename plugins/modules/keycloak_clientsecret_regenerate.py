@@ -115,7 +115,7 @@ msg:
 end_state:
   description: Representation of the client credential after module execution.
   returned: on success
-  type: complex
+  type: dict
   contains:
     type:
       description: Credential type.

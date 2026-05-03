@@ -85,7 +85,8 @@ vpc_id:
 rules:
   description:
     - Specifies the security group rule, which ensures that resources in the security group can communicate with one another.
-  type: complex
+  type: list
+  elements: dict
   returned: success
   contains:
     description:

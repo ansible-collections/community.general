@@ -135,45 +135,43 @@ notes:
 """
 
 RETURN = r"""
-partition_info:
-  description: Current partition information.
+disk:
+  description: Generic device information.
+  type: dict
   returned: success
-  type: complex
-  contains:
-    disk:
-      description: Generic device information.
-      type: dict
-    partitions:
-      description: List of device partitions.
-      type: list
-    script:
-      description: Parted script executed by module.
-      type: str
   sample:
-    "disk":
-      "dev": "/dev/sdb"
-      "logical_block": 512
-      "model": "VMware Virtual disk"
-      "physical_block": 512
-      "size": 5.0
-      "table": "msdos"
-      "unit": "GiB"
-    "partitions":
-      - "begin": 0.0
-        "end": 1.0
-        "flags": ["boot", "lvm"]
-        "fstype": ""
-        "name": ""
-        "num": 1
-        "size": 1.0
-      - "begin": 1.0
-        "end": 5.0
-        "flags": []
-        "fstype": ""
-        "name": ""
-        "num": 2
-        "size": 4.0
-    "script": "unit KiB print "
+    "dev": "/dev/sdb"
+    "logical_block": 512
+    "model": "VMware Virtual disk"
+    "physical_block": 512
+    "size": 5.0
+    "table": "msdos"
+    "unit": "GiB"
+partitions:
+  description: List of device partitions.
+  type: list
+  elements: dict
+  returned: success
+  sample:
+    - "begin": 0.0
+      "end": 1.0
+      "flags": ["boot", "lvm"]
+      "fstype": ""
+      "name": ""
+      "num": 1
+      "size": 1.0
+    - "begin": 1.0
+      "end": 5.0
+      "flags": []
+      "fstype": ""
+      "name": ""
+      "num": 2
+      "size": 4.0
+script:
+  description: Parted script executed by module.
+  type: str
+  returned: success
+  sample: "unit KiB print "
 """
 
 EXAMPLES = r"""

@@ -133,7 +133,7 @@ msg:
 end_state:
   description: Representation of the authentication required actions after module execution.
   returned: on success
-  type: complex
+  type: dict
   contains:
     alias:
       description:
