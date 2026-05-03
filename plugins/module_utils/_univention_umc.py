@@ -5,8 +5,7 @@
 # to the complete work.
 #
 # Copyright (c) 2016, Adfinis SyGroup AG
-# Tobias Rueetschi <tobias.ruetschi@adfinis-sygroup.ch>
-#
+# @keachi
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
