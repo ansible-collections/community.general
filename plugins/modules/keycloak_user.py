@@ -35,8 +35,9 @@ options:
     type: bool
   email_verified:
     description:
-      - Check the validity of user email.
-    default: false
+      - Set or reset the I(emailVerified) flag of the user.
+      - If O(keycloak_default_behavior) is set to V(compatiblity) (the default value), this
+        option has a default of V(false).
     type: bool
     aliases:
       - emailVerified
@@ -134,8 +135,7 @@ options:
         default: false
   required_actions:
     description:
-      - RequiredActions user Auth.
-    default: []
+      - Set or reset a user's required actions.
     type: list
     elements: str
     aliases:
@@ -200,6 +200,20 @@ options:
       - If V(true), allows to remove user and recreate it.
     type: bool
     default: false
+  keycloak_default_behavior:
+    description:
+      - Various module options used to have default values. This caused problems when the
+        user expects different behavior from keycloak by default or fill options which cause
+        problems when they have been set.
+      - The default value is C(compatibility), which will ensure that the default values
+        are used when the values are not explicitly specified by the user.
+      - This affects the O(email_verified) option.
+    type: str
+    choices:
+      - compatibility
+      - no_defaults
+    default: compatibility
+    version_added: "13.0.0"
 extends_documentation_fragment:
   - community.general._keycloak
   - community.general._keycloak.actiongroup_keycloak
@@ -380,7 +394,7 @@ def main():
         last_name=dict(type="str", aliases=["lastName"]),
         email=dict(type="str"),
         enabled=dict(type="bool"),
-        email_verified=dict(type="bool", default=False, aliases=["emailVerified"]),
+        email_verified=dict(type="bool", aliases=["emailVerified"]),
         federation_link=dict(type="str", aliases=["federationLink"]),
         service_account_client_id=dict(type="str", aliases=["serviceAccountClientId"]),
         attributes=dict(type="list", elements="dict", options=attributes_spec),
@@ -389,7 +403,7 @@ def main():
         disableable_credential_types=dict(
             type="list", default=[], aliases=["disableableCredentialTypes"], elements="str"
         ),
-        required_actions=dict(type="list", default=[], aliases=["requiredActions"], elements="str"),
+        required_actions=dict(type="list", aliases=["requiredActions"], elements="str"),
         credentials=dict(type="list", default=[], elements="dict", options=credential_spec),
         federated_identities=dict(type="list", default=[], aliases=["federatedIdentities"], elements="str"),
         client_consents=dict(
@@ -398,6 +412,7 @@ def main():
         origin=dict(type="str"),
         state=dict(choices=["absent", "present"], default="present"),
         force=dict(type="bool", default=False),
+        keycloak_default_behavior=dict(type="str", choices=["compatibility", "no_defaults"], default="compatibility"),
     )
     argument_spec.update(meta_args)
 
@@ -427,11 +442,21 @@ def main():
     username = module.params.get("username")
     groups = module.params.get("groups")
 
+    if module.params["keycloak_default_behavior"] == "compatibility":
+        old_default_values = dict(
+            email_verified=False,
+        )
+        for param, value in old_default_values.items():
+            if module.params[param] is None:
+                module.params[param] = value
+
     # Filter and map the parameters names that apply to the user
     user_params = [
         x
         for x in module.params
-        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups"]
+        if x
+        not in list(keycloak_argument_spec().keys())
+        + ["state", "realm", "force", "groups", "keycloak_default_behavior"]
         and module.params.get(x) is not None
     ]
 
@@ -465,6 +490,12 @@ def main():
     desired_user = copy.deepcopy(before_user)
     desired_user.update(changeset)
 
+    if before_user:
+        before_groups = kc.get_user_groups(user_id=before_user["id"], realm=realm)
+        before_user["groups"] = before_groups
+    else:
+        before_groups = []
+
     result["proposed"] = changeset
     result["existing"] = before_user
     # Default values for user_created
@@ -483,40 +514,44 @@ def main():
             module.exit_json(**result)
         else:
             # Delete user
-            kc.delete_user(user_id=before_user["id"], realm=realm)
-            result["msg"] = f"User {before_user['username']} deleted"
+            if module._diff:
+                result["diff"] = dict(before=before_user, after="")
+
+            if not module.check_mode:
+                kc.delete_user(user_id=before_user["id"], realm=realm)
+                result["msg"] = f"User {before_user['username']} deleted"
             changed = True
 
     else:
         after_user = {}
-        if force and before_user:  # If the force option is set to true
+        if force and before_user and not module.check_mode:  # If the force option is set to true
             # Delete the existing user
             kc.delete_user(user_id=before_user["id"], realm=realm)
 
         if not before_user or force:
-            # Process a creation
+            # Create a new user
             changed = True
 
             if username is None:
                 module.fail_json(msg="username must be specified when creating a new user")
 
             if module._diff:
-                result["diff"] = dict(before="", after=desired_user)
+                result["diff"] = dict(before=before_user, after=desired_user)
 
             if module.check_mode:
                 # Set user_created flag explicit for check_mode
                 # create_user could have failed, but we don't know for sure until we try to create the user.'
                 result["user_created"] = True
-                module.exit_json(**result)
-
-            # Create the user
-            after_user = kc.create_user(userrep=desired_user, realm=realm)
-            result["msg"] = f"User {desired_user['username']} created"
-            # Add user ID to new representation
-            desired_user["id"] = after_user["id"]
-            # Set user_created flag
-            result["user_created"] = True
+            else:
+                # Create the user
+                after_user = kc.create_user(userrep=desired_user, realm=realm)
+                result["msg"] = f"User {desired_user['username']} created"
+                # Add user ID to new representation
+                desired_user["id"] = after_user["id"]
+                # Set user_created flag
+                result["user_created"] = True
         else:
+            # Update an existing user
             excludes = [
                 "access",
                 "notBefore",
@@ -527,24 +562,49 @@ def main():
                 "groups",
                 "clientConsents",
                 "federatedIdentities",
-                "requiredActions",
             ]
             # Add user ID to new representation
             desired_user["id"] = before_user["id"]
 
             # Compare users
             if not (
-                is_struct_included(desired_user, before_user, excludes)
-            ):  # If the new user does not introduce a change to the existing user
+                is_struct_included(desired_user, before_user, excludes, empty_list_result=False)
+            ):  # If the new user introduces a change to the existing user
                 # Update the user
-                after_user = kc.update_user(userrep=desired_user, realm=realm)
+                if not module.check_mode:
+                    after_user = kc.update_user(userrep=desired_user, realm=realm)
+
                 changed = True
 
-        # set user groups
-        if kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
-            changed = True
-        # Get the user groups
-        after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
+        if not module.check_mode:
+            # set user groups
+            if kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
+                changed = True
+
+        if module._diff:
+            present_groups = [g["name"] for g in groups if g["state"] == "present"]
+            absent_groups = [g["name"] for g in groups if g["state"] == "absent"]
+
+            desired_user["groups"] = (set(before_groups) | set(present_groups)) - set(absent_groups)
+
+            if module.check_mode:
+                # after_user will not have changed, so use the desired user
+                result["diff"] = dict(before=before_user, after=desired_user)
+                changed = changed or not is_struct_included(
+                    groups, before_user["groups"], excludes, empty_list_result=False
+                )
+            else:
+                after_groups = (
+                    kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
+                )
+                if after_user:
+                    after_user["groups"] = after_groups
+                    result["diff"] = dict(before=before_user, after=after_user)
+                else:
+                    result["diff"] = dict(
+                        before={"groups": sorted(before_groups)}, after={"groups": sorted(after_groups)}
+                    )
+
         result["end_state"] = after_user
         if changed:
             result["msg"] = f"User {desired_user['username']} updated"

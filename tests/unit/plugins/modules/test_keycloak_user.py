@@ -146,7 +146,7 @@ class TestKeycloakUser(ModuleTestCase):
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 1)
         self.assertEqual(mock_update_user_groups_membership.call_count, 1)
-        self.assertEqual(mock_get_user_groups.call_count, 1)
+        self.assertEqual(mock_get_user_groups.call_count, 0)
         self.assertEqual(mock_update_user.call_count, 0)
         self.assertEqual(mock_delete_user.call_count, 0)
 
@@ -354,7 +354,7 @@ class TestKeycloakUser(ModuleTestCase):
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 0)
         self.assertEqual(mock_update_user_groups_membership.call_count, 0)
-        self.assertEqual(mock_get_user_groups.call_count, 0)
+        self.assertEqual(mock_get_user_groups.call_count, 1)
         self.assertEqual(mock_update_user.call_count, 0)
         self.assertEqual(mock_delete_user.call_count, 1)
 
