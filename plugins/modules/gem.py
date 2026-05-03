@@ -98,6 +98,17 @@ options:
       - Force gem to (un-)install, bypassing dependency checks.
     default: false
     type: bool
+  override_platform_install_dir:
+    description:
+      - Resolve the user gem installation directory via C(gem environment) and pass it explicitly
+        as C(--install-dir) to both C(gem install) and C(gem uninstall), instead of using C(--user-install).
+      - This is needed on distributions (such as Fedora) where a platform-specific C(operating_system.rb)
+        injects C(--install-dir) as a default for all gem commands, which conflicts with C(--user-install)
+        and causes C(gem uninstall) to search the wrong directory.
+      - Cannot be combined with O(user_install=false) or O(install_dir).
+    default: false
+    type: bool
+    version_added: 13.0.0
 author:
   - "Ansible Core Team"
   - "Johan Wiren (@johanwiren)"
@@ -134,13 +145,13 @@ RE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)")
 RE_INSTALLED = re.compile(r"\S+\s+\((?:default: )?(.+)\)")
 
 
-def get_rubygems_path(module):
+def get_rubygems_path(module: AnsibleModule) -> list[str]:
     if module.params["executable"]:
         return module.params["executable"].split()
     return [module.get_bin_path("gem", True)]
 
 
-def get_user_install_dir(module):
+def get_user_install_dir(module: AnsibleModule) -> str | None:
     cmd = get_rubygems_path(module)
     rc, out, err = module.run_command(cmd + ["environment"], check_rc=True)
     for line in out.splitlines():
@@ -150,7 +161,7 @@ def get_user_install_dir(module):
     return None
 
 
-def get_rubygems_version(module):
+def get_rubygems_version(module: AnsibleModule) -> tuple[int, ...] | None:
     cmd = get_rubygems_path(module) + ["--version"]
     rc, out, err = module.run_command(cmd, check_rc=True)
     match = RE_VERSION.match(out)
@@ -159,7 +170,7 @@ def get_rubygems_version(module):
     return tuple(int(x) for x in match.groups())
 
 
-def make_runner(module, ver):
+def make_runner(module: AnsibleModule, ver: tuple[int, ...] | None) -> CmdRunner:
     command = get_rubygems_path(module)
 
     environ_update = {}
@@ -206,7 +217,7 @@ def make_runner(module, ver):
     )
 
 
-def get_installed_versions(runner, remote=False):
+def get_installed_versions(runner: CmdRunner, remote: bool = False) -> list[str]:
     name = runner.module.params["name"]
     if remote:
         args_order = ["_list_subcmd", "norc", "_remote_flag", "repository", "_name_pattern"]
@@ -224,7 +235,7 @@ def get_installed_versions(runner, remote=False):
     return installed_versions
 
 
-def exists(runner):
+def exists(runner: CmdRunner) -> bool:
     module = runner.module
     if module.params["state"] == "latest":
         remoteversions = get_installed_versions(runner, remote=True)
@@ -236,7 +247,7 @@ def exists(runner):
     return bool(installed_versions)
 
 
-def install(runner, user_dir=None):
+def install(runner: CmdRunner, user_dir: str | None = None) -> None:
     args_order = [
         "_install_subcmd",
         "norc",
@@ -261,7 +272,7 @@ def install(runner, user_dir=None):
             ctx.run()
 
 
-def uninstall(runner, user_dir=None):
+def uninstall(runner: CmdRunner, user_dir: str | None = None) -> tuple[int, str, str] | None:
     args_order = [
         "_uninstall_subcmd",
         "norc",
@@ -298,6 +309,7 @@ def main():
             version=dict(type="str"),
             build_flags=dict(type="str"),
             force=dict(default=False, type="bool"),
+            override_platform_install_dir=dict(default=False, type="bool"),
         ),
         supports_check_mode=True,
         mutually_exclusive=[["gem_source", "repository"], ["gem_source", "version"]],
@@ -309,19 +321,19 @@ def main():
         module.fail_json(msg="Cannot maintain state=latest when installing from local source")
     if module.params["user_install"] and module.params["install_dir"]:
         module.fail_json(msg="install_dir requires user_install=false")
+    if module.params["override_platform_install_dir"]:
+        if not module.params["user_install"]:
+            module.fail_json(msg="override_platform_install_dir requires user_install=true")
+        if module.params["install_dir"]:
+            module.fail_json(msg="override_platform_install_dir cannot be combined with install_dir")
 
     if not module.params["gem_source"]:
         module.params["gem_source"] = module.params["name"]
 
     ver = get_rubygems_version(module)
 
-    # Some OS distributions (e.g. Fedora via operating_system.rb) inject --install-dir as a
-    # platform default, which conflicts with --user-install at the gem CLI parser level.
-    # Resolve the user install dir explicitly and pass --install-dir to gem install instead.
-    # We do this only for the install command; uninstall must remain unscoped so gem can find
-    # gems regardless of where they were installed.
     user_dir = None
-    if module.params["user_install"] and not module.params["install_dir"]:
+    if module.params["override_platform_install_dir"]:
         user_dir = get_user_install_dir(module)
 
     runner = make_runner(module, ver)
