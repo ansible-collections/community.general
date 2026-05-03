@@ -1,0 +1,2 @@
+minor_changes:
+  - gandi_livedns - add support for diff mode, showing before and after state of DNS records (https://github.com/ansible-collections/community.general/issues/4927, https://github.com/ansible-collections/community.general/pull/11934).
