@@ -202,6 +202,53 @@
           - install_gem_result is changed
           - not gem_bindir_stat.stat.exists
 
+    # override_platform_install_dir: install and remove using explicit user gem dir
+    - name: Install a gem with override_platform_install_dir
+      gem:
+        name: gist
+        state: present
+        override_platform_install_dir: true
+      register: install_gem_result
+
+    - name: List gems
+      command: gem list
+      register: current_gems
+
+    - name: Ensure gem was installed with override_platform_install_dir
+      assert:
+        that:
+          - install_gem_result is changed
+          - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+
+    - name: Install a gem with override_platform_install_dir (idempotency)
+      gem:
+        name: gist
+        state: present
+        override_platform_install_dir: true
+      register: install_gem_result
+
+    - name: Ensure install is idempotent
+      assert:
+        that:
+          - install_gem_result is not changed
+
+    - name: Remove a gem with override_platform_install_dir
+      gem:
+        name: gist
+        state: absent
+        override_platform_install_dir: true
+      register: remove_gem_result
+
+    - name: List gems
+      command: gem list
+      register: current_gems
+
+    - name: Verify gem was removed with override_platform_install_dir
+      assert:
+        that:
+          - remove_gem_result is changed
+          - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+
     - name: Attempt to uninstall default gem 'json'
       community.general.gem:
         name: json
