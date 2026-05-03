@@ -1,0 +1,2 @@
+minor_changes:
+  - snap - add ``revision`` parameter to install a specific snap revision (https://github.com/ansible-collections/community.general/issues/11467, https://github.com/ansible-collections/community.general/pull/11984).
