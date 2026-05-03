@@ -46,6 +46,7 @@ def snap_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             channel=cmd_runner_fmt.as_func(lambda v: [] if v == "stable" else ["--channel", f"{v}"]),
             options=cmd_runner_fmt.as_list(),
             info=cmd_runner_fmt.as_fixed("info"),
+            revision=cmd_runner_fmt.as_opt_val("--revision"),
             dangerous=cmd_runner_fmt.as_bool("--dangerous"),
             devmode=cmd_runner_fmt.as_bool("--devmode"),
             version=cmd_runner_fmt.as_fixed("version"),
