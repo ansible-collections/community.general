@@ -55,6 +55,87 @@ options:
       - Defaults to V(false) if O(force_defaults=false) when creating a new repository.
       - This is only used when O(state=present).
     type: bool
+  has_issues:
+    description:
+      - Whether to enable issues on the repository.
+    type: bool
+    version_added: NEXT_PATCH
+  has_wiki:
+    description:
+      - Whether to enable the wiki on the repository.
+    type: bool
+    version_added: NEXT_PATCH
+  has_projects:
+    description:
+      - Whether to enable projects on the repository.
+    type: bool
+    version_added: NEXT_PATCH
+  has_discussions:
+    description:
+      - Whether to enable discussions on the repository.
+    type: bool
+    version_added: NEXT_PATCH
+  allow_squash_merge:
+    description:
+      - Whether to allow squash merges for pull requests.
+    type: bool
+    version_added: NEXT_PATCH
+  allow_merge_commit:
+    description:
+      - Whether to allow merge commits for pull requests.
+    type: bool
+    version_added: NEXT_PATCH
+  allow_rebase_merge:
+    description:
+      - Whether to allow rebase merges for pull requests.
+    type: bool
+    version_added: NEXT_PATCH
+  delete_branch_on_merge:
+    description:
+      - Whether to automatically delete head branches after pull requests are merged.
+    type: bool
+    version_added: NEXT_PATCH
+  allow_auto_merge:
+    description:
+      - Whether to allow auto-merge on pull requests.
+    type: bool
+    version_added: NEXT_PATCH
+  squash_merge_commit_title:
+    description:
+      - The default value for a squash merge commit title.
+    type: str
+    choices: [PR_TITLE, COMMIT_OR_PR_TITLE]
+    version_added: NEXT_PATCH
+  squash_merge_commit_message:
+    description:
+      - The default value for a squash merge commit message.
+    type: str
+    choices: [PR_BODY, COMMIT_MESSAGES, BLANK]
+    version_added: NEXT_PATCH
+  merge_commit_title:
+    description:
+      - The default value for a merge commit title.
+    type: str
+    choices: [PR_TITLE, MERGE_MESSAGE]
+    version_added: NEXT_PATCH
+  merge_commit_message:
+    description:
+      - The default value for a merge commit message.
+    type: str
+    choices: [PR_BODY, PR_TITLE, BLANK]
+    version_added: NEXT_PATCH
+  homepage:
+    description:
+      - A URL with more information about the repository.
+    type: str
+    version_added: NEXT_PATCH
+  topics:
+    description:
+      - A list of topics to set on the repository.
+      - This replaces all existing topics.
+    type: list
+    elements: str
+    version_added: NEXT_PATCH
   state:
     description:
       - Whether the repository should exist or not.
@@ -99,6 +180,30 @@ EXAMPLES = r"""
     force_defaults: false
   register: result
 
+- name: Update repository settings
+  community.general.github_repo:
+    access_token: mytoken
+    organization: MyOrganization
+    name: myrepo
+    has_wiki: false
+    has_issues: true
+    has_projects: false
+    has_discussions: true
+    allow_squash_merge: true
+    allow_merge_commit: false
+    allow_rebase_merge: false
+    delete_branch_on_merge: true
+    allow_auto_merge: true
+    squash_merge_commit_title: PR_TITLE
+    squash_merge_commit_message: PR_BODY
+    homepage: "https://example.com"
+    topics:
+      - ansible
+      - automation
+    state: present
+    force_defaults: false
+  register: result
+
 - name: Delete the repository
   community.general.github_repo:
     username: octocat
@@ -130,6 +235,24 @@ except Exception:
     GITHUB_IMP_ERR = traceback.format_exc()
     HAS_GITHUB_PACKAGE = False
 
+# Parameters that map directly to Repository.edit() kwargs
+REPO_EDIT_PARAMS = [
+    "has_issues",
+    "has_wiki",
+    "has_projects",
+    "has_discussions",
+    "allow_squash_merge",
+    "allow_merge_commit",
+    "allow_rebase_merge",
+    "delete_branch_on_merge",
+    "allow_auto_merge",
+    "squash_merge_commit_title",
+    "squash_merge_commit_message",
+    "merge_commit_title",
+    "merge_commit_message",
+    "homepage",
+]
+
 
 def authenticate(username=None, password=None, access_token=None, api_url=None):
     if not api_url:
@@ -141,7 +264,7 @@ def authenticate(username=None, password=None, access_token=None, api_url=None):
         return Github(base_url=api_url, login_or_token=username, password=password)
 
 
-def create_repo(gh, name, organization=None, private=None, description=None, check_mode=False):
+def create_repo(gh, name, organization=None, private=None, description=None, check_mode=False, **extra_params):
     result = dict(changed=False, repo=dict())
     if organization:
         target = gh.get_organization(organization)
@@ -171,17 +294,31 @@ def create_repo(gh, name, organization=None, private=None, description=None, che
         if repo is None or repo.raw_data["description"] not in (description, description or None):
             changes["description"] = description
 
+    for param in REPO_EDIT_PARAMS:
+        value = extra_params.get(param)
+        if value is not None:
+            raw_key = param
+            if repo is None or repo.raw_data.get(raw_key) != value:
+                changes[param] = value
+
     if changes:
         if not check_mode:
             repo.edit(**changes)
 
-        result["repo"].update(
-            {
-                "private": repo._private.value if not check_mode else private,
-                "description": repo._description.value if not check_mode else description,
-            }
-        )
+        result["repo"].update(changes)
         result["changed"] = True
+
+    # Handle topics separately (different API endpoint)
+    topics = extra_params.get("topics")
+    if topics is not None:
+        current_topics = sorted(repo.get_topics()) if repo is not None and not check_mode else []
+        if sorted(topics) != current_topics:
+            if not check_mode:
+                repo.replace_topics(topics)
+                result["repo"]["topics"] = topics
+            else:
+                result["repo"]["topics"] = topics
+            result["changed"] = True
 
     return result
 
@@ -217,6 +354,9 @@ def run_module(params, check_mode=False):
     if params["state"] == "absent":
         return delete_repo(gh=gh, name=params["name"], organization=params["organization"], check_mode=check_mode)
     else:
+        extra_params = {param: params[param] for param in REPO_EDIT_PARAMS if params.get(param) is not None}
+        if params.get("topics") is not None:
+            extra_params["topics"] = params["topics"]
         return create_repo(
             gh=gh,
             name=params["name"],
@@ -224,6 +364,7 @@ def run_module(params, check_mode=False):
             private=params["private"],
             description=params["description"],
             check_mode=check_mode,
+            **extra_params,
         )
 
 
@@ -234,11 +375,24 @@ def main():
         access_token=dict(type="str", no_log=True),
         name=dict(type="str", required=True),
         state=dict(type="str", default="present", choices=["present", "absent"]),
-        organization=dict(
-            type="str",
-        ),
+        organization=dict(type="str"),
         private=dict(type="bool"),
         description=dict(type="str"),
+        has_issues=dict(type="bool"),
+        has_wiki=dict(type="bool"),
+        has_projects=dict(type="bool"),
+        has_discussions=dict(type="bool"),
+        allow_squash_merge=dict(type="bool"),
+        allow_merge_commit=dict(type="bool"),
+        allow_rebase_merge=dict(type="bool"),
+        delete_branch_on_merge=dict(type="bool"),
+        allow_auto_merge=dict(type="bool"),
+        squash_merge_commit_title=dict(type="str", choices=["PR_TITLE", "COMMIT_OR_PR_TITLE"]),
+        squash_merge_commit_message=dict(type="str", choices=["PR_BODY", "COMMIT_MESSAGES", "BLANK"]),
+        merge_commit_title=dict(type="str", choices=["PR_TITLE", "MERGE_MESSAGE"]),
+        merge_commit_message=dict(type="str", choices=["PR_BODY", "PR_TITLE", "BLANK"]),
+        homepage=dict(type="str"),
+        topics=dict(type="list", elements="str"),
         api_url=dict(type="str", default="https://api.github.com"),
         force_defaults=dict(type="bool", default=False),
     )
