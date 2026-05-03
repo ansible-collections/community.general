@@ -54,8 +54,9 @@ options:
       - How often to rotate the logs.
       - If not specified when modifying an existing configuration, the existing value is preserved.
       - When creating a new configuration, this option is only included if specified.
+      - Choice V(hourly) was added in community.general 13.0.0.
     type: str
-    choices: [daily, weekly, monthly, yearly]
+    choices: [hourly, daily, weekly, monthly, yearly]
   rotate_count:
     description:
       - Number of rotated log files to keep.
@@ -567,7 +568,17 @@ class LogrotateConfig:
                     ):
                         if not any(
                             keyword in line
-                            for keyword in [" ", "\t", "daily", "weekly", "monthly", "yearly", "rotate", "compress"]
+                            for keyword in [
+                                " ",
+                                "\t",
+                                "hourly",
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "yearly",
+                                "rotate",
+                                "compress",
+                            ]
                         ):
                             paths.append(line)
 
@@ -885,7 +896,7 @@ def main() -> None:
             paths=dict(type="list", elements="path"),
             rotation_period=dict(
                 type="str",
-                choices=["daily", "weekly", "monthly", "yearly"],
+                choices=["hourly", "daily", "weekly", "monthly", "yearly"],
             ),
             rotate_count=dict(type="int"),
             compress=dict(type="bool"),
