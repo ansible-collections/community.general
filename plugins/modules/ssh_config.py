@@ -146,6 +146,7 @@ options:
   address_family:
     description:
       - Sets the C(AddressFamily) option.
+    choices: ['any', 'inet', 'inet6']
     type: str
     version_added: 13.0.0
 requirements:
@@ -421,7 +422,7 @@ def main():
             dynamicforward=dict(type="str"),
             user=dict(type="str"),
             user_known_hosts_file=dict(type="str"),
-            address_family=dict(type="str"),
+            address_family=dict(type="str", choices=["any", "inet", "inet6"]),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
