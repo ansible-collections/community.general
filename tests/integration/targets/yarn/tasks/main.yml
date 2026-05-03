@@ -11,6 +11,9 @@
 
 # ============================================================
 
+- include_tasks: run_alpine.yml
+  when: ansible_facts.os_family == 'Alpine'
+
 - include_tasks: run.yml
   vars:
     nodejs_version: '{{ item.node_version }}'
@@ -22,4 +25,4 @@
   with_items:
     - {node_version: 16.20.2, yarn_version: 1.22.22}  # oldest node version with macOS arm64 support
   when:
-    - not (ansible_facts.os_family == 'Alpine')  # TODO
+    - not (ansible_facts.os_family == 'Alpine')
