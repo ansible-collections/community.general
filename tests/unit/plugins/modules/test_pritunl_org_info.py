@@ -16,7 +16,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 from ansible_collections.community.general.plugins.modules import (
     pritunl_org_info,
 )
-from ansible_collections.community.general.tests.unit.plugins.module_utils._pritunl_test_api import (
+from ansible_collections.community.general.tests.unit.plugins.module_utils.test__pritunl_test_api import (
     PritunlEmptyOrganizationMock,
     PritunlListOrganizationMock,
 )
