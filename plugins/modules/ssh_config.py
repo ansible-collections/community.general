@@ -143,6 +143,11 @@ options:
       - The values must be strings. Other values are rejected.
     type: dict
     version_added: 10.4.0
+  address_family:
+    description:
+      - Sets the C(AddressFamily) option.
+    type: str
+    version_added: 13.0.0
 requirements:
   - paramiko
 """
@@ -296,6 +301,7 @@ class SSHConfig:
             controlpath=self.params.get("controlpath"),
             controlpersist=fix_bool_str(self.params.get("controlpersist")),
             dynamicforward=self.params.get("dynamicforward"),
+            address_family=self.params.get("address_family"),
         )
         if self.params.get("other_options"):
             for key, value in self.params.get("other_options").items():
@@ -415,6 +421,7 @@ def main():
             dynamicforward=dict(type="str"),
             user=dict(type="str"),
             user_known_hosts_file=dict(type="str"),
+            address_family=dict(type="str"),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
