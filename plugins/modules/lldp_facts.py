@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: lldp
+module: lldp_facts
 requirements:
   - C(lldpctl), usually provided by the C(lldpd) package.
 short_description: Get details reported by LLDP
@@ -15,11 +15,8 @@ description:
   - Reads LLDP data from C(lldpd) using the CLI tool C(lldpctl).
 extends_documentation_fragment:
   - community.general._attributes
-attributes:
-  check_mode:
-    support: none
-  diff_mode:
-    support: none
+  - community.general._attributes.facts
+  - community.general._attributes.facts_module
 options:
   multivalues:
     description: If C(lldpctl) outputs an attribute multiple time represent all values as a list.
