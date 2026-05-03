@@ -106,6 +106,18 @@ options:
         B(Do not use the generated string as a password or a secure token when using this option!)
     type: str
     version_added: 11.3.0
+  avoid_special_first:
+    description:
+      - Avoid special characters at the first position of the string.
+    type: bool
+    default: false
+    version_added: 12.6.0
+  avoid_special_last:
+    description:
+      - Avoid special characters at the last position of the string.
+    type: bool
+    default: false
+    version_added: 12.6.0
 """
 
 EXAMPLES = r"""
@@ -155,6 +167,16 @@ EXAMPLES = r"""
   vars:
     hex_chars: '0123456789ABCDEF'
   # Example result: ['D2A40737']
+
+- name: Generate random string with avoid_special_first
+  debug:
+    var: query('community.general.random_string', avoid_special_first=true)
+  # Example result: ['U@n0hUiX5kVG']
+
+- name: Generate random string with avoid_special_last
+  debug:
+    var: query('community.general.random_string', avoid_special_last=true)
+  # Example result: ['U@n0hUiX5kVG']
 """
 
 RETURN = r"""
@@ -176,12 +198,6 @@ from ansible.plugins.lookup import LookupBase
 
 class LookupModule(LookupBase):
     @staticmethod
-    def get_random(random_generator, chars, length):
-        if not chars:
-            raise AnsibleLookupError("Available characters cannot be None, please change constraints")
-        return "".join(random_generator.choice(chars) for dummy in range(length))
-
-    @staticmethod
     def b64encode(string_value, encoding="utf-8"):
         return to_text(base64.b64encode(to_bytes(string_value, encoding=encoding, errors="surrogate_or_strict")))
 
@@ -196,8 +212,11 @@ class LookupModule(LookupBase):
         length = self.get_option("length")
         base64_flag = self.get_option("base64")
         override_all = self.get_option("override_all")
+        override_special = self.get_option("override_special")
         ignore_similar_chars = self.get_option("ignore_similar_chars")
         similar_chars = self.get_option("similar_chars")
+        avoid_special_first = self.get_option("avoid_special_first")
+        avoid_special_last = self.get_option("avoid_special_last")
         seed = self.get_option("seed")
 
         if seed is None:
@@ -205,7 +224,7 @@ class LookupModule(LookupBase):
         else:
             random_generator = random.Random(seed)
 
-        values = ""
+        result = []
         available_chars_set = ""
 
         if ignore_similar_chars:
@@ -222,7 +241,6 @@ class LookupModule(LookupBase):
             lower = self.get_option("lower")
             numbers = self.get_option("numbers")
             special = self.get_option("special")
-            override_special = self.get_option("override_special")
 
             if override_special:
                 special_chars = override_special
@@ -236,27 +254,60 @@ class LookupModule(LookupBase):
             if special:
                 available_chars_set += special_chars
 
-            mapping = {
-                "min_numeric": number_chars,
-                "min_lower": lower_chars,
-                "min_upper": upper_chars,
-                "min_special": special_chars,
-            }
+        if len(available_chars_set) == 0:
+            raise AnsibleLookupError("Available characters cannot be empty, please change constraints")
 
-            for m in mapping:
-                if self.get_option(m):
-                    values += self.get_random(random_generator, mapping[m], self.get_option(m))
+        min_numeric = self.get_option("min_numeric")
+        min_lower = self.get_option("min_lower")
+        min_upper = self.get_option("min_upper")
+        min_special = self.get_option("min_special")
+        min_non_special = min_numeric + min_lower + min_upper
+        if avoid_special_first and avoid_special_last:
+            min_non_special = max(min_non_special, 2)
+        elif avoid_special_first or avoid_special_last:
+            min_non_special = max(min_non_special, 1)
 
-        remaining_pass_len = length - len(values)
-        values += self.get_random(random_generator, available_chars_set, remaining_pass_len)
+        if length < min_special + min_non_special:
+            raise AnsibleLookupError("Minimum requirements exceed total length, please increase the length")
 
-        shuffled_values = list(values)
-        if seed is None:
-            # Get pseudo randomization
-            # Randomize the order
-            random.shuffle(shuffled_values)
+        # Ensure minimum requirements
+        result += [random_generator.choice(number_chars) for dummy in range(min_numeric)]
+        result += [random_generator.choice(lower_chars) for dummy in range(min_lower)]
+        result += [random_generator.choice(upper_chars) for dummy in range(min_upper)]
+        if override_special:
+            result += [random_generator.choice(override_special) for dummy in range(min_special)]
+        else:
+            result += [random_generator.choice(special_chars) for dummy in range(min_special)]
+
+        # Fill remaining length
+        remaining_length = length - len(result)
+        if min_non_special <= remaining_length:
+            # atleast one non-special character
+            available_chars_set = available_chars_set.replace(special_chars, "")
+
+        result += [random_generator.choice(available_chars_set) for dummy in range(remaining_length)]
+
+        # Shuffle to avoid predictable pattern
+        random_generator.shuffle(result)
+
+        # Handle first/last character constraints
+        if avoid_special_first and result[0] in special_chars:
+            for i in range(1, len(result)):
+                if result[i] not in special_chars:
+                    result[0], result[i] = result[i], result[0]
+                    break
+            else:
+                raise AssertionError("No character satisfies the constraints for avoid_special_first")
+
+        if avoid_special_last and result[-1] in special_chars:
+            for i in range(len(result) - 2, -1, -1):
+                if result[i] not in special_chars:
+                    result[-1], result[i] = result[i], result[-1]
+                    break
+            else:
+                raise AssertionError("No character satisfies the constraints for avoid_special_last")
 
         if base64_flag:
-            return [self.b64encode("".join(shuffled_values))]
+            return [self.b64encode("".join(result))]
 
-        return ["".join(shuffled_values)]
+        return ["".join(result)]
