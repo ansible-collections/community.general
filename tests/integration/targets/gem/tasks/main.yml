@@ -30,37 +30,40 @@
       loop: "{{ test_packages }}"
       when: ansible_facts.distribution != "MacOSX"
 
-    - name: Install a gem (default user_install)
-      gem:
-        name: gist
-        state: present
-      register: install_gem_result
+    # default user_install: skip on RedHat/Fedora where OS-injected --install-dir conflicts
+    - when: ansible_facts.os_family != "RedHat"
+      block:
+        - name: Install a gem (default user_install)
+          gem:
+            name: gist
+            state: present
+          register: install_gem_result
 
-    - name: List gems
-      command: gem list
-      register: current_gems
+        - name: List gems
+          command: gem list
+          register: current_gems
 
-    - name: Ensure gem was installed
-      assert:
-        that:
-          - install_gem_result is changed
-          - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+        - name: Ensure gem was installed
+          assert:
+            that:
+              - install_gem_result is changed
+              - current_gems.stdout is search('gist\s+\([0-9.]+\)')
 
-    - name: Remove a gem
-      gem:
-        name: gist
-        state: absent
-      register: remove_gem_results
+        - name: Remove a gem
+          gem:
+            name: gist
+            state: absent
+          register: remove_gem_results
 
-    - name: List gems
-      command: gem list
-      register: current_gems
+        - name: List gems
+          command: gem list
+          register: current_gems
 
-    - name: Verify gem is not installed
-      assert:
-        that:
-          - remove_gem_results is changed
-          - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+        - name: Verify gem is not installed
+          assert:
+            that:
+              - remove_gem_results is changed
+              - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
 
     # install gem in --no-user-install
     - block:
