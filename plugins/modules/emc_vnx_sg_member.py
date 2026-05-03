@@ -82,7 +82,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils._storage.emc.emc_vnx import emc_vnx_argument_spec
+from ansible_collections.community.general.plugins.module_utils._emc_vnx import emc_vnx_argument_spec
 
 LIB_IMP_ERR = None
 try:

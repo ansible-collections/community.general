@@ -10,9 +10,7 @@ from unittest.mock import MagicMock
 import pytest
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils._net_tools.pritunl import (
-    api,
-)
+from ansible_collections.community.general.plugins.module_utils import _pritunl_api as api
 
 # Pritunl Mocks
 

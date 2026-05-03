@@ -126,12 +126,12 @@ clientsecret_info:
       sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
 """
 
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._keycloak import (
     KeycloakAPI,
     KeycloakError,
     get_token,
 )
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak_clientsecret import (
+from ansible_collections.community.general.plugins.module_utils._keycloak_clientsecret import (
     keycloak_clientsecret_module,
     keycloak_clientsecret_module_resolve_params,
 )

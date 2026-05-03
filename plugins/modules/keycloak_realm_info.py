@@ -97,7 +97,7 @@ realm_info:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import KeycloakAPI
+from ansible_collections.community.general.plugins.module_utils._keycloak import KeycloakAPI
 
 
 def main():

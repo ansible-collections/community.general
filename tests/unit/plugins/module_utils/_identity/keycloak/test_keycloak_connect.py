@@ -10,7 +10,7 @@ from urllib.error import HTTPError
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak import (
+from ansible_collections.community.general.plugins.module_utils._keycloak import (
     KeycloakError,
     get_token,
 )
@@ -70,7 +70,7 @@ def mock_good_connection(mocker):
         ),
     }
     return mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak.open_url",
+        "ansible_collections.community.general.plugins.module_utils._keycloak.open_url",
         side_effect=build_mocked_request(count(), token_response),
         autospec=True,
     )
@@ -98,7 +98,7 @@ def mock_bad_json_returned(mocker):
         "http://keycloak.url/auth/realms/master/protocol/openid-connect/token": create_wrapper('{"access_token":'),
     }
     return mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak.open_url",
+        "ansible_collections.community.general.plugins.module_utils._keycloak.open_url",
         side_effect=build_mocked_request(count(), token_response),
         autospec=True,
     )
@@ -130,7 +130,7 @@ def mock_401_returned(mocker):
         ),
     }
     return mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak.open_url",
+        "ansible_collections.community.general.plugins.module_utils._keycloak.open_url",
         side_effect=build_mocked_request(count(), token_response),
         autospec=True,
     )
@@ -154,7 +154,7 @@ def mock_json_without_token_returned(mocker):
         ),
     }
     return mocker.patch(
-        "ansible_collections.community.general.plugins.module_utils._identity.keycloak.keycloak.open_url",
+        "ansible_collections.community.general.plugins.module_utils._keycloak.open_url",
         side_effect=build_mocked_request(count(), token_response),
         autospec=True,
     )

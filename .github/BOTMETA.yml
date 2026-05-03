@@ -347,9 +347,13 @@ files:
     maintainers: russoz
   $module_utils/_cmd_runner.py:
     maintainers: russoz
+  $module_utils/_crypt.py:
+    maintainers: russoz
   $module_utils/_deps.py:
     maintainers: russoz
   $module_utils/_django.py:
+    maintainers: russoz
+  $module_utils/_emc_vnx.py:
     maintainers: russoz
   $module_utils/_gconftool2.py:
     labels: gconftool2
@@ -361,26 +365,30 @@ files:
     labels: gitlab
     maintainers: $team_gitlab
     notify: jlozadad
+  $module_utils/_hpe3par.py:
+    maintainers: farhan7500 gautamphegde
   $module_utils/_hwc_utils.py:
     keywords: cloud huawei hwc
     labels: huawei hwc_utils networking
     maintainers: $team_huawei
   $module_utils/_icinga2.py:
     maintainers: cfiehe
-  $module_utils/_identity/keycloak/keycloak.py:
-    maintainers: $team_keycloak
-  $module_utils/_identity/keycloak/keycloak_clientsecret.py:
-    maintainers: $team_keycloak fynncfchen johncant
   $module_utils/_ipa.py:
     labels: ipa
     maintainers: $team_ipa
   $module_utils/_jenkins.py:
     labels: jenkins
     maintainers: russoz
-  $module_utils/_crypt.py:
-    maintainers: russoz
+  $module_utils/_keycloak_clientsecret.py:
+    maintainers: $team_keycloak fynncfchen johncant
+  $module_utils/_keycloak_utils.py:
+    maintainers: $team_keycloak
+  $module_utils/_keycloak.py:
+    maintainers: $team_keycloak
   $module_utils/_lxc.py:
     maintainers: russoz
+  $module_utils/_lxca_common.py:
+    maintainers: navalkp prabhosa
   $module_utils/_lvm.py:
     labels: lvm
     maintainers: russoz
@@ -395,7 +403,7 @@ files:
   $module_utils/_module_helper.py:
     labels: module_helper
     maintainers: russoz
-  $module_utils/_net_tools/pritunl/:
+  $module_utils/_pritunl_api.py:
     maintainers: Lowess
   $module_utils/_pacemaker.py:
     maintainers: munchtoast
@@ -412,8 +420,6 @@ files:
   $module_utils/_redfish_utils.py:
     labels: redfish_utils
     maintainers: $team_redfish
-  $module_utils/_remote_management/lxca/common.py:
-    maintainers: navalkp prabhosa
   $module_utils/_scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
@@ -424,8 +430,6 @@ files:
     maintainers: russoz
   $module_utils/_systemd.py:
     maintainers: NomakCooper
-  $module_utils/_storage/hpe3par/hpe3par.py:
-    maintainers: farhan7500 gautamphegde
   $module_utils/_utm_utils.py:
     labels: utm_utils
     maintainers: $team_e_spirit

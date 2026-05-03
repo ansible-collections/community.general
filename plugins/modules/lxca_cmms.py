@@ -93,7 +93,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils._remote_management.lxca.common import (
+from ansible_collections.community.general.plugins.module_utils._lxca_common import (
     LXCA_COMMON_ARGS,
     connection_object,
     has_pylxca,
