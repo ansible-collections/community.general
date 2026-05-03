@@ -1,0 +1,2 @@
+bugfixes:
+  - odbc - fetch rows before committing to fix ``HY010`` function sequence error (https://github.com/ansible-collections/community.general/issues/5395, https://github.com/ansible-collections/community.general/pull/11972).
