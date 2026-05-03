@@ -1,0 +1,3 @@
+bugfixes:
+  - keycloak_clientscope - add missing ``consentRequired`` and ``consentText`` suboptions to the ``protocol_mappers`` option
+    (https://github.com/ansible-collections/community.general/pull/11818).
