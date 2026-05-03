@@ -88,8 +88,12 @@ _raw:
       description: The permissions the resulting file or directory.
       type: str
     state:
-      description: TODO.
+      description:
+        - Entry type of the path relative to the tree root.
+        - V(directory) for a directory, V(file) for a regular file, V(link) for a symbolic link.
+        - Other file types are skipped and not returned.
       type: str
+      choices: [directory, file, link]
     owner:
       description: Name of the user that owns the file/directory.
       type: raw
