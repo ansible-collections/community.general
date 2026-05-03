@@ -76,7 +76,7 @@ msg:
 queried_state:
   description: State of the resource (a policy) as seen by Keycloak.
   returned: on success
-  type: complex
+  type: dict
   contains:
     id:
       description: ID of the authorization permission.

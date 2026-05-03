@@ -250,7 +250,7 @@ msg:
 end_state:
   description: Representation of the group after module execution (sample is truncated).
   returned: on success
-  type: complex
+  type: dict
   contains:
     id:
       description: GUID that identifies the group.

@@ -78,7 +78,8 @@ EXAMPLES = r"""
 RETURN = r"""
 images:
   description: A list of images info.
-  type: complex
+  type: list
+  elements: dict
   returned: success
   contains:
     id:

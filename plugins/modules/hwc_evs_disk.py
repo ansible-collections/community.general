@@ -223,7 +223,8 @@ snapshot_id:
 attachments:
   description:
     - Specifies the disk attachment information.
-  type: complex
+  type: list
+  elements: dict
   returned: success
   contains:
     attached_at:

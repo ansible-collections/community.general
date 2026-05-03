@@ -141,7 +141,7 @@ status:
   description: A dictionary with the key=value pairs returned by C(system-control show-json) or V(none) if the service is
     not loaded.
   returned: success
-  type: complex
+  type: dict
   contains:
     After:
       description: []        # FIXME
