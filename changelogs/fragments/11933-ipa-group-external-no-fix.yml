@@ -1,0 +1,2 @@
+bugfixes:
+  - "ipa_group - fix idempotency when ``external: false`` on an existing non-external group (https://github.com/ansible-collections/community.general/issues/5061, https://github.com/ansible-collections/community.general/pull/11933)."
