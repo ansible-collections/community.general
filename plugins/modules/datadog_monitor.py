@@ -41,6 +41,8 @@ options:
   state:
     description:
       - The designated state of the monitor.
+      - The values V(mute) and V(unmute) are deprecated since community.general 13.0.0 and will be removed in 15.0.0.
+        Use the M(community.general.datadog_downtime) module to manage monitor downtimes instead.
     required: true
     choices: ['present', 'absent', 'mute', 'unmute']
     type: str
@@ -212,7 +214,7 @@ EXAMPLES = r"""
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
-- name: Mutes a monitor
+- name: Mutes a monitor (deprecated, use community.general.datadog_downtime instead)
   community.general.datadog_monitor:
     name: "Test monitor"
     state: "mute"
@@ -220,7 +222,7 @@ EXAMPLES = r"""
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
-- name: Unmutes a monitor
+- name: Unmutes a monitor (deprecated, use community.general.datadog_downtime instead)
   community.general.datadog_monitor:
     name: "Test monitor"
     state: "unmute"
@@ -322,8 +324,20 @@ def main():
     elif module.params["state"] == "absent":
         delete_monitor(module)
     elif module.params["state"] == "mute":
+        module.deprecate(
+            "The 'mute' state is deprecated and will be removed in community.general 15.0.0. "
+            "Use the community.general.datadog_downtime module to manage monitor downtimes instead.",
+            version="15.0.0",
+            collection_name="community.general",
+        )
         mute_monitor(module)
     elif module.params["state"] == "unmute":
+        module.deprecate(
+            "The 'unmute' state is deprecated and will be removed in community.general 15.0.0. "
+            "Use the community.general.datadog_downtime module to manage monitor downtimes instead.",
+            version="15.0.0",
+            collection_name="community.general",
+        )
         unmute_monitor(module)
 
 
