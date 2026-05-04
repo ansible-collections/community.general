@@ -4,8 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Regression test for https://github.com/ansible-collections/community.general/issues/7171
-# Passing an unquoted YAML boolean as `value` used to crash with:
-#   TypeError: Argument must be bytes or unicode, got 'bool'
+# Passing an unquoted YAML boolean as `value` must now fail with an explicit error.
 
 - name: Setup test fixture
   copy:
@@ -13,72 +12,48 @@
     dest: /tmp/ansible-xml-beers.xml
 
 
-- name: "Set '/business/rating/@subjective' to boolean false (unquoted YAML boolean)"
+- name: "Set '/business/rating/@subjective' to boolean false (unquoted YAML boolean) - must fail"
   xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     attribute: subjective
     value: false
   register: set_attribute_boolean_false
+  ignore_errors: true
 
-- name: Add trailing newline
-  shell: echo "" >> /tmp/ansible-xml-beers.xml
-
-- name: Compare to expected result
-  copy:
-    src: results/test-set-attribute-value-boolean.xml
-    dest: /tmp/ansible-xml-beers.xml
-  check_mode: true
-  diff: true
-  register: comparison
-
-- name: Test expected result
+- name: Assert that passing a boolean attribute value raises an error
   assert:
     that:
-      - set_attribute_boolean_false is changed
-      - comparison is not changed  # identical
+      - set_attribute_boolean_false is failed
+      - "'A non-string value was parsed' in set_attribute_boolean_false.msg"
+      - "'attribute' in set_attribute_boolean_false.msg"
 
 
-- name: "Set '/business/rating/@subjective' to boolean false (unquoted YAML) a second time - no change expected"
-  xml:
-    path: /tmp/ansible-xml-beers.xml
-    xpath: /business/rating
-    attribute: subjective
-    value: false
-  register: set_attribute_boolean_false_again
-
-- name: Test idempotency
-  assert:
-    that:
-      - set_attribute_boolean_false_again is not changed
-
-
-- name: Setup test fixture (element text)
-  copy:
-    src: fixtures/ansible-xml-beers.xml
-    dest: /tmp/ansible-xml-beers.xml
-
-
-- name: "Set '/business/rating' text content to boolean true (unquoted YAML boolean)"
+- name: "Set '/business/rating' text content to boolean true (unquoted YAML boolean) - must fail"
   xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     value: true
   register: set_element_boolean_true
+  ignore_errors: true
 
-- name: Add trailing newline
-  shell: echo "" >> /tmp/ansible-xml-beers.xml
-
-- name: Compare to expected result (element text)
-  copy:
-    src: results/test-set-element-value-boolean.xml
-    dest: /tmp/ansible-xml-beers.xml
-  check_mode: true
-  diff: true
-  register: comparison_text
-
-- name: Test expected result (element text)
+- name: Assert that passing a boolean element value raises an error
   assert:
     that:
-      - set_element_boolean_true is changed
-      - comparison_text is not changed  # identical
+      - set_element_boolean_true is failed
+      - "'A non-string value was parsed' in set_element_boolean_true.msg"
+      - "'element text' in set_element_boolean_true.msg"
+
+
+- name: "Set '/business/rating/@subjective' to quoted string 'false' - must succeed"
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating
+    attribute: subjective
+    value: "false"
+  register: set_attribute_string_false
+
+- name: Assert that passing a quoted string attribute value succeeds
+  assert:
+    that:
+      - set_attribute_string_false is changed
