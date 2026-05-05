@@ -1,0 +1,4 @@
+minor_changes:
+  - iso_create - add ``boot_options`` parameter to support creating bootable ISOs using El Torito boot records
+    (https://github.com/ansible-collections/community.general/issues/1685,
+    https://github.com/ansible-collections/community.general/pull/11991).
