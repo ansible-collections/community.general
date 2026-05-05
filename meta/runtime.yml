@@ -1090,6 +1090,10 @@ plugin_routing:
       tombstone:
         removal_version: 13.0.0
         warning_text: The typetalk service will be discontinued on Dec 2025.
+    uptimerobot:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The module uses the Uptime Robot API v1, which was retired and is no longer available. Use the Uptime Robot API v3 directly with the ansible.builtin.uri module.
     vertica_facts:
       tombstone:
         removal_version: 3.0.0
