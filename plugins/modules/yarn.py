@@ -192,7 +192,7 @@ class Yarn:
             # rather than treated as errors, since their meaning is unknown.
             for line in err.splitlines():
                 if not line.startswith("{"):
-                    self.module.warn(line)
+                    self.module.warn(f"yarn stderr: {line}")
                     continue
                 if json.loads(line)["type"] == "error":
                     self.module.fail_json(msg=err)
