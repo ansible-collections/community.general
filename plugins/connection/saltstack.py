@@ -13,7 +13,29 @@ author: Michael Scherer (@mscherer) <misc@zarb.org>
 name: saltstack
 short_description: Allow ansible to piggyback on salt minions
 description:
-  - This allows you to use existing Saltstack infrastructure to connect to targets.
+  - Run commands or put/fetch files to Salt minions by using the local Salt master as transport.
+  - Ansible must run directly on the Salt master; this plugin uses C(salt.client.LocalClient)
+    and does not support connecting to a remote Salt master.
+requirements:
+  - the C(salt) Python package must be installed on the Salt master (the Ansible controller)
+options:
+  remote_addr:
+    description:
+      - The Salt minion ID to target.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+notes:
+  - Ansible must be run from the Salt master host; the plugin cannot reach a remote Salt master.
+  - The inventory hostname (or O(remote_addr)) is treated as the Salt minion ID, not as a DNS
+    name or IP address.
+  - The Salt master and its minion keys must already be configured and accepted before using
+    this connection plugin.
+  - File transfer via P(community.general.saltstack#connection) uses C(hashutil.base64_decodefile)
+    (put) and C(cp.get_file_str) (fetch); these Salt execution modules must be available on
+    the targeted minions.
 """
 
 import base64
