@@ -79,6 +79,43 @@ options:
       - If not specified or set to V(false), then no UDF support is added.
     type: bool
     default: false
+  boot_options:
+    description:
+      - Options for making the ISO bootable using El Torito boot support.
+      - If not specified, the ISO will not be bootable.
+    type: dict
+    version_added: 13.0.0
+    suboptions:
+      boot_file:
+        description:
+          - Local path to the boot image file to embed in the ISO.
+          - The file is added to the root of the ISO and referenced as the El Torito boot image.
+          - The boot image must not share a filename with any file added via O(src_files), or pycdlib will raise a duplicate entry error.
+        type: path
+        required: true
+      boot_catalog:
+        description:
+          - ISO9660 path for the El Torito boot catalog file inside the ISO.
+        type: str
+        default: '/BOOT.CAT;1'
+      media_name:
+        description:
+          - Media emulation type for the El Torito boot entry.
+        type: str
+        default: 'noemul'
+        choices: ['noemul', 'floppy', '1.2m', '1.44m', '2.88m']
+      platform_id:
+        description:
+          - Target platform for the El Torito boot entry.
+        type: str
+        default: 'x86'
+        choices: ['x86', 'efi', 'mac']
+      boot_info_table:
+        description:
+          - Whether to add a boot info table to the boot image.
+          - Required by some bootloaders such as ISOLINUX.
+        type: bool
+        default: false
 """
 
 EXAMPLES = r"""
@@ -106,6 +143,17 @@ EXAMPLES = r"""
     interchange_level: 3
     joliet: 3
     vol_ident: WIN_AUTOINSTALL
+
+- name: Create a bootable ISO file using ISOLINUX
+  community.general.iso_create:
+    src_files:
+      - /root/isocontents/isolinux.cfg
+    dest_iso: /tmp/boot.iso
+    interchange_level: 3
+    boot_options:
+      boot_file: /root/isocontents/isolinux.bin
+      media_name: noemul
+      boot_info_table: true
 """
 
 RETURN = r"""
@@ -145,10 +193,41 @@ udf:
   returned: on success
   type: bool
   sample: false
+boot_options:
+  description: Configured El Torito boot options, or V(null) if the ISO is not bootable.
+  returned: on success
+  type: dict
+  contains:
+    boot_file:
+      description: Local path to the boot image file.
+      type: str
+      sample: "/root/isolinux/isolinux.bin"
+    boot_catalog:
+      description: ISO9660 path of the boot catalog inside the ISO.
+      type: str
+      sample: "/BOOT.CAT;1"
+    media_name:
+      description: Media emulation type.
+      type: str
+      sample: "noemul"
+    platform_id:
+      description: Target platform identifier.
+      type: str
+      sample: "x86"
+    boot_info_table:
+      description: Whether a boot info table was added to the boot image.
+      type: bool
+      sample: false
 """
 
 import os
 import traceback
+
+PLATFORM_ID_MAP = {
+    "x86": b"\x00",
+    "efi": b"\xef",
+    "mac": b"\x02",
+}
 
 PYCDLIB_IMP_ERR = None
 try:
@@ -213,6 +292,16 @@ def main():
         rock_ridge=dict(type="str", choices=["1.09", "1.10", "1.12"]),
         joliet=dict(type="int", choices=[1, 2, 3]),
         udf=dict(type="bool", default=False),
+        boot_options=dict(
+            type="dict",
+            options=dict(
+                boot_file=dict(type="path", required=True),
+                boot_catalog=dict(type="str", default="/BOOT.CAT;1"),
+                media_name=dict(type="str", default="noemul", choices=["noemul", "floppy", "1.2m", "1.44m", "2.88m"]),
+                platform_id=dict(type="str", default="x86", choices=["x86", "efi", "mac"]),
+                boot_info_table=dict(type="bool", default=False),
+            ),
+        ),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -227,6 +316,12 @@ def main():
     for src_file in src_file_list:
         if not os.path.exists(src_file):
             module.fail_json(msg=f"Specified source file/directory path does not exist on local machine, {src_file}")
+
+    boot_options = module.params.get("boot_options")
+    if boot_options:
+        boot_file = boot_options["boot_file"]
+        if not os.path.exists(boot_file):
+            module.fail_json(msg=f"Specified boot file path does not exist on local machine, {boot_file}")
 
     dest_iso = module.params.get("dest_iso")
     if dest_iso and len(dest_iso) == 0:
@@ -259,6 +354,7 @@ def main():
         rock_ridge=rock_ridge,
         joliet=use_joliet,
         udf=use_udf,
+        boot_options=boot_options,
     )
     if not module.check_mode:
         iso_file = pycdlib.PyCdlib(always_consistent=True)
@@ -318,6 +414,38 @@ def main():
                     use_joliet=use_joliet,
                     use_udf=use_udf,
                 )
+
+        if boot_options:
+            boot_file = boot_options["boot_file"]
+            boot_file_basename = os.path.basename(boot_file)
+            if "." not in boot_file_basename:
+                boot_iso_path = f"/{boot_file_basename.upper()}.;1"
+            else:
+                boot_iso_path = f"/{boot_file_basename.upper()};1"
+            add_file(
+                module,
+                iso_file=iso_file,
+                src_file=boot_file,
+                file_path=f"/{boot_file_basename}",
+                rock_ridge=rock_ridge,
+                use_joliet=use_joliet,
+                use_udf=use_udf,
+            )
+            boot_catalog_basename = os.path.basename(boot_options["boot_catalog"]).split(";")[0].lower()
+            eltorito_kwargs = dict(
+                bootcatfile=boot_options["boot_catalog"],
+                media_name=boot_options["media_name"],
+                platform_id=PLATFORM_ID_MAP[boot_options["platform_id"]],
+                boot_info_table=boot_options["boot_info_table"],
+            )
+            if rock_ridge:
+                eltorito_kwargs["rr_bootcatfile"] = boot_catalog_basename
+            if use_joliet:
+                eltorito_kwargs["joliet_bootcatfile"] = f"/{boot_catalog_basename}"
+            try:
+                iso_file.add_eltorito(boot_iso_path, **eltorito_kwargs)
+            except Exception as err:
+                module.fail_json(msg=f"Failed to add El Torito boot record to ISO file: {err}")
 
         iso_file.write(dest_iso)
         iso_file.close()
