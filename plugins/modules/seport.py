@@ -158,6 +158,24 @@ def semanage_port_get_ports(seport, setype, proto, local):
         return []
 
 
+def _parse_port_range(port):
+    """Return (low, high) integers for a port or port range string."""
+    parts = str(port).split("-", 1)
+    low = int(parts[0])
+    high = int(parts[1]) if len(parts) == 2 else low
+    return low, high
+
+
+def _port_is_covered(port, existing_ports):
+    """Return True if port (or range) is fully covered by an existing port entry."""
+    req_low, req_high = _parse_port_range(port)
+    for entry in existing_ports:
+        entry_low, entry_high = _parse_port_range(entry)
+        if entry_low <= req_low and req_high <= entry_high:
+            return True
+    return False
+
+
 def semanage_port_get_type(seport, port, proto):
     """Get the SELinux type of the specified port.
 
@@ -218,7 +236,7 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange="s0", ses
         seport.set_reload(do_reload)
         ports_by_type = semanage_port_get_ports(seport, setype, proto, local)
         for port in ports:
-            if port in ports_by_type:
+            if _port_is_covered(port, ports_by_type):
                 continue
 
             change = True
@@ -230,6 +248,11 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange="s0", ses
             else:
                 seport.modify(port, proto, serange, setype)
 
+    except FileNotFoundError as e:
+        module.fail_json(
+            msg=f"Failed to modify SELinux port policy, possibly due to a port overlap with an existing range: {e}\n",
+            exception=traceback.format_exc(),
+        )
     except (ValueError, OSError, KeyError, RuntimeError) as e:
         module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
@@ -271,6 +294,11 @@ def semanage_port_del(module, ports, proto, setype, do_reload, sestore="", local
                 if not module.check_mode:
                     seport.delete(port, proto)
 
+    except FileNotFoundError as e:
+        module.fail_json(
+            msg=f"Failed to modify SELinux port policy, possibly due to a port overlap with an existing range: {e}\n",
+            exception=traceback.format_exc(),
+        )
     except (ValueError, OSError, KeyError, RuntimeError) as e:
         module.fail_json(msg=f"{e.__class__.__name__}: {e}\n", exception=traceback.format_exc())
 
