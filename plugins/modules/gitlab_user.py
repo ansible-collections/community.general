@@ -346,8 +346,15 @@ class GitLabUser:
     @param sshkey_name Name of the ssh key
     """
 
+    @staticmethod
+    def normalize_ssh_key(ssh_key):
+        return " ".join(ssh_key.split(None, 2)[:2])
+
+    def find_ssh_keys(self, user, sshkey_name):
+        return [key for key in user.keys.list(**list_all_kwargs) if key.title == sshkey_name]
+
     def ssh_key_exists(self, user, sshkey_name):
-        return any(k.title == sshkey_name for k in user.keys.list(**list_all_kwargs))
+        return bool(self.find_ssh_keys(user, sshkey_name))
 
     """
     @param user User object
@@ -355,22 +362,31 @@ class GitLabUser:
     """
 
     def add_ssh_key_to_user(self, user, sshkey):
-        if not self.ssh_key_exists(user, sshkey["name"]):
-            if self._module.check_mode:
-                return True
+        user_keys = self.find_ssh_keys(user, sshkey["name"])
+        desired_key = self.normalize_ssh_key(sshkey["file"])
 
-            try:
-                parameter = {
-                    "title": sshkey["name"],
-                    "key": sshkey["file"],
-                }
-                if sshkey["expires_at"] is not None:
-                    parameter["expires_at"] = sshkey["expires_at"]
-                user.keys.create(parameter)
-            except gitlab.exceptions.GitlabCreateError as e:
-                self._module.fail_json(msg=f"Failed to assign sshkey to user: {e}")
+        if any(self.normalize_ssh_key(key.key) == desired_key for key in user_keys):
+            return False
+
+        if self._module.check_mode:
             return True
-        return False
+
+        try:
+            for key in user_keys:
+                key.delete()
+
+            parameter = {
+                "title": sshkey["name"],
+                "key": sshkey["file"],
+            }
+            if sshkey["expires_at"] is not None:
+                parameter["expires_at"] = sshkey["expires_at"]
+            user.keys.create(parameter)
+        except gitlab.exceptions.GitlabDeleteError as e:
+            self._module.fail_json(msg=f"Failed to update sshkey for user: {e}")
+        except gitlab.exceptions.GitlabCreateError as e:
+            self._module.fail_json(msg=f"Failed to assign sshkey to user: {e}")
+        return True
 
     """
     @param group Group object

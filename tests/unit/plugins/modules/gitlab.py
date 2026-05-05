@@ -154,6 +154,14 @@ def resp_create_user_keys(url, request):
     return response(201, content, headers, None, 5, request)
 
 
+@urlmatch(scheme="http", netloc="localhost", path=r"/api/v4/users/1/keys/[0-9]+", method="delete")
+def resp_delete_user_key(url, request):
+    headers = {"content-type": "application/json"}
+    content = "{}"
+    content = content.encode("utf-8")
+    return response(204, content, headers, None, 5, request)
+
+
 """
 GROUP API
 """
