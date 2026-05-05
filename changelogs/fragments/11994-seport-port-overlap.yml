@@ -1,0 +1,2 @@
+bugfixes:
+  - seport - fix idempotency when a requested port is already covered by an existing range registered for the same setype (https://github.com/ansible-collections/community.general/issues/10105, https://github.com/ansible-collections/community.general/pull/11994).
