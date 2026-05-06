@@ -298,7 +298,8 @@ def main():
                         continue
                     if key not in IFPROPS_MAPPING:
                         module.warn(f"Property '{key}' is not a valid system property.")
-                    if not system or system["interfaces"][device][IFPROPS_MAPPING[key]] != value:
+                        continue
+                    if not system or system["interfaces"].get(device, {}).get(IFPROPS_MAPPING[key]) != value:
                         result["changed"] = True
                     interface_properties[f"{key}-{device}"] = value
 
