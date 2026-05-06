@@ -693,7 +693,7 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value):
         target = ("attribute '{attribute}' at xpath '{xpath}'" if attribute else "element text at xpath '{xpath}'").format(attribute=attribute, xpath=xpath)
         module.fail_json(
             msg=(
-                "A non-string value {value!r} was parsed for {target}. ".format(target=target) +
+                "A non-string value {value!r} was parsed for {target}. ".format(value=value, target=target) +
                 "YAML values for booleans, octals, floats may not yield the string you intended. "
                 """Quote the value to be explicit, like `value: "yes"`."""
             )
