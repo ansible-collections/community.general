@@ -290,9 +290,23 @@
   register: timedatectl_test
   ignore_errors: true
 
-- name:
+- name: check if /run/systemd/system exists (systemd actually running as init)
+  stat:
+    path: /run/systemd/system
+  register: systemd_dir_stat
+
+- name: determine which backend the timezone module will use
   set_fact:
-    hwclock_supported: '{{ hwclock_test is successful or (timedatectl_test is successful and "RTC time: n/a" not in timedatectl_test.stdout) }}'
+    using_systemd_backend: '{{ systemd_dir_stat.stat.exists and timedatectl_test.rc == 0 }}'
+
+- name: determine if hwclock can be reliably set in this environment
+  set_fact:
+    hwclock_supported: >-
+      {{
+        (using_systemd_backend and "RTC time: n/a" not in timedatectl_test.stdout)
+        or
+        (not using_systemd_backend and hwclock_test is successful)
+      }}
 ##
 ## test set hwclock, idempotency and checkmode
 ##
@@ -301,6 +315,18 @@
     - name: set hwclock to local
       timezone:
         hwclock: local
+
+    - name: verify hwclock is local via timedatectl (systemd backend)
+      command: timedatectl show --property=LocalRTC --value
+      register: timedatectl_localrtc_local
+      changed_when: false
+      when: using_systemd_backend
+
+    - name: ensure timedatectl reports hwclock as local
+      assert:
+        that: timedatectl_localrtc_local.stdout | trim == 'yes'
+        msg: "Expected timedatectl LocalRTC=yes (local) but got: {{ timedatectl_localrtc_local.stdout }}"
+      when: using_systemd_backend
 
     - name: set hwclock to UTC (checkmode)
       timezone:
@@ -344,6 +370,18 @@
         - name: ensure that hwclock is updated in the config file
           command: grep ^UTC=yes {{ hwclock_config_file }}
       when: ansible_facts.service_mgr != 'systemd'
+
+    - name: verify hwclock is UTC via timedatectl (systemd backend)
+      command: timedatectl show --property=LocalRTC --value
+      register: timedatectl_localrtc_utc
+      changed_when: false
+      when: using_systemd_backend
+
+    - name: ensure timedatectl reports hwclock as UTC
+      assert:
+        that: timedatectl_localrtc_utc.stdout | trim == 'no'
+        msg: "Expected timedatectl LocalRTC=no (UTC) but got: {{ timedatectl_localrtc_utc.stdout }}"
+      when: using_systemd_backend
 
     - name: set hwclock to RTC again
       timezone:
