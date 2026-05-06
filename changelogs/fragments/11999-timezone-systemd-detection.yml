@@ -1,0 +1,5 @@
+bugfixes:
+  - "timezone - detect systemd via ``/run/systemd/system`` instead of probing ``timedatectl``,
+    fixing incorrect backend selection on containerized systems
+    (https://github.com/ansible-collections/community.general/issues/10135,
+    https://github.com/ansible-collections/community.general/pull/11999)."
