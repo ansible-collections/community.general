@@ -297,7 +297,7 @@
 
 - name: determine which backend the timezone module will use
   set_fact:
-    using_systemd_backend: '{{ systemd_dir_stat.stat.exists and timedatectl_test.rc == 0 }}'
+    using_systemd_backend: '{{ ansible_facts.service_mgr == "systemd" }}'
 
 - name: determine if hwclock can be reliably set in this environment
   set_fact:
