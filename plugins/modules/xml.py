@@ -689,13 +689,12 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value):
         )
 
     if not isinstance(value, str):
-        str_value = str(value).lower()
         target = f"attribute '{attribute}' at xpath '{xpath}'" if attribute else f"element text at xpath '{xpath}'"
         module.fail_json(
             msg=(
-                f"""A non-string value was parsed for {target} and converted to '{str_value}'. "
+                f"A non-string value {value!r} was parsed for {target}. "
                 "YAML values for booleans, octals, floats may not yield the string you intended. "
-                "Quote the value to be explicit, like `value: "yes'"."""
+                """Quote the value to be explicit, like `value: "yes"`."""
             )
         )
 
