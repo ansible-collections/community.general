@@ -1,0 +1,2 @@
+bugfixes:
+  - yarn - skip Node.js runtime warning lines (starting with ``(node:``) in stderr before JSON parsing, fixing failures with Node.js 24 which emits ``DeprecationWarning`` to stderr. The warnings are passed on to the user (https://github.com/ansible-collections/community.general/pull/11943).
