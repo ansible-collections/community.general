@@ -1,0 +1,4 @@
+bugfixes:
+  - cobbler_system - fix ``KeyError`` when adding a new interface to an existing system that does not yet have it defined
+    (https://github.com/ansible-collections/community.general/issues/7007,
+    https://github.com/ansible-collections/community.general/pull/11995).
