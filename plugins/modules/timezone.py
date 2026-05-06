@@ -97,13 +97,10 @@ class Timezone:
         """
         if platform.system() == "Linux":
             timedatectl = module.get_bin_path("timedatectl")
-            if timedatectl is not None:
-                rc, stdout, stderr = module.run_command(timedatectl)
-                if rc == 0:
-                    return super(Timezone, SystemdTimezone).__new__(SystemdTimezone)
-                else:
-                    module.debug(f"timedatectl command was found but not usable: {stderr}. using other method.")
-                    return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
+            # /run/systemd/system is only present when systemd is actually running
+            # as PID 1 — absent in containers where timedatectl exists but fails.
+            if timedatectl is not None and os.path.isdir("/run/systemd/system"):
+                return super(Timezone, SystemdTimezone).__new__(SystemdTimezone)
             else:
                 return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
         elif re.match("^joyent_.*Z", platform.version()):
