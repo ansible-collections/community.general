@@ -25,7 +25,7 @@
   assert:
     that:
       - set_attribute_boolean_false is failed
-      - "'A non-string value was parsed' in set_attribute_boolean_false.msg"
+      - "'was parsed for' in set_attribute_boolean_false.msg"
       - "'attribute' in set_attribute_boolean_false.msg"
 
 
@@ -41,7 +41,7 @@
   assert:
     that:
       - set_element_boolean_true is failed
-      - "'A non-string value was parsed' in set_element_boolean_true.msg"
+      - "'was parsed for' in set_element_boolean_true.msg"
       - "'element text' in set_element_boolean_true.msg"
 
 
