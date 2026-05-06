@@ -197,6 +197,7 @@ boot_options:
   description: Configured El Torito boot options, or V(null) if the ISO is not bootable.
   returned: on success
   type: dict
+  version_added: 13.0.0
   contains:
     boot_file:
       description: Local path to the boot image file.
