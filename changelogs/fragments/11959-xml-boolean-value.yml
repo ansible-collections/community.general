@@ -1,0 +1,4 @@
+bugfixes:
+  - "xml - emit an error when ``value`` is not a string, pointing to the offending xpath
+    (https://github.com/ansible-collections/community.general/issues/7171,
+    https://github.com/ansible-collections/community.general/pull/11959)."

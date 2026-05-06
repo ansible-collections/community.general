@@ -689,6 +689,16 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value):
         module.fail_json(msg="Xpath %s does not reference a node! tree is %s" %
                              (xpath, etree.tostring(tree, pretty_print=True)))
 
+    if not isinstance(value, str):
+        target = f"attribute '{attribute}' at xpath '{xpath}'" if attribute else f"element text at xpath '{xpath}'"
+        module.fail_json(
+            msg=(
+                f"A non-string value {value!r} was parsed for {target}. "
+                "YAML values for booleans, octals, floats may not yield the string you intended. "
+                """Quote the value to be explicit, like `value: "yes"`."""
+            )
+        )
+
     for element in tree.xpath(xpath, namespaces=namespaces):
         if not attribute:
             changed = changed or (element.text != value)
