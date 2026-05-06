@@ -57,6 +57,7 @@
     validate_certs: false
     sshkey_name: "{{ gitlab_sshkey_name }}"
     sshkey_file: "{{ gitlab_sshkey_file_updated }}"
+    sshkey_update_mode: update
     state: present
   register: gitlab_user_sshkey_updated
 
@@ -76,6 +77,7 @@
     validate_certs: false
     sshkey_name: "{{ gitlab_sshkey_name }}"
     sshkey_file: "{{ gitlab_sshkey_file_updated }}"
+    sshkey_update_mode: update
     state: present
   register: gitlab_user_sshkey_updated_again
 
@@ -96,6 +98,7 @@
     sshkey_name: "{{ gitlab_sshkey_name }}"
     sshkey_file: "{{ gitlab_sshkey_file_updated }}"
     sshkey_expires_at: "{{ gitlab_sshkey_expires_at }}"
+    sshkey_update_mode: update
     state: present
   register: gitlab_user_created_user_sshkey_expires_at
 

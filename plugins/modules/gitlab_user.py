@@ -75,9 +75,20 @@ options:
   sshkey_expires_at:
     description:
       - The expiration date of the SSH public key in ISO 8601 format C(YYYY-MM-DDTHH:MM:SSZ).
-      - This is only used when adding new SSH public keys.
+      - This is only used when creating or replacing SSH public keys.
     type: str
     version_added: 3.1.0
+  sshkey_update_mode:
+    description:
+      - Controls how existing SSH keys with the same O(sshkey_name) are handled.
+      - Use V(create) to preserve the historical behavior and leave existing keys with the same name unchanged.
+      - Use V(update) to replace an existing key only when exactly one key with the same name exists and its key material differs.
+      - Use V(deduplicate) to delete all keys with the same name before creating the requested key.
+      - SSH key comments are ignored when comparing key material.
+    type: str
+    choices: ["create", "update", "deduplicate"]
+    default: create
+    version_added: 12.7.0
   group:
     description:
       - ID or Full path of parent group in the form of group/name.
@@ -160,6 +171,18 @@ EXAMPLES = r"""
     state: present
     group: super_group/mon_group
     access_level: owner
+
+- name: "Replace a GitLab SSH key when one matching name exists"
+  community.general.gitlab_user:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    name: My Name
+    username: myusername
+    email: me@example.com
+    sshkey_name: MySSH
+    sshkey_file: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...
+    sshkey_update_mode: update
+    state: present
 
 - name: "Create GitLab User using external identity provider"
   community.general.gitlab_user:
@@ -309,6 +332,7 @@ class GitLabUser:
                     "name": options["sshkey_name"],
                     "file": options["sshkey_file"],
                     "expires_at": options["sshkey_expires_at"],
+                    "update_mode": options["sshkey_update_mode"],
                 },
             )
             changed = changed or key_changed
@@ -364,8 +388,21 @@ class GitLabUser:
     def add_ssh_key_to_user(self, user, sshkey):
         user_keys = self.find_ssh_keys(user, sshkey["name"])
         desired_key = self.normalize_ssh_key(sshkey["file"])
+        update_mode = sshkey["update_mode"]
+        matching_keys = [key for key in user_keys if self.normalize_ssh_key(key.key) == desired_key]
 
-        if any(self.normalize_ssh_key(key.key) == desired_key for key in user_keys):
+        if update_mode == "create":
+            if user_keys:
+                return False
+        elif update_mode == "update":
+            if len(user_keys) > 1:
+                self._module.warn(
+                    f"Found multiple SSH keys named '{sshkey['name']}'. Skipping update because sshkey_update_mode=update requires a single matching key."
+                )
+                return False
+            if matching_keys:
+                return False
+        elif len(user_keys) == 1 and matching_keys:
             return False
 
         if self._module.check_mode:
@@ -612,6 +649,7 @@ def main():
             sshkey_name=dict(type="str"),
             sshkey_file=dict(type="str", no_log=False),
             sshkey_expires_at=dict(type="str", no_log=False),
+            sshkey_update_mode=dict(type="str", default="create", choices=["create", "update", "deduplicate"]),
             group=dict(type="str"),
             access_level=dict(
                 type="str", default="guest", choices=["developer", "guest", "maintainer", "master", "owner", "reporter"]
@@ -653,6 +691,7 @@ def main():
     user_sshkey_name = module.params["sshkey_name"]
     user_sshkey_file = module.params["sshkey_file"]
     user_sshkey_expires_at = module.params["sshkey_expires_at"]
+    user_sshkey_update_mode = module.params["sshkey_update_mode"]
     group_path = module.params["group"]
     access_level = module.params["access_level"]
     confirm = module.params["confirm"]
@@ -700,6 +739,7 @@ def main():
                 "sshkey_name": user_sshkey_name,
                 "sshkey_file": user_sshkey_file,
                 "sshkey_expires_at": user_sshkey_expires_at,
+                "sshkey_update_mode": user_sshkey_update_mode,
                 "group_path": group_path,
                 "access_level": access_level,
                 "confirm": confirm,

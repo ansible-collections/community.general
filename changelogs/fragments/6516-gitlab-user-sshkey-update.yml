@@ -1,2 +1,0 @@
-bugfixes:
-  - gitlab_user - replace an existing SSH key when the configured key material changes for the same ``sshkey_name`` (https://github.com/ansible-collections/community.general/issues/6516).
