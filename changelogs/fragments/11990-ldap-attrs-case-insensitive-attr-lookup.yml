@@ -1,0 +1,2 @@
+bugfixes:
+  - ldap_attrs - fix ``state=exact`` incorrectly issuing ``MOD_ADD`` instead of ``MOD_REPLACE`` for attributes returned by the server with different casing (https://github.com/ansible-collections/community.general/issues/1624, https://github.com/ansible-collections/community.general/pull/11990).

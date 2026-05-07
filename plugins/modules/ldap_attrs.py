@@ -347,7 +347,8 @@ class LdapAttrs(LdapGeneric):
                 results = self.connection.search_s(self.dn, ldap.SCOPE_BASE, attrlist=[name])
             except ldap.LDAPError as e:
                 self.fail(f"Cannot search for attribute {name}", e)
-            self._cached_values[lc_name] = results[0][1].get(name, [])
+            attrs = results[0][1]
+            self._cached_values[lc_name] = next((v for k, v in attrs.items() if k.lower() == lc_name), [])
         return self._cached_values[lc_name]
 
     def _is_value_absent(self, name, value):
