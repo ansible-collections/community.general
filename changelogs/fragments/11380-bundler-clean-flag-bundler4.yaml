@@ -1,0 +1,2 @@
+bugfixes:
+  - bundler - handle removal of the ``--clean`` flag in Bundler 4 by running ``bundle config set clean true`` instead (https://github.com/ansible-collections/community.general/issues/11380).

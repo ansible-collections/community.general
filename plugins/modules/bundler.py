@@ -114,6 +114,8 @@ EXAMPLES = r"""
     chdir: ~/rails_project
 """
 
+import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -123,6 +125,15 @@ def get_bundler_executable(module):
     else:
         result = [module.get_bin_path("bundle", True)]
     return result
+
+
+def get_bundler_major_version(module, bundler_cmd, chdir):
+    rc, out, _err = module.run_command(bundler_cmd + ["--version"], cwd=chdir, check_rc=False)
+    if rc == 0:
+        match = re.search(r"Bundler version (\d+)\.", out)
+        if match:
+            return int(match.group(1))
+    return 0
 
 
 def main():
@@ -170,7 +181,12 @@ def main():
         if exclude_groups:
             cmd.extend(["--without", ":".join(exclude_groups)])
         if clean:
-            cmd.append("--clean")
+            bundler_major = get_bundler_major_version(module, get_bundler_executable(module), chdir)
+            if bundler_major >= 4:
+                config_cmd = get_bundler_executable(module) + ["config", "set", "clean", "true"]
+                module.run_command(config_cmd, cwd=chdir, check_rc=True)
+            else:
+                cmd.append("--clean")
         if gemfile:
             cmd.extend(["--gemfile", gemfile])
         if local:
