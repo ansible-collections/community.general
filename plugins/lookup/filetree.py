@@ -89,7 +89,7 @@ _raw:
       type: str
     state:
       description:
-        - Entry type of the path relative to the tree root.
+        - Type of the resulting file or directory.
         - V(directory) for a directory, V(file) for a regular file, V(link) for a symbolic link.
         - Other file types are skipped and not returned.
       type: str
