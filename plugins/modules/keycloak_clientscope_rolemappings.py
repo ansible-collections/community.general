@@ -74,9 +74,8 @@ extends_documentation_fragment:
 
 author:
   - Felix Grzelka (@felix-grzelka)
+  # This module was adapted from keycloak_client_rolescope, which was written by Andre Desrosiers (@desand01).
 """
-
-# This module was adapted from keycloak_client_rolescope, which was written by Andre Desrosiers (@desand01).
 
 EXAMPLES = r"""
 - name: Add roles to clientscope
@@ -119,12 +118,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: Message as to what action was taken.
-  returned: always
-  type: str
-  sample: "clientscope scope mappings for frontend-client-public have been updated"
-
 end_state:
   description: Representation of clientscope scope mappings after module execution.
   returned: on success
