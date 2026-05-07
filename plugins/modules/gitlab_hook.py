@@ -216,8 +216,7 @@ class GitLabHook:
             changed = True
         else:
             update_arguments = hook_arguments.copy()
-            if options.get("releases_events") is not None:
-                update_arguments["releases_events"] = options["releases_events"]
+            update_arguments["releases_events"] = options["releases_events"]
             changed, hook = self.update_hook(self.hook_object, update_arguments)
 
         self.hook_object = hook
