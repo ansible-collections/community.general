@@ -210,7 +210,7 @@ class GitLabHook:
 
         # Because we have already call userExists in main()
         if self.hook_object is None:
-            if options.get("releases_events") is not None:
+            if options["releases_events"] is not None:
                 hook_arguments["releases_events"] = options["releases_events"]
             hook = self.create_hook(project, hook_arguments)
             changed = True
