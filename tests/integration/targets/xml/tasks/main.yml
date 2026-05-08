@@ -75,6 +75,7 @@
     - include_tasks: test-set-namespaced-element-value.yml
     - include_tasks: test-set-namespaced-children-elements.yml
     - include_tasks: test-get-element-content.yml
+    - include_tasks: test-print-match.yml
     - include_tasks: test-xmlstring.yml
     - include_tasks: test-children-elements-xml.yml
 
