@@ -355,7 +355,7 @@ count:
 matches:
   description: The xpath matches found.
   type: list
-  returned: when parameter O(print_match) is set
+  returned: when parameter O(print_match) is set, or when parameter O(content) is set
 xmlstring:
   description: An XML string of the resulting output.
   type: str
@@ -412,7 +412,7 @@ def do_print_match(module, tree, xpath, namespaces):
         match_xpaths.append(tree.getpath(m))
     match_str = json.dumps(match_xpaths)
     msg = f"selector '{xpath}' match: {match_str}"
-    finish(module, tree, xpath, namespaces, changed=False, msg=msg)
+    finish(module, tree, xpath, namespaces, changed=False, msg=msg, matches=match_xpaths)
 
 
 def count_nodes(module, tree, xpath, namespaces):
