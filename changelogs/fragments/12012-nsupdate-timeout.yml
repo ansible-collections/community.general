@@ -1,0 +1,2 @@
+minor_changes:
+  - "nsupdate - add ``timeout`` parameter to control the DNS query timeout (https://github.com/ansible-collections/community.general/issues/9906, https://github.com/ansible-collections/community.general/pull/12012)."
