@@ -235,10 +235,7 @@ def main():
 
     _assert_is_valid_value(module, limit_item, value)
 
-    # Backup
-    if backup:
-        backup_file = module.backup_local(limits_conf)
-
+    backup_file = None
     space_pattern = re.compile(r"\s+")
 
     if does_not_exist:
@@ -356,6 +353,9 @@ def main():
             with open(limits_conf, "a"):
                 pass
 
+        if backup and changed and not does_not_exist:
+            backup_file = module.backup_local(limits_conf)
+
         # Move tempfile to newfile
         module.atomic_move(os.path.abspath(nf.name), os.path.abspath(limits_conf))
 
@@ -370,7 +370,7 @@ def main():
         diff=dict(before=b"".join(lines), after=content_new),
     )
 
-    if backup:
+    if backup_file:
         res_args["backup_file"] = backup_file
 
     module.exit_json(**res_args)
