@@ -193,45 +193,31 @@ class GitLabHook:
     def create_or_update_hook(self, project, hook_url, options):
         changed = False
 
+        hook_arguments = {
+            "url": hook_url,
+            "push_events": options["push_events"],
+            "push_events_branch_filter": options["push_events_branch_filter"],
+            "issues_events": options["issues_events"],
+            "merge_requests_events": options["merge_requests_events"],
+            "tag_push_events": options["tag_push_events"],
+            "note_events": options["note_events"],
+            "job_events": options["job_events"],
+            "pipeline_events": options["pipeline_events"],
+            "wiki_page_events": options["wiki_page_events"],
+            "enable_ssl_verification": options["enable_ssl_verification"],
+            "token": options["token"],
+        }
+
         # Because we have already call userExists in main()
         if self.hook_object is None:
-            hook = self.create_hook(
-                project,
-                {
-                    "url": hook_url,
-                    "push_events": options["push_events"],
-                    "push_events_branch_filter": options["push_events_branch_filter"],
-                    "issues_events": options["issues_events"],
-                    "merge_requests_events": options["merge_requests_events"],
-                    "tag_push_events": options["tag_push_events"],
-                    "note_events": options["note_events"],
-                    "job_events": options["job_events"],
-                    "pipeline_events": options["pipeline_events"],
-                    "wiki_page_events": options["wiki_page_events"],
-                    "releases_events": options["releases_events"],
-                    "enable_ssl_verification": options["enable_ssl_verification"],
-                    "token": options["token"],
-                },
-            )
+            if options["releases_events"] is not None:
+                hook_arguments["releases_events"] = options["releases_events"]
+            hook = self.create_hook(project, hook_arguments)
             changed = True
         else:
-            changed, hook = self.update_hook(
-                self.hook_object,
-                {
-                    "push_events": options["push_events"],
-                    "push_events_branch_filter": options["push_events_branch_filter"],
-                    "issues_events": options["issues_events"],
-                    "merge_requests_events": options["merge_requests_events"],
-                    "tag_push_events": options["tag_push_events"],
-                    "note_events": options["note_events"],
-                    "job_events": options["job_events"],
-                    "pipeline_events": options["pipeline_events"],
-                    "wiki_page_events": options["wiki_page_events"],
-                    "releases_events": options["releases_events"],
-                    "enable_ssl_verification": options["enable_ssl_verification"],
-                    "token": options["token"],
-                },
-            )
+            update_arguments = hook_arguments.copy()
+            update_arguments["releases_events"] = options["releases_events"]
+            changed, hook = self.update_hook(self.hook_object, update_arguments)
 
         self.hook_object = hook
         if changed:
