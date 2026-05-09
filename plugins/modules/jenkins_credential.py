@@ -33,6 +33,7 @@ options:
   id:
     description:
       - The ID of the Jenkins credential or domain.
+      - When generating a new token, do not pass O(id). It is generated automatically.
     type: str
   type:
     description:
@@ -190,18 +191,37 @@ options:
 EXAMPLES = r"""
 - name: Generate token
   community.general.jenkins_credential:
-    id: "test-token"
+    name: "test-token"
     jenkins_user: "admin"
     jenkins_password: "password"
     type: "token"
   register: token_result
+
+- name: Save Jenkins token to INI file (you must secure/encrypt separately)
+  vars:
+    jenkins_token_ini: # Defining dict for to_ini filter
+      api_token:
+        uuid: "{{ token_result.token_uuid }}"
+        token: "{{ token_result.token }}"
+  ansible.builtin.copy:
+    dest: "/secure/path/jenkins_token.ini"
+    mode: '0600'
+    content: "{{ jenkins_token_ini | community.general.to_ini }}"
+
+# Note:
+# (1) Jenkins token is intended to be securely stored in encrypted storage
+#     or secrets vault outside the playbook, retrieved when needed.
+# (2) Examples below showcasing token retrieval from
+#     variable "token_result" are NOT how it should be used to add credentials.
+# (3) Data in "token_result" is inconsistent and unavailable
+#     across different playbooks and multiple executions.
 
 - name: Add CUSTOM scope credential
   community.general.jenkins_credential:
     id: "CUSTOM"
     type: "scope"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     description: "Custom scope credential"
     inc_path:
       - "include/path"
@@ -230,7 +250,7 @@ EXAMPLES = r"""
     id: "userpass-id"
     type: "user_and_pass"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     description: "User and password credential"
     username: "user1"
     password: "pass1"
@@ -240,7 +260,7 @@ EXAMPLES = r"""
     id: "file-id"
     type: "file"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     scope: "CUSTOM"
     description: "File credential"
     file_path: "../vars/my-secret.pem"
@@ -250,7 +270,7 @@ EXAMPLES = r"""
     id: "text-id"
     type: "text"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     description: "Text credential"
     secret: "mysecrettext"
     location: "folder"
@@ -261,7 +281,7 @@ EXAMPLES = r"""
     id: "githubapp-id"
     type: "github_app"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     description: "GitHub app credential"
     appID: "12345"
     file_path: "../vars/github.pem"
@@ -272,7 +292,7 @@ EXAMPLES = r"""
     id: "sshkey-id"
     type: "ssh_key"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     description: "SSH key credential"
     username: "sshuser"
     file_path: "../vars/ssh_key"
@@ -283,7 +303,7 @@ EXAMPLES = r"""
     id: "certificate-id"
     type: "certificate"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     description: "Certificate credential"
     password: "12345678901234"
     file_path: "../vars/certificate.p12"
@@ -293,7 +313,7 @@ EXAMPLES = r"""
     id: "certificate-id-pem"
     type: "certificate"
     jenkins_user: "admin"
-    token: "{{ token }}"
+    token: "{{ token_result.token }}"
     description: "Certificate credential (pem)"
     file_path: "../vars/cert.pem"
     private_key_path: "../vars/private.key"
