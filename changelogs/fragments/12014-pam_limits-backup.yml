@@ -1,0 +1,2 @@
+bugfixes:
+  - "pam_limits - only create backup file when the target file is actually modified (https://github.com/ansible-collections/community.general/issues/12011, https://github.com/ansible-collections/community.general/pull/12014)."
