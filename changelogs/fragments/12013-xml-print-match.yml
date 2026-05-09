@@ -1,0 +1,2 @@
+bugfixes:
+  - xml - fix ``print_match`` not populating the ``matches`` return value (https://github.com/ansible-collections/community.general/issues/9125, https://github.com/ansible-collections/community.general/pull/12013).
