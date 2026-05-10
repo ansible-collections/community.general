@@ -196,7 +196,7 @@ EXAMPLES = r"""
   community.general.xml:
     path: /foo/bar.xml
     xpath: /business/rating
-    value: 11
+    value: "11"  # must quote to ensure it is parsed as string
 
 # Retrieve and display the number of nodes
 - name: Get count of 'beers' nodes
