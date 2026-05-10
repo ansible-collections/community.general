@@ -29,6 +29,9 @@ options:
       - Name of the snaps to be installed.
       - Any named snap accepted by the C(snap) command is valid.
       - O(dangerous=true) may be necessary when installing C(.snap) files. See O(dangerous) for more details.
+      - The special name V(system) refers to the snapd system-wide configuration namespace.
+        When used with O(options), it runs C(snap set system <key=value>).
+        It is always considered present and only V(state=present) and O(options) are meaningful for it.
     required: true
     type: list
     elements: str
@@ -155,6 +158,14 @@ EXAMPLES = r"""
     name: helm
     classic: true
     revision: 481
+
+# Set snap system-wide configuration
+- name: Configure snapd proxy
+  community.general.snap:
+    name: system
+    options:
+      - proxy.http=http://proxy.example.com:3128/
+      - proxy.https=http://proxy.example.com:3128/
 """
 
 RETURN = r"""
@@ -200,6 +211,8 @@ import numbers
 import re
 
 from ansible.module_utils.common.text.converters import to_native
+
+_VIRTUAL_SNAPS = frozenset({"system"})
 
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils._snap import get_version, snap_runner
@@ -345,6 +358,11 @@ class Snap(StateModuleHelper):
             )
 
     def names_from_snaps(self, snaps):
+        real_snaps = [s for s in snaps if s not in _VIRTUAL_SNAPS]
+
+        if not real_snaps:
+            return list(snaps)
+
         def process_one(rc, out, err):
             res = [line for line in out.split("\n") if line.startswith("name:")]
             name = res[0].split()[1]
@@ -361,7 +379,7 @@ class Snap(StateModuleHelper):
             return res
 
         def process(rc, out, err):
-            if len(snaps) == 1:
+            if len(real_snaps) == 1:
                 check_error = err
                 process_ = process_one
             else:
@@ -373,17 +391,20 @@ class Snap(StateModuleHelper):
                 self.do_raise(f"Snaps not found: {snaps_not_found}.")
             return process_(rc, out, err)
 
-        names = []
-        if snaps:
-            with self.runner("info name", output_process=process) as ctx:
-                try:
-                    names = ctx.run(name=snaps)
-                finally:
-                    self.vars.snapinfo_run_info.append(ctx.run_info)
-        return names
+        real_names = []
+        with self.runner("info name", output_process=process) as ctx:
+            try:
+                real_names = ctx.run(name=real_snaps)
+            finally:
+                self.vars.snapinfo_run_info.append(ctx.run_info)
+
+        real_name_iter = iter(real_names)
+        return [s if s in _VIRTUAL_SNAPS else next(real_name_iter) for s in snaps]
 
     def snap_status(self, snap_name, channel, revision=None):
         def _status_check(name, channel, revision, installed):
+            if name in _VIRTUAL_SNAPS:
+                return Snap.INSTALLED
             match = [(r, c) for n, r, c in installed if n == name]
             if not match:
                 return Snap.NOT_INSTALLED

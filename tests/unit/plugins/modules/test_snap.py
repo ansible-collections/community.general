@@ -439,6 +439,90 @@ TEST_SPEC = dict(
             ),
         ),
         dict(
+            id="set_system_option",
+            input={"name": ["system"], "options": ["proxy.http=http://proxy.example.com:3128/"]},
+            output=dict(changed=True, options_changed=["system:proxy.http=http://proxy.example.com:3128/"]),
+            flags={},
+            mocks=dict(
+                run_command=[
+                    dict(
+                        command=["/testbin/snap", "version"],
+                        environ=default_env,
+                        rc=0,
+                        out=default_version_out,
+                        err="",
+                    ),
+                    # No "snap info system" — virtual snap bypasses names_from_snaps
+                    dict(
+                        command=["/testbin/snap", "list"],
+                        environ=default_env,
+                        rc=0,
+                        out="",
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "get", "-d", "system"],
+                        environ=default_env,
+                        rc=0,
+                        out="{}",
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "set", "system", "proxy.http=http://proxy.example.com:3128/"],
+                        environ=default_env,
+                        rc=0,
+                        out="",
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "list"],
+                        environ=default_env,
+                        rc=0,
+                        out="",
+                        err="",
+                    ),
+                ],
+            ),
+        ),
+        dict(
+            id="set_system_option_idempotent",
+            input={"name": ["system"], "options": ["proxy.http=http://proxy.example.com:3128/"]},
+            output=dict(changed=False),
+            flags={},
+            mocks=dict(
+                run_command=[
+                    dict(
+                        command=["/testbin/snap", "version"],
+                        environ=default_env,
+                        rc=0,
+                        out=default_version_out,
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "list"],
+                        environ=default_env,
+                        rc=0,
+                        out="",
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "get", "-d", "system"],
+                        environ=default_env,
+                        rc=0,
+                        out='{"proxy": {"http": "http://proxy.example.com:3128/"}}',
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "list"],
+                        environ=default_env,
+                        rc=0,
+                        out="",
+                        err="",
+                    ),
+                ],
+            ),
+        ),
+        dict(
             id="issue_6803",
             input={"name": ["microk8s", "kubectl"], "classic": True},
             output=dict(changed=True, snaps_installed=["microk8s", "kubectl"]),
