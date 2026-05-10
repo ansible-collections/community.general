@@ -165,24 +165,25 @@ def main():
 
         module.exit_json(changed=rc != 0, state=state, stdout=out, stderr=err)
 
+    bundle_env = {}
     if state == "present":
         cmd.append("install")
         if exclude_groups:
-            cmd.extend(["--without", ":".join(exclude_groups)])
+            bundle_env["BUNDLE_WITHOUT"] = ":".join(exclude_groups)
         if clean:
-            cmd.append("--clean")
+            bundle_env["BUNDLE_CLEAN"] = "true"
         if gemfile:
             cmd.extend(["--gemfile", gemfile])
         if local:
             cmd.append("--local")
         if deployment_mode:
-            cmd.append("--deployment")
+            bundle_env["BUNDLE_DEPLOYMENT"] = "true"
         if not user_install:
             cmd.append("--system")
         if gem_path:
-            cmd.extend(["--path", gem_path])
+            bundle_env["BUNDLE_PATH"] = gem_path
         if binstub_directory:
-            cmd.extend(["--binstubs", binstub_directory])
+            bundle_env["BUNDLE_BIN"] = binstub_directory
     else:
         cmd.append("update")
         if local:
@@ -191,7 +192,7 @@ def main():
     if extra_args:
         cmd.extend(extra_args.split(" "))
 
-    rc, out, err = module.run_command(cmd, cwd=chdir, check_rc=True)
+    rc, out, err = module.run_command(cmd, cwd=chdir, check_rc=True, environ_update=bundle_env)
 
     module.exit_json(changed="Installing" in out, state=state, stdout=out, stderr=err)
 
