@@ -32,6 +32,7 @@ options:
       - The special name V(system) refers to the snapd system-wide configuration namespace.
         When used with O(options), it runs C(snap set system <key=value>).
         It is always considered present and only V(state=present) and O(options) are meaningful for it.
+        Support for V(system) was added in community.general 13.0.0.
     required: true
     type: list
     elements: str

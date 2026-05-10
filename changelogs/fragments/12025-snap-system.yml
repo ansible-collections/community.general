@@ -1,0 +1,5 @@
+minor_changes:
+  - snap - add support for ``system`` as a special configuration target, allowing
+    ``snap set system`` to be used via the ``options`` parameter
+    (https://github.com/ansible-collections/community.general/issues/11266,
+    https://github.com/ansible-collections/community.general/pull/12025).
