@@ -7,4 +7,3 @@ destructive
 skip/macos
 skip/freebsd
 needs/root
-skip/rhel  # FIXME: keytool seems to be broken on newer RHELs
