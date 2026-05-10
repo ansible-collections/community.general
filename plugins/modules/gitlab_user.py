@@ -88,7 +88,7 @@ options:
     type: str
     choices: ["create", "update", "deduplicate"]
     default: create
-    version_added: 12.7.0
+    version_added: 13.0.0
   group:
     description:
       - ID or Full path of parent group in the form of group/name.
