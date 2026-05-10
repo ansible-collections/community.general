@@ -451,12 +451,6 @@ def main():
             # Map additional values, if available
             if "name" in repofile_items:
                 repodata["name"] = repofile_items["name"]
-            if "enabled" in repofile_items:
-                repodata["enabled"] = repofile_items["enabled"]
-            if "autorefresh" in repofile_items:
-                repodata["autorefresh"] = repofile_items["autorefresh"]
-            if "gpgcheck" in repofile_items:
-                repodata["gpgcheck"] = repofile_items["gpgcheck"]
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
