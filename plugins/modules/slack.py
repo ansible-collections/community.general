@@ -48,7 +48,7 @@ options:
         request access. It is there that the incoming webhooks can be added. The key is on the end of the URL given to you
         in that section.'
       - "WebAPI token: Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-),
-        V(xoxb-) or V(xoxa-), for example V(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive
+        V(xoxb-) or V(xoxa-), for example V(xoxb-your-token-here). WebAPI token is required if you intend to receive
         thread_id. See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
@@ -149,6 +149,28 @@ options:
       - 'never'
       - 'auto'
     version_added: 6.1.0
+  files:
+    type: list
+    elements: dict
+    description:
+      - A list of files to be uploaded to Slack.
+      - Each list item should be a dictionary containing O(path) (absolute or relative path to the file) and optionally O(name) (the filename as it will appear in Slack).
+      - If O(msg), O(attachments), or O(blocks) are provided, the files will be attached as a reply to that message (creating a thread).
+      - If no message content is provided, the files will be uploaded as a standalone post in the specified O(channel).
+      - "Note: File uploading requires a WebAPI token (starting with V(xoxb-) or V(xoxp-)). It will not work with standard Incoming Webhook URLs (the ones with tokens like V(T.../B.../...) )."
+      - The app must have C(files:write) and C(chat:write) scopes in your Slack App settings and must be invited to the channel.
+    suboptions:
+      path:
+        type: str
+        required: true
+        description:
+          - The local path to the file to be uploaded.
+      name:
+        type: str
+        description:
+          - The name of the file as it should appear in Slack.
+          - If not provided, the base name of the O(path) will be used.
+    version_added: 1.0.0
 """
 
 EXAMPLES = r"""
@@ -236,13 +258,13 @@ EXAMPLES = r"""
 - name: Initial Threaded Slack message
   community.general.slack:
     channel: '#ansible'
-    token: xoxb-1234-56789abcdefghijklmnop
+    token: xoxb-your-token-here
     msg: 'Starting a thread with my initial post.'
   register: slack_response
 - name: Add more info to thread
   community.general.slack:
     channel: '#ansible'
-    token: xoxb-1234-56789abcdefghijklmnop
+    token: xoxb-your-token-here
     thread_id: "{{ slack_response['ts'] }}"
     color: good
     msg: 'And this is my threaded response!'
@@ -261,10 +283,29 @@ EXAMPLES = r"""
     channel: "{{ slack_response.channel }}"
     msg: Deployment complete!
     message_id: "{{ slack_response.ts }}"
+- name: Send file to Slack
+  community.general.slack::
+    token: "xoxb-your-token-here"
+    channel: "channel-id"
+    msg: "Here is the file you asked for" # if you want to sent message to channel without threads, you dont need to use msg parameter
+    files:
+      - path: "./first.py" # file in your os
+        name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
+      - path: "./test_file.txt"
+        name: "test_report.txt"
+- name: Send file to Slack threads
+  community.general.slack::
+    token: "xoxb-your-token-here"
+    channel: "channel-id"
+    thread_id: "thread-id" # if you want to send file to a specific thread
+    files:
+      - path: "./first.py" # file in your os
+        name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
 """
 
 import re
 from urllib.parse import urlencode
+import os
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -451,6 +492,64 @@ def do_notify_slack(module, domain, token, payload):
     else:
         return {"webhook": "ok"}
 
+def upload_slack_files(module, token, channel, files, thread_ts=None):
+    if not files:
+        return []
+
+    uploaded_ids = []
+    headers = {"Authorization": f"Bearer {token}"}
+
+    for f_item in files:
+        f_path = f_item.get('path')
+        f_name = f_item.get('name', os.path.basename(f_path))
+
+        if not os.path.exists(f_path):
+            module.warn(f"File {f_path} not found, skipping.")
+            continue
+
+        file_size = os.path.getsize(f_path)
+        url_get = f"https://slack.com/api/files.getUploadURLExternal?filename={f_name}&length={file_size}"
+        
+        resp, info = fetch_url(module, url_get, headers=headers, method="GET")
+        if info['status'] != 200:
+            continue
+            
+        res = module.from_json(resp.read())
+        if not res.get("ok"):
+            continue
+
+        try:
+            with open(f_path, 'rb') as f:
+                file_data = f.read()
+                u_resp, u_info = fetch_url(module, res["upload_url"], data=file_data, method="POST", 
+                                           headers={"Content-Type": "application/octet-stream"})
+        except Exception as e:
+            module.warn(f"Failed to upload bits for {f_name}: {str(e)}")
+            continue
+
+        uploaded_ids.append({"id": res["file_id"], "title": f_name})
+
+    if uploaded_ids:
+        completion_payload = {
+            "files": uploaded_ids,
+            "channel_id": channel,
+            "initial_comment": "Attached Files:"
+        }
+
+        if thread_ts:
+            completion_payload["thread_ts"] = thread_ts
+
+        f_url = "https://slack.com/api/files.completeUploadExternal"
+        
+        final_headers = headers.copy()
+        final_headers["Content-Type"] = "application/json; charset=utf-8"
+        
+        resp, info = fetch_url(module, f_url, headers=final_headers, method="POST", 
+                               data=module.jsonify(completion_payload))
+        
+        return module.from_json(resp.read())
+    
+    return {"ok": False, "msg": "No files were uploaded"}
 
 def main():
     module = AnsibleModule(
@@ -471,6 +570,7 @@ def main():
             blocks=dict(type="list", elements="dict"),
             message_id=dict(type="str"),
             prepend_hash=dict(type="str", choices=["always", "never", "auto"], default="never"),
+            files=dict(type="list", elements="dict"),
         ),
         supports_check_mode=True,
     )
@@ -490,6 +590,7 @@ def main():
     blocks = module.params["blocks"]
     message_id = module.params["message_id"]
     prepend_hash = module.params["prepend_hash"]
+    files = module.params.get("files")
 
     color_choices = ["normal", "good", "warning", "danger"]
     if color not in color_choices and not is_valid_hex_color(color):
@@ -529,26 +630,46 @@ def main():
         message_id,
         prepend_hash,
     )
-    slack_response = do_notify_slack(module, domain, token, payload)
+    has_message_content = bool(text or attachments or blocks)
+    slack_response = {}
+    is_success = False
 
-    if "ok" in slack_response:
-        # Evaluate WebAPI response
-        if slack_response["ok"]:
-            # return payload as a string for backwards compatibility
-            payload_json = module.jsonify(payload)
-            module.exit_json(
-                changed=changed,
-                ts=slack_response["ts"],
-                channel=slack_response["channel"],
-                api=slack_response,
-                payload=payload_json,
-            )
-        else:
-            module.fail_json(msg="Slack API error", error=slack_response["error"])
+    if has_message_content:
+        slack_response = do_notify_slack(module, domain, token, payload)
+        is_success = slack_response.get("ok") or slack_response.get("webhook") == "ok"
     else:
-        # Exit with plain OK from WebHook, since we don't have more information
-        # If we get 200 from webhook, the only answer is OK
-        module.exit_json(msg="OK")
+        is_success = True
+
+    file_upload_res = None
+    if files and is_success:
+        target_channel = slack_response.get("channel") or channel
+        target_thread = slack_response.get("ts") or thread_id
+
+        file_upload_res = upload_slack_files(
+            module, token, target_channel, files, thread_ts=target_thread
+        )
+        
+        if not has_message_content:
+            is_success = file_upload_res.get("ok", False)
+
+    if is_success:
+        result = {
+            "changed": True,
+            "api": slack_response if has_message_content else {"status": "files_only_upload"},
+            "payload": module.jsonify(payload) if has_message_content else None
+        }
+        if file_upload_res:
+            result["files_upload"] = file_upload_res
+        
+        if "ts" in slack_response:
+            result.update({"ts": slack_response["ts"], "channel": slack_response["channel"]})
+        elif file_upload_res and "files" in file_upload_res:
+            result.update({"channel": channel})
+        
+        module.exit_json(**result)
+    else:
+        error_msg = slack_response.get("error") or (file_upload_res.get("msg") if file_upload_res else "Unknown error")
+        module.fail_json(msg="Slack operation failed", error=error_msg)
 
 
 if __name__ == "__main__":
