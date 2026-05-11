@@ -1,0 +1,5 @@
+bugfixes:
+  - "xml - fix predicated ``xpath`` (e.g. ``element[text()='old']``) incorrectly
+    creating nodes when the predicate finds no match instead of being a no-op
+    (https://github.com/ansible-collections/community.general/issues/8730,
+    https://github.com/ansible-collections/community.general/pull/12031)."
