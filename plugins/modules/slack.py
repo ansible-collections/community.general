@@ -9,12 +9,8 @@
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
 
-import re
-from urllib.parse import urlencode
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
-import os
 DOCUMENTATION = r"""
 module: slack
 short_description: Send Slack notifications
@@ -310,7 +306,11 @@ EXAMPLES = r"""
       - path: "./first.py" # file in your os
         name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
 """
-
+import re
+from urllib.parse import urlencode
+import os
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &,
