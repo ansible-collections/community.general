@@ -10,13 +10,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import annotations
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.basic import AnsibleModule
-import os
-from urllib.parse import urlencode
-import re
-
 DOCUMENTATION = r"""
 module: slack
 short_description: Send Slack notifications
@@ -159,11 +152,16 @@ options:
     elements: dict
     description:
       - A list of files to be uploaded to Slack.
-      - Each list item should be a dictionary containing O(path) (absolute or relative path to the file) and optionally O(name) (the filename as it will appear in Slack).
-      - If O(msg), O(attachments), or O(blocks) are provided, the files will be attached as a reply to that message (creating a thread).
-      - If no message content is provided, the files will be uploaded as a standalone post in the specified O(channel).
-      - "Note: File uploading requires a WebAPI token (starting with V(xoxb-) or V(xoxp-)). It will not work with standard Incoming Webhook URLs (the ones with tokens like V(T.../B.../...) )."
-      - The app must have C(files:write) and C(chat:write) scopes in your Slack App settings and must be invited to the channel.
+      - Each list item should be a dictionary containing C(path) (absolute or relative path to the file)
+      - and optionally C(name) (the filename as it will appear in Slack).
+      - If O(msg), O(attachments), or O(blocks) are provided, the files will be attached
+      - as a reply to that message (creating a thread).
+      - If no message content is provided, the files will be uploaded as a standalone post
+      - in the specified O(channel).
+      - "Note: File uploading requires a WebAPI token (starting with V(xoxb-) or V(xoxp-))."
+      - "It will not work with standard Incoming Webhook URLs (the ones with tokens like V(T.../B.../...) )."
+      - The app must have C(files:write) and C(chat:write) scopes in your Slack App settings
+      - and must be invited to the channel.
     suboptions:
       path:
         type: str
@@ -174,7 +172,7 @@ options:
         type: str
         description:
           - The name of the file as it should appear in Slack.
-          - If not provided, the base name of the O(path) will be used.
+          - If not provided, the base name of the С(path) will be used.
     version_added: 1.0.0
 """
 
@@ -308,6 +306,11 @@ EXAMPLES = r"""
         name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
 """
 
+import os
+from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.basic import AnsibleModule
+from urllib.parse import urlencode
+import re
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &,
