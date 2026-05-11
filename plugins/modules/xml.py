@@ -678,6 +678,12 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value):
 
     try:
         if not is_node(tree, xpath, namespaces):
+            # If the xpath ends with a [predicate] and the base path exists,
+            # the no-match is due to the predicate not being satisfied —
+            # treat as no-op rather than incorrectly creating new nodes.
+            m = _RE_SPLITSUBLAST.match(xpath)
+            if m and m.group(1) and is_node(tree, m.group(1), namespaces):
+                return changed
             changed = check_or_make_target(module, tree, xpath, namespaces)
     except Exception as e:
         missing_namespace = ""

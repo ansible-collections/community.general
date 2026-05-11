@@ -1,0 +1,46 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test for https://github.com/ansible-collections/community.general/issues/8730
+# When using a predicated xpath like element[text()='old'] with value=new, a second
+# run with the same search predicate (which no longer matches) must be a no-op and
+# must NOT create spurious new elements.
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-items.xml
+    dest: /tmp/ansible-xml-items.xml
+
+- name: Set items matching predicate - first run (should change two items)
+  xml:
+    path: /tmp/ansible-xml-items.xml
+    xpath: /business/items/item[text()='value_a']
+    value: value_c
+  register: set_predicate_first_run
+
+- name: Set items matching predicate - second run (predicate no longer matches, should be no-op)
+  xml:
+    path: /tmp/ansible-xml-items.xml
+    xpath: /business/items/item[text()='value_a']
+    value: value_c
+  register: set_predicate_second_run
+
+- name: Add trailing newline
+  shell: echo "" >> /tmp/ansible-xml-items.xml
+
+- name: Compare to expected result
+  copy:
+    src: results/test-set-element-value-predicate.xml
+    dest: /tmp/ansible-xml-items.xml
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Test expected result
+  assert:
+    that:
+      - set_predicate_first_run is changed
+      - set_predicate_second_run is not changed
+      - comparison is not changed  # identical - no spurious elements created
