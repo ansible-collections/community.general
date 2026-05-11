@@ -10,6 +10,11 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
+from urllib.parse import urlencode
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+import os
 DOCUMENTATION = r"""
 module: slack
 short_description: Send Slack notifications
@@ -306,11 +311,6 @@ EXAMPLES = r"""
         name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
 """
 
-import os
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.basic import AnsibleModule
-from urllib.parse import urlencode
-import re
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &,
@@ -614,9 +614,10 @@ def main():
     message_id = module.params["message_id"]
     prepend_hash = module.params["prepend_hash"]
     files = module.params.get("files")
-    
+
     if not token.startswith('xox') and '/' not in token:
-        module.fail_json(msg="The token provided is not a valid Slack token. Webhooks should look like XXX/YYY/ZZZ and API tokens should start with xox.")
+        module.fail_json(
+            msg="The token provided is not a valid Slack token. Webhooks should look like XXX/YYY/ZZZ and API tokens should start with xox.")
     color_choices = ["normal", "good", "warning", "danger"]
     if color not in color_choices and not is_valid_hex_color(color):
         module.fail_json(
