@@ -193,12 +193,9 @@ class TestSlackModule(ModuleTestCase):
                                 '{"ok": true}'
                             ]
                             fetch_url_mock.return_value = (mock_resp, {"status": 200})
-                            
                             with self.assertRaises(AnsibleExitJson) as result:
                                 self.module.main()
-                            
                             self.assertTrue(result.exception.args[0]["changed"])
-
 
 color_test = [
     ("#111111", True),
