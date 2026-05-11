@@ -306,9 +306,10 @@ EXAMPLES = r"""
       - path: "./first.py" # file in your os
         name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
 """
+import os
 import re
 from urllib.parse import urlencode
-import os
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
@@ -367,12 +368,7 @@ def build_payload_for_slack(
     elif text is not None:
         # With a custom color we have to set the message as attachment, and
         # explicitly turn markdown parsing on for it.
-        payload = dict(
-            attachments=[
-                dict(
-                    text=escape_quotes(text),
-                    color=color,
-                    mrkdwn_in=["text"])])
+        payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
         if prepend_hash == "auto":
             if channel.startswith(("#", "@", "C0", "GF", "G0", "CP")):
@@ -422,8 +418,7 @@ def build_payload_for_slack(
 
     if blocks is not None:
         block_keys_to_escape = ["text", "alt_text"]
-        payload["blocks"] = recursive_escape_quotes(
-            blocks, block_keys_to_escape)
+        payload["blocks"] = recursive_escape_quotes(blocks, block_keys_to_escape)
 
     return payload
 
@@ -448,8 +443,7 @@ def get_slack_message(module, domain, token, channel, ts):
     )
     domain = validate_slack_domain(domain)
     url = f"https://{domain}/api/conversations.history?{qs}"
-    response, info = fetch_url(
-        module=module, url=url, headers=headers, method="GET")
+    response, info = fetch_url(module=module, url=url, headers=headers, method="GET")
     if info["status"] != 200:
         module.fail_json(msg="failed to get slack message")
     data = module.from_json(response.read())
@@ -488,16 +482,14 @@ def do_notify_slack(module, domain, token, payload):
         headers["Authorization"] = f"Bearer {token}"
 
     data = module.jsonify(payload)
-    response, info = fetch_url(
-        module=module, url=slack_uri, headers=headers, method="POST", data=data)
+    response, info = fetch_url(module=module, url=slack_uri, headers=headers, method="POST", data=data)
 
     if info["status"] != 200:
         if use_webapi:
             obscured_incoming_webhook = slack_uri
         else:
             obscured_incoming_webhook = f"https://hooks.{domain}/services/[obscured]"
-        module.fail_json(
-            msg=f" failed to send {data} to {obscured_incoming_webhook}: {info['msg']}")
+        module.fail_json(msg=f" failed to send {data} to {obscured_incoming_webhook}: {info['msg']}")
 
     # each API requires different handling
     if use_webapi:
@@ -514,8 +506,8 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
     headers = {"Authorization": f"Bearer {token}"}
 
     for f_item in files:
-        f_path = f_item.get('path')
-        f_name = f_item.get('name', os.path.basename(f_path))
+        f_path = f_item.get("path")
+        f_name = f_item.get("name", os.path.basename(f_path))
 
         if not os.path.exists(f_path):
             module.warn(f"File {f_path} not found, skipping.")
@@ -525,7 +517,7 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         url_get = f"https://slack.com/api/files.getUploadURLExternal?filename={f_name}&length={file_size}"
 
         resp, info = fetch_url(module, url_get, headers=headers, method="GET")
-        if info['status'] != 200:
+        if info["status"] != 200:
             continue
 
         res = module.from_json(resp.read())
@@ -533,10 +525,15 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
             continue
 
         try:
-            with open(f_path, 'rb') as f:
+            with open(f_path, "rb") as f:
                 file_data = f.read()
-                u_resp, u_info = fetch_url(module, res["upload_url"], data=file_data, method="POST",
-                                           headers={"Content-Type": "application/octet-stream"})
+                u_resp, u_info = fetch_url(
+                    module,
+                    res["upload_url"],
+                    data=file_data,
+                    method="POST",
+                    headers={"Content-Type": "application/octet-stream"},
+                )
         except Exception as e:
             module.warn(f"Failed to upload bits for {f_name}: {str(e)}")
             continue
@@ -544,11 +541,7 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         uploaded_ids.append({"id": res["file_id"], "title": f_name})
 
     if uploaded_ids:
-        completion_payload = {
-            "files": uploaded_ids,
-            "channel_id": channel,
-            "initial_comment": "Attached Files:"
-        }
+        completion_payload = {"files": uploaded_ids, "channel_id": channel, "initial_comment": "Attached Files:"}
 
         if thread_ts:
             completion_payload["thread_ts"] = thread_ts
@@ -558,8 +551,9 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         final_headers = headers.copy()
         final_headers["Content-Type"] = "application/json; charset=utf-8"
 
-        resp, info = fetch_url(module, f_url, headers=final_headers, method="POST",
-                               data=module.jsonify(completion_payload))
+        resp, info = fetch_url(
+            module, f_url, headers=final_headers, method="POST", data=module.jsonify(completion_payload)
+        )
 
         return module.from_json(resp.read())
 
@@ -575,9 +569,7 @@ def main():
             channel=dict(type="str"),
             thread_id=dict(type="str"),
             username=dict(type="str", default="Ansible"),
-            icon_url=dict(
-                type="str",
-                default="https://docs.ansible.com/favicon/favicon.ico"),
+            icon_url=dict(type="str", default="https://docs.ansible.com/favicon/favicon.ico"),
             icon_emoji=dict(type="str"),
             link_names=dict(type="int", default=1, choices=[0, 1]),
             parse=dict(type="str", choices=["none", "full"]),
@@ -586,13 +578,7 @@ def main():
             attachments=dict(type="list", elements="dict"),
             blocks=dict(type="list", elements="dict"),
             message_id=dict(type="str"),
-            prepend_hash=dict(
-                type="str",
-                choices=[
-                    "always",
-                    "never",
-                    "auto"],
-                default="never"),
+            prepend_hash=dict(type="str", choices=["always", "never", "auto"], default="never"),
             files=dict(type="list", elements="dict"),
         ),
         supports_check_mode=True,
@@ -615,9 +601,10 @@ def main():
     prepend_hash = module.params["prepend_hash"]
     files = module.params.get("files")
 
-    if not token.startswith('xox') and '/' not in token:
+    if not token.startswith("xox") and "/" not in token:
         module.fail_json(
-            msg="The token provided is not a valid Slack token. Webhooks should look like XXX/YYY/ZZZ and API tokens should start with xox.")
+            msg="The token provided is not a valid Slack token. Webhooks should look like XXX/YYY/ZZZ and API tokens should start with xox."
+        )
     color_choices = ["normal", "good", "warning", "danger"]
     if color not in color_choices and not is_valid_hex_color(color):
         module.fail_json(
@@ -631,18 +618,14 @@ def main():
     if message_id is not None:
         changed = False
         msg = get_slack_message(module, domain, token, channel, message_id)
-        for key in ("icon_url", "icon_emoji", "link_names",
-                    "color", "attachments", "blocks"):
+        for key in ("icon_url", "icon_emoji", "link_names", "color", "attachments", "blocks"):
             if msg.get(key) != module.params.get(key):
                 changed = True
                 break
         # if check mode is active, we shouldn't do anything regardless.
         # if changed=False, we don't need to do anything, so don't do it.
         if module.check_mode or not changed:
-            module.exit_json(
-                changed=changed,
-                ts=msg["ts"],
-                channel=msg["channel"])
+            module.exit_json(changed=changed, ts=msg["ts"], channel=msg["channel"])
     elif module.check_mode:
         module.exit_json(changed=changed)
 
@@ -670,8 +653,7 @@ def main():
         slack_response = do_notify_slack(module, domain, token, payload)
         # Check success for both WebAPI (ok: true) and Incoming Webhooks
         # (webhook: ok)
-        is_success = slack_response.get(
-            "ok") or slack_response.get("webhook") == "ok"
+        is_success = slack_response.get("ok") or slack_response.get("webhook") == "ok"
     else:
         # If no message content, proceed to file upload
         is_success = True
@@ -682,9 +664,7 @@ def main():
         target_channel = slack_response.get("channel") or channel
         target_thread = slack_response.get("ts") or thread_id
 
-        file_upload_res = upload_slack_files(
-            module, token, target_channel, files, thread_ts=target_thread
-        )
+        file_upload_res = upload_slack_files(module, token, target_channel, files, thread_ts=target_thread)
 
         # If sending ONLY files, overall success depends on the upload result
         if not has_message_content:
@@ -695,15 +675,14 @@ def main():
         # If we get 200 from webhook, the only answer is OK
         # Original logic: return "OK" for webhooks without files to maintain
         # compatibility
-        if "ok" not in slack_response and slack_response.get(
-                "webhook") == "ok" and not files:
+        if "ok" not in slack_response and slack_response.get("webhook") == "ok" and not files:
             module.exit_json(msg="OK", changed=True)
 
         # Extended response for WebAPI or file uploads
         result = {
             "changed": True,
             "api": slack_response if has_message_content else {"status": "files_only_upload"},
-            "payload": module.jsonify(payload) if has_message_content else None
+            "payload": module.jsonify(payload) if has_message_content else None,
         }
 
         if file_upload_res:
@@ -711,16 +690,14 @@ def main():
 
         # Return channel and ts for future tasks in the playbook
         if "ts" in slack_response:
-            result.update(
-                {"ts": slack_response["ts"], "channel": slack_response["channel"]})
+            result.update({"ts": slack_response["ts"], "channel": slack_response["channel"]})
         elif file_upload_res and "files" in file_upload_res:
             result.update({"channel": channel})
 
         module.exit_json(**result)
     else:
         # Handle failure cases for both WebAPI and File Uploads
-        error_msg = slack_response.get("error") or (
-            file_upload_res.get("msg") if file_upload_res else "Unknown error")
+        error_msg = slack_response.get("error") or (file_upload_res.get("msg") if file_upload_res else "Unknown error")
         module.fail_json(msg="Slack operation failed", error=error_msg)
 
 

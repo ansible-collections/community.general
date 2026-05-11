@@ -28,8 +28,7 @@ class TestSlackModule(ModuleTestCase):
 
     @pytest.fixture
     def fetch_url_mock(self, mocker):
-        return mocker.patch(
-            "ansible.module_utils.notification.slack.fetch_url")
+        return mocker.patch("ansible.module_utils.notification.slack.fetch_url")
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""
@@ -66,8 +65,7 @@ class TestSlackModule(ModuleTestCase):
 
         with set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test"}):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (
-                    None, {"status": 404, "msg": "test"})
+                fetch_url_mock.return_value = (None, {"status": 404, "msg": "test"})
                 with self.assertRaises(AnsibleFailJson):
                     self.module.main()
 
@@ -97,9 +95,7 @@ class TestSlackModule(ModuleTestCase):
                     self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
-        self.assertEqual(
-            fetch_url_mock.call_args[1]["url"],
-            "https://slack.com/api/chat.postMessage")
+        self.assertEqual(fetch_url_mock.call_args[1]["url"], "https://slack.com/api/chat.postMessage")
 
     def test_govslack_message(self):
         with set_module_args({"token": "xoxa-123456789abcdef", "domain": "slack-gov.com", "msg": "test with ts"}):
@@ -111,9 +107,7 @@ class TestSlackModule(ModuleTestCase):
                     self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 1)
-        self.assertEqual(
-            fetch_url_mock.call_args[1]["url"],
-            "https://slack-gov.com/api/chat.postMessage")
+        self.assertEqual(fetch_url_mock.call_args[1]["url"], "https://slack-gov.com/api/chat.postMessage")
 
     def test_edit_message(self):
         with set_module_args({"token": "xoxa-123456789abcdef", "msg": "test2", "message_id": "12345"}):
@@ -128,9 +122,7 @@ class TestSlackModule(ModuleTestCase):
                     self.module.main()
 
         self.assertTrue(fetch_url_mock.call_count, 2)
-        self.assertEqual(
-            fetch_url_mock.call_args[1]["url"],
-            "https://slack.com/api/chat.update")
+        self.assertEqual(fetch_url_mock.call_args[1]["url"], "https://slack.com/api/chat.update")
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
         self.assertEqual(call_data["ts"], "12345")
 
@@ -150,8 +142,7 @@ class TestSlackModule(ModuleTestCase):
                             "alt_text": "test",
                         },
                     },
-                    {"type": "section", "text": {
-                        "type": "plain_text", "text": "test", "emoji": True}},
+                    {"type": "section", "text": {"type": "plain_text", "text": "test", "emoji": True}},
                 ],
             }
         ):
@@ -186,27 +177,24 @@ class TestSlackModule(ModuleTestCase):
         assert exec_info.exception.args[0]["msg"] == msg
 
     def test_upload_files_only(self):
-        with set_module_args({
-            "token": "xoxb-12345",
-            "channel": "C123",
-            "files": [{"path": "/tmp/test.txt", "name": "hello.txt"}]
-        }):
+        with set_module_args(
+            {"token": "xoxb-12345", "channel": "C123", "files": [{"path": "/tmp/test.txt", "name": "hello.txt"}]}
+        ):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
                 with patch("os.path.exists", return_value=True):
                     with patch("os.path.getsize", return_value=100):
                         from unittest.mock import mock_open
+
                         with patch("builtins.open", mock_open(read_data=b"data")):
                             mock_resp = Mock()
                             mock_resp.read.side_effect = [
                                 '{"ok": true, "upload_url": "https://upload", "file_id": "F1"}',
-                                '{"ok": true}'
+                                '{"ok": true}',
                             ]
-                            fetch_url_mock.return_value = (
-                                mock_resp, {"status": 200})
+                            fetch_url_mock.return_value = (mock_resp, {"status": 200})
                             with self.assertRaises(AnsibleExitJson) as result:
                                 self.module.main()
-                            self.assertTrue(
-                                result.exception.args[0]["changed"])
+                            self.assertTrue(result.exception.args[0]["changed"])
 
 
 color_test = [
