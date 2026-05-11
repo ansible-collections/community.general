@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+# Copyright (c) 2026, Maksym Bakurevych <maxim,bakurevy@gmail.com>
 # Copyright (c) 2020, Lee Goolsbee <lgoolsbee@atlassian.com>
 # Copyright (c) 2020, Michal Middleton <mm.404@icloud.com>
 # Copyright (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
