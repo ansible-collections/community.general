@@ -289,7 +289,7 @@ EXAMPLES = r"""
     msg: Deployment complete!
     message_id: "{{ slack_response.ts }}"
 - name: Send file to Slack
-  community.general.slack::
+  community.general.slack:
     token: "xoxb-your-token-here"
     channel: "channel-id"
     msg: "Here is the file you asked for" # if you want to sent message to channel without threads, you dont need to use msg parameter
@@ -299,7 +299,7 @@ EXAMPLES = r"""
       - path: "./test_file.txt"
         name: "test_report.txt"
 - name: Send file to Slack threads
-  community.general.slack::
+  community.general.slack:
     token: "xoxb-your-token-here"
     channel: "channel-id"
     thread_id: "thread-id" # if you want to send file to a specific thread
