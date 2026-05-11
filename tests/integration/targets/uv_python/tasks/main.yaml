@@ -55,6 +55,17 @@
       - install_python.python_versions | length >= 1
       - install_python.python_paths | length >= 1
 
+- name: Get Python install path stats
+  ansible.builtin.stat:
+    path: "{{ install_python.python_paths[0] }}"
+    follow: true
+  register: python_path_stats
+
+- name: Verify that Python 3.14 install path exists on host
+  ansible.builtin.fail:
+    msg: "Python install path {{ install_python.python_paths[0] }} is not correct"
+  when: not python_path_stats.stat.exists
+
 - name: Re-install Python 3.14
   uv_python:
     version: "3.14"
