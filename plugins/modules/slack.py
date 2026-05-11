@@ -630,18 +630,22 @@ def main():
         message_id,
         prepend_hash,
     )
+    # Check if there is any message content to send
     has_message_content = bool(text or attachments or blocks)
     slack_response = {}
     is_success = False
 
     if has_message_content:
         slack_response = do_notify_slack(module, domain, token, payload)
+        # Check success for both WebAPI (ok: true) and Incoming Webhooks (webhook: ok)
         is_success = slack_response.get("ok") or slack_response.get("webhook") == "ok"
     else:
+        # If no message content, proceed to file upload
         is_success = True
 
     file_upload_res = None
     if files and is_success:
+        # Determine target channel and thread for file upload
         target_channel = slack_response.get("channel") or channel
         target_thread = slack_response.get("ts") or thread_id
 
@@ -649,18 +653,28 @@ def main():
             module, token, target_channel, files, thread_ts=target_thread
         )
         
+        # If sending ONLY files, overall success depends on the upload result
         if not has_message_content:
             is_success = file_upload_res.get("ok", False)
 
     if is_success:
+        # Exit with plain OK from WebHook, since we don't have more information
+        # If we get 200 from webhook, the only answer is OK
+        # Original logic: return "OK" for webhooks without files to maintain compatibility
+        if "ok" not in slack_response and slack_response.get("webhook") == "ok" and not files:
+            module.exit_json(msg="OK", changed=True)
+
+        # Extended response for WebAPI or file uploads
         result = {
             "changed": True,
             "api": slack_response if has_message_content else {"status": "files_only_upload"},
             "payload": module.jsonify(payload) if has_message_content else None
         }
+        
         if file_upload_res:
             result["files_upload"] = file_upload_res
         
+        # Return channel and ts for future tasks in the playbook
         if "ts" in slack_response:
             result.update({"ts": slack_response["ts"], "channel": slack_response["channel"]})
         elif file_upload_res and "files" in file_upload_res:
@@ -668,6 +682,7 @@ def main():
         
         module.exit_json(**result)
     else:
+        # Handle failure cases for both WebAPI and File Uploads
         error_msg = slack_response.get("error") or (file_upload_res.get("msg") if file_upload_res else "Unknown error")
         module.fail_json(msg="Slack operation failed", error=error_msg)
 
