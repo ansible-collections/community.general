@@ -89,7 +89,7 @@ class TestSlackModule(ModuleTestCase):
         with set_module_args({"token": "xoxa-123456789abcdef", "msg": "test with ts"}):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
                 mock_response = Mock()
-                mock_response.read.return_value = '{"fake":"data"}'
+                mock_response.read.return_value = '{"ok": true, "fake":"data"}'
                 fetch_url_mock.return_value = (mock_response, {"status": 200})
                 with self.assertRaises(AnsibleExitJson):
                     self.module.main()
@@ -101,7 +101,7 @@ class TestSlackModule(ModuleTestCase):
         with set_module_args({"token": "xoxa-123456789abcdef", "domain": "slack-gov.com", "msg": "test with ts"}):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
                 mock_response = Mock()
-                mock_response.read.return_value = '{"fake":"data"}'
+                mock_response.read.return_value = '{"ok": true, "fake":"data"}'
                 fetch_url_mock.return_value = (mock_response, {"status": 200})
                 with self.assertRaises(AnsibleExitJson):
                     self.module.main()
@@ -113,7 +113,7 @@ class TestSlackModule(ModuleTestCase):
         with set_module_args({"token": "xoxa-123456789abcdef", "msg": "test2", "message_id": "12345"}):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
                 mock_response = Mock()
-                mock_response.read.return_value = '{"messages":[{"ts":"12345","msg":"test1"}]}'
+                mock_response.read.return_value = '{"ok": true, "messages":[{"ts":"12345","msg":"test1"}]}'
                 fetch_url_mock.side_effect = [
                     (mock_response, {"status": 200}),
                     (mock_response, {"status": 200}),
@@ -175,6 +175,29 @@ class TestSlackModule(ModuleTestCase):
             " hex value with length 3 or 6."
         )
         assert exec_info.exception.args[0]["msg"] == msg
+
+    def test_upload_files_only(self):
+        with set_module_args({
+            "token": "xoxb-12345", 
+            "channel": "C123", 
+            "files": [{"path": "/tmp/test.txt", "name": "hello.txt"}]
+        }):
+            with patch.object(slack, "fetch_url") as fetch_url_mock:
+                with patch("os.path.exists", return_value=True):
+                    with patch("os.path.getsize", return_value=100):
+                        from unittest.mock import mock_open
+                        with patch("builtins.open", mock_open(read_data=b"data")):
+                            mock_resp = Mock()
+                            mock_resp.read.side_effect = [
+                                '{"ok": true, "upload_url": "https://upload", "file_id": "F1"}',
+                                '{"ok": true}'
+                            ]
+                            fetch_url_mock.return_value = (mock_resp, {"status": 200})
+                            
+                            with self.assertRaises(AnsibleExitJson) as result:
+                                self.module.main()
+                            
+                            self.assertTrue(result.exception.args[0]["changed"])
 
 
 color_test = [

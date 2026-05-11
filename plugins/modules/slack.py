@@ -614,7 +614,9 @@ def main():
     message_id = module.params["message_id"]
     prepend_hash = module.params["prepend_hash"]
     files = module.params.get("files")
-
+    
+    if not token.startswith('xox') and '/' not in token:
+        module.fail_json(msg="The token provided is not a valid Slack token. Webhooks should look like XXX/YYY/ZZZ and API tokens should start with xox.")
     color_choices = ["normal", "good", "warning", "danger"]
     if color not in color_choices and not is_valid_hex_color(color):
         module.fail_json(
