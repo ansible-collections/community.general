@@ -46,6 +46,46 @@
     that:
       - gitlab_user_sshkey_again is not changed
 
+- name: Update gitlab user ssh key when key material changes
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    sshkey_name: "{{ gitlab_sshkey_name }}"
+    sshkey_file: "{{ gitlab_sshkey_file_updated }}"
+    sshkey_update_mode: update
+    state: present
+  register: gitlab_user_sshkey_updated
+
+- name: Check ssh key has been updated
+  assert:
+    that:
+      - gitlab_user_sshkey_updated is changed
+
+- name: Update gitlab user ssh key again
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    sshkey_name: "{{ gitlab_sshkey_name }}"
+    sshkey_file: "{{ gitlab_sshkey_file_updated }}"
+    sshkey_update_mode: update
+    state: present
+  register: gitlab_user_sshkey_updated_again
+
+- name: Check updated ssh key is idempotent
+  assert:
+    that:
+      - gitlab_user_sshkey_updated_again is not changed
+
 - name: Add expires_at to an already created gitlab user with ssh key
   gitlab_user:
     api_url: "{{ gitlab_host }}"
@@ -56,8 +96,9 @@
     password: "{{ gitlab_user_pass }}"
     validate_certs: false
     sshkey_name: "{{ gitlab_sshkey_name }}"
-    sshkey_file: "{{ gitlab_sshkey_file }}"
+    sshkey_file: "{{ gitlab_sshkey_file_updated }}"
     sshkey_expires_at: "{{ gitlab_sshkey_expires_at }}"
+    sshkey_update_mode: update
     state: present
   register: gitlab_user_created_user_sshkey_expires_at
 
