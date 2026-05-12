@@ -36,7 +36,7 @@ options:
   email_verified:
     description:
       - Set or reset the I(emailVerified) flag of the user.
-      - If O(keycloak_default_behavior) is set to V(compatiblity) (the default value), this
+      - If O(email_verified_behavior) is set to V(compatiblity) (the default value), this
         option has a default of V(false).
     type: bool
     aliases:
@@ -200,14 +200,12 @@ options:
       - If V(true), allows to remove user and recreate it.
     type: bool
     default: false
-  keycloak_default_behavior:
+  email_verified_behavior:
     description:
-      - Various module options used to have default values. This caused problems when the
-        user expects different behavior from keycloak by default or fill options which cause
-        problems when they have been set.
-      - The default value is C(compatibility), which will ensure that the default values
-        are used when the values are not explicitly specified by the user.
-      - This affects the O(email_verified) option.
+      - The O(email_verified) option used to have a default value. This caused problems when the
+        user expects different behavior from keycloak by default.
+      - The default value of this option is C(compatibility), which will ensure that the old default value
+        for O(email_verified) is used.
     type: str
     choices:
       - compatibility
@@ -412,7 +410,7 @@ def main():
         origin=dict(type="str"),
         state=dict(choices=["absent", "present"], default="present"),
         force=dict(type="bool", default=False),
-        keycloak_default_behavior=dict(type="str", choices=["compatibility", "no_defaults"], default="compatibility"),
+        email_verified_behavior=dict(type="str", choices=["compatibility", "no_defaults"], default="compatibility"),
     )
     argument_spec.update(meta_args)
 
@@ -442,13 +440,9 @@ def main():
     username = module.params.get("username")
     groups = module.params.get("groups")
 
-    if module.params["keycloak_default_behavior"] == "compatibility":
-        old_default_values = dict(
-            email_verified=False,
-        )
-        for param, value in old_default_values.items():
-            if module.params[param] is None:
-                module.params[param] = value
+    # If there is no value for email_verified, check if we should to set the old default
+    if module.params["email_verified"] is None and module.params["email_verified_behavior"] == "compatibility":
+        module.params["param"] = False
 
     # Filter and map the parameters names that apply to the user
     user_params = [
@@ -456,7 +450,7 @@ def main():
         for x in module.params
         if x
         not in list(keycloak_argument_spec().keys())
-        + ["state", "realm", "force", "groups", "keycloak_default_behavior"]
+        + ["state", "realm", "force", "groups", "email_verified_behavior"]
         and module.params.get(x) is not None
     ]
 
