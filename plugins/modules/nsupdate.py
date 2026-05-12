@@ -99,7 +99,7 @@ options:
     description:
       - Timeout in seconds for each DNS query sent to O(server).
     default: 10
-    type: int
+    type: float
     version_added: 13.0.0
 """
 
@@ -612,7 +612,7 @@ def main():
             ttl=dict(default=3600, type="int"),
             value=dict(type="list", elements="str"),
             protocol=dict(default="tcp", choices=["tcp", "udp"], type="str"),
-            timeout=dict(default=10, type="int"),
+            timeout=dict(default=10, type="float"),
         ),
         supports_check_mode=True,
     )
