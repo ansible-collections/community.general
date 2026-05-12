@@ -1,0 +1,4 @@
+bugfixes:
+  - "datadog_downtime - fix ``TypeError`` when returning API response with ``datadog-api-client`` >= 2.28.0
+    (https://github.com/ansible-collections/community.general/issues/9079,
+    https://github.com/ansible-collections/community.general/pull/12019)."
