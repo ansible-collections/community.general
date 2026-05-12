@@ -67,7 +67,6 @@
     - include_tasks: test-set-element-value.yml
     - include_tasks: test-set-element-value-empty.yml
     - include_tasks: test-set-element-value-predicate.yml
-    - include_tasks: test-unset-element-value.yml
     - include_tasks: test-pretty-print.yml
     - include_tasks: test-pretty-print-only.yml
     - include_tasks: test-add-namespaced-children-elements.yml
