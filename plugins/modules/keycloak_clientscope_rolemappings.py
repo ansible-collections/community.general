@@ -225,8 +225,8 @@ def main():
         # update desired
         for role_name in role_names:
             if role_name not in available_roles_by_name:
-                if clientscope_id:
-                    module.fail_json(msg=f"Failed to retrive role '{realm}.{clientscope_id}.{role_name}'")
+                if client_id:
+                    module.fail_json(msg=f"Failed to retrive role '{realm}.{client_id}.{role_name}'")
                 else:
                     module.fail_json(msg=f"Failed to retrive role '{realm}.{role_name}'")
             if role_name not in before_roles_by_name:

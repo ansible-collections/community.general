@@ -10,13 +10,13 @@ admin_password: password
 realm: myrealm
 
 
-client_name_private: backend-client-private
+client_name: backend-client
+full_scope_client_name: full-scope-client
 client_role_admin: client-role-admin
 client_role_user: client-role-user
 client_role_not_exists: client-role-missing
 
-client_name_public: frontend-client-public
-
+clientscope_id: "client-scope"
 
 realm_role_admin: realm-role-admin
 realm_role_user: realm-role-user
