@@ -442,7 +442,7 @@ def main():
 
     # If there is no value for email_verified, check if we should to set the old default
     if module.params["email_verified"] is None and module.params["email_verified_behavior"] == "compatibility":
-        module.params["param"] = False
+        module.params["email_verified"] = False
 
     # Filter and map the parameters names that apply to the user
     user_params = [
