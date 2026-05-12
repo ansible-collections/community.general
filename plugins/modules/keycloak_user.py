@@ -449,8 +449,7 @@ def main():
         x
         for x in module.params
         if x
-        not in list(keycloak_argument_spec().keys())
-        + ["state", "realm", "force", "groups", "email_verified_behavior"]
+        not in list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups", "email_verified_behavior"]
         and module.params.get(x) is not None
     ]
 
