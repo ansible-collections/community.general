@@ -37,6 +37,7 @@ options:
     description:
       - Custom telegram api host.
     required: false
+    default: api.telegram.org
   api_method:
     type: str
     description:
