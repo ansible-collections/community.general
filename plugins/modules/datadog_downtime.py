@@ -247,13 +247,20 @@ def build_downtime(module):
     return downtime
 
 
+def _resp_to_dict(resp):
+    d = resp.to_dict()
+    if "uuid" in d:
+        d["uuid"] = str(d["uuid"])
+    return d
+
+
 def _post_downtime(module, api_client):
     api = DowntimesApi(api_client)
     downtime = build_downtime(module)
     try:
         resp = api.create_downtime(downtime)
         module.params["id"] = resp.id
-        module.exit_json(changed=True, downtime=resp.to_dict())
+        module.exit_json(changed=True, downtime=_resp_to_dict(resp))
     except ApiException as e:
         module.fail_json(msg=f"Failed to create downtime: {e}")
 
@@ -273,9 +280,9 @@ def _update_downtime(module, current_downtime, api_client):
         else:
             resp = api.update_downtime(module.params["id"], downtime)
         if _equal_dicts(resp.to_dict(), current_downtime.to_dict(), ["active", "creator_id", "updater_id"]):
-            module.exit_json(changed=False, downtime=resp.to_dict())
+            module.exit_json(changed=False, downtime=_resp_to_dict(resp))
         else:
-            module.exit_json(changed=True, downtime=resp.to_dict())
+            module.exit_json(changed=True, downtime=_resp_to_dict(resp))
     except ApiException as e:
         module.fail_json(msg=f"Failed to update downtime: {e}")
 
