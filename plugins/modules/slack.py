@@ -175,7 +175,7 @@ options:
         description:
           - The name of the file as it should appear in Slack.
           - If not provided, the base name of the С(path) will be used.
-    version_added: 1.0.0
+    version_added: 13.0.0
 """
 
 EXAMPLES = r"""
