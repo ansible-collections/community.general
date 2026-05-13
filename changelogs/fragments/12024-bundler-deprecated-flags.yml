@@ -1,0 +1,6 @@
+bugfixes:
+  - "bundler - replace deprecated ``--deployment``, ``--without``, ``--path``,
+    ``--clean``, and ``--binstubs`` flags with ``BUNDLE_*`` environment variables,
+    fixing compatibility with Bundler 4 (https://github.com/ansible-collections/community.general/issues/4583,
+    https://github.com/ansible-collections/community.general/issues/11380,
+    https://github.com/ansible-collections/community.general/pull/12024)."
