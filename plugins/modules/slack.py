@@ -48,7 +48,7 @@ options:
         request access. It is there that the incoming webhooks can be added. The key is on the end of the URL given to you
         in that section.'
       - "WebAPI token: Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-),
-        V(xoxb-) or V(xoxa-), for example V(xoxb-your-token-here). WebAPI token is required if you intend to receive
+        V(xoxb-) or V(xoxa-), for example V(xoxb-1234-56789abcdefghijklmnopqrstuvwxyz). WebAPI token is required if you intend to receive
         thread_id. See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
@@ -263,13 +263,13 @@ EXAMPLES = r"""
 - name: Initial Threaded Slack message
   community.general.slack:
     channel: '#ansible'
-    token: xoxb-your-token-here
+    token: xoxb-1234-56789abcdefghijklmnopqrstuvwxyz
     msg: 'Starting a thread with my initial post.'
   register: slack_response
 - name: Add more info to thread
   community.general.slack:
     channel: '#ansible'
-    token: xoxb-your-token-here
+    token: xoxb-1234-56789abcdefghijklmnopqrstuvwxyz
     thread_id: "{{ slack_response['ts'] }}"
     color: good
     msg: 'And this is my threaded response!'
@@ -290,7 +290,7 @@ EXAMPLES = r"""
     message_id: "{{ slack_response.ts }}"
 - name: Send file to Slack
   community.general.slack:
-    token: "xoxb-your-token-here"
+    token: "xoxb-1234-56789abcdefghijklmnopqrstuvwxyz"
     channel: "channel-id"
     msg: "Here is the file you asked for" # if you want to sent message to channel without threads, you dont need to use msg parameter
     files:
@@ -300,7 +300,7 @@ EXAMPLES = r"""
         name: "test_report.txt"
 - name: Send file to Slack threads
   community.general.slack:
-    token: "xoxb-your-token-here"
+    token: "xoxb-1234-56789abcdefghijklmnopqrstuvwxyz"
     channel: "channel-id"
     thread_id: "thread-id" # if you want to send file to a specific thread
     files:

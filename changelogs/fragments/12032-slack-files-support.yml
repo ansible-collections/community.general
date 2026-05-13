@@ -1,2 +1,2 @@
 minor_changes:
-  - slack - added support for uploading files to channels and threads using the new Slack WebAPI.
+  - slack - added support for uploading files to channels and threads using the new Slack WebAPI (https://github.com/ansible-collections/community.general/pull/12032).
