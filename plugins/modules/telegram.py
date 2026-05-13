@@ -32,6 +32,11 @@ options:
     description:
       - Token identifying your telegram bot.
     required: true
+  api_host:
+    type: str
+    description:
+      - Custom telegram api host. Default: api.telegram.org
+    required: false
   api_method:
     type: str
     description:
@@ -51,6 +56,7 @@ EXAMPLES = r"""
 - name: Send notify to Telegram
   community.general.telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
+    api_host: "api.telegram.org"
     api_args:
       chat_id: "000000"
       parse_mode: "markdown"
@@ -61,6 +67,7 @@ EXAMPLES = r"""
 - name: Forward message to someone
   community.general.telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
+    api_host: "api.telegram.org"
     api_method: forwardMessage
     api_args:
       chat_id: "000000"
@@ -95,6 +102,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(type="str", required=True, no_log=True),
+            api_host=dict(type="str", required=False, no_log=True),
             api_args=dict(type="dict"),
             api_method=dict(type="str", default="SendMessage"),
         ),
@@ -102,6 +110,7 @@ def main():
     )
 
     token = quote(module.params.get("token"))
+    api_host = quote(module.params.get("api_host") or "api.telegram.org")
     api_args = module.params.get("api_args") or {}
     api_method = module.params.get("api_method")
     # filling backward compatibility args
@@ -112,7 +121,7 @@ def main():
     if api_args["parse_mode"] == "plain":
         del api_args["parse_mode"]
 
-    url = f"https://api.telegram.org/bot{token}/{api_method}"
+    url = f"https://{api_host}/bot{token}/{api_method}"
 
     if module.check_mode:
         module.exit_json(changed=False)
