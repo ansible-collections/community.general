@@ -22,14 +22,18 @@ try:
 
     from .gitlab import (
         GitlabModuleTestCase,
+        created_user_keys,
+        deleted_user_key_ids,
         resp_add_member,
         resp_create_user,
         resp_create_user_keys,
         resp_delete_user,
+        resp_delete_user_key,
         resp_find_user,
         resp_get_group,
         resp_get_member,
         resp_get_user,
+        resp_get_user_duplicate_keys,
         resp_get_user_keys,
         resp_update_member,
     )
@@ -37,12 +41,16 @@ except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing
     GitlabModuleTestCase = object  # type: ignore
+    created_user_keys = []
+    deleted_user_key_ids = []
     resp_find_user = _dummy
     resp_get_user = _dummy
     resp_get_user_keys = _dummy
     resp_create_user_keys = _dummy
+    resp_delete_user_key = _dummy
     resp_create_user = _dummy
     resp_delete_user = _dummy
+    resp_get_user_duplicate_keys = _dummy
     resp_get_member = _dummy
     resp_get_group = _dummy
     resp_add_member = _dummy
@@ -153,6 +161,7 @@ class TestGitlabUser(GitlabModuleTestCase):
                 "jgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4"
                 "soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0=",
                 "expires_at": "",
+                "update_mode": "create",
             },
         )
         self.assertEqual(rvalue, False)
@@ -167,9 +176,137 @@ class TestGitlabUser(GitlabModuleTestCase):
                 "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
                 "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",
                 "expires_at": "2027-01-01",
+                "update_mode": "create",
             },
         )
         self.assertEqual(rvalue, True)
+
+    @with_httmock(resp_get_user)
+    @with_httmock(resp_get_user_keys)
+    def test_sshkey_comment_change_is_ignored(self):
+        user = self.gitlab_instance.users.get(1)
+
+        rvalue = self.moduleUtil.add_ssh_key_to_user(
+            user,
+            {
+                "name": "Public key",
+                "file": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJe"
+                "jgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4"
+                "soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0= desired-comment",
+                "expires_at": None,
+                "update_mode": "update",
+            },
+        )
+
+        self.assertEqual(rvalue, False)
+
+    @with_httmock(resp_get_user)
+    @with_httmock(resp_delete_user_key)
+    @with_httmock(resp_create_user_keys)
+    @with_httmock(resp_get_user_keys)
+    def test_update_sshkey_when_key_changes(self):
+        user = self.gitlab_instance.users.get(1)
+
+        rvalue = self.moduleUtil.add_ssh_key_to_user(
+            user,
+            {
+                "name": "Public key",
+                "file": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcU"
+                "dRuSuA5zszUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+"
+                "xawxKWmI7hJ5S0tOv6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2j"
+                "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
+                "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",
+                "expires_at": "2027-01-01",
+                "update_mode": "update",
+            },
+        )
+
+        self.assertEqual(rvalue, True)
+
+    @with_httmock(resp_get_user)
+    @with_httmock(resp_get_user_keys)
+    def test_create_sshkey_with_existing_same_name_does_not_change(self):
+        user = self.gitlab_instance.users.get(1)
+
+        rvalue = self.moduleUtil.add_ssh_key_to_user(
+            user,
+            {
+                "name": "Public key",
+                "file": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcU"
+                "dRuSuA5zszUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+"
+                "xawxKWmI7hJ5S0tOv6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2j"
+                "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
+                "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",
+                "expires_at": None,
+                "update_mode": "create",
+            },
+        )
+
+        self.assertEqual(rvalue, False)
+
+    @with_httmock(resp_get_user)
+    @with_httmock(resp_get_user_duplicate_keys)
+    def test_update_sshkey_with_multiple_same_name_keys_warns(self):
+        user = self.gitlab_instance.users.get(1)
+
+        rvalue = self.moduleUtil.add_ssh_key_to_user(
+            user,
+            {
+                "name": "Public key",
+                "file": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcU"
+                "dRuSuA5zszUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+"
+                "xawxKWmI7hJ5S0tOv6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2j"
+                "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
+                "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",
+                "expires_at": None,
+                "update_mode": "update",
+            },
+        )
+
+        self.assertEqual(rvalue, False)
+        self.mock_module.warn.assert_called_once_with(
+            "Found multiple SSH keys named 'Public key'. Skipping update because sshkey_update_mode=update requires a single matching key."
+        )
+
+    @with_httmock(resp_get_user)
+    @with_httmock(resp_delete_user_key)
+    @with_httmock(resp_create_user_keys)
+    @with_httmock(resp_get_user_duplicate_keys)
+    def test_deduplicate_sshkey_deletes_all_same_name_keys(self):
+        user = self.gitlab_instance.users.get(1)
+        deleted_user_key_ids.clear()
+        created_user_keys.clear()
+
+        rvalue = self.moduleUtil.add_ssh_key_to_user(
+            user,
+            {
+                "name": "Public key",
+                "file": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcU"
+                "dRuSuA5zszUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+"
+                "xawxKWmI7hJ5S0tOv6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2j"
+                "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
+                "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",
+                "expires_at": "2027-01-01",
+                "update_mode": "deduplicate",
+            },
+        )
+
+        self.assertEqual(rvalue, True)
+        self.assertEqual(deleted_user_key_ids, ["1", "3"])
+        self.assertEqual(
+            created_user_keys,
+            [
+                {
+                    "title": "Public key",
+                    "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcU"
+                    "dRuSuA5zszUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+"
+                    "xawxKWmI7hJ5S0tOv6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2j"
+                    "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
+                    "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",
+                    "expires_at": "2027-01-01",
+                },
+            ],
+        )
 
     @with_httmock(resp_get_group)
     @with_httmock(resp_get_member)

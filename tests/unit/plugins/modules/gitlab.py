@@ -4,7 +4,10 @@
 
 from __future__ import annotations
 
+import json
 import unittest
+from typing import Any
+from unittest.mock import Mock
 
 import gitlab
 from httmock import (
@@ -17,6 +20,7 @@ class FakeAnsibleModule:
     def __init__(self, module_params=None):
         self.check_mode = False
         self.params = module_params if module_params else {}
+        self.warn = Mock()
 
     def fail_json(self, **args):
         pass
@@ -38,6 +42,10 @@ def python_gitlab_module_version():
 
 def python_gitlab_version_match_requirement():
     return "2.3.0"
+
+
+deleted_user_key_ids: list[str] = []
+created_user_keys: list[dict[str, Any]] = []
 
 
 """
@@ -140,6 +148,8 @@ def resp_get_user_keys(url, request):
 
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/users/1/keys", method="post")
 def resp_create_user_keys(url, request):
+    if request.body:
+        created_user_keys.append(json.loads(request.body))
     headers = {"content-type": "application/json"}
     content = (
         '{"id": 1, "title": "Private key",'
@@ -152,6 +162,36 @@ def resp_create_user_keys(url, request):
     )
     content = content.encode("utf-8")
     return response(201, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r"/api/v4/users/1/keys/[0-9]+", method="delete")
+def resp_delete_user_key(url, request):
+    deleted_user_key_ids.append(url.path.rsplit("/", 1)[1])
+    headers = {"content-type": "application/json"}
+    content = "{}"
+    content = content.encode("utf-8")
+    return response(204, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/users/1/keys", method="get")
+def resp_get_user_duplicate_keys(url, request):
+    headers = {"content-type": "application/json"}
+    content = (
+        '[{"id": 1, "title": "Public key",'
+        '"key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcU'
+        "dRuSuA5zszUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+"
+        "xawxKWmI7hJ5S0tOv6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2j"
+        "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
+        'c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",'
+        '"created_at": "2014-08-01T14:47:39.080Z"},'
+        '{"id": 3, "title": "Public key",'
+        '"key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596'
+        "k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfDzpvZK2H5E7eQa"
+        'SeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0=",'
+        '"created_at": "2014-08-01T14:47:39.080Z"}]'
+    )
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
 
 
 """

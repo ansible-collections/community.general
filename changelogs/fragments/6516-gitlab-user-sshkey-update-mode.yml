@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_user - add the ``sshkey_update_mode`` option to control whether same-name SSH keys are preserved, updated when unique, or deduplicated before replacement (https://github.com/ansible-collections/community.general/issues/6516, https://github.com/ansible-collections/community.general/pull/11996).
