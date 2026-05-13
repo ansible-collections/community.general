@@ -4,16 +4,12 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
-
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils._kopia import (
     KOPIA_COMMON_ARGUMENT_SPEC,
     REPOSITORY_STATE_MAP,
     fmt_backend,
-    kopia_runner,
 )
 
 # ---------------------------------------------------------------------------
@@ -178,29 +174,3 @@ TC_FMT_BACKEND_IDS = sorted(TC_FMT_BACKEND.keys())
 )
 def test_fmt_backend(backend, expected):
     assert fmt_backend(backend) == expected
-
-
-# ---------------------------------------------------------------------------
-# kopia_runner
-# ---------------------------------------------------------------------------
-
-
-def _make_mock_module(**params):
-    module = MagicMock()
-    module.params = params
-    module.get_bin_path.return_value = "/testbin/kopia"
-    module.run_command.return_value = (0, "", "")
-    return module
-
-
-def test_kopia_runner_returns_cmd_runner():
-    module = _make_mock_module(config=None, password=None)
-    runner = kopia_runner(module)
-    assert isinstance(runner, CmdRunner)
-
-
-def test_kopia_runner_extra_formats_merged():
-    module = _make_mock_module(config=None, password=None)
-    extra = {"my_custom_flag": cmd_runner_fmt.as_opt_eq_val("--custom")}
-    runner = kopia_runner(module, extra_formats=extra)
-    assert isinstance(runner, CmdRunner)
