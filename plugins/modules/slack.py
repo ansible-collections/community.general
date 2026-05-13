@@ -614,8 +614,7 @@ def main():
 
     changed = True
 
-    # if updating an existing message, we can check if there's anything to
-    # update
+    # if updating an existing message, we can check if there's anything to update
     if message_id is not None:
         changed = False
         msg = get_slack_message(module, domain, token, channel, message_id)
