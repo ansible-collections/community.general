@@ -35,7 +35,7 @@ options:
   api_host:
     type: str
     description:
-      - Custom telegram api host. Default: api.telegram.org
+      - Custom telegram api host.
     required: false
   api_method:
     type: str
@@ -102,7 +102,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(type="str", required=True, no_log=True),
-            api_host=dict(type="str", required=False, no_log=True),
+            api_host=dict(type="str", default="api.telegram.org"),
             api_args=dict(type="dict"),
             api_method=dict(type="str", default="SendMessage"),
         ),
@@ -110,7 +110,7 @@ def main():
     )
 
     token = quote(module.params.get("token"))
-    api_host = quote(module.params.get("api_host") or "api.telegram.org")
+    api_host = quote(module.params.get("api_host"))
     api_args = module.params.get("api_args") or {}
     api_method = module.params.get("api_method")
     # filling backward compatibility args
