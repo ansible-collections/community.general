@@ -2,11 +2,14 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# Note that this module util is **PRIVATE** to the collection. It can have breaking changes at any time.
+# Do not use this from other collections or standalone plugins/modules!
+
 from __future__ import annotations
 
 import typing as t
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
@@ -120,7 +123,7 @@ def kopia_runner(module: AnsibleModule, extra_formats: dict | None = None, **kwa
         state=cmd_runner_fmt.as_map(REPOSITORY_STATE_MAP),
         backend=cmd_runner_fmt.as_func(fmt_backend),
         password=cmd_runner_fmt.as_opt_eq_val("--password"),
-        fingerprint_ssl=cmd_runner_fmt.as_opt_eq_val("--server-cert-fingerprint"),
+        fingerprint_tls=cmd_runner_fmt.as_opt_eq_val("--server-cert-fingerprint"),
         url=cmd_runner_fmt.as_opt_eq_val("--url"),
         config=cmd_runner_fmt.as_opt_eq_val("--config-file"),
         throttle_operation=cmd_runner_fmt.as_list(),

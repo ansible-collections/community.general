@@ -120,7 +120,7 @@ test_cases:
       password: secret
       config: /etc/kopia/root.config
       url: https://kopia.example.com:51515
-      fingerprint_ssl: "AA:BB:CC:DD"
+      fingerprint_tls: "AA:BB:CC:DD"
       backend:
         provider: server
     output:

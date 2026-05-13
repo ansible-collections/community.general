@@ -11,12 +11,12 @@ module: kopia_repository
 short_description: Manage Kopia repository
 author:
   - Dexter Le (@munchtoast)
-version_added: "12.6.0"
+version_added: "13.0.0"
 description:
   - Manage a Kopia repository using the Kopia CLI.
   - Supports creating, connecting, disconnecting, syncing, and throttling repositories.
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general._attributes
 attributes:
   check_mode:
     support: full
@@ -39,7 +39,7 @@ options:
       - Repository password used to encrypt and decrypt repository contents.
       - Required if O(state=created) or O(state=connected).
     type: str
-  fingerprint_ssl:
+  fingerprint_tls:
     description:
       - TLS certificate fingerprint of the Kopia server.
       - Required if O(state=connected) and O(backend.provider=server).
@@ -218,7 +218,7 @@ EXAMPLES = r"""
     password: secret
     config: /etc/kopia/root.config
     url: https://kopia.example.com:51515
-    fingerprint_ssl: AA:BB:CC:DD:EE:FF
+    fingerprint_tls: AA:BB:CC:DD:EE:FF
     backend:
       provider: server
 
@@ -263,11 +263,11 @@ kopia_repository:
   returned: always
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.kopia import (
+from ansible_collections.community.general.plugins.module_utils._kopia import (
     KOPIA_COMMON_ARGUMENT_SPEC,
     kopia_runner,
 )
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 
 class KopiaRepository(StateModuleHelper):
@@ -280,7 +280,7 @@ class KopiaRepository(StateModuleHelper):
                 default="created",
                 choices=["created", "connected", "disconnected", "synced", "throttled"],
             ),
-            fingerprint_ssl=dict(type="str"),
+            fingerprint_tls=dict(type="str"),
             url=dict(type="str"),
             throttle_operation=dict(type="str", default="get", choices=["set", "get"]),
             backend=dict(
@@ -289,7 +289,18 @@ class KopiaRepository(StateModuleHelper):
                     provider=dict(
                         type="str",
                         required=True,
-                        choices=["azure", "b2", "filesystem", "gcs", "gdrive", "rclone", "s3", "sftp", "webdav", "server"],
+                        choices=[
+                            "azure",
+                            "b2",
+                            "filesystem",
+                            "gcs",
+                            "gdrive",
+                            "rclone",
+                            "s3",
+                            "sftp",
+                            "webdav",
+                            "server",
+                        ],
                     ),
                     bucket=dict(type="str"),
                     container=dict(type="str"),
@@ -360,7 +371,7 @@ class KopiaRepository(StateModuleHelper):
 
     def state_connected(self):
         with self.runner(
-            "cli_action state backend password fingerprint_ssl url config",
+            "cli_action state backend password fingerprint_tls url config",
             output_process=self._process_command_output(True, "already connected"),
             check_mode_skip=True,
         ) as ctx:

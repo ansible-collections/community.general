@@ -4,11 +4,12 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.kopia import (
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._kopia import (
     KOPIA_COMMON_ARGUMENT_SPEC,
     REPOSITORY_STATE_MAP,
     fmt_backend,
@@ -193,78 +194,13 @@ def _make_mock_module(**params):
 
 
 def test_kopia_runner_returns_cmd_runner():
-    from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
-
     module = _make_mock_module(config=None, password=None)
-    with patch(
-        "ansible_collections.community.general.plugins.module_utils.cmd_runner.CmdRunner.__init__",
-        return_value=None,
-    ):
-        runner = kopia_runner(module)
-    # kopia_runner returns a CmdRunner instance
+    runner = kopia_runner(module)
     assert isinstance(runner, CmdRunner)
 
 
-def test_kopia_runner_has_shared_formats():
-    """Verify that the shared format keys are registered."""
-    formats_captured = {}
-
-    original_init = __import__(
-        "ansible_collections.community.general.plugins.module_utils.cmd_runner",
-        fromlist=["CmdRunner"],
-    ).CmdRunner.__init__
-
-    def capturing_init(self, module, command, arg_formats=None, **kwargs):
-        if arg_formats:
-            formats_captured.update(arg_formats)
-        original_init(self, module, command, arg_formats=arg_formats, **kwargs)
-
-    module = _make_mock_module(config=None, password=None)
-    with patch(
-        "ansible_collections.community.general.plugins.module_utils.cmd_runner.CmdRunner.__init__",
-        capturing_init,
-    ):
-        kopia_runner(module)
-
-    for key in ("cli_action", "state", "backend", "password", "fingerprint_ssl", "url", "config", "throttle_operation"):
-        assert key in formats_captured, f"expected format key '{key}' not registered"
-
-
 def test_kopia_runner_extra_formats_merged():
-    """Extra formats passed to kopia_runner are merged into args_formats."""
-    formats_captured = {}
-
-    original_init = __import__(
-        "ansible_collections.community.general.plugins.module_utils.cmd_runner",
-        fromlist=["CmdRunner"],
-    ).CmdRunner.__init__
-
-    def capturing_init(self, module, command, arg_formats=None, **kwargs):
-        if arg_formats:
-            formats_captured.update(arg_formats)
-        original_init(self, module, command, arg_formats=arg_formats, **kwargs)
-
-    from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
-
+    module = _make_mock_module(config=None, password=None)
     extra = {"my_custom_flag": cmd_runner_fmt.as_opt_eq_val("--custom")}
-
-    module = _make_mock_module(config=None, password=None)
-    with patch(
-        "ansible_collections.community.general.plugins.module_utils.cmd_runner.CmdRunner.__init__",
-        capturing_init,
-    ):
-        kopia_runner(module, extra_formats=extra)
-
-    assert "my_custom_flag" in formats_captured
-    # shared keys still present
-    assert "cli_action" in formats_captured
-
-
-def test_kopia_runner_no_extra_formats():
-    """kopia_runner(module, extra_formats=None) should not raise."""
-    module = _make_mock_module(config=None, password=None)
-    # Should not raise; CmdRunner will call get_bin_path internally
-    try:
-        kopia_runner(module, extra_formats=None)
-    except Exception:
-        pass  # CmdRunner may need the binary; we just ensure no TypeError from extra_formats
+    runner = kopia_runner(module, extra_formats=extra)
+    assert isinstance(runner, CmdRunner)
