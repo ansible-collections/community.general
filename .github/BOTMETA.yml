@@ -385,6 +385,8 @@ files:
     maintainers: $team_keycloak
   $module_utils/_keycloak.py:
     maintainers: $team_keycloak
+  $module_utils/_kopia.py:
+    maintainers: munchtoast
   $module_utils/_lxc.py:
     maintainers: russoz
   $module_utils/_lxca_common.py:
@@ -895,6 +897,8 @@ files:
     maintainers: ahussey-redhat
   $modules/kibana_plugin.py:
     maintainers: barryib
+  $modules/kopia_repository.py:
+    maintainers: munchtoast
   $modules/krb_ticket.py:
     maintainers: abakanovskii
   $modules/launchd.py:
