@@ -1398,7 +1398,7 @@ files:
   $modules/typetalk.py:
     maintainers: tksmd
   $modules/udm_:
-    maintainers: keachi
+    ignore: keachi
   $modules/ufw.py:
     labels: ufw
     maintainers: ahtik ovcharenko pyykkis
