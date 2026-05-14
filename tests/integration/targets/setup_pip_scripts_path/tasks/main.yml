@@ -1,0 +1,39 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get facts
+  setup:
+  when: ansible_facts == {}
+
+# pip._internal.locations.get_scheme() reflects pip's actual install scheme (e.g. RHEL root → /usr/local/bin),
+# which can differ from sysconfig.get_path('scripts') (e.g. RHEL → /usr/bin).
+- name: Get pip scripts path from current Python interpreter
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_python_interpreter }}"
+      - -c
+      - |
+        import sys
+        try:
+            from pip._internal.locations import get_scheme
+            print(get_scheme('pip').scripts)
+        except Exception:
+            import sysconfig
+            print(sysconfig.get_path('scripts'))
+  register: _pip_scripts_path
+  changed_when: false
+
+- name: Build pip_path from env PATH and Python scripts dir
+  vars:
+    pip_path_list: >
+      {{ [_pip_scripts_path.stdout.strip()] + ansible_facts.env.PATH.split(":") }}
+  ansible.builtin.set_fact:
+    pip_scripts_path: >-
+      {{ pip_path_list | join(":") }}
