@@ -635,7 +635,7 @@ def main():
     prepend_hash = module.params["prepend_hash"]
     files = module.params["files"]
 
-    webhook_re = re.compile(r'^T[A-Z0-9]+/[B[A-Z0-9]+/[A-Za-z0-9]+$')
+    webhook_re = re.compile(r'^T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+$')
     api_token_re = re.compile(r'^xox[bpa]-')
     is_webhook = bool(webhook_re.match(token))
     is_api_token = bool(api_token_re.match(token))

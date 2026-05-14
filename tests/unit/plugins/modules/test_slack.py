@@ -49,7 +49,7 @@ class TestSlackModule(ModuleTestCase):
 
     def test_successful_message(self):
         """tests sending a message. This is example 1 from the docs"""
-        with set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test"}):
+        with set_module_args({"token": "TXX/BYY/ZZZ", "msg": "test"}):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
                 fetch_url_mock.return_value = (None, {"status": 200})
                 with self.assertRaises(AnsibleExitJson):
@@ -59,12 +59,12 @@ class TestSlackModule(ModuleTestCase):
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
         assert call_data["username"] == "Ansible"
         assert call_data["text"] == "test"
-        assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/XXXX/YYYY/ZZZZ"
+        assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/TXX/BYY/ZZZ"
 
     def test_failed_message(self):
         """tests failing to send a message"""
 
-        with set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test"}):
+        with set_module_args({"token": "TXX/BYY/ZZZ", "msg": "test"}):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
                 fetch_url_mock.return_value = (
                     None, {"status": 404, "msg": "test"})
@@ -73,7 +73,7 @@ class TestSlackModule(ModuleTestCase):
 
     def test_message_with_thread(self):
         """tests sending a message with a thread"""
-        with set_module_args({"token": "XXXX/YYYY/ZZZZ", "msg": "test", "thread_id": "100.00"}):
+        with set_module_args({"token": "TXX/BYY/ZZZ", "msg": "test", "thread_id": "100.00"}):
             with patch.object(slack, "fetch_url") as fetch_url_mock:
                 fetch_url_mock.return_value = (None, {"status": 200})
                 with self.assertRaises(AnsibleExitJson):
@@ -84,7 +84,7 @@ class TestSlackModule(ModuleTestCase):
         assert call_data["username"] == "Ansible"
         assert call_data["text"] == "test"
         assert call_data["thread_ts"] == "100.00"
-        assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/XXXX/YYYY/ZZZZ"
+        assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/TXX/BYY/ZZZ"
 
     # https://github.com/ansible-collections/community.general/issues/1097
     def test_ts_in_message_does_not_cause_edit(self):
@@ -135,7 +135,7 @@ class TestSlackModule(ModuleTestCase):
         """tests sending a message with blocks"""
         with set_module_args(
             {
-                "token": "XXXX/YYYY/ZZZZ",
+                "token": "TXX/BYY/ZZZ",
                 "msg": "test",
                 "blocks": [
                     {
@@ -161,13 +161,13 @@ class TestSlackModule(ModuleTestCase):
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
         assert call_data["username"] == "Ansible"
         assert call_data["blocks"][1]["text"]["text"] == "test"
-        assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/XXXX/YYYY/ZZZZ"
+        assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/TXX/BYY/ZZZ"
 
     def test_message_with_invalid_color(self):
         """tests sending invalid color value to module"""
         with set_module_args(
             {
-                "token": "XXXX/YYYY/ZZZZ",
+                "token": "TXX/BYY/ZZZ",
                 "msg": "test",
                 "color": "aa",
             }
