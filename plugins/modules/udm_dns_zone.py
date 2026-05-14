@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Adfinis SyGroup AG
-# Tobias Rueetschi <tobias.ruetschi@adfinis-sygroup.ch>
+# @keachi
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 module: udm_dns_zone
 author:
-  - Tobias Rüetschi (@keachi)
+  - keachi (@keachi)
 short_description: Manage DNS zones on a univention corporate server
 description:
   - This module allows to manage DNS zones on a univention corporate server (UCS). It uses the Python API of the UCS to create
