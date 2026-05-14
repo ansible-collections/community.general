@@ -10,6 +10,7 @@
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
 from __future__ import annotations
 
 DOCUMENTATION = r"""
@@ -316,7 +317,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
-# We do not escape other characters used as Slack metacharacters (e.g. &,<, >).
+# We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
 escape_table = {
     '"': '"',
     "'": "'",
@@ -367,8 +368,7 @@ def build_payload_for_slack(
     if color == "normal" and text is not None:
         payload = dict(text=escape_quotes(text))
     elif text is not None:
-        # With a custom color we have to set the message as attachment, and
-        # explicitly turn markdown parsing on for it.
+        # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
         payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
         if prepend_hash == "auto":
@@ -648,8 +648,7 @@ def main():
 
     changed = True
 
-    # If updating an existing message, we can check if there's
-    # anything to update
+    # if updating an existing message, we can check if there's anything to update
     if message_id is not None:
         changed = False
         msg = get_slack_message(module, domain, token, channel, message_id)
@@ -657,8 +656,8 @@ def main():
             if msg.get(key) != module.params.get(key):
                 changed = True
                 break
-        # If check mode is active, we shouldn't do anything regardless.
-        # If changed=False, we don't need to do anything, so don't do it.
+        # if check mode is active, we shouldn't do anything regardless.
+        # if changed=False, we don't need to do anything, so don't do it.
         if module.check_mode or not changed:
             module.exit_json(changed=changed, ts=msg["ts"], channel=msg["channel"])
     elif module.check_mode:
