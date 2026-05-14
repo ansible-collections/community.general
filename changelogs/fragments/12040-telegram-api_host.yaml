@@ -1,0 +1,2 @@
+bugfixes:
+  - "telegram - added the ``api_host`` parameter to fix connectivity with self-hosted proxies and custom API endpoints (https://github.com/ansible-collections/community.general/pull/12040)."
