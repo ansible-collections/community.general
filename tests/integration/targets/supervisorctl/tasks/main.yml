@@ -34,6 +34,8 @@
             - 'install_{{ ansible_facts.system }}.yml'       # Linux
 
     - include_tasks: test.yml
+      environment:
+        PATH: "{{ pip_path }}"
       with_items:
         - { username: '', password: '' }
         - { username: 'testétest', password: 'passéword' } # non-ASCII credentials

@@ -20,6 +20,9 @@
   changed_when: false
 
 - name: Build pip_path from env PATH and Python scripts dir
-  ansible.builtin.set_fact:
-    pip_path: >
+  vars:
+    pip_path_list: >
       {{ [_pip_scripts_path.stdout.strip()] + ansible_facts.env.PATH.split(":") }}
+  ansible.builtin.set_fact:
+    pip_path: >-
+      {{ pip_path_list | join(":") }}
