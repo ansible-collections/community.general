@@ -521,15 +521,22 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         # case not all files from list can be generated for example supply logs, and i want to
         # get all possible files uploaded, not fail on first one
         if info["status"] != 200:
-            module.warn(
-                f"Failed to get upload URL for {f_name}. HTTP Status: {info['status']}. Message: {info.get('msg', 'Unknown error')}")
-            continue
+            module.fail_json(
+                msg=f"Failed to get upload URL for {f_name}. Slack API endpoint returned HTTP {info['status']}.",
+                details=info.get('msg', 'No HTTP error message provided')
+            )
 
         res = module.from_json(resp.read())
 
         if not res.get("ok"):
-            module.warn(
-                f"Slack API error for {f_name}: {res.get('error', 'No error message provided')}")
+            error_code = res.get('error', 'unknown_error')
+            fatal_errors = ['invalid_auth', 'unknown_method', 'missing_scope', 'account_inactive']
+            if error_code in fatal_errors:
+                module.fail_json(
+                    msg=f"Fatal Slack API error occurred for {f_name}. Operation aborted.",
+                    error=error_code
+                )
+            module.warn(f"Slack API error for {f_name}: {error_code}")
             continue
 
         try:
