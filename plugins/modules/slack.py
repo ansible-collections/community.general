@@ -311,8 +311,9 @@ EXAMPLES = r"""
 import os
 import re
 from urllib.parse import urlencode
-from ansible.module_utils.urls import fetch_url
+
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &,<, >).
@@ -523,18 +524,17 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         if info["status"] != 200:
             module.fail_json(
                 msg=f"Failed to get upload URL for {f_name}. Slack API endpoint returned HTTP {info['status']}.",
-                details=info.get('msg', 'No HTTP error message provided')
+                details=info.get("msg", "No HTTP error message provided"),
             )
 
         res = module.from_json(resp.read())
 
         if not res.get("ok"):
-            error_code = res.get('error', 'unknown_error')
-            fatal_errors = ['invalid_auth', 'unknown_method', 'missing_scope', 'account_inactive']
+            error_code = res.get("error", "unknown_error")
+            fatal_errors = ["invalid_auth", "unknown_method", "missing_scope", "account_inactive"]
             if error_code in fatal_errors:
                 module.fail_json(
-                    msg=f"Fatal Slack API error occurred for {f_name}. Operation aborted.",
-                    error=error_code
+                    msg=f"Fatal Slack API error occurred for {f_name}. Operation aborted.", error=error_code
                 )
             module.warn(f"Slack API error for {f_name}: {error_code}")
             continue
@@ -551,8 +551,7 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
                 )
 
                 if u_info["status"] != 200:
-                    module.warn(
-                        f"Failed to upload bits for {f_name}. Status: {u_info['status']}")
+                    module.warn(f"Failed to upload bits for {f_name}. Status: {u_info['status']}")
                     continue
 
         except Exception as e:
@@ -562,10 +561,7 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         uploaded_ids.append({"id": res["file_id"], "title": f_name})
 
     if uploaded_ids:
-        completion_payload = {
-            "files": uploaded_ids,
-            "channel_id": channel,
-            "initial_comment": "Attached Files:"}
+        completion_payload = {"files": uploaded_ids, "channel_id": channel, "initial_comment": "Attached Files:"}
 
         if thread_ts:
             completion_payload["thread_ts"] = thread_ts
@@ -579,8 +575,7 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         )
 
         if info["status"] != 200:
-            return {
-                "ok": False, "msg": f"Failed to complete upload. Status: {info['status']}"}
+            return {"ok": False, "msg": f"Failed to complete upload. Status: {info['status']}"}
 
         return module.from_json(resp.read())
 
@@ -635,15 +630,15 @@ def main():
     prepend_hash = module.params["prepend_hash"]
     files = module.params["files"]
 
-    webhook_re = re.compile(r'^T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+$')
-    api_token_re = re.compile(r'^xox[bpa]-')
+    webhook_re = re.compile(r"^T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+$")
+    api_token_re = re.compile(r"^xox[bpa]-")
     is_webhook = bool(webhook_re.match(token))
     is_api_token = bool(api_token_re.match(token))
     if not (is_webhook or is_api_token):
         module.fail_json(
             msg="The token provided is not a valid Slack token. "
-                "Webhooks should look like T.../B.../X... and "
-                "API tokens should start with xoxb-, xoxp-, or xoxa-."
+            "Webhooks should look like T.../B.../X... and "
+            "API tokens should start with xoxb-, xoxp-, or xoxa-."
         )
     color_choices = ["normal", "good", "warning", "danger"]
     if color not in color_choices and not is_valid_hex_color(color):
@@ -658,18 +653,14 @@ def main():
     if message_id is not None:
         changed = False
         msg = get_slack_message(module, domain, token, channel, message_id)
-        for key in ("icon_url", "icon_emoji", "link_names",
-                    "color", "attachments", "blocks"):
+        for key in ("icon_url", "icon_emoji", "link_names", "color", "attachments", "blocks"):
             if msg.get(key) != module.params.get(key):
                 changed = True
                 break
         # If check mode is active, we shouldn't do anything regardless.
         # If changed=False, we don't need to do anything, so don't do it.
         if module.check_mode or not changed:
-            module.exit_json(
-                changed=changed,
-                ts=msg["ts"],
-                channel=msg["channel"])
+            module.exit_json(changed=changed, ts=msg["ts"], channel=msg["channel"])
     elif module.check_mode:
         module.exit_json(changed=changed)
 
@@ -706,8 +697,7 @@ def main():
         target_channel = slack_response.get("channel") or channel
         target_thread = slack_response.get("ts") or thread_id
 
-        file_upload_res = upload_slack_files(
-            module, token, target_channel, files, thread_ts=target_thread)
+        file_upload_res = upload_slack_files(module, token, target_channel, files, thread_ts=target_thread)
 
         # If sending only files, overall success depends on the upload result
         if not has_message_content:
@@ -716,8 +706,7 @@ def main():
     if is_success:
         # Exit with plain OK from WebHook, since we don't have more information
         # If we get 200 from webhook, the only answer is OK
-        if "ok" not in slack_response and slack_response.get(
-                "webhook") == "ok" and not files:
+        if "ok" not in slack_response and slack_response.get("webhook") == "ok" and not files:
             module.exit_json(msg="OK", changed=True)
 
         result = {
@@ -730,15 +719,13 @@ def main():
             result["files_upload"] = file_upload_res
 
         if "ts" in slack_response:
-            result.update(
-                {"ts": slack_response["ts"], "channel": slack_response["channel"]})
+            result.update({"ts": slack_response["ts"], "channel": slack_response["channel"]})
         elif file_upload_res and "files" in file_upload_res:
             result.update({"channel": channel})
 
         module.exit_json(**result)
     else:
-        error_msg = slack_response.get("error") or (
-            file_upload_res.get("msg") if file_upload_res else "Unknown error")
+        error_msg = slack_response.get("error") or (file_upload_res.get("msg") if file_upload_res else "Unknown error")
         module.fail_json(msg="Slack operation failed", error=error_msg)
 
 
