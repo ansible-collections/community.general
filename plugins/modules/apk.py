@@ -78,6 +78,10 @@ notes:
   - O(name) and O(upgrade) are mutually exclusive.
   - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
+  - This module expects C(apk) to run in non-interactive mode. On Chimera Linux, C(apk) runs interactively by default,
+    which will cause this module to hang. Interactive mode can be configured in C(/etc/apk/config). Even though not
+    officially supported, other systems using C(apk) should be able to use this module, as long as C(apk) is running
+    in non-interactive mode by default.
 """
 
 EXAMPLES = r"""
