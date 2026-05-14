@@ -35,5 +35,5 @@
     pip_path_list: >
       {{ [_pip_scripts_path.stdout.strip()] + ansible_facts.env.PATH.split(":") }}
   ansible.builtin.set_fact:
-    pip_path: >-
+    pip_scripts_path: >-
       {{ pip_path_list | join(":") }}

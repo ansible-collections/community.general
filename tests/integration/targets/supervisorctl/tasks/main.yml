@@ -10,7 +10,7 @@
 
 - name: Install/Uninstall supervisorctl block
   environment:
-    PATH: "{{ pip_path }}"
+    PATH: "{{ pip_scripts_path }}"
   block:
     - tempfile:
         state: directory
