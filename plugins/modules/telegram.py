@@ -119,10 +119,10 @@ def main():
         supports_check_mode=True,
     )
 
-    token = quote(module.params.get("token"))
-    api_host = module.params.get("api_host")
-    api_args = module.params.get("api_args") or {}
-    api_method = module.params.get("api_method")
+    token = quote(module.params["token"])
+    api_host = module.params["api_host"]
+    api_args = module.params["api_args"] or {}
+    api_method = module.params["api_method"]
     # filling backward compatibility args
     api_args["chat_id"] = api_args.get("chat_id")
     api_args["parse_mode"] = api_args.get("parse_mode")
