@@ -35,9 +35,9 @@ options:
   api_host:
     type: str
     description:
-      - Custom telegram api host.
-    required: false
+      - Custom telegram API host.
     default: api.telegram.org
+    version_added: 13.0.0
   api_method:
     type: str
     description:
@@ -57,7 +57,6 @@ EXAMPLES = r"""
 - name: Send notify to Telegram
   community.general.telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
-    api_host: "api.telegram.org"
     api_args:
       chat_id: "000000"
       parse_mode: "markdown"
@@ -68,13 +67,23 @@ EXAMPLES = r"""
 - name: Forward message to someone
   community.general.telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
-    api_host: "api.telegram.org"
     api_method: forwardMessage
     api_args:
       chat_id: "000000"
       from_chat_id: 111111
       disable_notification: true
       message_id: '{{ saved_msg_id }}'
+
+- name: Send notify to custom telegram API host
+  community.general.telegram:
+    token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
+    api_host: "telegram.example.com"
+    api_args:
+      chat_id: "000000"
+      parse_mode: "markdown"
+      text: "Your precious application has been deployed: https://example.com"
+      disable_web_page_preview: true
+      disable_notification: true
 """
 
 RETURN = r"""
@@ -111,7 +120,7 @@ def main():
     )
 
     token = quote(module.params.get("token"))
-    api_host = quote(module.params.get("api_host"))
+    api_host = module.params.get("api_host")
     api_args = module.params.get("api_args") or {}
     api_method = module.params.get("api_method")
     # filling backward compatibility args
