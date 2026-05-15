@@ -3,117 +3,122 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: install passlib
-  ansible.builtin.pip:
-    name: passlib
-  notify: remove passlib
+- when:
+    # passlib is dead and doesn't work with recent bcrypt versions anymore
+    # (https://foss.heptapod.net/python-libs/passlib/-/work_items/196)
+    - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_version is version('26.04', '<')
+  block:
+    - name: install passlib
+      ansible.builtin.pip:
+        name: passlib
+      notify: remove passlib
 
-- name: add bob (check mode)
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: c00lbob
-    mode: "0644"
-  check_mode: true
-  register: add_bob_check
+    - name: add bob (check mode)
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: c00lbob
+        mode: "0644"
+      check_mode: true
+      register: add_bob_check
 
-- name: add bob
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: c00lbob
-    mode: "0644"
-  register: add_bob
+    - name: add bob
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: c00lbob
+        mode: "0644"
+      register: add_bob
 
-- name: add bob (idempotency)
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: c00lbob
-    mode: "0644"
-  register: add_bob_idempot
+    - name: add bob (idempotency)
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: c00lbob
+        mode: "0644"
+      register: add_bob_idempot
 
-- name: update permissions (check mode)
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: c00lbob
-    mode: "0600"
-  check_mode: true
-  register: update_perms_check
+    - name: update permissions (check mode)
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: c00lbob
+        mode: "0600"
+      check_mode: true
+      register: update_perms_check
 
-- name: update permissions
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: c00lbob
-    mode: "0600"
-  register: update_perms
+    - name: update permissions
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: c00lbob
+        mode: "0600"
+      register: update_perms
 
-- name: update permissions (idempotency)
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: c00lbob
-    mode: "0600"
-  register: update_perms_idempot
+    - name: update permissions (idempotency)
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: c00lbob
+        mode: "0600"
+      register: update_perms_idempot
 
-- name: add bob new password
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: SUPERsecret
-    mode: "0600"
-  register: add_bob_newpw
+    - name: add bob new password
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: SUPERsecret
+        mode: "0600"
+      register: add_bob_newpw
 
-- name: add bob new password (idempotency)
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    password: SUPERsecret
-    mode: "0600"
-  register: add_bob_newpw_idempot
+    - name: add bob new password (idempotency)
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        password: SUPERsecret
+        mode: "0600"
+      register: add_bob_newpw_idempot
 
-- name: test add bob assertions
-  ansible.builtin.assert:
-    that:
-      - add_bob_check is changed
-      - add_bob is changed
-      - add_bob_idempot is not changed
-      - update_perms_check is changed
-      - update_perms is changed
-      - update_perms_idempot is not changed
-      - add_bob_newpw is changed
-      - add_bob_newpw_idempot is not changed
+    - name: test add bob assertions
+      ansible.builtin.assert:
+        that:
+          - add_bob_check is changed
+          - add_bob is changed
+          - add_bob_idempot is not changed
+          - update_perms_check is changed
+          - update_perms is changed
+          - update_perms_idempot is not changed
+          - add_bob_newpw is changed
+          - add_bob_newpw_idempot is not changed
 
-- name: remove bob (check mode)
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    state: absent
-    mode: "0600"
-  check_mode: true
-  register: del_bob_check
+    - name: remove bob (check mode)
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        state: absent
+        mode: "0600"
+      check_mode: true
+      register: del_bob_check
 
-- name: remove bob
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    state: absent
-    mode: "0600"
-  register: del_bob
+    - name: remove bob
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        state: absent
+        mode: "0600"
+      register: del_bob
 
-- name: remove bob (idempotency)
-  community.general.htpasswd:
-    path: "{{ htpasswd_path }}"
-    name: bob
-    state: absent
-    mode: "0600"
-  register: del_bob_idempot
+    - name: remove bob (idempotency)
+      community.general.htpasswd:
+        path: "{{ htpasswd_path }}"
+        name: bob
+        state: absent
+        mode: "0600"
+      register: del_bob_idempot
 
-- name: test remove bob assertions
-  ansible.builtin.assert:
-    that:
-      - del_bob_check is changed
-      - del_bob is changed
-      - del_bob_idempot is not changed
+    - name: test remove bob assertions
+      ansible.builtin.assert:
+        that:
+          - del_bob_check is changed
+          - del_bob is changed
+          - del_bob_idempot is not changed
