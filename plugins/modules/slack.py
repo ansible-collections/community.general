@@ -297,7 +297,9 @@ EXAMPLES = r"""
     msg: "Here is the file you asked for"
     files:
       - path: "./first.py" # file in your os
-        name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
+        # File name in Slack. If not provided, it will be the same as path,
+        # so in this case "first.py":
+        name: "test_report.py"
       - path: "./test_file.txt"
         name: "test_report.txt"
 - name: Send file to Slack threads
