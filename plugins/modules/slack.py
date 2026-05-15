@@ -309,7 +309,9 @@ EXAMPLES = r"""
     thread_id: "thread-id" # if you want to send file to a specific thread
     files:
       - path: "./first.py" # file in your os
-        name: "test_report.py" # file name in slack, if not provided, it will be the same as path, so in this case "first.py"
+        # File name in Slack. If not provided, it will be the same as path,
+        # so in this case "first.py":
+        name: "test_report.py"
 """
 import os
 import re
