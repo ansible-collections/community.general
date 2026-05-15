@@ -11,11 +11,11 @@
 - name: Bail out if not supported
   ansible.builtin.meta: end_play
   # TODO: remove Archlinux from the list
-  # TODO: remove Ubuntu 24.04 (noble) from the list
+  # TODO: remove Ubuntu 24.04 or newer from the list
   # TODO: remove Debian 13 (Trixie) from the list
   when: >
     ansible_facts.distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora', 'Archlinux')
-    or (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_release in ['noble'])
+    or (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version | int >= 24)
     or (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '13')
 
 - name: Remove ejabberd

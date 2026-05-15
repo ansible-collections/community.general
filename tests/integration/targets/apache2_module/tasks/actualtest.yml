@@ -88,8 +88,11 @@
       community.general.apache2_module:
         name: evasive
         state: present
-      # TODO: fix for Debian 13 (Trixie)!
-      when: ansible_facts.distribution != 'Debian' or ansible_facts.distribution_major_version is version('13', '<')
+      when:
+        # TODO: fix for Debian 13 (Trixie)!
+        - ansible_facts.distribution != 'Debian' or ansible_facts.distribution_major_version is version('13', '<')
+        # TODO: fix for Ubuntu 26.04!
+        - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_major_version is version('26', '<')
 
     - name: use identifier to enable module, fix for https://github.com/ansible/ansible/issues/33669
       community.general.apache2_module:
