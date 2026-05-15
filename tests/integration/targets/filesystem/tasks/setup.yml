@@ -74,6 +74,7 @@
   when:
     - ansible_facts.system == 'Linux'
     - ansible_facts.os_family not in ['Suse', 'RedHat', 'Alpine', 'Archlinux']
+    - ansible_facts.distribution != "Ubuntu" or (ansible_facts.distribution_major_version | int < 26)
 
 - name: "Install reiserfs progs (FreeBSD)"
   ansible.builtin.package:

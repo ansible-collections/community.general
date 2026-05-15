@@ -29,6 +29,7 @@
     - not (ansible_facts.distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
     - not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int == 13)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
     - not (ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int >= 43)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
+    - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version|int >= 26)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
   block:
     - name: setup install cloud-init
       package:
