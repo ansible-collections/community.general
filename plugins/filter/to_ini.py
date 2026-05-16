@@ -79,6 +79,8 @@ def to_ini(obj, no_extra_spaces=False):
 
     if not isinstance(obj, Mapping):
         raise AnsibleFilterError(f"to_ini requires a dict, got {type(obj)}")
+    if not isinstance(no_extra_spaces, bool):
+        raise AnsibleFilterError(f"no_extra_spaces must be a boolean, got {type(no_extra_spaces)}")
 
     ini_parser = IniParser()
 
