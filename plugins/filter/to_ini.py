@@ -21,6 +21,7 @@ options:
       - Do not insert spaces before and after '=' symbol.
     type: bool
     default: false
+    version_added: 13.0.0
 seealso:
   - plugin: ansible.builtin.ini
     plugin_type: lookup
