@@ -74,7 +74,7 @@ class IniParser(ConfigParser):
         self.optionxform = str
 
 
-def to_ini(obj, no_extra_spaces=False):
+def to_ini(obj, *, no_extra_spaces=False):
     """Read the given dict and return an INI formatted string"""
 
     if not isinstance(obj, Mapping):
