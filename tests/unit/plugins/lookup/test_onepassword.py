@@ -13,73 +13,12 @@ from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 from ansible.plugins.loader import lookup_loader
 
 from ansible_collections.community.general.plugins.lookup.onepassword import (
-    OnePassCLIv1,
     OnePassCLIv2,
 )
 
 from .onepassword_common import MOCK_ENTRIES
 
-OP_VERSION_FIXTURES = ["opv1", "opv2"]
-
-
-@pytest.mark.parametrize(
-    ("args", "rc", "expected_call_args", "expected_call_kwargs", "expected"),
-    (
-        (
-            [],
-            0,
-            ["get", "account"],
-            {"ignore_errors": True},
-            True,
-        ),
-        (
-            [],
-            1,
-            ["get", "account"],
-            {"ignore_errors": True},
-            False,
-        ),
-        (
-            ["acme"],
-            1,
-            ["get", "account", "--account", "acme.1password.com"],
-            {"ignore_errors": True},
-            False,
-        ),
-    ),
-)
-def test_assert_logged_in_v1(mocker, args, rc, expected_call_args, expected_call_kwargs, expected):
-    mocker.patch.object(OnePassCLIv1, "_run", return_value=[rc, "", ""])
-
-    op_cli = OnePassCLIv1(*args)
-    result = op_cli.assert_logged_in()
-
-    op_cli._run.assert_called_with(expected_call_args, **expected_call_kwargs)
-    assert result == expected
-
-
-def test_full_signin_v1(mocker):
-    mocker.patch.object(OnePassCLIv1, "_run", return_value=[0, "", ""])
-
-    op_cli = OnePassCLIv1(
-        subdomain="acme",
-        username="bob@acme.com",
-        secret_key="SECRET",
-        master_password="ONEKEYTORULETHEMALL",
-    )
-    result = op_cli.full_signin()
-
-    op_cli._run.assert_called_with(
-        [
-            "signin",
-            "acme.1password.com",
-            b"bob@acme.com",
-            b"SECRET",
-            "--raw",
-        ],
-        command_input=b"ONEKEYTORULETHEMALL",
-    )
-    assert result == [0, "", ""]
+OP_VERSION_FIXTURES = ["opv2"]
 
 
 @pytest.mark.parametrize(
@@ -153,10 +92,7 @@ def test_full_signin_v2(mocker):
 
 @pytest.mark.parametrize(
     ("version", "version_class"),
-    (
-        ("1.17.2", OnePassCLIv1),
-        ("2.27.4", OnePassCLIv2),
-    ),
+    (("2.27.4", OnePassCLIv2),),
 )
 def test_op_correct_cli_class(fake_op, version, version_class):
     op = fake_op(version)
@@ -165,6 +101,8 @@ def test_op_correct_cli_class(fake_op, version, version_class):
 
 
 def test_op_unsupported_cli_version(fake_op):
+    with pytest.raises(AnsibleLookupError, match="is unsupported"):
+        fake_op("1.17.2")
     with pytest.raises(AnsibleLookupError, match="is unsupported"):
         fake_op("99.77.77")
 
@@ -247,17 +185,6 @@ def test_op_assert_logged_in(mocker, login_status, op_fixture, request):
 
     if not login_status:
         op.set_token.assert_called_once()
-
-
-@pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
-def test_op_get_raw_v1(mocker, op_fixture, request):
-    op = request.getfixturevalue(op_fixture)
-    mocker.patch.object(op._cli, "get_raw", return_value=[99, "RAW OUTPUT", ""])
-
-    result = op.get_raw("some item")
-
-    assert result == "RAW OUTPUT"
-    op._cli.get_raw.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -354,16 +281,3 @@ def test_op_connect_partial_args(plugin, connect_host, connect_token, mocker):
 
     with pytest.raises(AnsibleOptionsError):
         op_lookup.run("login", vault_name="test vault", connect_host=connect_host, connect_token=connect_token)
-
-
-@pytest.mark.parametrize(
-    ("kwargs"),
-    (
-        {"connect_host": "http://localhost", "connect_token": "foobar"},
-        {"service_account_token": "foobar"},
-    ),
-)
-def test_opv1_unsupported_features(kwargs):
-    op_cli = OnePassCLIv1(**kwargs)
-    with pytest.raises(AnsibleLookupError):
-        op_cli.full_signin()

@@ -11,6 +11,7 @@ from __future__ import annotations
 class ModuleDocFragment:
     DOCUMENTATION = r"""
 requirements:
+  - C(op) 1Password command line utility version 2 or later.
   - See U(https://support.1password.com/command-line/)
 options:
   master_password:
@@ -39,7 +40,6 @@ options:
   service_account_token:
     description:
       - The access key for a service account.
-      - Only works with 1Password CLI version 2 or later.
     type: str
   vault:
     description: Vault containing the item to retrieve (case-insensitive). If absent, searches all vaults.
