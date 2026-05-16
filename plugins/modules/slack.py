@@ -522,9 +522,7 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         url_get = f"https://slack.com/api/files.getUploadURLExternal?filename={f_name}&length={file_size}"
 
         resp, info = fetch_url(module, url_get, headers=headers, method="GET")
-        # Add warning with status code and message for better debugging, not fail, because in my
-        # case not all files from list can be generated for example supply logs, and i want to
-        # get all possible files uploaded, not fail on first one
+
         if info["status"] != 200:
             module.fail_json(
                 msg=f"Failed to get upload URL for {f_name}. Slack API endpoint returned HTTP {info['status']}.",
