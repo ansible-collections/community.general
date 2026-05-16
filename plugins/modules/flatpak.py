@@ -185,7 +185,6 @@ command:
 """
 
 from re import match
-
 from urllib.parse import urlparse
 
 from ansible.module_utils.basic import AnsibleModule
