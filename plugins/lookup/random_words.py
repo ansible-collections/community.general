@@ -79,6 +79,8 @@ _raw:
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_no_terms
+
 try:
     from xkcdpass import xkcd_password as xp
 
@@ -95,6 +97,7 @@ class LookupModule(LookupBase):
             raise AnsibleLookupError('Python xkcdpass library is required. Please install using "pip install xkcdpass"')
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_no_terms(self, terms=terms, direct=kwargs)
         method = self.get_option("case")
         delimiter = self.get_option("delimiter")
         max_length = self.get_option("max_length")

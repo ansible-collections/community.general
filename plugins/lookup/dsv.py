@@ -85,6 +85,8 @@ EXAMPLES = r"""
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 sdk_is_missing = False
 
 try:
@@ -115,6 +117,7 @@ class LookupModule(LookupBase):
             raise AnsibleError("python-dsv-sdk==0.0.1 must be installed to use this plugin")
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         vault = LookupModule.Client(
             {

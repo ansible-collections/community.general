@@ -1,0 +1,6 @@
+breaking_changes:
+  - "all lookup plugins - if a keyword argument ``_terms`` is passed, the plugin rejects the call and tells the user to use positional arguments instead. ``_terms`` was never used, and is used in documentation as a placeholder for positional arguments (https://github.com/ansible-collections/community.general/pull/12060)."
+  - "github_app_access_token lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060)."
+  - "random_pet lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060)."
+  - "random_string lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060)."
+  - "random_words lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060)."

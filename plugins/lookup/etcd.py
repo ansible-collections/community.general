@@ -72,6 +72,8 @@ import json
 from ansible.module_utils.urls import open_url
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 # this can be made configurable, not should not use ansible.cfg
 #
 # Made module configurable from playbooks:
@@ -156,6 +158,7 @@ class Etcd:
 class LookupModule(LookupBase):
     def run(self, terms, variables, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         validate_certs = self.get_option("validate_certs")
         url = self.get_option("url")

@@ -57,11 +57,13 @@ import json
 from ansible.plugins.lookup import LookupBase
 
 from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         vault = self.get_option("vault")
         subdomain = self.get_option("subdomain")

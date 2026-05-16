@@ -64,6 +64,8 @@ from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 ANOTHER_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from pam.revbits_ansible.server import SecretServer
@@ -85,6 +87,7 @@ class LookupModule(LookupBase):
         if ANOTHER_LIBRARY_IMPORT_ERROR:
             raise AnsibleError("revbits_ansible must be installed to use this plugin") from ANOTHER_LIBRARY_IMPORT_ERROR
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
         secret_server = LookupModule.Client(
             {
                 "base_url": self.get_option("base_url"),

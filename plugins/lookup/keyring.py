@@ -14,6 +14,13 @@ requirements:
 short_description: Grab secrets from the OS keyring
 description:
   - Allows you to access data stored in the OS provided keyring/keychain.
+options:
+  _terms:
+    description:
+      - List of pairs of service and user name.
+      - Every entry must be of the form V(servicename username).
+    type: list
+    elements: str
 """
 
 EXAMPLES = r"""
@@ -41,6 +48,8 @@ HAS_KEYRING = True
 from ansible.errors import AnsibleError
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 try:
     import keyring
 except ImportError:
@@ -57,6 +66,7 @@ class LookupModule(LookupBase):
             raise AnsibleError("Can't LOOKUP(keyring): missing required python library 'keyring'")
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         display.vvvv(f"keyring: {keyring.get_keyring()}")
         ret = []

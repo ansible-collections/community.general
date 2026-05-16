@@ -65,6 +65,8 @@ except ImportError:
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 # ==============================================================
 # DNSTXT: DNS TXT records
 #
@@ -76,6 +78,7 @@ from ansible.plugins.lookup import LookupBase
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         if HAVE_DNS is False:
             raise AnsibleError("Can't LOOKUP(dnstxt): module dns.resolver is not installed")

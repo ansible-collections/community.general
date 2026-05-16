@@ -173,6 +173,8 @@ from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_no_terms
+
 
 class LookupModule(LookupBase):
     @staticmethod
@@ -192,6 +194,7 @@ class LookupModule(LookupBase):
         special_chars = string.punctuation
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_no_terms(self, terms=terms, direct=kwargs)
 
         length = self.get_option("length")
         base64_flag = self.get_option("base64")

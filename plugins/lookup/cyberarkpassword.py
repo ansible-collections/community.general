@@ -179,6 +179,7 @@ class LookupModule(LookupBase):
     """
 
     def run(self, terms, variables=None, **kwargs):
+        # TODO: use new-style option parsing
         display.vvvv(f"{terms}")
         if isinstance(terms, list):
             return_values = []

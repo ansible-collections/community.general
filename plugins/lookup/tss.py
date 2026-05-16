@@ -305,6 +305,8 @@ from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 try:
     from delinea.secrets.server import (
         AccessTokenAuthorizer,
@@ -465,6 +467,7 @@ class LookupModule(LookupBase):
             raise AnsibleError("python-tss-sdk must be installed to use this plugin")
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         tss = TSSClient.from_params(
             base_url=self.get_option("base_url"),

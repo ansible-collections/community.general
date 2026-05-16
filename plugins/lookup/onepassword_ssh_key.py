@@ -56,6 +56,7 @@ from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePass,
     OnePassCLIv2,
 )
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
 class LookupModule(LookupBase):
@@ -82,6 +83,7 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         ssh_format = self.get_option("ssh_format")
         vault = self.get_option("vault")

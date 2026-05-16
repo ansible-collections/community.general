@@ -247,6 +247,8 @@ from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 try:
     import dns.exception
     import dns.name
@@ -371,6 +373,7 @@ class LookupModule(LookupBase):
             raise AnsibleError("The dig lookup requires the python 'dnspython' library and it is not installed")
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         # Create Resolver object so that we can set NS if necessary
         myres = dns.resolver.Resolver(configure=True)

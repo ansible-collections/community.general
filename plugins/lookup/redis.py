@@ -85,6 +85,8 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 
 class LookupModule(LookupBase):
     def run(self, terms, variables, **kwargs):
@@ -93,6 +95,7 @@ class LookupModule(LookupBase):
 
         # get options
         self.set_options(direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         # setup connection
         host = self.get_option("host")

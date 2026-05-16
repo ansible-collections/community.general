@@ -34,9 +34,12 @@ _raw:
     - Flattened list.
   type: list
 """
+
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.listify import listify_lookup_plugin_terms
+
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
 class LookupModule(LookupBase):
@@ -81,5 +84,6 @@ class LookupModule(LookupBase):
             raise AnsibleError("with_flattened expects a list")
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         return self._do_flatten(terms, variables)

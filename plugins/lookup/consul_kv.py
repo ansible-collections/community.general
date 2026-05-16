@@ -15,7 +15,7 @@ description:
 requirements:
   - 'py-consul python library U(https://github.com/criteo/py-consul?tab=readme-ov-file#installation)'
 options:
-  _raw:
+  _terms:
     description: List of key(s) to retrieve.
     type: list
     elements: string
@@ -126,6 +126,8 @@ from ansible.errors import AnsibleAssertionError, AnsibleError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 try:
     import consul
 
@@ -143,6 +145,7 @@ class LookupModule(LookupBase):
 
         # get options
         self.set_options(direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         scheme = self.get_option("scheme")
         host = self.get_option("host")

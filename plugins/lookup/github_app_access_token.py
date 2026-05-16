@@ -105,6 +105,8 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_no_terms
+
 display = Display()
 
 
@@ -208,6 +210,7 @@ class LookupModule(LookupBase):
             )
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_no_terms(self, terms=terms, direct=kwargs)
 
         if not (self.get_option("key_path") or self.get_option("private_key")):
             raise AnsibleOptionsError("One of key_path or private_key is required")

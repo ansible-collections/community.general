@@ -124,6 +124,8 @@ from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 from ansible.template import Templar
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 try:
     from ansible.template import trust_as_template as _trust_as_template
 
@@ -195,6 +197,7 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         """Generate list."""
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         result = []
         if len(terms) > 0:

@@ -94,6 +94,8 @@ _raw:
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 CREDSTASH_INSTALLED = False
 
 try:
@@ -110,6 +112,7 @@ class LookupModule(LookupBase):
             raise AnsibleError("The credstash lookup plugin requires credstash to be installed.")
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         version = self.get_option("version")
         region = self.get_option("region")

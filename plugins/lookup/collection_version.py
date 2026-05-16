@@ -64,6 +64,8 @@ import yaml
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 FQCN_RE = re.compile(r"^[A-Za-z0-9_]+\.[A-Za-z0-9_]+$")
 
 
@@ -103,6 +105,7 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         result = []
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
         not_found = self.get_option("result_not_found")
         no_version = self.get_option("result_no_version")
 

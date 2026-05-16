@@ -125,6 +125,8 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 
 class BitwardenException(AnsibleError):
     pass
@@ -254,6 +256,7 @@ class Bitwarden:
 class LookupModule(LookupBase):
     def run(self, terms=None, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
         field = self.get_option("field")
         search_field = self.get_option("search")
         collection_id = self.get_option("collection_id")

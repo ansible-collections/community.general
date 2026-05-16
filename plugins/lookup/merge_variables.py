@@ -275,6 +275,8 @@ from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 if t.TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -294,6 +296,7 @@ def _verify_and_get_type(variable: t.Any) -> str:
 class LookupModule(LookupBase):
     def run(self, terms: list[str], variables: dict[str, t.Any], **kwargs) -> list[t.Any]:
         self.set_options(direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
         initial_value = self.get_option("initial_value", None)
         self._override_behavior = self.get_option("override", "error")
         self._pattern_type = self.get_option("pattern_type", "regex")

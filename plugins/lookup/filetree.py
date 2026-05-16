@@ -128,6 +128,7 @@ _raw:
       description: Time of last metadata update or creation (depends on OS).
       type: float
 """
+
 import grp
 import os
 import pwd
@@ -145,6 +146,8 @@ except ImportError:
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 display = Display()
 
@@ -218,6 +221,7 @@ def file_props(root, path):
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         basedir = self.get_basedir(variables)
 

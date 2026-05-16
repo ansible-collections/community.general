@@ -44,6 +44,8 @@ from ansible.errors import AnsibleAssertionError, AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 
 class LookupModule(LookupBase):
     def read_shelve(self, shelve_filename, key):
@@ -56,8 +58,11 @@ class LookupModule(LookupBase):
         return res
 
     def run(self, terms, variables=None, **kwargs):
+        # TODO: use new-style option parsing
         if not isinstance(terms, list):
             terms = [terms]
+
+        check_for_wrong_terms(self, direct=kwargs)
 
         ret = []
 

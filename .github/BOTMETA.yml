@@ -1503,6 +1503,8 @@ files:
     maintainers: vbotka
   $plugin_utils/_keys_filter.py:
     maintainers: vbotka
+  $plugin_utils/_lookup.py:
+    maintainers: felixfontein
   $plugin_utils/_unsafe.py:
     maintainers: felixfontein
   $plugin_utils/_tags.py:

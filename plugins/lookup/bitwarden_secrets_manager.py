@@ -75,6 +75,7 @@ from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
 from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
 class BitwardenSecretsManagerException(AnsibleLookupError):
@@ -147,6 +148,7 @@ class BitwardenSecretsManager:
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
         bws_access_token = self.get_option("bws_access_token")
 
         return [_bitwarden_secrets_manager.get_secret(term, bws_access_token) for term in terms]

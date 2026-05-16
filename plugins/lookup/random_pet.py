@@ -75,6 +75,8 @@ except ImportError:
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_no_terms
+
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
@@ -82,6 +84,7 @@ class LookupModule(LookupBase):
             raise AnsibleError('Python petname library is required. Please install using "pip install petname"')
 
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_no_terms(self, terms=terms, direct=kwargs)
         words = self.get_option("words")
         length = self.get_option("length")
         prefix = self.get_option("prefix")

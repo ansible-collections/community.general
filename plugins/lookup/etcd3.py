@@ -151,6 +151,8 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
 try:
     import etcd3
 
@@ -185,6 +187,7 @@ def etcd3_client(client_params):
 class LookupModule(LookupBase):
     def run(self, terms, variables, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
 
         if not HAS_ETCD:
             display.error(missing_required_lib("etcd3"))
