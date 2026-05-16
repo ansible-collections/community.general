@@ -1,0 +1,2 @@
+bugfixes:
+  - flatpak - fix reporting ``changed`` on already present flatpaks with a dash in the last part of the id (https://github.com/ansible-collections/community.general/issues/12062).
