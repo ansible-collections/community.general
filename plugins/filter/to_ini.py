@@ -18,7 +18,7 @@ options:
     required: true
   no_extra_spaces:
     description:
-      - Do not insert spaces before and after '=' symbol.
+      - Do not insert spaces before and after V(=) symbol.
     type: bool
     default: false
     version_added: 13.0.0
