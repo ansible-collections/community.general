@@ -184,6 +184,7 @@ command:
   sample: "/usr/bin/flatpak install --user --nontinteractive flathub org.gnome.Calculator"
 """
 
+from re import match
 from urllib.parse import urlparse
 
 from ansible.module_utils.basic import AnsibleModule
@@ -324,15 +325,7 @@ def _is_flatpak_id(part):
     # https://docs.flatpak.org/en/latest/conventions.html#application-ids
     # Flathub:
     # https://docs.flathub.org/docs/for-app-authors/requirements#application-id
-    if "." not in part:
-        return False
-    sections = part.split(".")
-    if len(sections) < 2:
-        return False
-    domain = sections[0]
-    if not domain.islower():
-        return False
-    return all(section.isalnum() for section in sections[1:])
+    return match(r"^[a-z]{2,}(\.\w+)+\.[\w-]+$", part)
 
 
 def _parse_flatpak_name(name):
