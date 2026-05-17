@@ -1,0 +1,103 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Setup: create a minimal site config for testing
+- name: create test site config
+  ansible.builtin.copy:
+    dest: /etc/apache2/sites-available/ansible_test_site.conf
+    content: |
+      <VirtualHost *:80>
+          ServerName ansible-test.local
+          DocumentRoot /var/www/html
+      </VirtualHost>
+
+# ------------------------------------------------------------------
+# Test: enable a site
+# ------------------------------------------------------------------
+- name: enable test site
+  community.general.apache2_site:
+    name: ansible_test_site
+    state: present
+  register: enable_first
+
+- name: ensure changed on first enable
+  ansible.builtin.assert:
+    that:
+      - enable_first is changed
+
+# ------------------------------------------------------------------
+# Test: idempotency on enable
+# ------------------------------------------------------------------
+- name: enable test site again (idempotency check)
+  community.general.apache2_site:
+    name: ansible_test_site
+    state: present
+  register: enable_second
+
+- name: ensure idempotency on enable
+  ansible.builtin.assert:
+    that:
+      - enable_second is not changed
+
+# ------------------------------------------------------------------
+# Test: disable a site
+# ------------------------------------------------------------------
+- name: disable test site
+  community.general.apache2_site:
+    name: ansible_test_site
+    state: absent
+  register: disable_first
+
+- name: ensure changed on first disable
+  ansible.builtin.assert:
+    that:
+      - disable_first is changed
+
+# ------------------------------------------------------------------
+# Test: idempotency on disable
+# ------------------------------------------------------------------
+- name: disable test site again (idempotency check)
+  community.general.apache2_site:
+    name: ansible_test_site
+    state: absent
+  register: disable_second
+
+- name: ensure idempotency on disable
+  ansible.builtin.assert:
+    that:
+      - disable_second is not changed
+
+# ------------------------------------------------------------------
+# Test: check_mode does not make changes
+# ------------------------------------------------------------------
+- name: enable test site in check_mode
+  community.general.apache2_site:
+    name: ansible_test_site
+    state: present
+  check_mode: true
+  register: check_mode_result
+
+- name: ensure check_mode reports changed
+  ansible.builtin.assert:
+    that:
+      - check_mode_result is changed
+
+- name: ensure check_mode did not actually enable the site
+  ansible.builtin.stat:
+    path: /etc/apache2/sites-enabled/ansible_test_site.conf
+  register: site_stat
+
+- name: assert symlink was not created in check_mode
+  ansible.builtin.assert:
+    that:
+      - not site_stat.stat.exists
+
+# ------------------------------------------------------------------
+# Cleanup: remove test site config
+# ------------------------------------------------------------------
+- name: remove test site config
+  ansible.builtin.file:
+    path: /etc/apache2/sites-available/ansible_test_site.conf
+    state: absent
