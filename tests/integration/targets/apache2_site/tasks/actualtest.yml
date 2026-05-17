@@ -3,7 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Setup: create a minimal site config for testing
 - name: create test site config
   ansible.builtin.copy:
     dest: /etc/apache2/sites-available/ansible_test_site.conf
@@ -13,9 +12,6 @@
           DocumentRoot /var/www/html
       </VirtualHost>
 
-# ------------------------------------------------------------------
-# Test: enable a site
-# ------------------------------------------------------------------
 - name: enable test site
   community.general.apache2_site:
     name: ansible_test_site
@@ -27,9 +23,6 @@
     that:
       - enable_first is changed
 
-# ------------------------------------------------------------------
-# Test: idempotency on enable
-# ------------------------------------------------------------------
 - name: enable test site again (idempotency check)
   community.general.apache2_site:
     name: ansible_test_site
@@ -41,9 +34,6 @@
     that:
       - enable_second is not changed
 
-# ------------------------------------------------------------------
-# Test: disable a site
-# ------------------------------------------------------------------
 - name: disable test site
   community.general.apache2_site:
     name: ansible_test_site
@@ -55,9 +45,6 @@
     that:
       - disable_first is changed
 
-# ------------------------------------------------------------------
-# Test: idempotency on disable
-# ------------------------------------------------------------------
 - name: disable test site again (idempotency check)
   community.general.apache2_site:
     name: ansible_test_site
@@ -69,9 +56,6 @@
     that:
       - disable_second is not changed
 
-# ------------------------------------------------------------------
-# Test: check_mode does not make changes
-# ------------------------------------------------------------------
 - name: enable test site in check_mode
   community.general.apache2_site:
     name: ansible_test_site
@@ -94,9 +78,6 @@
     that:
       - not site_stat.stat.exists
 
-# ------------------------------------------------------------------
-# Cleanup: remove test site config
-# ------------------------------------------------------------------
 - name: remove test site config
   ansible.builtin.file:
     path: /etc/apache2/sites-available/ansible_test_site.conf
