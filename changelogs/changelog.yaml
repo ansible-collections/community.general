@@ -1974,3 +1974,25 @@ releases:
       - 11836-fixes.yml
       - 11850-homebrew-cask-sudo-password.yml
     release_date: '2026-04-20'
+  11.4.8:
+    changes:
+      bugfixes:
+        - cargo - fix ``state=latest`` always reporting ``changed`` due to greedy
+          regex capturing description text instead of version string (https://github.com/ansible-collections/community.general/issues/8949,
+          https://github.com/ansible-collections/community.general/pull/12064).
+        - odbc - fetch rows before committing to fix ``HY010`` function sequence error
+          (https://github.com/ansible-collections/community.general/issues/5395, https://github.com/ansible-collections/community.general/pull/11972).
+        - xml - emit an error when ``value`` is not a string, pointing to the offending
+          xpath (https://github.com/ansible-collections/community.general/issues/7171,
+          https://github.com/ansible-collections/community.general/pull/11959).
+      minor_changes:
+        - mattermost, rocketchat, slack - update default ``icon_url`` to ansible favicon
+          (https://github.com/ansible-collections/community.general/pull/11909).
+      release_summary: Bugfix release.
+    fragments:
+      - 11.4.8.yml
+      - 11909-fix-favicon-url.yml
+      - 11959-xml-boolean-value.yml
+      - 11972-odbc-fix-commit-fetch-order.yml
+      - 12064-cargo-latest-version-regex.yml
+    release_date: '2026-05-17'

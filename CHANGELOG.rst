@@ -6,6 +6,26 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.8
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Minor Changes
+-------------
+
+- mattermost, rocketchat, slack - update default ``icon_url`` to ansible favicon (https://github.com/ansible-collections/community.general/pull/11909).
+
+Bugfixes
+--------
+
+- cargo - fix ``state=latest`` always reporting ``changed`` due to greedy regex capturing description text instead of version string (https://github.com/ansible-collections/community.general/issues/8949, https://github.com/ansible-collections/community.general/pull/12064).
+- odbc - fetch rows before committing to fix ``HY010`` function sequence error (https://github.com/ansible-collections/community.general/issues/5395, https://github.com/ansible-collections/community.general/pull/11972).
+- xml - emit an error when ``value`` is not a string, pointing to the offending xpath (https://github.com/ansible-collections/community.general/issues/7171, https://github.com/ansible-collections/community.general/pull/11959).
+
 v11.4.7
 =======
 
