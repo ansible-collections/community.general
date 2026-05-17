@@ -478,6 +478,8 @@ files:
   $modules/apache2_module.py:
     ignore: robinro
     maintainers: berendt n0trax
+  $modules/apache2_site.py:
+    maintainers: Francisco-Xiq
   $modules/apk.py:
     ignore: kbrebanov
     labels: apk

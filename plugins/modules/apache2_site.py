@@ -60,6 +60,7 @@ name:
 """
 
 import os
+
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -89,10 +90,7 @@ def main():
             a2ensite = module.get_bin_path("a2ensite", required=True)
             rc, stdout, stderr = module.run_command([a2ensite, name])
             if rc != 0:
-                module.fail_json(
-                    msg=f"Failed to enable site {name}: {stderr}",
-                    rc=rc, stdout=stdout, stderr=stderr
-                )
+                module.fail_json(msg=f"Failed to enable site {name}: {stderr}", rc=rc, stdout=stdout, stderr=stderr)
 
     elif not want_enabled and is_enabled:
         changed = True
@@ -100,10 +98,7 @@ def main():
             a2dissite = module.get_bin_path("a2dissite", required=True)
             rc, stdout, stderr = module.run_command([a2dissite, name])
             if rc != 0:
-                module.fail_json(
-                    msg=f"Failed to disable site {name}: {stderr}",
-                    rc=rc, stdout=stdout, stderr=stderr
-                )
+                module.fail_json(msg=f"Failed to disable site {name}: {stderr}", rc=rc, stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=changed, name=name)
 
