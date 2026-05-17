@@ -37,4 +37,3 @@
     - name: ensure that all test sites are disabled again
       ansible.builtin.assert:
         that: sites_before.stdout == sites_after.stdout
-
