@@ -11,7 +11,7 @@ To run Keycloak component info module's integration test, start a keycloak serve
 
 Run integration tests:
 
-    ansible-test integration -v keycloak_realm --allow-unsupported --docker fedora35 --docker-network host
+    ansible-test integration -v keycloak_realm --allow-unsupported --docker fedora --docker-network host
 
 Cleanup:
 

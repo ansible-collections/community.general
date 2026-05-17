@@ -13,7 +13,7 @@ Source Ansible env-setup from ansible github repository
 
 Run integration tests:
 
-    ansible-test integration -v keycloak_role --allow-unsupported --docker fedora35 --docker-network host
+    ansible-test integration -v keycloak_role --allow-unsupported --docker fedora --docker-network host
 
 Cleanup:
 

@@ -7,4 +7,4 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 Run integration tests:
 
-    ansible-test integration -v keycloak_authentication --allow-unsupported --docker fedora35 --docker-network host
+    ansible-test integration -v keycloak_authentication --allow-unsupported --docker fedora --docker-network host

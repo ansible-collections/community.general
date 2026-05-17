@@ -177,14 +177,14 @@ Integration tests on Docker have the following parameters:
   For plugins, the plugin type is added before the plugin's short name, for example `callback_yaml` for the `community.general.yaml` callback.
 
 ```.bash
-# Test all plugins/modules on fedora40
-ansible-test integration -v --docker fedora40
+# Test all plugins/modules on fedora
+ansible-test integration -v --docker fedora
 
 # Template
 ansible-test integration -v --docker image_name test_name
 
-# Example community.general.ini_file module on fedora40 Docker image:
-ansible-test integration -v --docker fedora40 ini_file
+# Example community.general.ini_file module on fedora Docker image:
+ansible-test integration -v --docker fedora ini_file
 ```
 
 #### Without isolation
