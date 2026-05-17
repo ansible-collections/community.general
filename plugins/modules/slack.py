@@ -631,11 +631,8 @@ def main():
     message_id = module.params["message_id"]
     prepend_hash = module.params["prepend_hash"]
     files = module.params["files"]
-
-    webhook_re = re.compile(r"^T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+$")
-    api_token_re = re.compile(r"^xox[bpa]-")
-    is_webhook = bool(webhook_re.match(token))
-    is_api_token = bool(api_token_re.match(token))
+    is_webhook = re.match(r"^T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+$", token)
+    is_api_token = re.match(r"^xox[bpa]-", token)
     if not (is_webhook or is_api_token):
         module.fail_json(
             msg="The token provided is not a valid Slack token. "
