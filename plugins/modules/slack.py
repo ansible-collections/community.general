@@ -544,17 +544,18 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         try:
             with open(f_path, "rb") as f:
                 file_data = f.read()
-                u_resp, u_info = fetch_url(
-                    module,
-                    res["upload_url"],
-                    data=file_data,
-                    method="POST",
-                    headers={"Content-Type": "application/octet-stream"},
-                )
 
-                if u_info["status"] != 200:
-                    module.warn(f"Failed to upload bits for {f_name}. Status: {u_info['status']}")
-                    continue
+            u_resp, u_info = fetch_url(
+                module,
+                res["upload_url"],
+                data=file_data,
+                method="POST",
+                headers={"Content-Type": "application/octet-stream"},
+            )
+
+            if u_info["status"] != 200:
+                module.warn(f"Failed to upload bits for {f_name}. Status: {u_info['status']}")
+                continue
 
         except Exception as e:
             module.warn(f"Failed to upload bits for {f_name}: {e}")
