@@ -1,0 +1,4 @@
+bugfixes:
+  - "cargo - fix ``state=latest`` always reporting ``changed`` due to greedy regex capturing description text instead of version string
+    (https://github.com/ansible-collections/community.general/issues/8949,
+    https://github.com/ansible-collections/community.general/pull/12064)."
