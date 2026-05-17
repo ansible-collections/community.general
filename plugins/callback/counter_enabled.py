@@ -141,10 +141,16 @@ class CallbackModule(CallbackBase):
         self._task_counter += 1
 
     def _host_label(self, result):
-        delegated_vars = result._result.get("_ansible_delegated_vars", None)
-        if delegated_vars:
-            return f"[{result._host.get_name()} -> {delegated_vars['ansible_host']}]"
-        return f"[{result._host.get_name()}]"
+        host_name = result._host.get_name()
+        delegate_to = result._task.delegate_to
+        if delegate_to and delegate_to != host_name:
+            delegated_vars = result._result.get("_ansible_delegated_vars", {})
+            ahost = delegated_vars.get("ansible_host", delegate_to)
+            label = f"{host_name} -> {delegate_to}"
+            if ahost != delegate_to:
+                label += f"({ahost})"
+            return f"[{label}]"
+        return f"[{host_name}]"
 
     def _display_result_ok(self, result, counter_str="", item_suffix=""):
         if isinstance(result._task, TaskInclude):
