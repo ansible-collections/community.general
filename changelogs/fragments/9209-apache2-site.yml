@@ -1,2 +1,0 @@
-minor_changes:
-  - apache2_site - new module to enable/disable Apache2 sites using ``a2ensite`` and ``a2dissite`` (https://github.com/ansible-collections/community.general/issues/9209).
