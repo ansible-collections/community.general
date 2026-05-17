@@ -196,7 +196,7 @@ class Cargo:
         cmd = ["search", name, "--limit", "1"]
         data, dummy = self._exec(cmd, True, False, False)
 
-        match = re.search(r'"(.+)"', data)
+        match = re.search(r"^" + re.escape(name) + r'\s*=\s*"([^"]+)"', data, re.MULTILINE)
         if not match:
             self.module.fail_json(msg=f"No published version for package {name} found")
         return match.group(1)
