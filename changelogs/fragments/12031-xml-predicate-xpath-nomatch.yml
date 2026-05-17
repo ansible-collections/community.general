@@ -1,5 +1,5 @@
-bugfixes:
-  - "xml - fix predicated ``xpath`` (e.g. ``element[text()='old']``) incorrectly
-    creating nodes when the predicate finds no match instead of being a no-op
+minor_changes:
+  - xml - add ``create_if_missing`` option to control whether a node is created when
+    ``value`` is set and ``xpath`` finds no match
     (https://github.com/ansible-collections/community.general/issues/8730,
-    https://github.com/ansible-collections/community.general/pull/12031)."
+    https://github.com/ansible-collections/community.general/pull/12031).

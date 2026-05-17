@@ -144,6 +144,13 @@ options:
       - This parameter requires O(xpath) to be set.
     type: bool
     default: false
+  create_if_missing:
+    description:
+      - When using O(value) and the O(xpath) matches no nodes, create the node.
+      - When set to V(false), a no-match is silently ignored instead of creating a new node.
+    type: bool
+    default: true
+    version_added: "13.0.0"
 requirements:
   - lxml >= 2.3.0
 notes:
@@ -673,16 +680,12 @@ def ensure_xpath_exists(module, tree, xpath, namespaces):
     finish(module, tree, xpath, namespaces, changed)
 
 
-def set_target_inner(module, tree, xpath, namespaces, attribute, value):
+def set_target_inner(module, tree, xpath, namespaces, attribute, value, create_if_missing=True):
     changed = False
 
     try:
         if not is_node(tree, xpath, namespaces):
-            # If the xpath ends with a [predicate] and the base path exists,
-            # the no-match is due to the predicate not being satisfied —
-            # treat as no-op rather than incorrectly creating new nodes.
-            m = _RE_SPLITSUBLAST.match(xpath)
-            if m and m.group(1) and is_node(tree, m.group(1), namespaces):
+            if not create_if_missing:
                 return changed
             changed = check_or_make_target(module, tree, xpath, namespaces)
     except Exception as e:
@@ -728,8 +731,8 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value):
     return changed
 
 
-def set_target(module, tree, xpath, namespaces, attribute, value):
-    changed = set_target_inner(module, tree, xpath, namespaces, attribute, value)
+def set_target(module, tree, xpath, namespaces, attribute, value, create_if_missing):
+    changed = set_target_inner(module, tree, xpath, namespaces, attribute, value, create_if_missing)
     finish(module, tree, xpath, namespaces, changed)
 
 
@@ -901,6 +904,7 @@ def main():
             huge_tree=dict(type="bool", default=False),
             insertbefore=dict(type="bool", default=False),
             insertafter=dict(type="bool", default=False),
+            create_if_missing=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
         required_by=dict(
@@ -945,6 +949,7 @@ def main():
     huge_tree = module.params["huge_tree"]
     insertbefore = module.params["insertbefore"]
     insertafter = module.params["insertafter"]
+    create_if_missing = module.params["create_if_missing"]
 
     # Check if we have lxml 2.3.0 or newer installed
     if not HAS_LXML:
@@ -1020,7 +1025,7 @@ def main():
 
     # Is the xpath target an attribute selector?
     if value is not None:
-        set_target(module, doc, xpath, namespaces, attribute, value)
+        set_target(module, doc, xpath, namespaces, attribute, value, create_if_missing)
 
     # If an xpath was provided, we need to do something with the data
     if xpath is not None:
