@@ -2,36 +2,39 @@
 
 **Topics**
 
-- <a href="#v10-7-8">v10\.7\.8</a>
+- <a href="#v10-7-9">v10\.7\.9</a>
     - <a href="#release-summary">Release Summary</a>
+    - <a href="#minor-changes">Minor Changes</a>
+- <a href="#v10-7-8">v10\.7\.8</a>
+    - <a href="#release-summary-1">Release Summary</a>
     - <a href="#bugfixes">Bugfixes</a>
 - <a href="#v10-7-7">v10\.7\.7</a>
-    - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#release-summary-2">Release Summary</a>
     - <a href="#bugfixes-1">Bugfixes</a>
 - <a href="#v10-7-6">v10\.7\.6</a>
-    - <a href="#release-summary-2">Release Summary</a>
+    - <a href="#release-summary-3">Release Summary</a>
     - <a href="#security-fixes">Security Fixes</a>
     - <a href="#bugfixes-2">Bugfixes</a>
 - <a href="#v10-7-5">v10\.7\.5</a>
-    - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#release-summary-4">Release Summary</a>
     - <a href="#bugfixes-3">Bugfixes</a>
 - <a href="#v10-7-4">v10\.7\.4</a>
-    - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#release-summary-5">Release Summary</a>
     - <a href="#bugfixes-4">Bugfixes</a>
 - <a href="#v10-7-3">v10\.7\.3</a>
-    - <a href="#release-summary-5">Release Summary</a>
+    - <a href="#release-summary-6">Release Summary</a>
     - <a href="#bugfixes-5">Bugfixes</a>
 - <a href="#v10-7-2">v10\.7\.2</a>
-    - <a href="#release-summary-6">Release Summary</a>
+    - <a href="#release-summary-7">Release Summary</a>
     - <a href="#bugfixes-6">Bugfixes</a>
 - <a href="#v10-7-1">v10\.7\.1</a>
-    - <a href="#release-summary-7">Release Summary</a>
-    - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#release-summary-8">Release Summary</a>
+    - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes-7">Bugfixes</a>
 - <a href="#v10-7-0">v10\.7\.0</a>
-    - <a href="#release-summary-8">Release Summary</a>
-    - <a href="#minor-changes-1">Minor Changes</a>
+    - <a href="#release-summary-9">Release Summary</a>
+    - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-8">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
@@ -39,31 +42,31 @@
         - <a href="#filter">Filter</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v10-6-0">v10\.6\.0</a>
-    - <a href="#release-summary-9">Release Summary</a>
-    - <a href="#minor-changes-2">Minor Changes</a>
+    - <a href="#release-summary-10">Release Summary</a>
+    - <a href="#minor-changes-3">Minor Changes</a>
     - <a href="#deprecated-features-2">Deprecated Features</a>
     - <a href="#bugfixes-9">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
     - <a href="#new-plugins-1">New Plugins</a>
         - <a href="#connection">Connection</a>
 - <a href="#v10-5-0">v10\.5\.0</a>
-    - <a href="#release-summary-10">Release Summary</a>
-    - <a href="#minor-changes-3">Minor Changes</a>
+    - <a href="#release-summary-11">Release Summary</a>
+    - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#bugfixes-10">Bugfixes</a>
     - <a href="#new-modules-1">New Modules</a>
 - <a href="#v10-4-0">v10\.4\.0</a>
-    - <a href="#release-summary-11">Release Summary</a>
-    - <a href="#minor-changes-4">Minor Changes</a>
+    - <a href="#release-summary-12">Release Summary</a>
+    - <a href="#minor-changes-5">Minor Changes</a>
     - <a href="#deprecated-features-3">Deprecated Features</a>
     - <a href="#bugfixes-11">Bugfixes</a>
     - <a href="#new-modules-2">New Modules</a>
 - <a href="#v10-3-1">v10\.3\.1</a>
-    - <a href="#release-summary-12">Release Summary</a>
-    - <a href="#minor-changes-5">Minor Changes</a>
-    - <a href="#bugfixes-12">Bugfixes</a>
-- <a href="#v10-3-0">v10\.3\.0</a>
     - <a href="#release-summary-13">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
+    - <a href="#bugfixes-12">Bugfixes</a>
+- <a href="#v10-3-0">v10\.3\.0</a>
+    - <a href="#release-summary-14">Release Summary</a>
+    - <a href="#minor-changes-7">Minor Changes</a>
     - <a href="#deprecated-features-4">Deprecated Features</a>
     - <a href="#security-fixes-1">Security Fixes</a>
     - <a href="#bugfixes-13">Bugfixes</a>
@@ -73,8 +76,8 @@
         - <a href="#lookup">Lookup</a>
     - <a href="#new-modules-3">New Modules</a>
 - <a href="#v10-2-0">v10\.2\.0</a>
-    - <a href="#release-summary-14">Release Summary</a>
-    - <a href="#minor-changes-7">Minor Changes</a>
+    - <a href="#release-summary-15">Release Summary</a>
+    - <a href="#minor-changes-8">Minor Changes</a>
     - <a href="#deprecated-features-5">Deprecated Features</a>
     - <a href="#security-fixes-2">Security Fixes</a>
     - <a href="#bugfixes-14">Bugfixes</a>
@@ -82,19 +85,19 @@
         - <a href="#inventory">Inventory</a>
     - <a href="#new-modules-4">New Modules</a>
 - <a href="#v10-1-0">v10\.1\.0</a>
-    - <a href="#release-summary-15">Release Summary</a>
-    - <a href="#minor-changes-8">Minor Changes</a>
+    - <a href="#release-summary-16">Release Summary</a>
+    - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#deprecated-features-6">Deprecated Features</a>
     - <a href="#bugfixes-15">Bugfixes</a>
     - <a href="#new-plugins-4">New Plugins</a>
         - <a href="#filter-2">Filter</a>
     - <a href="#new-modules-5">New Modules</a>
 - <a href="#v10-0-1">v10\.0\.1</a>
-    - <a href="#release-summary-16">Release Summary</a>
+    - <a href="#release-summary-17">Release Summary</a>
     - <a href="#bugfixes-16">Bugfixes</a>
 - <a href="#v10-0-0">v10\.0\.0</a>
-    - <a href="#release-summary-17">Release Summary</a>
-    - <a href="#minor-changes-9">Minor Changes</a>
+    - <a href="#release-summary-18">Release Summary</a>
+    - <a href="#minor-changes-10">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features-7">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
@@ -106,10 +109,27 @@
     - <a href="#new-modules-6">New Modules</a>
 This changelog describes changes after version 9\.0\.0\.
 
+<a id="v10-7-9"></a>
+## v10\.7\.9
+
+<a id="release-summary"></a>
+### Release Summary
+
+Final bugfix release\.
+
+This is the last community\.general 10\.x\.y release\.
+Please upgrade to community\.general 11\.x\.y\, 12\.x\.y\, or 13\.x\.y\.
+Thanks a lot to everyone who contributed to a 10\.x\.y release\!
+
+<a id="minor-changes"></a>
+### Minor Changes
+
+* mattermost\, rocketchat\, slack \- update default <code>icon\_url</code> to ansible favicon \([https\://github\.com/ansible\-collections/community\.general/pull/11909](https\://github\.com/ansible\-collections/community\.general/pull/11909)\)\.
+
 <a id="v10-7-8"></a>
 ## v10\.7\.8
 
-<a id="release-summary"></a>
+<a id="release-summary-1"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -122,7 +142,7 @@ Bugfix release\.
 <a id="v10-7-7"></a>
 ## v10\.7\.7
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -135,7 +155,7 @@ Bugfix release\.
 <a id="v10-7-6"></a>
 ## v10\.7\.6
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -158,7 +178,7 @@ Regular bugfix release\.
 <a id="v10-7-5"></a>
 ## v10\.7\.5
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -176,7 +196,7 @@ Regular bugfix release\.
 <a id="v10-7-4"></a>
 ## v10\.7\.4
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -194,7 +214,7 @@ Regular bugfix release\.
 <a id="v10-7-3"></a>
 ## v10\.7\.3
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -226,7 +246,7 @@ Regular bugfix release\.
 <a id="v10-7-2"></a>
 ## v10\.7\.2
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -244,12 +264,12 @@ Regular bugfix release\.
 <a id="v10-7-1"></a>
 ## v10\.7\.1
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
-<a id="minor-changes"></a>
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * git\_config \- remove redundant <code>required\=False</code> from <code>argument\_spec</code> \([https\://github\.com/ansible\-collections/community\.general/pull/10177](https\://github\.com/ansible\-collections/community\.general/pull/10177)\)\.
@@ -274,7 +294,7 @@ Regular bugfix release\.
 <a id="v10-7-0"></a>
 ## v10\.7\.0
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Bugfix and feature release\.
@@ -282,7 +302,7 @@ Note that this is the final minor 10\.x\.0 release\.
 The next release with new features will be 11\.0\.0\.
 From now on\, there will only be bugfix 10\.7\.x releases for the community\.general 10 release train\.
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * cobbler inventory plugin \- add <code>connection\_timeout</code> option to specify the connection timeout to the cobbler server \([https\://github\.com/ansible\-collections/community\.general/pull/11063](https\://github\.com/ansible\-collections/community\.general/pull/11063)\)\.
@@ -330,12 +350,12 @@ From now on\, there will only be bugfix 10\.7\.x releases for the community\.gen
 <a id="v10-6-0"></a>
 ## v10\.6\.0
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-2"></a>
+<a id="minor-changes-3"></a>
 ### Minor Changes
 
 * apache2\_module \- added workaround for new PHP module name\, from <code>php7\_module</code> to <code>php\_module</code> \([https\://github\.com/ansible\-collections/community\.general/pull/9951](https\://github\.com/ansible\-collections/community\.general/pull/9951)\)\.
@@ -407,12 +427,12 @@ Regular bugfix and feature release\.
 <a id="v10-5-0"></a>
 ## v10\.5\.0
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-3"></a>
+<a id="minor-changes-4"></a>
 ### Minor Changes
 
 * CmdRunner module utils \- the convenience method <code>cmd\_runner\_fmt\.as\_fixed\(\)</code> now accepts multiple arguments as a list \([https\://github\.com/ansible\-collections/community\.general/pull/9893](https\://github\.com/ansible\-collections/community\.general/pull/9893)\)\.
@@ -449,12 +469,12 @@ Regular bugfix and feature release\.
 <a id="v10-4-0"></a>
 ## v10\.4\.0
 
-<a id="release-summary-11"></a>
+<a id="release-summary-12"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-4"></a>
+<a id="minor-changes-5"></a>
 ### Minor Changes
 
 * bitwarden lookup plugin \- add new option <code>collection\_name</code> to filter results by collection name\, and new option <code>result\_count</code> to validate number of results \([https\://github\.com/ansible\-collections/community\.general/pull/9728](https\://github\.com/ansible\-collections/community\.general/pull/9728)\)\.
@@ -507,12 +527,12 @@ Regular bugfix and feature release\.
 <a id="v10-3-1"></a>
 ## v10\.3\.1
 
-<a id="release-summary-12"></a>
+<a id="release-summary-13"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="minor-changes-5"></a>
+<a id="minor-changes-6"></a>
 ### Minor Changes
 
 * onepassword\_ssh\_key \- refactor to move code to lookup class \([https\://github\.com/ansible\-collections/community\.general/pull/9633](https\://github\.com/ansible\-collections/community\.general/pull/9633)\)\.
@@ -531,12 +551,12 @@ Bugfix release\.
 <a id="v10-3-0"></a>
 ## v10\.3\.0
 
-<a id="release-summary-13"></a>
+<a id="release-summary-14"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-6"></a>
+<a id="minor-changes-7"></a>
 ### Minor Changes
 
 * MH module utils \- delegate <code>debug</code> to the underlying <code>AnsibleModule</code> instance or issues a warning if an attribute already exists with that name \([https\://github\.com/ansible\-collections/community\.general/pull/9577](https\://github\.com/ansible\-collections/community\.general/pull/9577)\)\.
@@ -714,12 +734,12 @@ Regular bugfix and feature release\.
 <a id="v10-2-0"></a>
 ## v10\.2\.0
 
-<a id="release-summary-14"></a>
+<a id="release-summary-15"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-7"></a>
+<a id="minor-changes-8"></a>
 ### Minor Changes
 
 * bitwarden lookup plugin \- use f\-strings instead of interpolations or <code>format</code> \([https\://github\.com/ansible\-collections/community\.general/pull/9324](https\://github\.com/ansible\-collections/community\.general/pull/9324)\)\.
@@ -904,12 +924,12 @@ Regular bugfix and feature release\.
 <a id="v10-1-0"></a>
 ## v10\.1\.0
 
-<a id="release-summary-15"></a>
+<a id="release-summary-16"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-8"></a>
+<a id="minor-changes-9"></a>
 ### Minor Changes
 
 * alternatives \- add <code>family</code> parameter that allows to utilize the <code>\-\-family</code> option available in RedHat version of update\-alternatives \([https\://github\.com/ansible\-collections/community\.general/issues/5060](https\://github\.com/ansible\-collections/community\.general/issues/5060)\, [https\://github\.com/ansible\-collections/community\.general/pull/9096](https\://github\.com/ansible\-collections/community\.general/pull/9096)\)\.
@@ -965,7 +985,7 @@ Regular bugfix and feature release\.
 <a id="v10-0-1"></a>
 ## v10\.0\.1
 
-<a id="release-summary-16"></a>
+<a id="release-summary-17"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 11\.0\.0rc1\.
@@ -980,12 +1000,12 @@ Bugfix release for inclusion in Ansible 11\.0\.0rc1\.
 <a id="v10-0-0"></a>
 ## v10\.0\.0
 
-<a id="release-summary-17"></a>
+<a id="release-summary-18"></a>
 ### Release Summary
 
 This is release 10\.0\.0 of <code>community\.general</code>\, released on 2024\-11\-04\.
 
-<a id="minor-changes-9"></a>
+<a id="minor-changes-10"></a>
 ### Minor Changes
 
 * CmdRunner module util \- argument formats can be specified as plain functions without calling <code>cmd\_runner\_fmt\.as\_func\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/8479](https\://github\.com/ansible\-collections/community\.general/pull/8479)\)\.

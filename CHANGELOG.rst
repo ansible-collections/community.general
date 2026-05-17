@@ -6,6 +6,23 @@ Community General Release Notes
 
 This changelog describes changes after version 9.0.0.
 
+v10.7.9
+=======
+
+Release Summary
+---------------
+
+Final bugfix release.
+
+This is the last community.general 10.x.y release.
+Please upgrade to community.general 11.x.y, 12.x.y, or 13.x.y.
+Thanks a lot to everyone who contributed to a 10.x.y release!
+
+Minor Changes
+-------------
+
+- mattermost, rocketchat, slack - update default ``icon_url`` to ansible favicon (https://github.com/ansible-collections/community.general/pull/11909).
+
 v10.7.8
 =======
 
