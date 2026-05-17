@@ -6,6 +6,46 @@ Community General Release Notes
 
 This changelog describes changes after version 11.0.0.
 
+v12.6.1
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Minor Changes
+-------------
+
+- mattermost, rocketchat, slack - update default ``icon_url`` to ansible favicon (https://github.com/ansible-collections/community.general/pull/11909).
+
+Bugfixes
+--------
+
+- apt_rpm - do not fail when ``update_kernel`` finds no new kernel available (https://github.com/ansible-collections/community.general/issues/10055, https://github.com/ansible-collections/community.general/pull/11949).
+- apt_rpm - fix upgrade of local RPM not present in repository (https://github.com/ansible-collections/community.general/issues/9161, https://github.com/ansible-collections/community.general/pull/12039).
+- bundler - replace deprecated ``--deployment``, ``--without``, ``--path``, ``--clean``, and ``--binstubs`` flags with ``BUNDLE_*`` environment variables, fixing compatibility with Bundler 4 (https://github.com/ansible-collections/community.general/issues/4583, https://github.com/ansible-collections/community.general/issues/11380, https://github.com/ansible-collections/community.general/pull/12024).
+- cargo - fix ``state=latest`` always reporting ``changed`` due to greedy regex capturing description text instead of version string (https://github.com/ansible-collections/community.general/issues/8949, https://github.com/ansible-collections/community.general/pull/12064).
+- cobbler_system - fix ``KeyError`` when adding a new interface to an existing system that does not yet have it defined (https://github.com/ansible-collections/community.general/issues/7007, https://github.com/ansible-collections/community.general/pull/11995).
+- crypttab - fix parsing of options whose value contains an equal sign (https://github.com/ansible-collections/community.general/issues/4963, https://github.com/ansible-collections/community.general/pull/11926).
+- datadog_downtime - fix ``TypeError`` when returning API response with ``datadog-api-client`` >= 2.28.0 (https://github.com/ansible-collections/community.general/issues/9079, https://github.com/ansible-collections/community.general/pull/12019).
+- flatpak - fix reporting ``changed`` on already present flatpaks with a dash in the last part of the ID (https://github.com/ansible-collections/community.general/issues/12062, https://github.com/ansible-collections/community.general/pull/12063).
+- gitlab_hook - now properly passes the ``releases_events`` parameter to the GitLab API on hook creation, fixing a 500 Internal Server Error when the parameter was not specified (https://github.com/ansible-collections/community.general/issues/11269, https://github.com/ansible-collections/community.general/pull/11917).
+- ipa_group - fix idempotency when ``external: false`` on an existing non-external group (https://github.com/ansible-collections/community.general/issues/5061, https://github.com/ansible-collections/community.general/pull/11933).
+- ldap_attrs - fix ``state=exact`` incorrectly issuing ``MOD_ADD`` instead of ``MOD_REPLACE`` for attributes returned by the server with different casing (https://github.com/ansible-collections/community.general/issues/1624, https://github.com/ansible-collections/community.general/pull/11990).
+- logstash_plugin - use ``http_proxy``/``https_proxy`` environment variables for proxy support instead of broken JVM flags; expose ``stderr`` on failure (https://github.com/ansible-collections/community.general/issues/8650, https://github.com/ansible-collections/community.general/pull/11951).
+- lvol - fix thin-pool creation when ``size`` is a percentage (https://github.com/ansible-collections/community.general/issues/11923, https://github.com/ansible-collections/community.general/pull/11925).
+- odbc - fetch rows before committing to fix ``HY010`` function sequence error (https://github.com/ansible-collections/community.general/issues/5395, https://github.com/ansible-collections/community.general/pull/11972).
+- pam_limits - only create backup file when the target file is actually modified (https://github.com/ansible-collections/community.general/issues/12011, https://github.com/ansible-collections/community.general/pull/12014).
+- puppet - fix ``TypeError`` when writing facts data (https://github.com/ansible-collections/community.general/issues/7932, https://github.com/ansible-collections/community.general/pull/11954).
+- scaleway_image_info, scaleway_ip_info, scaleway_organization_info, scaleway_security_group_info, scaleway_server_info, scaleway_snapshot_info, scaleway_volume_info - fix ``NoneType`` error when the Scaleway API returns an empty or non-JSON response body (https://github.com/ansible-collections/community.general/issues/11361, https://github.com/ansible-collections/community.general/pull/11918).
+- selective callback plugin - align host names in stats output by padding to the longest name (https://github.com/ansible-collections/community.general/issues/8797, https://github.com/ansible-collections/community.general/pull/12065).
+- seport - fix idempotency when a requested port is already covered by an existing range registered for the same setype (https://github.com/ansible-collections/community.general/issues/10105, https://github.com/ansible-collections/community.general/pull/11994).
+- xml - emit an error when ``value`` is not a string, pointing to the offending xpath (https://github.com/ansible-collections/community.general/issues/7171, https://github.com/ansible-collections/community.general/pull/11959).
+- xml - fix ``print_match`` not populating the ``matches`` return value (https://github.com/ansible-collections/community.general/issues/9125, https://github.com/ansible-collections/community.general/pull/12013).
+- yarn - skip Node.js runtime warning lines (starting with ``(node:``) in stderr before JSON parsing, fixing failures with Node.js 24 which emits ``DeprecationWarning`` to stderr. The warnings are passed on to the user (https://github.com/ansible-collections/community.general/pull/11943).
+- zypper_repository - allow unreachable ``.repo`` URLs and missing local paths when using ``state=absent`` (https://github.com/ansible-collections/community.general/issues/5769, https://github.com/ansible-collections/community.general/pull/11947).
+
 v12.6.0
 =======
 
