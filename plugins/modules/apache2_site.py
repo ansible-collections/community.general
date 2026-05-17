@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2025, Francisco Pereira (@Francisco-Xiq)
+# Copyright (c) 2026, Francisco Pereira (@Francisco-Xiq)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -88,17 +88,13 @@ def main():
         changed = True
         if not module.check_mode:
             a2ensite = module.get_bin_path("a2ensite", required=True)
-            rc, stdout, stderr = module.run_command([a2ensite, name])
-            if rc != 0:
-                module.fail_json(msg=f"Failed to enable site {name}: {stderr}", rc=rc, stdout=stdout, stderr=stderr)
+            module.run_command([a2ensite, name], check_rc=True)
 
     elif not want_enabled and is_enabled:
         changed = True
         if not module.check_mode:
             a2dissite = module.get_bin_path("a2dissite", required=True)
-            rc, stdout, stderr = module.run_command([a2dissite, name])
-            if rc != 0:
-                module.fail_json(msg=f"Failed to disable site {name}: {stderr}", rc=rc, stdout=stdout, stderr=stderr)
+            module.run_command([a2dissite, name], check_rc=True)
 
     module.exit_json(changed=changed, name=name)
 

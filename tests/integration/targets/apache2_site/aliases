@@ -4,3 +4,8 @@
 
 azp/posix/3
 destructive
+
+skip/rhel
+skip/freebsd
+skip/macos
+skip/alpine
