@@ -11,7 +11,7 @@
 - name: test apache2_site
 
   when: ansible_facts.os_family == 'Debian'
-  
+
   block:
     - name: get list of enabled sites before tests
       ansible.builtin.command: ls /etc/apache2/sites-enabled/
