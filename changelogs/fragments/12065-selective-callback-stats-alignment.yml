@@ -1,0 +1,2 @@
+bugfixes:
+  - selective callback plugin - align host names in stats output by padding to the longest name (https://github.com/ansible-collections/community.general/issues/8797, https://github.com/ansible-collections/community.general/pull/12065).
