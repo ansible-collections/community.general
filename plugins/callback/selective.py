@@ -228,6 +228,7 @@ class CallbackModule(CallbackBase):
         self._print_task("STATS")
 
         hosts = sorted(stats.processed.keys())
+        max_len = max((len(h) for h in hosts), default=0)
         for host in hosts:
             s = stats.summarize(host)
 
@@ -239,8 +240,8 @@ class CallbackModule(CallbackBase):
                 color = "ok"
 
             msg = (
-                f"{host}    : ok={s['ok']}\tchanged={s['changed']}\tfailed={s['failures']}\tunreachable="
-                f"{s['unreachable']}\trescued={s['rescued']}\tignored={s['ignored']}"
+                f"{host.ljust(max_len)} : ok={s['ok']}\tchanged={s['changed']}\tfailed={s['failures']}\t"
+                f"unreachable={s['unreachable']}\trescued={s['rescued']}\tignored={s['ignored']}"
             )
             self._display.display(colorize(msg, color))
 
