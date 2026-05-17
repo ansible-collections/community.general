@@ -1,0 +1,2 @@
+bugfixes:
+  - "apt_rpm - fix upgrade of local RPM not present in repository (https://github.com/ansible-collections/community.general/issues/9161, https://github.com/ansible-collections/community.general/pull/12039)."
