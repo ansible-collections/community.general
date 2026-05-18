@@ -14,6 +14,7 @@ short_description: Enables/disables a site of the Apache2 webserver
 description:
   - Enables or disables a specified site of the Apache2 webserver.
   - Uses C(a2ensite) and C(a2dissite) under the hood.
+version_added: 13.0.0
 notes:
   - This module is only available on Debian/Ubuntu-based systems,
     as it depends on C(a2ensite) and C(a2dissite).
