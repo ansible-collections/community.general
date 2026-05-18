@@ -186,11 +186,11 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get("realm")
-    client_id = module.params.get("client_id")
-    clientscope_id = module.params.get("clientscope_id")
-    role_names = module.params.get("role_names")
-    state = module.params.get("state")
+    realm = module.params["realm"]
+    client_id = module.params["client_id"]
+    clientscope_id = module.params["clientscope_id"]
+    role_names = module.params["role_names"]
+    state = module.params["state"]
 
     realm_object = kc.get_realm_by_id(realm)
     if not realm_object:
