@@ -1,6 +1,0 @@
-bugfixes:
-  - nmcli - use ``get_best_parsable_locale()`` to set locale environment for ``run_command()`` calls,
-    fixing UTF-8 connection names being corrupted to ``????`` under ``LC_ALL=C``
-    (https://github.com/ansible-collections/community.general/issues/10384,
-    https://github.com/ansible-collections/community.general/issues/11737,
-    https://github.com/ansible-collections/community.general/pull/11742).

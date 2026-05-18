@@ -1,3 +1,0 @@
-minor_changes:
-  - rundeck module utils - improve handling the return value ``exception``. It now contains the full stack trace of the exception, while the message is included in ``msg`` (https://github.com/ansible-collections/community.general/pull/11149).
-  - vmadm - in case of failure, the module no longer returns the stderr output as ``exception``, but instead as ``stderr``. Other information (``stdout``, ``rc``) is now also returned (https://github.com/ansible-collections/community.general/pull/11149).

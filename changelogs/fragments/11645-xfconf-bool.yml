@@ -1,2 +1,0 @@
-bugfixes:
-  - xfconf - representation of boolean properties was not consistent between Python and ``xfconf-query``, leading to broken idempotency (https://github.com/ansible-collections/community.general/pull/11645).

@@ -1,3 +1,0 @@
-bugfixes:
-  - nictagadm - add a condition to the if statement so that ``is_valid_mac()`` does not get called if ``etherstub`` is false
-    (https://github.com/ansible-collections/community.general/pull/11589).

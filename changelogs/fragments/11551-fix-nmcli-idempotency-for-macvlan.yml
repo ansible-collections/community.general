@@ -1,4 +1,0 @@
----
-minor_changes:
-  - nmcli - fix idempotency for MAC VLAN interfaces when using ``macvlan.tap``
-    (https://github.com/ansible-collections/community.general/pull/11551).

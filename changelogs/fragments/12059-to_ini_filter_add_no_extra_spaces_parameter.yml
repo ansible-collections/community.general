@@ -1,2 +1,0 @@
-minor_changes:
-  - to_ini filter plugin - add ``no_extra_spaces`` parameter (https://github.com/ansible-collections/community.general/issues/8576, https://github.com/ansible-collections/community.general/pull/12059).

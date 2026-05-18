@@ -1,3 +1,0 @@
-minor_changes:
-  - consul_kv - add ``ca_path`` option to specify a CA bundle for HTTPS connections (https://github.com/ansible-collections/community.general/pull/11817).
-  - consul_kv lookup plugin - add ``ca_path`` option to specify a CA bundle for HTTPS connections (https://github.com/ansible-collections/community.general/issues/2876, https://github.com/ansible-collections/community.general/pull/11817).

@@ -1,2 +1,0 @@
-bugfixes:
-  - puppet - fix ``TypeError`` when writing facts data (https://github.com/ansible-collections/community.general/issues/7932, https://github.com/ansible-collections/community.general/pull/11954).

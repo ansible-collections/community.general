@@ -1,7 +1,0 @@
-bugfixes:
-  - homebrew_tap - fix ``None`` being passed as a command argument when adding a tap without a URL
-    (https://github.com/ansible-collections/community.general/pull/11848).
-minor_changes:
-  - homebrew_tap - avoid redundant ``brew tap`` calls when processing multiple taps by fetching
-    the tap list once upfront
-    (https://github.com/ansible-collections/community.general/pull/11848).

@@ -1,4 +1,0 @@
-minor_changes:
-  - java_cert - support proxy authentication when ``https_proxy`` environment variable includes credentials
-    (https://github.com/ansible-collections/community.general/issues/4126,
-    https://github.com/ansible-collections/community.general/pull/11753).

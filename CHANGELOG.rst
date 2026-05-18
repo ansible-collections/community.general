@@ -1,6 +1,1022 @@
-Placeholder changelog
-=====================
+===============================
+Community General Release Notes
+===============================
 
-This file is a placeholder; a version-specific ``CHANGELOG-vX.rst`` will be generated during releases from fragments
-under ``changelogs/fragments``. On release branches once a release has been created, consult the branch's version-specific
-file for changes that have occurred in that branch.
+.. contents:: Topics
+
+This changelog describes changes after version 12.0.0.
+
+v13.0.0
+=======
+
+Release Summary
+---------------
+
+This is release 13.0.0 of ``community.general``, released on 2026-05-18.
+
+Minor Changes
+-------------
+
+- ModuleHelper module utils - allow to ignore specific exceptions in ``module_fails_on_exception`` decorator (https://github.com/ansible-collections/community.general/pull/11488).
+- The last code included in the collection that was licensed under the PSF 2.0 license was removed form the collection. This means that now all code is either GPLv3+ licensed, MIT licensed, or BSD-2-clause licensed (https://github.com/ansible-collections/community.general/pull/11232).
+- _mount module utils - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- _stormssh module utils - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- a_module test plugin - add proper parameter checking and type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- aerospike_migrations - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- aix_filesystem - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- ali_instance - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- alicloud_ecs module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- android_sdk - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- ansible_galaxy_install - add parameter ``executable`` (https://github.com/ansible-collections/community.general/issues/7261, https://github.com/ansible-collections/community.general/pull/11646).
+- ansible_type plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- ansible_type test plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- api module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- apk - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- apt_rpm - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- apt_rpm - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- archive - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- atomic_container - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- atomic_container modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- atomic_host - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- atomic_image - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- atomic_image modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- awall - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- beadm - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- bigpanda - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- binary_file lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- bitbucket module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- bitbucket module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- bitbucket_access_key modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- bitbucket_pipeline_key_pair modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- bitbucket_pipeline_known_host - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- bitbucket_pipeline_known_host modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- bitbucket_pipeline_variable modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- btrfs module utils - make execution of external commands safer by passing arguments as list (https://github.com/ansible-collections/community.general/pull/11240).
+- campfire - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- chef_databag lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- chroot connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- chroot connection plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- circonus_annotation - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- cloudflare_dns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- cmd_runner module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- cobbler inventory plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- cobbler inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- cobbler_sync - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- cobbler_sync - remove conditional code handling SSL for unsupported versions of Python (https://github.com/ansible-collections/community.general/pull/11078).
+- cobbler_sync - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
+- cobbler_system - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- cobbler_system - remove conditional code handling SSL for unsupported versions of Python (https://github.com/ansible-collections/community.general/pull/11078).
+- cobbler_system - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
+- collection_version lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- composer - add ``force`` parameter; when ``command=create-project``, the module now checks whether a ``composer.json`` already exists in ``working_dir`` and skips the command if so, making the task idempotent. Set ``force=true`` to always run the command regardless (https://github.com/ansible-collections/community.general/issues/725, https://github.com/ansible-collections/community.general/pull/11689).
+- composer - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- consul module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+- consul_kv - add ``ca_path`` option to specify a CA bundle for HTTPS connections (https://github.com/ansible-collections/community.general/pull/11817).
+- consul_kv lookup plugin - add ``ca_path`` option to specify a CA bundle for HTTPS connections (https://github.com/ansible-collections/community.general/issues/2876, https://github.com/ansible-collections/community.general/pull/11817).
+- consul_kv lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- copr - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- counter filter plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- credstash lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- cronvar - simplify handling unknown exceptions (https://github.com/ansible-collections/community.general/pull/11340).
+- cronvar - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- cronvar - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- crypttab - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- crypttab - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- csv module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- csv module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- cyberarkpassword lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- database module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- database module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- datadog_event - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- datadog_monitor - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- datetime module utils - remove code for unsupported Python version (https://github.com/ansible-collections/community.general/pull/11048).
+- dconf - add support for C(dbus-broker) (https://github.com/ansible-collections/community.general/issues/495, https://github.com/ansible-collections/community.general/pull/11772).
+- dconf - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- decompress - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- dependent lookup plugin - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+- dependent lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- deps module utils - change the internal representaion of dependency state (https://github.com/ansible-collections/community.general/pull/11242).
+- deps module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- dig lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- dimensiondata_network - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- dimensiondata_network modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- dnf_config_manager - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- dnsimple_info - use Ansible construct to validate parameters (https://github.com/ansible-collections/community.general/pull/11052).
+- dnstxt lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- doas become plugin - add new option ``allow_pipelining`` to explicitly allow the use of pipelining with this plugin. This should only be set to ``true`` with ansible-core 2.19+ when ``doas`` does not require a password (https://github.com/ansible-collections/community.general/issues/11411, https://github.com/ansible-collections/community.general/pull/11481).
+- dsv lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- elastic callback plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- elasticsearch_plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- etcd3 lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- exceptions module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- filesize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+- filesize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- filesystem - migrate ``LVM.get_fs_size()`` to use ``CmdRunner``, ensuring locale-independent output parsing (https://github.com/ansible-collections/community.general/pull/11888).
+- flatpak - add new parameter ``from_url`` to install a flatpak from a ``.flatpakref`` URL (https://github.com/ansible-collections/community.general/issues/4000, https://github.com/ansible-collections/community.general/pull/11748).
+- flatpak - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- flatpak_remote - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- fqdn_valid test plugin - add proper parameter checking, and add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- from_csv filter plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- from_ini filter plugin - add ``delimiters`` parameter to allow correctly parsing more INI documents (https://github.com/ansible-collections/community.general/issues/11506, https://github.com/ansible-collections/community.general/pull/11512).
+- from_ini filter plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- gandi_livedns - add support for diff mode, showing before and after state of DNS records (https://github.com/ansible-collections/community.general/issues/4927, https://github.com/ansible-collections/community.general/pull/11934).
+- gandi_livedns_api module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- gandi_livedns_api module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- gem - add ``override_platform_install_dir`` option to work around OS-injected platform install dir defaults on distributions such as Fedora (https://github.com/ansible-collections/community.general/issues/3259, https://github.com/ansible-collections/community.general/pull/11873).
+- gem - refactor module to use ``CmdRunner`` (https://github.com/ansible-collections/community.general/pull/11733).
+- github_app_access_token lookup plugin - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- github_app_access_token lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- gitlab_group - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- gitlab_group_access_token - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- gitlab_group_members - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- gitlab_issue - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- gitlab_merge_request - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- gitlab_project - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- gitlab_project_access_token - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- gitlab_project_members - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- gitlab_runner - allow maximum timeout to be disabled by passing ``0`` to ``maximum_timeout``  (https://github.com/ansible-collections/community.general/pull/11174).
+- gitlab_runners inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- gitlab_user - add the ``sshkey_update_mode`` option to control whether same-name SSH keys are preserved, updated when unique, or deduplicated before replacement (https://github.com/ansible-collections/community.general/issues/6516, https://github.com/ansible-collections/community.general/pull/11996).
+- grove - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- gunicorn - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- haproxy - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- hashids filter - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- hashids filter plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- hg - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- hg - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- homebrew_services - remove various redundancies including dead state validation, unused return values, and unnecessary locale environment variables (https://github.com/ansible-collections/community.general/pull/11839).
+- homebrew_tap - avoid redundant ``brew tap`` calls when processing multiple taps by fetching the tap list once upfront (https://github.com/ansible-collections/community.general/pull/11848).
+- hpilo_info - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- hpilo_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- htpasswd - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- htpasswd - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- hwc_ecs_instance - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- hwc_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- hwc_utils module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+- hwc_utils module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- hwc_vpc_port - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- ibm_sa_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- icinga2 inventory plugin - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+- icinga2 inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- icinga2_host - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- identity.keycloak.keycloak module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- idrac_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- idrac_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- idrac_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- idrac_redfish_info - add multiple manager support to ``GetManagerAttributes`` command (https://github.com/ansible-collections/community.general/pull/11294).
+- idrac_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- idrac_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- ilo_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- ilo_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- ilo_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- ilo_redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- imc_rest - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- imc_rest modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- incus connection plugin - add support for Windows virtual machines (https://github.com/ansible-collections/community.general/pull/11199).
+- incus connection plugin - improve code readability (https://github.com/ansible-collections/community.general/pull/11346).
+- incus connection plugin - simplify regular expression matching commands (https://github.com/ansible-collections/community.general/pull/11347).
+- incus inventory plugin - add support for constructing project-independent FQDNs (https://github.com/ansible-collections/community.general/pull/11555).
+- infinity - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
+- influxdb_query - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- influxdb_user - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- influxdb_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- influxdb_write - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ini_file - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- ini_file - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- interfaces_file - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- iocage inventory plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+- ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
+- ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- ipa module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- ipa module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- ipa module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- ipa_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_dnsrecord - add ``exclusive`` parameter to allow appending values to existing records without replacing them (https://github.com/ansible-collections/community.general/issues/682, https://github.com/ansible-collections/community.general/pull/11694).
+- ipa_dnsrecord - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_dnszone - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_group - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_hbacrule - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_host - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_hostgroup - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_otpconfig - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_otptoken - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
+- ipa_otptoken - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_pwpolicy - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_pwpolicy - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- ipa_role - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_service - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_subca - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+- ipa_sudocmd - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_sudocmdgroup - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_sudorule - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- ipa_vault - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- iptables_state - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- iptables_state action plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- irc - use proper boolean value in loops (https://github.com/ansible-collections/community.general/pull/11076).
+- iso_create - add ``boot_options`` parameter to support creating bootable ISOs using El Torito boot records (https://github.com/ansible-collections/community.general/issues/1685, https://github.com/ansible-collections/community.general/pull/11991).
+- iso_customize - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- jail connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- jail connection plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- java_cert - support proxy authentication when ``https_proxy`` environment variable includes credentials (https://github.com/ansible-collections/community.general/issues/4126, https://github.com/ansible-collections/community.general/pull/11753).
+- jc filter plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- jenkins_credential - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- jenkins_job - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- jenkins_job_info - remove conditional code handling SSL for unsupported versions of Python (https://github.com/ansible-collections/community.general/pull/11078).
+- jenkins_node - remove code for unsupported Python version (https://github.com/ansible-collections/community.general/pull/11048).
+- jenkins_plugin - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- jenkins_plugin - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- jenkins_plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- jenkins_plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- jenkins_plugin modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- jenkins_script - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+- jenkins_script - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- jira - add ``cloud`` option to support Jira Cloud's new search endpoint ``/rest/api/2/search/jql``, since the legacy ``/rest/api/2/search`` endpoint has been removed on Jira Cloud (https://github.com/ansible-collections/community.general/issues/10786, https://github.com/ansible-collections/community.general/pull/11701).
+- jira - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+- jira - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- jira - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- jira - when ``cloud=true``, user-type fields (``assignee``, ``reporter``, and any listed in the new ``custom_user_fields`` parameter) containing an email address are automatically resolved to Jira Cloud account IDs (https://github.com/ansible-collections/community.general/issues/11734, https://github.com/ansible-collections/community.general/pull/11735).
+- json_query filter plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- kdeconfig - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- keycloak module utils - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keycloak module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- keycloak module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- keycloak module_utils - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- keycloak_authentication - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keycloak_client - add ``valid_post_logout_redirect_uris`` option to configure post logout redirect URIs for a client, and ``backchannel_logout_url`` option to configure the backchannel logout URL for a client (https://github.com/ansible-collections/community.general/issues/6812, https://github.com/ansible-collections/community.general/issues/4892, https://github.com/ansible-collections/community.general/pull/11473).
+- keycloak_client_rolemapping - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keycloak_client_rolemapping, keycloak_realm_rolemapping, keycloak_group - optimize retrieval of groups by name to use Keycloak search API with exact matching instead of fetching all groups (https://github.com/ansible-collections/community.general/pull/11503).
+- keycloak_component - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keycloak_realm - add ``first_broker_login_flow`` parameter (https://github.com/ansible-collections/community.general/pull/11622).
+- keycloak_realm - add ``webAuthnPolicyPasswordlessPasskeysEnabled`` parameter (https://github.com/ansible-collections/community.general/pull/11197).
+- keycloak_realm - add support for ``localizationTexts`` option in Keycloak realms (https://github.com/ansible-collections/community.general/pull/11513).
+- keycloak_realm_key - add support for auto-generated key providers (``rsa-generated``, ``rsa-enc-generated``, ``hmac-generated``, ``aes-generated``, ``ecdsa-generated``, ``ecdh-generated``, ``eddsa-generated``), ``java-keystore`` provider, additional algorithms (HMAC, ECDSA, ECDH, EdDSA, AES), and new config options (``secret_size``, ``key_size``, ``elliptic_curve``, ``keystore``, ``keystore_password``, ``key_alias``, ``key_password``). Also makes ``config.private_key`` and ``config.certificate`` optional as they are only required for imported key providers (https://github.com/ansible-collections/community.general/pull/11468).
+- keycloak_realm_key - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keycloak_realm_rolemapping - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keycloak_user_rolemapping - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keycloak_userprofile - add support for ``selector`` option (https://github.com/ansible-collections/community.general/pull/11309).
+- keycloak_userprofile - add support for additional user profile attribute-validations available in Keycloak (https://github.com/ansible-collections/community.general/issues/9048, https://github.com/ansible-collections/community.general/pull/11285).
+- keycloak_userprofile - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- keys_filter plugin utils - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- keys_filter plugin_utils plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- keys_filter.py plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- known_hosts module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- known_hosts module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- layman - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- layman - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- ldap module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- ldap_attrs - add ``binary_attributes`` and ``honor_binary`` parameters to handle binary attribute values (https://github.com/ansible-collections/community.general/pull/11558).
+- ldap_attrs - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- ldap_entry - add ``binary_attributes`` and ``honor_binary`` parameters to handle creating objects with attributes set to binary values (https://github.com/ansible-collections/community.general/pull/11558).
+- ldap_entry - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- ldap_inc - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- ldap_search - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11104).
+- ldap_search - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- linode - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+- linode inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- linode inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- listen_ports_facts - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- listen_ports_facts - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- listen_ports_facts - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- lists filter plugin - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- lists_mergeby filter plugin - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- lldp - the module has been renamed to ``community.general.lldp_facts`` (https://github.com/ansible-collections/community.general/pull/11980).
+- lldp - the module now supports check mode (https://github.com/ansible-collections/community.general/pull/11980).
+- lmdb_kv lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- locale_gen - extend the search for available locales to include ``/usr/local/share/i18n/SUPPORTED`` in Debian and Ubuntu systems (https://github.com/ansible-collections/community.general/issues/10964, https://github.com/ansible-collections/community.general/pull/11046).
+- locale_gen - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- logentries - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- logentries callback plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- logrotate - adds optional ``backup`` parameter to create a backup of the existing configuration file before writing changes (https://github.com/ansible-collections/community.general/pull/11764).
+- logrotate - allow hourly logrotate (https://github.com/ansible-collections/community.general/pull/11939).
+- lookup plugin passwordstore - modernize internal ``check_output2()`` helper using ``subprocess.run()`` and rename it to ``run_backend_cmd()`` (https://github.com/ansible-collections/community.general/pull/11655).
+- lvg - migrate to ``CmdRunner``, removing direct ``run_command`` calls and ``run_command_environ_update`` (https://github.com/ansible-collections/community.general/pull/11835).
+- lvm_pv - migrate to ``CmdRunner`` using shared runners from ``module_utils/_lvm`` (https://github.com/ansible-collections/community.general/pull/11811).
+- lvm_pv - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11343).
+- lvol - migrate to ``CmdRunner`` (https://github.com/ansible-collections/community.general/pull/11887).
+- lxc connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- lxc connection plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- lxc_container - refactor function ``create_script``, using ``subprocess.Popen()``, to a new module_utils ``_lxc`` (https://github.com/ansible-collections/community.general/pull/11204).
+- lxc_container - use ``tempfile.TemporaryDirectory()`` instead of ``mkdtemp()`` (https://github.com/ansible-collections/community.general/pull/11323).
+- lxc_container - use shared LVM runners from ``_lvm`` module utils instead of direct ``run_command`` calls for LVM2 commands (https://github.com/ansible-collections/community.general/pull/11920).
+- lxca_cmms - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- lxca_nodes - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- lxd connection plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- lxd inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- lxd inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- lxd module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- lxd module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- lxd module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- lxd_container - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- macports - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- mail - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- manageiq module utils - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- manageiq module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- manageiq_alert_profiles - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- manageiq_alert_profiles - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- manageiq_alerts - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- mattermost, rocketchat, slack - update default ``icon_url`` to ansible favicon (https://github.com/ansible-collections/community.general/pull/11909).
+- maven_artifact - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- memset module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- merge_variables - extend type detection failure message to allow users for easier failure debugging (https://github.com/ansible-collections/community.general/pull/11107).
+- merge_variables lookup plugin - extended merging capabilities added (https://github.com/ansible-collections/community.general/pull/11536).
+- merge_variables lookup plugin - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- modprobe - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- modprobe - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- monit - add ``monit_version`` return value also when the module has succeeded (https://github.com/ansible-collections/community.general/pull/11255).
+- monit - use ``Enum`` to represent the possible states (https://github.com/ansible-collections/community.general/pull/11245).
+- mssql_db - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- nagios - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- net_tools.pritunl.api module utils - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- netcup_dns - support diff mode (https://github.com/ansible-collections/community.general/pull/11376).
+- nmap inventory plugin - add ``skip_host_discovery`` option to skip nmap host discovery phase (``-Pn``) (https://github.com/ansible-collections/community.general/issues/7893, https://github.com/ansible-collections/community.general/pull/11955).
+- nmap inventory plugin - added ``set_name_variable`` option to control whether the ``name`` variable is set for each host, allowing users to avoid the "Found variable using reserved name" warning while maintaining backward compatibility (https://github.com/ansible-collections/community.general/pull/11893, https://github.com/ansible-collections/community.general/issues/11766).
+- nmap inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- nmcli - add idempotency check (https://github.com/ansible-collections/community.general/pull/11114).
+- nmcli - add support for IPv6 routing rules (https://github.com/ansible-collections/community.general/issues/7094, https://github.com/ansible-collections/community.general/pull/11413).
+- nmcli - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- nmcli - fix comparison of type (https://github.com/ansible-collections/community.general/pull/11121).
+- nmcli - fix idempotency for MAC VLAN interfaces when using ``macvlan.tap`` (https://github.com/ansible-collections/community.general/pull/11551).
+- nmcli module - add ``vxlan_parent`` option required for multicast ``vxlan_remote`` addresses; add ``vxlan`` to list of bridgeable devices (https://github.com/ansible-collections/community.general/pull/11182).
+- nmcli modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- nomad_job - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- nomad_job - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- nomad_job - use ``_nomad`` module utils for common Nomad connection logic (https://github.com/ansible-collections/community.general/issues/7688, https://github.com/ansible-collections/community.general/pull/11957).
+- nomad_job_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- nomad_job_info - use ``_nomad`` module utils for common Nomad connection logic (https://github.com/ansible-collections/community.general/issues/7688, https://github.com/ansible-collections/community.general/pull/11957).
+- nomad_token - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- nomad_token - use ``_nomad`` module utils for common Nomad connection logic (https://github.com/ansible-collections/community.general/issues/7688, https://github.com/ansible-collections/community.general/pull/11957).
+- nosh - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- nosh - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- nsupdate - add ``timeout`` parameter to control the DNS query timeout (https://github.com/ansible-collections/community.general/issues/9906, https://github.com/ansible-collections/community.general/pull/12012).
+- nsupdate - add support for server FQDN and the GSS-TSIG key algorithm (https://github.com/ansible-collections/community.general/issues/5730, https://github.com/ansible-collections/community.general/pull/11425).
+- nsupdate - replace ``list(map(...))`` constructs with Python comprehensions (https://github.com/ansible-collections/community.general/pull/11590).
+- nsupdate modules plugin - replace aliased errors with proper Python error (https://github.com/ansible-collections/community.general/pull/11391).
+- ocapi_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- ocapi_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- ocapi_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- ocapi_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- ocapi_utils module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- oci_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- oci_utils module utils - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+- oci_utils module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- oci_utils module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- omapi_host - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- one_image - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+- one_image_info - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+- one_service - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+- one_vm - move ``import`` statemetns to the top of the file (https://github.com/ansible-collections/community.general/pull/11396).
+- one_vm - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- oneandone_firewall_policy - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- oneandone_load_balancer - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- oneandone_monitoring_policy - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- oneandone_private_network - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- oneandone_server - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11231).
+- oneandone_server modules - mark ``%`` templating as ``noqa`` (https://github.com/ansible-collections/community.general/pull/11223).
+- onepassword - add support for ``op://`` secret references in the OnePassword lookup plugin (https://github.com/ansible-collections/community.general/issues/7586, https://github.com/ansible-collections/community.general/pull/11958).
+- onepassword lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- onepassword_info - execute external commands using Ansible construct (https://github.com/ansible-collections/community.general/pull/11193).
+- onepassword_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- onepassword_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- oneview module utils - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- oneview module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- oneview_san_manager - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- online inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- online module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- opendj_backendprop - refactor to use ``CmdRunner`` (https://github.com/ansible-collections/community.general/pull/11728).
+- opendj_backendprop - use Ansible construct to perform check for external commands (https://github.com/ansible-collections/community.general/pull/11072).
+- opennebula inventory plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- opennebula inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- opentelemetry callback plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- osx_defaults - add support for ``dict`` type values, including ``dict_mode`` option to merge keys into an existing dictionary (https://github.com/ansible-collections/community.general/issues/238, https://github.com/ansible-collections/community.general/pull/11659).
+- osx_defaults - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- packet_device - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- packet_device - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11231).
+- packet_device modules - mark ``%`` templating as ``noqa`` (https://github.com/ansible-collections/community.general/pull/11223).
+- packet_ip_subnet - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- packet_ip_subnet - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- packet_project - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- packet_sshkey - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- packet_volume - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- packet_volume - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- pacman - add ``root``, ``cachedir``, and ``config`` options to support installing packages into an alternative root directory (https://github.com/ansible-collections/community.general/issues/438, https://github.com/ansible-collections/community.general/pull/11681).
+- pam_limits - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- pamd - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- pamd - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- parted - add ``unit_preserve_case`` option to control the case of the ``unit`` field in the return value, fixing the round-trip use case where the returned unit is fed back as input (https://github.com/ansible-collections/community.general/issues/1860, https://github.com/ansible-collections/community.general/pull/11813).
+- parted - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- parted - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- passwordstore lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- pear - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- pids - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- pids - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- pipx - small refactor, no behavior affected (https://github.com/ansible-collections/community.general/pull/11640).
+- pipx module utils - small refactor, no behavior affected (https://github.com/ansible-collections/community.general/pull/11640).
+- pipx_info - small refactor, no behavior affected (https://github.com/ansible-collections/community.general/pull/11640).
+- pmem - simplify text tests without using regular expression (https://github.com/ansible-collections/community.general/pull/11388).
+- portage - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- pritunl_org - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- pritunl_org_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- pritunl_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- pritunl_user_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- pubnub_blocks - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- pubnub_blocks - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- pulp_repo - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- pushbullet modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- read_csv - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- read_csv - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- redfish_config - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- redfish_info - add Redfish Root data to results of successful ``CheckAvailability`` command (https://github.com/ansible-collections/community.general/pull/11504).
+- redfish_utils module utils - adds support of ``@Redfish.Settings`` in ``ComputerSystem`` attributes for ``set_boot_override`` function (https://github.com/ansible-collections/community.general/issues/11297, https://github.com/ansible-collections/community.general/pull/11322).
+- redfish_utils module utils - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- redfish_utils module utils - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- redfish_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- redfish_utils module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+- redhat_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- redhat_subscription - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- redhat_subscription - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- redis cache plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- redis lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- revbitspss lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- rhevm - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
+- rhevm - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- rhsm_repository - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- riak - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- rocketchat - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- rundeck module utils - improve handling the return value ``exception``. It now contains the full stack trace of the exception, while the message is included in ``msg`` (https://github.com/ansible-collections/community.general/pull/11149).
+- rundeck module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+- runit - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- scaleway inventory plugin - added support for ``SCW_PROFILE`` environment variable for the ``scw_profile`` option (https://github.com/ansible-collections/community.general/issues/11310, https://github.com/ansible-collections/community.general/pull/11311).
+- scaleway inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- scaleway module utils - added ``scw_profile`` parameter with ``SCW_PROFILE`` environment variable support (https://github.com/ansible-collections/community.general/issues/11313, https://github.com/ansible-collections/community.general/pull/11314).
+- scaleway module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561).
+- scaleway_ip - added ``project`` parameter (https://github.com/ansible-collections/community.general/issues/11367, https://github.com/ansible-collections/community.general/pull/11368).
+- scaleway_security_group - added ``project`` parameter (https://github.com/ansible-collections/community.general/issues/11364, https://github.com/ansible-collections/community.general/pull/11366).
+- scaleway_user_data modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- selinux_permissive - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- sensu_check - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- sensu_check - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- sensu_client - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- sensu_handler - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- sensu_silence - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- sensu_silence modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- sensu_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- sensu_subscription - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- sensu_subscription - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- seport - adds support for DCCP and SCTP protocols (https://github.com/ansible-collections/community.general/pull/11486).
+- seport - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- serverless - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- shelvefile lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- shutdown action plugin - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- shutdown action plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- slack - consolidate double and triple whitespaces (https://github.com/ansible-collections/community.general/pull/11029).
+- slack - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11908).
+- slack - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- slackpkg - refactor function ``query_packages()`` (https://github.com/ansible-collections/community.general/pull/11390).
+- slackpkg - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- snap - add ``devmode`` option to support installing snaps in developer mode (https://github.com/ansible-collections/community.general/pull/11952, https://github.com/ansible-collections/community.general/issues/8155).
+- snap - add ``revision`` parameter to install a specific snap revision (https://github.com/ansible-collections/community.general/issues/11467, https://github.com/ansible-collections/community.general/pull/11984).
+- snap - add support for ``system`` as a special configuration target, allowing ``snap set system`` to be used via the ``options`` parameter (https://github.com/ansible-collections/community.general/issues/11266, https://github.com/ansible-collections/community.general/pull/12025).
+- snap - improve templating of strings (https://github.com/ansible-collections/community.general/pull/11189).
+- snmp_facts - simplify and improve code using standard Ansible validations (https://github.com/ansible-collections/community.general/pull/11148).
+- solaris_zone - execute external commands using Ansible construct (https://github.com/ansible-collections/community.general/pull/11192).
+- solaris_zone - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- solaris_zone - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- sorcery - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- spectrum_model_attrs - convert ``%`` templating to f-string (https://github.com/ansible-collections/community.general/pull/11229).
+- spotinst_aws_elastigroup - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- ssh_config - add support for the ``AddressFamily`` option (https://github.com/ansible-collections/community.general/pull/11968).
+- statusio_maintenance - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- sudoers - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- sudoers - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- supervisorctl - added an additional condition for generating the error 'no such process' (https://github.com/ansible-collections/community.general/issues/11621, https://github.com/ansible-collections/community.general/pull/11632).
+- supervisorctl - when ``name=all``, dispatch a single ``supervisorctl start/stop/restart all`` command (https://github.com/ansible-collections/community.general/issues/8159, https://github.com/ansible-collections/community.general/pull/11953).
+- svc - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- svc - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- svr4pkg - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- swupd - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- terraform - minor code cleanup (https://github.com/ansible-collections/community.general/pull/11879).
+- timestamp callback plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- timezone - replace ``list(map(...))`` constructs with Python comprehensions (https://github.com/ansible-collections/community.general/pull/11590).
+- timezone - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- to_ini filter plugin - add ``no_extra_spaces`` parameter (https://github.com/ansible-collections/community.general/issues/8576, https://github.com/ansible-collections/community.general/pull/12059).
+- to_ini filter plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- tss lookup plugin - fixed ``AccessTokenAuthorizer`` initialization to include ``base_url`` parameter for proper token authentication (https://github.com/ansible-collections/community.general/pull/11031).
+- tss lookup plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- univention_umc module utils - update code to Python 3 (https://github.com/ansible-collections/community.general/pull/11122).
+- univention_umc module utils - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- unsafe.py plugin utils - add type hints (https://github.com/ansible-collections/community.general/pull/11167).
+- urpmi - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- utm_aaa_group - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_aaa_group_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_ca_host_key_cert - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_ca_host_key_cert_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_dns_host - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_network_interface_address - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_network_interface_address_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_proxy_auth_profile - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_proxy_exception - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_proxy_frontend - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_proxy_frontend_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_proxy_location - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_proxy_location_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- utm_utils module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- utm_utils module utils - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11112).
+- utm_utils module utils - use Python-defined constants for HTTP return codes (https://github.com/ansible-collections/community.general/pull/11561, https://github.com/ansible-collections/community.general/pull/11573).
+- vertica_configuration - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- vertica_configuration - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- vertica_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- vertica_role - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- vertica_role - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- vertica_schema - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- vertica_schema - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- vertica_schema - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- vertica_user - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- vertica_user - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- vertica_user - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11097).
+- virtualbox inventory plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- vmadm - in case of failure, the module no longer returns the stderr output as ``exception``, but instead as ``stderr``. Other information (``stdout``, ``rc``) is now also returned (https://github.com/ansible-collections/community.general/pull/11149).
+- vmadm - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11102).
+- wakeonlan - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11098).
+- wakeonlan - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- wdc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- wdc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- wdc_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- wdc_redfish_info - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- wsl connection plugin - add option ``wsl_remote_ssh_shell_type``. Support PowerShell in addition to cmd as the Windows shell (https://github.com/ansible-collections/community.general/issues/11307, https://github.com/ansible-collections/community.general/pull/11308).
+- wsl connection plugin - adjust variable name for integration tests (https://github.com/ansible-collections/community.general/pull/11190).
+- wsl connection plugin - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- wsl connection plugin - replace aliased errors with proper Python error (https://github.com/ansible-collections/community.general/pull/11391).
+- wsl connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- wsl connection plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- xbps - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- xbps - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- xcc_redfish_command - fix cases of unused variables in loops (https://github.com/ansible-collections/community.general/pull/11115).
+- xcc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11110).
+- xcc_redfish_command - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/1114).
+- xenserver module utils - improve code by using native Python construct (https://github.com/ansible-collections/community.general/pull/11215).
+- xenserver module utils - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- xenserver_guest - use ``enumerate()`` instead of manual index variable in ``for`` loop (https://github.com/ansible-collections/community.general/pull/11721).
+- xenserver_guest modules - replace ``%`` templating with f-strings or ``format()`` (https://github.com/ansible-collections/community.general/pull/11223).
+- xfs_quota - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- xml - add ``create_if_missing`` option to control whether a node is created when ``value`` is set and ``xpath`` finds no match (https://github.com/ansible-collections/community.general/issues/8730, https://github.com/ansible-collections/community.general/pull/12031).
+- xml - add ``huge_tree`` option to support processing of very large XML files (https://github.com/ansible-collections/community.general/issues/4897, https://github.com/ansible-collections/community.general/pull/11940).
+- xml - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11106).
+- xml - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- yaml cache plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- yum_versionlock - remove redundant conversion to unicode in command output (https://github.com/ansible-collections/community.general/pull/11093).
+- zfs - simplify return of boolean values in functions (https://github.com/ansible-collections/community.general/pull/11119).
+- zfs_facts - use Ansible construct to check result of external command (https://github.com/ansible-collections/community.general/pull/11054).
+- zone connection plugin - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11341).
+- zone connection plugin - use ``raise ... from ...`` when passing on exceptions (https://github.com/ansible-collections/community.general/pull/11095).
+- zypper - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+- zypper_repository - update to Python 3.7 idioms (https://github.com/ansible-collections/community.general/pull/11344).
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- Since community.general 13.0.0, all module utils, plugin utils, and doc fragments contained in this collection are private to the collection. This means that if another collection wants to use these, there is no longer any guarantee that there are no breaking changes, even in bugfix releases. This has no practical impact on any other use of the collection, that is, everyone using modules or plugins from the collections will not notice any difference (https://github.com/ansible-collections/community.general/issues/11312, https://github.com/ansible-collections/community.general/pull/11896).
+- The collection no longer supports ansible-core 2.17 (https://github.com/ansible-collections/community.general/pull/11906).
+- all lookup plugins - if a keyword argument ``_terms`` is passed, the plugin rejects the call and tells the user to use positional arguments instead. ``_terms`` was never used, and is used in documentation as a placeholder for positional arguments (https://github.com/ansible-collections/community.general/pull/12060).
+- github_app_access_token lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060).
+- github_repo - the default for the ``force_defaults`` option changed from ``true`` to ``false`` (https://github.com/ansible-collections/community.general/pull/11834).
+- onepassword* lookup plugins - drop support for ``op`` version 1 (https://github.com/ansible-collections/community.general/pull/12061).
+- random_pet lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060).
+- random_string lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060).
+- random_words lookup plugin - the plugin no longer accepts positional arguments. They were never used anyway (https://github.com/ansible-collections/community.general/pull/12060).
+- rocketchat - the default for the ``is_pre740`` option changed from ``true`` to ``false`` (https://github.com/ansible-collections/community.general/pull/11834).
+
+Deprecated Features
+-------------------
+
+- aix_devices - module is superseded by equivalent in ``ibm.power_aix`` collection. It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290, https://github.com/ansible-collections/community.general/pull/11540).
+- aix_filesystem - module is superseded by equivalent in ``ibm.power_aix`` collection. It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290, https://github.com/ansible-collections/community.general/pull/11540).
+- aix_inittab - module is superseded by equivalent in ``ibm.power_aix`` collection. It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290, https://github.com/ansible-collections/community.general/pull/11540).
+- aix_lvg - module is superseded by equivalent in ``ibm.power_aix`` collection. It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290, https://github.com/ansible-collections/community.general/pull/11540).
+- aix_lvol - module is superseded by equivalent in ``ibm.power_aix`` collection. It will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/issues/11290, https://github.com/ansible-collections/community.general/pull/11540).
+- datadog_monitor - the ``mute`` and ``unmute`` states are deprecated and will be removed in community.general 15.0.0; use the ``community.general.datadog_downtime`` module to manage monitor downtimes instead (https://github.com/ansible-collections/community.general/issues/1535, https://github.com/ansible-collections/community.general/pull/11988).
+- dconf - deprecate fallback mechanism when ``gi.repository`` is not available; fallback will be removed in community.general 15.0.0 (https://github.com/ansible-collections/community.general/pull/11088).
+- installp - deprecated and scheduled for removal in community.general 15.0.0. Use ``ibm.power_aix.installp`` instead (https://github.com/ansible-collections/community.general/pull/11910).
+- layman - ClearLinux was made EOL in July 2025.; the module will be removed from community.general 15.0.0 (https://github.com/ansible-collections/community.general/pull/11087).
+- layman - Gentoo deprecated ``layman`` in mid-2023; the module will be removed from community.general 14.0.0 (https://github.com/ansible-collections/community.general/pull/11070).
+- loganalytics callback plugin - is deprecated in favor of ``community.general.loganalytics_ingestion`` due to upcoming API changes in Azure Monitor (https://github.com/ansible-collections/community.general/pull/11505).
+- monit - support for Monit version 5.18 or older is deprecated and will be removed in community.general 14.0.0 (https://github.com/ansible-collections/community.general/pull/11254).
+- pfexec become plugin - the default value of the ``wrap_exe`` option will change from ``false`` to ``true`` in community.general 14.0.0. The current default only works in very limited cases because ``pfexec`` does not interpret shell constructs internally. Set ``wrap_exe`` explicitly to silence the deprecation warning (https://github.com/ansible-collections/community.general/pull/11623).
+- puppet - the ``timeout`` parameter is deprecated and will be removed in community.general 14.0.0. (https://github.com/ansible-collections/community.general/pull/11658).
+
+Removed Features (previously deprecated)
+----------------------------------------
+
+- atomic_container - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- atomic_host - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- atomic_image - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- catapult - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- cloud module utils - the module utils has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- cpanm - the ``mode=compatibility`` is no longer available. Migrate to ``mode=new`` (https://github.com/ansible-collections/community.general/pull/11834).
+- database module utils - the module utils has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- dimensiondata - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- dimensiondata module utils - the module utils has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- dimensiondata_network - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- dimensiondata_vlan - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- dimensiondata_wait - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- django module utils - the deprecated ``database``, ``noinput``, ``dry_run``, and ``check`` parameters for the Django runner have been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- hiera lookup plugin - the lookup has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- keycloak module utils - the deprecated ``KeycloakAPI.add_user_in_group()`` method has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- known_hosts module utils - the module utils has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- locale_gen - support for the ``ubuntu_legacy`` mechanism has been removed. Only the ``glibc`` mechanism is supported by the module anymore (https://github.com/ansible-collections/community.general/pull/11834).
+- oci_vcn - the module has been removed. Use ``oracle.oci.oci_network_vcn`` instead (https://github.com/ansible-collections/community.general/pull/11834).
+- oneandone module utils - the module utils has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oneandone_firewall_policy - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oneandone_load_balancer - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oneandone_monitoring_policy - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oneandone_private_network - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oneandone_public_ip - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oneandone_server - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oracle - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oracle.oci_utils module utils - the module utils has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oracle_creatable_resource - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oracle_display_name_option - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oracle_name_option - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oracle_tags - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- oracle_wait_options - the doc fragment has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- pipx module utils - the deprecated ``make_process_list()`` function has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- pushbullet - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- saslprep module utils - the module utils has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- sensu_check - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- sensu_client - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- sensu_handler - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- sensu_silence - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- sensu_subscription - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+- spotinst_aws_elastigroup - the module has been removed. Use ``spot.cloud_modules.aws_elastigroup`` instead (https://github.com/ansible-collections/community.general/pull/11834).
+- typetalk - the module has been removed (https://github.com/ansible-collections/community.general/pull/11834).
+
+Bugfixes
+--------
+
+- _filelock module utils - add type hints. Fix bug if ``set_lock()`` is called with ``lock_timeout=None`` (https://github.com/ansible-collections/community.general/pull/11222).
+- _filelock module utils - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- aerospike_migrations - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- aix_filesystem - remove compatibility code for ancient Python versions (https://github.com/ansible-collections/community.general/pull/11232).
+- aix_lvol - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- ali_instance - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- ali_instance - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- ali_instance_info - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- alternatives - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
+- ansible_type plugin utils - avoid potential concatenation of non-strings when ``alias`` has non-string values (https://github.com/ansible-collections/community.general/pull/11167).
+- ansible_type test plugin - fix parameter checking (https://github.com/ansible-collections/community.general/pull/11167).
+- apache2_module - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- apk - fix ``packages`` return value for apk-tools >= 3 (Alpine 3.23) (https://github.com/ansible-collections/community.general/issues/11264).
+- apk - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
+- apt_repo - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11782).
+- apt_rpm - do not fail when ``update_kernel`` finds no new kernel available (https://github.com/ansible-collections/community.general/issues/10055, https://github.com/ansible-collections/community.general/pull/11949).
+- apt_rpm - fix upgrade of local RPM not present in repository (https://github.com/ansible-collections/community.general/issues/9161, https://github.com/ansible-collections/community.general/pull/12039).
+- apt_rpm - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- apt_rpm - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- apt_rpm - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
+- awall - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11784).
+- beadm - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11780).
+- bower - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11783).
+- btrfs module utils - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- btrfs module utils - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- btrfs module_utils - set ``LANGUAGE`` and ``LC_ALL`` environment variables to ``C`` in all ``run_command()`` calls (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11787).
+- btrfs_subvolume - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- btrfs_subvolume - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- bundler - replace deprecated ``--deployment``, ``--without``, ``--path``, ``--clean``, and ``--binstubs`` flags with ``BUNDLE_*`` environment variables, fixing compatibility with Bundler 4 (https://github.com/ansible-collections/community.general/issues/4583, https://github.com/ansible-collections/community.general/issues/11380, https://github.com/ansible-collections/community.general/pull/12024).
+- bundler - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11783).
+- bzr - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11785).
+- capabilities - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11779).
+- cargo - fix ``state=latest`` always reporting ``changed`` due to greedy regex capturing description text instead of version string (https://github.com/ansible-collections/community.general/issues/8949, https://github.com/ansible-collections/community.general/pull/12064).
+- cargo - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
+- chef_databag lookup plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- cloudflare_dns - also allow ``flag=128`` for CAA records (https://github.com/ansible-collections/community.general/issues/11355, https://github.com/ansible-collections/community.general/pull/11377).
+- cobbler_system - compare the version as a float which is the type returned by the Cobbler API (https://github.com/ansible-collections/community.general/issues/11044).
+- cobbler_system - fix ``KeyError`` when adding a new interface to an existing system that does not yet have it defined (https://github.com/ansible-collections/community.general/issues/7007, https://github.com/ansible-collections/community.general/pull/11995).
+- composer - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- consul - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- consul_kv lookup plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- counter_enabled callback plugin - fix plugin not observing ``display_ok_hosts`` option (https://github.com/ansible-collections/community.general/issues/3978, https://github.com/ansible-collections/community.general/pull/11656).
+- cronvar - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
+- cronvar - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- crypttab - fix parsing of options whose value contains an equal sign (https://github.com/ansible-collections/community.general/issues/4963, https://github.com/ansible-collections/community.general/pull/11926).
+- datadog_downtime - fix ``TypeError`` when returning API response with ``datadog-api-client`` >= 2.28.0 (https://github.com/ansible-collections/community.general/issues/9079, https://github.com/ansible-collections/community.general/pull/12019).
+- datetime module utils - fix bug in ``fromtimestamp()`` that caused the function to crash. This function is not used in community.general (https://github.com/ansible-collections/community.general/pull/11206).
+- dconf - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11765).
+- discord - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- dnf_versionlock - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
+- dnf_versionlock - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- dnsmadeeasy - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- dpkg_divert - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
+- dpkg_divert - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- easy_install - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11782).
+- elastic callback plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- etcd3 lookup plugin - improve HTTPS endpoint handling by stripping URL schemes from the ``host`` option and warning when ``ca_cert`` is not provided for HTTPS endpoints (https://github.com/ansible-collections/community.general/issues/1664, https://github.com/ansible-collections/community.general/pull/11861).
+- facter_facts - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- filesystem - avoid false positive change detection on XFS resize due to unusable slack space (https://github.com/ansible-collections/community.general/pull/11033).
+- filesystem - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
+- flatpak - fix removal of runtimes, which was broken because the module was filtering the installed flatpak list to apps only, so runtimes could never be matched for uninstallation (https://github.com/ansible-collections/community.general/issues/553, https://github.com/ansible-collections/community.general/pull/11688).
+- flatpak - fix reporting ``changed`` on already present flatpaks with a dash in the last part of the ID (https://github.com/ansible-collections/community.general/issues/12062, https://github.com/ansible-collections/community.general/pull/12063).
+- flatpak - support new output message when an update resulted in no action that appears on Fedora 44 (https://github.com/ansible-collections/community.general/pull/11836).
+- flatpak_remote - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
+- gem - add compatibility with Ruby 4 rubygems (https://github.com/ansible-collections/community.general/issues/11397, https://github.com/ansible-collections/community.general/pull/11442).
+- git_config - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
+- git_config_info - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11738).
+- gitlab module utils - add type hints. Pass API version to python-gitlab as string and not as integer (https://github.com/ansible-collections/community.general/pull/11222).
+- gitlab module utils - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- gitlab_branch - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- gitlab_group_members - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- gitlab_hook - now properly passes the ``releases_events`` parameter to the GitLab API on hook creation, fixing a 500 Internal Server Error when the parameter was not specified (https://github.com/ansible-collections/community.general/issues/11269, https://github.com/ansible-collections/community.general/pull/11917).
+- gitlab_issue - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- gitlab_merge_request - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- gitlab_project - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- gitlab_project_members - fail with a clear error when multiple projects match the given name, instead of silently operating on the first result (https://github.com/ansible-collections/community.general/issues/2767, https://github.com/ansible-collections/community.general/pull/11851).
+- gitlab_project_members - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- gitlab_project_variable - use ``find_project()`` from module utils for project lookup, consistent with all other GitLab modules in the collection (https://github.com/ansible-collections/community.general/issues/3157, https://github.com/ansible-collections/community.general/pull/11878).
+- gitlab_protected_branch - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- gitlab_user - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- haproxy - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- hg - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11773).
+- homebrew - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- homebrew - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- homebrew_cask - fix ``sudo_password`` failing when the password contains single quotes or other special shell characters (https://github.com/ansible-collections/community.general/issues/4957, https://github.com/ansible-collections/community.general/pull/11850).
+- homebrew_cask - fix failure when ``brew --version`` returns a placeholder version string (https://github.com/ansible-collections/community.general/issues/4708, https://github.com/ansible-collections/community.general/pull/11849).
+- homebrew_cask - fix false task failure when upgrading casks with ``version=latest``; the post-upgrade check incorrectly re-ran ``brew outdated`` (which always lists ``latest`` casks as outdated under ``--greedy``), now uses the command exit code instead (https://github.com/ansible-collections/community.general/issues/1647, https://github.com/ansible-collections/community.general/pull/11838).
+- homebrew_cask - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- homebrew_service - slightly refactor code (https://github.com/ansible-collections/community.general/pull/11168).
+- homebrew_services - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- homebrew_tap - fix ``None`` being passed as a command argument when adding a tap without a URL (https://github.com/ansible-collections/community.general/pull/11848).
+- homectl - allow to use passlib instead of legacycrypt for Python 3.13+ (https://github.com/ansible-collections/community.general/pull/11860).
+- homectl - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11774).
+- hpilo_boot - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- icinga2_feature - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- imgadm - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11781).
+- incus connection plugin - fix parsing of commands for Windows, enforcing a ``\`` after the drive letter and colon symbol (https://github.com/ansible-collections/community.general/pull/11347).
+- incus connection plugin - work when the active become plugin sets ``require_tty`` instead of failing silently (https://github.com/ansible-collections/community.general/pull/11771).
+- infinity - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- ini_file - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- interfaces_file - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- ip_netns - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11779).
+- ipa module utils - fix failure to detect errors reported in the ``failed`` field of the IPA API response, which is returned with HTTP 200 on partial or full failures in member add/remove operations (https://github.com/ansible-collections/community.general/issues/1239, https://github.com/ansible-collections/community.general/pull/11698).
+- ipa_dnsrecord - fix errors when module is used with existing record with default TTL (https://github.com/ansible-collections/community.general/pull/11717).
+- ipa_dnsrecord - fix idempotency bug when using ``dnsttl`` due to wrong Python types (https://github.com/ansible-collections/community.general/pull/11559).
+- ipa_group - fix idempotency when ``external: false`` on an existing non-external group (https://github.com/ansible-collections/community.general/issues/5061, https://github.com/ansible-collections/community.general/pull/11933).
+- ipa_group - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- ipa_host - fix logic to disable existing hosts (https://github.com/ansible-collections/community.general/issues/11483, https://github.com/ansible-collections/community.general/pull/11487).
+- ipa_otptoken - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- ipa_vault - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- ipinfoio_facts - fix handling of HTTP errors consulting the service (https://github.com/ansible-collections/community.general/pull/11145).
+- ipmi_boot - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- iptables_state - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- iptables_state - refactor code to avoid writing unnecessary temporary files (https://github.com/ansible-collections/community.general/pull/11258).
+- iso_extract - retry ``umount`` up to 5 times preventing ``OSError`` on cleanup (https://github.com/ansible-collections/community.general/issues/5333, https://github.com/ansible-collections/community.general/pull/11837).
+- iso_extract - strip leading path separator from file entries so files with a leading ``/`` are extracted correctly (https://github.com/ansible-collections/community.general/issues/5283, https://github.com/ansible-collections/community.general/pull/11825).
+- java_cert - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11774).
+- java_keystore - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- jenkins_build - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- jenkins_build_info - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- jenkins_credential - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- jenkins_plugin - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- jenkins_plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- json_patch filter plugin - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- kea_command - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- keycloak module utils - fix ``TypeError`` crash when managing users whose username or email contains special characters such as ``+`` (https://github.com/ansible-collections/community.general/issues/10305, https://github.com/ansible-collections/community.general/pull/11472).
+- keycloak module utils - use proper URL encoding (``urllib.parse.quote``) for query parameters in authorization permission name searches, replacing fragile manual space replacement (https://github.com/ansible-collections/community.general/pull/11472).
+- keycloak_authentication - fix ``TypeError`` crash when a flow is defined without ``authenticationExecutions`` (https://github.com/ansible-collections/community.general/issues/11547, https://github.com/ansible-collections/community.general/pull/11548).
+- keycloak_authz_permission - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- keycloak_client - fix idempotency bug caused by ``null`` client attribute value differences for non-existing client attributes (https://github.com/ansible-collections/community.general/issues/11443, https://github.com/ansible-collections/community.general/pull/11444).
+- keycloak_client - fix idempotency bug caused by ``null`` flow overrides value differences for non-existing flow overrides (https://github.com/ansible-collections/community.general/issues/11430, https://github.com/ansible-collections/community.general/pull/11455).
+- keycloak_client - remove IDs as change from diff result for protocol mappers (https://github.com/ansible-collections/community.general/issues/11453, https://github.com/ansible-collections/community.general/pull/11454).
+- keycloak_clientscope_type - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- keycloak_component - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- keycloak_realm - fixed crash in ``sanitize_cr()`` when ``realmrep`` was ``None`` (https://github.com/ansible-collections/community.general/pull/11260).
+- keycloak_realm_key - fix ``KeyError`` crash when managing realm keys where Keycloak does not return ``active``, ``enabled``, or ``algorithm`` fields in the config response (https://github.com/ansible-collections/community.general/issues/11459, https://github.com/ansible-collections/community.general/pull/11470).
+- keycloak_realm_key - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- keycloak_user_execute_actions_email - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- keycloak_user_federation - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- keycloak_user_federation - mapper config item can be an array (https://github.com/ansible-collections/community.general/issues/11502, https://github.com/ansible-collections/community.general/pull/11515).
+- keycloak_user_rolemapping - fix ``TypeError`` crash when adding a client role to a user who has no existing roles for that client (https://github.com/ansible-collections/community.general/issues/10960, https://github.com/ansible-collections/community.general/pull/11471).
+- keycloak_user_rolemapping module - fixed crash when assigning roles to users without an existing role (https://github.com/ansible-collections/community.general/issues/10960, https://github.com/ansible-collections/community.general/pull/11256).
+- keycloak_userprofile - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- keyring - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11774).
+- keyring_info - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11786).
+- keys_filter.py plugin utils - fixed requirements check so that other sequences than lists and strings are checked, and corrected broken formatting during error reporting (https://github.com/ansible-collections/community.general/pull/11167).
+- kibana_plugin - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11783).
+- known_hosts module utils - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- launchd - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- launchd - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11774).
+- lbu - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11781).
+- ldap_attrs - fix ``state=exact`` incorrectly issuing ``MOD_ADD`` instead of ``MOD_REPLACE`` for attributes returned by the server with different casing (https://github.com/ansible-collections/community.general/issues/1624, https://github.com/ansible-collections/community.general/pull/11990).
+- linode inventory plugin - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- listen_ports_facts - fix handling of empty PID lists when ``command=ss`` (https://github.com/ansible-collections/community.general/pull/11332).
+- listen_ports_facts - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- listen_ports_facts - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- listen_ports_facts - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11774).
+- lldp - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11785).
+- locale_gen - add missing locale entries to ``/etc/locale.gen`` when not already present (https://github.com/ansible-collections/community.general/issues/2399, https://github.com/ansible-collections/community.general/pull/11824).
+- logentries callback plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- logrotate - adds missing default values for ``state`` and ``config_dir`` parameters, and adds ``required_by`` declarations for shred and compression parameters (https://github.com/ansible-collections/community.general/pull/11764).
+- logrotate - fixes ``TypeError`` when ``shred_cycles`` is ``None`` and corrects ``enabled=None`` handling in ``get_config_path()`` (https://github.com/ansible-collections/community.general/pull/11764).
+- logrotate - writes configuration files to a temporary file first and validates before atomically moving to the destination, and properly wraps all ``os.remove()`` and ``atomic_move()`` calls in error handling (https://github.com/ansible-collections/community.general/pull/11764).
+- logstash_plugin - fix argument order when using ``version`` parameter. The plugin name must come after options like ``--version`` for the ``logstash-plugin`` CLI to work correctly (https://github.com/ansible-collections/community.general/issues/10745, https://github.com/ansible-collections/community.general/pull/11440).
+- logstash_plugin - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11775).
+- logstash_plugin - use ``http_proxy``/``https_proxy`` environment variables for proxy support instead of broken JVM flags; expose ``stderr`` on failure (https://github.com/ansible-collections/community.general/issues/8650, https://github.com/ansible-collections/community.general/pull/11951).
+- lvg - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11775).
+- lvol - fix LVM version parsing (https://github.com/ansible-collections/community.general/issues/5445, https://github.com/ansible-collections/community.general/pull/11823).
+- lvol - fix thin-pool creation when ``size`` is a percentage (https://github.com/ansible-collections/community.general/issues/11923, https://github.com/ansible-collections/community.general/pull/11925).
+- lvol - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- lxc_container - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- lxc_container - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11779).
+- lxd_container - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- machinectl become plugin - prevent printing ANSI terminal color sequences (https://github.com/ansible-collections/community.general/pull/11771).
+- macports - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- manageiq_alert_profiles - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- manageiq_provider - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- manageiq_tenant - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- mas - parse CLI output correctly when listing installed apps with mas 3.0.0+ (https://github.com/ansible-collections/community.general/pull/11179).
+- mas - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11775).
+- matrix - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- maven_artifact - fix SNAPSHOT version resolution to pick the newest matching ``<snapshotVersion>`` entry by ``<updated>`` timestamp instead of the first. Repositories like GitHub Packages keep all historical entries in ``<snapshotVersions>`` (oldest first), causing the module to resolve to the oldest snapshot instead of the latest (https://github.com/ansible-collections/community.general/issues/5117, https://github.com/ansible-collections/community.general/issues/11489, https://github.com/ansible-collections/community.general/pull/11501).
+- maven_artifact - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- memset_memstore_info - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- memset_server_info - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- memset_zone - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- modprobe - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- module_helper module utils - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- monit - add delay of 0.5 seconds after state change and check for status (https://github.com/ansible-collections/community.general/pull/11255).
+- monit - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- monit - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- monit - internal state was not reflecting when operation is "pending" in ``monit`` (https://github.com/ansible-collections/community.general/pull/11245).
+- mssql_db - fail with a clear error message when a named instance (``server\instance`` format) is used together with ``login_port``, since these are mutually exclusive connection methods (https://github.com/ansible-collections/community.general/issues/5693, https://github.com/ansible-collections/community.general/pull/11664).
+- mssql_script - fail with a clear error message when a named instance (``server\instance`` format) is used together with ``login_port``, since these are mutually exclusive connection methods (https://github.com/ansible-collections/community.general/issues/5693, https://github.com/ansible-collections/community.general/pull/11664).
+- mssql_script - only passes ``params`` to ``cursor.execute()`` when the user actually provides them (https://github.com/ansible-collections/community.general/issues/11699, https://github.com/ansible-collections/community.general/pull/11754).
+- netcup_dns - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- nictagadm - add a condition to the if statement so that ``is_valid_mac()`` does not get called if ``etherstub`` is false (https://github.com/ansible-collections/community.general/pull/11589).
+- nmcli - add missing ``ipv6.routing-rules`` to ``settings_type()`` list type, preventing ``routing_rules6`` list from being corrupted (https://github.com/ansible-collections/community.general/issues/11630, https://github.com/ansible-collections/community.general/pull/11635).
+- nmcli - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- nmcli - use ``get_best_parsable_locale()`` to set locale environment for ``run_command()`` calls, fixing UTF-8 connection names being corrupted to ``????`` under ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/10384, https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11742).
+- nomad_job - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- nosh - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- npm - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- nsupdate - fix GSS-TSIG support (accidentally broken by https://github.com/ansible-collections/community.general/pull/11461, https://github.com/ansible-collections/community.general/pull/11712)
+- nsupdate - fix ``AttributeError`` when using the module without TSIG authentication (https://github.com/ansible-collections/community.general/issues/11460, https://github.com/ansible-collections/community.general/pull/11461).
+- odbc - fetch rows before committing to fix ``HY010`` function sequence error (https://github.com/ansible-collections/community.general/issues/5395, https://github.com/ansible-collections/community.general/pull/11972).
+- odbc - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- ohai - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11785).
+- one_host - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- one_image - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- one_service - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- one_template - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- one_vm - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- one_vm - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- one_vnet - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- oneandone module utils - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- onepassword_info - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- onepassword_info - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11786).
+- online inventory plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- open_iscsi - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- open_iscsi - fix IPv6 portal address formatting; iscsiadm requires bracket notation for IPv6 addresses but the module was producing an incorrect format (https://github.com/ansible-collections/community.general/issues/4467, https://github.com/ansible-collections/community.general/pull/11657).
+- openbsd_pkg - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11767).
+- opendj_backendprop - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- opennebula module utils - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- opentelemetry callback plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- opentelemetry callback plugin - set span start to the actual start time of the task for the given host instead of the task start time for the first host of that task (https://github.com/ansible-collections/community.general/pull/11434).
+- openwrt_init - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11784).
+- osx_defaults - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11775).
+- ovh_monthly_billing - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- pacemaker_resource, pacemaker_stonith - fix resource and stonith creation race condition by polling PCS status (https://github.com/ansible-collections/community.general/issues/11574, https://github.com/ansible-collections/community.general/pull/11750).
+- pacman - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- pacman_key - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- pam_limits - only create backup file when the target file is actually modified (https://github.com/ansible-collections/community.general/issues/12011, https://github.com/ansible-collections/community.general/pull/12014).
+- pam_limits - remove ``%`` templating no longer used in f-string (https://github.com/ansible-collections/community.general/pull/11229).
+- pamd - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- parted - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11740).
+- pear - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11782).
+- pfexec become plugin - fix default ``become_flags`` from ``-H -S -n`` (sudo flags) to empty string, as ``pfexec`` does not accept these options (https://github.com/ansible-collections/community.general/pull/11623).
+- pip_package_info - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11784).
+- pkg5 - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11780).
+- pkg5_publisher - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11780).
+- pkgin - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- pkgin - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- pkgng - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11765).
+- pkgutil - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11775).
+- pmem - fix test for invalid data input (https://github.com/ansible-collections/community.general/pull/11388).
+- pnpm - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11776).
+- portage - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11781).
+- portinstall - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- portinstall - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11781).
+- pulp_repo - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- puppet - fix ``TypeError`` when writing facts data (https://github.com/ansible-collections/community.general/issues/7932, https://github.com/ansible-collections/community.general/pull/11954).
+- python_requirements_info - use ``importlib.metadata`` if ``pkg_resources`` from ``setuptools`` cannot be imported. That module has been removed from setuptools 82.0.0 (https://github.com/ansible-collections/community.general/issues/11491, https://github.com/ansible-collections/community.general/pull/11492).
+- redfish_utils module utils - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- redhat_subscription - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- redhat_subscription - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- redhat_subscription - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- redis_data_incr - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- rhevm - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- rhsm_release - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- rhsm_repository - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- riak - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11786).
+- rpm_ostree_pkg - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- run0 become plugin - mark the plugin as incompatible with connection pipelining (see https://github.com/ansible/ansible/issues/81254, https://github.com/ansible-collections/community.general/pull/11771).
+- run0 become plugin - prevent printing ANSI terminal color sequences (https://github.com/ansible-collections/community.general/pull/11771).
+- runit - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- scaleway module utils - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- scaleway_image_info, scaleway_ip_info, scaleway_organization_info, scaleway_security_group_info, scaleway_server_info, scaleway_snapshot_info, scaleway_volume_info - fix ``NoneType`` error when the Scaleway API returns an empty or non-JSON response body (https://github.com/ansible-collections/community.general/issues/11361, https://github.com/ansible-collections/community.general/pull/11918).
+- scaleway_sshkey - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- sefcontext - flush the in-process ``matchpathcon`` cache after applying changes, so subsequent tasks running in the same process (for example via the Mitogen connection plugin) see the updated SELinux file context rules instead of stale cached data (https://github.com/ansible-collections/community.general/issues/888, https://github.com/ansible-collections/community.general/pull/11812).
+- selective callback plugin - align host names in stats output by padding to the longest name (https://github.com/ansible-collections/community.general/issues/8797, https://github.com/ansible-collections/community.general/pull/12065).
+- selective callback plugin - route all output through ``self._display.display()`` instead of bare ``print()`` calls, fixing missing output when ``ANSIBLE_LOG_PATH`` is set (https://github.com/ansible-collections/community.general/issues/4850, https://github.com/ansible-collections/community.general/pull/11927).
+- sensu_check - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- seport - fix idempotency when a requested port is already covered by an existing range registered for the same setype (https://github.com/ansible-collections/community.general/issues/10105, https://github.com/ansible-collections/community.general/pull/11994).
+- simpleinit_msb - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- smartos_image_info - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11781).
+- snmp_facts - the module now also supports pysnmp >= 7.1 (https://github.com/ansible-collections/community.general/issues/8852, https://github.com/ansible-collections/community.general/pull/11683).
+- sorcery - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11767).
+- sorcery - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- spectrum_model_attrs - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- splunk callback plugin - replace deprecated callback function (https://github.com/ansible-collections/community.general/pull/11485).
+- spotinst_aws_elastigroup - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- supervisorctl - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- svc - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- svc - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- swdepot - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11780).
+- syslog_json callback plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- syspatch - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11781).
+- sysrc - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11776).
+- sysupgrade - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11768).
+- telegram - added the ``api_host`` parameter to fix connectivity with self-hosted proxies and custom API endpoints (https://github.com/ansible-collections/community.general/pull/12040).
+- terraform - ensure ``LANGUAGE=C`` and ``LC_ALL=C`` are set when running commands that parse output (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11765).
+- terraform - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- timestamp callback plugin - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- timezone - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- timezone - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11776).
+- to_* time filter plugins - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- to_prettytable filter plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- udm_user - allow to use passlib instead of legacycrypt for Python 3.13+ (https://github.com/ansible-collections/community.general/issues/4690, https://github.com/ansible-collections/community.general/pull/11860).
+- udm_user - fix alias-to-canonical parameter name mismatch that caused all camelCase-aliased parameters such as ``display_name`` and ``primary_group`` to be silently ignored (https://github.com/ansible-collections/community.general/issues/2950, https://github.com/ansible-collections/community.general/issues/3691, https://github.com/ansible-collections/community.general/pull/11859).
+- ufw - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- vmadm - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- wsl connection plugin - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- wsl connection plugin - rename variable to fix type checking (https://github.com/ansible-collections/community.general/pull/11030).
+- xattr - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11776).
+- xbps - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11781).
+- xcc_redfish_command - fix templating of dictionary keys as list (https://github.com/ansible-collections/community.general/pull/11144).
+- xen_orchestra inventory plugin - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- xenserver module utils - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- xenserver_guest - fix an issue where booting from ISO is not possible because CD-ROM device is placed in position above number 3. Position number 3 is now reserved for CD-ROM device and cannot be occupied by a disk (https://github.com/ansible-collections/community.general/issues/11624, https://github.com/ansible-collections/community.general/pull/11702).
+- xenserver_guest - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- xenserver_guest - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- xfconf - representation of boolean properties was not consistent between Python and ``xfconf-query``, leading to broken idempotency (https://github.com/ansible-collections/community.general/pull/11645).
+- xfs_quota - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- xml - emit an error when ``value`` is not a string, pointing to the offending xpath (https://github.com/ansible-collections/community.general/issues/7171, https://github.com/ansible-collections/community.general/pull/11959).
+- xml - fix ``print_match`` not populating the ``matches`` return value (https://github.com/ansible-collections/community.general/issues/9125, https://github.com/ansible-collections/community.general/pull/12013).
+- xml - improve Python code by removing unnecessary variables (https://github.com/ansible-collections/community.general/pull/11049).
+- yarn - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11776).
+- yarn - skip Node.js runtime warning lines (starting with ``(node:``) in stderr before JSON parsing, fixing failures with Node.js 24 which emits ``DeprecationWarning`` to stderr. The warnings are passed on to the user (https://github.com/ansible-collections/community.general/pull/11943).
+- yum_versionlock - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11777).
+- zfs - mark change correctly when updating properties whose current value differs, even if they already have a non-default value (https://github.com/ansible-collections/community.general/issues/11019, https://github.com/ansible-collections/community.general/pull/11172).
+- zfs - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11778).
+- zfs_delegate_admin - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11778).
+- zfs_facts - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11778).
+- zpool_facts - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11778).
+- zypper - normalize locale environment for ``run_command()`` calls to ``LANGUAGE=C``, ``LC_ALL=C`` (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11741).
+- zypper_repository - allow unreachable ``.repo`` URLs and missing local paths when using ``state=absent`` (https://github.com/ansible-collections/community.general/issues/5769, https://github.com/ansible-collections/community.general/pull/11947).
+- zypper_repository - improve Python code (https://github.com/ansible-collections/community.general/pull/11043).
+- zypper_repository - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11777).
+- zypper_repository_info - set ``LANGUAGE`` and ``LC_ALL`` to ``C`` in ``run_command()`` calls to ensure locale-independent output parsing (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11782).
+
+New Plugins
+-----------
+
+Callback
+~~~~~~~~
+
+- community.general.loganalytics_ingestion - Posts task results to an Azure Log Analytics workspace using the new Logs Ingestion API.
+
+Filter
+~~~~~~
+
+- community.general.to_toml - Convert variable to TOML string.
+
+New Modules
+-----------
+
+- community.general.file_remove - Remove files matching a pattern from a directory.
+- community.general.github_secrets - Manage GitHub repository or organization secrets.
+- community.general.github_secrets_info - List GitHub repository or organization secrets.
+- community.general.icinga2_downtime - Manages Icinga 2 downtimes.
+- community.general.ip2location_info - Retrieve IP geolocation information of a host's IP address.
+- community.general.keycloak_authentication_v2 - Configure authentication flows in Keycloak in an idempotent and safe manner.
+- community.general.keycloak_realm_localization - Allows management of Keycloak realm localization overrides via the Keycloak API.
+- community.general.logrotate - Manage logrotate configurations.
+- community.general.lxd_storage_pool_info - Retrieve information about LXD storage pools.
+- community.general.lxd_storage_volume_info - Retrieve information about LXD storage volumes.
+- community.general.snap_connect - Manages snap interface connections.
+- community.general.sssd_info - Check SSSD domain status using D\-Bus.
+- community.general.uv_python - Manage Python versions and installations using the :literal:`uv` Python package manager.

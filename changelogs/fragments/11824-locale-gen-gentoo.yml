@@ -1,4 +1,0 @@
-bugfixes:
-  - "locale_gen - add missing locale entries to ``/etc/locale.gen`` when not already present
-    (https://github.com/ansible-collections/community.general/issues/2399,
-    https://github.com/ansible-collections/community.general/pull/11824)."

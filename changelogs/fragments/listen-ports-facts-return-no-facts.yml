@@ -1,2 +1,0 @@
-bugfixes:
-  - listen_ports_facts - fix handling of empty PID lists when ``command=ss`` (https://github.com/ansible-collections/community.general/pull/11332).

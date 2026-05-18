@@ -1,3 +1,0 @@
----
-minor_changes:
-  - keycloak_realm - add support for ``localizationTexts`` option in Keycloak realms (https://github.com/ansible-collections/community.general/pull/11513).

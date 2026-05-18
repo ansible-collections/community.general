@@ -1,5 +1,0 @@
-bugfixes:
-  - flatpak - fix removal of runtimes, which was broken because the module was filtering
-    the installed flatpak list to apps only, so runtimes could never be matched for
-    uninstallation (https://github.com/ansible-collections/community.general/issues/553,
-    https://github.com/ansible-collections/community.general/pull/11688).

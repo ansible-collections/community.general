@@ -1,2 +1,0 @@
-bugfixes:
-  - counter_enabled callback plugin - fix plugin not observing ``display_ok_hosts`` option (https://github.com/ansible-collections/community.general/issues/3978, https://github.com/ansible-collections/community.general/pull/11656).

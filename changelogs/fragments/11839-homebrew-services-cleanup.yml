@@ -1,4 +1,0 @@
-minor_changes:
-  - homebrew_services - remove various redundancies including dead state validation, unused return
-    values, and unnecessary locale environment variables
-    (https://github.com/ansible-collections/community.general/pull/11839).

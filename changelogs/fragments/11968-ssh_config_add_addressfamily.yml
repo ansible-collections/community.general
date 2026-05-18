@@ -1,2 +1,0 @@
-minor_changes:
-  - "ssh_config - add support for the ``AddressFamily`` option (https://github.com/ansible-collections/community.general/pull/11968)."
