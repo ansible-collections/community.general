@@ -12,8 +12,6 @@ author:
   - Scott Buchanan (@scottsb)
   - Andrew Zenk (@azenk)
   - Sam Doran (@samdoran)
-requirements:
-  - C(op) 1Password command line utility
 short_description: Fetch an entire item from 1Password
 description:
   - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch an entire item from 1Password.

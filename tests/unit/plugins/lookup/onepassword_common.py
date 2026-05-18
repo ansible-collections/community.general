@@ -8,7 +8,6 @@ import json
 import os
 
 from ansible_collections.community.general.plugins.lookup.onepassword import (
-    OnePassCLIv1,
     OnePassCLIv2,
 )
 
@@ -20,26 +19,6 @@ def load_file(file):
 
 # Intentionally excludes metadata leaf nodes that would exist in real output if not relevant.
 MOCK_ENTRIES = {
-    OnePassCLIv1: [
-        {
-            "vault_name": 'Acme "Quot\'d" Servers',
-            "queries": ["0123456789", 'Mock "Quot\'d" Server'],
-            "expected": ["t0pS3cret", "t0pS3cret"],
-            "output": load_file("v1_out_01.json"),
-        },
-        {
-            "vault_name": "Acme Logins",
-            "queries": ["9876543210", "Mock Website", "acme.com"],
-            "expected": ["t0pS3cret", "t0pS3cret", "t0pS3cret"],
-            "output": load_file("v1_out_02.json"),
-        },
-        {
-            "vault_name": "Acme Logins",
-            "queries": ["864201357"],
-            "expected": ["vauxhall"],
-            "output": load_file("v1_out_03.json"),
-        },
-    ],
     OnePassCLIv2: [
         {
             "vault_name": "Test Vault",
