@@ -1,4 +1,0 @@
-bugfixes:
-  - "ipa module utils - fix failure to detect errors reported in the ``failed`` field of the IPA API response,
-    which is returned with HTTP 200 on partial or full failures in member add/remove operations
-    (https://github.com/ansible-collections/community.general/issues/1239, https://github.com/ansible-collections/community.general/pull/11698)."

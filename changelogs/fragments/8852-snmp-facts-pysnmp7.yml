@@ -1,2 +1,0 @@
-bugfixes:
-  - snmp_facts - the module now also supports pysnmp >= 7.1 (https://github.com/ansible-collections/community.general/issues/8852, https://github.com/ansible-collections/community.general/pull/11683).

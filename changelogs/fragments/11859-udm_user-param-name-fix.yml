@@ -1,6 +1,0 @@
-bugfixes:
-  - udm_user - fix alias-to-canonical parameter name mismatch that caused all camelCase-aliased
-    parameters such as ``display_name`` and ``primary_group`` to be silently ignored
-    (https://github.com/ansible-collections/community.general/issues/2950,
-    https://github.com/ansible-collections/community.general/issues/3691,
-    https://github.com/ansible-collections/community.general/pull/11859).

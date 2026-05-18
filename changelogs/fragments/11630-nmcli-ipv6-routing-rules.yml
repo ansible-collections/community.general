@@ -1,2 +1,0 @@
-bugfixes:
-  - nmcli - add missing ``ipv6.routing-rules`` to ``settings_type()`` list type, preventing ``routing_rules6`` list from being corrupted (https://github.com/ansible-collections/community.general/issues/11630, https://github.com/ansible-collections/community.general/pull/11635).

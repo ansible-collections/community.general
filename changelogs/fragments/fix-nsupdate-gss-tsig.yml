@@ -1,2 +1,0 @@
-bugfixes:
-  - nsupdate - fix GSS-TSIG support (accidentally broken by https://github.com/ansible-collections/community.general/pull/11461, https://github.com/ansible-collections/community.general/pull/11712)

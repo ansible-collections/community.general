@@ -1,2 +1,0 @@
-bugfixes:
-  - btrfs module_utils - set ``LANGUAGE`` and ``LC_ALL`` environment variables to ``C`` in all ``run_command()`` calls (https://github.com/ansible-collections/community.general/issues/11737, https://github.com/ansible-collections/community.general/pull/11787).

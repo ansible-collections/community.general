@@ -1,3 +1,0 @@
-minor_changes:
-  - ldap_attrs - add ``binary_attributes`` and ``honor_binary`` parameters to handle binary attribute values (https://github.com/ansible-collections/community.general/pull/11558).
-  - ldap_entry - add ``binary_attributes`` and ``honor_binary`` parameters to handle creating objects with attributes set to binary values (https://github.com/ansible-collections/community.general/pull/11558).

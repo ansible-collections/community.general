@@ -1,2 +1,0 @@
-minor_changes:
-  - lvg - migrate to ``CmdRunner``, removing direct ``run_command`` calls and ``run_command_environ_update`` (https://github.com/ansible-collections/community.general/pull/11835).

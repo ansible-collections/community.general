@@ -1,2 +1,0 @@
-bugfixes:
-  - splunk callback plugin - replace deprecated callback function (https://github.com/ansible-collections/community.general/pull/11485).

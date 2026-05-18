@@ -1,2 +1,0 @@
-minor_changes:
-  - lvm_pv - migrate to ``CmdRunner`` using shared runners from ``module_utils/_lvm`` (https://github.com/ansible-collections/community.general/pull/11811).

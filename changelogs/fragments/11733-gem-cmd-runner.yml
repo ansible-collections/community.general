@@ -1,2 +1,0 @@
-minor_changes:
-  - gem - refactor module to use ``CmdRunner`` (https://github.com/ansible-collections/community.general/pull/11733).

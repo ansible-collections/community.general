@@ -1,2 +1,0 @@
-minor_changes:
-  - ModuleHelper module utils - allow to ignore specific exceptions in ``module_fails_on_exception`` decorator (https://github.com/ansible-collections/community.general/pull/11488).

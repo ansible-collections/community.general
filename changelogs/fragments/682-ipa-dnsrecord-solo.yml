@@ -1,4 +1,0 @@
-minor_changes:
-  - ipa_dnsrecord - add ``exclusive`` parameter to allow appending values to existing records
-    without replacing them (https://github.com/ansible-collections/community.general/issues/682,
-    https://github.com/ansible-collections/community.general/pull/11694).

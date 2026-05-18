@@ -1,2 +1,0 @@
-minor_changes:
-  - ansible_galaxy_install - add parameter ``executable`` (https://github.com/ansible-collections/community.general/issues/7261, https://github.com/ansible-collections/community.general/pull/11646).

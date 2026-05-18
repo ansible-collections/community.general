@@ -1,2 +1,0 @@
-minor_changes:
-  - nsupdate - add support for server FQDN and the GSS-TSIG key algorithm (https://github.com/ansible-collections/community.general/issues/5730, https://github.com/ansible-collections/community.general/pull/11425).

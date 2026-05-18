@@ -1,4 +1,0 @@
-minor_changes:
-  - cobbler_sync - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
-  - cobbler_system - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
-  - ip_netns - remove redundant conversions to unicode (https://github.com/ansible-collections/community.general/pull/11105).
