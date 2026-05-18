@@ -323,7 +323,10 @@ def get_token(module_params: dict[str, t.Any]) -> dict[str, str]:
 
 
 def is_struct_included(
-    struct1: object, struct2: object, exclude: Sequence[str] | None = None, empty_list_result: bool = True
+    struct1: dict | list | bool | int | str,
+    struct2: dict | list | bool | int | str,
+    exclude: Sequence[str] | None = None,
+    empty_list_result: bool = True,
 ) -> bool:
     """
     This function compare if the first parameter structure is included in the second.
@@ -331,30 +334,18 @@ def is_struct_included(
     The two structure does not need to be equals for that function to return true.
     Each elements are compared recursively.
     :param struct1:
-        type:
-            dict for the initial call, can be dict, list, bool, int or str for recursive calls
         description:
             reference structure
     :param struct2:
-        type:
-            dict for the initial call, can be dict, list, bool, int or str for recursive calls
         description:
             structure to compare with first parameter.
     :param exclude:
-        type:
-            list
         description:
             Key to exclude from the comparison.
-        default: None
     :param empty_list_result:
-        type:
-            bool
         description:
             Return this value, when struct1 is an empty list.
-        default: True
     :return:
-        type:
-            bool
         description:
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
