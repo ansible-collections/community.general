@@ -194,17 +194,17 @@ def main():
 
     realm_object = kc.get_realm_by_id(realm)
     if not realm_object:
-        module.fail_json(msg=f"Failed to retrive realm '{realm}'")
+        module.fail_json(msg=f"Failed to retrieve realm '{realm}'")
 
     clientscope_object = kc.get_clientscope_by_name(clientscope_id, realm)
     if not clientscope_object:
-        module.fail_json(msg=f"Failed to retrive client-scope '{clientscope_id}'")
+        module.fail_json(msg=f"Failed to retrieve client-scope '{clientscope_id}'")
 
     if client_id:
         # add client role
         client_object = kc.get_client_by_clientid(client_id, realm)
         if not client_object:
-            module.fail_json(msg=f"Failed to retrive client '{realm}.{client_id}'")
+            module.fail_json(msg=f"Failed to retrieve client '{realm}.{client_id}'")
         if client_object["fullScopeAllowed"] and state == "present":
             module.fail_json(msg=f"FullScopeAllowed is active for Client '{realm}.{client_id}'")
 
@@ -226,9 +226,9 @@ def main():
         for role_name in role_names:
             if role_name not in available_roles_by_name:
                 if client_id:
-                    module.fail_json(msg=f"Failed to retrive role '{realm}.{client_id}.{role_name}'")
+                    module.fail_json(msg=f"Failed to retrieve role '{realm}.{client_id}.{role_name}'")
                 else:
-                    module.fail_json(msg=f"Failed to retrive role '{realm}.{role_name}'")
+                    module.fail_json(msg=f"Failed to retrieve role '{realm}.{role_name}'")
             if role_name not in before_roles_by_name:
                 changed_roles.append(available_roles_by_name[role_name])
                 desired_roles.append(available_roles_by_name[role_name])
