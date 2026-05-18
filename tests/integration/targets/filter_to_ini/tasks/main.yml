@@ -3,11 +3,10 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: >-
-    Write INI file that reflects using to_ini to {{ ini_test_file_filter }}
+- name: Write INI files that reflect using to_ini
   ansible.builtin.copy:
-    dest: '{{ ini_test_file_filter }}'
-    content: '{{ ini_test_dict | community.general.to_ini }}'
+    dest: '{{ item.file }}'
+    content: '{{ ini_test_dict | community.general.to_ini(no_extra_spaces=item.no_extra_spaces) }}'
   vars:
     ini_test_dict:
       section_name:
@@ -18,6 +17,11 @@
 
       interpolate_test:
         interpolate_test_key: '%'
+  loop:
+    - 'file': '{{ ini_test_file_filter }}'
+      'no_extra_spaces': false
+    - 'file': '{{ ini_test_file_filter_no_extra_spaces }}'
+      'no_extra_spaces': true
 
 - name: 'Write INI file manually to {{ ini_test_file }}'
   ansible.builtin.copy:
@@ -32,23 +36,38 @@
       [interpolate_test]
       interpolate_test_key = %
 
-- name: 'Slurp the manually created test file: {{ ini_test_file }}'
-  ansible.builtin.slurp:
-    src: '{{ ini_test_file }}'
-  register: 'ini_file_content'
+- name: 'Write INI file manually to {{ ini_test_file_no_extra_spaces }}'
+  ansible.builtin.copy:
+    dest: '{{ ini_test_file_no_extra_spaces }}'
+    content: |
+      [section_name]
+      key_name=key value
 
-- name: 'Slurp the test file created with to_ini: {{ ini_test_file_filter }}'
+      [another_section]
+      connection=ssh
+
+      [interpolate_test]
+      interpolate_test_key=%
+
+- name: 'Slurp the manually created test files'
   ansible.builtin.slurp:
-    src: '{{ ini_test_file_filter }}'
-  register: 'ini_file_filter_content'
+    src: '{{ item }}'
+  loop:
+    - '{{ ini_test_file }}'
+    - '{{ ini_test_file_filter }}'
+    - '{{ ini_test_file_no_extra_spaces }}'
+    - '{{ ini_test_file_filter_no_extra_spaces }}'
+  register: 'ini_file_content'
 
 - name: >-
     Ensure the manually created test file and the test file created with
     to_ini are identical
   ansible.builtin.assert:
     that:
-      - 'ini_file_content.content | b64decode ==
-         ini_file_filter_content.content | b64decode'
+      - "ini_file_content.results | selectattr('source', 'equalto', ini_test_file) | map(attribute='content') | first | b64decode ==
+         ini_file_content.results | selectattr('source', 'equalto', ini_test_file_filter) | map(attribute='content') | first | b64decode"
+      - "ini_file_content.results | selectattr('source', 'equalto', ini_test_file_no_extra_spaces) | map(attribute='content') | first | b64decode ==
+         ini_file_content.results | selectattr('source', 'equalto', ini_test_file_filter_no_extra_spaces) | map(attribute='content') | first | b64decode"
 
 - name: 'Try to convert an empty dictionary with to_ini'
   ansible.builtin.debug:

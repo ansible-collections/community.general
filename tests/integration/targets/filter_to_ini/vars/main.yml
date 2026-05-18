@@ -4,5 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ini_test_file: '/tmp/test.ini'
+ini_test_file_no_extra_spaces: '/tmp/test_no_extra_spaces.ini'
 ini_test_file_filter: '/tmp/test_filter.ini'
+ini_test_file_filter_no_extra_spaces: '/tmp/test_filter_no_extra_spaces.ini'
 ...
