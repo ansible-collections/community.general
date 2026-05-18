@@ -445,13 +445,15 @@ def main():
     # If there is no value for email_verified, check if we should to set the old default
     if module.params["email_verified"] is None and module.params["email_verified_behavior"] == "compatibility":
         module.params["email_verified"] = False
+    
+    ignored_arguments = list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups", "email_verified_behavior"]
 
     # Filter and map the parameters names that apply to the user
     user_params = [
         x
         for x in module.params
         if x
-        not in list(keycloak_argument_spec().keys()) + ["state", "realm", "force", "groups", "email_verified_behavior"]
+        not in ignored_arguments
         and module.params.get(x) is not None
     ]
 
