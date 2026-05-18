@@ -2923,7 +2923,7 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(e, msg=f"Could not delete scope {id} for client {client_id} in realm {realm}: {e}")
 
-    def get_user_by_id(self, user_id, realm: str = "master", user_profile_metadata: bool = False):
+    def get_user_by_id(self, user_id, realm: str = "master"):
         """
         Get a User by its ID.
         :param user_id: ID of the user.
@@ -2932,9 +2932,7 @@ class KeycloakAPI:
         :return: Representation of the user.
         """
         try:
-            user_url = URL_USER.format(url=self.baseurl, realm=realm, id=user_id)
-            if user_profile_metadata:
-                user_url += "?userProfileMetadata=True"
+            user_url = URL_USER.format(url=self.baseurl, realm=realm, id=user_id) + "?userProfileMetadata=True"
             userrep = json.load(self._request(user_url, method="GET"))
             return userrep
         except Exception as e:
@@ -2987,7 +2985,7 @@ class KeycloakAPI:
                 userrep["attributes"] = self.convert_user_attributes_to_keycloak_dict(attributes=attributes)
             user_url = URL_USER.format(url=self.baseurl, realm=realm, id=userrep["id"])
             self._request(user_url, method="PUT", data=json.dumps(userrep))
-            updated_user = self.get_user_by_id(user_id=userrep["id"], realm=realm, user_profile_metadata=True)
+            updated_user = self.get_user_by_id(user_id=userrep["id"], realm=realm)
             return updated_user
         except Exception as e:
             self.fail_request(e, msg=f"Could not update user {userrep['username']} in realm {realm}: {str(e)}")
