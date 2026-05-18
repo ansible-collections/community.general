@@ -60,6 +60,7 @@
         - <a href="#inventory">Inventory</a>
         - <a href="#lookup">Lookup</a>
     - <a href="#new-modules-5">New Modules</a>
+
 This changelog describes changes after version 11\.0\.0\.
 
 <a id="v12-6-1"></a>
