@@ -242,7 +242,7 @@ def main():
     before_roles = sorted(before_roles, key=lambda d: d["name"])
     desired_role_mapping = sorted(desired_roles, key=lambda d: d["name"])
 
-    result["changed"] = len(changed_roles) > 0
+    result["changed"] = bool(changed_roles)
 
     if module._diff:
         result["diff"] = dict(before={"roles": before_roles}, after={"roles": desired_role_mapping})
