@@ -3087,13 +3087,19 @@ class KeycloakAPI:
                 realm_group = self.find_group_by_path(group_to_add, realm=realm)
                 if realm_group:
                     self.add_user_to_group(user_id=userrep["id"], group_id=realm_group["id"], realm=realm)
-                # TODO: raise if user not found
+                else:
+                    self.module.fail_json(
+                        msg=f"Could not update group membership for user {userrep['username']} in realm {realm}: group not found {group_to_add}"
+                    )
 
             for group_to_remove in groups_to_remove:
                 realm_group = self.find_group_by_path(group_to_remove, realm=realm)
                 if realm_group:
                     self.remove_user_from_group(user_id=userrep["id"], group_id=realm_group["id"], realm=realm)
-                # TODO: raise if user not found
+                else:
+                    self.module.fail_json(
+                        msg=f"Could not update group membership for user {userrep['username']} in realm {realm}: group not found {group_to_remove}"
+                    )
 
             return True
         except Exception as e:
