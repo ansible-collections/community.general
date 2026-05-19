@@ -498,29 +498,19 @@ def main():
     # Default values for user_created
     result["user_created"] = False
     changed = False
+    after_user = {}
 
-    # Cater for when it doesn't exist (an empty dict)
     if state == "absent":
         if not before_user:
             # Do nothing and exit
-            if module._diff:
-                result["diff"] = dict(before="", after="")
-            result["changed"] = False
-            result["end_state"] = {}
-            result["msg"] = "Role does not exist, doing nothing."
-            module.exit_json(**result)
+            result["msg"] = "User does not exist, doing nothing."
         else:
             # Delete user
-            if module._diff:
-                result["diff"] = dict(before=before_user, after="")
-
             if not module.check_mode:
                 kc.delete_user(user_id=before_user["id"], realm=realm)
-                result["msg"] = f"User {before_user['username']} deleted"
+            result["msg"] = f"User {before_user['username']} deleted"
             changed = True
-
     else:
-        after_user = {}
         if force and before_user and not module.check_mode:  # If the force option is set to true
             # Delete the existing user
             kc.delete_user(user_id=before_user["id"], realm=realm)
@@ -535,18 +525,17 @@ def main():
             if module._diff:
                 result["diff"] = dict(before=before_user, after=desired_user)
 
-            if module.check_mode:
-                # Set user_created flag explicit for check_mode
-                # create_user could have failed, but we don't know for sure until we try to create the user.'
-                result["user_created"] = True
-            else:
+            if not module.check_mode:
                 # Create the user
                 after_user = kc.create_user(userrep=desired_user, realm=realm)
-                result["msg"] = f"User {desired_user['username']} created"
-                # Add user ID to new representation
+                # Add user ID to desired_user for group updates
                 desired_user["id"] = after_user["id"]
-                # Set user_created flag
-                result["user_created"] = True
+            else:
+                after_user = desired_user
+            
+            result["msg"] = f"User {desired_user['username']} created"
+            # Set user_created flag
+            result["user_created"] = True
         else:
             # Update an existing user
             excludes = [
@@ -560,9 +549,6 @@ def main():
                 "clientConsents",
                 "federatedIdentities",
             ]
-            # Add user ID to new representation
-            desired_user["id"] = before_user["id"]
-
             # Compare users
             if not (
                 is_struct_included(desired_user, before_user, excludes, empty_list_result=False)
@@ -570,45 +556,37 @@ def main():
                 # Update the user
                 if not module.check_mode:
                     after_user = kc.update_user(userrep=desired_user, realm=realm)
-
-                changed = True
-
-        if not module.check_mode:
-            # set user groups
-            if kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
-                changed = True
-
-        if module._diff:
-            present_groups = [g["name"] for g in groups if g["state"] == "present"]
-            absent_groups = [g["name"] for g in groups if g["state"] == "absent"]
-
-            desired_user["groups"] = (set(before_groups) | set(present_groups)) - set(absent_groups)
-
-            if module.check_mode:
-                # after_user will not have changed, so use the desired user
-                result["diff"] = dict(before=before_user, after=desired_user)
-                changed = changed or not is_struct_included(
-                    groups, before_user["groups"], excludes, empty_list_result=False
-                )
-            else:
-                after_groups = (
-                    kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
-                )
-                if after_user:
-                    after_user["groups"] = after_groups
-                    result["diff"] = dict(before=before_user, after=after_user)
                 else:
-                    result["diff"] = dict(
-                        before={"groups": sorted(before_groups)}, after={"groups": sorted(after_groups)}
-                    )
+                    after_user = desired_user
 
-        result["end_state"] = after_user
+                changed = True
+        
+        # set user groups
+        if not module.check_mode:
+            changed |= kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm)
+
+        present_groups = [g["name"] for g in groups if g["state"] == "present"]
+        absent_groups = [g["name"] for g in groups if g["state"] == "absent"]
+
+        desired_user["groups"] = (set(before_groups) | set(present_groups)) - set(absent_groups)
+
+        if module.check_mode:
+            # after_user will not have changed, so use the desired user
+            changed |= not is_struct_included(
+                groups, before_user["groups"], excludes, empty_list_result=False
+            )
+        else:
+            after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
+
+    
+    if not result["msg"]:
         if changed:
             result["msg"] = f"User {desired_user['username']} updated"
         else:
             result["msg"] = f"No changes made for user {desired_user['username']}"
-
+    result["end_state"] = after_user
     result["changed"] = changed
+    result["diff"] = dict(before=before_user, after=after_user)
     module.exit_json(**result)
 
 
