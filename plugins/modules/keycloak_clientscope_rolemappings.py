@@ -157,11 +157,6 @@ from ansible_collections.community.general.plugins.module_utils._keycloak import
 
 
 def main():
-    """
-    Module execution
-
-    :return:
-    """
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
