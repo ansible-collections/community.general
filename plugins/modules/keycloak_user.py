@@ -571,12 +571,12 @@ def main():
         desired_user["groups"] = (set(before_groups) | set(present_groups)) - set(absent_groups)
 
         if module.check_mode:
-            # after_user will not have changed, so use the desired user
-            changed |= not is_struct_included(groups, before_user["groups"], excludes, empty_list_result=False)
-        else:
-            after_user["groups"] = (
-                kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
+            # check if group meberships would have changed
+            changed |= not is_struct_included(
+                desired_user["groups"], before_user["groups"], excludes, empty_list_result=False
             )
+        else:
+            after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
 
     if not result["msg"]:
         if changed:
