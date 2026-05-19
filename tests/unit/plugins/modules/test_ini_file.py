@@ -56,6 +56,7 @@ def test_no_ignore_spaces_unchanged():
 
 class FakeModule:
     """Minimal AnsibleModule stub for do_ini unit tests."""
+
     _diff = False
     check_mode = False
     tmpdir = tempfile.gettempdir()
@@ -73,10 +74,12 @@ class FakeModule:
 @pytest.fixture()
 def ini_file_path(tmp_path):
     """Return a factory that writes content to a temp ini file and yields the path."""
+
     def _make(content):
         p = tmp_path / "test.ini"
         p.write_text(content)
         return str(p)
+
     return _make
 
 
@@ -119,12 +122,8 @@ def test_ini_file_doc_comment_lines_not_deleted_gh11919(ini_file_path):
 
     result = open(path).read()
 
-    assert "; output_buffering\n" in result, (
-        "Doc comment '; output_buffering' must not be deleted"
-    )
-    assert "output_buffering = 123\n" in result, (
-        "Active config 'output_buffering = 123' must be present"
-    )
+    assert "; output_buffering\n" in result, "Doc comment '; output_buffering' must not be deleted"
+    assert "output_buffering = 123\n" in result, "Active config 'output_buffering = 123' must be present"
     assert ";output_buffering = 4096\n" not in result, (
         "Old commented config ';output_buffering = 4096' must be replaced"
     )
@@ -133,10 +132,7 @@ def test_ini_file_doc_comment_lines_not_deleted_gh11919(ini_file_path):
 def test_ini_file_commented_config_replaced_not_duplicated_gh11919(ini_file_path):
     """Companion to gh11919: the commented config line must be replaced in-place,
     not left behind alongside the new active line."""
-    content = (
-        "[PHP]\n"
-        ";output_buffering = 4096\n"
-    )
+    content = "[PHP]\n;output_buffering = 4096\n"
     path = ini_file_path(content)
 
     ini_file.do_ini(
