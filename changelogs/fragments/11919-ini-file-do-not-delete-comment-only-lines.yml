@@ -1,0 +1,2 @@
+bugfixes:
+  - ini_file - do not delete comment-only lines that contain the option name (for example, ``; output_buffering``) when ``state=present`` and ``exclusive=true``; only lines that are actual configuration entries (with ``=``) are now considered for replacement or deletion (https://github.com/ansible-collections/community.general/issues/11919).
