@@ -149,6 +149,10 @@ class ActionModule(ActionBase):
             # 3. Confirm the restored state by removing the backup on the remote.
             #    Retrieve the results of the asynchronous task to return them.
             if "_back" in module_args:
+                # If _back is there, the following two are defined:
+                assert starter_cmd is not None
+                assert confirm_cmd is not None
+
                 async_status_args["jid"] = result.get("ansible_job_id", None)
                 if async_status_args["jid"] is None:
                     raise AnsibleActionFail("Unable to get 'ansible_job_id'.")
@@ -170,7 +174,7 @@ class ActionModule(ActionBase):
                     except AttributeError:
                         pass
 
-                    for dummy in range(max_timeout):
+                    for dummy2 in range(max_timeout):
                         time.sleep(1)
                         remaining_time -= 1
                         # - AnsibleConnectionFailure covers rejected requests (i.e.
@@ -178,7 +182,7 @@ class ActionModule(ActionBase):
                         # - ansible_timeout is able to cover dropped requests (due
                         #   to a rule or policy DROP) if not lower than async_val.
                         try:
-                            dummy = self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
+                            dummy3 = self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
                             break
                         except AnsibleConnectionFailure:
                             continue
@@ -196,7 +200,7 @@ class ActionModule(ActionBase):
                             del result["invocation"]["module_args"][key]
 
                 async_status_args["mode"] = "cleanup"
-                dummy = self._async_result(async_status_args, task_vars, 0)
+                dummy4 = self._async_result(async_status_args, task_vars, 0)
 
         if not wrap_async:
             # remove a temporary path we created
