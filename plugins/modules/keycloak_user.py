@@ -36,7 +36,7 @@ options:
   email_verified:
     description:
       - Set or reset the I(emailVerified) flag of the user.
-      - When O(email_verified_behavior) is set to no_defaults,
+      - When O(email_verified_behavior) is set to C(no_defaults),
         that means the default value here becomes C(None) and
         that causes the module not to change any existing value for that attribute.
     type: bool
@@ -207,7 +207,7 @@ options:
         user expects different behavior from keycloak by default.
       - The default value of this option is C(compatibility), which will ensure that the old default value
         for O(email_verified) is used.
-      - When set to O(no_defaults), the module will not change existing values of O(email_verified) if no value is specified.
+      - When set to C(no_defaults), the module will not change existing values of O(email_verified) if no value is specified.
     type: str
     choices:
       - compatibility
