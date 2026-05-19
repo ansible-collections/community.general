@@ -1,3 +1,4 @@
+plugins/action/iptables_state.py no-assert
 plugins/module_utils/_crypt.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/module_utils/_crypt.py import-3.12  # Uses deprecated stdlib library 'crypt'
 plugins/module_utils/_lxc.py pylint:ansible-bad-function  # needs to use Popen() to stream logs

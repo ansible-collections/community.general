@@ -91,10 +91,12 @@ class ActionModule(ActionBase):
                 raise AnsibleError(
                     f"Failed to determine system distribution. {to_native(module_output['module_stdout'])}, {to_native(module_output['module_stderr'])}"
                 )
+            # For some reason, ansible-core insists of using "object" for "arbitrary JSON", which makes it very awkward to use the result...
+            ansible_facts: dict[str, t.Any] = module_output["ansible_facts"]  # type: ignore
             distribution: Distribution = {
-                "name": module_output["ansible_facts"]["ansible_distribution"].lower(),
-                "version": to_text(module_output["ansible_facts"]["ansible_distribution_version"].split(".")[0]),
-                "family": to_text(module_output["ansible_facts"]["ansible_os_family"].lower()),
+                "name": ansible_facts["ansible_distribution"].lower(),
+                "version": to_text(ansible_facts["ansible_distribution_version"].split(".")[0]),
+                "family": to_text(ansible_facts["ansible_os_family"].lower()),
             }
             display.debug(f"{self._task.action}: distribution: {distribution}")
             return distribution
@@ -112,7 +114,8 @@ class ActionModule(ActionBase):
                 module_name="ansible.legacy.find",
                 module_args={"paths": find_search_paths, "patterns": [command], "file_type": "any"},
             )
-            return [x["path"] for x in find_result["files"]]
+            files: list[dict[str, t.Any]] = find_result["files"]  # type: ignore
+            return [x["path"] for x in files]
 
         shutdown_bin = self._get_value_from_facts(self.SHUTDOWN_COMMANDS, distribution, self.DEFAULT_SHUTDOWN_COMMAND)
         default_search_paths = ["/sbin", "/usr/sbin", "/usr/local/sbin"]
@@ -159,7 +162,7 @@ class ActionModule(ActionBase):
 
     def perform_shutdown(self, task_vars, distribution) -> dict[str, t.Any]:
         result: dict[str, t.Any] = {}
-        shutdown_result = {}
+        shutdown_result: dict[str, t.Any] = {}
         shutdown_command_exec = self.get_shutdown_command(task_vars, distribution)
 
         self.cleanup(force=True)
@@ -169,7 +172,9 @@ class ActionModule(ActionBase):
             if self._play_context.check_mode:
                 shutdown_result["rc"] = 0
             else:
-                shutdown_result = self._low_level_execute_command(shutdown_command_exec, sudoable=self.DEFAULT_SUDOABLE)
+                shutdown_result.update(
+                    self._low_level_execute_command(shutdown_command_exec, sudoable=self.DEFAULT_SUDOABLE)
+                )
         except AnsibleConnectionFailure as e:
             # If the connection is closed too quickly due to the system being shutdown, carry on
             display.debug(f"{self._task.action}: AnsibleConnectionFailure caught and handled: {e}")
