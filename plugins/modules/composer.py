@@ -186,9 +186,10 @@ def composer_command(module, command, arguments=None, options=None):
 
     if global_command:
         global_arg = ["global"]
+        working_dir_option = []
     else:
         global_arg = []
-        options.extend(["--working-dir", module.params["working_dir"]])
+        working_dir_option = ["--working-dir", module.params["working_dir"]]
 
     if module.params["executable"] is None:
         php_path = module.get_bin_path("php", True, ["/usr/local/bin"])
@@ -200,8 +201,57 @@ def composer_command(module, command, arguments=None, options=None):
     else:
         composer_path = module.params["composer_executable"]
 
-    cmd = [php_path, composer_path] + global_arg + command + options + arguments
+    cmd = [php_path, composer_path] + working_dir_option + global_arg + command + options + arguments
     return module.run_command(cmd)
+
+
+def get_composer_home(module):
+    """Get the composer home directory by running 'composer config --global home'."""
+    if module.params["executable"] is None:
+        php_path = module.get_bin_path("php", True, ["/usr/local/bin"])
+    else:
+        php_path = module.params["executable"]
+
+    if module.params["composer_executable"] is None:
+        composer_path = module.get_bin_path("composer", True, ["/usr/local/bin"])
+    else:
+        composer_path = module.params["composer_executable"]
+
+    cmd = [php_path, composer_path, "config", "--global", "--no-interaction", "home"]
+    rc, out, err = module.run_command(cmd)
+    if rc == 0:
+        return out.strip()
+    return None
+
+
+def get_config_files(module):
+    """Get list of config files that might be changed by 'composer config'."""
+    files = []
+    global_command = module.params["global_command"]
+    working_dir = module.params["working_dir"]
+
+    if global_command:
+        composer_home = get_composer_home(module)
+        if composer_home:
+            for f in ("config.json", "auth.json"):
+                files.append(os.path.join(composer_home, f))
+    else:
+        if working_dir:
+            for f in ("composer.json", "auth.json"):
+                files.append(os.path.join(working_dir, f))
+
+    return files
+
+
+def hash_config_files(module, files):
+    """Return a dict mapping file path to its sha256 hash (or None if the file does not exist)."""
+    hashes = {}
+    for f in files:
+        if os.path.isfile(f):
+            hashes[f] = module.sha256(f)
+        else:
+            hashes[f] = None
+    return hashes
 
 
 def main():
@@ -280,6 +330,12 @@ def main():
         else:
             module.exit_json(skipped=True, msg=f"command '{command}' does not support check mode, skipping")
 
+    # For 'config' command in non-check mode, use sha256 hashing to detect changes
+    use_hash_detection = (command == "config" and not module.check_mode)
+    if use_hash_detection:
+        config_files = get_config_files(module)
+        hashes_before = hash_config_files(module, config_files)
+
     rc, out, err = composer_command(module, [command], arguments, options)
 
     if rc != 0:
@@ -288,7 +344,12 @@ def main():
     else:
         # Composer version > 1.0.0-alpha9 now use stderr for standard notification messages
         output = parse_out(out + err)
-        module.exit_json(changed=has_changed(output), msg=output, stdout=out + err)
+        if use_hash_detection:
+            hashes_after = hash_config_files(module, config_files)
+            changed = hashes_before != hashes_after
+        else:
+            changed = has_changed(output)
+        module.exit_json(changed=changed, msg=output, stdout=out + err)
 
 
 if __name__ == "__main__":
