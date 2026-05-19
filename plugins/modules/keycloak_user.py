@@ -556,10 +556,11 @@ def main():
                 # Update the user
                 if not module.check_mode:
                     after_user = kc.update_user(userrep=desired_user, realm=realm)
-                else:
-                    after_user = desired_user
-
                 changed = True
+
+            if not after_user:
+                # no change
+                after_user = desired_user
 
         # set user groups
         if not module.check_mode:
