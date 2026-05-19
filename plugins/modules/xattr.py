@@ -159,7 +159,7 @@ def main():
         module.fail_json(msg="path not found or not accessible!")
 
     if state == 'read' and key is None:
-        #NOTE: This is backwards compatible, but should go away once we deprecate and remove 'info states'
+        # NOTE: This is backwards compatible, but should go away if we deprecate and remove 'info states'
         module.warn('No key provided for state "read", assuming you really want "all"')
         state == 'all'
 
