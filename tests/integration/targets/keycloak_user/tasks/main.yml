@@ -80,7 +80,7 @@
     var: create_result
 
 - name: Assert user is created
-  assert:
+  ansible.builtin.assert:
     that:
       - create_result.changed
       - create_result.end_state.username == 'test'
@@ -108,7 +108,7 @@
     var: delete_result
 
 - name: Assert user is deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - delete_result.changed
       - delete_result.end_state | length == 0
@@ -128,7 +128,7 @@
   register: plus_create_result
 
 - name: Assert plus-addressed user is created
-  assert:
+  ansible.builtin.assert:
     that:
       - plus_create_result.changed
       - plus_create_result.end_state.username == 'testuser+tag'
@@ -149,7 +149,7 @@
   register: plus_idempotent_result
 
 - name: Assert plus-addressed user is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - plus_idempotent_result is not changed
 
@@ -165,10 +165,9 @@
   register: plus_delete_result
 
 - name: Assert plus-addressed user is deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - plus_delete_result.changed
-
 
 - name: Create user again
   community.general.keycloak_user:
@@ -186,11 +185,11 @@
   register: create_result
 
 - name: Assert user is created without email_verified
-  assert:
+  ansible.builtin.assert:
     that:
       - create_result.changed
       - create_result.end_state.username == 'test'
-      - create_result.end_state.email_verified == False
+      - create_result.end_state.emailVerified == false
 
 - name: Set email_verified
   community.general.keycloak_user:
@@ -205,16 +204,15 @@
     email: ceciestuntestes@test.com
     groups: "{{ keycloak_user_groups }}"
     attributes: "{{ keycloak_user_attributes }}"
-    email_verified: True
+    email_verified: true
     state: present
   register: create_result
 
 - name: Assert email_verified is set
-  assert:
+  ansible.builtin.assert:
     that:
       - create_result.changed
-      - create_result.end_state.email_verified == True
-
+      - create_result.end_state.emailVerified == True
 
 - name: Leave email_verified as it is
   community.general.keycloak_user:
@@ -232,10 +230,10 @@
   register: create_result
 
 - name: Assert email_verified is still set
-  assert:
+  ansible.builtin.assert:
     that:
       - not create_result.changed
-      - create_result.end_state.email_verified == True
+      - create_result.end_state.emailVerified == True
 
 - name: Test old email_verified behavior
   community.general.keycloak_user:
@@ -252,7 +250,7 @@
   register: create_result
 
 - name: Assert email_verified is reset
-  assert:
+  ansible.builtin.assert:
     that:
       - create_result.changed
-      - create_result.end_state.email_verified == False
+      - create_result.end_state.emailVerified == False
