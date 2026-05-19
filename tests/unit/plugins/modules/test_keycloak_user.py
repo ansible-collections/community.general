@@ -245,7 +245,7 @@ class TestKeycloakUser(ModuleTestCase):
             }
         ]
         return_value_update_user_groups_membership = [True]
-        return_get_user_groups = [[],["group1"]]
+        return_get_user_groups = [[], ["group1"]]
         return_create_user = None
         return_delete_user = None
         return_update_user = [
