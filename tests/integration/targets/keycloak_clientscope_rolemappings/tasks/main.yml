@@ -186,7 +186,7 @@
   assert:
     that:
       - result is failed
-      - "result.msg == 'Failed to retrive role \\'myrealm.backend-client.client-role-missing\\''"
+      - "result.msg == 'Failed to retrieve role \\'myrealm.backend-client.client-role-missing\\''"
 
 - name: Map roles duplicate
   community.general.keycloak_clientscope_rolemappings:
@@ -302,7 +302,7 @@
   assert:
     that:
       - result is failed
-      - "result.msg == 'Failed to retrive role \\'myrealm.client-role-missing\\''"
+      - "result.msg == 'Failed to retrieve role \\'myrealm.client-role-missing\\''"
 
 - name: Check-mode try to Map realm roles to public client
   community.general.keycloak_clientscope_rolemappings:
