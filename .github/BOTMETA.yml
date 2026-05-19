@@ -159,6 +159,8 @@ files:
     maintainers: Ajpantuso
   $filters/from_ini.py:
     maintainers: sscheib
+  $filters/from_toml.yml:
+    maintainers: spike77453
   $filters/groupby_as_dict.py:
     maintainers: felixfontein
   $filters/hashids.py:
@@ -221,8 +223,6 @@ files:
     maintainers: resmo
   $filters/to_time_unit.yml:
     maintainers: resmo
-  $filters/to_toml.py:
-    maintainers: milliams
   $filters/to_toml.yml:
     maintainers: milliams
   $filters/to_weeks.yml:
@@ -233,6 +233,8 @@ files:
     maintainers: felixfontein
   $filters/to_years.yml:
     maintainers: resmo
+  $filters/toml.py:
+    maintainers: milliams
   $filters/unicode_normalize.py:
     maintainers: Ajpantuso
   $filters/version_sort.py:

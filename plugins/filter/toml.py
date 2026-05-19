@@ -12,7 +12,7 @@ from ansible.module_utils.common.text.converters import to_text
 
 TOMLKIT_IMPORT_ERROR: ImportError | None
 try:
-    from tomlkit import dumps
+    from tomlkit import dumps, loads
 except ImportError as imp_exc:
     TOMLKIT_IMPORT_ERROR = imp_exc
 else:
@@ -43,8 +43,17 @@ def to_toml(value: t.Mapping, *, redact_sensitive_values: bool = False) -> str:
     )
 
 
+def from_toml(value: t.LiteralString) -> t.Mapping:
+    if TOMLKIT_IMPORT_ERROR:
+        raise AnsibleError("tomlkit must be installed to use this plugin") from TOMLKIT_IMPORT_ERROR
+    if not isinstance(value, str):
+        raise AnsibleFilterError("from_toml only accepts strings.")
+    return loads(value).unwrap()
+
+
 class FilterModule:
     def filters(self):
         return {
             "to_toml": to_toml,
+            "from_toml": from_toml,
         }
