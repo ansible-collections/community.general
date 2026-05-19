@@ -532,7 +532,7 @@ def main():
                 desired_user["id"] = after_user["id"]
             else:
                 after_user = desired_user
-            
+
             result["msg"] = f"User {desired_user['username']} created"
             # Set user_created flag
             result["user_created"] = True
@@ -560,7 +560,7 @@ def main():
                     after_user = desired_user
 
                 changed = True
-        
+
         # set user groups
         if not module.check_mode:
             changed |= kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm)
@@ -572,13 +572,12 @@ def main():
 
         if module.check_mode:
             # after_user will not have changed, so use the desired user
-            changed |= not is_struct_included(
-                groups, before_user["groups"], excludes, empty_list_result=False
-            )
+            changed |= not is_struct_included(groups, before_user["groups"], excludes, empty_list_result=False)
         else:
-            after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
+            after_user["groups"] = (
+                kc.get_user_groups(user_id=desired_user["id"], realm=realm) if "id" in desired_user else []
+            )
 
-    
     if not result["msg"]:
         if changed:
             result["msg"] = f"User {desired_user['username']} updated"
