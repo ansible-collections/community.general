@@ -84,7 +84,7 @@
     that:
       - create_result.changed
       - create_result.end_state.username == 'test'
-      - create_result.end_state.attributes | length == 3
+      - create_result.end_state.userProfileMetadata.attributes | length == 4
       - create_result.end_state.groups | length == 2
 
 - name: Delete User
@@ -168,3 +168,91 @@
   assert:
     that:
       - plus_delete_result.changed
+
+
+- name: Create user again
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+    email_verified_behavior: no_defaults
+  register: create_result
+
+- name: Assert user is created without email_verified
+  assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.username == 'test'
+      - create_result.end_state.email_verified == False
+
+- name: Set email_verified
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    email_verified: True
+    state: present
+  register: create_result
+
+- name: Assert email_verified is set
+  assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.email_verified == True
+
+
+- name: Leave email_verified as it is
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+    email_verified_behavior: no_defaults
+  register: create_result
+
+- name: Assert email_verified is still set
+  assert:
+    that:
+      - not create_result.changed
+      - create_result.end_state.email_verified == True
+
+- name: Test old email_verified behavior
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+  register: create_result
+
+- name: Assert email_verified is reset
+  assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.email_verified == False
