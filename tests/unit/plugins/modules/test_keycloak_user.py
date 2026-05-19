@@ -146,14 +146,14 @@ class TestKeycloakUser(ModuleTestCase):
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 1)
         self.assertEqual(mock_update_user_groups_membership.call_count, 1)
-        self.assertEqual(mock_get_user_groups.call_count, 0)
+        self.assertEqual(mock_get_user_groups.call_count, 1)
         self.assertEqual(mock_update_user.call_count, 0)
         self.assertEqual(mock_delete_user.call_count, 0)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]["changed"], changed)
 
-    def test_add_exiting_user_no_change(self):
+    def test_add_existing_user_no_change(self):
         """Add a new user"""
 
         module_args = {
@@ -179,7 +179,7 @@ class TestKeycloakUser(ModuleTestCase):
             }
         ]
         return_value_update_user_groups_membership = [False]
-        return_get_user_groups = [[]]
+        return_get_user_groups = [[], []]
         return_create_user = None
         return_delete_user = None
         return_update_user = None
@@ -210,7 +210,7 @@ class TestKeycloakUser(ModuleTestCase):
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 0)
         self.assertEqual(mock_update_user_groups_membership.call_count, 1)
-        self.assertEqual(mock_get_user_groups.call_count, 1)
+        self.assertEqual(mock_get_user_groups.call_count, 2)
         self.assertEqual(mock_update_user.call_count, 0)
         self.assertEqual(mock_delete_user.call_count, 0)
 
@@ -245,7 +245,7 @@ class TestKeycloakUser(ModuleTestCase):
             }
         ]
         return_value_update_user_groups_membership = [True]
-        return_get_user_groups = [["group1"]]
+        return_get_user_groups = [[],["group1"]]
         return_create_user = None
         return_delete_user = None
         return_update_user = [
@@ -290,7 +290,7 @@ class TestKeycloakUser(ModuleTestCase):
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 0)
         self.assertEqual(mock_update_user_groups_membership.call_count, 1)
-        self.assertEqual(mock_get_user_groups.call_count, 1)
+        self.assertEqual(mock_get_user_groups.call_count, 2)
         self.assertEqual(mock_update_user.call_count, 1)
         self.assertEqual(mock_delete_user.call_count, 0)
 
