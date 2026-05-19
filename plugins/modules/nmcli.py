@@ -1941,8 +1941,8 @@ class Nmcli:
         if self.type == "bond":
             options.update(
                 {
-                    "arp-interval": self.arp_interval,
-                    "arp-ip-target": self.arp_ip_target,
+                    "arp_interval": self.arp_interval,
+                    "arp_ip_target": self.arp_ip_target,
                     "downdelay": self.downdelay,
                     "miimon": self.miimon,
                     "mode": self.mode,
@@ -2474,11 +2474,8 @@ class Nmcli:
                 if key in self.SECRET_OPTIONS:
                     self.edit_commands += [f"set {key} {value}"]
                     continue
-                if key == "xmit_hash_policy":
-                    cmd.extend(["+bond.options", f"xmit_hash_policy={value}"])
-                    continue
-                if key == "fail_over_mac":
-                    cmd.extend(["+bond.options", f"fail_over_mac={value}"])
+                if key in ("xmit_hash_policy", "fail_over_mac", "arp_interval", "arp_ip_target"):
+                    cmd.extend(["+bond.options", f"{key}={value}"])
                     continue
                 cmd.extend([key, value])
 
@@ -2680,7 +2677,7 @@ class Nmcli:
             elif all(
                 [
                     key == self.mtu_setting,
-                    self.type == "dummy",
+                    self.type in ("bond", "bond-slave", "dummy"),
                     current_value is None,
                     value == "auto",
                     self.mtu is None,
