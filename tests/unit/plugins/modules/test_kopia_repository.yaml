@@ -224,11 +224,15 @@ test_cases:
           err: ''
         - *status-ok
 
-  - id: throttle_get
+  - id: throttle_set
     input:
       state: throttled
-      throttle_operation: get
       config: /etc/kopia/root.config
+      throttle:
+        upload_bytes_per_second: 1048576
+        download_bytes_per_second: 5242880
+        concurrent_reads: 4
+        concurrent_writes: 2
     output:
       changed: false
     mocks:
@@ -238,10 +242,105 @@ test_cases:
             - /testbin/kopia
             - repository
             - throttle
-            - get
+            - set
+            - --download-bytes-per-second
+            - "5242880"
+            - --upload-bytes-per-second
+            - "1048576"
+            - --concurrent-reads
+            - "4"
+            - --concurrent-writes
+            - "2"
             - --config-file=/etc/kopia/root.config
           environ: *env-def
           rc: 0
-          out: "upload-speed-limit: 0"
+          out: ''
           err: ''
         - *status-ok
+
+  - id: throttle_set_rate_limits
+    input:
+      state: throttled
+      config: /etc/kopia/root.config
+      throttle:
+        read_requests_per_second: 10.0
+        write_requests_per_second: 5.0
+        list_requests_per_second: 2.5
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *status-ok
+        - command:
+            - /testbin/kopia
+            - repository
+            - throttle
+            - set
+            - --read-requests-per-second
+            - "10.0"
+            - --write-requests-per-second
+            - "5.0"
+            - --list-requests-per-second
+            - "2.5"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *status-ok
+
+  - id: check_mode_create_not_exists
+    flags: {check: true}
+    input:
+      state: created
+      password: secret
+      config: /etc/kopia/root.config
+      backend:
+        provider: s3
+        bucket: my-bucket
+        access_key: myaccesskey
+        secret_access_key: mysecretkey
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *status-empty
+
+  - id: check_mode_create_already_exists
+    flags: {check: true}
+    input:
+      state: created
+      password: secret
+      config: /etc/kopia/root.config
+      backend:
+        provider: s3
+        bucket: my-bucket
+        access_key: myaccesskey
+        secret_access_key: mysecretkey
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *status-ok
+
+  - id: check_mode_disconnect_connected
+    flags: {check: true}
+    input:
+      state: disconnected
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *status-ok
+
+  - id: check_mode_disconnect_not_connected
+    flags: {check: true}
+    input:
+      state: disconnected
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *status-empty

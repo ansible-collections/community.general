@@ -112,6 +112,27 @@ def fmt_backend(value):
     return result
 
 
+def _fmt_throttle(value):
+    """Format the throttle dict into --flag value arguments for kopia repository throttle set."""
+    if not value:
+        return []
+    flag_map = {
+        "download_bytes_per_second": "--download-bytes-per-second",
+        "upload_bytes_per_second": "--upload-bytes-per-second",
+        "read_requests_per_second": "--read-requests-per-second",
+        "write_requests_per_second": "--write-requests-per-second",
+        "list_requests_per_second": "--list-requests-per-second",
+        "concurrent_reads": "--concurrent-reads",
+        "concurrent_writes": "--concurrent-writes",
+    }
+    result = []
+    for param, flag in flag_map.items():
+        v = value.get(param)
+        if v is not None:
+            result.extend([flag, str(v)])
+    return result
+
+
 def kopia_runner(module: AnsibleModule, extra_formats: dict | None = None, **kwargs) -> CmdRunner:
     """Create a CmdRunner for the kopia CLI.
 
@@ -127,6 +148,7 @@ def kopia_runner(module: AnsibleModule, extra_formats: dict | None = None, **kwa
         url=cmd_runner_fmt.as_opt_eq_val("--url"),
         config=cmd_runner_fmt.as_opt_eq_val("--config-file"),
         throttle_operation=cmd_runner_fmt.as_list(),
+        throttle=cmd_runner_fmt.as_func(_fmt_throttle),
     )
     if extra_formats:
         formats.update(extra_formats)

@@ -897,6 +897,8 @@ files:
     maintainers: ahussey-redhat
   $modules/kibana_plugin.py:
     maintainers: barryib
+  $modules/kopia_info.py:
+    maintainers: munchtoast
   $modules/kopia_repository.py:
     maintainers: munchtoast
   $modules/krb_ticket.py:

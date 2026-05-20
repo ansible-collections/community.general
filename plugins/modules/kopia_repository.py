@@ -21,7 +21,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
 options:
   state:
     description:
@@ -32,7 +32,7 @@ options:
       connected: Connects to an existing repository or Kopia server.
       disconnected: Disconnects from the current repository.
       synced: Synchronizes the current repository to another backend location.
-      throttled: Sets or gets throttle limits on the current repository.
+      throttled: Sets throttle limits on the current repository.
     default: created
   password:
     description:
@@ -54,13 +54,40 @@ options:
       - Path to the Kopia config file for this repository connection.
       - Defaults to the Kopia default config path when not set.
     type: path
-  throttle_operation:
+  throttle:
     description:
-      - Whether to V(set) or V(get) throttle limits on the repository.
-      - Required if O(state=throttled).
-    type: str
-    choices: [set, get]
-    default: get
+      - Throttle limits for the repository connection.
+      - Only used when O(state=throttled).
+    type: dict
+    suboptions:
+      download_bytes_per_second:
+        description:
+          - Maximum download speed in bytes per second. Set to 0 to disable the limit.
+        type: int
+      upload_bytes_per_second:
+        description:
+          - Maximum upload speed in bytes per second. Set to 0 to disable the limit.
+        type: int
+      read_requests_per_second:
+        description:
+          - Maximum number of read requests per second.
+        type: float
+      write_requests_per_second:
+        description:
+          - Maximum number of write requests per second.
+        type: float
+      list_requests_per_second:
+        description:
+          - Maximum number of list requests per second.
+        type: float
+      concurrent_reads:
+        description:
+          - Maximum number of concurrent read operations.
+        type: int
+      concurrent_writes:
+        description:
+          - Maximum number of concurrent write operations.
+        type: int
   backend:
     description:
       - Backend storage configuration for the repository.
@@ -247,19 +274,13 @@ EXAMPLES = r"""
       bucket: my-synced-bucket
       access_key: myaccesskey
       secret_access_key: mysecretaccesskey
-
-- name: Get throttle settings for the Kopia repository
-  community.general.kopia_repository:
-    state: throttled
-    throttle_operation: get
-    config: /etc/kopia/root.config
 """
 
 RETURN = r"""
 kopia_repository:
   description: Output from the Kopia repository command.
   type: str
-  sample: ""
+  sample: "Connected to repository: s3:/my-bucket/\nConfig file: /etc/kopia/root.config\n..."
   returned: always
 """
 
@@ -282,7 +303,18 @@ class KopiaRepository(StateModuleHelper):
             ),
             fingerprint_tls=dict(type="str"),
             url=dict(type="str"),
-            throttle_operation=dict(type="str", default="get", choices=["set", "get"]),
+            throttle=dict(
+                type="dict",
+                options=dict(
+                    download_bytes_per_second=dict(type="int"),
+                    upload_bytes_per_second=dict(type="int"),
+                    read_requests_per_second=dict(type="float"),
+                    write_requests_per_second=dict(type="float"),
+                    list_requests_per_second=dict(type="float"),
+                    concurrent_reads=dict(type="int"),
+                    concurrent_writes=dict(type="int"),
+                ),
+            ),
             backend=dict(
                 type="dict",
                 options=dict(
@@ -352,7 +384,20 @@ class KopiaRepository(StateModuleHelper):
         self.vars.set("value", self.vars.previous_value, change=True, diff=True)
 
     def __quit_module__(self):
-        self.vars.set("value", self._get()["out"])
+        if self.module.check_mode:
+            self.vars.set("value", self._predict_value())
+        else:
+            self.vars.set("value", self._get()["out"])
+
+    def _predict_value(self):
+        """Predict the post-operation repository status for check mode change detection."""
+        state = self.module.params["state"]
+        previous = self.vars.previous_value
+        if state in ("created", "connected"):
+            return previous if previous is not None else "Connected to repository."
+        if state == "disconnected":
+            return None if previous is not None else previous
+        return previous
 
     def _get(self):
         with self.runner("cli_action config") as ctx:
@@ -367,7 +412,7 @@ class KopiaRepository(StateModuleHelper):
         def process(rc, out, err):
             if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
                 self.do_raise(f"kopia failed with error (rc={rc}): {err}")
-            out = out.rstrip() if out else ""
+            out = out.rstrip()
             return None if out == "" else out
 
         return process
@@ -406,11 +451,11 @@ class KopiaRepository(StateModuleHelper):
 
     def state_throttled(self):
         with self.runner(
-            "cli_action state throttle_operation config",
+            "cli_action state throttle_operation throttle config",
             output_process=self._process_command_output(True),
             check_mode_skip=True,
         ) as ctx:
-            ctx.run(cli_action="repository")
+            ctx.run(cli_action="repository", throttle_operation="set")
 
 
 def main():
