@@ -2928,7 +2928,6 @@ class KeycloakAPI:
         Get a User by its ID.
         :param user_id: ID of the user.
         :param realm: Realm
-        :param user_profile_metadata: (optional) include user profile metadata in the response
         :return: Representation of the user.
         """
         try:
